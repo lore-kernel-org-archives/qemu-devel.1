@@ -7,71 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26043C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B943DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:22:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EADD320DD4
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86CB420DD4
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:22:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IH8YTxvF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EADD320DD4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJ3PAkzA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86CB420DD4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmGy5-0007ra-5y
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44816)
+	id 1jmGyN-0000Qp-P1
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:22:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmGu3-0001wP-9g
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:17:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28789
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmGu1-0001sn-6j
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:17:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55695
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmGu1-00038C-Hq
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:17:54 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmGtz-00037f-Ey
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:17:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592572672;
+ s=mimecast20190719; t=1592572670;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ADLGoijcriWal76g9pZL90rjMe6sgPfFLAkeGhj1ZKQ=;
- b=IH8YTxvFPFHxF+UophBmN8S4diW4frojBJAZRR/WIZurAaUdb5GQiNWoCAUI7kwOdbWGoz
- MBysd9IXjqwaNTQFs69Krr/XEZUBgyoU1bBviHd1HTvFchSv/rcPLtlVjCkLl4JcKt3vWN
- 9/jGq6rm+zoUgTRJ76Rszwurc6OHy8I=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=jPa2YSuhcE8XmFP/p7u4U5O131eiJBvelXpiMbSwNpA=;
+ b=HJ3PAkzALOFY1Y3KKaIc9+t9+r6gGF/zs/+tDumFMMsmie0p/bJPh7HNTiT9zXHXcQCj2R
+ 8BcvvQJWG1+G8jXJnxTXIuc8ThjAQaSMEIoNu5rETEmUU0NjkU4LitPf1d+xfPvzhGgAl4
+ epnlMTCTZicMpewmqvAqVcjKNbcQivg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-anF8DNeBMF2B7yrzLYlAMQ-1; Fri, 19 Jun 2020 09:17:51 -0400
-X-MC-Unique: anF8DNeBMF2B7yrzLYlAMQ-1
+ us-mta-468-5QRxkxiIMZS7ugoNQBWIjA-1; Fri, 19 Jun 2020 09:17:48 -0400
+X-MC-Unique: 5QRxkxiIMZS7ugoNQBWIjA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E134801503;
- Fri, 19 Jun 2020 13:17:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A452910059A1;
+ Fri, 19 Jun 2020 13:17:47 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4916C60F88;
- Fri, 19 Jun 2020 13:17:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C43C60F88;
+ Fri, 19 Jun 2020 13:17:47 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A0BEE9D95; Fri, 19 Jun 2020 15:17:41 +0200 (CEST)
+ id 963BE9D94; Fri, 19 Jun 2020 15:17:41 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 7/7] hw/audio/gus: Fix registers 32-bit access
-Date: Fri, 19 Jun 2020 15:17:41 +0200
-Message-Id: <20200619131741.10857-8-kraxel@redhat.com>
+Subject: [PULL 6/7] audio/jack: simplify the re-init code path
+Date: Fri, 19 Jun 2020 15:17:40 +0200
+Message-Id: <20200619131741.10857-7-kraxel@redhat.com>
 In-Reply-To: <20200619131741.10857-1-kraxel@redhat.com>
 References: <20200619131741.10857-1-kraxel@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
@@ -95,62 +91,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Allan Peramaki <aperamak@pp1.inet.fi>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-stable@nongnu.org
+Cc: Geoffrey McRae <geoff@hostfission.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Allan Peramaki <aperamak@pp1.inet.fi>
+From: Geoffrey McRae <geoff@hostfission.com>
 
-Fix audio on software that accesses DRAM above 64k via register
-peek/poke and some cases when more than 16 voices are used.
+Instead of checking for the audodev state in each code path, centralize
+the check into the initialize function itself to make it safe to call it
+at any time.
 
-Cc: qemu-stable@nongnu.org
-Fixes: 135f5ae1974c ("audio: GUSsample is int16_t")
-Signed-off-by: Allan Peramaki <aperamak@pp1.inet.fi>
-Tested-by: Volker Rümelin <vr_qemu@t-online.de>
-Reviewed-by: Volker Rümelin <vr_qemu@t-online.de>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200618103623.6031-1-philmd@redhat.com
-Message-Id: <20200615201757.16868-1-aperamak@pp1.inet.fi>
-[PMD: Removed unrelated style changes]
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+Message-id: 20200613040518.38172-7-geoff@hostfission.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/gusemu_hal.c   | 2 +-
- hw/audio/gusemu_mixer.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ audio/jackaudio.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/audio/gusemu_hal.c b/hw/audio/gusemu_hal.c
-index ae40ca341cc4..5b9a14ee21b6 100644
---- a/hw/audio/gusemu_hal.c
-+++ b/hw/audio/gusemu_hal.c
-@@ -32,7 +32,7 @@
+diff --git a/audio/jackaudio.c b/audio/jackaudio.c
+index b2b53985ae61..72ed7c492998 100644
+--- a/audio/jackaudio.c
++++ b/audio/jackaudio.c
+@@ -395,6 +395,10 @@ static int qjack_client_init(QJackClient *c)
+     char client_name[jack_client_name_size()];
+     jack_options_t options = JackNullOption;
  
- #define GUSregb(position) (*            (gusptr+(position)))
- #define GUSregw(position) (*(uint16_t *) (gusptr+(position)))
--#define GUSregd(position) (*(uint16_t *)(gusptr+(position)))
-+#define GUSregd(position) (*(uint32_t *)(gusptr + (position)))
++    if (c->state == QJACK_STATE_RUNNING) {
++        return 0;
++    }
++
+     c->connect_ports = true;
  
- /* size given in bytes */
- unsigned int gus_read(GUSEmuState * state, int port, int size)
-diff --git a/hw/audio/gusemu_mixer.c b/hw/audio/gusemu_mixer.c
-index 00b9861b92b2..56300de77e44 100644
---- a/hw/audio/gusemu_mixer.c
-+++ b/hw/audio/gusemu_mixer.c
-@@ -28,7 +28,7 @@
+     snprintf(client_name, sizeof(client_name), "%s-%s",
+@@ -485,9 +489,7 @@ static int qjack_init_out(HWVoiceOut *hw, struct audsettings *as,
+     QJackOut *jo  = (QJackOut *)hw;
+     Audiodev *dev = (Audiodev *)drv_opaque;
  
- #define GUSregb(position)  (*            (gusptr+(position)))
- #define GUSregw(position)  (*(uint16_t *) (gusptr+(position)))
--#define GUSregd(position)  (*(uint16_t *)(gusptr+(position)))
-+#define GUSregd(position)  (*(uint32_t *)(gusptr + (position)))
+-    if (jo->c.state != QJACK_STATE_DISCONNECTED) {
+-        return 0;
+-    }
++    qjack_client_fini(&jo->c);
  
- #define GUSvoice(position) (*(uint16_t *)(voiceptr+(position)))
+     jo->c.out       = true;
+     jo->c.enabled   = false;
+@@ -523,9 +525,7 @@ static int qjack_init_in(HWVoiceIn *hw, struct audsettings *as,
+     QJackIn  *ji  = (QJackIn *)hw;
+     Audiodev *dev = (Audiodev *)drv_opaque;
  
+-    if (ji->c.state != QJACK_STATE_DISCONNECTED) {
+-        return 0;
+-    }
++    qjack_client_fini(&ji->c);
+ 
+     ji->c.out       = false;
+     ji->c.enabled   = false;
 -- 
 2.18.4
 
