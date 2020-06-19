@@ -4,55 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90923C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B82C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4998320773
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:11:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ABA420773
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="i+8S4y1n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4998320773
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Vb47zuH8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ABA420773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm6Ue-0003oc-HL
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:11:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41940)
+	id 1jm6VH-0004ua-K9
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6QC-0003BE-6o; Thu, 18 Jun 2020 22:06:24 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60065 helo=ozlabs.org)
+ id 1jm6QC-0003BC-6d; Thu, 18 Jun 2020 22:06:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35735 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q9-0000p4-DC; Thu, 18 Jun 2020 22:06:23 -0400
+ id 1jm6Q9-0000p5-Ax; Thu, 18 Jun 2020 22:06:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p2GT35rgz9sT8; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+ id 49p2GT4QHRz9sT9; Fri, 19 Jun 2020 12:06:09 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1592532369;
- bh=rKuvzP3I0zndPbCxEWAF/KYSFkgJfgyIKqNEdtPx2Aw=;
+ bh=mtzkVC37cD70gZZRJwitgnHn1rAt12wP3H2B7h801OA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=i+8S4y1njyzLLozEwk54jAInltcAB7xtL2/XwnGGBQFN7qOQAQ0LZY3Evxk2yTYJd
- 6bUkAK3fV2KpkTo/COE+7OTMowzQkzMykiAVXGhU7yVD8isuUojgXeq1Qi3x0BZowU
- tubDnZmwDpkophHRr3f8elKyeKGTHw6YoExLu9ag=
+ b=Vb47zuH8AeY0Rt1D1epCfmen+R/9FWcG0PkfOkDWsRDehfFaIxDcwBec2zAstER0V
+ /0Apuld5o9ZDSaPq1QqKcZbGISKS9FbMqq0/+k/lQLY+pNvSmSzjBGjQ64shXj9yHz
+ +gVGN2ZqMpWC9V1jeUFXD56PQwZf68UyPuEhsKHE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
  pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
-Subject: [PATCH v3 6/9] host trust limitation: Add Error ** to
- HostTrustLimitation::kvm_init
-Date: Fri, 19 Jun 2020 12:05:59 +1000
-Message-Id: <20200619020602.118306-7-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 9/9] host trust limitation: Alter virtio default properties
+ for protected guests
+Date: Fri, 19 Jun 2020 12:06:02 +1000
+Message-Id: <20200619020602.118306-10-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -78,135 +77,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
- david@redhat.com, mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ cohuck@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+ pasic@linux.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
  David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows failures to be reported richly and idiomatically.
+The default behaviour for virtio devices is not to use the platforms normal
+DMA paths, but instead to use the fact that it's running in a hypervisor
+to directly access guest memory.  That doesn't work if the guest's memory
+is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+
+So, if a host trust limitation mechanism is enabled, then apply the
+iommu_platform=on option so it will go through normal DMA mechanisms.
+Those will presumably have some way of marking memory as shared with the
+hypervisor or hardware so that DMA will work.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/kvm/kvm-all.c                  |  4 +++-
- include/exec/host-trust-limitation.h |  2 +-
- target/i386/sev.c                    | 31 ++++++++++++++--------------
- 3 files changed, 19 insertions(+), 18 deletions(-)
+ hw/core/machine.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9645271ca5..c236ebeae0 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2158,9 +2158,11 @@ static int kvm_init(MachineState *ms)
-     if (ms->htl) {
-         HostTrustLimitationClass *htlc =
-             HOST_TRUST_LIMITATION_GET_CLASS(ms->htl);
-+        Error *local_err = NULL;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index a71792bc16..8dfc1bb3f8 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,6 +28,8 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+ #include "exec/host-trust-limitation.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-pci.h"
  
--        ret = htlc->kvm_init(ms->htl);
-+        ret = htlc->kvm_init(ms->htl, &local_err);
-         if (ret < 0) {
-+            error_report_err(local_err);
-             goto err;
-         }
-     }
-diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
-index fc30ea3f78..d93b537280 100644
---- a/include/exec/host-trust-limitation.h
-+++ b/include/exec/host-trust-limitation.h
-@@ -30,7 +30,7 @@
- typedef struct HostTrustLimitationClass {
-     InterfaceClass parent;
- 
--    int (*kvm_init)(HostTrustLimitation *);
-+    int (*kvm_init)(HostTrustLimitation *, Error **);
-     int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
- } HostTrustLimitationClass;
- 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 052a05d15a..829f78436a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -617,7 +617,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
-     }
- }
- 
--static int sev_kvm_init(HostTrustLimitation *htl)
-+static int sev_kvm_init(HostTrustLimitation *htl, Error **errp)
- {
-     SevGuestState *sev = SEV_GUEST(htl);
-     char *devname;
-@@ -633,14 +633,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     host_cbitpos = ebx & 0x3f;
- 
-     if (host_cbitpos != sev->cbitpos) {
--        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
--                     __func__, host_cbitpos, sev->cbitpos);
-+        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
-+                   __func__, host_cbitpos, sev->cbitpos);
-         goto err;
+ GlobalProperty hw_compat_5_0[] = {
+     { "virtio-balloon-device", "page-poison", "false" },
+@@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
+          * areas.
+          */
+         machine_set_mem_merge(OBJECT(machine), false, &error_abort);
++
++        /*
++         * Virtio devices can't count on directly accessing guest
++         * memory, so they need iommu_platform=on to use normal DMA
++         * mechanisms.  That requires disabling legacy virtio support
++         * for virtio pci devices
++         */
++        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
++        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
      }
  
-     if (sev->reduced_phys_bits < 1) {
--        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
--                     " requested '%d'", __func__, sev->reduced_phys_bits);
-+        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
-+                   " requested '%d'", __func__, sev->reduced_phys_bits);
-         goto err;
-     }
- 
-@@ -649,20 +649,19 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
-     sev->sev_fd = open(devname, O_RDWR);
-     if (sev->sev_fd < 0) {
--        error_report("%s: Failed to open %s '%s'", __func__,
--                     devname, strerror(errno));
--    }
--    g_free(devname);
--    if (sev->sev_fd < 0) {
-+        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
-+                   devname, strerror(errno));
-+        g_free(devname);
-         goto err;
-     }
-+    g_free(devname);
- 
-     ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
-                              &fw_error);
-     if (ret) {
--        error_report("%s: failed to get platform status ret=%d "
--                     "fw_error='%d: %s'", __func__, ret, fw_error,
--                     fw_error_to_str(fw_error));
-+        error_setg(errp, "%s: failed to get platform status ret=%d "
-+                   "fw_error='%d: %s'", __func__, ret, fw_error,
-+                   fw_error_to_str(fw_error));
-         goto err;
-     }
-     sev->build_id = status.build;
-@@ -672,14 +671,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     trace_kvm_sev_init();
-     ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-     if (ret) {
--        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
--                     __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
-+                   __func__, ret, fw_error, fw_error_to_str(fw_error));
-         goto err;
-     }
- 
-     ret = sev_launch_start(sev);
-     if (ret) {
--        error_report("%s: failed to create encryption context", __func__);
-+        error_setg(errp, "%s: failed to create encryption context", __func__);
-         goto err;
-     }
- 
+     machine_class->init(machine);
 -- 
 2.26.2
 
