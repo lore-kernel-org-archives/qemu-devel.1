@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D487C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6337EC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67C4720888
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31B5B20773
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:07:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Mm7MtGBT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C4720888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="drqFS3tp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B5B20773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm6RT-0005HJ-JA
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:07:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41872)
+	id 1jm6RV-0005Lm-Cb
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:07:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q7-0002zP-9F; Thu, 18 Jun 2020 22:06:19 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34221 helo=ozlabs.org)
+ id 1jm6Q6-0002wE-5p; Thu, 18 Jun 2020 22:06:18 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48763)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q3-0000nO-81; Thu, 18 Jun 2020 22:06:18 -0400
+ id 1jm6Q1-0000nR-Qf; Thu, 18 Jun 2020 22:06:17 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p2GS2q6qz9sRk; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+ id 49p2GS51gdz9sSf; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1592532368;
- bh=XEsRFDuyA9etU74BIO7+DftC/mG9MemHlS+RfUcqgWk=;
+ bh=Tyfc+G1PqLXR9Edr87dtqwm5FYWBIwO1iB0LtB7dWSM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Mm7MtGBTWXfvAn9KUWFu1PSbCvov+j8g3pczK4fahDCG5dPcWIQ1oFVn0sbM+L3vj
- MPaMFJSiWnV5XQhIhAaAtRldSguNquShBVzHTuPrM8BPyOyf5r7IPIE3cRfUgGqRDb
- DbZiCB7nl8UBg2P0E5OoVjo4T8jHjyW6d11Q+ta8=
+ b=drqFS3tpsGIz2+f7bAqa/NyDDVa8fH74EB+evMxQBZ+GKXjKVqjxhls6+I8ngzm4X
+ aYxiIo3goBkbOVNhJO3Kxp/sVaSHSc8Yn/BFhn0ZiluUUAP7vKlkigQ70pu7WuRso9
+ DHGoeXqhC1s5d09Esffgc94vIW1vDMUjWYMAEf6g=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
  pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
-Subject: [PATCH v3 2/9] host trust limitation: Handle memory encryption via
- interface
-Date: Fri, 19 Jun 2020 12:05:55 +1000
-Message-Id: <20200619020602.118306-3-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 4/9] host trust limitation: Rework the "memory-encryption"
+ property
+Date: Fri, 19 Jun 2020 12:05:57 +1000
+Message-Id: <20200619020602.118306-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
@@ -77,337 +77,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
- david@redhat.com, mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ cohuck@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+ pasic@linux.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
  David Gibson <david@gibson.dropbear.id.au>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the moment AMD SEV sets a special function pointer, plus an opaque
-handle in KVMState to let things know how to encrypt guest memory.
+Currently the "memory-encryption" property is only looked at once we get to
+kvm_init().  Although protection of guest memory from the hypervisor isn't
+something that could really ever work with TCG, it's not conceptually tied
+to the KVM accelerator.
 
-Now that we have a QOM interface for handling things related to host trust
-limitation, use a QOM method on that interface, rather than a bare function
-pointer for this.
+In addition, the way the string property is resolved to an object is
+almost identical to how a QOM link property is handled.
+
+So, create a new "host-trust-limitation" link property which sets this QOM
+interface link directly in the machine.  For compatibility we keep the
+"memory-encryption" property, but now implemented in terms of the new
+property.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/kvm/kvm-all.c                  |  38 ++++++---
- accel/kvm/sev-stub.c                 |   7 +-
- include/exec/host-trust-limitation.h |   3 +
- include/sysemu/sev.h                 |   4 +-
- target/i386/sev.c                    | 117 +++++++++++----------------
- 5 files changed, 79 insertions(+), 90 deletions(-)
+ accel/kvm/kvm-all.c | 23 +++++++----------------
+ hw/core/machine.c   | 41 ++++++++++++++++++++++++++++++++++++-----
+ include/hw/boards.h |  2 +-
+ 3 files changed, 44 insertions(+), 22 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f24d7da783..1e43e27f45 100644
+index 1e43e27f45..d8e8fa345e 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -39,12 +39,12 @@
- #include "qemu/main-loop.h"
- #include "trace.h"
- #include "hw/irq.h"
--#include "sysemu/sev.h"
- #include "sysemu/balloon.h"
- #include "qapi/visitor.h"
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
- #include "sysemu/reset.h"
-+#include "exec/host-trust-limitation.h"
- 
- #include "hw/boards.h"
- 
-@@ -118,9 +118,8 @@ struct KVMState
-     KVMMemoryListener memory_listener;
-     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
- 
--    /* memory encryption */
--    void *memcrypt_handle;
--    int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-+    /* host trust limitation (e.g. by guest memory encryption) */
-+    HostTrustLimitation *htl;
- 
-     /* For "info mtree -f" to tell if an MR is registered in KVM */
-     int nr_as;
-@@ -222,7 +221,7 @@ int kvm_get_max_memslots(void)
- 
- bool kvm_memcrypt_enabled(void)
- {
--    if (kvm_state && kvm_state->memcrypt_handle) {
-+    if (kvm_state && kvm_state->htl) {
-         return true;
-     }
- 
-@@ -231,10 +230,12 @@ bool kvm_memcrypt_enabled(void)
- 
- int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
- {
--    if (kvm_state->memcrypt_handle &&
--        kvm_state->memcrypt_encrypt_data) {
--        return kvm_state->memcrypt_encrypt_data(kvm_state->memcrypt_handle,
--                                              ptr, len);
-+    HostTrustLimitation *htl = kvm_state->htl;
-+
-+    if (htl) {
-+        HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_GET_CLASS(htl);
-+
-+        return htlc->encrypt_data(htl, ptr, len);
-     }
- 
-     return 1;
-@@ -2180,13 +2181,24 @@ static int kvm_init(MachineState *ms)
+@@ -2180,25 +2180,16 @@ static int kvm_init(MachineState *ms)
+      * if memory encryption object is specified then initialize the memory
       * encryption context.
       */
-     if (ms->memory_encryption) {
--        kvm_state->memcrypt_handle = sev_guest_init(ms->memory_encryption);
--        if (!kvm_state->memcrypt_handle) {
-+        Object *obj = object_resolve_path_component(object_get_objects_root(),
-+                                                    ms->memory_encryption);
-+
-+        if (object_dynamic_cast(obj, TYPE_HOST_TRUST_LIMITATION)) {
-+            HostTrustLimitation *htl = HOST_TRUST_LIMITATION(obj);
-+            HostTrustLimitationClass *htlc
-+                = HOST_TRUST_LIMITATION_GET_CLASS(htl);
-+
-+            ret = htlc->kvm_init(htl);
-+            if (ret < 0) {
-+                goto err;
-+            }
-+
-+            kvm_state->htl = htl;
-+        } else {
-             ret = -1;
+-    if (ms->memory_encryption) {
+-        Object *obj = object_resolve_path_component(object_get_objects_root(),
+-                                                    ms->memory_encryption);
+-
+-        if (object_dynamic_cast(obj, TYPE_HOST_TRUST_LIMITATION)) {
+-            HostTrustLimitation *htl = HOST_TRUST_LIMITATION(obj);
+-            HostTrustLimitationClass *htlc
+-                = HOST_TRUST_LIMITATION_GET_CLASS(htl);
+-
+-            ret = htlc->kvm_init(htl);
+-            if (ret < 0) {
+-                goto err;
+-            }
++    if (ms->htl) {
++        HostTrustLimitationClass *htlc =
++            HOST_TRUST_LIMITATION_GET_CLASS(ms->htl);
+ 
+-            kvm_state->htl = htl;
+-        } else {
+-            ret = -1;
++        ret = htlc->kvm_init(ms->htl);
++        if (ret < 0) {
              goto err;
          }
--
--        kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
++
++        kvm_state->htl = ms->htl;
      }
  
      ret = kvm_arch_init(ms, s);
-diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
-index 4f97452585..9c7c897593 100644
---- a/accel/kvm/sev-stub.c
-+++ b/accel/kvm/sev-stub.c
-@@ -15,12 +15,7 @@
- #include "qemu-common.h"
- #include "sysemu/sev.h"
- 
--int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
--{
--    abort();
--}
--
--void *sev_guest_init(const char *id)
-+HostTrustLimitation *sev_guest_init(const char *id)
- {
-     return NULL;
- }
-diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
-index 03887b1be1..a19f12ae14 100644
---- a/include/exec/host-trust-limitation.h
-+++ b/include/exec/host-trust-limitation.h
-@@ -28,6 +28,9 @@
- 
- typedef struct HostTrustLimitationClass {
-     InterfaceClass parent;
-+
-+    int (*kvm_init)(HostTrustLimitation *);
-+    int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
- } HostTrustLimitationClass;
- 
- #endif /* QEMU_HOST_TRUST_LIMITATION_H */
-diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-index 98c1ec8d38..a4aee6a87d 100644
---- a/include/sysemu/sev.h
-+++ b/include/sysemu/sev.h
-@@ -16,6 +16,6 @@
- 
- #include "sysemu/kvm.h"
- 
--void *sev_guest_init(const char *id);
--int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-+HostTrustLimitation *sev_guest_init(const char *id);
-+
- #endif
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index d273174ad3..052a05d15a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -28,6 +28,7 @@
- #include "sysemu/runstate.h"
- #include "trace.h"
- #include "migration/blocker.h"
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index fdc0c7e038..a71792bc16 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -27,6 +27,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
 +#include "exec/host-trust-limitation.h"
  
- #define TYPE_SEV_GUEST "sev-guest"
- #define SEV_GUEST(obj)                                          \
-@@ -281,26 +282,6 @@ sev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
-     sev->sev_device = g_strdup(value);
- }
- 
--static void
--sev_guest_class_init(ObjectClass *oc, void *data)
--{
--    object_class_property_add_str(oc, "sev-device",
--                                  sev_guest_get_sev_device,
--                                  sev_guest_set_sev_device);
--    object_class_property_set_description(oc, "sev-device",
--            "SEV device to use");
--    object_class_property_add_str(oc, "dh-cert-file",
--                                  sev_guest_get_dh_cert_file,
--                                  sev_guest_set_dh_cert_file);
--    object_class_property_set_description(oc, "dh-cert-file",
--            "guest owners DH certificate (encoded with base64)");
--    object_class_property_add_str(oc, "session-file",
--                                  sev_guest_get_session_file,
--                                  sev_guest_set_session_file);
--    object_class_property_set_description(oc, "session-file",
--            "guest owners session parameters (encoded with base64)");
--}
--
- static void
- sev_guest_instance_init(Object *obj)
+ GlobalProperty hw_compat_5_0[] = {
+     { "virtio-balloon-device", "page-poison", "false" },
+@@ -425,16 +426,37 @@ static char *machine_get_memory_encryption(Object *obj, Error **errp)
  {
-@@ -319,40 +300,6 @@ sev_guest_instance_init(Object *obj)
-                                    OBJ_PROP_FLAG_READWRITE);
- }
+     MachineState *ms = MACHINE(obj);
  
--/* sev guest info */
--static const TypeInfo sev_guest_info = {
--    .parent = TYPE_OBJECT,
--    .name = TYPE_SEV_GUEST,
--    .instance_size = sizeof(SevGuestState),
--    .instance_finalize = sev_guest_finalize,
--    .class_init = sev_guest_class_init,
--    .instance_init = sev_guest_instance_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_USER_CREATABLE },
--        { }
--    }
--};
--
--static SevGuestState *
--lookup_sev_guest_info(const char *id)
--{
--    Object *obj;
--    SevGuestState *info;
--
--    obj = object_resolve_path_component(object_get_objects_root(), id);
--    if (!obj) {
--        return NULL;
--    }
--
--    info = (SevGuestState *)
--            object_dynamic_cast(obj, TYPE_SEV_GUEST);
--    if (!info) {
--        return NULL;
--    }
--
--    return info;
--}
--
- bool
- sev_enabled(void)
- {
-@@ -670,23 +617,15 @@ sev_vm_state_change(void *opaque, int running, RunState state)
-     }
- }
- 
--void *
--sev_guest_init(const char *id)
-+static int sev_kvm_init(HostTrustLimitation *htl)
- {
--    SevGuestState *sev;
-+    SevGuestState *sev = SEV_GUEST(htl);
-     char *devname;
-     int ret, fw_error;
-     uint32_t ebx;
-     uint32_t host_cbitpos;
-     struct sev_user_data_status status = {};
- 
--    sev = lookup_sev_guest_info(id);
--    if (!sev) {
--        error_report("%s: '%s' is not a valid '%s' object",
--                     __func__, id, TYPE_SEV_GUEST);
--        goto err;
--    }
--
-     sev_guest = sev;
-     sev->state = SEV_STATE_UNINIT;
- 
-@@ -748,16 +687,16 @@ sev_guest_init(const char *id)
-     qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-     qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
- 
--    return sev;
-+    return 0;
- err:
-     sev_guest = NULL;
--    return NULL;
-+    return -1;
- }
- 
--int
--sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-+static int
-+sev_encrypt_data(HostTrustLimitation *opaque, uint8_t *ptr, uint64_t len)
- {
--    SevGuestState *sev = handle;
-+    SevGuestState *sev = SEV_GUEST(opaque);
- 
-     assert(sev);
- 
-@@ -769,6 +708,46 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-     return 0;
- }
- 
-+static void
-+sev_guest_class_init(ObjectClass *oc, void *data)
-+{
-+    HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_CLASS(oc);
+-    return g_strdup(ms->memory_encryption);
++    if (ms->htl) {
++        return object_get_canonical_path_component(OBJECT(ms->htl));
++    }
 +
-+    object_class_property_add_str(oc, "sev-device",
-+                                  sev_guest_get_sev_device,
-+                                  sev_guest_set_sev_device);
-+    object_class_property_set_description(oc, "sev-device",
-+        "SEV device to use");
-+    object_class_property_add_str(oc, "dh-cert-file",
-+                                  sev_guest_get_dh_cert_file,
-+                                  sev_guest_set_dh_cert_file);
-+    object_class_property_set_description(oc, "dh-cert-file",
-+        "guest owners DH certificate (encoded with base64)");
-+    object_class_property_add_str(oc, "session-file",
-+                                  sev_guest_get_session_file,
-+                                  sev_guest_set_session_file);
-+    object_class_property_set_description(oc, "session-file",
-+        "guest owners session parameters (encoded with base64)");
++    return NULL;
+ }
+ 
+ static void machine_set_memory_encryption(Object *obj, const char *value,
+                                         Error **errp)
+ {
+-    MachineState *ms = MACHINE(obj);
++    Object *htl =
++        object_resolve_path_component(object_get_objects_root(), value);
 +
-+    htlc->kvm_init = sev_kvm_init;
-+    htlc->encrypt_data = sev_encrypt_data;
++    if (!htl) {
++        error_setg(errp, "No such memory encryption object '%s'", value);
++        return;
++    }
+ 
+-    g_free(ms->memory_encryption);
+-    ms->memory_encryption = g_strdup(value);
++    object_property_set_link(obj, htl, "host-trust-limitation", errp);
 +}
 +
-+/* sev guest info */
-+static const TypeInfo sev_guest_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_SEV_GUEST,
-+    .instance_size = sizeof(SevGuestState),
-+    .instance_finalize = sev_guest_finalize,
-+    .class_init = sev_guest_class_init,
-+    .instance_init = sev_guest_instance_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOST_TRUST_LIMITATION },
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
++static void machine_check_host_trust_limitation(const Object *obj,
++                                                const char *name,
++                                                Object *new_target,
++                                                Error **errp)
++{
++    /*
++     * So far the only constraint is that the target has the
++     * TYPE_HOST_TRUST_LIMITATION interface, and that's checked by the
++     * QOM core
++     */
+ }
+ 
+ static bool machine_get_nvdimm(Object *obj, Error **errp)
+@@ -855,6 +877,15 @@ static void machine_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "enforce-config-section",
+         "Set on to enforce configuration section migration");
+ 
++    object_class_property_add_link(oc, "host-trust-limitation",
++                                   TYPE_HOST_TRUST_LIMITATION,
++                                   offsetof(MachineState, htl),
++                                   machine_check_host_trust_limitation,
++                                   OBJ_PROP_LINK_STRONG);
++    object_class_property_set_description(oc, "host-trust-limitation",
++        "Set host trust limitation object to use");
 +
- static void
- sev_register_types(void)
- {
++    /* For compatibility */
+     object_class_property_add_str(oc, "memory-encryption",
+         machine_get_memory_encryption, machine_set_memory_encryption);
+     object_class_property_set_description(oc, "memory-encryption",
+@@ -1127,7 +1158,7 @@ void machine_run_board_init(MachineState *machine)
+         }
+     }
+ 
+-    if (machine->memory_encryption) {
++    if (machine->htl) {
+         /*
+          * With host trust limitation, the host can't see the real
+          * contents of RAM, so there's no point in it trying to merge
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 18815d9be2..a9f8444729 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -277,7 +277,7 @@ struct MachineState {
+     bool suppress_vmdesc;
+     bool enforce_config_section;
+     bool enable_graphics;
+-    char *memory_encryption;
++    HostTrustLimitation *htl;
+     char *ram_memdev_id;
+     /*
+      * convenience alias to ram_memdev_id backend memory region
 -- 
 2.26.2
 
