@@ -2,97 +2,82 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB3DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 663E9C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:51:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 962F120CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 301A720FC3
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:51:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+Kei2qD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 962F120CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSgbfWPn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 301A720FC3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmFVg-0003L4-Op
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 07:48:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48226)
+	id 1jmFXx-0005tD-EZ
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 07:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jmFUZ-0002aq-O1
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:47:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27607
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jmFXB-0004u4-RF
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:50:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44005
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jmFUW-00044P-6v
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:47:31 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jmFX9-0004dQ-Ko
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:50:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592567247;
+ s=mimecast20190719; t=1592567411;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pYG4SnP9utTFhjO7Aw9Lbue1YiNQktao7ej4RoC/CeA=;
- b=d+Kei2qDSEI2HdHbrav5vCh1k8wZqNI++DR61jn73IpTq7FR4I5T75rVsO6/XNDtG44/UD
- TaMnw+EWGRunARoIlLtNK1/KQlJffzGxswHugCrYEpvWvnkXNw9oEtnRI1pQc8vPu3gZLc
- t8SllOh6rd2u/H5kkaq1WgK9Dh9+M48=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-x1BUy-TGNICgKuw2FPMw3A-1; Fri, 19 Jun 2020 07:47:25 -0400
-X-MC-Unique: x1BUy-TGNICgKuw2FPMw3A-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so4200933wrs.2
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 04:47:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=fDJADSxWgFpnsQhGGo+Y26ipmydYeWZDAFsCiyoQkqI=;
- b=V7zOCYFhLCbtg7hU+3zoyZ8po5JLX25w1B3s0AXSb9b5VBNk9TlVoOYXt90a7vMl4n
- rzCDJPNIFRnGXWx0wDPrRQuWUIT62ufIHsAcaxPTzZEZqxXH/Sw9wMI1k6ow0PG9ocDo
- 8ZZzYPf5qif15QDkah9pEOef6MTw0blEoVs7T45RaIvgROdOXdiJlG9YPetyUoV8t9Gt
- pZB1Htosx1u8kbnBHif88ZwrG6WC2/XRr6V9GBxrgtbYIQpQshxcNsh5mLjoWi8c2c2Q
- 903OnNyEUyuI0qn6SgrekN06xDorzzTiHFgGPG0eAlvB8SjtDcqkbDUzIQHXQ49nKpDL
- r63Q==
-X-Gm-Message-State: AOAM531qxSt0b94M2NphMtLWRG2QRvz0AWCmwu2K5lxaxmo8+rufRAZZ
- rQMEEyS6CAtvRaNHwdVyc83oFXJ0QgH5Ym5CpfgxP0a50aSKUSDRGv0sqKMFTEdxTvNsIlet1+x
- 7bNWd3pzkOWFXLQQ=
-X-Received: by 2002:a5d:4c88:: with SMTP id z8mr3631277wrs.35.1592567244403;
- Fri, 19 Jun 2020 04:47:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJznQGnECWymBeyrfl3qGQ1U09JtwTagONqKA0qZQVXG0ytZb1kr14EWONVwdIDjj42TPeYaFA==
-X-Received: by 2002:a5d:4c88:: with SMTP id z8mr3631251wrs.35.1592567244208;
- Fri, 19 Jun 2020 04:47:24 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id u9sm6745769wme.16.2020.06.19.04.47.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 19 Jun 2020 04:47:23 -0700 (PDT)
-Date: Fri, 19 Jun 2020 07:47:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ bh=2d6kYS4YMCQENlyr9kAT1TLtL+1ud1NYaXO56UzHkE8=;
+ b=hSgbfWPn/muiP1Ngf/Wmi3GWRzlIILxWkK/SSj1Jr+vh087Gw3mR+ViBRp0TMgnoELKCWf
+ tP8VdoZoFIPeuuKrGnX3pzgHSAEyQIT1qq8fosPglKyH7K7IQQN8NCwlpm8OFgSh9cO2/7
+ mhEhwaFrjiuRiMiIawv05ukQZQX9Er0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-yW6SwygCOQOyDvSCH61deQ-1; Fri, 19 Jun 2020 07:50:09 -0400
+X-MC-Unique: yW6SwygCOQOyDvSCH61deQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF22110059A1;
+ Fri, 19 Jun 2020 11:50:07 +0000 (UTC)
+Received: from work-vm (ovpn-114-215.ams2.redhat.com [10.36.114.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 135065BAD7;
+ Fri, 19 Jun 2020 11:49:59 +0000 (UTC)
+Date: Fri, 19 Jun 2020 12:49:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200619074630-mutt-send-email-mst@kernel.org>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-10-david@gibson.dropbear.id.au>
- <20200619101245.GC700896@redhat.com>
- <20200619074432-mutt-send-email-mst@kernel.org>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
+Message-ID: <20200619114957.GG2690@work-vm>
+References: <20200416164907.244868-1-stefanha@redhat.com>
+ <20200618190816.GD3814@redhat.com> <20200618191655.GI2769@work-vm>
+ <20200618192717.GE3814@redhat.com> <20200619082746.GA2690@work-vm>
+ <20200619113914.GI700896@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200619074432-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200619113914.GI700896@redhat.com>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -113,84 +98,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- dgilbert@redhat.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, Vivek Goyal <vgoyal@redhat.com>,
+ Miklos Szeredi <miklos@szeredi.hu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 07:46:14AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrangé wrote:
-> > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
-> > > The default behaviour for virtio devices is not to use the platforms normal
-> > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+* Daniel P. Berrangé (berrange@redhat.com) wrote:
+> On Fri, Jun 19, 2020 at 09:27:46AM +0100, Dr. David Alan Gilbert wrote:
+> > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
+> > > > > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
+> > > > > > whitelisted set of capabilities that we require.  This improves security in
+> > > > > > case virtiofsd is compromised by making it hard for an attacker to gain further
+> > > > > > access to the system.
+> > > > > 
+> > > > > Hi Stefan,
+> > > > > 
+> > > > > I just noticed that this patch set breaks overlayfs on top of virtiofs.
+> > > > > 
+> > > > > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
+> > > > > need CAP_SYS_ADMIN.
+> > > > > 
+> > > > > man xattr says.
+> > > > > 
+> > > > >    Trusted extended attributes
+> > > > >        Trusted  extended  attributes  are  visible and accessible only to pro‐
+> > > > >        cesses that have the  CAP_SYS_ADMIN  capability.   Attributes  in  this
+> > > > >        class are used to implement mechanisms in user space (i.e., outside the
+> > > > >        kernel) which keep information in extended attributes to which ordinary
+> > > > >        processes should not have access.
+> > > > > 
+> > > > > There is a chance that overlay moves away from trusted xattr in future.
+> > > > > But for now we need to make it work. This is an important use case for
+> > > > > kata docker in docker build.
+> > > > > 
+> > > > > May be we can add an option to virtiofsd say "--add-cap <capability>" and
+> > > > > ask user to pass in "--add-cap cap_sys_admin" if they need to run daemon
+> > > > > with this capaibility.
+> > > > 
+> > > > I'll admit I don't like the idea of giving it cap_sys_admin.
+> > > > Can you explain:
+> > > >   a) What overlayfs uses trusted for?
 > > > 
-> > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > Those will presumably have some way of marking memory as shared with the
-> > > hypervisor or hardware so that DMA will work.
+> > > overlayfs stores bunch of metadata and uses "trusted" xattrs for it.
+> > 
+> > Tell me more about this metadata.
+> > Taking a juicy looking one, what does OVL_XATTR_REDIRECT do?
+> > Or what happens if I was to write random numbers into OVL_XATTR_NLINK?
+> > 
+> > > >   b) If something nasty was to write junk into the trusted attributes,
+> > > >     what would happen?
 > > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/core/machine.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
+> > > This directory is owned by guest. So it should be able to write
+> > > anything it wants, as long as process in guest has CAP_SYS_ADMIN, right?
+> > 
+> > Well, we shouldn't be able to break/crash/escape into the host; how
+> > much does overlayfs validate trusted.* it uses?
+> > 
+> > > >   c) I see overlayfs has a fallback check if xattr isn't supported at
+> > > > all - what is the consequence?
 > > > 
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index a71792bc16..8dfc1bb3f8 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "hw/mem/nvdimm.h"
-> > >  #include "migration/vmstate.h"
-> > >  #include "exec/host-trust-limitation.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +#include "hw/virtio/virtio-pci.h"
-> > >  
-> > >  GlobalProperty hw_compat_5_0[] = {
-> > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
-> > >           * areas.
-> > >           */
-> > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > +
-> > > +        /*
-> > > +         * Virtio devices can't count on directly accessing guest
-> > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > +         * for virtio pci devices
-> > > +         */
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > >      }
+> > > It falls back to I think read only mode. 
 > > 
-> > Silently changing the user's request configuration like this is a bad idea.
-> > The "disable-legacy" option in particular is undesirable as that switches
-> > the device to virtio-1.0 only mode, which exposes a different PCI ID to
-> > the guest.
+> > It looks like the fallback is more subtle to me:
+> >         /*
+> >          * Check if upper/work fs supports trusted.overlay.* xattr
+> >          */
+> >         err = ovl_do_setxattr(ofs->workdir, OVL_XATTR_OPAQUE, "0", 1, 0);
+> >         if (err) {
+> >                 ofs->noxattr = true;
+> >                 ofs->config.index = false;
+> >                 ofs->config.metacopy = false;
+> >                 pr_warn("upper fs does not support xattr, falling back to index=off and metacopy=off.\n");
 > > 
-> > If some options are incompatible with encryption, then we should raise a
-> > fatal error at startup, so applications/admins are aware that their requested
-> > config is broken.
+> > but I don't know what index and metacopy are.
 > > 
-> > Regards,
-> > Daniel
+> > > For a moment forget about overlayfs. Say a user process in guest with
+> > > CAP_SYS_ADMIN is writing trusted.foo. Should that succeed? Is a
+> > > passthrough filesystem, so it should go through. But currently it
+> > > wont.
+> > 
+> > As long as any effects of what it writes are contained to the area of
+> > the filesystem exposed to the guest, yes - however it worries me what
+> > the consequences of broken trusted metadata is.  If it's delicate enough
+> > that it's guarded by CAP_SYS_ADMIN someone must have worried about it.
 > 
-> Agreed - my suggestion is an on/off/auto property, auto value
-> changes automatically, on/off is validated.
-
-
-In fact should we extend all bit properties to allow an auto value?
-
+> The CAP_SYS_ADMIN requirement for 'trusted.' xattrs is simply a useful
+> mechanism for applications to control access. The host kernel doesn'
+> tuse this namespace itself. Linux has four namespaces for xattrs:
 > 
-> > -- 
-> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> > |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>  -  user - for userspace apps. accessible based on read/write permissions
+>  -  trusted - for userspace apps. accessible by CAP_SYS_ADMIN processes only
+>  -  system - for kernel only. used by ACLs
+>  -  security - for kernel only. used by SELinux
+> 
+> The use case for "trusted" xattrs is thus where a privileged management
+> application or service wants to store metadata against the file, but
+> also needs to grant an unprivileged process access to write to this file
+> while not allowing that unprivileged process the ability to change the
+> metadata. This is mentioned in the man page:
+> 
+> [man xattr(7)]
+>    Trusted extended attributes
+>        Trusted  extended attributes are visible and accessible only to pro‐
+>        cesses that have the CAP_SYS_ADMIN capability.  Attributes  in  this
+>        class  are used to implement mechanisms in user space (i.e., outside
+>        the kernel) which keep information in extended attributes  to  which
+>        ordinary processes should not have access.
+
+overlayfs inside the kernel is using trusted though which is the case
+Vivek ran into.
+
+>    User extended attributes
+>        User  extended  attributes  may be assigned to files and directories
+>        for storing arbitrary additional information such as the mime  type,
+>        character  set  or  encoding  of a file.  The access permissions for
+>        user attributes are defined by the file permission bits:  read  per‐
+>        mission is required to retrieve the attribute value, and writer per‐
+>        mission is required to change it.
+> [/man]
+> 
+> Libvirtd uses the "trusted." xattr namespace to record information against
+> disk images for QEMU, because we need to grant QEMU access to read/write
+> the disk iamges, but don't want QEMU to be able to alter our xattrs.
+> 
+> It is unfortunate that this namespace is tied to the CAP_SYS_ADMIN cap.
+> It really ought to have had its own dedicated capability :-( Such is
+> life with anything that uses CAP_SYS_ADMIN...
+> 
+> With this in mind we really should have both trusted. & user. xattrs
+> allowed to the guest by default.
+> 
+> Conversely, we'll need to block usage of the security. and system.
+> namespaces.
+> 
+> Unfortuntely this implies allowing CAP_SYS_ADMIN by default. We could
+> have a "--trusted-xattrs=on|off" flag to allow people to run in a more
+> locked down state if they knowingly want to block trusted xattrs.
+
+Does the trick described by Chirantan work for you, where the clients
+'trusted' view is different from the host?
+
+Dave
+
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
