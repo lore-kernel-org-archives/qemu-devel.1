@@ -2,70 +2,76 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A095C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD300C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FAFF22CF8
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:41:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FAFF22CF8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1D0D22D2B
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:53:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1D0D22D2B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmSVs-0006iA-Ce
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 21:41:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46978)
+	id 1jmSh9-00041a-UR
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 21:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmSUV-00051i-V8; Fri, 19 Jun 2020 21:40:19 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49220)
+ (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
+ id 1jmSgV-0003S1-1n
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 21:52:43 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:49760 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmSUS-00035M-OE; Fri, 19 Jun 2020 21:40:19 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07462457|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.101927-0.000919617-0.897153;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HpTQJ.W_1592617205; 
-Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HpTQJ.W_1592617205)
- by smtp.aliyun-inc.com(10.147.43.230);
- Sat, 20 Jun 2020 09:40:06 +0800
-Subject: Re: [PATCH v9 57/61] target/riscv: floating-point scalar move
- instructions
-To: Alistair Francis <alistair23@gmail.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
- <20200610113748.4754-58-zhiwei_liu@c-sky.com>
- <CAKmqyKN4pk=XgO-v-grTRvrQY-DEKap_Kouko6-gM-r3HynSjQ@mail.gmail.com>
- <6fdd0b58-3ea0-1052-feed-d2bf8312f211@c-sky.com>
- <CAKmqyKOV0CqKXY=DcWcNn3wEjxjqYNYsnckpuCb5jqTOsmRtRw@mail.gmail.com>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <b90aac40-dc97-2c0a-086d-e3306d44661b@c-sky.com>
-Date: Sat, 20 Jun 2020 09:40:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
+ id 1jmSgS-0004uq-G7
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 21:52:42 -0400
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id A62E6387FDA899DE122F;
+ Sat, 20 Jun 2020 09:52:30 +0800 (CST)
+Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Sat, 20 Jun 2020 09:50:23 +0800
+Received: from [127.0.0.1] (10.140.157.78) by dggeme755-chm.china.huawei.com
+ (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Sat, 20
+ Jun 2020 09:50:24 +0800
+Subject: Re: [PULL 26/45] ACPI: Record Generic Error Status Block(GESB) table
+To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin"
+ <mst@redhat.com>
+References: <20200514142138.20875-1-peter.maydell@linaro.org>
+ <20200514142138.20875-27-peter.maydell@linaro.org>
+ <CAFEAcA_a4yiE9UZx=MAFUM+f0LSiNvjQ=X1+dObELRzfnTyUHQ@mail.gmail.com>
+ <20200521113048-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-PTtLvouxo5XZmgSbeRWa4WCwH7_cC5xrg3Dnr8UyZxg@mail.gmail.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-ID: <ca79ea28-9ea9-18a5-99ad-25c3eb744721@huawei.com>
+Date: Sat, 20 Jun 2020 09:50:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOV0CqKXY=DcWcNn3wEjxjqYNYsnckpuCb5jqTOsmRtRw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFEAcA-PTtLvouxo5XZmgSbeRWa4WCwH7_cC5xrg3Dnr8UyZxg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 21:09:48
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.140.157.78]
+X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
+ dggeme755-chm.china.huawei.com (10.3.19.101)
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.255;
+ envelope-from=gengdongjiu@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 21:52:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,139 +84,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2020/6/20 9:06, Alistair Francis wrote:
-> On Fri, Jun 19, 2020 at 6:09 PM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+On 2020/6/20 1:21, Peter Maydell wrote:
+> On Thu, 21 May 2020 at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
 >>
->>
->> On 2020/6/20 8:44, Alistair Francis wrote:
->>> On Wed, Jun 10, 2020 at 6:44 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->>>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
->>>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>> Hello,
->>>
->>> This patch fails to compile with this error:
->>>
->>> target/riscv/insn32.decode:566: error: undefined format @r2rd
->>>
->>> Do you mind looking into why this test fails?
->> Sorry, it's a mistake.
->>
->> the @r2rd is defined in the next patch  "[PATCH v9 58/61] target/riscv:
->> vector slide instructions",  where doesn't need the definition at all.
->>
->> When I split patch set, I must make a mistake here. After that I only
->> build  and tested the whole patch set.
->>
->> Thanks for pointing it.
-> No worries.
->
-> Do you mind fixing that problem and also rebasing the series on this
-> branch (it should be in master in a few days):
-> https://github.com/alistair23/qemu/tree/riscv-to-apply.next
->
-> Then send a new patch series.
-Of course not.
-
-I will rebase and send it later.
-
-Zhiwei
->
-> Alistair
->
->> Zhiwei
->>> Alistair
->>>
->>>
->>>> ---
->>>>    target/riscv/insn32.decode              |  2 +
->>>>    target/riscv/insn_trans/trans_rvv.inc.c | 49 +++++++++++++++++++++++++
->>>>    2 files changed, 51 insertions(+)
+>> On Thu, May 21, 2020 at 02:03:36PM +0100, Peter Maydell wrote:
+>>> On Thu, 14 May 2020 at 15:22, Peter Maydell <peter.maydell@linaro.org> wrote:
 >>>>
->>>> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
->>>> index 0741a25540..79f9b37b29 100644
->>>> --- a/target/riscv/insn32.decode
->>>> +++ b/target/riscv/insn32.decode
->>>> @@ -563,6 +563,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
->>>>    vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
->>>>    vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
->>>>    vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
->>>> +vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
->>>> +vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
+>>>> From: Dongjiu Geng <gengdongjiu@huawei.com>
 >>>>
->>>>    vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->>>>    vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
->>>> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
->>>> index e67eff0a7f..884ad910b1 100644
->>>> --- a/target/riscv/insn_trans/trans_rvv.inc.c
->>>> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
->>>> @@ -2709,3 +2709,52 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
->>>>        }
->>>>        return false;
->>>>    }
->>>> +
->>>> +/* Floating-Point Scalar Move Instructions */
->>>> +static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
+>>>> kvm_arch_on_sigbus_vcpu() error injection uses source_id as
+>>>> index in etc/hardware_errors to find out Error Status Data
+>>>> Block entry corresponding to error source. So supported source_id
+>>>> values should be assigned here and not be changed afterwards to
+>>>> make sure that guest will write error into expected Error Status
+>>>> Data Block.
+>>>>
+>>>> Before QEMU writes a new error to ACPI table, it will check whether
+>>>> previous error has been acknowledged. If not acknowledged, the new
+>>>> errors will be ignored and not be recorded. For the errors section
+>>>> type, QEMU simulate it to memory section error.
+>>>
+>>> Hi; Coverity points out (CID 1428962) that there is
+>>> unreachable code in this function:
+>>>
+>>>> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+>>>> +                                      uint64_t error_physical_addr)
 >>>> +{
->>>> +    if (!s->vill && has_ext(s, RVF) &&
->>>> +        (s->mstatus_fs != 0) && (s->sew != 0)) {
->>>> +        unsigned int len = 8 << s->sew;
+>>>> +    GArray *block;
 >>>> +
->>>> +        vec_element_loadi(s, cpu_fpr[a->rd], a->rs2, 0);
->>>> +        if (len < 64) {
->>>> +            tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd],
->>>> +                            MAKE_64BIT_MASK(len, 64 - len));
->>>> +        }
+>>>> +    /* Memory Error Section Type */
+>>>> +    const uint8_t uefi_cper_mem_sec[] =
+>>>> +          UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
+>>>> +                  0xED, 0x7C, 0x83, 0xB1);
 >>>> +
->>>> +        mark_fs_dirty(s);
->>>> +        return true;
+>>>> +    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
+>>>> +     * Table 17-13 Generic Error Data Entry
+>>>> +     */
+>>>> +    QemuUUID fru_id = {};
+>>>> +    uint32_t data_length;
+>>>> +
+>>>> +    block = g_array_new(false, true /* clear */, 1);
+>>>> +
+>>>> +    /* This is the length if adding a new generic error data entry*/
+>>>> +    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
+>>>
+>>> Here data_length has a constant value...
+>>>
+>>>> +
+>>>> +    /*
+>>>> +     * Check whether it will run out of the preallocated memory if adding a new
+>>>> +     * generic error data entry
+>>>> +     */
+>>>> +    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
+>>>
+>>> ...but here we immediately have a runtime check which can't possibly
+>>> fail because of the values of the constants involved, so this
+>>> if() block is dead code.
+>>>
+>>>> +        error_report("Not enough memory to record new CPER!!!");
+>>>> +        g_array_free(block, true);
+>>>> +        return -1;
 >>>> +    }
->>>> +    return false;
->>>> +}
->>>> +
->>>> +/* vfmv.s.f vd, rs1 # vd[0] = rs1 (vs2=0) */
->>>> +static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
->>>> +{
->>>> +    if (!s->vill && has_ext(s, RVF) && (s->sew != 0)) {
->>>> +        TCGv_i64 t1;
->>>> +        /* The instructions ignore LMUL and vector register group. */
->>>> +        uint32_t vlmax = s->vlen >> 3;
->>>> +
->>>> +        /* if vl == 0, skip vector register write back */
->>>> +        TCGLabel *over = gen_new_label();
->>>> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
->>>> +
->>>> +        /* zeroed all elements */
->>>> +        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), vlmax, vlmax, 0);
->>>> +
->>>> +        /* NaN-box f[rs1] as necessary for SEW */
->>>> +        t1 = tcg_temp_new_i64();
->>>> +        if (s->sew == MO_64 && !has_ext(s, RVD)) {
->>>> +            tcg_gen_ori_i64(t1, cpu_fpr[a->rs1], MAKE_64BIT_MASK(32, 32));
->>>> +        } else {
->>>> +            tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->>>> +        }
->>>> +        vec_element_storei(s, a->rd, 0, t1);
->>>> +        tcg_temp_free_i64(t1);
->>>> +        gen_set_label(over);
->>>> +        return true;
->>>> +    }
->>>> +    return false;
->>>> +}
->>>> --
->>>> 2.23.0
->>>>
->>>>
+>>>
+>>> What was this code trying to do? Is the initial value of
+>>> data_length incorrect, or is the if() condition wrong, or
+>>> should this simply have been an assert() ?
+> 
+>> It's just a validity check. assert will do just as well.
+> 
+> Would somebody like to write a patch to make it assert instead, then,
+> please? That should keep Coverity happy.
+  I will check the comments history and make a patch, thanks a lot.
+
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
 
 
