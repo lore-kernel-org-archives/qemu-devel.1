@@ -2,75 +2,75 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E4FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 062FDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:02:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52B8A2474B
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:02:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C446B2474B
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:02:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVjMF968"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B8A2474B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oxjuPb+o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C446B2474B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmmVS-0006YZ-KG
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:02:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40524)
+	id 1jmmVZ-0006zw-1s
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:02:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmmRy-0000dc-HF; Sat, 20 Jun 2020 18:59:02 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40466)
+ id 1jmmS4-0000u0-0b; Sat, 20 Jun 2020 18:59:08 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36678)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmmRx-0000xb-4B; Sat, 20 Jun 2020 18:59:02 -0400
-Received: by mail-wm1-x344.google.com with SMTP id r15so12410879wmh.5;
- Sat, 20 Jun 2020 15:59:00 -0700 (PDT)
+ id 1jmmS2-0000yT-5A; Sat, 20 Jun 2020 18:59:07 -0400
+Received: by mail-wr1-x442.google.com with SMTP id k6so677798wrn.3;
+ Sat, 20 Jun 2020 15:59:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PMxJwJBI3i/pj9/ZmzkEHm5G2TKnOFdjlimCFEXNzcQ=;
- b=mVjMF968rBtCgu5Q3KOuOALUM4aXGyvylX53nc5C4wDkvqOmtFzDzvjtkeKtkFibKV
- SR9QqE2gmQZ6kqm3mng7VGR1acJUGhVnofAT43SEf6S6BBOOw6kkaZ5nVpx2cutOBzOc
- jdYVN4CIW+LT7JN0eGsAcENWUdIo/2FQgqu4+B/KiJqJtHIfG6G6Yk76OYn/V0O158F3
- rLHplFyUmsia5MEjBCN4vqLR/CRCZkZkYGbuI1OQFsYPW0l/+/Oq0wMka845cEwhR3yk
- IrqfqTTn2wnMF3Okn2ThDCBrNJye8MHWZAsyVhFhGtMKj5WQL9Bmp452mPqe7E7lsZb3
- GxhA==
+ bh=SiT2334pLV4XCYraQE2kkHCbieDQYd9kjZYL7o8p/6E=;
+ b=oxjuPb+oFP+7OsIJTJnwVIbV0sH+lq7Go+H+H+7up5NCwICr065ZZ1+Ai8xRzBRdkc
+ XZj2ceJ+Jun6Uqb7fp0r4lCYfELrnLXwNJZDof4q0J2RUzuFl/hloend+OyuSlBUD9hS
+ aQsE8z6OpCNOH9c6EQyLanoa83sEfet3nmMdH4d9OIj60ZWOs3TDLRjIQG6vqd6zcyFp
+ xJnnWc+TZqm0HqmH1Dz+FhjKPEZ6aBWUnvG/88me5X606doKmdEjq3CU3UI1YNliJXUn
+ /UfpfpSWTtUBE+ClQZWpD/ai4TTrYTr5yWsgBVl4pJEB+4u8eFRYzJve3ymGcGfjLwz1
+ piVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=PMxJwJBI3i/pj9/ZmzkEHm5G2TKnOFdjlimCFEXNzcQ=;
- b=EU4D/1pNtYTj07n8Wjri1cH5Zxzy8n3cA7QwGD9MZUvM0Z8L+jE42+Pg5sc/3Kn3Dd
- sO5lbUw7l6X5NxkhUTyuK3NVPZv+a8c4AI2nrylcRgKUsXddQAdtSlviJ32OXoTLVSDI
- VPSCMAXboyCacceakxPnYkpRCcJ513V7KQlMVPmSj0R7U1fRDSjfrBaatCOrU/SspE81
- u5f+sFO8dYf3M2oK2uCIAQn93vQwiY2xaynxQ1/I0+ybjrFG0HK6WKC6w7l1NH9x9/uZ
- prA1rKUPnycJlcqLXrNdpKZ3y3/sxi6/AZ+3W9Lzr/ot2YlHOJhcII8rZGK8J+sutJCV
- xvBQ==
-X-Gm-Message-State: AOAM533u76JsNbKkzi2KD78cvxmcM8D2/5PTPkHilWimpwgSKHJAE5DG
- HbzRSGVxccJNa0j6qJqdddlCxgb/
-X-Google-Smtp-Source: ABdhPJxVeyz4GUnxrUsbhyTLjNL9HR6WSnBkumxISLK2JE4pEitFMLgI5jfKEUxX3Xrgca6Ksoq3aQ==
-X-Received: by 2002:a1c:7fd7:: with SMTP id a206mr3228068wmd.104.1592693939373; 
- Sat, 20 Jun 2020 15:58:59 -0700 (PDT)
+ bh=SiT2334pLV4XCYraQE2kkHCbieDQYd9kjZYL7o8p/6E=;
+ b=M+KRJM0J78j5rivS73lm0btT7DPXto5r0DefY+8GTQOA3uiEHEcKG616ZRye1/h1Ax
+ tWgCeblxiGic/oZ6DQ9YJE1OUl4rXml6UCaNaVC/rxtvoI6zFAOcdYob60ifMWk4VCDM
+ 4cuau4WMIGHXt7xhSWtgL8tPNaRpxNnloM1AcgcWMf5+60blS/HiSi76QUvcJ8J25fsl
+ JyU15zv28dQE24ZwPu4APMpcBDWmq7HM1ZPXXbBa5P4Z4ARgx+UyygPFcLZVcbpq1ybh
+ PaGZ781tw1ETDX0++k/fZboxxm4IwdakgZXTYcJN6uFe9RpsrDdZdO17i4Qo6oHYE1zK
+ 4iyQ==
+X-Gm-Message-State: AOAM531m0QDabsl674wVhBAvtIDsET9qWf3qCFcS15FvxJRyuSkRJNxK
+ t0VsgYrPnHV0qpyOqXIqlS2bOa4f
+X-Google-Smtp-Source: ABdhPJzvOCGyP24w4tIrJurVJShF8dUJVv6zp+X7J12Gplpim3IeUvjZGvbavFgUl5RL6E55JjZzYw==
+X-Received: by 2002:a5d:6b83:: with SMTP id n3mr11121629wrx.395.1592693943203; 
+ Sat, 20 Jun 2020 15:59:03 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x18sm11147127wmi.35.2020.06.20.15.58.58
+ by smtp.gmail.com with ESMTPSA id x18sm11147127wmi.35.2020.06.20.15.59.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 15:58:58 -0700 (PDT)
+ Sat, 20 Jun 2020 15:59:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/8] hw/misc/pca9552: Replace magic value by
- PCA9552_PIN_COUNT definition
-Date: Sun, 21 Jun 2020 00:58:48 +0200
-Message-Id: <20200620225854.31160-3-f4bug@amsat.org>
+Subject: [PATCH v4 5/8] hw/misc/pca9552: Trace GPIO High/Low events
+Date: Sun, 21 Jun 2020 00:58:51 +0200
+Message-Id: <20200620225854.31160-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200620225854.31160-1-f4bug@amsat.org>
 References: <20200620225854.31160-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -110,39 +110,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace the '16' magic value by the PCA9552_PIN_COUNT definition.
+Add a trivial representation of the PCA9552 GPIOs.
 
+Example booting obmc-phosphor-image:
+
+  $ qemu-system-arm -M witherspoon-bmc -trace pca9552_gpio_status
+  1592689902.327837:pca9552_gpio_status pca-unspecified GPIOs 0-15 [*...............]
+  1592689902.329934:pca9552_gpio_status pca-unspecified GPIOs 0-15 [**..............]
+  1592689902.330717:pca9552_gpio_status pca-unspecified GPIOs 0-15 [***.............]
+  1592689902.331431:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****............]
+  1592689902.332163:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........*..]
+  1592689902.332888:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........**.]
+  1592689902.333629:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690032.793289:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+  1592690033.303163:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690033.812962:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+  1592690034.323234:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690034.832922:pca9552_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+
+We notice the GPIO #14 (front-power LED) starts to blink.
+
+This LED is described in the witherspoon device-tree [*]:
+
+  front-power {
+      retain-state-shutdown;
+      default-state = "keep";
+      gpios = <&pca0 14 GPIO_ACTIVE_LOW>;
+  };
+
+[*] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts?id=b1f9be9392f0#n140
+
+Suggested-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/misc/pca9552.h | 1 +
- hw/misc/pca9552.c         | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ include/hw/misc/pca9552.h |  1 +
+ hw/misc/pca9552.c         | 29 +++++++++++++++++++++++++++++
+ hw/misc/trace-events      |  3 +++
+ 3 files changed, 33 insertions(+)
 
 diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
-index ebb43c63fe..ef6da4988f 100644
+index c5be7f1c5e..755be2e8e5 100644
 --- a/include/hw/misc/pca9552.h
 +++ b/include/hw/misc/pca9552.h
-@@ -15,6 +15,7 @@
- #define PCA9552(obj) OBJECT_CHECK(PCA9552State, (obj), TYPE_PCA9552)
+@@ -26,6 +26,7 @@ typedef struct PCA9552State {
+     uint8_t pointer;
  
- #define PCA9552_NR_REGS 10
-+#define PCA9552_PIN_COUNT 16
- 
- typedef struct PCA9552State {
-     /*< private >*/
+     uint8_t regs[PCA9552_NR_REGS];
++    uint16_t pins_status; /* Holds latest INPUT0 & INPUT1 status */
+     uint8_t max_reg;
+     char *description; /* For debugging purpose only */
+     uint8_t nr_leds;
 diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-index cac729e35a..cfefb8fce8 100644
+index 54ccdcf6d4..f0d435e310 100644
 --- a/hw/misc/pca9552.c
 +++ b/hw/misc/pca9552.c
-@@ -291,7 +291,7 @@ static void pca9552_initfn(Object *obj)
-      * PCA955X device
-      */
-     s->max_reg = PCA9552_LS3;
--    s->nr_leds = 16;
-+    s->nr_leds = PCA9552_PIN_COUNT;
+@@ -12,12 +12,14 @@
+ #include "qemu/osdep.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
++#include "qemu/bitops.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/misc/pca9552.h"
+ #include "hw/misc/pca9552_regs.h"
+ #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
++#include "trace.h"
  
-     for (led = 0; led < s->nr_leds; led++) {
-         char *name;
+ #define PCA9552_LED_ON   0x0
+ #define PCA9552_LED_OFF  0x1
+@@ -34,6 +36,32 @@ static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
+     return extract32(s->regs[reg], shift, 2);
+ }
+ 
++static void pca9552_display_pins_status(PCA9552State *s)
++{
++    uint16_t pins_status, pins_changed;
++    int i;
++
++    pins_status = (s->regs[PCA9552_INPUT1] << 8) | s->regs[PCA9552_INPUT0];
++    pins_changed = s->pins_status ^ pins_status;
++    if (!pins_changed) {
++        return;
++    }
++    s->pins_status = pins_status;
++    if (trace_event_get_state_backends(TRACE_PCA9552_GPIO_STATUS)) {
++        char buf[PCA9552_PIN_COUNT + 1];
++
++        for (i = 0; i < s->nr_leds; i++) {
++            if (extract32(pins_status, i, 1)) {
++                buf[i] = '*';
++            } else {
++                buf[i] = '.';
++            }
++        }
++        buf[i] = '\0';
++        trace_pca9552_gpio_status(s->description, buf);
++    }
++}
++
+ static void pca9552_update_pin_input(PCA9552State *s)
+ {
+     int i;
+@@ -57,6 +85,7 @@ static void pca9552_update_pin_input(PCA9552State *s)
+             break;
+         }
+     }
++    pca9552_display_pins_status(s);
+ }
+ 
+ static uint8_t pca9552_read(PCA9552State *s, uint8_t reg)
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 5561746866..7630e59652 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+ # grlib_ahb_apb_pnp.c
+ grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+ grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
++
++# pca9552.c
++pca9552_gpio_status(const char *description, const char *buf) "%s GPIOs 0-15 [%s]"
 -- 
 2.21.3
 
