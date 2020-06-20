@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F7BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8729AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:14:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA5B246BD
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:13:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA5B246BD
+	by mail.kernel.org (Postfix) with ESMTPS id 5CE38246BD
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:14:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CE38246BD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmknz-0002Ue-TF
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:13:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53432)
+	id 1jmkop-0003eU-NA
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:14:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmkfO-0005I3-WD
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:47 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:49507)
+ id 1jmkfS-0005QI-St
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:50 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:54118)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmkfL-0001gC-9I
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:46 -0400
+ id 1jmkfP-0001mn-2s
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:50 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 61067748DE3;
- Sat, 20 Jun 2020 23:04:33 +0200 (CEST)
+ by localhost (Postfix) with SMTP id 4F0697456F8;
+ Sat, 20 Jun 2020 23:04:41 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D86E5748DDA; Sat, 20 Jun 2020 23:04:32 +0200 (CEST)
-Message-Id: <e2f649cb286f0735a10ec87c1b36a7ae081acb61.1592686588.git.balaton@eik.bme.hu>
+ id CA17F748DD9; Sat, 20 Jun 2020 23:04:32 +0200 (CEST)
+Message-Id: <a2a8214dd37344dfb65f1c343ace4cff2e94f3bb.1592686588.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592686588.git.balaton@eik.bme.hu>
 References: <cover.1592686588.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v3 6/9] sm501: Use stn_he_p/ldn_he_p instead of switch/case
+Subject: [PATCH v3 3/9] sm501: Ignore no-op blits
 Date: Sat, 20 Jun 2020 22:56:28 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,39 +75,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of open coding op with different sizes using a switch and type
-casting it can be written more compactly using stn_he_p/ldn_he_p.
+Some guests seem to try source copy blits with same source and dest
+which are no-op so avoid calling pixman for these.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/sm501.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ hw/display/sm501.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 2098e69810..6349f31e64 100644
+index 5d2e019575..ad5a62bfab 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -766,17 +766,7 @@ static void sm501_2d_operation(SM501State *s)
-             for (y = 0; y < height; y++) {
-                 i = (dst_x + (dst_y + y) * dst_pitch) * bypp;
-                 for (x = 0; x < width; x++, i += bypp) {
--                    switch (format) {
--                    case 0:
--                        d[i] = ~d[i];
--                        break;
--                    case 1:
--                        *(uint16_t *)&d[i] = ~*(uint16_t *)&d[i];
--                        break;
--                    case 2:
--                        *(uint32_t *)&d[i] = ~*(uint32_t *)&d[i];
--                        break;
--                    }
-+                    stn_he_p(&d[i], bypp, ~ldn_he_p(&d[i], bypp));
-                 }
+@@ -788,6 +788,11 @@ static void sm501_2d_operation(SM501State *s)
+                               (rop2_source_is_pattern ?
+                                   " with pattern source" : ""));
              }
-         } else {
++            /* Ignore no-op blits, some guests seem to do this */
++            if (src_base == dst_base && src_pitch == dst_pitch &&
++                src_x == dst_x && src_y == dst_y) {
++                break;
++            }
+             /* Check for overlaps, this could be made more exact */
+             uint32_t sb, se, db, de;
+             sb = src_base + src_x + src_y * (width + src_pitch);
 -- 
 2.21.3
 
