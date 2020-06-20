@@ -4,97 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C861C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 08:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15871C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 08:25:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08494223C8
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 08:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D641F22202
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 08:25:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P7zCZ0Ek"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08494223C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gOKShuaD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D641F22202
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmYkS-00036B-9c
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 04:21:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48600)
+	id 1jmYod-0005gZ-4L
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 04:25:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jmYjo-0002UW-Ms
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 04:20:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49419
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jmYjm-0006bm-CA
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 04:20:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592641229;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=obUo6HZAdjXutnbLIE2JysT3bYunkZVGEWv7bf2UCl0=;
- b=P7zCZ0EkZoD0HW+y3vZ+8OCxYGSI2mNPYh/4qwAqf5scEiHUnlp3eZsEQV8OEnUmPEgEjs
- hZ5axsjrlarVHpyM558zFf50m6Wye4V49//Xyng/nCN/X7MQNe8lB3D9bAvyzQXNfOZF3a
- v8HmhLxHUPkVRfPTL0fHE/VP5GheAWs=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-SLuG9JvoNEqyFuxqmgK1jA-1; Sat, 20 Jun 2020 04:20:27 -0400
-X-MC-Unique: SLuG9JvoNEqyFuxqmgK1jA-1
-Received: by mail-oo1-f69.google.com with SMTP id r5so5828374ooq.18
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 01:20:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=obUo6HZAdjXutnbLIE2JysT3bYunkZVGEWv7bf2UCl0=;
- b=jNYE+u1k2JctFVux74sO15mCnreTw2VCal9fYrgGluXM2CmlHcnlloN0NblfB0KzJf
- mGEbeI+V0eMHF3MYIxWg19yM1SQcoCYJPgoPsJxcGiaDW6/AfQMCpZ0/af0f1MSm83gK
- Rb8Mh7nt+T0vXuYK3HjzbMt7fBm1QCdxpAwyOFHa25rMjqmwNXSOXZLNz3rwDLBWq5fi
- 255kMLsAs+W5I9kqDdMaazwbpwTRxqrCu9I1QXzMrz9hPh8hCgLj380qC2rMGRKQAxpC
- G7SgIMc3fGdwyBvPGNhyl6Y+UXcVOPfA2qtM4jgG88s+S4R+eYN0GqCUxb7kswz1PhBw
- mH/w==
-X-Gm-Message-State: AOAM530mPjr7EaCKb3XJMtuXmvFSAd5sr7sWLe8Vxlo8TasYwIduao7H
- zXbufIWH42BQzaaTGEF8SFbqYk98ZtAim1iq4r+VPsB/cFN1EcUq0rtjTH0TfJBWimOtvSXvY43
- Mz/87lXN4cnR72iS9VG9o1gNHt8Gu/gI=
-X-Received: by 2002:a9d:5e4:: with SMTP id 91mr6712194otd.244.1592641226322;
- Sat, 20 Jun 2020 01:20:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvU2YOsEFylScz51ZOfP0KXmYcZue/LonDf7fw8CvBVb0BqnEyRCUjeRQaxiP+sLlanoMV2cRst8P5QKGYHJA=
-X-Received: by 2002:a9d:5e4:: with SMTP id 91mr6712177otd.244.1592641225981;
- Sat, 20 Jun 2020 01:20:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jmYnz-0004wQ-EU; Sat, 20 Jun 2020 04:24:51 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:42965 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jmYnu-0007Jo-Ka; Sat, 20 Jun 2020 04:24:51 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49ppcj0CfPz9sRh; Sat, 20 Jun 2020 18:24:36 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1592641477;
+ bh=W38gQ8kAX055GFm1vlm4XFMgXT6TAso2CKHgAagLEDk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=gOKShuaDtZTlQUv5OT6rfvdnBWF/EcOzPzNOVllcLC3My5sM3/tLrGX1WsFdSUblR
+ LmQ2ZJtF27ciH3tx3oKHEPpx3m9GaG9lgXD9i+0Ddcaf9Pg2mHWnbpc5M8e/2DVzh7
+ wAGixsJmMv3w67MtBbz43+mwFBjYpX3J+VOx/QOc=
+Date: Sat, 20 Jun 2020 18:24:27 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
+ properties for protected guests
+Message-ID: <20200620082427.GP17085@umbus.fritz.box>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <20200619020602.118306-10-david@gibson.dropbear.id.au>
+ <20200619101245.GC700896@redhat.com>
+ <20200619144541.GM17085@umbus.fritz.box>
+ <20200619150556.GW700896@redhat.com>
 MIME-Version: 1.0
-References: <20200604202236.25039-1-jsnow@redhat.com>
- <20200604202236.25039-13-jsnow@redhat.com>
- <659c7e95-54c3-dc20-02e3-86ce4ca74a5f@redhat.com>
-In-Reply-To: <659c7e95-54c3-dc20-02e3-86ce4ca74a5f@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Sat, 20 Jun 2020 10:20:14 +0200
-Message-ID: <CAP+75-UDM0zxzBWze2NvuJPQ3ezZDn3r-SsrM2q_7JU3ANiYaA@mail.gmail.com>
-Subject: Re: [PATCH v3 12/16] python/machine.py: Add _qmp access shim
-To: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, 
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 04:14:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ftQmbtOmUf2cr8rB"
+Content-Disposition: inline
+In-Reply-To: <20200619150556.GW700896@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 04:24:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,93 +80,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 20, 2020 at 10:14 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 6/4/20 10:22 PM, John Snow wrote:
-> > Like many other Optional[] types, it's not always a given that this
-> > object will be set. Wrap it in a type-shim that raises a meaningful
-> > error and will always return a concrete type.
-> >
-> > Signed-off-by: John Snow <jsnow@redhat.com>
-> > ---
-> >  python/qemu/machine.py | 12 +++++++++---
-> >  1 file changed, 9 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> > index d8289936816..a451f9000d6 100644
-> > --- a/python/qemu/machine.py
-> > +++ b/python/qemu/machine.py
-> > @@ -118,7 +118,7 @@ def __init__(self, binary, args=3DNone, wrapper=3DN=
-one, name=3DNone,
-> >          self._events =3D []
-> >          self._iolog =3D None
-> >          self._qmp_set =3D True   # Enable QMP monitor by default.
-> > -        self._qmp =3D None
-> > +        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] =3D No=
-ne
-> >          self._qemu_full_args =3D None
-> >          self._temp_dir =3D None
-> >          self._launched =3D False
-> > @@ -285,7 +285,7 @@ def _pre_launch(self):
-> >              if self._remove_monitor_sockfile:
-> >                  assert isinstance(self._monitor_address, str)
-> >                  self._remove_files.append(self._monitor_address)
-> > -            self._qmp =3D qmp.QEMUMonitorProtocol(
-> > +            self._qmp_connection =3D qmp.QEMUMonitorProtocol(
-> >                  self._monitor_address,
-> >                  server=3DTrue,
-> >                  nickname=3Dself._name
-> > @@ -455,7 +455,13 @@ def set_qmp_monitor(self, enabled=3DTrue):
-> >              self._qmp_set =3D True
-> >          else:
-> >              self._qmp_set =3D False
-> > -            self._qmp =3D None
-> > +            self._qmp_connection =3D None
-> > +
-> > +    @property
-> > +    def _qmp(self) -> qmp.QEMUMonitorProtocol:
-> > +        if self._qmp_connection is None:
-> > +            raise QEMUMachineError("Attempt to access QMP with no conn=
-ection")
-> > +        return self._qmp_connection
-> >
-> >      @classmethod
-> >      def _qmp_args(cls, _conv_keys: bool =3D True, **args: Any) -> Dict=
-[str, Any]:
-> >
->
-> This patch breaks the EmptyCPUModel test:
->
-> (043/101) tests/acceptance/empty_cpu_model.py:EmptyCPUModel.test:
-> ERROR: Attempt to access QMP with no connection (0.03 s)
 
-Fixed with:
+--ftQmbtOmUf2cr8rB
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- >8 --
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index ba6397dd7e..26ae7be89b 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -480,7 +480,7 @@ def set_qmp_monitor(self, enabled: bool =3D True) -> No=
-ne:
+On Fri, Jun 19, 2020 at 04:05:56PM +0100, Daniel P. Berrang=E9 wrote:
+> On Sat, Jun 20, 2020 at 12:45:41AM +1000, David Gibson wrote:
+> > On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
+> > > > The default behaviour for virtio devices is not to use the platform=
+s normal
+> > > > DMA paths, but instead to use the fact that it's running in a hyper=
+visor
+> > > > to directly access guest memory.  That doesn't work if the guest's =
+memory
+> > > > is protected from hypervisor access, such as with AMD's SEV or POWE=
+R's PEF.
+> > > >=20
+> > > > So, if a host trust limitation mechanism is enabled, then apply the
+> > > > iommu_platform=3Don option so it will go through normal DMA mechani=
+sms.
+> > > > Those will presumably have some way of marking memory as shared wit=
+h the
+> > > > hypervisor or hardware so that DMA will work.
+> > > >=20
+> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > ---
+> > > >  hw/core/machine.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > >=20
+> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > index a71792bc16..8dfc1bb3f8 100644
+> > > > --- a/hw/core/machine.c
+> > > > +++ b/hw/core/machine.c
+> > > > @@ -28,6 +28,8 @@
+> > > >  #include "hw/mem/nvdimm.h"
+> > > >  #include "migration/vmstate.h"
+> > > >  #include "exec/host-trust-limitation.h"
+> > > > +#include "hw/virtio/virtio.h"
+> > > > +#include "hw/virtio/virtio-pci.h"
+> > > > =20
+> > > >  GlobalProperty hw_compat_5_0[] =3D {
+> > > >      { "virtio-balloon-device", "page-poison", "false" },
+> > > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *ma=
+chine)
+> > > >           * areas.
+> > > >           */
+> > > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort=
+);
+> > > > +
+> > > > +        /*
+> > > > +         * Virtio devices can't count on directly accessing guest
+> > > > +         * memory, so they need iommu_platform=3Don to use normal =
+DMA
+> > > > +         * mechanisms.  That requires disabling legacy virtio supp=
+ort
+> > > > +         * for virtio pci devices
+> > > > +         */
+> > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legac=
+y", "on");
+> > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_plat=
+form", "on");
+> > > >      }
+> > >=20
+> > > Silently changing the user's request configuration like this
+> >=20
+> > It doesn't, though.  register_sugar_prop() effectively registers a
+> > default, so if the user has explicitly specified something, that will
+> > take precedence.
+>=20
+> Don't assume that the user has set "disable-legacy=3Doff". People who wan=
+t to
+> have a transtional device are almost certainly pasing "-device virtio-blk=
+-pci",
+> because historical behaviour is that this is sufficient to give you a
+> transitional device. Changing the default of disable-legacy=3Don has not
+> honoured the users' requested config.
 
-     @property
-     def _qmp(self) -> qmp.QEMUMonitorProtocol:
--        if self._qmp_connection is None:
-+        if self._qmp_set and self._qmp_connection is None:
-             raise QEMUMachineError("Attempt to access QMP with no connecti=
-on")
-         return self._qmp_connection
+Umm.. by this argument we can never change any default, ever.  But we
+do that routinely with new machine versions.  How is changing based on
+a machine option different from that?
 
----
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Does that sound reasonable to you?
+--ftQmbtOmUf2cr8rB
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7tx7sACgkQbDjKyiDZ
+s5Lk1Q/9EyZXMK2UB/lzd6fAojOLADfFhZxOt+1U1YObtM8o8pRBIcXCzGtvzgHU
+533geSroEFIm+4Y8Mq41KigHqV95a5roJE+UpfZ/AJkB/VZyOiEtr4oFubj+a3OW
+zTk4pwCfEq7dtrK/UVJbBeebDuKioGX5mhMXBbbsHPDUITNDb++FjT2dMLG2aiOF
+HOtzzc1lFkZnEAnUf8rHcsulFeihNG50qARa5BxPlcRFvuOWFperm8SGCxYbHuRv
+cjHOQCRBw4HTSO3kz8TKo6uK1OB3jw9XuSRsmmczPDiwJvpFrJ9BHF4e45e+9xjy
+A19ESEqV0fTfr67YxTinyLeiXHxvJXPPr1ASV0lTif0rpVqbfshf7jW66LqHo0Ss
+cCxXOkgiyQEwGEhmcUzoQ/nGonhvz/i1zKR1xoApjK6DfbuW102ojdxesxMNyEM1
+Rp2xy2b2Et0cuiIFVOZwG+5KkeQ9VHIgnlrYPA2hQNoas3hSzYa+8V7cqo/ELd+3
+eccQaHAR0nNEsV/Fk5ppJ+VSPmjLVvB4rff0xv/m9e+z2GFJdFfV58vNTV/d5l4P
+t3Mdm0gCP27shb7jZm3eQHzQLcqUGoUOUppTALP1E4lQSlCF/cKigUjmyvzOMmc8
+ZIfbz0dxlSqQIhiJF/SPCic83D6Hg9ucyoEPmuRUkHpLIfMEvCM=
+=GaO6
+-----END PGP SIGNATURE-----
+
+--ftQmbtOmUf2cr8rB--
 
