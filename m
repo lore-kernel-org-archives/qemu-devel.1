@@ -2,86 +2,59 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E422DC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B80C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B58E320809
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="CSAmbb5V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58E320809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFDA62081A
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFDA62081A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmkgc-0007Qe-Tk
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:06:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51760)
+	id 1jmkgk-0007qw-OA
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:06:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkXO-0006OP-KD
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:30 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:1161)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jmkfR-0005NG-AO
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:49 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:54115)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkXM-0000SS-94
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:30 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eee77ee0000>; Sat, 20 Jun 2020 13:56:14 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Sat, 20 Jun 2020 13:56:26 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Sat, 20 Jun 2020 13:56:26 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 20 Jun
- 2020 20:56:21 +0000
-Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via
- Frontend Transport; Sat, 20 Jun 2020 20:56:13 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH QEMU v25 13/17] vfio: create mapped iova list when vIOMMU is
- enabled
-Date: Sun, 21 Jun 2020 01:51:22 +0530
-Message-ID: <1592684486-18511-14-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jmkfO-0001mL-M1
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:48 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 9B0FE748DC8;
+ Sat, 20 Jun 2020 23:04:33 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id E2C97748DDE; Sat, 20 Jun 2020 23:04:32 +0200 (CEST)
+Message-Id: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1592686588.git.balaton@eik.bme.hu>
+References: <cover.1592686588.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v3 9/9] sm501: Fix and optimize overlap check
+Date: Sat, 20 Jun 2020 22:56:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1592686574; bh=azm+HEg8eFiI6GAZx/d7Ht6MPVKq1vZpEvScHis2BBU=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=CSAmbb5VyjkUYUl2YEmLdzYnnjRVzs3Tiv6sikoYmCe0+m0cEG1xcewLqkdmqQIgn
- WJ7Wc+SJvqO2HarasEy9AsIvEELsohUhwjIIyr3LUuDVw3tjo3nbU2tNuH49z57v+M
- bP0PKRwolkyxg2QE4LDzSffLIEB02/lgbDMQTMM3bA5dJeGplFv0Gg+G8+v/cF0T95
- V3JyYfKB4LnQj7doy1HCmIgM2o/b4mQp0ioa9Z1aefpNooqRhCF5E0rhakWligNURB
- G0I8yRMR5iXDjFHYDyr4cwwCX7s1KPItNolvdo4j9AdvcsalUIYrSsSA80mX0D/kSD
- yMmL/G405bqKw==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 16:54:48
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: qemu-devel@nongnu.org
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 17:04:33
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,174 +67,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Create mapped iova list when vIOMMU is enabled. For each mapped iova
-save translated address. Add node to list on MAP and remove node from
-list on UNMAP.
-This list is used to track dirty pages during migration.
+When doing reverse blit we need to check if source and dest overlap
+but it is not trivial due to possible different base and pitch of
+source and dest. Do rectangle overlap if base and pitch match,
+otherwise just check if memory area containing the rects overlaps so
+rects could possibly overlap.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/vfio/common.c              | 58 ++++++++++++++++++++++++++++++++++++++-----
- include/hw/vfio/vfio-common.h |  8 ++++++
- 2 files changed, 60 insertions(+), 6 deletions(-)
+ hw/display/sm501.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index e0d3d4585a65..6921a78e9ba5 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -408,8 +408,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
- }
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 2db347dcbc..e7c69bf7fd 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -690,6 +690,7 @@ static void sm501_2d_operation(SM501State *s)
+     unsigned int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
+     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
+     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
++    bool overlap = false;
  
- /* Called with rcu_read_lock held.  */
--static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
--                           bool *read_only)
-+static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
-+                               ram_addr_t *ram_addr, bool *read_only)
- {
-     MemoryRegion *mr;
-     hwaddr xlat;
-@@ -440,8 +440,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-         return false;
-     }
- 
--    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
--    *read_only = !writable || mr->readonly;
-+    if (vaddr) {
-+        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-+    }
-+
-+    if (ram_addr) {
-+        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
-+    }
-+
-+    if (read_only) {
-+        *read_only = !writable || mr->readonly;
-+    }
- 
-     return true;
- }
-@@ -451,7 +460,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-     VFIOContainer *container = giommu->container;
-     hwaddr iova = iotlb->iova + giommu->iommu_offset;
--    bool read_only;
-     void *vaddr;
-     int ret;
- 
-@@ -467,7 +475,10 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     rcu_read_lock();
- 
-     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
--        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-+        ram_addr_t ram_addr;
-+        bool read_only;
-+
-+        if (!vfio_get_xlat_addr(iotlb, &vaddr, &ram_addr, &read_only)) {
-             goto out;
-         }
-         /*
-@@ -485,8 +496,28 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-                          "0x%"HWADDR_PRIx", %p) = %d (%m)",
-                          container, iova,
-                          iotlb->addr_mask + 1, vaddr, ret);
-+        } else {
-+            VFIOIovaRange *iova_range;
-+
-+            iova_range = g_malloc0(sizeof(*iova_range));
-+            iova_range->iova = iova;
-+            iova_range->size = iotlb->addr_mask + 1;
-+            iova_range->ram_addr = ram_addr;
-+
-+            QLIST_INSERT_HEAD(&giommu->iova_list, iova_range, next);
-         }
-     } else {
-+        VFIOIovaRange *iova_range, *tmp;
-+
-+        QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
-+            if (iova_range->iova >= iova &&
-+                iova_range->iova + iova_range->size <= iova +
-+                                                       iotlb->addr_mask + 1) {
-+                QLIST_REMOVE(iova_range, next);
-+                g_free(iova_range);
+     if ((s->twoD_stretch >> 16) & 0xF) {
+         qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
+@@ -784,16 +785,21 @@ static void sm501_2d_operation(SM501State *s)
+                          ldn_he_p(&s->local_mem[src_base + si], bypp));
+                 break;
+             }
+-            /* Check for overlaps, this could be made more exact */
+-            uint32_t sb, se, db, de;
+-            sb = src_base + src_x + src_y * (width + src_pitch);
+-            se = sb + width + height * (width + src_pitch);
+-            db = dst_base + dst_x + dst_y * (width + dst_pitch);
+-            de = db + width + height * (width + dst_pitch);
+-            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+-                /* regions may overlap: copy via temporary */
+-                int llb = width * bypp;
+-                int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
++            /* If reverse blit do simple check for overlaps */
++            if (rtl && src_base == dst_base && src_pitch == dst_pitch) {
++                overlap = (src_x < dst_x + width && src_x + width > dst_x &&
++                           src_y < dst_y + height && src_y + height > dst_y);
++            } else if (rtl) {
++                unsigned int sb, se, db, de;
++                sb = src_base + (src_x + src_y * src_pitch) * bypp;
++                se = sb + (width + height * src_pitch) * bypp;
++                db = dst_base + (dst_x + dst_y * dst_pitch) * bypp;
++                de = db + (width + height * dst_pitch) * bypp;
++                overlap = (db >= sb && db <= se) || (de >= sb && de <= se);
 +            }
-+        }
-+
-         ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-@@ -643,6 +674,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-             g_free(giommu);
-             goto fail;
-         }
-+        QLIST_INIT(&giommu->iova_list);
-         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
-         memory_region_iommu_replay(giommu->iommu, &giommu->n);
++            if (overlap) {
++                /* pixman can't do reverse blit: copy via temporary */
++                int tmp_stride = DIV_ROUND_UP(width * bypp, sizeof(uint32_t));
+                 uint32_t *tmp = tmp_buf;
  
-@@ -741,6 +773,13 @@ static void vfio_listener_region_del(MemoryListener *listener,
-         QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-             if (MEMORY_REGION(giommu->iommu) == section->mr &&
-                 giommu->n.start == section->offset_within_region) {
-+                VFIOIovaRange *iova_range, *tmp;
-+
-+                QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
-+                    QLIST_REMOVE(iova_range, next);
-+                    g_free(iova_range);
-+                }
-+
-                 memory_region_unregister_iommu_notifier(section->mr,
-                                                         &giommu->n);
-                 QLIST_REMOVE(giommu, giommu_next);
-@@ -1538,6 +1577,13 @@ static void vfio_disconnect_container(VFIOGroup *group)
-         QLIST_REMOVE(container, next);
- 
-         QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
-+            VFIOIovaRange *iova_range, *itmp;
-+
-+            QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, itmp) {
-+                QLIST_REMOVE(iova_range, next);
-+                g_free(iova_range);
-+            }
-+
-             memory_region_unregister_iommu_notifier(
-                     MEMORY_REGION(giommu->iommu), &giommu->n);
-             QLIST_REMOVE(giommu, giommu_next);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 5a57a78ec517..56b75e4a8bc4 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -89,11 +89,19 @@ typedef struct VFIOContainer {
-     QLIST_ENTRY(VFIOContainer) next;
- } VFIOContainer;
- 
-+typedef struct VFIOIovaRange {
-+    hwaddr iova;
-+    size_t size;
-+    ram_addr_t ram_addr;
-+    QLIST_ENTRY(VFIOIovaRange) next;
-+} VFIOIovaRange;
-+
- typedef struct VFIOGuestIOMMU {
-     VFIOContainer *container;
-     IOMMUMemoryRegion *iommu;
-     hwaddr iommu_offset;
-     IOMMUNotifier n;
-+    QLIST_HEAD(, VFIOIovaRange) iova_list;
-     QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
- } VFIOGuestIOMMU;
- 
+                 if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
 -- 
-2.7.0
+2.21.3
 
 
