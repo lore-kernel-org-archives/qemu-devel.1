@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1986DC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D059BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:01:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98DE62074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:00:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95F3D23339
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:01:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="cIHH1839"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98DE62074A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="PKDDXdqI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F3D23339
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmkbM-0005fu-Fe
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:00:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
+	id 1jmkc0-0006sb-NH
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:01:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkXK-0006Ee-Iq
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:26 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:19783)
+ id 1jmkX6-0005rA-9g
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:13 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:1144)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkXI-0000SB-Jo
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:26 -0400
+ id 1jmkX2-0000Pp-Hm
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:11 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eee77ca0000>; Sat, 20 Jun 2020 13:55:39 -0700
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5eee77da0000>; Sat, 20 Jun 2020 13:55:54 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Sat, 20 Jun 2020 13:56:23 -0700
+ Sat, 20 Jun 2020 13:56:07 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Sat, 20 Jun 2020 13:56:23 -0700
+ by hqpgpgate101.nvidia.com on Sat, 20 Jun 2020 13:56:07 -0700
 Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 20 Jun
- 2020 20:56:13 +0000
+ 2020 20:55:57 +0000
 Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via
- Frontend Transport; Sat, 20 Jun 2020 20:56:05 +0000
+ Frontend Transport; Sat, 20 Jun 2020 20:55:49 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH QEMU v25 12/17] vfio: Add function to start and stop dirty
- pages tracking
-Date: Sun, 21 Jun 2020 01:51:21 +0530
-Message-ID: <1592684486-18511-13-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH QEMU v25 10/17] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU
+ is enabled
+Date: Sun, 21 Jun 2020 01:51:19 +0530
+Message-ID: <1592684486-18511-11-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
 References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
@@ -61,19 +61,19 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1592686539; bh=d4GtgRebZrD+j0T32Py4C4tR/eRSo8dzeIagsSuR6cU=;
+ t=1592686554; bh=lNqT20ne3SxmddsSgpUXew1AhQgIkvUAlxCSf7c7Hcs=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=cIHH1839z43c++N4/pbKAzQYwJZNHMO25LmYdiVRPGYtqQ/yXeHpQUXh8NhDwwKHN
- FIipwoNaMSLTZM9JG6lCQiuluR3VWW3JOTk2chpByTcwRtheSVmfgtlGumbNPiK1V+
- X+s3ORRLGvEhiDauoSfy8y95yrVBLm4IXKSxC5G2+R3/7qebndPjT++vT4pZRoa4cO
- 2Qb3+UN8+pOV68RzCLnt8e55OJ1/YrfEk+RGB4Ggyavtxf8cUph9NQHE8T9lsPwwbW
- gBogSNJL8ixsX6MzP5t58Ak+ihS1VnaKCkAygfYGHMSWY9J3zZXipLZchcEGiNzv+7
- kNbU68aR94nKw==
-Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate25.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 16:55:03
+ b=PKDDXdqIp6UgRFETptIt0xpYy76NZb2QMNqKGyrHxVemNWWll6ZPSnfk7LRDG0FUf
+ I+QkLBoWU2pin37fO7sg3h4O6s+c+LXkPuE3PkqgxKpZ/Z0o+MOfe4AV5yb7AXG3cU
+ 8G3RGFDSHsFfEDPGdEdyZH2QMr3YvfFGfCr9VfyWmC/B36VPnC19s7Vkkr6Sd15lJe
+ SRL0uB4IU+EOUKDNSElXSspFNAFMSgBAeKCrjUtt7qFgFnb73a3RBVs4akcBeam1uF
+ UGMxqOM/EWIuj++7BLK/ZcvbNsUDaDbnKHIGTijTOxHXyxquF4/gdkbl4FAplDoD2h
+ Yt/uvHIahKoQA==
+Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate26.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 16:54:48
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -80
 X-Spam_score: -8.1
@@ -106,90 +106,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
-for VFIO devices.
+mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
+wasn't set correctly due to which memory listener's log_sync doesn't
+get called.
+This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
+IOMMU is enabled.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/vfio/migration.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ memory.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index faacea5327cb..e0fbb3a01855 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -11,6 +11,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/cutils.h"
- #include <linux/vfio.h>
-+#include <sys/ioctl.h>
- 
- #include "sysemu/runstate.h"
- #include "hw/vfio/vfio-common.h"
-@@ -329,6 +330,32 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-     return qemu_file_get_error(f);
- }
- 
-+static int vfio_start_dirty_page_tracking(VFIODevice *vbasedev, bool start)
-+{
-+    int ret;
-+    VFIOContainer *container = vbasedev->group->container;
-+    struct vfio_iommu_type1_dirty_bitmap dirty = {
-+        .argsz = sizeof(dirty),
-+    };
-+
-+    if (start) {
-+        if (vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_START;
-+        } else {
-+            return -EINVAL;
-+        }
-+    } else {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP;
-+    }
-+
-+    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, &dirty);
-+    if (ret) {
-+        error_report("Failed to set dirty tracking flag 0x%x errno: %d",
-+                     dirty.flags, errno);
-+    }
-+    return ret;
-+}
-+
- /* ---------------------------------------------------------------------- */
- 
- static int vfio_save_setup(QEMUFile *f, void *opaque)
-@@ -360,6 +387,11 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
-         return ret;
+diff --git a/memory.c b/memory.c
+index 2f15a4b250c8..95a47d2d9533 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1788,7 +1788,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
+-    if (global_dirty_log && mr->ram_block) {
++    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
+         mask |= (1 << DIRTY_MEMORY_MIGRATION);
      }
- 
-+    ret = vfio_start_dirty_page_tracking(vbasedev, true);
-+    if (ret) {
-+        return ret;
-+    }
-+
-     qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
- 
-     ret = qemu_file_get_error(f);
-@@ -375,6 +407,8 @@ static void vfio_save_cleanup(void *opaque)
-     VFIODevice *vbasedev = opaque;
-     VFIOMigration *migration = vbasedev->migration;
- 
-+    vfio_start_dirty_page_tracking(vbasedev, false);
-+
-     if (migration->region.mmaps) {
-         vfio_region_unmap(&migration->region);
-     }
-@@ -706,6 +740,8 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-         if (ret) {
-             error_report("%s: Failed to set state RUNNING", vbasedev->name);
-         }
-+
-+        vfio_start_dirty_page_tracking(vbasedev, false);
-     }
- }
- 
+     return mask;
 -- 
 2.7.0
 
