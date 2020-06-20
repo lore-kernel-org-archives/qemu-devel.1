@@ -2,95 +2,86 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B24C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 00:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE35C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 00:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42335229C6
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 00:23:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9918922B39
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 00:54:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gm8NdzWF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42335229C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9uvmcCN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9918922B39
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmRIN-0002HN-Jg
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 20:23:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35598)
+	id 1jmRmH-0001ni-R3
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 20:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmRHp-0001pg-71
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 20:23:09 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37007)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jmRlh-0001FF-Lt; Fri, 19 Jun 2020 20:54:01 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43220)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmRHn-00085U-MX
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 20:23:08 -0400
-Received: by mail-pl1-x642.google.com with SMTP id y18so4630349plr.4
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 17:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Yf0PnAnGLCLY9g+lvYg57egrjljX44v9bJe37LTyOpc=;
- b=gm8NdzWF8uAgAT6qSQOHtErIy4CpfvRG7CTA69A3BVK9pWMFDflncmVLoziB+5XeGc
- xNx/bHQipo5cDuPcGTOgRUXSv3YVoUdGyYoFJzQmMom4CGEya5ikJ9c54FcieqQ5i1G+
- DEt/FyngjMbNSIk4/9uW0Z4k7dMqSOisyQ5OJBzvjvqBD4p+WRaw14sq0SkvVyYhULHL
- Lh/0K4VwdhOyKnCydd6mluwVarH/sBK6I6py9mAOZEJ7hRnZDvIPkRCdtaSl8QYmnTZL
- XJLKBXU5db9HHOCHUN0aQUaA/FcCLMpIPlest0r+qf8RIsIgu60jbouDxOB3djEHf1yX
- CSEw==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jmRlf-0004et-W1; Fri, 19 Jun 2020 20:54:01 -0400
+Received: by mail-io1-xd41.google.com with SMTP id u13so13360914iol.10;
+ Fri, 19 Jun 2020 17:53:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bpHtGsnucc8pDkVJ+kTXa1rdUjAhmbWZsloyJ/trOtw=;
+ b=d9uvmcCNF0ZaDgRgzNGi86kUSuHPaHaq6WkmLsPaemXeLIJ5nrrFdOfqMtzpYr+Qk8
+ ewzkMJjP3DtI1yWbXClKte/MRQLKXIXWnD/g8biiM3x57Pwa8WhZnO7aOGoR0TEQss9G
+ jMlbn+dcL1d+kJgo1nzhQy+i5kKP/ON09Jk7tRgyDm9YddS1VzYymLL9zxN39FTC4Mru
+ Jf8kkQGA8aMQF0+9eUdYMPaPRNCvLG2eG3IC3MfdXa/IjQDIGx6jQoO2taLEO+7aiM1e
+ EYgvSmQU23B4Fg022ALAsBx4g7ZQ0R1jdkEe3+KvY5SL0qUMyTudf8GKaNWNh2e1OWvB
+ 6HXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Yf0PnAnGLCLY9g+lvYg57egrjljX44v9bJe37LTyOpc=;
- b=FuwDTesUG+y3OmR+buXW4YodqDIiMmogI+uSVG9n7+vHwzhrURUdzJ8GGBUmVA1Dae
- QsEG02gUX1eHvqbm8wCRK/s2QtTGszs69iMNKkFJ3CPGTk1WYcCLbw9hrbNosn0r8vG+
- v+iG2vJ8cKR37GmxhlDxfyfCzX/fUHGVA7pT2e+ezKqsAe1Z6Vzkbr16qiqh7cWMNfqd
- 1A5m54OIbwtnQ5GHK7T97R5S2SoygpbIXgReD5fb3z8FXRBIzKRDVdLkAD5MRQD23w+j
- 3GfzIubMpHxxmeHEx8YUyzL3j0Uvqm6KF4NRwromZCFyrjnPG1cFlriynQNC/hOz7amA
- O31g==
-X-Gm-Message-State: AOAM531hGtNvfkV9C54vTuYV4uUJv18bOwzgxyzhztst+snFlDozCqAT
- FQqKoh0LXGK25yzdX3ryVJvoQw==
-X-Google-Smtp-Source: ABdhPJzWGr6/MT4H0R1a9fZAQ0IPCIco2RmhEir+wDHtARFBcgUuP3qijev1jf53TLmQSlaNRNt1vA==
-X-Received: by 2002:a17:902:8d8d:: with SMTP id
- v13mr9467117plo.162.1592612586167; 
- Fri, 19 Jun 2020 17:23:06 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id z1sm6157580pjz.10.2020.06.19.17.23.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 19 Jun 2020 17:23:05 -0700 (PDT)
-Subject: Re: [PATCH] target/arm: Remove unnecessary gen_io_end() calls
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200619170324.12093-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b1dbcfa7-84fa-b5ca-7603-e8251b693f91@linaro.org>
-Date: Fri, 19 Jun 2020 17:23:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bpHtGsnucc8pDkVJ+kTXa1rdUjAhmbWZsloyJ/trOtw=;
+ b=Ebvr4bWFb3AxZm75kqQQczCubdOzTdETMyFJ1xAQxvFcZc0K14epIv7TzkS70QowMy
+ RVdZNrAXf1Kw4eVDb8lnlhw4W+yz5U8gAByQMm64Gk/iXfVgiz0X3HxAgK4czVr7WI4o
+ XOs0cZYjZ73q9klh62fiUvejnn1tCMyXgcCG+nNxrSMCGNoF3eCu1+miTOMfa6+W/iQS
+ OZi7pVpVsuTWNaIINKb7Kj/8x/usr+okNjJtiBmvxN0UVputlphcIunfA210ZFnq+m/R
+ rEnnCfCVM7IKUugycLQAUdQj8re/IyTqE7iAWet9ptIx8ngui0TlZ4oDNu5gBoV+5DMu
+ aHJQ==
+X-Gm-Message-State: AOAM532fM/A+SwwioaZR+Fqmt3mGiqZPVjqd98rQDgSpmzWXr5hpps04
+ Mzw3yQt2s3xWFMYatEbE18bwim1oScb8A2jNA+8=
+X-Google-Smtp-Source: ABdhPJzhkbr64b5qR9fomgAh0Efv/X44CsYUU/M8+dW3wXimYkZRlkyfaV70v9QIOs4RmaJPbhkRzItejD8a60omIP0=
+X-Received: by 2002:a05:6638:dd3:: with SMTP id
+ m19mr6507973jaj.106.1592614438483; 
+ Fri, 19 Jun 2020 17:53:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200619170324.12093-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+ <20200610113748.4754-58-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200610113748.4754-58-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 19 Jun 2020 17:44:30 -0700
+Message-ID: <CAKmqyKN4pk=XgO-v-grTRvrQY-DEKap_Kouko6-gM-r3HynSjQ@mail.gmail.com>
+Subject: Re: [PATCH v9 57/61] target/riscv: floating-point scalar move
+ instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -105,41 +96,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/20 10:03 AM, Peter Maydell wrote:
-> Since commit ba3e7926691ed3 it has been unnecessary for target code
-> to call gen_io_end() after an IO instruction in icount mode; it is
-> sufficient to call gen_io_start() before it and to force the end of
-> the TB.
-> 
-> Many now-unnecessary calls to gen_io_end() were removed in commit
-> 9e9b10c6491153b, but some were missed or accidentally added later.
-> Remove unneeded calls from the arm target:
-> 
->  * the call in the handling of exception-return-via-LDM is
->    unnecessary, and the code is already forcing end-of-TB
->  * the call in the VFP access check code is more complicated:
->    we weren't ending the TB, so we need to add the code to
->    force that by setting DISAS_UPDATE
->  * the doc comment for ARM_CP_IO doesn't need to mention
->    gen_io_end() any more
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Wed, Jun 10, 2020 at 6:44 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Hello,
+
+This patch fails to compile with this error:
+
+target/riscv/insn32.decode:566: error: undefined format @r2rd
+
+Do you mind looking into why this test fails?
+
+Alistair
+
+
 > ---
->  target/arm/cpu.h               | 2 +-
->  target/arm/translate-vfp.inc.c | 7 +++----
->  target/arm/translate.c         | 3 ---
->  3 files changed, 4 insertions(+), 8 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
-
+>  target/riscv/insn32.decode              |  2 +
+>  target/riscv/insn_trans/trans_rvv.inc.c | 49 +++++++++++++++++++++++++
+>  2 files changed, 51 insertions(+)
+>
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 0741a25540..79f9b37b29 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -563,6 +563,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+>  vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+>  vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+>  vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+> +vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
+> +vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
+>
+>  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+> index e67eff0a7f..884ad910b1 100644
+> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+> @@ -2709,3 +2709,52 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
+>      }
+>      return false;
+>  }
+> +
+> +/* Floating-Point Scalar Move Instructions */
+> +static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
+> +{
+> +    if (!s->vill && has_ext(s, RVF) &&
+> +        (s->mstatus_fs != 0) && (s->sew != 0)) {
+> +        unsigned int len = 8 << s->sew;
+> +
+> +        vec_element_loadi(s, cpu_fpr[a->rd], a->rs2, 0);
+> +        if (len < 64) {
+> +            tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd],
+> +                            MAKE_64BIT_MASK(len, 64 - len));
+> +        }
+> +
+> +        mark_fs_dirty(s);
+> +        return true;
+> +    }
+> +    return false;
+> +}
+> +
+> +/* vfmv.s.f vd, rs1 # vd[0] = rs1 (vs2=0) */
+> +static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
+> +{
+> +    if (!s->vill && has_ext(s, RVF) && (s->sew != 0)) {
+> +        TCGv_i64 t1;
+> +        /* The instructions ignore LMUL and vector register group. */
+> +        uint32_t vlmax = s->vlen >> 3;
+> +
+> +        /* if vl == 0, skip vector register write back */
+> +        TCGLabel *over = gen_new_label();
+> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+> +
+> +        /* zeroed all elements */
+> +        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), vlmax, vlmax, 0);
+> +
+> +        /* NaN-box f[rs1] as necessary for SEW */
+> +        t1 = tcg_temp_new_i64();
+> +        if (s->sew == MO_64 && !has_ext(s, RVD)) {
+> +            tcg_gen_ori_i64(t1, cpu_fpr[a->rs1], MAKE_64BIT_MASK(32, 32));
+> +        } else {
+> +            tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
+> +        }
+> +        vec_element_storei(s, a->rd, 0, t1);
+> +        tcg_temp_free_i64(t1);
+> +        gen_set_label(over);
+> +        return true;
+> +    }
+> +    return false;
+> +}
+> --
+> 2.23.0
+>
+>
 
