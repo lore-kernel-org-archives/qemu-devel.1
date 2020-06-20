@@ -2,81 +2,97 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A10C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C785C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:50:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C3122B45
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:37:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C3122B45
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DA79520720
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:50:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmS6nzHK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA79520720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmboD-0003O0-SQ
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 07:37:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53678)
+	id 1jmc0t-0006Xu-1t
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 07:50:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmbmg-0002Fe-MN
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 07:35:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41534)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jmc0F-0005eS-Ii; Sat, 20 Jun 2020 07:49:43 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35725)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmbmb-0002nV-25
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 07:35:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jmbmY-0003vx-UJ
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 11:35:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D92052E810A
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 11:35:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 20 Jun 2020 11:25:56 -0000
-From: ruthan <1873338@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jmc0D-0004mE-SQ; Sat, 20 Jun 2020 07:49:43 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g18so3024578wrm.2;
+ Sat, 20 Jun 2020 04:49:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Ux4mfRTVWMcxBrf6xo9T8Z0qwZxSRgdeAbPuTScn+R0=;
+ b=BmS6nzHK3ePBVvRzFsUNyViXVHmjo/QPozAY/3qGbTVq/34n1NSfbpBGdB0WKfG/FU
+ l9fo7ciDEPuQXrdlaO0bZi/5CTZ1XGszKv9mPSNlZ/c7yD8BDkiSfTH/cRUS0h9EQlru
+ YssxjTX8X94ztj7itA/xPnUSoaicy2ksCnM7sAGy3ghNvBuH7qaVqnykGtXSJmVLKXEi
+ 8YDEhQlGq0Z0BM1xVS3b8AM+bwygOYrh/TnfQvb8uaIklAXMrtspw7kR5E0Q5M8p6hYQ
+ 15Pryqbt4WAMCVBrHMq6LAE/sWWI3Pq8nfQpQP1YObxzvgB59mSF5khUiPC0oO9c8T5u
+ 3gEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ux4mfRTVWMcxBrf6xo9T8Z0qwZxSRgdeAbPuTScn+R0=;
+ b=t3j7MHUv+DB5Iy5pqEaaEvc1jgSyUFbgG20IoX4c3boDvsFnmrnYczH1TZQyfV18/D
+ 8QaWdeb7buUkwXPElM+PkZsBve3sTMOW4y++0YRUTU9umQNPUGXyae1CK2KlAKKlzTgu
+ Ord1FfC5TlddL+tIFRcuonWVWrmAu9vif3Qywie8DZpGxDokpjrotUBa3nbV8ZN2DtSh
+ GU/qqSUqLjOuYMfWJ3Uo3Mtu60CuRR0XNmhsJTmW2+hwtuElM8B4P/3SB+IL8Z0TMrWZ
+ 7+wREo5sbdzUzOwEDL1xI6qH0XbjiO8/eSBGgzXDXQynu6DUFWIwEXSPzUdcBDMRhPw5
+ nyQQ==
+X-Gm-Message-State: AOAM531oJLBiwEQr+RD0yQYWIg2e/0v4HkaW2xglZ+lkrrkFWclOkc19
+ oUlKldiaqgTbciTFb6X1HPo=
+X-Google-Smtp-Source: ABdhPJyidvYt1JxwMafn9qsi0L0M6NlGToWjSdAutBu51xjJARucXcQwXQg4484ofCq8XeHJcdV6bw==
+X-Received: by 2002:a5d:4987:: with SMTP id r7mr8722261wrq.316.1592653780003; 
+ Sat, 20 Jun 2020 04:49:40 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id 14sm1951354wmk.19.2020.06.20.04.49.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 20 Jun 2020 04:49:39 -0700 (PDT)
+Subject: Re: [PATCH v3 0/4] hw/misc/pca9552: Trace LED On/Off events
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor jnsnow ruthan
-X-Launchpad-Bug-Reporter: ruthan (ruthan)
-X-Launchpad-Bug-Modifier: ruthan (ruthan)
-References: <158706562034.6027.11807874678540403888.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159265235645.14479.3044227777727972546.malone@wampee.canonical.com>
-Subject: [Bug 1873338] Re: Dos on the fly CD image replacement is not Working
- with DOS
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d2301dfae6115238ead379ff84050eda0f9be408
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 06:20:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, T_SPF_TEMPERROR=0.01 autolearn=_AUTOLEARN
+References: <20200619145101.1637-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <00d75321-7245-ef59-c856-148dbbd101e3@amsat.org>
+Date: Sat, 20 Jun 2020 13:49:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200619145101.1637-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,34 +101,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1873338 <1873338@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Its not incomplete. i gave lots of info.
+On 6/19/20 4:50 PM, Philippe Mathieu-Daudé wrote:
+> This series add trace events to better display LEDs changes.
+> This helps me to work on a generic LED device, see:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg711917.html
 
--- =
+FYI I'm going to send a v4, using the generic LED device.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1873338
-
-Title:
-  Dos on the fly CD image replacement is not Working with DOS
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Im not able to exchange CD image on the fly (needed for some games). I
-  messed with command like - in console(ATL+CRTL+2) eject ide1-cd0 and
-  change ide-cd0 D:/Games/!Emulators/Dos-QEMU/ISOs/TestChangeISO.iso ,
-  but system so never able to find new CD data.. simply drive so empty..
-  but when i reboot virtual machine, new change image is now working.
-
-  =C2=A0=C2=A0Qemu 4.2. Linux Mint 19.3 and also Windows 10.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1873338/+subscriptions
+> 
+> Example when booting an obmc-phosphor-image, we can see the LED #14
+> (front-power LED) starting to blink.
+> 
+> - ASCII LED bar view:
+> 
+>   $ qemu-system-arm -M witherspoon-bmc -trace pca9552_leds_status
+>   19286@1592574170.202791:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [*...............]
+>   19286@1592574170.203609:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [**..............]
+>   19286@1592574170.204102:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [***.............]
+>   19286@1592574170.204415:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****............]
+>   19286@1592574170.204758:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*..]
+>   19286@1592574170.205070:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........**.]
+>   19286@1592574170.205380:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
+>   19286@1592574235.384845:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
+>   19286@1592574235.894049:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
+>   19286@1592574236.404277:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
+>   19286@1592574236.914644:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
+>   19286@1592574237.424558:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
+>   19286@1592574237.934580:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
+>   19286@1592574238.444688:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
+> 
+> - Only display LEDs which status changes:
+> 
+>   $ qemu-system-arm -M witherspoon-bmc -trace pca9552_led_change
+>   23367@1592575218.896117:pca9552_led_change 0x557cb6896d80 LED id:0 status: 0 -> 1
+>   23367@1592575218.897072:pca9552_led_change 0x557cb6896d80 LED id:1 status: 0 -> 1
+>   23367@1592575218.897487:pca9552_led_change 0x557cb6896d80 LED id:2 status: 0 -> 1
+>   23367@1592575218.897855:pca9552_led_change 0x557cb6896d80 LED id:3 status: 0 -> 1
+>   23367@1592575218.898256:pca9552_led_change 0x557cb6896d80 LED id:13 status: 0 -> 1
+>   23367@1592575218.898663:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
+>   23367@1592575218.899138:pca9552_led_change 0x557cb6896d80 LED id:15 status: 0 -> 1
+>   23367@1592575281.593379:pca9552_led_change 0x557cb6896d80 LED id:14 status: 1 -> 0
+>   23367@1592575282.102994:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
+>   23367@1592575282.613558:pca9552_led_change 0x557cb6896d80 LED id:14 status: 1 -> 0
+>   23367@1592575283.122774:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
+> 
+> For information about how to test the obmc-phosphor-image, see:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg712911.html
+> 
+> Supersedes: <20200617064734.26956-1-f4bug@amsat.org>
+> 
+> Philippe Mathieu-Daudé (4):
+>   hw/misc/pca9552: Replace magic value by PCA9552_LED_COUNT definition
+>   hw/misc/pca9552: Add a PCA955X_LED_MAX definition
+>   hw/misc/pca9552: Trace LED On/Off events
+>   hw/misc/pca9552: Trace LED change events
+> 
+>  include/hw/misc/pca9552.h |  2 ++
+>  hw/misc/pca9552.c         | 60 ++++++++++++++++++++++++++++++++++++++-
+>  hw/misc/trace-events      |  4 +++
+>  3 files changed, 65 insertions(+), 1 deletion(-)
+> 
 
