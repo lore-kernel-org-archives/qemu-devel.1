@@ -2,80 +2,83 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DFDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 354C1C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 722E023ECF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0514523ECF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB58rHbi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722E023ECF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nc3M7l9x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0514523ECF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmgNP-0007D8-I7
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 12:29:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43934)
+	id 1jmgNQ-0007ET-9K
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 12:29:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmgLw-0005ZO-Ku; Sat, 20 Jun 2020 12:28:24 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:55298)
+ id 1jmgLx-0005Za-NN; Sat, 20 Jun 2020 12:28:25 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmgLv-0004me-43; Sat, 20 Jun 2020 12:28:24 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id g75so2963986wme.5;
- Sat, 20 Jun 2020 09:28:22 -0700 (PDT)
+ id 1jmgLw-0004mo-7M; Sat, 20 Jun 2020 12:28:25 -0400
+Received: by mail-wm1-x343.google.com with SMTP id r9so11063039wmh.2;
+ Sat, 20 Jun 2020 09:28:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=LD86i6ePSe4PN5iFnsRMbNNgXe4bEQc0BX5nmcZuiH8=;
- b=VB58rHbilN8iHXRO6p4547/ir7TCrlzj8csaPS0NPlvowOC+m/HvYRnIclV4o6E0bZ
- ikSBXQL58RCM1FQdJpSYR28TBIDHO+QOETXBkvn+cekR1xLKjPjorF2Df24ODs0jPsDb
- IaZ1tyzrBSahVEWeWi/nJsDcVm0QVlVvNcELg3Epg9AOxSBu3Ei3vCougI1GGcjS6D7v
- qhEU7W39qUv542FzpudfIkN876lVGV2D0gEW3v/SHGNHraFXhPJlDe+1uDLcRuRFDvCX
- BHl7u9dgU0ufriNvNYM2b/ncaJf0vbax3S64mt2rXJNmOGcSUcT7lzKO8rN9iZeOicqv
- AxnA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=IdJDaxaaDoVYI8SF19S5iYRVy5MISpN5ZXPUywc1aS0=;
+ b=Nc3M7l9xFOrVmmB3KrRu5vZDzS0gWFgP5ariHr69mR8iTcRJ93PEwmynFVEV7ZVG/7
+ W6WFSgSHJCYbbebBQGPwgX+rnVkaWeKrhEdV+9e+09STacpsq+SkMdNx9MLIovyQhMvP
+ ZU8PCwUNUJ6e10a09LfXDKGTFRud7ARqTJQoDyXV0CTu8pCchYU5qjSBI338FY8rLjj7
+ iOoNWEAE/3306DZm58GU6/n9pZfkfS+k5XL+pHOkgshfuoGE+JpBt5NOR3jPre1IMs/Y
+ +MV+tkxOLSbNuQBTNtfzjnW+Vf20IPMh9SOhb9pPOZmL50Q+fOrCOyncMavip88maXu/
+ /5Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=LD86i6ePSe4PN5iFnsRMbNNgXe4bEQc0BX5nmcZuiH8=;
- b=tICJ+qALMqISS5G2HEHvQ2hh6Hh7rXo1I6ma/fUdxjBcwwDHt7do4B7ZfTt/LEEcE9
- a5fvNiRKhYoY7a0xbWJFNJsV596R7RK70c9/c2iTMXj7ileDTW0d+4GJab/dpMdNQbbI
- V31HxpcgvtV7ueHZ5IyFKd+KKHyvZvRXdX193O+ViAc/s/0AbC6kt9Km39OqE8nVMJO5
- hiHHoaM/lfjez/SrsEuFyrlSFdlaFN7iPV8EAQJ/afHy3PV20Y/WSgWiH6koOFa8JBl1
- 0IaAZ7NToolt4aCbOoAiIu1CBiTZ0hXeMKUMaIseFDAvy+NZkg6SAznx7VEnbW9K/Mpm
- +J4w==
-X-Gm-Message-State: AOAM532GUXpEkILSw+MMOHvbH1lMmlpzF3YdEvslhvog9j4xs6OyA9q7
- Cm6sOaVvWb12cVHvb43/i0UjSdps
-X-Google-Smtp-Source: ABdhPJy1QhJrwYlASr5yz2XmkyzgJkYGkkDJrYMe6m1Qy6K27J8yxzbdnq6pTMHSAs1Zadb3+zcRVg==
-X-Received: by 2002:a1c:ab04:: with SMTP id u4mr9945063wme.52.1592670501164;
- Sat, 20 Jun 2020 09:28:21 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=IdJDaxaaDoVYI8SF19S5iYRVy5MISpN5ZXPUywc1aS0=;
+ b=gJofSdFkm2Uu3um+Kit2ZxQ9ZFF3kYR5wagZNHcv5KmP4hTKd8S0bX6w4YJpApHmkW
+ wRrzWmiBnL0Q6rtj0y/+19pk0/ks9DnD8cIKG9Hl7/dHQUpLsdJPgo4IyLfdKXE8uOZF
+ HGHThlmtxP0qHhxcJPAvkEej3G4eeTqmVQ4Zvu5mseO1oyQM+joBkypqcdmfoT3lK/MU
+ UVefiVK4ku/rHDys+1VCBs1ufTWz/3UZGINRCgCopJOnRSOTIiro+2E/c3yxYlGBazlC
+ OwRqTjBo/BCigYyys73+nA/lXZ0quAvBCrb3MToDHB0v8apEnj2MPRVxLARR3/7ZHYSI
+ rw2g==
+X-Gm-Message-State: AOAM532oUHoQZld8aQiTvY8D6ixKlOmfNhcBLzcTrZ6nH2C2IOPlvZsh
+ fLHSe0mqNEnMteMSnWxBhRBSYAQ4
+X-Google-Smtp-Source: ABdhPJwFmZB4pI9d7/3Cpve77qO1VU0BMAf8Wtc4HjjnfovAU876I6jEc4IhYn+dC0tJqPBNRvM2fg==
+X-Received: by 2002:a1c:c357:: with SMTP id t84mr9949149wmf.155.1592670502257; 
+ Sat, 20 Jun 2020 09:28:22 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e8sm9240006wrv.24.2020.06.20.09.28.19
+ by smtp.gmail.com with ESMTPSA id e8sm9240006wrv.24.2020.06.20.09.28.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 09:28:20 -0700 (PDT)
+ Sat, 20 Jun 2020 09:28:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] hw/arm/aspeed: Improve QOM usage
-Date: Sat, 20 Jun 2020 18:28:16 +0200
-Message-Id: <20200620162818.22340-1-f4bug@amsat.org>
+Subject: [PATCH 1/2] hw/arm/aspeed: Remove extraneous MemoryRegion object owner
+Date: Sat, 20 Jun 2020 18:28:17 +0200
+Message-Id: <20200620162818.22340-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200620162818.22340-1-f4bug@amsat.org>
+References: <20200620162818.22340-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -107,17 +110,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yet another cleanup.
-Simplify aspeed machine QOM usage.
+I'm confused by this code, 'bmc' is created as:
 
-Philippe Mathieu-Daudé (2):
-  hw/arm/aspeed: Remove extraneous MemoryRegion object owner
-  hw/arm/aspeed: QOM'ify AspeedBoardState
+  bmc = g_new0(AspeedBoardState, 1);
 
- include/hw/arm/aspeed.h |  8 +-------
- hw/arm/aspeed.c         | 17 ++++++++++-------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+Then we use it as QOM owner for different MemoryRegion objects.
+But looking at memory_region_init_ram (similarly for ROM):
 
+  void memory_region_init_ram(MemoryRegion *mr,
+                              struct Object *owner,
+                              const char *name,
+                              uint64_t size,
+                              Error **errp)
+  {
+      DeviceState *owner_dev;
+      Error *err = NULL;
+
+      memory_region_init_ram_nomigrate(mr, owner, name, size, &err);
+      if (err) {
+          error_propagate(errp, err);
+          return;
+      }
+      /* This will assert if owner is neither NULL nor a DeviceState.
+       * We only want the owner here for the purposes of defining a
+       * unique name for migration. TODO: Ideally we should implement
+       * a naming scheme for Objects which are not DeviceStates, in
+       * which case we can relax this restriction.
+       */
+      owner_dev = DEVICE(owner);
+      vmstate_register_ram(mr, owner_dev);
+  }
+
+The expected assertion is not triggered ('bmc' is not NULL neither
+a DeviceState).
+
+'bmc' structure is defined as:
+
+  struct AspeedBoardState {
+      AspeedSoCState soc;
+      MemoryRegion ram_container;
+      MemoryRegion max_ram;
+  };
+
+Apparently
+What happens is when using 'OBJECT(bmc)', the QOM macros cast the
+memory pointed by bmc, which first member is 'soc', which is
+initialized ...:
+
+  object_initialize_child(OBJECT(machine), "soc",
+                          &bmc->soc, amc->soc_name);
+
+The 'soc' object is indeed a DeviceState, so the assertion passes.
+
+Since this is fragile and only happens to work by luck, remove the
+dangerous OBJECT(bmc) owner argument.
+
+This probably breaks migration for this machine.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/arm/aspeed.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 0ad08a2b4c..31765792a2 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -329,12 +329,12 @@ static void aspeed_machine_init(MachineState *machine)
+          * needed by the flash modules of the Aspeed machines.
+          */
+         if (ASPEED_MACHINE(machine)->mmio_exec) {
+-            memory_region_init_alias(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
++            memory_region_init_alias(boot_rom, NULL, "aspeed.boot_rom",
+                                      &fl->mmio, 0, fl->size);
+             memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
+                                         boot_rom);
+         } else {
+-            memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
++            memory_region_init_rom(boot_rom, NULL, "aspeed.boot_rom",
+                                    fl->size, &error_abort);
+             memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
+                                         boot_rom);
+@@ -345,7 +345,7 @@ static void aspeed_machine_init(MachineState *machine)
+     if (machine->kernel_filename && sc->num_cpus > 1) {
+         /* With no u-boot we must set up a boot stub for the secondary CPU */
+         MemoryRegion *smpboot = g_new(MemoryRegion, 1);
+-        memory_region_init_ram(smpboot, OBJECT(bmc), "aspeed.smpboot",
++        memory_region_init_ram(smpboot, NULL, "aspeed.smpboot",
+                                0x80, &error_abort);
+         memory_region_add_subregion(get_system_memory(),
+                                     AST_SMP_MAILBOX_BASE, smpboot);
 -- 
 2.21.3
 
