@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E23FAC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 665FDC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:21:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE09B221EA
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30F1C23C8D
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:21:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bSAVRmZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE09B221EA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vdky9vbz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F1C23C8D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmf8n-0002cn-Ux
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 11:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60708)
+	id 1jmfJT-0001Hk-EM
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 11:21:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmf81-0001zT-FX
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:09:57 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52353)
+ id 1jmfIj-00080Y-UD
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:21:01 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38422)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmf7z-0001BU-Lc
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:09:57 -0400
-Received: by mail-wm1-x342.google.com with SMTP id r9so10946558wmh.2
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 08:09:55 -0700 (PDT)
+ id 1jmfIi-0002fe-52
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:21:01 -0400
+Received: by mail-wr1-x443.google.com with SMTP id z13so640409wrw.5
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 08:20:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=TbTYXxUw4R/YqyG9Nft7VcrVZ1yGzJkU0/vdb4RVAyY=;
- b=bSAVRmZf6yOm71IKTDwuI+0KEmdaThSKWomPV204qhsJPySIupfiYmTVx490jM+JX0
- d/77RZ1vGfDtq1Ki/TqzSgCsX7D2+O6zsJRrLmEX8S7+gVE7FGtVAxMD1jesMPBv6dZE
- yqEIn4cLxacuxMH6JrEe4GIMYDimL6ECT/unJL7eBT6BW7glzxG8JnXLVjXTL6YVkzKm
- b3TbDtuGvOZDGi0AVkwmMd4rjYyJGfWFzkYuj5i9pBvoq9nnA8olOnKMgYEneu2l7M7g
- dr91hrk29bdRA/FnaZLYqexhQmOGxDH+wGNy7NTkep3bVWXma15HmXv4RhThDpIF6VyG
- Jn3g==
+ bh=cp8yjQty0CYXjDEf32CauBLvI2lQ5+q1uWNFlIGopBQ=;
+ b=vdky9vbzqa2cK6QE65vpL4VlWpUaKrzTTfQr0W193swx76YipUkUyb65Y50cN6vOMZ
+ 2wvaQFQx4s8NAw/EDVl0W3ZwB+n/2iIboqCh3tF3Ch6YH7+XaOaDRZwKKD4OfHU7kNXR
+ 4YM2EITKWSAdlYp5yuYy4BDVNSLkZYNAo915JHj2oU+CF6w3mk2Z1Vkak/pq1dTJpHN6
+ 6N7EuThUDM1X+k7NMSRfWJIiCRgHp/ot0F4mEYb/65XWyv61DkxaG1sjj7/1aGQwpK5w
+ TDI/hRbmHaNjsV4cBSCj34C3VfXD6k2x+vDUrh6kdNQaVspfH/MDLfBO6b5B+d9W58cD
+ m23g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=TbTYXxUw4R/YqyG9Nft7VcrVZ1yGzJkU0/vdb4RVAyY=;
- b=nhCHi+rSFioja4bJzeRdBofBWkn+AJjofr869eziXx5h/cZC6E6hzwIMc8EVk1XZtF
- xfDkqEBu5eNo/vxXaLPVf8SjGv7traf17fYRWSbMVd5wVd1OFYDU3Rfj7QbcqWvvkMQK
- hjhNgY1iBBGU/lAsZwfbppdOJFKZeVhOaH6VdVjoUZPIAgJya6SXcnplv17bxU47kvwG
- djIpD9BmYPmc5auvyIbugwtH3MyHMTjEjmtoL4YWG1acynVkmDW2C10+d96JDZtunJHX
- SpTQiU9hBymTB9+sS18D6wWjRh7rOnNDfa8QtOJ+OUlKdfbmYANVmqFEqqDySPJfI+dQ
- yznA==
-X-Gm-Message-State: AOAM5309ek5nKnq/4fIlkgCwGzFqXQH1q9o8zjxcQXy6adMsCO9DGF4s
- KhI44hz7O32Z/NNOYc1eiml7RczW2N+lGklqQQU=
-X-Google-Smtp-Source: ABdhPJw3rl//rFoTPn0ToiJJr7rx4Yy0WeS/SVR3Pj6YRlApfyBN0TUhe0TQozSygqDuBc5KjLN1lGbcQvauHb0IzdA=
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr8704234wmf.129.1592665793892; 
- Sat, 20 Jun 2020 08:09:53 -0700 (PDT)
+ bh=cp8yjQty0CYXjDEf32CauBLvI2lQ5+q1uWNFlIGopBQ=;
+ b=BEkvJ6UzF4QQbyWvGjUBEI2Y1MoFlWTJvSa52uj15aOVqpewJumYsRWvpkgxJNbzTN
+ qf+uoiuAG6NYy0NqgdFUbcUB47dtXKacraNtRA7LdKmyIH3Lt7RCSbGW9kG2j/I/6DUq
+ 6ZgDbrv1tkW/zFXhBzm4/bJdxDJX7bXBWKTrs5XZZyGGQrHoBaWQ0XgypsreM7C2bUwu
+ nqC1QZXe5QAx6O6ZBAG3y6dNm4nnSnif+nZEvb/cEMT8AWH0pC7ijWJiqG7KIkPbG8Zp
+ FmjDl/qZuUDpcasnCEETzbFRdLetySWlnd1Ub9F9QFaLceC+ntUYwWo7BNNY8dky7aM5
+ 9dCg==
+X-Gm-Message-State: AOAM533z7wmCctvqWcoxFslakCiQqbMu6uEHkDW5/7zVg2x6XN03LvaE
+ 8NDxnoZgSbj/sU4NVUCjjLjZYbHxl3Q515+zqio=
+X-Google-Smtp-Source: ABdhPJzjP013Sli/A3frcqVlumAgp7lZVuykjq5sGQzuo9+lSHNTOv0oVJLSaHpUdwl/wEaoyKRA6LDd7Ib2xp6yB08=
+X-Received: by 2002:a5d:4385:: with SMTP id i5mr9559937wrq.420.1592666458501; 
+ Sat, 20 Jun 2020 08:20:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
  <CAFEAcA9C+cJ_2DdNQBckNZJEZXiG4jNPsE1HSh9bU5AOrOGMCQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA9C+cJ_2DdNQBckNZJEZXiG4jNPsE1HSh9bU5AOrOGMCQ@mail.gmail.com>
+ <CAHiYmc5XehmzTB953JP85zTxoqVJX7Hbuak3W0m0QrB2HsQrVw@mail.gmail.com>
+In-Reply-To: <CAHiYmc5XehmzTB953JP85zTxoqVJX7Hbuak3W0m0QrB2HsQrVw@mail.gmail.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sat, 20 Jun 2020 17:09:38 +0200
-Message-ID: <CAHiYmc5XehmzTB953JP85zTxoqVJX7Hbuak3W0m0QrB2HsQrVw@mail.gmail.com>
+Date: Sat, 20 Jun 2020 17:20:41 +0200
+Message-ID: <CAHiYmc6yuh=dExQKMsn9tfp0BAvS4LaxWCcAu1Lq6bYLE6CJXA@mail.gmail.com>
 Subject: Re: [PATCH 0/2] checkpatch: Do appropriate kernel->qemu renaming
 To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,93 +104,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=81=D1=83=D0=B1, 20. =D1=98=D1=83=D0=BD 2020. =D1=83 16:25 Peter Maydell=
- <peter.maydell@linaro.org> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+=D1=81=D1=83=D0=B1, 20. =D1=98=D1=83=D0=BD 2020. =D1=83 17:09 Aleksandar Ma=
+rkovic
+<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
-> On Sat, 20 Jun 2020 at 14:33, Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> > There are several places where 'kernel' is mentioned instead of
-> > 'qemu' in checkpatch.pl.
+> =D1=81=D1=83=D0=B1, 20. =D1=98=D1=83=D0=BD 2020. =D1=83 16:25 Peter Mayde=
+ll <peter.maydell@linaro.org> =D1=98=D0=B5
+> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 > >
-> > This small series corrects this.
+> > On Sat, 20 Jun 2020 at 14:33, Aleksandar Markovic
+> > <aleksandar.qemu.devel@gmail.com> wrote:
+> > > There are several places where 'kernel' is mentioned instead of
+> > > 'qemu' in checkpatch.pl.
+> > >
+> > > This small series corrects this.
+> >
+> > So, the thing about this kind of change is that it's implicitly saying =
+"we have
+> > forked checkpatch and will not try to update to newer versions of it fr=
+om
+> > the kernel tree", because this sort of no-behavioural-change tends to
+> > get in the way of that kind of update by obscuring the delta between
+> > the kernel version and ours. Effectively I think we *have* ended up
+> > with our own fork,
+> > simply because we haven't cared to do that kind of update from the kern=
+el's
+> > version and we've gradually added our own changes to our copy. But it s=
+eems
+> > like it's worth discussing the general principle.
+> >
 >
-> So, the thing about this kind of change is that it's implicitly saying "w=
-e have
-> forked checkpatch and will not try to update to newer versions of it from
-> the kernel tree", because this sort of no-behavioural-change tends to
-> get in the way of that kind of update by obscuring the delta between
-> the kernel version and ours. Effectively I think we *have* ended up
-> with our own fork,
-> simply because we haven't cared to do that kind of update from the kernel=
-'s
-> version and we've gradually added our own changes to our copy. But it see=
-ms
-> like it's worth discussing the general principle.
+> I do not say (explicitly or implicitly) that we should or should not
+> follow and attempt to mirror changes in checkpatch.pl from kernel. (In
+> fact, I think we should.)
+>
+> However, I don't think that several differences (in this series, I
+> thinks altogether 7 lines) that would originate from difference of
+> names QEMU vs. kernel would not be any significant obstacle for a
+> potential future attempts to do comparison QEMU checkpatch vs kernel
+> chekpatch.
 >
 
-I do not say (explicitly or implicitly) that we should or should not
-follow and attempt to mirror changes in checkpatch.pl from kernel. (In
-fact, I think we should.)
+Sorry, I meant to say:
 
 However, I don't think that several differences (in this series, I
-thinks altogether 7 lines) that would originate from difference of
-names QEMU vs. kernel would not be any significant obstacle for a
+think, altogether 7 lines) that would originate from difference of
+names (QEMU vs. kernel) would be any significant obstacle for a
 potential future attempts to do comparison QEMU checkpatch vs kernel
-chekpatch.
+checkpatch.
 
-Take a look at two versions of top_of_kernel_tree below - they already
-differ in their body. Left this way, QEMU's checkpatch version simply
-violates basic naming principles in software development. And, it
-looks we want to sacrifice the principle - just for the sake of
-convenience of a potential engineer having 7 less line in his diff
-(out of much more).
 
-I don't insist on these two patches. I, of course, leave the decision
-to Peter, Paolo, Stefan, Michael, or others tracking kernel's
-checkpatch script.
 
-Thanks,
-Aleksandar
-
-QEMU version:
-
-sub top_of_kernel_tree {
-my ($root) =3D @_;
-
-my @tree_check =3D (
-"COPYING", "MAINTAINERS", "Makefile",
-"README.rst", "docs", "VERSION",
-"linux-user", "softmmu"
-);
-
-foreach my $check (@tree_check) {
-if (! -e $root . '/' . $check) {
-return 0;
-}
-}
-return 1;
-}
-
-Kernel version:
-
-sub top_of_kernel_tree {
-my ($root) =3D @_;
-
-my @tree_check =3D (
-"COPYING", "CREDITS", "Kbuild", "MAINTAINERS", "Makefile",
-"README", "Documentation", "arch", "include", "drivers",
-"fs", "init", "ipc", "kernel", "lib", "scripts",
-);
-
-foreach my $check (@tree_check) {
-if (! -e $root . '/' . $check) {
-return 0;
-}
-}
-return 1;
-}
-
-> thanks
-> -- PMM
+> Take a look at two versions of top_of_kernel_tree below - they already
+> differ in their body. Left this way, QEMU's checkpatch version simply
+> violates basic naming principles in software development. And, it
+> looks we want to sacrifice the principle - just for the sake of
+> convenience of a potential engineer having 7 less line in his diff
+> (out of much more).
+>
+> I don't insist on these two patches. I, of course, leave the decision
+> to Peter, Paolo, Stefan, Michael, or others tracking kernel's
+> checkpatch script.
+>
+> Thanks,
+> Aleksandar
+>
+> QEMU version:
+>
+> sub top_of_kernel_tree {
+> my ($root) =3D @_;
+>
+> my @tree_check =3D (
+> "COPYING", "MAINTAINERS", "Makefile",
+> "README.rst", "docs", "VERSION",
+> "linux-user", "softmmu"
+> );
+>
+> foreach my $check (@tree_check) {
+> if (! -e $root . '/' . $check) {
+> return 0;
+> }
+> }
+> return 1;
+> }
+>
+> Kernel version:
+>
+> sub top_of_kernel_tree {
+> my ($root) =3D @_;
+>
+> my @tree_check =3D (
+> "COPYING", "CREDITS", "Kbuild", "MAINTAINERS", "Makefile",
+> "README", "Documentation", "arch", "include", "drivers",
+> "fs", "init", "ipc", "kernel", "lib", "scripts",
+> );
+>
+> foreach my $check (@tree_check) {
+> if (! -e $root . '/' . $check) {
+> return 0;
+> }
+> }
+> return 1;
+> }
+>
+> > thanks
+> > -- PMM
 
