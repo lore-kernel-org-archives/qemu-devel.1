@@ -2,75 +2,75 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2228DC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:11:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0F8E22202
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C652823E1E
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:11:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6VxCSMD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F8E22202
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChozLKdb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C652823E1E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmmdL-0004Uz-4H
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:10:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42250)
+	id 1jmmeF-0005gR-2g
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:11:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmmaB-00076s-88; Sat, 20 Jun 2020 19:07:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41203)
+ id 1jmmaC-0007B4-NB; Sat, 20 Jun 2020 19:07:32 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:40048)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmma9-0002Md-HF; Sat, 20 Jun 2020 19:07:30 -0400
-Received: by mail-wr1-x444.google.com with SMTP id q2so10719772wrv.8;
- Sat, 20 Jun 2020 16:07:28 -0700 (PDT)
+ id 1jmmaB-0002Mn-3y; Sat, 20 Jun 2020 19:07:32 -0400
+Received: by mail-wm1-x329.google.com with SMTP id r15so12422190wmh.5;
+ Sat, 20 Jun 2020 16:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L7Y35LMk2Ma+Lon7EzcxgbVJFXZUaFqzrr3RXETrmOQ=;
- b=k6VxCSMDgEdEDsiaM6vtAhIPZymGdRmGefv4UZVGsNQ70nKYIRkUj7i1ujUNc3qc3U
- lS4qrSjXSz1pCIQDQNf7BEDU6sy6ebiVAF9dL9le+LyPMUwcvTzQUf8gXFRokFnbzkcY
- biV6ZIhConz/vN9Sa00siyogwyjSieiNLbow85GAWPswqUgaHMlyfOLj+5VhIhXnJQ+Z
- rv38WmeGXkQqlMgDigry+ZLwYgRSLMmNelq7BXMRHb3jsPLzi3Wc687OKRCIfqw4/h3J
- awmirJWZ8Q7d7B2RTuX8YOLFkA3T+yY2HYS2d5OVZR2gTCW3kyuySTTpxLErWC/kL2oD
- VuDQ==
+ bh=Zb02tNNP3k4Arx05DuNHXof+/AxtMqtoGOWXwVkHhHE=;
+ b=ChozLKdbQ6jvH8LOrBEmhTiTnB6CM+KaxSJdPJhNfUQdvp+Fbh+88XYQq+WPSKInD3
+ Xkq9bOIrF+jqzR56B1axkXGlgG0EhSOqtU4HMbH939mn0vVwpKYdkJp7tdpV6HnPJoAJ
+ D+zKWH3VtEgbC05QjDHppTqE8X/LqasuySfLvoxr1Va9Aba9GTFVI+GPbo8xUMBOwssF
+ df2l1p36/tOI4KieRx4Zr0uTySdF3Qz1/kgW+mV7TCL3BPf7gdivfz14u0oAwgWKkbE9
+ tAWOGoTXm4A8Jxjr0IK049PuAuro/O32n3h2krOyNuPBTjDus4txUa6f27mooZjyPQco
+ r8tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=L7Y35LMk2Ma+Lon7EzcxgbVJFXZUaFqzrr3RXETrmOQ=;
- b=qYpmd9jCIBWu1s1BzAwBbApHPA/B427sBYP+fid7RABpn4bJa4sxUa1kSniAQSikZX
- e1jH+s5ee8BpuWUsGTOoAsWNLUWV4ttxOvS3i7OuoVsfL7PSVKWPMM0kqRjsQN4LOpPb
- KuDQeCjKbNxE8mFGnT5aVZ45KgKENpaJIAH+L2JO0txWwBRkquMH5v+RVLYkASCg5lNU
- DQzO34wxXdJ9+EppseElbb0XY7Dju0mHSlPoHNOOl/IS3m059wUw1GDjiIr52rTgYbtJ
- 7lf7EEf2yGUIZSrJgndRu8YphG4Gjljcg7wul5kkGdLRtuycwyVaduRdu6N0lucZLsN/
- xwrw==
-X-Gm-Message-State: AOAM533p1XZFtD/W4HAFmVdjehtGyXDpkVtAZ+VYMaPCITgpo15sO2iy
- nnMWiD6a9WZc9oKik4+Ynu8P/bDb
-X-Google-Smtp-Source: ABdhPJwi2ycvqI0fhGiGhapj06F7HM5xGwQwG2GGJrOOwU6awWZypl9oBtK07LQeu6Si4vVEBa2GNg==
-X-Received: by 2002:adf:ecc2:: with SMTP id s2mr12209614wro.60.1592694447696; 
- Sat, 20 Jun 2020 16:07:27 -0700 (PDT)
+ bh=Zb02tNNP3k4Arx05DuNHXof+/AxtMqtoGOWXwVkHhHE=;
+ b=YNY5Bqw8jIQID3Q54r1ynJsTe+Ur7C09wXlUNQDRMWobP2GRYhFgqU6VyvWOmMGewB
+ CGpkry6byiz+YbtTalGMriShiO162X6B28HDxwNPtXxLZtHib1sM3Xjs1kORkXIBvcSt
+ z3Hd8wsp3X2p/SxgsqNu/P4tUR7gYq3OeSbhKksHqvKb+ddFoVElwUxEo6NgAgCTwiX9
+ WLapnI19z7pDKDPmRM81Ds2wTAJF+Nk8goJMEVJPbdVJNRJLieS5cA2KXFkVyB+Goukc
+ f+Z/rI4YvfsToYvSrLNlVXfVns1H/pxHWzTA9dzgAtR/EYsy2bmCpm5U5cmVM4LeAs9N
+ 20JQ==
+X-Gm-Message-State: AOAM530R3kw1GjlotMjs4ThpjooND/NaXZBXrH4SlWaxKVLCs8iQOrZT
+ p64lJHfNnbmeec/4vDuyEQv/589F
+X-Google-Smtp-Source: ABdhPJwcWZvw2SW4J2OX6umGvBK8DrcWhC2bxhD5ZS1TJWagkAT0K7vuxYMLiW2tYzhulGsr6ScL4Q==
+X-Received: by 2002:a05:600c:ce:: with SMTP id
+ u14mr10382440wmm.131.1592694448968; 
+ Sat, 20 Jun 2020 16:07:28 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o82sm11455037wmo.40.2020.06.20.16.07.26
+ by smtp.gmail.com with ESMTPSA id o82sm11455037wmo.40.2020.06.20.16.07.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 16:07:27 -0700 (PDT)
+ Sat, 20 Jun 2020 16:07:28 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/7] hw/arm/aspeed: Add the 3 front LEDs drived by the
- PCA9552 #1
-Date: Sun, 21 Jun 2020 01:07:16 +0200
-Message-Id: <20200620230719.32139-5-f4bug@amsat.org>
+Subject: [PATCH v3 5/7] hw/misc/mps2-fpgaio: Use the LED device
+Date: Sun, 21 Jun 2020 01:07:17 +0200
+Message-Id: <20200620230719.32139-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200620230719.32139-1-f4bug@amsat.org>
 References: <20200620230719.32139-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x329.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -110,87 +110,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Witherspoon has 3 LEDs connected to a PCA9552. Add them.
-The names and reset values are taken from:
-https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
+Per the 'ARM MPS2 and MPS2+ FPGA Prototyping Boards Technical
+Reference Manual' (100112_0200_07_en):
 
-Example booting obmc-phosphor-image:
+  2.1  Overview of the MPS2 and MPS2+ hardware
 
-  $ qemu-system-arm -M witherspoon-bmc -trace led_change_intensity
-  1592693373.997015:led_change_intensity LED desc:'front-fault-4' color:green intensity 0x0000 -> 0xffff
-  1592693373.997632:led_change_intensity LED desc:'front-power-3' color:green intensity 0x0000 -> 0xffff
-  1592693373.998239:led_change_intensity LED desc:'front-id-5' color:green intensity 0x0000 -> 0xffff
-  1592693500.291805:led_change_intensity LED desc:'front-power-3' color:green intensity 0xffff -> 0x0000
-  1592693500.312041:led_change_intensity LED desc:'front-power-3' color:green intensity 0x0000 -> 0xffff
-  1592693500.821254:led_change_intensity LED desc:'front-power-3' color:green intensity 0xffff -> 0x0000
-  1592693501.331517:led_change_intensity LED desc:'front-power-3' color:green intensity 0x0000 -> 0xffff
-  1592693501.841367:led_change_intensity LED desc:'front-power-3' color:green intensity 0xffff -> 0x0000
-  1592693502.350839:led_change_intensity LED desc:'front-power-3' color:green intensity 0x0000 -> 0xffff
-  1592693502.861134:led_change_intensity LED desc:'front-power-3' color:green intensity 0xffff -> 0x0000
-  1592693503.371090:led_change_intensity LED desc:'front-power-3' color:green intensity 0x0000 -> 0xffff
+       The MPS2 and MPS2+ FPGA Prototyping Boards contain the
+       following components and interfaces:
 
-We notice the front-power LED starts to blink.
+       * User switches and user LEDs:
+
+         - Two green LEDs and two push buttons that connect to
+           the FPGA.
+         - Eight green LEDs and one 8-way dip switch that connect
+           to the MCC.
+
+Add the 2 LEDs connected to the FPGA.
+
+This remplaces the 'mps2_fpgaio_leds' trace events by the generic
+'led_set_intensity' event.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/aspeed.c | 17 +++++++++++++++++
- hw/arm/Kconfig  |  1 +
- 2 files changed, 18 insertions(+)
+ include/hw/misc/mps2-fpgaio.h |  1 +
+ hw/misc/mps2-fpgaio.c         | 13 ++++++++-----
+ hw/misc/Kconfig               |  1 +
+ hw/misc/trace-events          |  1 -
+ 4 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 3d5dec4692..217f8ad7d5 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -20,6 +20,7 @@
- #include "hw/i2c/smbus_eeprom.h"
- #include "hw/misc/pca9552.h"
- #include "hw/misc/tmp105.h"
+diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
+index 69e265cd4b..228b813fd3 100644
+--- a/include/hw/misc/mps2-fpgaio.h
++++ b/include/hw/misc/mps2-fpgaio.h
+@@ -32,6 +32,7 @@ typedef struct {
+ 
+     /*< public >*/
+     MemoryRegion iomem;
++    DeviceState *led[2];
+ 
+     uint32_t led0;
+     uint32_t prescale;
+diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
+index 2f3fbeef34..65488f8634 100644
+--- a/hw/misc/mps2-fpgaio.c
++++ b/hw/misc/mps2-fpgaio.c
+@@ -24,6 +24,7 @@
+ #include "migration/vmstate.h"
+ #include "hw/registerfields.h"
+ #include "hw/misc/mps2-fpgaio.h"
 +#include "hw/misc/led.h"
  #include "hw/qdev-properties.h"
- #include "qemu/log.h"
- #include "sysemu/block-backend.h"
-@@ -506,6 +507,16 @@ static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
+ #include "qemu/timer.h"
  
- static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
- {
-+    static const struct {
-+        unsigned gpio_id;
-+        LEDColor color;
-+        const char *description;
-+        uint16_t reset_intensity;
-+    } pca1_leds[] = {
-+        {13, LED_COLOR_GREEN, "front-fault-4",  LED_RESET_INTENSITY_ACTIVE_LOW},
-+        {14, LED_COLOR_GREEN, "front-power-3",  LED_RESET_INTENSITY_ACTIVE_LOW},
-+        {15, LED_COLOR_GREEN, "front-id-5",     LED_RESET_INTENSITY_ACTIVE_LOW},
-+    };
-     AspeedSoCState *soc = &bmc->soc;
-     uint8_t *eeprom_buf = g_malloc0(8 * 1024);
-     DeviceState *dev;
-@@ -518,6 +529,12 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
-     i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3),
-                           &error_fatal);
+@@ -176,12 +177,9 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
  
-+    for (size_t i = 0; i < ARRAY_SIZE(pca1_leds); i++) {
-+        create_led_by_gpio_id(OBJECT(bmc), dev,
-+                              pca1_leds[i].gpio_id, pca1_leds[i].color,
-+                              pca1_leds[i].description,
-+                              pca1_leds[i].reset_intensity);
-+    }
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423", 0x4c);
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423", 0x4c);
+     switch (offset) {
+     case A_LED0:
+-        /* LED bits [1:0] control board LEDs. We don't currently have
+-         * a mechanism for displaying this graphically, so use a trace event.
+-         */
+-        trace_mps2_fpgaio_leds(value & 0x02 ? '*' : '.',
+-                               value & 0x01 ? '*' : '.');
+         s->led0 = value & 0x3;
++        led_set_state(LED(s->led[0]), value & 0x01);
++        led_set_state(LED(s->led[1]), value & 0x02);
+         break;
+     case A_PRESCALE:
+         resync_counter(s);
+@@ -249,6 +247,11 @@ static void mps2_fpgaio_init(Object *obj)
+     memory_region_init_io(&s->iomem, obj, &mps2_fpgaio_ops, s,
+                           "mps2-fpgaio", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
++
++    s->led[0] = create_led(obj, LED_COLOR_GREEN,
++                           "USERLED0", LED_RESET_INTENSITY_ACTIVE_HIGH);
++    s->led[1] = create_led(obj, LED_COLOR_GREEN,
++                           "USERLED1", LED_RESET_INTENSITY_ACTIVE_HIGH);
+ }
  
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 9afa6eee79..1a57a861ac 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -393,6 +393,7 @@ config ASPEED_SOC
-     select TMP105
-     select TMP421
-     select UNIMP
+ static bool mps2_fpgaio_counters_needed(void *opaque)
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index f60dce694d..889757731b 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -93,6 +93,7 @@ config MIPS_ITU
+ 
+ config MPS2_FPGAIO
+     bool
 +    select LED
  
- config MPS2
+ config MPS2_SCC
      bool
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 57d39bf9b9..8bc7a675e8 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -89,7 +89,6 @@ mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC
+ mps2_fpgaio_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ mps2_fpgaio_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 FPGAIO write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ mps2_fpgaio_reset(void) "MPS2 FPGAIO: reset"
+-mps2_fpgaio_leds(char led1, char led0) "MPS2 FPGAIO LEDs: %c%c"
+ 
+ # msf2-sysreg.c
+ msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sysreg write: addr 0x%08" PRIx64 " data 0x%" PRIx32 " prev 0x%" PRIx32
 -- 
 2.21.3
 
