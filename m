@@ -2,84 +2,80 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E662CC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DFDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE199221F7
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 15:40:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 722E023ECF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 16:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n67Bf4dc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE199221F7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB58rHbi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722E023ECF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmfbZ-0004Nk-UX
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 11:40:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36354)
+	id 1jmgNP-0007D8-I7
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 12:29:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmfZt-0002hX-6W
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:38:45 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45907)
+ id 1jmgLw-0005ZO-Ku; Sat, 20 Jun 2020 12:28:24 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:55298)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmfZq-0005zC-Dv
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 11:38:44 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c3so12376262wru.12
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 08:38:40 -0700 (PDT)
+ id 1jmgLv-0004me-43; Sat, 20 Jun 2020 12:28:24 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id g75so2963986wme.5;
+ Sat, 20 Jun 2020 09:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=Zn+iIpXpdwJ6WSGdxt8VQvwtltggvLu0E5NwS3wf3MA=;
- b=n67Bf4dcqmcLn/GpWf120kXsYvpI2i+cGDuwnL8a169PZ6kctm8Z8mzECMkrWuBGgr
- LqC+/S5BBz6sNcNA/ZIVfm9bUDHkwJ/HlZzIwvlKuZdyG1qKcr/Mo3fLSLHC4bbgM9CO
- i4mQIxbZS6gITeai5FDsTP03J8U6rjRUzfFweePBahG7RFOUbOQ7XbdfG1L9YKOcPgOu
- Q++U0MzZI5QdW9c5C7JEeiJR41xcPAEv9nFGK9i4PKnsNteGY1DQcihP2PR62KeyJKQR
- ts1HS3JbSZbFf0LvJegUxVlX3Fr7kMvayQb7f+QnKle1eBFkLDDE/Q1/uZcXhNfTbGaE
- NuWw==
+ bh=LD86i6ePSe4PN5iFnsRMbNNgXe4bEQc0BX5nmcZuiH8=;
+ b=VB58rHbilN8iHXRO6p4547/ir7TCrlzj8csaPS0NPlvowOC+m/HvYRnIclV4o6E0bZ
+ ikSBXQL58RCM1FQdJpSYR28TBIDHO+QOETXBkvn+cekR1xLKjPjorF2Df24ODs0jPsDb
+ IaZ1tyzrBSahVEWeWi/nJsDcVm0QVlVvNcELg3Epg9AOxSBu3Ei3vCougI1GGcjS6D7v
+ qhEU7W39qUv542FzpudfIkN876lVGV2D0gEW3v/SHGNHraFXhPJlDe+1uDLcRuRFDvCX
+ BHl7u9dgU0ufriNvNYM2b/ncaJf0vbax3S64mt2rXJNmOGcSUcT7lzKO8rN9iZeOicqv
+ AxnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=Zn+iIpXpdwJ6WSGdxt8VQvwtltggvLu0E5NwS3wf3MA=;
- b=hnzMMCmEALDMscWQ4vCVRwedFPQisRxhUDCn1hjwdXWds/yexr5s6AwVZl5lFYmnRi
- LmXjDcqQUbd/BkQcKtWifSpbr78DIRXe6Y47YMbFyxdxqe6tvWLlQ0BpQwFUTaBGlZwb
- qKiuMRewtmKkt0wimGQwfEN5ercx4VTdbc3BUIzveV4WRNriv9Fm3Xvzomnws0Tm/odw
- LmdYOy6jLVqVmdE5s5NX7JbQo0lAqskwoI0uj7T1OP4XyIGSmoUpbFjc/QcVNbKQmAvf
- M9rOaoFhujhrBWuMpv7jBhOdsTJwXA6f9mEOyvPlNUA9y2k1fo3AumeBKk7/Em7yM69J
- Ec3A==
-X-Gm-Message-State: AOAM5315CD3dw9WerTSoeY148NOLfHKyYv8BLY0jpBkNpykhN9v6KBHh
- oY7qt1nkttL8PGPMsgpky7dlTvES
-X-Google-Smtp-Source: ABdhPJx+Db8SMjtAoN1YB0tpHu0cx+WWKYihCV99RQ6t1v/H20yA/4TIC2KAHF1sMT1hAWKUA4R4dw==
-X-Received: by 2002:adf:e604:: with SMTP id p4mr9444250wrm.212.1592667519412; 
- Sat, 20 Jun 2020 08:38:39 -0700 (PDT)
+ bh=LD86i6ePSe4PN5iFnsRMbNNgXe4bEQc0BX5nmcZuiH8=;
+ b=tICJ+qALMqISS5G2HEHvQ2hh6Hh7rXo1I6ma/fUdxjBcwwDHt7do4B7ZfTt/LEEcE9
+ a5fvNiRKhYoY7a0xbWJFNJsV596R7RK70c9/c2iTMXj7ileDTW0d+4GJab/dpMdNQbbI
+ V31HxpcgvtV7ueHZ5IyFKd+KKHyvZvRXdX193O+ViAc/s/0AbC6kt9Km39OqE8nVMJO5
+ hiHHoaM/lfjez/SrsEuFyrlSFdlaFN7iPV8EAQJ/afHy3PV20Y/WSgWiH6koOFa8JBl1
+ 0IaAZ7NToolt4aCbOoAiIu1CBiTZ0hXeMKUMaIseFDAvy+NZkg6SAznx7VEnbW9K/Mpm
+ +J4w==
+X-Gm-Message-State: AOAM532GUXpEkILSw+MMOHvbH1lMmlpzF3YdEvslhvog9j4xs6OyA9q7
+ Cm6sOaVvWb12cVHvb43/i0UjSdps
+X-Google-Smtp-Source: ABdhPJy1QhJrwYlASr5yz2XmkyzgJkYGkkDJrYMe6m1Qy6K27J8yxzbdnq6pTMHSAs1Zadb3+zcRVg==
+X-Received: by 2002:a1c:ab04:: with SMTP id u4mr9945063wme.52.1592670501164;
+ Sat, 20 Jun 2020 09:28:21 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l17sm8659514wmh.14.2020.06.20.08.38.38
+ by smtp.gmail.com with ESMTPSA id e8sm9240006wrv.24.2020.06.20.09.28.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 08:38:38 -0700 (PDT)
+ Sat, 20 Jun 2020 09:28:20 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH] hw/core/qdev: Increase qdev_realize() kindness
-Date: Sat, 20 Jun 2020 17:38:37 +0200
-Message-Id: <20200620153837.14222-1-f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] hw/arm/aspeed: Improve QOM usage
+Date: Sat, 20 Jun 2020 18:28:16 +0200
+Message-Id: <20200620162818.22340-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -101,41 +97,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 510ef98dca5, qdev_realize() aborts if bus-less
-device is realized on a bus. Be kind with the developer by
-displaying a hint about what is wrong.
+Yet another cleanup.
+Simplify aspeed machine QOM usage.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/core/qdev.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Philippe Mathieu-Daudé (2):
+  hw/arm/aspeed: Remove extraneous MemoryRegion object owner
+  hw/arm/aspeed: QOM'ify AspeedBoardState
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 2131c7f951..dd3c90d37a 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -392,8 +392,11 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
- 
-     if (bus) {
-         qdev_set_parent_bus(dev, bus);
--    } else {
--        assert(!DEVICE_GET_CLASS(dev)->bus_type);
-+    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
-+        error_report("%s: Unexpected bus '%s' for device '%s'",
-+                     __func__, DEVICE_GET_CLASS(dev)->bus_type,
-+                     object_get_typename(OBJECT(dev)));
-+        abort();
-     }
- 
-     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+ include/hw/arm/aspeed.h |  8 +-------
+ hw/arm/aspeed.c         | 17 ++++++++++-------
+ 2 files changed, 11 insertions(+), 14 deletions(-)
+
 -- 
 2.21.3
 
