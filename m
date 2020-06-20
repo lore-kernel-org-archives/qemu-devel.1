@@ -2,92 +2,96 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C04BAC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5705EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89026246EF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F1D12376F
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 23:26:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKh/GdEt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89026246EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NI1z8haX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F1D12376F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmmgI-0000ze-Rj
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:13:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42288)
+	id 1jmmsW-0008Rt-Ae
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 19:26:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmmaE-0007GQ-TX; Sat, 20 Jun 2020 19:07:34 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43336)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jmmrt-0007sM-MK
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 19:25:49 -0400
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:36538)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmmaD-0002N8-8M; Sat, 20 Jun 2020 19:07:34 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l10so13144728wrr.10;
- Sat, 20 Jun 2020 16:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=dqGlIc+jv7onYHOT7vp+iSAvaDEPRQt/mIvRK1NcKyk=;
- b=jKh/GdEt/HW1QsvtpsCneycRhcGokA0wBKP/6lBsRCfkrMDNOJ24oFuVM5dp7qf49q
- 3XpqVv0Do4gzwzvLLxvp+fm9s7yMpLfVffjOD8zlEc6U7wRJUpvlhUvzArbbhmrPDA/5
- Wnfmds4aTncR9Whux0eiOXQbzHBIc+bCFqHIJmEb787CtAkThq1xO4YIKqT/jzT4DC1z
- b6xvS0jcZ7o8/rogUANGVIZptHGsjR8TjSmPZNySQDtGhKACbFlKT7jYzQF3MkZdWzx6
- agGW2cyofSRw6fufORUzkW75mjfkSRCGIK6a0Ha+fou0kvLBMH6shcYbhGXaqyz6ZBsr
- ixeg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jmmrr-00053g-WD
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 19:25:49 -0400
+Received: by mail-pl1-x631.google.com with SMTP id j4so5768625plk.3
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 16:25:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=aYWN/IrKxxHeww+rGye1j4UEFZHcphjQ1biTlGEPwcI=;
+ b=NI1z8haX54MQBmlrpxde4xQ2oVpBNraViJili8FGdBM7iVI9Ow/D3Sng8H8+7Wmzn3
+ PNMzSBR2yuXS6AQiOCsu67eTX50Cm4fogfaXlg+orEe6lnbWFcT8WtuEHK+8fo/KlKr5
+ qvavjXqBVcLUPZ8V2rvUUpu2ZZcnsD9hp4p/Qla+8qU4HgMuAjpAa87U+JfAqThXdZaM
+ DUHPgwS1BlW2kfhpwqv/nGkl0rzzLACgcvy6/7JDMx8m95bef574k4qH9nYTTou7X3Jd
+ tjz3+G5nswx1diXaVLAw8l466+QjytVjCSo5QP2xXQuAnWUDliYK+hfM63qFrPMmynfi
+ FBiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=dqGlIc+jv7onYHOT7vp+iSAvaDEPRQt/mIvRK1NcKyk=;
- b=dRamd0R1/XvNh7/PnqnnW2Ds02TlGNR53LwCnjVklrEx87Q2+LsXmU00TfF9wHkjmq
- bTX66+yWGn/tOIBrxeV7/11Y3G8+fE8dJ/m4bVL0OZom3eSAryQjYuLkczNtOJrl7qmP
- uK+8b0mYEGm6WDaX0Ff2WcdwltlbsFe3R+da2XCyTOhpgwFA4qk4zo9oaXsY1jrPcXuk
- IF3O3IWaPOn5Co+ZFZWPPuUsm+2zjQDveBRY6fb6OgaA+hVK2kujhgnUCGaA0Gp2Aa/h
- zW8OlsPg0vcm2ToV7bQvT12QZKs/YpJC0o8WQD2lvS+ik9g2SFYxa//BkewDr8OBMoFF
- kj1w==
-X-Gm-Message-State: AOAM533hBsyL7nlz0Y0Rtns5y35PKuNCjE2Ss6RT9oBdgxV0BgRIHwAt
- anrp5xP6u0THXcHh7AwWsHYat6yE
-X-Google-Smtp-Source: ABdhPJxQ2xwfMc7RNoy61gt7hL3XowZlJJt/Ffbes6D8Zn9Rt97UaK2OeetCreMBGUf/xeate7Ql0Q==
-X-Received: by 2002:a5d:45cb:: with SMTP id b11mr10617176wrs.235.1592694451400; 
- Sat, 20 Jun 2020 16:07:31 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o82sm11455037wmo.40.2020.06.20.16.07.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 16:07:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 7/7] hw/arm/tosa: Replace fprintf() calls by LED devices
-Date: Sun, 21 Jun 2020 01:07:19 +0200
-Message-Id: <20200620230719.32139-8-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200620230719.32139-1-f4bug@amsat.org>
-References: <20200620230719.32139-1-f4bug@amsat.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aYWN/IrKxxHeww+rGye1j4UEFZHcphjQ1biTlGEPwcI=;
+ b=Mb4pf6opbE7Ek6Ek+JSNFxQlXTNAfZFe4IZ/+TZ9mV9hn672FWQgv8JHdFaEx4fGAN
+ cOl/TQlpa+8CcJWSq1QhzuWAswk4ib4T8tyPCL1V6bqG+VnEiJnJpQppftB8C6Oaicu6
+ dTE+7YvWsIzdQWbeMnI7TNbqASxtN6BHryWZY8UVbGHTaTVFgHjOn2c1W0OQ//u8Yc+D
+ KO0Qj3F9ejo2ErFIEe2Xp4ZfYan+Qzu2FIl9oD0RVrb7by4GBl/7E8Fh2u2BG44q9z0g
+ BVbUEWitEnyAoclHodwYHtUNEAqVVkCjqo7xgxzl4sHQJba6jtvJ8KWr4g9LkpQsTLU9
+ ut9A==
+X-Gm-Message-State: AOAM531nAAFruYkBYxX1V30ArCQkfFbP1go1mf9FhzGQbaRCbSyKrtWr
+ cvI2Qu372rn1XShaKM/l90unRA==
+X-Google-Smtp-Source: ABdhPJx2X3xRNhl1c+Pkp8gDctcytaMJINDkeHkv4hd800au7/CfvnkDnxdWYQVb+l4nhqFJQETBUg==
+X-Received: by 2002:a17:90b:238d:: with SMTP id
+ mr13mr11034753pjb.19.1592695545595; 
+ Sat, 20 Jun 2020 16:25:45 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id u21sm9396782pfn.123.2020.06.20.16.25.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 20 Jun 2020 16:25:44 -0700 (PDT)
+Subject: Re: [PATCH v2] docs/devel: add some notes on tcg-icount for developers
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200619170930.11704-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7611429f-ec38-554d-3aec-e4a2f456a1ea@linaro.org>
+Date: Sat, 20 Jun 2020 16:25:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200619170930.11704-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::631;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x631.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,118 +104,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recently added LED device reports LED status changes with
-the 'led_set_intensity' trace event. It is less invasive than
-the fprintf() calls. We need however to have a binary built
-with tracing support.
+On 6/19/20 10:09 AM, Alex Bennée wrote:
+> +TCG has long supported a feature known as icount which allows for
+> +instruction counting during execution. This should be confused with
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/tosa.c  | 40 +++++++++++++---------------------------
- hw/arm/Kconfig |  1 +
- 2 files changed, 14 insertions(+), 27 deletions(-)
+should not be
 
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 5dee2d76c6..74b5fd1049 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -24,6 +24,7 @@
- #include "hw/irq.h"
- #include "hw/ssi/ssi.h"
- #include "hw/sysbus.h"
-+#include "hw/misc/led.h"
- #include "exec/address-spaces.h"
- 
- #define TOSA_RAM    0x04000000
-@@ -65,27 +66,6 @@ static void tosa_microdrive_attach(PXA2xxState *cpu)
-     pxa2xx_pcmcia_attach(cpu->pcmcia[0], md);
- }
- 
--static void tosa_out_switch(void *opaque, int line, int level)
--{
--    switch (line) {
--        case 0:
--            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
--            break;
--        case 1:
--            fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
--            break;
--        case 2:
--            fprintf(stderr, "amber LED %s.\n", level ? "on" : "off");
--            break;
--        case 3:
--            fprintf(stderr, "wlan LED %s.\n", level ? "on" : "off");
--            break;
--        default:
--            fprintf(stderr, "Uhandled out event: %d = %d\n", line, level);
--            break;
--    }
--}
--
- static void tosa_reset(void *opaque, int line, int level)
- {
-     if (level) {
-@@ -98,7 +78,6 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
-                 DeviceState *scp1,
-                 TC6393xbState *tmio)
- {
--    qemu_irq *outsignals = qemu_allocate_irqs(tosa_out_switch, cpu, 4);
-     qemu_irq reset;
- 
-     /* MMC/SD host */
-@@ -119,11 +98,6 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
-                         qdev_get_gpio_in(cpu->gpio, TOSA_GPIO_JC_CF_IRQ),
-                         NULL);
- 
--    qdev_connect_gpio_out(scp1, TOSA_GPIO_BT_LED, outsignals[0]);
--    qdev_connect_gpio_out(scp1, TOSA_GPIO_NOTE_LED, outsignals[1]);
--    qdev_connect_gpio_out(scp1, TOSA_GPIO_CHRG_ERR_LED, outsignals[2]);
--    qdev_connect_gpio_out(scp1, TOSA_GPIO_WLAN_LED, outsignals[3]);
--
-     qdev_connect_gpio_out(scp1, TOSA_GPIO_TC6393XB_L3V_ON, tc6393xb_l3v_get(tmio));
- 
-     /* UDC Vbus */
-@@ -234,6 +208,18 @@ static void tosa_init(MachineState *machine)
- 
-     scp0 = sysbus_create_simple("scoop", 0x08800000, NULL);
-     scp1 = sysbus_create_simple("scoop", 0x14800040, NULL);
-+    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
-+                          TOSA_GPIO_BT_LED,
-+                          LED_COLOR_BLUE, "bluetooth", 0);
-+    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
-+                          TOSA_GPIO_NOTE_LED,
-+                          LED_COLOR_GREEN, "note", 1);
-+    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
-+                          TOSA_GPIO_CHRG_ERR_LED,
-+                          LED_COLOR_AMBER, "charger-error", 2);
-+    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
-+                          TOSA_GPIO_WLAN_LED,
-+                          LED_COLOR_GREEN, "wlan", 3);
- 
-     tosa_gpio_setup(mpu, scp0, scp1, tmio);
- 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 1a57a861ac..057c869d65 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -150,6 +150,7 @@ config TOSA
-     select ZAURUS  # scoop
-     select MICRODRIVE
-     select PXA2XX
-+    select LED
- 
- config SPITZ
-     bool
--- 
-2.21.3
+> +cycle accurate emulation - QEMU does not attempt to emulate how long
 
+--- for em-dash, iirc, and (technically) no surrounding spaces.
+
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
 
