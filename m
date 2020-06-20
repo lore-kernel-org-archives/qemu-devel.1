@@ -8,80 +8,79 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE98C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 13:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8EB3C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 13:33:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 946F923B8B
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 13:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8ACA23B8B
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 13:33:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XucwHUZY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 946F923B8B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="utnx94dq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8ACA23B8B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmdd2-0001rC-To
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 09:33:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46202)
+	id 1jmdd3-0001ra-V7
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 09:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmdbj-0000I8-Kn
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 09:32:31 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:33310)
+ id 1jmdbl-0000K9-FT
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 09:32:33 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:42393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmdbi-0003H7-5b
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 09:32:31 -0400
-Received: by mail-ej1-x642.google.com with SMTP id n24so13314191ejd.0
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 06:32:29 -0700 (PDT)
+ id 1jmdbj-0003HF-Rv
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 09:32:33 -0400
+Received: by mail-ed1-x541.google.com with SMTP id x93so9937147ede.9
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 06:32:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6A70r10UqwNPv6j5EPw/nw3u2xwDuBB18TdeRszHq/8=;
- b=XucwHUZYA6/iTLoKLs7Sxf8+ww8cJpFMBFIrzSSx4V4Q5DFFg6CdC9YP+smdvj/mnI
- FdcOimzvRcvr7szzEjBaD2IJ6DUz5pXw424eHHHYOh9Z0/IqvIH8cFbGjo0M3AuSmETM
- cDe4MogCk2AFeGZ0FiFvQ0lTMMrh2aNCrQ9EOWO4pCq7ZeOPwSD8NPUWBboIozvrx01G
- MmAZssbdoQpndg5/nN6N9ZG7U2jjJyoI0ZPggUvOgFL4jjheiAh2/NacbprcAjR6OxCj
- cyjkuW+kHtLIoINFSJY+edEc7IjFXckKXkgoH4N6BdwwX9nGc2aWdzXbdt51FkVCsZx1
- TVQA==
+ bh=ZI4rFIHyx7d9nC2CjEQDYphQq+Kuoo8/ZRfXYMg/rE0=;
+ b=utnx94dqw6i07bvL1xXWZoqV0f6M7uIhIs/xuer4ax4Ii/VB73F6S8o0hUVmtxwza9
+ ihyIoasFsmwUKfbhzezpbDHDrMDVwzFzOoyDFFM86Uupp79Zwqo0llTAx0cgDc6URC6O
+ g1B1UVa5iLuFiKg5fUf43zCC2EywHPMEz+p87QpepZ5cKP1X0XNso/sPGaPgOpq5gR0F
+ FJX4Jc5cJhIHbNsrmVBdgV8Ee+d/9z/5ouFOfMMATZsLfRyHXkRsuWnzC3xVGeu47nC9
+ AJuhAW9c5SRiBH8OBUSmSnE0Ewf65CSBPfC4MFA7qYQPn3nE6LkoSVdCO7hckb4UmyNY
+ s7GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=6A70r10UqwNPv6j5EPw/nw3u2xwDuBB18TdeRszHq/8=;
- b=IalScX3x1Beg7loeJq2Pu/2l+PUCmdD6cP7Nqbjkb5Xf2U6fJ4/E7FqYTVv6huCBgL
- B4N+yIEEE900wu/tZyT595q2aA9/vRIIYrCEPvM1WvINugfR4RbzEsGYzs9+gf/hZbPV
- 9LKQJR623CA6PJfKMxe5REkhFfRDDTMaswx4OwYk9xqK+AtZz7TEyJjX94zk5CLfmi3K
- M0dOwNgMpMFxGepjK32dGwzt9Yudah0ceuIXUVH9rrCkhOCLqYdSKrDF6X+6AAP7BvTU
- Y/lCl50FWWHr3/5zvbmHTlZ7oya49EascalMcrPmAZ+aQU9Z0kty5kSlH4cnzKkAmQdn
- gpNw==
-X-Gm-Message-State: AOAM5306tFcZ7PCpB+/RG7QUk5IYdypPvv9O0rhpTROxWyU0LslyHVbQ
- Ay2iRoVnoZ5FVnvis03mU/Vnmlu4
-X-Google-Smtp-Source: ABdhPJzaxVj3XG71RJZHmmNJgbVc2lPvYYRfa/t0Bd8rBO6Y86NXDV6ZXSaykhMNG/47W2KNkwJLTw==
-X-Received: by 2002:a17:906:454b:: with SMTP id
- s11mr8352453ejq.546.1592659948802; 
- Sat, 20 Jun 2020 06:32:28 -0700 (PDT)
+ bh=ZI4rFIHyx7d9nC2CjEQDYphQq+Kuoo8/ZRfXYMg/rE0=;
+ b=dTXBo5TSB8z3Z3D4lya64ZPoOvnlZoh0kf7tc6CKcIKJy/5MGanAqtNdU17jViHMK+
+ 6OxfecqgUE+xGQ6W8asyglor1bbSxNWOKKfqZmsNQOfu9pJZVBx9u9kzhvo309MAl9ke
+ UOvUypxGtAfkwrOPIdLiSibWZ0J3v8jsiFW92EMA/5V8NIYlOPonY/JqJsfMqLmt/lGI
+ PueomFQDMqcW8arLbnVJ5NssxL2seQoox/YU1Ifnw7r0wu5mP2Mfser2+A8UB/yeJbBq
+ Te+lomHmUth4O9zCQLUMEnei6sK6Fvu79tO0UWreAE+5byZHvsj0es9sTWvFvAzCix09
+ 3Q9Q==
+X-Gm-Message-State: AOAM5326MkfY6nrNu1keQPmC/7bU+lzD0H/fII2/v5aJuqU31ljy+DcS
+ 3Ej4l1gITIuO90fJ3vI2dX0q3Gmn
+X-Google-Smtp-Source: ABdhPJwwEsSmhbN4798K9lWF/xXaJ1w/ZEYBnchdut+lSnaQ2CzT6d1D+qjhficAuSCcNiylF5zuoQ==
+X-Received: by 2002:a50:b022:: with SMTP id i31mr8255631edd.301.1592659950296; 
+ Sat, 20 Jun 2020 06:32:30 -0700 (PDT)
 Received: from localhost.localdomain (net252-38-245-109.mbb.telenor.rs.
  [109.245.38.252])
- by smtp.gmail.com with ESMTPSA id bd19sm7453202edb.2.2020.06.20.06.32.27
+ by smtp.gmail.com with ESMTPSA id bd19sm7453202edb.2.2020.06.20.06.32.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 20 Jun 2020 06:32:28 -0700 (PDT)
+ Sat, 20 Jun 2020 06:32:29 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] checkpatch: Rename top_of_kernel_tree() to
- top_of_qemu_tree()
-Date: Sat, 20 Jun 2020 15:32:06 +0200
-Message-Id: <20200620133207.26849-2-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH 2/2] checkpatch: Change occurences of 'kernel' to 'qemu' in
+ user messages
+Date: Sat, 20 Jun 2020 15:32:07 +0200
+Message-Id: <20200620133207.26849-3-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
 References: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,46 +108,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This subroutine establishes top of qemu, not kernel, tree.
+It is odd that we inform user that, for example, his current working
+directory is not kernel root, when, in face, we mean qemu root.
 
-Do appropriate renaming.
+Replace that and few other similar odd user messages.
 
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
- scripts/checkpatch.pl | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/checkpatch.pl | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 0ba213e9f2..c760c5a4a9 100755
+index c760c5a4a9..f46c18e413 100755
 --- a/scripts/checkpatch.pl
 +++ b/scripts/checkpatch.pl
-@@ -190,14 +190,14 @@ if ($terse) {
+@@ -49,7 +49,7 @@ Version: $V
  
- if ($tree) {
- 	if (defined $root) {
--		if (!top_of_kernel_tree($root)) {
-+		if (!top_of_qemu_tree($root)) {
- 			die "$P: $root: --root does not point at a valid tree\n";
- 		}
- 	} else {
--		if (top_of_kernel_tree('.')) {
-+		if (top_of_qemu_tree('.')) {
- 			$root = '.';
- 		} elsif ($0 =~ m@(.*)/scripts/[^/]*$@ &&
--						top_of_kernel_tree($1)) {
-+						top_of_qemu_tree($1)) {
- 			$root = $1;
- 		}
+ Options:
+   -q, --quiet                quiet
+-  --no-tree                  run without a kernel tree
++  --no-tree                  run without a qemu tree
+   --no-signoff               do not check for 'Signed-off-by' line
+   --patch                    treat FILE as patchfile
+   --branch                   treat args as GIT revision list
+@@ -57,7 +57,7 @@ Options:
+   --terse                    one line per report
+   -f, --file                 treat FILE as regular source file
+   --strict                   fail if only warnings are found
+-  --root=PATH                PATH to the kernel tree root
++  --root=PATH                PATH to the qemu tree root
+   --no-summary               suppress the per-file summary
+   --mailback                 only produce a report in case of warnings/errors
+   --summary-file             include the filename in summary
+@@ -203,7 +203,7 @@ if ($tree) {
  	}
-@@ -456,7 +456,7 @@ if ($chk_branch) {
  
- exit($exit);
- 
--sub top_of_kernel_tree {
-+sub top_of_qemu_tree {
- 	my ($root) = @_;
- 
- 	my @tree_check = (
+ 	if (!defined $root) {
+-		print "Must be run from the top-level dir. of a kernel tree\n";
++		print "Must be run from the top-level dir. of a qemu tree\n";
+ 		exit(2);
+ 	}
+ }
 -- 
 2.20.1
 
