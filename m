@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF65C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1768FC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0437C21556
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:06:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0437C21556
+	by mail.kernel.org (Postfix) with ESMTPS id DF76E24697
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:08:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF76E24697
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmkgz-00083t-8U
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53456)
+	id 1jmkin-0003TF-5c
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmkfP-0005KT-Rk
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:47 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:59732)
+ id 1jmkfQ-0005Lq-Go
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:48 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:54114)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmkfL-0001gA-7i
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:47 -0400
+ id 1jmkfO-0001mK-NW
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 17:04:48 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 44A02748DE1;
+ by localhost (Postfix) with SMTP id 62C5E748DE4;
  Sat, 20 Jun 2020 23:04:33 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id C1D737475FA; Sat, 20 Jun 2020 23:04:32 +0200 (CEST)
-Message-Id: <ddb5781d12913bb9d6dbfd9e5b1e2b893e2b3e2d.1592686588.git.balaton@eik.bme.hu>
+ id DB1BD748DDB; Sat, 20 Jun 2020 23:04:32 +0200 (CEST)
+Message-Id: <26d4fa9b8ce81e2723e98d592ccba7550042752c.1592686588.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592686588.git.balaton@eik.bme.hu>
 References: <cover.1592686588.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v3 1/9] sm501: Fix bounds checks
+Subject: [PATCH v3 7/9] sm501: Do not allow guest to set invalid format
 Date: Sat, 20 Jun 2020 22:56:28 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,42 +75,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need to add width to pitch when calculating last point, that
-would reject valid ops within the card's local_mem.
+Prevent guest setting invalid format value that might trip checks in
+sm501_2d_operation().
 
-Fixes: b15a22bbcbe6a78dc3d88fe3134985e4cdd87de4
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/sm501.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/display/sm501.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index a7fc08c52b..5ceee4166f 100644
+index 6349f31e64..7e4c042d52 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -723,8 +723,8 @@ static void sm501_2d_operation(SM501State *s)
-         dst_y -= height - 1;
-     }
- 
--    if (dst_base >= get_local_mem_size(s) || dst_base +
--        (dst_x + width + (dst_y + height) * (dst_pitch + width)) *
-+    if (dst_base >= get_local_mem_size(s) ||
-+        dst_base + (dst_x + width + (dst_y + height) * dst_pitch) *
-         (1 << format) >= get_local_mem_size(s)) {
-         qemu_log_mask(LOG_GUEST_ERROR, "sm501: 2D op dest is outside vram.\n");
-         return;
-@@ -749,8 +749,8 @@ static void sm501_2d_operation(SM501State *s)
-             src_y -= height - 1;
-         }
- 
--        if (src_base >= get_local_mem_size(s) || src_base +
--            (src_x + width + (src_y + height) * (src_pitch + width)) *
-+        if (src_base >= get_local_mem_size(s) ||
-+            src_base + (src_x + width + (src_y + height) * src_pitch) *
-             (1 << format) >= get_local_mem_size(s)) {
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "sm501: 2D op src is outside vram.\n");
+@@ -1503,6 +1503,9 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
+         s->twoD_background = value;
+         break;
+     case SM501_2D_STRETCH:
++        if (((value >> 20) & 3) == 3) {
++            value &= ~BIT(20);
++        }
+         s->twoD_stretch = value;
+         break;
+     case SM501_2D_COLOR_COMPARE:
 -- 
 2.21.3
 
