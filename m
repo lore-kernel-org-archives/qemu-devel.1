@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4B9C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A10C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BC9F23AFE
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BC9F23AFE
+	by mail.kernel.org (Postfix) with ESMTPS id B2C3122B45
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 11:37:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C3122B45
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmafd-0002N7-Ln
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 06:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40716)
+	id 1jmboD-0003O0-SQ
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 07:37:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmacA-0000N0-6n
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 06:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36342)
+ id 1jmbmg-0002Fe-MN
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 07:35:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41534)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmac7-0007ri-WE
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 06:20:45 -0400
+ id 1jmbmb-0002nV-25
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 07:35:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jmac4-0007H8-9W
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 10:20:40 +0000
+ id 1jmbmY-0003vx-UJ
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 11:35:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 24EE82E810A
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 10:20:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id D92052E810A
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 11:35:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 20 Jun 2020 10:12:13 -0000
-From: Bruno Haible <1883984@bugs.launchpad.net>
+Date: Sat, 20 Jun 2020 11:25:56 -0000
+From: ruthan <1873338@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
  assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp nhfbeebe rth
-X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
-X-Launchpad-Bug-Modifier: Bruno Haible (bruno-clisp)
-References: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159264793366.17357.5317079707701111475.malone@chaenomeles.canonical.com>
-Subject: [Bug 1883984] Re: QEMU S/390x sqxbr (128-bit IEEE 754 square root)
- crashes qemu-system-s390x
+X-Launchpad-Bug-Commenters: janitor jnsnow ruthan
+X-Launchpad-Bug-Reporter: ruthan (ruthan)
+X-Launchpad-Bug-Modifier: ruthan (ruthan)
+References: <158706562034.6027.11807874678540403888.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159265235645.14479.3044227777727972546.malone@wampee.canonical.com>
+Subject: [Bug 1873338] Re: Dos on the fly CD image replacement is not Working
+ with DOS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0054709ade6b805086cd6067f2e1b725738a04ab
+X-Launchpad-Hash: d2301dfae6115238ead379ff84050eda0f9be408
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 06:20:40
@@ -73,7 +73,7 @@ X-Spam_score: -5.9
 X-Spam_bar: -----
 X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
  RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, T_SPF_TEMPERROR=0.01 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,73 +85,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883984 <1883984@bugs.launchpad.net>
+Reply-To: Bug 1873338 <1873338@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I confirm that the patch https://lists.gnu.org/archive/html/qemu-
-s390x/2020-06/msg00213.html fixes the issue, both for qemu-s390x and
-qemu-system-s390x.
-
-Thanks Richard!
+Its not incomplete. i gave lots of info.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883984
+https://bugs.launchpad.net/bugs/1873338
 
 Title:
-  QEMU S/390x sqxbr (128-bit IEEE 754 square root) crashes qemu-system-
-  s390x
+  Dos on the fly CD image replacement is not Working with DOS
 
 Status in QEMU:
-  Confirmed
+  Expired
 
 Bug description:
-  In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I dis=
-covered
-  that some of my own numerical programs, and also a GNU configure script f=
-or at
-  least one package with CC=3Dclang, would cause an instant crash of the VM=
-, sometimes
-  also destroying recently opened files, and producing long strings of NUL =
-characters
-  in /var/log/syslog in the S/390 guest O/S.
+  Im not able to exchange CD image on the fly (needed for some games). I
+  messed with command like - in console(ATL+CRTL+2) eject ide1-cd0 and
+  change ide-cd0 D:/Games/!Emulators/Dos-QEMU/ISOs/TestChangeISO.iso ,
+  but system so never able to find new CD data.. simply drive so empty..
+  but when i reboot virtual machine, new change image is now working.
 
-  Further detective work narrowed the cause of the crash down to a single I=
-BM S/390
-  instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line pr=
-ogram
-  that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.=
-0 =
-
-  (Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 792=
-0 =
-
-  workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emul=
-ator =
-
-  version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
-
-  % cat bug-sqrtl-one-line.c
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatil=
-e__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-
-  % cc bug-sqrtl-one-line.c && ./a.out
-  Segmentation fault (core dumped)
-
-  The problem code may be the function float128_sqrt() defined in qemu-5.0.=
-0/fpu/softfloat.c
-  starting at line 7619.  I have NOT attempted to run the qemu-system-s390x=
- executable
-  under a debugger.  However, I observe that S/390 is the only CPU family t=
-hat I know of,
-  except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in=
- hardware.
-  Thus, this instruction bug may not have been seen before.
+  =C2=A0=C2=A0Qemu 4.2. Linux Mint 19.3 and also Windows 10.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883984/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1873338/+subscriptions
 
