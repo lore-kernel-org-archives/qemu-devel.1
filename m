@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D059BC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBE6C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95F3D23339
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFF67246A0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 21:02:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="PKDDXdqI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F3D23339
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="LDU+ZD/q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF67246A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmkc0-0006sb-NH
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:01:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51696)
+	id 1jmkdJ-0000m7-TE
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 17:02:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkX6-0005rA-9g
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:13 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:1144)
+ id 1jmkXt-0007N5-Qx
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:57:01 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:1216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jmkX2-0000Pp-Hm
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:56:11 -0400
+ id 1jmkXr-0000bL-M8
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 16:57:01 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
  hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eee77da0000>; Sat, 20 Jun 2020 13:55:54 -0700
+ id <B5eee780d0000>; Sat, 20 Jun 2020 13:56:45 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Sat, 20 Jun 2020 13:56:07 -0700
+ Sat, 20 Jun 2020 13:56:58 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Sat, 20 Jun 2020 13:56:07 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 20 Jun
- 2020 20:55:57 +0000
+ by hqpgpgate101.nvidia.com on Sat, 20 Jun 2020 13:56:58 -0700
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 20 Jun
+ 2020 20:56:52 +0000
 Received: from kwankhede-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via
- Frontend Transport; Sat, 20 Jun 2020 20:55:49 +0000
+ Frontend Transport; Sat, 20 Jun 2020 20:56:45 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH QEMU v25 10/17] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU
- is enabled
-Date: Sun, 21 Jun 2020 01:51:19 +0530
-Message-ID: <1592684486-18511-11-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH QEMU v25 17/17] qapi: Add VFIO devices migration stats in
+ Migration stats
+Date: Sun, 21 Jun 2020 01:51:26 +0530
+Message-ID: <1592684486-18511-18-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
 References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
@@ -61,16 +61,16 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1592686554; bh=lNqT20ne3SxmddsSgpUXew1AhQgIkvUAlxCSf7c7Hcs=;
+ t=1592686605; bh=ZgbpubgazlEdcwYSFUCPqwnBN7S6ohc3gEMlRJXIsxc=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=PKDDXdqIp6UgRFETptIt0xpYy76NZb2QMNqKGyrHxVemNWWll6ZPSnfk7LRDG0FUf
- I+QkLBoWU2pin37fO7sg3h4O6s+c+LXkPuE3PkqgxKpZ/Z0o+MOfe4AV5yb7AXG3cU
- 8G3RGFDSHsFfEDPGdEdyZH2QMr3YvfFGfCr9VfyWmC/B36VPnC19s7Vkkr6Sd15lJe
- SRL0uB4IU+EOUKDNSElXSspFNAFMSgBAeKCrjUtt7qFgFnb73a3RBVs4akcBeam1uF
- UGMxqOM/EWIuj++7BLK/ZcvbNsUDaDbnKHIGTijTOxHXyxquF4/gdkbl4FAplDoD2h
- Yt/uvHIahKoQA==
+ b=LDU+ZD/qv8f4owutKpzCEmU4jX0twqTBg6nP38h9prN4eQDjJCD477OmtfQ242rSS
+ QE9jhXz4Aiq5iA9rUvabavmrbm2w6gn83ch3THkkaMO36JRatwu+ABjKerxRboby5C
+ 4paXyGQv26OuSXA+yQGnRoHv1fyfJL/Y8U0dOs0RLXOefIYKXAWHePtKE5S6ELGyKK
+ HyrS2FF4A4VFXOC1XwXgghOcCKYysz5BDsgo85mu8oZkuQ/3njiUzjTJvB9N0Mi6FL
+ a/Jgn092jCylo6zL2qvTQL+T6Dj7NG61mG6hc9rG5E2Ij02b2yoFfMCK4V8zaZCFAs
+ 49f31Svi38Hfw==
 Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
  helo=hqnvemgate26.nvidia.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/20 16:54:48
@@ -106,30 +106,221 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
-wasn't set correctly due to which memory listener's log_sync doesn't
-get called.
-This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
-IOMMU is enabled.
+Added amount of bytes transferred to the target VM by all VFIO devices
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 ---
- memory.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/common.c            | 20 ++++++++++++++++++++
+ hw/vfio/migration.c         | 11 ++++++++++-
+ include/qemu/vfio-helpers.h |  3 +++
+ migration/migration.c       | 14 ++++++++++++++
+ monitor/hmp-cmds.c          |  6 ++++++
+ qapi/migration.json         | 17 +++++++++++++++++
+ 6 files changed, 70 insertions(+), 1 deletion(-)
 
-diff --git a/memory.c b/memory.c
-index 2f15a4b250c8..95a47d2d9533 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1788,7 +1788,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
- uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index a06b8f2f66e2..ff0a4072107f 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -40,6 +40,7 @@
+ #include "trace.h"
+ #include "qapi/error.h"
+ #include "migration/migration.h"
++#include "qemu/vfio-helpers.h"
+ 
+ VFIOGroupList vfio_group_list =
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+@@ -293,6 +294,25 @@ const MemoryRegionOps vfio_region_ops = {
+  * Device state interfaces
+  */
+ 
++bool vfio_mig_active(void)
++{
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
++
++    if (QLIST_EMPTY(&vfio_group_list)) {
++        return false;
++    }
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            if (vbasedev->migration_blocker) {
++                return false;
++            }
++        }
++    }
++    return true;
++}
++
+ static bool vfio_devices_are_stopped_and_saving(void)
  {
-     uint8_t mask = mr->dirty_log_mask;
--    if (global_dirty_log && mr->ram_block) {
-+    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
-         mask |= (1 << DIRTY_MEMORY_MIGRATION);
+     VFIOGroup *group;
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index e0fbb3a01855..09eec9cafdd5 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -27,7 +27,7 @@
+ #include "exec/ram_addr.h"
+ #include "pci.h"
+ #include "trace.h"
+-
++#include "qemu/vfio-helpers.h"
+ /*
+  * Flags used as delimiter:
+  * 0xffffffff => MSB 32-bit all 1s
+@@ -39,6 +39,8 @@
+ #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+ #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+ 
++static int64_t bytes_transferred;
++
+ static void vfio_migration_region_exit(VFIODevice *vbasedev)
+ {
+     VFIOMigration *migration = vbasedev->migration;
+@@ -261,6 +263,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev)
+         return ret;
      }
-     return mask;
+ 
++    bytes_transferred += data_size;
+     return data_size;
+ }
+ 
+@@ -742,6 +745,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+         }
+ 
+         vfio_start_dirty_page_tracking(vbasedev, false);
++        bytes_transferred = 0;
+     }
+ }
+ 
+@@ -789,6 +793,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+ 
+ /* ---------------------------------------------------------------------- */
+ 
++int64_t vfio_mig_bytes_transferred(void)
++{
++    return bytes_transferred;
++}
++
+ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+ {
+     struct vfio_region_info *info;
+diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+index 1f057c2b9e40..26a7df0767b1 100644
+--- a/include/qemu/vfio-helpers.h
++++ b/include/qemu/vfio-helpers.h
+@@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+                            int irq_type, Error **errp);
+ 
++bool vfio_mig_active(void);
++int64_t vfio_mig_bytes_transferred(void);
++
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 481a590f7222..8b010a002c3d 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -54,6 +54,7 @@
+ #include "net/announce.h"
+ #include "qemu/queue.h"
+ #include "multifd.h"
++#include "qemu/vfio-helpers.h"
+ 
+ #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+ 
+@@ -970,6 +971,17 @@ static void populate_disk_info(MigrationInfo *info)
+     }
+ }
+ 
++static void populate_vfio_info(MigrationInfo *info)
++{
++#ifdef CONFIG_LINUX
++    if (vfio_mig_active()) {
++        info->has_vfio = true;
++        info->vfio = g_malloc0(sizeof(*info->vfio));
++        info->vfio->transferred = vfio_mig_bytes_transferred();
++    }
++#endif
++}
++
+ static void fill_source_migration_info(MigrationInfo *info)
+ {
+     MigrationState *s = migrate_get_current();
+@@ -995,6 +1007,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+         populate_time_info(info, s);
+         populate_ram_info(info, s);
+         populate_disk_info(info);
++        populate_vfio_info(info);
+         break;
+     case MIGRATION_STATUS_COLO:
+         info->has_status = true;
+@@ -1003,6 +1016,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+     case MIGRATION_STATUS_COMPLETED:
+         populate_time_info(info, s);
+         populate_ram_info(info, s);
++        populate_vfio_info(info);
+         break;
+     case MIGRATION_STATUS_FAILED:
+         info->has_status = true;
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 2b0b58a336e6..29bb4d2d949c 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -355,6 +355,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+         }
+         monitor_printf(mon, "]\n");
+     }
++
++    if (info->has_vfio) {
++        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
++                       info->vfio->transferred >> 10);
++    }
++
+     qapi_free_MigrationInfo(info);
+ }
+ 
+diff --git a/qapi/migration.json b/qapi/migration.json
+index d5000558c6c9..952864b05455 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -146,6 +146,18 @@
+             'active', 'postcopy-active', 'postcopy-paused',
+             'postcopy-recover', 'completed', 'failed', 'colo',
+             'pre-switchover', 'device', 'wait-unplug' ] }
++##
++# @VfioStats:
++#
++# Detailed VFIO devices migration statistics
++#
++# @transferred: amount of bytes transferred to the target VM by VFIO devices
++#
++# Since: 5.1
++#
++##
++{ 'struct': 'VfioStats',
++  'data': {'transferred': 'int' } }
+ 
+ ##
+ # @MigrationInfo:
+@@ -207,11 +219,16 @@
+ #
+ # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
+ #
++# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
++#        only returned if VFIO device is present, migration is supported by all
++#         VFIO devices and status is 'active' or 'completed' (since 5.1)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationInfo',
+   'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+            '*disk': 'MigrationStats',
++           '*vfio': 'VfioStats',
+            '*xbzrle-cache': 'XBZRLECacheStats',
+            '*total-time': 'int',
+            '*expected-downtime': 'int',
 -- 
 2.7.0
 
