@@ -2,76 +2,62 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD300C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58089C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 02:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1D0D22D2B
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 01:53:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1D0D22D2B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02CFD22DD6
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 02:56:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02CFD22DD6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmSh9-00041a-UR
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 21:53:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48514)
+	id 1jmTge-0000UV-7U
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 22:56:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jmSgV-0003S1-1n
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 21:52:43 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:49760 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jmTfo-0008S8-1T; Fri, 19 Jun 2020 22:56:04 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jmSgS-0004uq-G7
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 21:52:42 -0400
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id A62E6387FDA899DE122F;
- Sat, 20 Jun 2020 09:52:30 +0800 (CST)
-Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Sat, 20 Jun 2020 09:50:23 +0800
-Received: from [127.0.0.1] (10.140.157.78) by dggeme755-chm.china.huawei.com
- (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Sat, 20
- Jun 2020 09:50:24 +0800
-Subject: Re: [PULL 26/45] ACPI: Record Generic Error Status Block(GESB) table
-To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin"
- <mst@redhat.com>
-References: <20200514142138.20875-1-peter.maydell@linaro.org>
- <20200514142138.20875-27-peter.maydell@linaro.org>
- <CAFEAcA_a4yiE9UZx=MAFUM+f0LSiNvjQ=X1+dObELRzfnTyUHQ@mail.gmail.com>
- <20200521113048-mutt-send-email-mst@kernel.org>
- <CAFEAcA-PTtLvouxo5XZmgSbeRWa4WCwH7_cC5xrg3Dnr8UyZxg@mail.gmail.com>
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Message-ID: <ca79ea28-9ea9-18a5-99ad-25c3eb744721@huawei.com>
-Date: Sat, 20 Jun 2020 09:50:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.6.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jmTfj-00067K-Dj; Fri, 19 Jun 2020 22:56:03 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07441942|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.015081-0.000550396-0.984369;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16367; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HpV3V17_1592621748; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HpV3V17_1592621748)
+ by smtp.aliyun-inc.com(10.147.42.198);
+ Sat, 20 Jun 2020 10:55:49 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v10 00/61] target/riscv: support vector extension v0.7.1
+Date: Sat, 20 Jun 2020 10:54:39 +0800
+Message-Id: <20200620025540.1109-1-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-PTtLvouxo5XZmgSbeRWa4WCwH7_cC5xrg3Dnr8UyZxg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.140.157.78]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggeme755-chm.china.huawei.com (10.3.19.101)
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=gengdongjiu@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 21:52:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 21:09:48
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,91 +70,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patchset implements the vector extension for RISC-V on QEMU.
+
+You can also find the patchset and all *test cases* in
+my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v10).
+All the test cases are in the directory qemu/tests/riscv/vector/. They are
+riscv64 linux user mode programs.
+
+You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
+
+Features:
+  * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
+  * support basic vector extension.
+  * support Zvlsseg.
+  * support Zvamo.
+  * not support Zvediv as it is changing.
+  * SLEN always equals VLEN.
+  * element width support 8bit, 16bit, 32bit, 64bit.
+
+Changelog:
+v10
+  * rebase to https://github.com/alistair23/qemu/tree/riscv-to-apply.next.
+  * fix compile error in patch 57/61.
+  * fix review tag typo.
+
+v9
+  * always set dynamic rounding mode for vector float insns.
+  * bug fix atomic implementation.
+  * bug fix first-only-fault.
+  * some small tidy up.
+
+v8
+  * support different float rounding modes for vector instructions.
+  * use lastest released TCG GVEC DUP IR.
+  * set RV_VLEN_MAX to 256 bits, as GVEC IR uses simd_desc.
+
+v7
+  * move vl == 0 check to translation time by add a global cpu_vl.
+  * implement vector element inline load and store function by TCG IR.
+  * based on vec_element_load(store), implement some permutation instructions.
+  * implement rsubs GVEC IR.
+  * fixup vsmul, vmfne, vfmerge, vslidedown.
+  * some other small bugs and indentation errors.
+
+v6
+  * use gvec_dup Gvec IR to accellerate move and merge.
+  * a better way to implement fixed point instructions.
+  * a global check when vl == 0.
+  * limit some macros to only one inline function call.
+  * fixup sew error when use Gvec IR.
+  * fixup bugs for corner cases.
+
+v5
+  * fixup a bug in tb flags.
+
+v4
+  * no change
+
+v3
+  * move check code from execution-time to translation-time
+  * use a continous memory block for vector register description.
+  * vector registers as direct fields in RISCVCPUState.
+  * support VLEN configure from qemu command line.
+  * support ELEN configure from qemu command line.
+  * support vector specification version configure from qemu command line.
+  * probe pages before real load or store access.
+  * use probe_page_check for no-fault operations in linux user mode.
+  * generation atomic exit exception when in parallel environment.
+  * fixup a lot of concrete bugs.
+
+V2
+  * use float16_compare{_quiet}
+  * only use GETPC() in outer most helper
+  * add ctx.ext_v Property
 
 
-On 2020/6/20 1:21, Peter Maydell wrote:
-> On Thu, 21 May 2020 at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
->>
->> On Thu, May 21, 2020 at 02:03:36PM +0100, Peter Maydell wrote:
->>> On Thu, 14 May 2020 at 15:22, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>>
->>>> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>>>
->>>> kvm_arch_on_sigbus_vcpu() error injection uses source_id as
->>>> index in etc/hardware_errors to find out Error Status Data
->>>> Block entry corresponding to error source. So supported source_id
->>>> values should be assigned here and not be changed afterwards to
->>>> make sure that guest will write error into expected Error Status
->>>> Data Block.
->>>>
->>>> Before QEMU writes a new error to ACPI table, it will check whether
->>>> previous error has been acknowledged. If not acknowledged, the new
->>>> errors will be ignored and not be recorded. For the errors section
->>>> type, QEMU simulate it to memory section error.
->>>
->>> Hi; Coverity points out (CID 1428962) that there is
->>> unreachable code in this function:
->>>
->>>> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
->>>> +                                      uint64_t error_physical_addr)
->>>> +{
->>>> +    GArray *block;
->>>> +
->>>> +    /* Memory Error Section Type */
->>>> +    const uint8_t uefi_cper_mem_sec[] =
->>>> +          UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
->>>> +                  0xED, 0x7C, 0x83, 0xB1);
->>>> +
->>>> +    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
->>>> +     * Table 17-13 Generic Error Data Entry
->>>> +     */
->>>> +    QemuUUID fru_id = {};
->>>> +    uint32_t data_length;
->>>> +
->>>> +    block = g_array_new(false, true /* clear */, 1);
->>>> +
->>>> +    /* This is the length if adding a new generic error data entry*/
->>>> +    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
->>>
->>> Here data_length has a constant value...
->>>
->>>> +
->>>> +    /*
->>>> +     * Check whether it will run out of the preallocated memory if adding a new
->>>> +     * generic error data entry
->>>> +     */
->>>> +    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
->>>
->>> ...but here we immediately have a runtime check which can't possibly
->>> fail because of the values of the constants involved, so this
->>> if() block is dead code.
->>>
->>>> +        error_report("Not enough memory to record new CPER!!!");
->>>> +        g_array_free(block, true);
->>>> +        return -1;
->>>> +    }
->>>
->>> What was this code trying to do? Is the initial value of
->>> data_length incorrect, or is the if() condition wrong, or
->>> should this simply have been an assert() ?
-> 
->> It's just a validity check. assert will do just as well.
-> 
-> Would somebody like to write a patch to make it assert instead, then,
-> please? That should keep Coverity happy.
-  I will check the comments history and make a patch, thanks a lot.
 
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+LIU Zhiwei (61):
+  target/riscv: add vector extension field in CPURISCVState
+  target/riscv: implementation-defined constant parameters
+  target/riscv: support vector extension csr
+  target/riscv: add vector configure instruction
+  target/riscv: add an internals.h header
+  target/riscv: add vector stride load and store instructions
+  target/riscv: add vector index load and store instructions
+  target/riscv: add fault-only-first unit stride load
+  target/riscv: add vector amo operations
+  target/riscv: vector single-width integer add and subtract
+  target/riscv: vector widening integer add and subtract
+  target/riscv: vector integer add-with-carry / subtract-with-borrow
+    instructions
+  target/riscv: vector bitwise logical instructions
+  target/riscv: vector single-width bit shift instructions
+  target/riscv: vector narrowing integer right shift instructions
+  target/riscv: vector integer comparison instructions
+  target/riscv: vector integer min/max instructions
+  target/riscv: vector single-width integer multiply instructions
+  target/riscv: vector integer divide instructions
+  target/riscv: vector widening integer multiply instructions
+  target/riscv: vector single-width integer multiply-add instructions
+  target/riscv: vector widening integer multiply-add instructions
+  target/riscv: vector integer merge and move instructions
+  target/riscv: vector single-width saturating add and subtract
+  target/riscv: vector single-width averaging add and subtract
+  target/riscv: vector single-width fractional multiply with rounding
+    and saturation
+  target/riscv: vector widening saturating scaled multiply-add
+  target/riscv: vector single-width scaling shift instructions
+  target/riscv: vector narrowing fixed-point clip instructions
+  target/riscv: vector single-width floating-point add/subtract
+    instructions
+  target/riscv: vector widening floating-point add/subtract instructions
+  target/riscv: vector single-width floating-point multiply/divide
+    instructions
+  target/riscv: vector widening floating-point multiply
+  target/riscv: vector single-width floating-point fused multiply-add
+    instructions
+  target/riscv: vector widening floating-point fused multiply-add
+    instructions
+  target/riscv: vector floating-point square-root instruction
+  target/riscv: vector floating-point min/max instructions
+  target/riscv: vector floating-point sign-injection instructions
+  target/riscv: vector floating-point compare instructions
+  target/riscv: vector floating-point classify instructions
+  target/riscv: vector floating-point merge instructions
+  target/riscv: vector floating-point/integer type-convert instructions
+  target/riscv: widening floating-point/integer type-convert
+    instructions
+  target/riscv: narrowing floating-point/integer type-convert
+    instructions
+  target/riscv: vector single-width integer reduction instructions
+  target/riscv: vector wideing integer reduction instructions
+  target/riscv: vector single-width floating-point reduction
+    instructions
+  target/riscv: vector widening floating-point reduction instructions
+  target/riscv: vector mask-register logical instructions
+  target/riscv: vector mask population count vmpopc
+  target/riscv: vmfirst find-first-set mask bit
+  target/riscv: set-X-first mask bit
+  target/riscv: vector iota instruction
+  target/riscv: vector element index instruction
+  target/riscv: integer extract instruction
+  target/riscv: integer scalar move instruction
+  target/riscv: floating-point scalar move instructions
+  target/riscv: vector slide instructions
+  target/riscv: vector register gather instruction
+  target/riscv: vector compress instruction
+  target/riscv: configure and turn on vector extension from command line
+
+ target/riscv/Makefile.objs              |    2 +-
+ target/riscv/cpu.c                      |   50 +
+ target/riscv/cpu.h                      |   82 +-
+ target/riscv/cpu_bits.h                 |   15 +
+ target/riscv/csr.c                      |   75 +-
+ target/riscv/fpu_helper.c               |   33 +-
+ target/riscv/helper.h                   | 1069 +++++
+ target/riscv/insn32-64.decode           |   11 +
+ target/riscv/insn32.decode              |  372 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 2888 +++++++++++++
+ target/riscv/internals.h                |   41 +
+ target/riscv/translate.c                |   27 +-
+ target/riscv/vector_helper.c            | 4899 +++++++++++++++++++++++
+ 13 files changed, 9520 insertions(+), 44 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+ create mode 100644 target/riscv/internals.h
+ create mode 100644 target/riscv/vector_helper.c
+
+-- 
+2.23.0
 
 
