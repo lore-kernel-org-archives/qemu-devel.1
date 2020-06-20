@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E05EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B4BDC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6DB82388D
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:38:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DB82388D
+	by mail.kernel.org (Postfix) with ESMTPS id CB32A22280
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:40:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB32A22280
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmX9E-0005PN-3U
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 02:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58652)
+	id 1jmXBE-0006hh-1L
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 02:40:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmX8Y-0004fi-Kl; Sat, 20 Jun 2020 02:37:58 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42278)
+ id 1jmXAZ-00060P-P0; Sat, 20 Jun 2020 02:40:03 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:41927)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmX8W-0007tE-DE; Sat, 20 Jun 2020 02:37:58 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07801939|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.16566-4.44909e-05-0.834296;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03294; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HpZbnOB_1592635070; 
+ id 1jmXAX-0007zC-4D; Sat, 20 Jun 2020 02:40:03 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07437574|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.0270799-9.17707e-05-0.972828;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03267; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HpZeqEK_1592635190; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HpZbnOB_1592635070)
- by smtp.aliyun-inc.com(10.147.41.138);
- Sat, 20 Jun 2020 14:37:50 +0800
+ fp:SMTPD_---.HpZeqEK_1592635190)
+ by smtp.aliyun-inc.com(10.147.42.241);
+ Sat, 20 Jun 2020 14:39:51 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v10 60/61] target/riscv: vector compress instruction
-Date: Sat, 20 Jun 2020 12:37:00 +0800
-Message-Id: <20200620043701.1323-61-zhiwei_liu@c-sky.com>
+Subject: [PATCH v10 61/61] target/riscv: configure and turn on vector
+ extension from command line
+Date: Sat, 20 Jun 2020 12:37:01 +0800
+Message-Id: <20200620043701.1323-62-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200620043701.1323-1-zhiwei_liu@c-sky.com>
 References: <20200620043701.1323-1-zhiwei_liu@c-sky.com>
@@ -71,120 +72,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Vector extension is default off. The only way to use vector extension is
+1. use cpu rv32 or rv64
+2. turn on it by command line
+   "-cpu rv64,x-v=true,vlen=128,elen=64,vext_spec=v0.7.1".
+
+vlen is the vector register length, default value is 128 bit.
+elen is the max operator size in bits, default value is 64 bit.
+vext_spec is the vector specification version, default value is v0.7.1.
+These properties can be specified with other values.
+
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/helper.h                   |  5 ++++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 32 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 26 ++++++++++++++++++++
- 4 files changed, 64 insertions(+)
+ target/riscv/cpu.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ target/riscv/cpu.h |  4 +++-
+ 2 files changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index eca1ab541b..acc298219d 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1145,3 +1145,8 @@ DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vcompress_vm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_d, void, ptr, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 80d5ff74a9..bdd8563067 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -577,6 +577,7 @@ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
- vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
- vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
- vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
-+vcompress_vm    010111 - ..... ..... 010 ..... 1010111 @r
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index d525cfb687..228b9bdb5d 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -430,6 +430,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         if (cpu->cfg.ext_h) {
+             target_misa |= RVH;
+         }
++        if (cpu->cfg.ext_v) {
++            target_misa |= RVV;
++            if (!is_power_of_2(cpu->cfg.vlen)) {
++                error_setg(errp,
++                        "Vector extension VLEN must be power of 2");
++                return;
++            }
++            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
++                error_setg(errp,
++                        "Vector extension implementation only supports VLEN "
++                        "in the range [128, %d]", RV_VLEN_MAX);
++                return;
++            }
++            if (!is_power_of_2(cpu->cfg.elen)) {
++                error_setg(errp,
++                        "Vector extension ELEN must be power of 2");
++                return;
++            }
++            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
++                error_setg(errp,
++                        "Vector extension implementation only supports ELEN "
++                        "in the range [8, 64]");
++                return;
++            }
++            if (cpu->cfg.vext_spec) {
++                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
++                    vext_version = VEXT_VERSION_0_07_1;
++                } else {
++                    error_setg(errp,
++                           "Unsupported vector spec version '%s'",
++                           cpu->cfg.vext_spec);
++                    return;
++                }
++            } else {
++                qemu_log("vector verison is not specified, "
++                        "use the default value v0.7.1\n");
++            }
++            set_vext_version(env, vext_version);
++        }
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index f6547f7e6d..ebc4e8174f 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2854,3 +2854,35 @@ static bool trans_vrgather_vi(DisasContext *s, arg_rmrr *a)
+         set_misa(env, RVXLEN | target_misa);
      }
-     return true;
- }
-+
-+/* Vector Compress Instruction */
-+static bool vcompress_vm_check(DisasContext *s, arg_r *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs1, 1) &&
-+            (a->rd != a->rs2));
-+}
-+
-+static bool trans_vcompress_vm(DisasContext *s, arg_r *a)
-+{
-+    if (vcompress_vm_check(s, a)) {
-+        uint32_t data = 0;
-+        static gen_helper_gvec_4_ptr * const fns[4] = {
-+            gen_helper_vcompress_vm_b, gen_helper_vcompress_vm_h,
-+            gen_helper_vcompress_vm_w, gen_helper_vcompress_vm_d,
-+        };
-+        TCGLabel *over = gen_new_label();
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                           vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
-+                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 220fa76d54..e9e0b1e7a8 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4871,3 +4871,29 @@ GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
-+
-+/* Vector Compress Instruction */
-+#define GEN_VEXT_VCOMPRESS_VM(NAME, ETYPE, H, CLEAR_FN)                   \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
-+                  CPURISCVState *env, uint32_t desc)                      \
-+{                                                                         \
-+    uint32_t mlen = vext_mlen(desc);                                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-+    uint32_t vl = env->vl;                                                \
-+    uint32_t num = 0, i;                                                  \
-+                                                                          \
-+    for (i = 0; i < vl; i++) {                                            \
-+        if (!vext_elem_mask(vs1, mlen, i)) {                              \
-+            continue;                                                     \
-+        }                                                                 \
-+        *((ETYPE *)vd + H(num)) = *((ETYPE *)vs2 + H(i));                 \
-+        num++;                                                            \
-+    }                                                                     \
-+    CLEAR_FN(vd, num, num * sizeof(ETYPE), vlmax * sizeof(ETYPE));        \
-+}
-+
-+/* Compress into vd elements of vs2 where vs1 is enabled */
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_b, uint8_t, H1, clearb)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_h, uint16_t, H2, clearh)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_w, uint32_t, H4, clearl)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_d, uint64_t, H8, clearq)
+@@ -469,10 +508,14 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+     /* This is experimental so mark with 'x-' */
+     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
++    DEFINE_PROP_BOOL("x-v", RISCVCPU, cfg.ext_v, false),
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
++    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
++    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
++    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 0ad51c6580..eef20ca6e5 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -92,7 +92,7 @@ typedef struct CPURISCVState CPURISCVState;
+ 
+ #include "pmp.h"
+ 
+-#define RV_VLEN_MAX 512
++#define RV_VLEN_MAX 256
+ 
+ FIELD(VTYPE, VLMUL, 0, 2)
+ FIELD(VTYPE, VSEW, 2, 3)
+@@ -279,12 +279,14 @@ typedef struct RISCVCPU {
+         bool ext_s;
+         bool ext_u;
+         bool ext_h;
++        bool ext_v;
+         bool ext_counters;
+         bool ext_ifencei;
+         bool ext_icsr;
+ 
+         char *priv_spec;
+         char *user_spec;
++        char *vext_spec;
+         uint16_t vlen;
+         uint16_t elen;
+         bool mmu;
 -- 
 2.23.0
 
