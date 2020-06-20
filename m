@@ -8,74 +8,74 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C31DCC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD4DC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82B16217BA
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A65D23AF8
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 10:02:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UlDkxIlE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82B16217BA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJk+T1im"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A65D23AF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmaJ1-0000g6-LK
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 06:00:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37330)
+	id 1jmaKO-0003E5-Pr
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 06:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmaHp-000873-Dq
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 05:59:45 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37271)
+ id 1jmaJK-0001Kq-9L
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 06:01:18 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jmaHm-0004fy-Mv
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 05:59:45 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a6so9973933wrm.4
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 02:59:42 -0700 (PDT)
+ id 1jmaJH-00057J-Te
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 06:01:17 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l10so11927005wrr.10
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 03:01:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=s/rbi/kwKJZ8AFPDlQMrmbRC6MIueYXe17LH9flFYjQ=;
- b=UlDkxIlEhDQue7E3heSPKXh5k+5TTbiR8KSqlDdLGw37fwOb2hmmyF0d17nbEn1K5K
- 6jw0WEPf1WQhVY8aQbRxvXhWjcTpUqu7CY+bQjr34o6VdqYffqCvi856h8aO/spmUP7G
- sVuyuvXUWsjNz/9HgLP1lJdfQHOUZgGvx/ufe/qPJen9sSmHrebOz5IJxh11/IemRQL9
- B0QXIwYe+vxOzBczu2VNIbUvmREO/1IiNO81zfBtjz7WnUnmFT43zmbWog8TWWHjpd4G
- ISsJGsEXpqf8/iCVVO4p+efDJY6DtQY5DzHhvnLAtDK4i13/xi/DSpDHHQYszs7uuvDq
- Td6g==
+ :cc; bh=KDrDI44Xn1/uqB57rbz2pbb4jMhLxRp4houc92re78Y=;
+ b=VJk+T1imtU0+/EH2tsXgz3jRU4y5OoAADAmMlVlDmjU6QF2yq6t4ZQoPCajQ5TxZ/4
+ lAl6Ufiy1aDlKldARrgTUtrbSivXd0rxBWt3o8j/tiR0/dfhADaTt8UBVaBmCtITWv6H
+ JByzVyMoll32JvzSg45VreXQvaTu9K9r0vPvIwASrpoLV/rtKDIhYxE0J5HNAvCGAaoX
+ NCrih4Tf4B5Yhuz2kcMZqKSRBtCcg7bN0VbPohyfJAm+9vNlVjhADt/jLCNZhCPiJmpC
+ jU1ZFKuWY+mrgGKpVknOqLjRBEs4nEW2FOHTuTovkZsvLyQVJZEQDihvHaVZZfUqt8LR
+ 2R3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=s/rbi/kwKJZ8AFPDlQMrmbRC6MIueYXe17LH9flFYjQ=;
- b=JSFk9t6FT1wwvVB2LLZGhEPX92Eq+g+0HInZcd37F0KePjk1+ZObRevlzYUJ/jgbar
- N/BpENK2LGKcXBndLXjpuUd6Q9jEUPUNwzXS7nSfD7MnOpWAaA7qr6CYSYP0kFRhmqrE
- NdrrpMuCg1HwqZbExudYF0EHLXvhGwTRSblsbLWACz9+Tz0sb5o5fJmug84L8QaOAPQ2
- 6DR4xXtvBG/dmXVXpCtgDrWSjl1EebkW5lA+KFk7+CgzN5Xs6GbU4SzOgZBkmJ8nXXDv
- OOyAy7+M0Nu7efJfEDZuzOvNTBzvxkJrv5ItD0Wd6onnlm+qFkaMdz+ALvgPYo1JpT84
- 22hQ==
-X-Gm-Message-State: AOAM533cbc/l2K2shCAgLxrRBuFbWtcnPsk5bs+6rQfTWYSWA/TZPzZc
- PN6xC6qESPXfRY+d+2kgq5lxje9o2+tlU1EGHy4=
-X-Google-Smtp-Source: ABdhPJwahz4rCicLJ6yzZDqgqfZU5fZRy5UWcdQ7H3zU9AsMSs+jN1GFNz8dfZZSNu2+yZCO/VCG3phFBR9hj2E2sp4=
-X-Received: by 2002:a5d:62d1:: with SMTP id o17mr8281866wrv.162.1592647180625; 
- Sat, 20 Jun 2020 02:59:40 -0700 (PDT)
+ bh=KDrDI44Xn1/uqB57rbz2pbb4jMhLxRp4houc92re78Y=;
+ b=ZtDCTiDjObRd9fytD3rQhQ9t1uFjZyTqLyc3/9+/J3LMkLMO0DeZID5I7QNKq/sgmK
+ GJGKeGvx/hSZKVZJO6uPB3Sd7RyCKr5t3oXQeZhooeqG+A/sNiWZmDZU6iOaNQ/i49JS
+ W5qQlBFX/3YLQYYqPit4e1r9y5lSxjlitgAtEtt05XkQctF8/+GqKmmUDpzCrxhA8UE7
+ TJ7ougZrYvg5aoaI3Yzl711CigeZg3Vj0/Z81Pyhdt+TX/u+Ff3erXbNai2ZpyYJ7ZjN
+ ZNcu3uZmotPyTph2mvs3B3gGgvzDZUGSBeWm4sCay3bA6mHaDbAfJZruTFhO2L7gF2vt
+ 5ZGQ==
+X-Gm-Message-State: AOAM5307PaMY471lJTj4k/s78DKli+TXCV9f5MxuYIW27XefFE4mRy3M
+ lj3yOzUlAwWVLDDBwz20QAYTIPFNe0/hSnU18gU=
+X-Google-Smtp-Source: ABdhPJy8inu29WojpyS8Au2UvHxsDmz/NVCUtMmPXwxmg45zDA4NushTmiGzkUm2j462HhABUtKzE9P5KZR9a6squhw=
+X-Received: by 2002:adf:a283:: with SMTP id s3mr7982471wra.147.1592647273875; 
+ Sat, 20 Jun 2020 03:01:13 -0700 (PDT)
 MIME-Version: 1.0
 Received: by 2002:a1c:451:0:0:0:0:0 with HTTP;
- Sat, 20 Jun 2020 02:59:40 -0700 (PDT)
+ Sat, 20 Jun 2020 03:01:13 -0700 (PDT)
 In-Reply-To: <20200619153632.1365-2-ahmedkhaledkaraman@gmail.com>
 References: <20200619153632.1365-1-ahmedkhaledkaraman@gmail.com>
  <20200619153632.1365-2-ahmedkhaledkaraman@gmail.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sat, 20 Jun 2020 11:59:40 +0200
-Message-ID: <CAHiYmc79=PaKFeF0og5BW_QctDTS-cRudr3ZXjTab7D+_snb6w@mail.gmail.com>
+Date: Sat, 20 Jun 2020 12:01:13 +0200
+Message-ID: <CAHiYmc6=WZqKBr=Rri4s2iHgN-FOLDfxvDOX+5Nnj6gnthrJYw@mail.gmail.com>
 Subject: Re: [PATCH v2 1/3] scripts/performance: Add topN_perf.py script
 To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000007428f205a88111dd"
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
+Content-Type: multipart/alternative; boundary="000000000000030bd705a8811701"
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -10
@@ -106,7 +106,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007428f205a88111dd
+--000000000000030bd705a8811701
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -118,51 +118,17 @@ Content-Transfer-Encoding: quoted-printable
 > using perf.
 >
 > Example Usage:
-
-
-Don't use capitalization when not appropriate. This is better:
-
-Example of usage:
-
-
 > topN_perf.py -n 20 -- /path/to/qemu program -program -flags
 >
 > If '-n' is not specified, the default is 25.
 >
 >
-The command line above is hardly example of usage. Furthermore, it is
-unclear of what you meant with "program -program". Other things are unclear
-too (what about qemu options?) The command line, as is now, is somewhere
-between a syntax description and an example of usage, but is neither a
-syntax description nor example of usage.
-
-From the script, it looks that there is "-h" too. Not mentioned in commit
-message ar all, and it shouldbe.
-
-I would suggest that you rework this section inthis way, for the sake of
-clarity:
-
-Syntax: (
-
-topN_perf.py [-h] [-n <number of displayed top functions >  -- <qemu
-executable> [<qemu executable options>] <target executable> [<target
-execurable options>]
-
--h - .........explain here
--n - .........explain here
-
-Example of usage:
-
-topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
-
-Example of output:
-
-
-..... and here you continue with:
+Comments similar to the one for the previous patch apply here too.
 
 
 
- No.  Percentage  Name                       Caller
+> Example Output:
+>  No.  Percentage  Name                       Caller
 > ----  ----------  -------------------------  -------------------------
 >    1      16.25%  float64_mul                qemu-x86_64
 >    2      12.01%  float64_sub                qemu-x86_64
@@ -204,11 +170,6 @@ Example of output:
 > +#  Example Usage:
 > +#  topN_perf.py -n 20 -- /path/to/qemu program -program -flags
 > +#
-
-
-The similat comments from commit message section apply here too.
-
-
 > +#   If '-n' is not specified, the default is 25.
 > +#
 > +#  This file is a part of the project "TCG Continuous Benchmarking".
@@ -242,11 +203,7 @@ The similat comments from commit message section apply here too.
 > +                                ' /path/to/qemu program -[flags
 > PROGRAM_FLAGS]')
 > +
-
-
-Same.
-
-+parser.add_argument('-n', dest=3D'top', type=3Dint, default=3D25,
+> +parser.add_argument('-n', dest=3D'top', type=3Dint, default=3D25,
 > +                    help=3D'Specify the number of top functions to print=
 .')
 > +
@@ -265,11 +222,6 @@ NULL)
 > +if check_perf.returncode:
 > +    sys.exit("Please install perf before running the script!")
 > +
-
-
-OK. This is good.
-
-
 > +# Insure user has previllage to run perf
 > +check_previlage =3D subprocess.run(["perf", "stat", "ls", "/"],
 > +                              stdout=3Dsubprocess.DEVNULL,
@@ -278,16 +230,6 @@ OK. This is good.
 > +    sys.exit(check_previlage.stderr.decode("utf-8") +
 > +             "\nOr alternatively, you can run the script with sudo
 > privileges!")
-
-
-I would avoid mixing stderr message and your message practically in one
-sentence. Better:
-
-error: <text from stderr>
-You must run the script with sudo pivilages, or, alternatively, set kernel
-Xxx option to....
-
-
 > +
 > +# Run perf record
 > +perf_record =3D subprocess.run((["perf", "record"] + command),
@@ -308,14 +250,7 @@ Xxx option to....
 > +        os.unlink('tmp.perf.data')
 > +        sys.exit(perf_report.stderr.decode("utf-8"))
 > +
-
-
-I am really confused by using both perf.data and tmp.perf.data names. Why?
-They are in entirely different format. "tmp.perf.data should be
-perf.top-function.list, let's say, if I am not mistaken about its meaning
-and usage.
-
-+# Read the reported data to functions[]
+> +# Read the reported data to functions[]
 > +functions =3D []
 > +with open("tmp.perf.data", "r") as data:
 > +    # Only read lines that are not comments (comments start with #)
@@ -331,11 +266,6 @@ ns)
 > +top_functions =3D functions[:number_of_top_functions]
 > +
 > +# Print information headers
-
-
-# Print table header
-
-
 > +print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
 > +                                                         'Percentage',
 > +                                                         'Name',
@@ -361,17 +291,11 @@ ns)
 > +os.unlink('perf.data')
 > +os.unlink('tmp.perf.data')
 > --
-
-
-Thanks,
-Aleksandar.
-
-
 > 2.17.1
 >
 >
 
---0000000000007428f205a88111dd
+--000000000000030bd705a8811701
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -383,32 +307,15 @@ aman@gmail.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
 ts the top N most executed functions in QEMU<br>
 using perf.<br>
 <br>
-Example Usage:</blockquote><div><br></div><div>Don&#39;t use capitalization=
- when not appropriate. This is better:</div><div><br></div><div>Example of =
-usage:</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+Example Usage:<br>
 topN_perf.py -n 20 -- /path/to/qemu program -program -flags<br>
 <br>
 If &#39;-n&#39; is not specified, the default is 25.<br>
-<br></blockquote><div><br></div><div>The command line above is hardly examp=
-le of usage. Furthermore, it is unclear of what you meant with &quot;progra=
-m -program&quot;. Other things are unclear too (what about qemu options?) T=
-he command line, as is now, is somewhere between a syntax description and a=
-n example of usage, but is neither a syntax description nor example of usag=
-e.</div><div><br></div><div>From the script, it looks that there is &quot;-=
-h&quot; too. Not mentioned in commit message ar all, and it shouldbe.<br></=
-div><div><br></div><div>I would suggest that you rework this section inthis=
- way, for the sake of clarity:</div><div><br></div><div>Syntax: (</div><div=
-><br></div><div>topN_perf.py [-h] [-n &lt;number of displayed top functions=
- &gt; =C2=A0-- &lt;qemu executable&gt; [&lt;qemu executable options&gt;] &l=
-t;target executable&gt; [&lt;target execurable options&gt;]</div><div><br><=
-/div><div>-h - .........explain here</div><div><div>-n - .........explain h=
-ere</div></div><div><br></div><div>Example of usage:</div><div><br></div><d=
-iv>topN_perf.py -n 20 -- qemu-arm coulomb_double-arm</div><div><br></div><d=
-iv>Example of output:</div><div><br></div><div><br></div><div>..... and her=
-e you continue with:</div><div><br></div><div><br></div><div><br></div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #c=
-cc solid;padding-left:1ex">
+<br></blockquote><div><br></div><div>Comments similar to the one for the pr=
+evious patch apply here too.</div><div><br></div><div>=C2=A0</div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
+lid;padding-left:1ex">
+Example Output:<br>
 =C2=A0No.=C2=A0 Percentage=C2=A0 Name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
 =A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Caller<br>
 ----=C2=A0 ----------=C2=A0 -------------------------=C2=A0 ---------------=
@@ -474,10 +381,7 @@ index 0000000000..53fa503d8a<br>
 +#=C2=A0 Print the top N most executed functions in QEMU using perf.<br>
 +#=C2=A0 Example Usage:<br>
 +#=C2=A0 topN_perf.py -n 20 -- /path/to/qemu program -program -flags<br>
-+#</blockquote><div><br></div><div>The similat comments from commit message=
- section apply here too.</div><div>=C2=A0</div><blockquote class=3D"gmail_q=
-uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
-x">
++#<br>
 +#=C2=A0 =C2=A0If &#39;-n&#39; is not specified, the default is 25.<br>
 +#<br>
 +#=C2=A0 This file is a part of the project &quot;TCG Continuous Benchmarki=
@@ -521,9 +425,7 @@ t;.<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
 =A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39; /path/to/qemu program -[flags =
 PROGRAM_FLAGS]&#39;)<br>
-+</blockquote><div><br></div><div>Same.</div><div><br></div><blockquote cla=
-ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
-dding-left:1ex">
++<br>
 +parser.add_argument(&#39;-n&#39;, dest=3D&#39;top&#39;, type=3Dint, defaul=
 t=3D25,<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 help=
@@ -544,9 +446,7 @@ t=3Dsubprocess.DEVNULL)<br>
 +if check_perf.returncode:<br>
 +=C2=A0 =C2=A0 sys.exit(&quot;Please install perf before running the script=
 !&quot;)<br>
-+</blockquote><div><br></div><div>OK. This is good.</div><div>=C2=A0</div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
- #ccc solid;padding-left:1ex">
++<br>
 +# Insure user has previllage to run perf<br>
 +check_previlage =3D subprocess.run([&quot;perf&quot;, &quot;stat&quot;, &q=
 uot;ls&quot;, &quot;/&quot;],<br>
@@ -557,13 +457,7 @@ ocess.PIPE)<br>
 +=C2=A0 =C2=A0 sys.exit(check_previlage.<wbr>stderr.decode(&quot;utf-8&quot=
 ;) +<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;\nOr alternatively, =
-you can run the script with sudo privileges!&quot;)</blockquote><div><br></=
-div><div>I would avoid mixing stderr message and your message practically i=
-n one sentence. Better:</div><div><br></div><div>error: &lt;text from stder=
-r&gt;</div><div>You must run the script with sudo pivilages, or, alternativ=
-ely, set kernel Xxx option to....</div><div>=C2=A0</div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
+you can run the script with sudo privileges!&quot;)<br>
 +<br>
 +# Run perf record<br>
 +perf_record =3D subprocess.run(([&quot;perf&quot;, &quot;record&quot;] + c=
@@ -587,12 +481,7 @@ br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 os.unlink(&#39;tmp.perf.data&#39;)<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 sys.exit(perf_report.stderr.<wbr>decode(&quot;=
 utf-8&quot;))<br>
-+</blockquote><div><br></div><div>I am really confused by using both perf.d=
-ata and tmp.perf.data names. Why? They are in entirely different format. &q=
-uot;tmp.perf.data should be perf.top-function.list, let&#39;s say, if I am =
-not mistaken about its meaning and usage.</div><div><br></div><blockquote c=
-lass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;=
-padding-left:1ex">
++<br>
 +# Read the reported data to functions[]<br>
 +functions =3D []<br>
 +with open(&quot;tmp.perf.data&quot;, &quot;r&quot;) as data:<br>
@@ -611,9 +500,7 @@ ons)<br>
 +# Store the data of the top functions in top_functions[]<br>
 +top_functions =3D functions[:number_of_top_<wbr>functions]<br>
 +<br>
-+# Print information headers</blockquote><div><br></div><div># Print table =
-header</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
++# Print information headers<br>
 +print(&#39;{:&gt;4}=C2=A0 {:&gt;10}=C2=A0 {:&lt;30}=C2=A0 {}\n{}=C2=A0 {}=
 =C2=A0 {}=C2=A0 {}&#39;.format(&#39;No.&#39;,<br>
 +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
@@ -666,12 +553,10 @@ r>
 +# Remove intermediate files<br>
 +os.unlink(&#39;perf.data&#39;)<br>
 +os.unlink(&#39;tmp.perf.data&#39;)<br>
---=C2=A0</blockquote><div><br></div><div>Thanks,</div><div>Aleksandar.</div=
-><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .=
-8ex;border-left:1px #ccc solid;padding-left:1ex">
+-- <br>
 2.17.1<br>
 <br>
 </blockquote>
 
---0000000000007428f205a88111dd--
+--000000000000030bd705a8811701--
 
