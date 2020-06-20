@@ -7,43 +7,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D44FC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A5BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F060B20732
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:10:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F060B20732
+	by mail.kernel.org (Postfix) with ESMTPS id B1BAA235FC
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 06:13:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1BAA235FC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmWhz-0007Rv-A2
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 02:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54944)
+	id 1jmWkU-0000Iv-0U
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 02:13:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmWhL-0006z6-JN; Sat, 20 Jun 2020 02:09:51 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47451)
+ id 1jmWjL-0008Ah-Cs; Sat, 20 Jun 2020 02:11:55 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56189)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jmWhI-0003m5-Rp; Sat, 20 Jun 2020 02:09:51 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1254952|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.432005-0.000103955-0.567891;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HpZ7Xzz_1592633380; 
+ id 1jmWjI-00049m-JO; Sat, 20 Jun 2020 02:11:55 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0745944|-1;
+ BR=01201311R141S95ruler371_34042_170602; CH=green; DM=|OVERLOAD|false|;
+ DS=SPAM|spam_blackmail|0.892561-9.6942e-05-0.107342; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=9; RT=8; SR=0;
+ TI=SMTPD_---.HpZKqDM_1592633501; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HpZ7Xzz_1592633380)
- by smtp.aliyun-inc.com(10.147.40.44); Sat, 20 Jun 2020 14:09:41 +0800
+ fp:SMTPD_---.HpZKqDM_1592633501)
+ by smtp.aliyun-inc.com(10.147.44.145);
+ Sat, 20 Jun 2020 14:11:41 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v10 46/61] target/riscv: vector wideing integer reduction
- instructions
-Date: Sat, 20 Jun 2020 12:36:46 +0800
-Message-Id: <20200620043701.1323-47-zhiwei_liu@c-sky.com>
+Subject: [PATCH v10 47/61] target/riscv: vector single-width floating-point
+ reduction instructions
+Date: Sat, 20 Jun 2020 12:36:47 +0800
+Message-Id: <20200620043701.1323-48-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200620043701.1323-1-zhiwei_liu@c-sky.com>
 References: <20200620043701.1323-1-zhiwei_liu@c-sky.com>
@@ -81,71 +83,105 @@ Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  7 +++++++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
- target/riscv/vector_helper.c            | 11 +++++++++++
- 4 files changed, 24 insertions(+)
+ target/riscv/helper.h                   | 10 +++++++
+ target/riscv/insn32.decode              |  4 +++
+ target/riscv/insn_trans/trans_rvv.inc.c |  5 ++++
+ target/riscv/vector_helper.c            | 39 +++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a7fe4443e4..1c1277c0d1 100644
+index 1c1277c0d1..8e8b8d0407 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1072,3 +1072,10 @@ DEF_HELPER_6(vredxor_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+@@ -1079,3 +1079,13 @@ DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
 +
-+DEF_HELPER_6(vwredsumu_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 878eeecb7e..b78fd8bc04 100644
+index b78fd8bc04..986308e99a 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -539,6 +539,8 @@ vredminu_vs     000100 . ..... ..... 010 ..... 1010111 @r_vm
- vredmin_vs      000101 . ..... ..... 010 ..... 1010111 @r_vm
- vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
+@@ -541,6 +541,10 @@ vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
  vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
-+vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+ vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
+ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
++# Vector ordered and unordered reduction sum
++vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b3920eed23..06842c424e 100644
+index 06842c424e..7e9d0ded37 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2342,3 +2342,7 @@ GEN_OPIVV_TRANS(vredmin_vs, reduction_check)
- GEN_OPIVV_TRANS(vredand_vs, reduction_check)
- GEN_OPIVV_TRANS(vredor_vs, reduction_check)
- GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
+@@ -2346,3 +2346,8 @@ GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
+ /* Vector Widening Integer Reduction Instructions */
+ GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
+ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
 +
-+/* Vector Widening Integer Reduction Instructions */
-+GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
-+GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
++/* Vector Single-Width Floating-Point Reduction Instructions */
++GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 5c357b688f..fdeedad64f 100644
+index fdeedad64f..ba961230f6 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -4406,3 +4406,14 @@ GEN_VEXT_RED(vredxor_vs_b, int8_t, int8_t, H1, H1, DO_XOR, clearb)
- GEN_VEXT_RED(vredxor_vs_h, int16_t, int16_t, H2, H2, DO_XOR, clearh)
- GEN_VEXT_RED(vredxor_vs_w, int32_t, int32_t, H4, H4, DO_XOR, clearl)
- GEN_VEXT_RED(vredxor_vs_d, int64_t, int64_t, H8, H8, DO_XOR, clearq)
+@@ -4417,3 +4417,42 @@ GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
+ GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
+ GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
+ GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
 +
-+/* Vector Widening Integer Reduction Instructions */
-+/* signed sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsum_vs_b, int16_t, int8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsum_vs_h, int32_t, int16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
++/* Vector Single-Width Floating-Point Reduction Instructions */
++#define GEN_VEXT_FRED(NAME, TD, TS2, HD, HS2, OP, CLEAR_FN)\
++void HELPER(NAME)(void *vd, void *v0, void *vs1,           \
++                  void *vs2, CPURISCVState *env,           \
++                  uint32_t desc)                           \
++{                                                          \
++    uint32_t mlen = vext_mlen(desc);                       \
++    uint32_t vm = vext_vm(desc);                           \
++    uint32_t vl = env->vl;                                 \
++    uint32_t i;                                            \
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;         \
++    TD s1 =  *((TD *)vs1 + HD(0));                         \
++                                                           \
++    for (i = 0; i < vl; i++) {                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                   \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {         \
++            continue;                                      \
++        }                                                  \
++        s1 = OP(s1, (TD)s2, &env->fp_status);              \
++    }                                                      \
++    *((TD *)vd + HD(0)) = s1;                              \
++    CLEAR_FN(vd, 1, sizeof(TD), tot);                      \
++}
 +
-+/* Unsigned sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
++/* Unordered sum */
++GEN_VEXT_FRED(vfredsum_vs_h, uint16_t, uint16_t, H2, H2, float16_add, clearh)
++GEN_VEXT_FRED(vfredsum_vs_w, uint32_t, uint32_t, H4, H4, float32_add, clearl)
++GEN_VEXT_FRED(vfredsum_vs_d, uint64_t, uint64_t, H8, H8, float64_add, clearq)
++
++/* Maximum value */
++GEN_VEXT_FRED(vfredmax_vs_h, uint16_t, uint16_t, H2, H2, float16_maxnum, clearh)
++GEN_VEXT_FRED(vfredmax_vs_w, uint32_t, uint32_t, H4, H4, float32_maxnum, clearl)
++GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
++
++/* Minimum value */
++GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
++GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
++GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
 -- 
 2.23.0
 
