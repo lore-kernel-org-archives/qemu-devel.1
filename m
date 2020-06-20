@@ -2,90 +2,89 @@ Return-Path: <SRS0=xv8e=AB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD68BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 17:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14282C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 17:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 997CC2311D
-	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 17:36:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCA9323E55
+	for <qemu-devel@archiver.kernel.org>; Sat, 20 Jun 2020 17:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j+a/AR6H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 997CC2311D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HM9Go5QA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA9323E55
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmhPs-0002zT-UD
-	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 13:36:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53228)
+	id 1jmhTF-0005vT-29
+	for qemu-devel@archiver.kernel.org; Sat, 20 Jun 2020 13:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmhPE-0002LH-9x
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 13:35:52 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38402)
+ id 1jmhSR-0005TP-LK
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 13:39:11 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35141)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmhPC-0005x5-Ig
- for qemu-devel@nongnu.org; Sat, 20 Jun 2020 13:35:52 -0400
-Received: by mail-pl1-x643.google.com with SMTP id d10so3579152pls.5
- for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 10:35:50 -0700 (PDT)
+ id 1jmhSQ-0006Ju-57
+ for qemu-devel@nongnu.org; Sat, 20 Jun 2020 13:39:11 -0400
+Received: by mail-pl1-x641.google.com with SMTP id k1so5482914pls.2
+ for <qemu-devel@nongnu.org>; Sat, 20 Jun 2020 10:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=h3yGZCDORrFy+QlFQcw0g5yYcdCj1Jz8HToicNoUaOo=;
- b=j+a/AR6HTi6OkyRdKjs1nPIQY/D5XfIWhguzIX+HHaUNTxw7/bqIqDUwCz/XMFuWP4
- 3sGS5JJkaewsidunoigh9aZ48sZN/RT/DH3PglM3t2R4ZkT/ZQq91ZG8IY3OHwg8wnO6
- nNTG/NMtoqIQHEoC1ozJNjlyMhMFYHoO8nsbCTcWoIimGaWNb7u52/3ZgQSyZAHMjCS4
- fKgI2q1tZS+bYIPPMYjtfICuno3vc+sgrOm2UEG/hk6VUeuH3+WNvlxM8e4OiPEf5RKt
- lJW1KsTchxRUCKvhncCj2SF7mBXVxVOPGv2rvjCFNDvY/iMPwsbTT3DOpAmUNZW0A0x7
- u+BA==
+ bh=JWQwPAcDcUMEFm/UmcouwvWGwawUqAePNHJCGVw1534=;
+ b=HM9Go5QAvQRTs+sFN0QJny3BLjI8cpolTvk6EsrvZ+JqpxWOmtrDl1ftD/UIjhPVQZ
+ 7ilk05dL6sDhx4bj41qTUPH2DLUNz+uWzsiqxxVJFqFAOur6yElY39fGS5ROzD4E7jJ3
+ HcQcw91v0I/qj86Ah6DbnOqHIAkxX2YjFovP99Nl4dO6exI6mhGu/9fYaMF3xhE0ejx+
+ S3a9rCK/1vv1g0csy3wExwH77gGzEc8KznzoIonVFPvic4aHF8hm08Cj/agxdRbjILSb
+ tt0GOqiCkbLO2Ipg8VoWQHACrVxeZK4nzSVO/XOgNjUbTostn79/oxzZYmZmjh0oAXBG
+ q4zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=h3yGZCDORrFy+QlFQcw0g5yYcdCj1Jz8HToicNoUaOo=;
- b=o4wWkKUngJPGi2FNr6z7B8PAUbcOgQOAxdsDjPk9x4MzIsUB9qIrIBaCKnP2S5m0Ym
- CDNwTqkBG4PYfgpgSB1J3Kr1VLjjoTSkDNEbBhgfICVROunzoJ3CmNCCzcHhTF54i99s
- Fe/KWgRi0y0h5M/aAw7heLkTDEJOuYor+xzV74VtWxw/jqSdCEzc8qX6NQW6py8rMQlF
- bHk/SNF3T7QKZearKFYC6F6Jy/ELbmoBOK+ViuO5RTXw+3GavjHAXFcEGVo3XTMG6OGQ
- ziUgARK2P902UmLB3EAwfvGlVh/ehEFvRKuMprrK9JOyrtBst6vHrt0XXoebOeAQKmDo
- qVBw==
-X-Gm-Message-State: AOAM533GEA+VEHjkPCIPLDPrUTR5FL+g942OPBq0pTvMKPTCMhtyuda2
- 6sDtRAG/W8x3HNg+cAlMybeWmQ==
-X-Google-Smtp-Source: ABdhPJzplu1izZTSY+R253vpgbbT7CNj5y1YtNBguwS56CJ5cnSk0s6FwfyYYRInyuW9GTww6Lvx6w==
-X-Received: by 2002:a17:90a:acf:: with SMTP id
- r15mr9912288pje.171.1592674549094; 
- Sat, 20 Jun 2020 10:35:49 -0700 (PDT)
+ bh=JWQwPAcDcUMEFm/UmcouwvWGwawUqAePNHJCGVw1534=;
+ b=Tod+/UnITD23kVDW62mxa6LdGWFpus3DRcKYatoKmPkaVQuf0u/FRYWKEqi9774G4j
+ jxOHHdEf/4pJXijG7rYkXa4BFZtObz9ETDXslWnRR5COCcC2VnU4B2lISNW7FTu0khqg
+ 4E9yKdpTXgsgoqKV0fcu8ERmZvtOhT93VRx8ZQx1MSXBS29W3mfHA7wh6Qy4tD8QbeII
+ OhcISGIZZpi2QaWAtURki4H6sVWaR/LD+GaplvHWTqbqE79kRRT/ykJzuI2Othv0Oopt
+ FMeQr37kGcJuKQ/cJwEd502HwN1MOwuZKoE7U1FpmuAKeHV6e7VEXG8dl0xCdXf4V5c9
+ dZfA==
+X-Gm-Message-State: AOAM531zd1NYMdwqsTRQ9AgTS/MF6GjbnwBFsMQKgY4erNBnyO9hdCkO
+ BENp3bwGE9Lkh0qWLcR3vimTjA==
+X-Google-Smtp-Source: ABdhPJywofZIW1WCleHzgGDsXG0Bk5LaprqqHuCTAhkf4J+pn8IuShjO0gYGWUDxua7BH+2UwhQxhw==
+X-Received: by 2002:a17:902:7:: with SMTP id 7mr11793346pla.209.1592674748245; 
+ Sat, 20 Jun 2020 10:39:08 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id i12sm9267157pfk.180.2020.06.20.10.35.47
+ by smtp.gmail.com with ESMTPSA id o22sm9110196pfd.114.2020.06.20.10.39.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 20 Jun 2020 10:35:48 -0700 (PDT)
-Subject: Re: [PATCH rc1 14/15] BootLinuxConsoleTest: Test the RX GDB simulator
+ Sat, 20 Jun 2020 10:39:07 -0700 (PDT)
+Subject: Re: [PATCH rc1 15/15] docs: Document the RX target
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Richard Henderson <rth@twiddle.net>,
  Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20200617191519.14842-1-f4bug@amsat.org>
- <20200617191519.14842-15-f4bug@amsat.org>
+ <20200617191519.14842-16-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <59849145-d016-15e4-3b9f-cff834cf1cd9@linaro.org>
-Date: Sat, 20 Jun 2020 10:35:46 -0700
+Message-ID: <c9f19ea5-e02d-bcff-3486-0f86b64fd2e2@linaro.org>
+Date: Sat, 20 Jun 2020 10:39:05 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200617191519.14842-15-f4bug@amsat.org>
+In-Reply-To: <20200617191519.14842-16-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,54 +106,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/17/20 12:15 PM, Philippe Mathieu-Daudé wrote:
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+> From: Yoshinori Sato <ysato@users.sourceforge.jp>
 > 
-> Add two tests for the rx-gdbsim machine, based on the recommended
-> test setup from Yoshinori Sato:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
+> Add rx-virt target specification document.
 > 
-> - U-Boot prompt
-> - Linux kernel with Sash shell
-> 
-> These are very quick tests:
-> 
->   $ avocado run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
->   JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
->   JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef0/job.log
->    (1/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_uboot: PASS (0.11 s)
->    (2/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_linux_sash: PASS (0.45 s)
->   RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-> 
-> Tests can also be run with:
-> 
->   $ avocado --show=console run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
->   console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:56:06 +0900)
->   console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
->   console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
->   ...
->   console: SuperH (H)SCI(F) driver initialized
->   console: 88240.serial: ttySC0 at MMIO 0x88240 (irq = 215, base_baud = 0) is a sci
->   console: console [ttySC0] enabled
->   console: 88248.serial: ttySC1 at MMIO 0x88248 (irq = 219, base_baud = 0) is a sci
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Message-Id: <20200224141923.82118-22-ysato@users.sourceforge.jp>
-> [PMD: Replace obsolete set_machine() by machine tag, and rename as gdbsim]
+> Message-Id: <20200308130637.37651-1-ysato@users.sourceforge.jp>
+> [PMD: Cover in MAINTAINERS, rename as gdbsim, use machine argument]
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  MAINTAINERS                           |  1 +
->  tests/acceptance/machine_rx_gdbsim.py | 68 +++++++++++++++++++++++++++
->  2 files changed, 69 insertions(+)
->  create mode 100644 tests/acceptance/machine_rx_gdbsim.py
+>  docs/system/target-rx.rst | 36 ++++++++++++++++++++++++++++++++++++
+>  docs/system/targets.rst   |  1 +
+>  MAINTAINERS               |  1 +
+>  3 files changed, 38 insertions(+)
+>  create mode 100644 docs/system/target-rx.rst
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
