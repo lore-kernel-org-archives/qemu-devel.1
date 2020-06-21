@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDEE7C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BEFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ACB621D90
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0DDF246E6
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtvZBekX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ACB621D90
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vccjz5oj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0DDF246E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmzW6-0000U1-Pu
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 08:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47502)
+	id 1jmzXA-00030u-1M
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 08:57:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmzOa-0005FY-8N
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:25 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:32921)
+ id 1jmzOh-0005TF-B8
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:31 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:38423)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmzOY-0002qu-1y
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:23 -0400
-Received: by mail-wr1-x435.google.com with SMTP id l11so14018032wru.0
- for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 05:48:21 -0700 (PDT)
+ id 1jmzOf-0002s0-D4
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:30 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id f18so671505wml.3
+ for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 05:48:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bcKld0eaekjaOavSgG+FcA8qhxJmWxkd64BI9BXaJ5g=;
- b=mtvZBekX+ZpvaowXv00oY7hwRcukXUv6IIMDIyRQoh0pFbMo6eWfteXf38NRmApO6T
- InQlekkPJ7jYyIAedw0WCBQWNxOPoVhFgOWq1S3596Rcn/VJd95pMfyo2NsgJSJksI1z
- jQTrfmrf34owhoafsl+cUmEOqfN6KBO1NW6Fy9i2bqwTo3MRdHRmkU6oGwe357GtjIpE
- kq0P7/k0Qnaf28rGI2mT9jooW5YzSKYkTs0WfmLSaTgz0Ave5eye5rP+J9zC6BuZwHDP
- y06rdI86wv99q+0OViCfniqFkZejMOW1iZDK1sR+PDvFou7Xu8PlGqQMbkkgleIYxdIc
- UzYQ==
+ bh=EoWHfagBj+px7QOt2jISTsysM/p7txdQCZQ0YKMDkTQ=;
+ b=vccjz5ojLoeb70SENktPL1UJil2s5FwpdeFFK9KLSv1pP/t0USGNpydn7L+EOB09T/
+ jJ7OcustMbpOmqfJR8tT6LzwNKE+VB2yrbJbnV62pc8FS1HbafmE2yKX8V5Bbgn+JfzP
+ WFmfSnpvhIOZjA0lZLN0H43ptegjMOK7Bp+llek5P6v0OTXHASM5961RQIfH9m1WIxJJ
+ rm903sbuze8/eGA9KP4BifmN0t1dIxlaX0P7WlePTa3+bdIdcw+PRvVHNd8yyxHhorRh
+ PTeDTuWki8OvopfAQbZVQrhqDhh+wQMxMXGXHtxVOgvMhU2p6syVRyPWw3NJrFASCh44
+ Ee3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=bcKld0eaekjaOavSgG+FcA8qhxJmWxkd64BI9BXaJ5g=;
- b=oNA//ZSQtsIMWOmEcVbHGhvPLVE2p4QoPpKf+miHlrAEyUDQx3XBdFKGQB7oQ8OBGs
- oUnrugBxeCYOGeBBQK9cip9sb5CczllHPJ9houJfEeGa67PY76coiuVtzSQ8rjXJ9mxi
- 5wQKmVLX9Q/MxksX3GStNilwmlLVbmjITlGgU/GjmYt4KF1Bz35dvm2lgwZa+gO5arIu
- 4JjuuX8sblDl7cJojLpRWeFYrFRYfjTDkkn+PtQMqxN/rksDl/ow8axo0k06VUwcVu+w
- SlpjaeHWOCfAzMVDD1UPagiAK1+ILzcLOknHmOWfIuGVVrLLMDK0Iqx3SwnUoUWR8BEh
- d+mA==
-X-Gm-Message-State: AOAM5324iRdvDWtSqT5fU2KSPJQCqR5Eb/vNZeAJTNO0ZX/UnBiAKy+L
- pQ0Rl57iV0waFsNk8g0m7bHRjU/n
-X-Google-Smtp-Source: ABdhPJw3dbU9UCtk5NWz2Lay1UnxV8EKJ2st9L7BFKvqUAUFh1Cv9jqzPQkKmbtFpvsq+oLui8YzvA==
-X-Received: by 2002:adf:cc85:: with SMTP id p5mr10034105wrj.273.1592743700155; 
- Sun, 21 Jun 2020 05:48:20 -0700 (PDT)
+ bh=EoWHfagBj+px7QOt2jISTsysM/p7txdQCZQ0YKMDkTQ=;
+ b=d9Xz+i75FoxN2LYTmlF3iD1qlmGsECTSZ2d2PT4IShQm7nuqTwJvkFNN1sreXg5wg5
+ mGcCyzl6k40G7OtfJJsFhBjpIP/Zl5ONfN8DkPzwGf0ptI6uVItQRd/QzXB4qabXXNck
+ fAPriR2iw9XNQT5oU1Rmntxd5nUwGrKmkoazMKQ/NIpeK/DUl2alV5D28SDThBnrc9vB
+ hvbYUANxMrFc90dK0iE+a+gxe+EYWUGJeMxZ8Fu8XNoC24wFS4lcDRCy8RbD0w6AuEua
+ gg9aqOrrfV/0blWUIlDHJQek4sQ/uBA39K8GEmcWmSUNMzzmjx1h5apqXP7JNZx7XF7f
+ a+gw==
+X-Gm-Message-State: AOAM531ON12QqVkS5OAfoqOYnJeb1mj+rS1spGav7d67PH7rxS+2VpGw
+ bLlQJpXrLIJzydPJ+Ywtwkeaue67
+X-Google-Smtp-Source: ABdhPJwmXtVfSIxcO2KAKR4gHDhvgHCB/FnvWirgvBe1/9QWw5uI/ED5YCPjT+fepUHajslPXqmOew==
+X-Received: by 2002:a05:600c:210:: with SMTP id
+ 16mr14167611wmi.185.1592743707866; 
+ Sun, 21 Jun 2020 05:48:27 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o10sm13779362wrj.37.2020.06.21.05.48.19
+ by smtp.gmail.com with ESMTPSA id o10sm13779362wrj.37.2020.06.21.05.48.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 21 Jun 2020 05:48:19 -0700 (PDT)
+ Sun, 21 Jun 2020 05:48:27 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/15] hw/timer: RX62N compare match timer (CMT)
-Date: Sun, 21 Jun 2020 14:48:00 +0200
-Message-Id: <20200621124807.17226-9-f4bug@amsat.org>
+Subject: [PULL 14/15] BootLinuxConsoleTest: Test the RX GDB simulator
+Date: Sun, 21 Jun 2020 14:48:06 +0200
+Message-Id: <20200621124807.17226-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200621124807.17226-1-f4bug@amsat.org>
 References: <20200621124807.17226-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -103,418 +104,145 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Magnus Damm <magnus.damm@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-renesas_cmt: 16bit compare match timer modules.
-This part use many renesas's CPU.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
+Add two tests for the rx-gdbsim machine, based on the recommended
+test setup from Yoshinori Sato:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
 
+- U-Boot prompt
+- Linux kernel with Sash shell
+
+These are very quick tests:
+
+  $ avocado run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
+  JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+  JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef0/job.log
+   (1/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_uboot: PASS (0.11 s)
+   (2/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_linux_sash: PASS (0.45 s)
+  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+
+Tests can also be run with:
+
+  $ avocado --show=console run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
+  console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:56:06 +0900)
+  console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+  console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
+  ...
+  console: SuperH (H)SCI(F) driver initialized
+  console: 88240.serial: ttySC0 at MMIO 0x88240 (irq = 215, base_baud = 0) is a sci
+  console: console [ttySC0] enabled
+  console: 88248.serial: ttySC1 at MMIO 0x88248 (irq = 219, base_baud = 0) is a sci
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200224141923.82118-16-ysato@users.sourceforge.jp>
-[PMD: Split from TMR, filled VMStateField for migration]
+Message-Id: <20200224141923.82118-22-ysato@users.sourceforge.jp>
+[PMD: Replace obsolete set_machine() by machine tag, and rename as gdbsim]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/timer/renesas_cmt.h |  40 +++++
- hw/timer/renesas_cmt.c         | 283 +++++++++++++++++++++++++++++++++
- MAINTAINERS                    |   4 +-
- hw/timer/Kconfig               |   3 +
- hw/timer/Makefile.objs         |   1 +
- 5 files changed, 329 insertions(+), 2 deletions(-)
- create mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 hw/timer/renesas_cmt.c
+ MAINTAINERS                           |  1 +
+ tests/acceptance/machine_rx_gdbsim.py | 68 +++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 tests/acceptance/machine_rx_gdbsim.py
 
-diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cmt.h
-new file mode 100644
-index 0000000000..e28a15cb38
---- /dev/null
-+++ b/include/hw/timer/renesas_cmt.h
-@@ -0,0 +1,40 @@
-+/*
-+ * Renesas Compare-match timer Object
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef HW_TIMER_RENESAS_CMT_H
-+#define HW_TIMER_RENESAS_CMT_H
-+
-+#include "qemu/timer.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_CMT "renesas-cmt"
-+#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
-+
-+enum {
-+    CMT_CH = 2,
-+    CMT_NR_IRQ = 1 * CMT_CH
-+};
-+
-+typedef struct RCMTState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    uint64_t input_freq;
-+    MemoryRegion memory;
-+
-+    uint16_t cmstr;
-+    uint16_t cmcr[CMT_CH];
-+    uint16_t cmcnt[CMT_CH];
-+    uint16_t cmcor[CMT_CH];
-+    int64_t tick[CMT_CH];
-+    qemu_irq cmi[CMT_CH];
-+    QEMUTimer timer[CMT_CH];
-+} RCMTState;
-+
-+#endif
-diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
-new file mode 100644
-index 0000000000..2e0fd21a36
---- /dev/null
-+++ b/hw/timer/renesas_cmt.c
-@@ -0,0 +1,283 @@
-+/*
-+ * Renesas 16bit Compare-match timer
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ *            (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/irq.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "migration/vmstate.h"
-+
-+/*
-+ *  +0 CMSTR - common control
-+ *  +2 CMCR  - ch0
-+ *  +4 CMCNT - ch0
-+ *  +6 CMCOR - ch0
-+ *  +8 CMCR  - ch1
-+ * +10 CMCNT - ch1
-+ * +12 CMCOR - ch1
-+ * If we think that the address of CH 0 has an offset of +2,
-+ * we can treat it with the same address as CH 1, so define it like that.
-+ */
-+REG16(CMSTR, 0)
-+  FIELD(CMSTR, STR0, 0, 1)
-+  FIELD(CMSTR, STR1, 1, 1)
-+  FIELD(CMSTR, STR,  0, 2)
-+/* This addeess is channel offset */
-+REG16(CMCR, 0)
-+  FIELD(CMCR, CKS,  0, 2)
-+  FIELD(CMCR, CMIE, 6, 1)
-+REG16(CMCNT, 2)
-+REG16(CMCOR, 4)
-+
-+static void update_events(RCMTState *cmt, int ch)
-+{
-+    int64_t next_time;
-+
-+    if ((cmt->cmstr & (1 << ch)) == 0) {
-+        /* count disable, so not happened next event. */
-+        return ;
-+    }
-+    next_time = cmt->cmcor[ch] - cmt->cmcnt[ch];
-+    next_time *= NANOSECONDS_PER_SECOND;
-+    next_time /= cmt->input_freq;
-+    /*
-+     * CKS -> div rate
-+     *  0 -> 8 (1 << 3)
-+     *  1 -> 32 (1 << 5)
-+     *  2 -> 128 (1 << 7)
-+     *  3 -> 512 (1 << 9)
-+     */
-+    next_time *= 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+    next_time += qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(&cmt->timer[ch], next_time);
-+}
-+
-+static int64_t read_cmcnt(RCMTState *cmt, int ch)
-+{
-+    int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    if (cmt->cmstr & (1 << ch)) {
-+        delta = (now - cmt->tick[ch]);
-+        delta /= NANOSECONDS_PER_SECOND;
-+        delta /= cmt->input_freq;
-+        delta /= 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+        cmt->tick[ch] = now;
-+        return cmt->cmcnt[ch] + delta;
-+    } else {
-+        return cmt->cmcnt[ch];
-+    }
-+}
-+
-+static uint64_t cmt_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    RCMTState *cmt = opaque;
-+    int ch = offset / 0x08;
-+    uint64_t ret;
-+
-+    if (offset == A_CMSTR) {
-+        ret = 0;
-+        ret = FIELD_DP16(ret, CMSTR, STR,
-+                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
-+        return ret;
-+    } else {
-+        offset &= 0x07;
-+        if (ch == 0) {
-+            offset -= 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            ret = 0;
-+            ret = FIELD_DP16(ret, CMCR, CKS,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
-+            ret = FIELD_DP16(ret, CMCR, CMIE,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
-+            return ret;
-+        case A_CMCNT:
-+            return read_cmcnt(cmt, ch);
-+        case A_CMCOR:
-+            return cmt->cmcor[ch];
-+        }
-+    }
-+    qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%" HWADDR_PRIX " "
-+                             "not implemented\n",
-+                  offset);
-+    return UINT64_MAX;
-+}
-+
-+static void start_stop(RCMTState *cmt, int ch, int st)
-+{
-+    if (st) {
-+        update_events(cmt, ch);
-+    } else {
-+        timer_del(&cmt->timer[ch]);
-+    }
-+}
-+
-+static void cmt_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-+{
-+    RCMTState *cmt = opaque;
-+    int ch = offset / 0x08;
-+
-+    if (offset == A_CMSTR) {
-+        cmt->cmstr = FIELD_EX16(val, CMSTR, STR);
-+        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
-+        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
-+    } else {
-+        offset &= 0x07;
-+        if (ch == 0) {
-+            offset -= 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            cmt->cmcr[ch] = FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
-+                                       FIELD_EX16(val, CMCR, CKS));
-+            cmt->cmcr[ch] = FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
-+                                       FIELD_EX16(val, CMCR, CMIE));
-+            break;
-+        case 2:
-+            cmt->cmcnt[ch] = val;
-+            break;
-+        case 4:
-+            cmt->cmcor[ch] = val;
-+            break;
-+        default:
-+            qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%" HWADDR_PRIX " "
-+                                     "not implemented\n",
-+                          offset);
-+            return;
-+        }
-+        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
-+            update_events(cmt, ch);
-+        }
-+    }
-+}
-+
-+static const MemoryRegionOps cmt_ops = {
-+    .write = cmt_write,
-+    .read  = cmt_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 2,
-+        .max_access_size = 2,
-+    },
-+    .valid = {
-+        .min_access_size = 2,
-+        .max_access_size = 2,
-+    },
-+};
-+
-+static void timer_events(RCMTState *cmt, int ch)
-+{
-+    cmt->cmcnt[ch] = 0;
-+    cmt->tick[ch] = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    update_events(cmt, ch);
-+    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
-+        qemu_irq_pulse(cmt->cmi[ch]);
-+    }
-+}
-+
-+static void timer_event0(void *opaque)
-+{
-+    RCMTState *cmt = opaque;
-+
-+    timer_events(cmt, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RCMTState *cmt = opaque;
-+
-+    timer_events(cmt, 1);
-+}
-+
-+static void rcmt_reset(DeviceState *dev)
-+{
-+    RCMTState *cmt = RCMT(dev);
-+    cmt->cmstr = 0;
-+    cmt->cmcr[0] = cmt->cmcr[1] = 0;
-+    cmt->cmcnt[0] = cmt->cmcnt[1] = 0;
-+    cmt->cmcor[0] = cmt->cmcor[1] = 0xffff;
-+}
-+
-+static void rcmt_init(Object *obj)
-+{
-+    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-+    RCMTState *cmt = RCMT(obj);
-+    int i;
-+
-+    memory_region_init_io(&cmt->memory, OBJECT(cmt), &cmt_ops,
-+                          cmt, "renesas-cmt", 0x10);
-+    sysbus_init_mmio(d, &cmt->memory);
-+
-+    for (i = 0; i < ARRAY_SIZE(cmt->cmi); i++) {
-+        sysbus_init_irq(d, &cmt->cmi[i]);
-+    }
-+    timer_init_ns(&cmt->timer[0], QEMU_CLOCK_VIRTUAL, timer_event0, cmt);
-+    timer_init_ns(&cmt->timer[1], QEMU_CLOCK_VIRTUAL, timer_event1, cmt);
-+}
-+
-+static const VMStateDescription vmstate_rcmt = {
-+    .name = "rx-cmt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(cmstr, RCMTState),
-+        VMSTATE_UINT16_ARRAY(cmcr, RCMTState, CMT_CH),
-+        VMSTATE_UINT16_ARRAY(cmcnt, RCMTState, CMT_CH),
-+        VMSTATE_UINT16_ARRAY(cmcor, RCMTState, CMT_CH),
-+        VMSTATE_INT64_ARRAY(tick, RCMTState, CMT_CH),
-+        VMSTATE_TIMER_ARRAY(timer, RCMTState, CMT_CH),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rcmt_properties[] = {
-+    DEFINE_PROP_UINT64("input-freq", RCMTState, input_freq, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rcmt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &vmstate_rcmt;
-+    dc->reset = rcmt_reset;
-+    device_class_set_props(dc, rcmt_properties);
-+}
-+
-+static const TypeInfo rcmt_info = {
-+    .name = TYPE_RENESAS_CMT,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RCMTState),
-+    .instance_init = rcmt_init,
-+    .class_init = rcmt_class_init,
-+};
-+
-+static void rcmt_register_types(void)
-+{
-+    type_register_static(&rcmt_info);
-+}
-+
-+type_init(rcmt_register_types)
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 4c84fb13ef..b9eb14b27f 100644
+index a16e167721..1c9b4bc8e7 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1968,10 +1968,10 @@ M: Yoshinori Sato <ysato@users.sourceforge.jp>
- R: Magnus Damm <magnus.damm@gmail.com>
- S: Maintained
- F: hw/char/sh_serial.c
--F: hw/timer/renesas_tmr.c
-+F: hw/timer/renesas_*.c
- F: hw/timer/sh_timer.c
- F: include/hw/sh4/sh.h
--F: include/hw/timer/renesas_tmr.h
-+F: include/hw/timer/renesas_*.h
- 
- Renesas RX peripherals
+@@ -1258,6 +1258,7 @@ rx-gdbsim
  M: Yoshinori Sato <ysato@users.sourceforge.jp>
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 7039c2a686..59a667c503 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -38,3 +38,6 @@ config CMSDK_APB_DUALTIMER
+ S: Maintained
+ F: hw/rx/rx-gdbsim.c
++F: tests/acceptance/machine_rx_gdbsim.py
  
- config RENESAS_TMR
-     bool
+ SH4 Machines
+ ------------
+diff --git a/tests/acceptance/machine_rx_gdbsim.py b/tests/acceptance/machine_rx_gdbsim.py
+new file mode 100644
+index 0000000000..a44f2c87da
+--- /dev/null
++++ b/tests/acceptance/machine_rx_gdbsim.py
+@@ -0,0 +1,68 @@
++# Functional test that boots a Linux kernel and checks the console
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
-+config RENESAS_CMT
-+    bool
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 44fb47a433..a39f6ec0c2 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -24,6 +24,7 @@ common-obj-$(CONFIG_OMAP) += omap_synctimer.o
- common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
- common-obj-$(CONFIG_SH4) += sh_timer.o
- common-obj-$(CONFIG_RENESAS_TMR) += renesas_tmr.o
-+common-obj-$(CONFIG_RENESAS_CMT) += renesas_cmt.o
- common-obj-$(CONFIG_DIGIC) += digic-timer.o
- common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
- 
++from avocado_qemu import Test
++from avocado_qemu import exec_command_and_wait_for_pattern
++from avocado_qemu import wait_for_console_pattern
++from avocado.utils import archive
++
++
++class RxGdbSimMachine(Test):
++
++    timeout = 30
++    KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
++
++    def test_uboot(self):
++        """
++        U-Boot and checks that the console is operational.
++
++        :avocado: tags=arch:rx
++        :avocado: tags=machine:gdbsim-r5f562n8
++        :avocado: tags=endian:little
++        """
++        uboot_url = ('https://acc.dl.osdn.jp/users/23/23888/u-boot.bin.gz')
++        uboot_hash = '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
++        uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
++        uboot_path = archive.uncompress(uboot_path, self.workdir)
++
++        self.vm.set_console()
++        self.vm.add_args('-bios', uboot_path,
++                         '-no-reboot')
++        self.vm.launch()
++        uboot_version = 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
++        wait_for_console_pattern(self, uboot_version)
++        gcc_version = 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (experimental)'
++        # FIXME limit baudrate on chardev, else we type too fast
++        #exec_command_and_wait_for_pattern(self, 'version', gcc_version)
++
++    def test_linux_sash(self):
++        """
++        Boots a Linux kernel and checks that the console is operational.
++
++        :avocado: tags=arch:rx
++        :avocado: tags=machine:gdbsim-r5f562n7
++        :avocado: tags=endian:little
++        """
++        dtb_url = ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dtb')
++        dtb_hash = '7b4e4e2c71905da44e86ce47adee2210b026ac18'
++        dtb_path = self.fetch_asset(dtb_url, asset_hash=dtb_hash)
++        kernel_url = ('http://acc.dl.osdn.jp/users/23/23845/zImage')
++        kernel_hash = '39a81067f8d72faad90866ddfefa19165d68fc99'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++
++        self.vm.set_console()
++        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'earlycon'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-no-reboot')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Sash command shell (version 1.1.1)',
++                                 failure_message='Kernel panic - not syncing')
++        exec_command_and_wait_for_pattern(self, 'printenv', 'TERM=linux')
 -- 
 2.21.3
 
