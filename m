@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A055C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC7BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DFB224748
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F52F248E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 12:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNUhS0qw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFB224748
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rUbUvZQP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F52F248E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmzXJ-0003LS-BM
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 08:57:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47610)
+	id 1jmzXg-0003au-Ie
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 08:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmzOi-0005Wa-F7
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:32 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40418)
+ id 1jmzOd-0005JJ-Cs
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:27 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43655)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmzOg-0002sB-OC
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:32 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h5so14017792wrc.7
- for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 05:48:30 -0700 (PDT)
+ id 1jmzOb-0002rQ-PX
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 08:48:27 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id l10so13990588wrr.10
+ for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 05:48:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sH5Z7PRdVohuoItYDl5pz8xjGsZcdn/4T0aCVreGxQE=;
- b=VNUhS0qwVHBPqs/7BDhN4Shxzj0oR2USE/DL7xqrIrfo6rg1W3Lk5MKZHgn0LidjdK
- pBus3MqJJ2M0q4DrYQKNJyCcHi1LdKwCIB9YsWx8HfOf8flMN032jVudKnauP1gtidId
- GFXMnQwVzQ0VO6LoFm++RXVXAU/fAV9lzD5QfWnOBjrCkyeawCG17AqxhBddtbK3c0mx
- CapzmqhwXSZUIn9099zfhj0p0RFi7w6PQMidXxYZ7I3KVS6RjlMYdOT6Cw7tilCU+LRH
- WLlTuFB+oRKQWseQy5PDoWVlDxMcdxg6Y59kYnQOr/xLxb/suFzNcn7UEZjHzOd/U4wh
- fzvw==
+ bh=nrmkQ/EOlQRnkklRoevO7IWC+EItEHCLWkyyjykQYg4=;
+ b=rUbUvZQPRK6l8ahNcHix5CVlOp7Kg4tqkpKQU9wggMl/8GGaYlCj/phzi+DnehhOaV
+ zbJcbjBXo4YKEQWRkqkCxZpjWmvaMSiV22+Pbj+Q7p8Hh07qEgInGrVqn1KaRpJCQW6P
+ hoEKswRBKoX8XPLSMHi/jNXf4V36JitUTVesn3ZcPWJQTJlVd1WRbSO8L8fkLj1C2/l0
+ I9TT/blOSQo4DsjvfSW8F3j2MaWwHSzFg9jFaWdhk5lby4ezRUOv7ofnd7IQoG61Ect6
+ NKNj/IYuP4ElNBViH46q/ZhqpnRtqPto4GHw1J+vRmBO8LCq4XN2vXsOI2M+uLvYhvmT
+ TQww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=sH5Z7PRdVohuoItYDl5pz8xjGsZcdn/4T0aCVreGxQE=;
- b=S+PBy9H0Ii6ADvzZSvf3AO4spdq4RK7RvxLXaXypDZafgsSCfY0LXX7iG5Fiotzjiu
- /wnWmR9SKMkDfPO5WxUg16fLwGFQ19sMqOCCzwnG3H5lTPk89ZJt810LuvjSxmLaflbA
- rbG/9BYR3jg06nht/A4tSxbqKUUO0f43DdVmWokIwdBb7TUvVYqkqrkK5b1TzwcOfg5s
- OGvm/8/aWJtyVF8h7Qhyn6YecVbhnVb8H/3BrjlHxdT6809RnOBe2kE1A0uX/kd1Z2Hn
- 0r76nh2svuVNQueAlNZGkyVt9os/U+/DC6B/I/SJ7VwkYrQfJx6+qHZD4rp7JzpI3V2O
- Zf8Q==
-X-Gm-Message-State: AOAM533+IFujB8rfB5uZjbR6a9hZ4C/jUck35RWmchdBczi8E4STlIOL
- eEbgaibey1wffkJvDbbKUE07vIrL
-X-Google-Smtp-Source: ABdhPJzxaQQBUfqKw3Ek3zqe/pQS6NGe6YbJ2IwZhN4H+GwgH/fThLJsZNxPd7gmtc1Kqcg6VHOWsQ==
-X-Received: by 2002:adf:edd0:: with SMTP id v16mr494022wro.214.1592743708998; 
- Sun, 21 Jun 2020 05:48:28 -0700 (PDT)
+ bh=nrmkQ/EOlQRnkklRoevO7IWC+EItEHCLWkyyjykQYg4=;
+ b=ugvVI3VSBvAhTCDKitC/xTys4M6chOMzrOks49cdxuosnRtFzaDZBFEPSjpQz5WKuR
+ wXW4LRb24IYEMcINZ4m/1rMi+BASX3wAuc66kV0/Bx87xq6z9Ph4jnO7EZ0UYPWSKUcb
+ GwanjmJqCU90pHpjv6SqTIciCRXs0NF6Ee3Fi95JhXgiouOIRbNTnSPCDw4HugkWpkcA
+ IH0Ow8eFoZT7fn+PW/MS8U5Q22sLRnf89elVPk7YO0s49KNPKDxPI9aW5t/x2+h/LT4W
+ nL5F33euGGsodJP5tU03fS9ZuWy9qS8/6cLDmKONpunWG4wfJGlAnFgFtfY0TB3Dyza9
+ mTgg==
+X-Gm-Message-State: AOAM532BavsmpCmzd6Rfn7G7xzBrWVem6lU5VgvT0LpCaYW+d22/d3OS
+ DSunEGXJ6Y0YT1n9TSRpsgrYbR5G
+X-Google-Smtp-Source: ABdhPJygkObZExsXC4J7rxg9bU+HAguStLMr5Tj6vClRVrhx0lIBcbimmIkB6C4gNvrs/j5X6aA21w==
+X-Received: by 2002:a5d:5647:: with SMTP id j7mr5734779wrw.242.1592743703981; 
+ Sun, 21 Jun 2020 05:48:23 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o10sm13779362wrj.37.2020.06.21.05.48.28
+ by smtp.gmail.com with ESMTPSA id o10sm13779362wrj.37.2020.06.21.05.48.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 21 Jun 2020 05:48:28 -0700 (PDT)
+ Sun, 21 Jun 2020 05:48:23 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/15] docs: Document the RX target
-Date: Sun, 21 Jun 2020 14:48:07 +0200
-Message-Id: <20200621124807.17226-16-f4bug@amsat.org>
+Subject: [PULL 11/15] hw/rx: Honor -accel qtest
+Date: Sun, 21 Jun 2020 14:48:03 +0200
+Message-Id: <20200621124807.17226-12-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200621124807.17226-1-f4bug@amsat.org>
 References: <20200621124807.17226-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -89,7 +89,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,94 +103,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
  Magnus Damm <magnus.damm@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add rx-virt target specification document.
+Issue an error if no kernel, no bios, and not qtest'ing.
+Fixes make check-qtest-rx: test/qom-test.
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20200308130637.37651-1-ysato@users.sourceforge.jp>
-[PMD: Cover in MAINTAINERS, rename as gdbsim, use machine argument]
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190531134315.4109-16-richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- docs/system/target-rx.rst | 36 ++++++++++++++++++++++++++++++++++++
- docs/system/targets.rst   |  1 +
- MAINTAINERS               |  1 +
- 3 files changed, 38 insertions(+)
- create mode 100644 docs/system/target-rx.rst
+ hw/rx/rx62n.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/docs/system/target-rx.rst b/docs/system/target-rx.rst
-new file mode 100644
-index 0000000000..4a20a89a06
---- /dev/null
-+++ b/docs/system/target-rx.rst
-@@ -0,0 +1,36 @@
-+.. _RX-System-emulator:
-+
-+RX System emulator
-+--------------------
-+
-+Use the executable ``qemu-system-rx`` to simulate RX target (GDB simulator).
-+This target emulated following devices.
-+
-+-  R5F562N8 MCU
-+
-+   -  On-chip memory (ROM 512KB, RAM 96KB)
-+   -  Interrupt Control Unit (ICUa)
-+   -  8Bit Timer x 1CH (TMR0,1)
-+   -  Compare Match Timer x 2CH (CMT0,1)
-+   -  Serial Communication Interface x 1CH (SCI0)
-+
-+-  External memory 16MByte
-+
-+Example of ``qemu-system-rx`` usage for RX is shown below:
-+
-+Download ``<u-boot_image_file>`` from
-+https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-+
-+Start emulation of rx-virt::
-+  qemu-system-rx -M gdbsim-r5f562n8 -bios <u-boot_image_file>
-+
-+Download ``kernel_image_file`` from
-+https://osdn.net/users/ysato/pf/qemu/dl/zImage
-+
-+Download ``device_tree_blob`` from
-+https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb
-+
-+Start emulation of rx-virt::
-+  qemu-system-rx -M gdbsim-r5f562n8 \
-+      -kernel <kernel_image_file> -dtb <device_tree_blob> \
-+      -append "earlycon"
-diff --git a/docs/system/targets.rst b/docs/system/targets.rst
-index 0d8f91580a..99435a3eba 100644
---- a/docs/system/targets.rst
-+++ b/docs/system/targets.rst
-@@ -18,3 +18,4 @@ Contents:
-    target-m68k
-    target-xtensa
-    target-s390x
-+   target-rx
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1c9b4bc8e7..5a46536d86 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1257,6 +1257,7 @@ RX Machines
- rx-gdbsim
- M: Yoshinori Sato <ysato@users.sourceforge.jp>
- S: Maintained
-+F: docs/system/target-rx.rst
- F: hw/rx/rx-gdbsim.c
- F: tests/acceptance/machine_rx_gdbsim.py
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index 85b7770023..d8f0fa4625 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -21,12 +21,14 @@
  
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/rx/rx62n.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
+ #include "cpu.h"
+ 
+ /*
+@@ -208,7 +210,12 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
+ 
+     if (!s->kernel) {
+-        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        if (bios_name) {
++            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        }  else if (!qtest_enabled()) {
++            error_report("No bios or kernel specified");
++            exit(1);
++        }
+     }
+ 
+     /* Initialize CPU */
 -- 
 2.21.3
 
