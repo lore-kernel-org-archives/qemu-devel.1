@@ -2,92 +2,96 @@ Return-Path: <SRS0=M+f9=AC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DE9C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 20:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0EBC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 20:35:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB7B325281
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 20:33:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B836520771
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 20:35:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="bnW117qb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB7B325281
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNiSZ22L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B836520771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jn6f4-00072T-TT
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 16:33:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34298)
+	id 1jn6gz-0008A9-1w
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 16:35:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jn6eO-0005xv-8Y
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 16:33:12 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:38176)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jn6gJ-0007WQ-BR; Sun, 21 Jun 2020 16:35:11 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34280)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jn6eM-0001MP-HT
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 16:33:11 -0400
-Received: by mail-qt1-x844.google.com with SMTP id z2so9160776qts.5
- for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 13:33:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=0zqCvujoZbph+2s/UDGvvCI8Fw7lKs568q/Kjwnbdhc=;
- b=bnW117qbsYaSNM1tAj6KCSnIOPdts2WX/ca2YuEOiTC19d9CP44rXzk080OqaHMWXt
- hnOE20UYT5cWyDv3UQ91Z6P6UQTNSjBZT92YJyGgIUUX9afo77tVEOCSozfVmH8skvHm
- WgRbYwp+Ujw4NbggCVHFXU5fyaTZuxgvw312KSG6gBTgNesyemPqmisf6YNXz9rhihAy
- tsMToSTK/E4QaS6mI45L06HUnE0/C7uK8XzozY7NYedQOLzw6uY8tnz4IbJZ3j9tS4uH
- nebfdM4K8RFYNjbaR+fcF7T3It1BoR978++jW8T6SDB6ar3UgEXrD2SYQ15nEMI8Dt0N
- v8tw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jn6gH-0001UU-GP; Sun, 21 Jun 2020 16:35:11 -0400
+Received: by mail-wm1-x341.google.com with SMTP id u26so12234717wmn.1;
+ Sun, 21 Jun 2020 13:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+QiGPbdFMlAbX4GMi1npxH4g4wnia0NgzsxKdGmq4o0=;
+ b=MNiSZ22Li3OJfvWZZYkI14kCjcrgQo+T7iu7R5ALxFezjjZ8M4QaE2njoRY5HLJFmv
+ ZzWqtUTkIXYLD8R54+z+dV2L2/TTAIOdxLMG23k5kQt1HMTR/rNWFIh6zeomGb5WsKqQ
+ EZbfFywRJv/kodht+X7d200GCC7MH6Lc9OsIjLVRN4B6Qw2XrKReMlb6beNwCofHeVzJ
+ tBBlLs2cKFK56CVZI4rnQe/0Afgst64DTcvUDxYv9yaLzIgFInAh44RQEYySjjZEiED7
+ OEp6AeSEps13MeGHDGlbeUeoc3csFwqoCUa3fFAYipjxKaLJaciC1KSBHrm1/FWveUVV
+ Bp+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=0zqCvujoZbph+2s/UDGvvCI8Fw7lKs568q/Kjwnbdhc=;
- b=hHglOqwcxf3jdZDb5KHcLOsfgHPKEOgDNcIoLn0mqcv7H/RZh3aNGZEF6SZT9OT6fk
- lsjObf7izOWungaGlzEpTlartWX7sSQwD7bICnzCe1U700+AFOiqJEm9Kmy9saI2Hvzu
- l1Hn02VGmLB9rsaCnWmfEEU8YvYYZms6SUZkwGC+noUmE1/WWv1AH6QJ6QdXRdYJ4Y2a
- hEPrqEoiLoJbCp+L2vdr28ERdFKdj73qKMi7rLIqccrXxZByNk/Zu+fHCY0MaOBUlr3Z
- qV+2QzigG51XJ0gJXfrFq1Qdw+KQtdBqzEblo/HPZPpyF0pmjRzzPCHchjEpUPv1/isH
- gC9g==
-X-Gm-Message-State: AOAM533zRPTXFmOgCNl3spLA900RcIjpQlerWFElJvrYivhOwdaJ1PEo
- 7YQdRxCPXwvfvIt+Z9Hqavw27w==
-X-Google-Smtp-Source: ABdhPJwfuQcxiLM0K6qRP4MIo73l5QtBkHwAV9idh0NGEUPaxAOJk4H8NuYQXGHlRWJIYNNiKsVjZg==
-X-Received: by 2002:aed:2142:: with SMTP id 60mr13668150qtc.176.1592771588905; 
- Sun, 21 Jun 2020 13:33:08 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id x13sm1069527qts.57.2020.06.21.13.33.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 21 Jun 2020 13:33:08 -0700 (PDT)
-Date: Sun, 21 Jun 2020 16:33:07 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 3/6] cputlb: ensure we save the IOTLB data in case of
- reset
-Message-ID: <20200621203307.GA168836@sff>
-References: <20200610155509.12850-1-alex.bennee@linaro.org>
- <20200610155509.12850-4-alex.bennee@linaro.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+QiGPbdFMlAbX4GMi1npxH4g4wnia0NgzsxKdGmq4o0=;
+ b=n5BffULHrIxQTTHtWu90Ai6ycn1IwKg0rvYhaAECKVOfQ6fNsTSmx709+fQMyURo//
+ 0kwGzk2I1/eJgrWGJvzlePaxHa2y/nSvtDDgWjgZRsBXBQqYBqiXoOg5YnVZrkWcBA4m
+ qLAH+BwzXMRgX6TbalVnQqnoExarLK5ZmoP+6NUdPVXsAHmbpRkp6K86C2PEZhfhaJXa
+ +zcAoJUjI3AYDKCiVqNKuFbUe1eEAfkSfQ0Q0wV0lf+zaVqclmXBPPPD73Js6sUVLRc+
+ K9FLbpbQY1iqRD7r+Ujox980225tgKvGvDbK6A20hDY399PLoaHiAbSMA/wjkZHWriug
+ JJtg==
+X-Gm-Message-State: AOAM5304D2ssm7BcpLtBWxewg+z6x3s2tB/2uGb8eeXTsc4xG0DZ2PwK
+ Ux8P8oEm8qY75g2wp+ZtOBY=
+X-Google-Smtp-Source: ABdhPJzIKbFrYruemBIDCkT0bVR1zeGCFzZBwpGyjFyKnnL0WdBf2wk8dEOXy1cHgZjFcuYyxUZ44w==
+X-Received: by 2002:a1c:f204:: with SMTP id s4mr15629374wmc.159.1592771706913; 
+ Sun, 21 Jun 2020 13:35:06 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id l10sm535803wme.1.2020.06.21.13.35.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 21 Jun 2020 13:35:06 -0700 (PDT)
+Subject: Re: [PATCH v3 1/7] hw/misc: Add a LED device
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200620230719.32139-1-f4bug@amsat.org>
+ <20200620230719.32139-2-f4bug@amsat.org>
+ <f2cc97dc-87c8-5cc8-e0fb-026cf80c25fa@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <dfe79efa-0f77-6e86-c7e4-42fed7756071@amsat.org>
+Date: Sun, 21 Jun 2020 22:35:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <f2cc97dc-87c8-5cc8-e0fb-026cf80c25fa@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200610155509.12850-4-alex.bennee@linaro.org>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::844;
- envelope-from=cota@braap.org; helo=mail-qt1-x844.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,158 +104,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, Paolo Bonzini <pbonzini@redhat.com>,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 10, 2020 at 16:55:06 +0100, Alex BennÈe wrote:
-> Any write to a device might cause a re-arrangement of memory
-> triggering a TLB flush and potential re-size of the TLB invalidating
-> previous entries. This would cause users of qemu_plugin_get_hwaddr()
-> to see the warning:
+Hi Richard,
+
+On 6/21/20 4:00 AM, Richard Henderson wrote:
+> On 6/20/20 4:07 PM, Philippe Mathieu-Daud√© wrote:
+>> Add a LED device which can be connected to a GPIO output.
+>> LEDs are limited to a set of colors.
+>> They can also be dimmed with PWM devices. For now we do
+>> not implement the dimmed mode, but in preparation of a
+>> future implementation, we start using the LED intensity.
+>> When used with GPIOs, the intensity can only be either
+>> minium or maximum. This depends of the polarity of the
+>> GPIO.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud√© <f4bug@amsat.org>
+>> ---
+>>  include/hw/misc/led.h |  79 +++++++++++++++++++++++++++
+>>  hw/misc/led.c         | 121 ++++++++++++++++++++++++++++++++++++++++++
+>>  MAINTAINERS           |   6 +++
+>>  hw/misc/Kconfig       |   3 ++
+>>  hw/misc/Makefile.objs |   1 +
+>>  hw/misc/trace-events  |   3 ++
+>>  6 files changed, 213 insertions(+)
+>>  create mode 100644 include/hw/misc/led.h
+>>  create mode 100644 hw/misc/led.c
+>>
+>> diff --git a/include/hw/misc/led.h b/include/hw/misc/led.h
+>> new file mode 100644
+>> index 0000000000..821ee1247d
+>> --- /dev/null
+>> +++ b/include/hw/misc/led.h
+>> @@ -0,0 +1,79 @@
+>> +/*
+>> + * QEMU single LED device
+>> + *
+>> + * Copyright (C) 2020 Philippe Mathieu-Daud√© <f4bug@amsat.org>
+>> + *
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + */
+>> +#ifndef HW_MISC_LED_H
+>> +#define HW_MISC_LED_H
+>> +
+>> +#include "hw/qdev-core.h"
+>> +
+>> +#define TYPE_LED "led"
+>> +#define LED(obj) OBJECT_CHECK(LEDState, (obj), TYPE_LED)
+>> +
+>> +typedef enum {
+>> +    LED_COLOR_UNKNOWN,
+>> +    LED_COLOR_RED,
+>> +    LED_COLOR_ORANGE,
+>> +    LED_COLOR_AMBER,
+>> +    LED_COLOR_YELLOW,
+>> +    LED_COLOR_GREEN,
+>> +    LED_COLOR_BLUE,
+>> +    LED_COLOR_VIOLET, /* PURPLE */
+>> +    LED_COLOR_WHITE,
+>> +    LED_COLOR_COUNT
+>> +} LEDColor;
 > 
->   invalid use of qemu_plugin_get_hwaddr
+> Is color especially interesting, given that we only actually "display" the
+> color via tracing?
+
+The idea of this device is to easily visualize events. Currently
+via tracing, but eventually an external UI could introspect the
+board for devices able to represent visual changes such LEDs, and
+automatically display them.
+To limit the list of representable object the visualizer has to
+support, I prefer to restrict this device to the existing LED
+physical colors.
+
 > 
-> because of the failed tlb_lookup which should always succeed. To
-> prevent this we save the IOTLB data in case it is later needed by a
-> plugin doing a lookup.
+>> +/* Definitions useful when a LED is connected to a GPIO */
+>> +#define LED_RESET_INTENSITY_ACTIVE_LOW  UINT16_MAX
+>> +#define LED_RESET_INTENSITY_ACTIVE_HIGH 0U
+>> +
+>> +typedef struct LEDState {
+>> +    /* Private */
+>> +    DeviceState parent_obj;
+>> +    /* Public */
+>> +
+>> +    /* Properties */
+>> +    char *description;
+>> +    char *color;
 > 
-> Signed-off-by: Alex BennÈe <alex.bennee@linaro.org>
+> The enumeration is unused by the actual device, it would seem?
+
+I want to, but it seems having a enum qdev property involves
+a lot of code.
+
 > 
-> ---
-> v2
->   - save the entry instead of re-running the tlb_fill.
+>> +/**
+>> + * led_set_intensity: set the state of a LED device
+>> + * @s: the LED object
+>> + * @is_on: boolean indicating whether the LED is emitting
+>> + *
+>> + * This utility is meant for LED connected to GPIO.
+>> + */
+>> +void led_set_state(LEDState *s, bool is_on);
 > 
-> squash! cputlb: ensure we save the IOTLB entry in case of reset
-> ---
->  accel/tcg/cputlb.c | 63 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 61 insertions(+), 2 deletions(-)
+> Comment mismatch.
 > 
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index eb2cf9de5e6..9bf9e479c7c 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1058,6 +1058,47 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->      return val;
->  }
->  
-> +#ifdef CONFIG_PLUGIN
-> +
-> +typedef struct SavedIOTLB {
-> +    struct rcu_head rcu;
-> +    struct SavedIOTLB **save_loc;
-> +    MemoryRegionSection *section;
-> +    hwaddr mr_offset;
-> +} SavedIOTLB;
-> +
-> +static void clean_saved_entry(SavedIOTLB *s)
-> +{
-> +    atomic_rcu_set(s->save_loc, NULL);
+> 
+>> +void led_set_intensity(LEDState *s, uint16_t new_intensity)
+>> +{
+>> +    trace_led_set_intensity(s->description ? s->description : "n/a",
+>> +                            s->color, new_intensity);
+> 
+> Why not default description upon reset/realize?
 
-This will race with the CPU thread that sets saved_for_plugin in
-save_iotlb_data().
+Yes.
 
-> +    g_free(s);
-> +}
-> +
-> +static __thread SavedIOTLB *saved_for_plugin;
+> 
+>> +static void led_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    LEDState *s = LED(dev);
+>> +
+>> +    if (s->color == NULL) {
+>> +        error_setg(errp, "property 'color' not specified");
+>> +        return;
+>> +    }
+>> +}
+> 
+> Indeed, why not insist that description is set?  If a board is forced to say
+> that the led is red, should it not also be forced to label it?
 
-Apologies if this has been discussed, but why is this using TLS
-variables and not state embedded in CPUState?
-I see that qemu_plugin_get_hwaddr does not take a cpu_index, but
-maybe it should? We could then just embed the RCU pointer in CPUState.
+Because when we don't have access to the hardware schematics,
+we can not specify the label. I'll add a comment about this.
 
-> +
-> +/*
-> + * Save a potentially trashed IOTLB entry for later lookup by plugin.
-> + *
-> + * We also need to track the thread storage address because the RCU
-> + * cleanup that runs when we leave the critical region (the current
-> + * execution) is actually in a different thread.
-> + */
-> +static void save_iotlb_data(MemoryRegionSection *section, hwaddr mr_offset)
-> +{
-> +    SavedIOTLB *s = g_new(SavedIOTLB, 1);
-> +    s->save_loc = &saved_for_plugin;
-> +    s->section = section;
-> +    s->mr_offset = mr_offset;
-> +    atomic_rcu_set(&saved_for_plugin, s);
-> +    call_rcu(s, clean_saved_entry, rcu);
+> 
+>> +static Property led_properties[] = {
+>> +    DEFINE_PROP_STRING("color", LEDState, color),
+> 
+> It would appear that one can set any color via properties, including "plaid".
+> So if you do want the char *color field, what's the point in the enum?
 
-Here we could just publish the new pointer and g_free_rcu the old
-one, if any.
+Good catch... I will either use an enum propery, or check the
+property is in the allowed color names.
 
-> +}
-> +
-> +#else
-> +static void save_iotlb_data(MemoryRegionSection *section, hwaddr mr_offset)
-> +{
-> +    /* do nothing */
-> +}
-> +#endif
-> +
->  static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                        int mmu_idx, uint64_t val, target_ulong addr,
->                        uintptr_t retaddr, MemOp op)
-> @@ -1077,6 +1118,12 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->      }
->      cpu->mem_io_pc = retaddr;
->  
-> +    /*
-> +     * The memory_region_dispatch may trigger a flush/resize
-> +     * so for plugins we save the iotlb_data just in case.
-> +     */
-> +    save_iotlb_data(section, mr_offset);
-> +
->      if (mr->global_locking && !qemu_mutex_iothread_locked()) {
->          qemu_mutex_lock_iothread();
->          locked = true;
-> @@ -1091,6 +1138,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                                 MMU_DATA_STORE, mmu_idx, iotlbentry->attrs, r,
->                                 retaddr);
->      }
-> +
+> 
+>> +# led.c
+>> +led_set_intensity(const char *color, const char *desc, uint16_t intensity) "LED desc:'%s' color:%s intensity: 0x%04"PRIx16
+> 
+> Is 0...65535 the best set of intensities?
 
-Stray whitespace change.
+You are right. I was thinking of PWM resolution (limiting to
+16-bits). This is a different API to model, I mixed.
 
->      if (locked) {
->          qemu_mutex_unlock_iothread();
->      }
-> @@ -1366,8 +1414,11 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
->   * in the softmmu lookup code (or helper). We don't handle re-fills or
->   * checking the victim table. This is purely informational.
->   *
-> - * This should never fail as the memory access being instrumented
-> - * should have just filled the TLB.
-> + * This almost never fails as the memory access being instrumented
-> + * should have just filled the TLB. The one corner case is io_writex
-> + * which can cause TLB flushes and potential resizing of the TLBs
-> + * loosing the information we need. In those cases we need to recover
-> + * data from a thread local copy of the io_tlb entry.
->   */
->  
->  bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
-> @@ -1391,6 +1442,14 @@ bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
->              data->v.ram.hostaddr = addr + tlbe->addend;
->          }
->          return true;
-> +    } else {
-> +        SavedIOTLB *saved = atomic_rcu_read(&saved_for_plugin);
-> +        if (saved) {
-> +            data->is_io = true;
-> +            data->v.io.section = saved->section;
-> +            data->v.io.offset = saved->mr_offset;
-> +            return true;
-> +        }
+> Is that more valuable than e.g. a percentage?
 
-Shouldn't we check that the contents of the saved IOTLB match the
-parameters of the lookup? Otherwise passing a random address is likely
-to land here.
+Yes, the [0-100] range of integer is sufficient to represent
+light intensity =)
 
-Thanks,
-		Emilio
+Thanks for your review!
+
+Phil.
 
