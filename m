@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8051C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 11:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E56C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 11:18:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9380524834
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 11:18:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9380524834
+	by mail.kernel.org (Postfix) with ESMTPS id 3C42D24834
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 11:18:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C42D24834
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmxzl-0002q8-RY
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 07:18:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34392)
+	id 1jmxzn-0002su-Fk
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 07:18:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmxyp-0001UC-3E
+ id 1jmxyp-0001UD-89
  for qemu-devel@nongnu.org; Sun, 21 Jun 2020 07:17:43 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:36616)
+Received: from zero.eik.bme.hu ([152.66.115.2]:36619)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jmxym-0007hO-HR
+ id 1jmxym-0007hP-JL
  for qemu-devel@nongnu.org; Sun, 21 Jun 2020 07:17:42 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E45E6746307;
+ by localhost (Postfix) with SMTP id E684E74633D;
  Sun, 21 Jun 2020 13:17:37 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 6EEEB7475FA; Sun, 21 Jun 2020 13:17:37 +0200 (CEST)
-Message-Id: <cc1324b9ef06beb8ae233ddc77dedd8bab9b8624.1592737958.git.balaton@eik.bme.hu>
+ id 65EF974632C; Sun, 21 Jun 2020 13:17:37 +0200 (CEST)
+Message-Id: <ba1d5ba97f246e8807f86f1243c2bdc6497dc8f2.1592737958.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592737958.git.balaton@eik.bme.hu>
 References: <cover.1592737958.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 3/3] ati-vga: Add dummy MEM_SDRAM_MODE_REG
+Subject: [PATCH 1/3] ati-vga: Support unaligned access to hardware cursor
+ registers
 Date: Sun, 21 Jun 2020 13:12:38 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -72,57 +73,150 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Radeon chips have an SDRAM mode reg that is accessed by some drivers.
-We don't emulate the memory controller but provide some default value
-to prevent drivers getting unexpected 0.
+This fixes horizontal mouse movement and pointer color with MacOS that
+writes these registers with access size less than 4 so previously only
+the last portion of access was effective overwriting previous partial
+writes.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/display/ati.c      | 5 +++++
- hw/display/ati_dbg.c  | 1 +
- hw/display/ati_regs.h | 1 +
- 3 files changed, 7 insertions(+)
+ hw/display/ati.c | 87 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 58 insertions(+), 29 deletions(-)
 
 diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 42755cffbb..944f9f420f 100644
+index d45127a976..21ae36c535 100644
 --- a/hw/display/ati.c
 +++ b/hw/display/ati.c
-@@ -361,6 +361,11 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
-     case MC_STATUS:
-         val = 5;
+@@ -389,22 +389,28 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
+     case 0xf00 ... 0xfff:
+         val = pci_default_read_config(&s->dev, addr - 0xf00, size);
          break;
-+    case MEM_SDRAM_MODE_REG:
-+        if (s->dev_id != PCI_DEVICE_ID_ATI_RAGE128_PF) {
-+            val = BIT(28) | BIT(20);
-+        }
+-    case CUR_OFFSET:
+-        val = s->regs.cur_offset;
+-        break;
+-    case CUR_HORZ_VERT_POSN:
+-        val = s->regs.cur_hv_pos;
+-        val |= s->regs.cur_offset & BIT(31);
++    case CUR_OFFSET ... CUR_OFFSET + 3:
++        val = ati_reg_read_offs(s->regs.cur_offset, addr - CUR_OFFSET, size);
 +        break;
-     case RBBM_STATUS:
-     case GUI_STAT:
-         val = 64; /* free CMDFIFO entries */
-diff --git a/hw/display/ati_dbg.c b/hw/display/ati_dbg.c
-index 0ebbd36f14..bd0ecd48c7 100644
---- a/hw/display/ati_dbg.c
-+++ b/hw/display/ati_dbg.c
-@@ -42,6 +42,7 @@ static struct ati_regdesc ati_reg_names[] = {
-     {"MC_FB_LOCATION", 0x0148},
-     {"MC_AGP_LOCATION", 0x014C},
-     {"MC_STATUS", 0x0150},
-+    {"MEM_SDRAM_MODE_REG", 0x0158},
-     {"MEM_POWER_MISC", 0x015c},
-     {"AGP_BASE", 0x0170},
-     {"AGP_CNTL", 0x0174},
-diff --git a/hw/display/ati_regs.h b/hw/display/ati_regs.h
-index ebd37ee30d..d6282b2ef2 100644
---- a/hw/display/ati_regs.h
-+++ b/hw/display/ati_regs.h
-@@ -60,6 +60,7 @@
- #define MC_FB_LOCATION                          0x0148
- #define MC_AGP_LOCATION                         0x014C
- #define MC_STATUS                               0x0150
-+#define MEM_SDRAM_MODE_REG                      0x0158
- #define MEM_POWER_MISC                          0x015c
- #define AGP_BASE                                0x0170
- #define AGP_CNTL                                0x0174
++    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
++        val = ati_reg_read_offs(s->regs.cur_hv_pos,
++                                addr - CUR_HORZ_VERT_POSN, size);
++        if (addr + size > CUR_HORZ_VERT_POSN + 3) {
++            val |= (s->regs.cur_offset & BIT(31)) >> (4 - size);
++        }
+         break;
+-    case CUR_HORZ_VERT_OFF:
+-        val = s->regs.cur_hv_offs;
+-        val |= s->regs.cur_offset & BIT(31);
++    case CUR_HORZ_VERT_OFF ... CUR_HORZ_VERT_OFF + 3:
++        val = ati_reg_read_offs(s->regs.cur_hv_offs,
++                                addr - CUR_HORZ_VERT_OFF, size);
++        if (addr + size > CUR_HORZ_VERT_OFF + 3) {
++            val |= (s->regs.cur_offset & BIT(31)) >> (4 - size);
++        }
+         break;
+-    case CUR_CLR0:
+-        val = s->regs.cur_color0;
++    case CUR_CLR0 ... CUR_CLR0 + 3:
++        val = ati_reg_read_offs(s->regs.cur_color0, addr - CUR_CLR0, size);
+         break;
+-    case CUR_CLR1:
+-        val = s->regs.cur_color1;
++    case CUR_CLR1 ... CUR_CLR1 + 3:
++        val = ati_reg_read_offs(s->regs.cur_color1, addr - CUR_CLR1, size);
+         break;
+     case DST_OFFSET:
+         val = s->regs.dst_offset;
+@@ -693,48 +699,71 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+     case 0xf00 ... 0xfff:
+         /* read-only copy of PCI config space so ignore writes */
+         break;
+-    case CUR_OFFSET:
+-        if (s->regs.cur_offset != (data & 0x87fffff0)) {
+-            s->regs.cur_offset = data & 0x87fffff0;
++    case CUR_OFFSET ... CUR_OFFSET + 3:
++    {
++        uint32_t t = s->regs.cur_offset;
++
++        ati_reg_write_offs(&t, addr - CUR_OFFSET, data, size);
++        t &= 0x87fffff0;
++        if (s->regs.cur_offset != t) {
++            s->regs.cur_offset = t;
+             ati_cursor_define(s);
+         }
+         break;
+-    case CUR_HORZ_VERT_POSN:
+-        s->regs.cur_hv_pos = data & 0x3fff0fff;
+-        if (data & BIT(31)) {
+-            s->regs.cur_offset |= data & BIT(31);
++    }
++    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
++    {
++        uint32_t t = s->regs.cur_hv_pos | (s->regs.cur_offset & BIT(31));
++
++        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_POSN, data, size);
++        s->regs.cur_hv_pos = t & 0x3fff0fff;
++        if (t & BIT(31)) {
++            s->regs.cur_offset |= t & BIT(31);
+         } else if (s->regs.cur_offset & BIT(31)) {
+             s->regs.cur_offset &= ~BIT(31);
+             ati_cursor_define(s);
+         }
+         if (!s->cursor_guest_mode &&
+-            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(data & BIT(31))) {
++            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(t & BIT(31))) {
+             dpy_mouse_set(s->vga.con, s->regs.cur_hv_pos >> 16,
+                           s->regs.cur_hv_pos & 0xffff, 1);
+         }
+         break;
++    }
+     case CUR_HORZ_VERT_OFF:
+-        s->regs.cur_hv_offs = data & 0x3f003f;
+-        if (data & BIT(31)) {
+-            s->regs.cur_offset |= data & BIT(31);
++    {
++        uint32_t t = s->regs.cur_hv_offs | (s->regs.cur_offset & BIT(31));
++
++        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_OFF, data, size);
++        s->regs.cur_hv_offs = t & 0x3f003f;
++        if (t & BIT(31)) {
++            s->regs.cur_offset |= t & BIT(31);
+         } else if (s->regs.cur_offset & BIT(31)) {
+             s->regs.cur_offset &= ~BIT(31);
+             ati_cursor_define(s);
+         }
+         break;
+-    case CUR_CLR0:
+-        if (s->regs.cur_color0 != (data & 0xffffff)) {
+-            s->regs.cur_color0 = data & 0xffffff;
++    }
++    case CUR_CLR0 ... CUR_CLR0 + 3:
++    {
++        uint32_t t = s->regs.cur_color0;
++
++        ati_reg_write_offs(&t, addr - CUR_CLR0, data, size);
++        t &= 0xffffff;
++        if (s->regs.cur_color0 != t) {
++            s->regs.cur_color0 = t;
+             ati_cursor_define(s);
+         }
+         break;
+-    case CUR_CLR1:
++    }
++    case CUR_CLR1 ... CUR_CLR1 + 3:
+         /*
+          * Update cursor unconditionally here because some clients set up
+          * other registers before actually writing cursor data to memory at
+          * offset so we would miss cursor change unless always updating here
+          */
+-        s->regs.cur_color1 = data & 0xffffff;
++        ati_reg_write_offs(&s->regs.cur_color1, addr - CUR_CLR1, data, size);
++        s->regs.cur_color1 &= 0xffffff;
+         ati_cursor_define(s);
+         break;
+     case DST_OFFSET:
 -- 
 2.21.3
 
