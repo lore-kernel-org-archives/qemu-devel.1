@@ -2,94 +2,97 @@ Return-Path: <SRS0=M+f9=AC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDFCC433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 16:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8866C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 16:53:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE5DE20C09
-	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 16:35:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4D5215A4
+	for <qemu-devel@archiver.kernel.org>; Sun, 21 Jun 2020 16:53:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H03A6iht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE5DE20C09
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OyL1wEkU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4D5215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jn2wa-0007af-4b
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 12:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52646)
+	id 1jn3Dk-0007CL-Uu
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 12:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jn2jo-0006ov-BW
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 12:22:32 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43589)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jn3D2-0006fe-Ns; Sun, 21 Jun 2020 12:52:46 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32788)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jn2jm-0007yX-Nx
- for qemu-devel@nongnu.org; Sun, 21 Jun 2020 12:22:32 -0400
-Received: by mail-lf1-x142.google.com with SMTP id g139so7439638lfd.10
- for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 09:22:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jn3D1-0003dK-7C; Sun, 21 Jun 2020 12:52:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l11so14360470wru.0;
+ Sun, 21 Jun 2020 09:52:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Q2aSrf1EjsOvJpOxHsvMeL3ETTLqp6nu/7mQtqEiP9s=;
- b=H03A6ihttpKK3VflZUmPrTBPZbEJxZKofg5laNIMhTqWGQpwoXrRtbMNGhP/u+4JVy
- bds3YKL8pSfX9v8TF/vAWpwrKc9/c//3hywq2y1S1DVbmYsT5m48eCFbgGpyr+WlFsuJ
- Zb+jXeZIbnd/61y0IE1VS3Wjf22UcRRj1C/Lib4gmOEHcV2d7300aHUBk8xqBSAyMznf
- lDjEXNJIP66Rvs714CnQ115koMWDzBUVUY/DDDQSZqBGdnGyfTCcblH3AYWgUU5qCfmN
- 3QP5zF3HPxq762vxbY20iJmj682jCGqnkQoD1PEEvk1Yjpstn4wYGWsLqR2UPddAuFcd
- N/hQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xsRWBDAQ8vlJQpU8BrCg4Fe+1vZzqFIokH+gai1iDYg=;
+ b=OyL1wEkUUByS/qsBtE880PYcLQIga8KgzHwCtP0bfRgVVPPty51oa4Lfln8VXmwtZ3
+ 9PSufK0ir8Gou6cvjlwt9HD95WGC8ZMGYFdjT1aYKhMAT5upe2KllKXwLei9mWGtouf7
+ MMysXdX/fTzFFBfh4Rd/VFpwFwIButG706o4XA61PRu6uzSFyZ0uhIlF2sEiYq4/zqwX
+ 4uNNRJBRBwPdo6hIxKuDyzS4g4rp4w0deEQx4m3bMULD0HpALxIfEOASkLAkrYIRgvt6
+ 8mDucggHOm9Q5XcQiZnq6AYqg9iskNJ7ABfjJo51IeWOXFwETdEjrdKTfKRAnjuzmZio
+ BnOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Q2aSrf1EjsOvJpOxHsvMeL3ETTLqp6nu/7mQtqEiP9s=;
- b=WnbQJKYBn4cLmleGAyC/8O18DMfpDw4qoDQy3AfINdqjxIZXx2++pG+5MJRrww9Zq0
- c49eaG9FzNU/lFB9vKGYeFHoPionTcIIqzD9fx8Sfuuoevg2Z0jAhRzGKuZJC5pBLqC4
- Lkw94SjComdYb1YhVaFnjz6mkW1ElKIDdGlUaS3K49P4JJ60JdiEN0cb5xEruroFeCMI
- myHuzwIVzioKdwMeoImgU2UUZw8tMt25gzUEmoKd/khEq7qpzkObqhC3Ay0OxeD3IjII
- sHHGTTucfPi4nGMLagbEpv9TAIhstTSC3su5qv0eKYWNC940OdjEDyojbabBmdjigE8G
- ct8Q==
-X-Gm-Message-State: AOAM532g8rzqMyyncyYZT+k1fF0K/FqFrHY7XMh0ivy5qSBj1a2rUrm6
- PGDzNs9FrOTGR80jNuSEpUM2NOyFho5vpA==
-X-Google-Smtp-Source: ABdhPJx3pOxtSxnLFDrQOKItyvSoJmuOKWnZ51s+DP4Rf3ck+0Cp4aIl7KsD+14fp1yTqVNFM/u0+g==
-X-Received: by 2002:a05:6512:303:: with SMTP id
- t3mr7487637lfp.159.1592756548935; 
- Sun, 21 Jun 2020 09:22:28 -0700 (PDT)
-Received: from localhost.localdomain (193-239-39-51.ksi-system.net.
- [193.239.39.51])
- by smtp.gmail.com with ESMTPSA id k7sm2822838lfd.67.2020.06.21.09.22.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 21 Jun 2020 09:22:28 -0700 (PDT)
-From: Szymon Lukasz <noh4hss@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 6/6] virtio-console: notify the guest about terminal resizes
-Date: Sun, 21 Jun 2020 18:21:32 +0200
-Message-Id: <20200621162132.62797-7-noh4hss@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200621162132.62797-1-noh4hss@gmail.com>
-References: <20200621162132.62797-1-noh4hss@gmail.com>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xsRWBDAQ8vlJQpU8BrCg4Fe+1vZzqFIokH+gai1iDYg=;
+ b=MvH9OzmjJHPuianhHvWHl+9+w1EThK+zNRdNv5wMm2qdCefQIXDAbtMPRnOwfY+6cG
+ Mwn6cHpRGh/7AtfyRqKIVrwgOSpQ5j4XKql2Q9TQbZ2Eo1o+Mpk/FvdVn0rUcuWpe9Fk
+ KS5BjvjeMp6UK+66+kdqlgxIyuxZuQ4Np4ZEcA8ABNjdhk/ftUxkPlSgyyKiz19JrKsK
+ eevwdmMHsm2lTmTn5tCsQKVOYcyeBtC+UK42apE8AGeyb0ck5Jd3vc+LLwAfZeRSGDHE
+ BLbY2UikplCgiRN/eYuuMEX+P84GNSTTEg8sg5isysVuD/jR+bpd5HEsR/GJd7O+SY0P
+ 8WYg==
+X-Gm-Message-State: AOAM533riO5xUW9LOvwxe47bsfWMRwjDNYFOPwLIef68kVmp2QfP7YZT
+ fJ7u6IbRiS7XZz1vsrikSwM=
+X-Google-Smtp-Source: ABdhPJy2io4D1BWHYuBsBZU09IYg7F1j9BVMBaxctyXUcE+sbnhPWv4ip/wS9mtMCWZrKsnIeBnHzQ==
+X-Received: by 2002:adf:f34c:: with SMTP id e12mr3606795wrp.46.1592758360759; 
+ Sun, 21 Jun 2020 09:52:40 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id f16sm14007244wmh.27.2020.06.21.09.52.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 21 Jun 2020 09:52:40 -0700 (PDT)
+Subject: Re: [PATCH v3 7/7] hw/arm/tosa: Replace fprintf() calls by LED devices
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200620230719.32139-1-f4bug@amsat.org>
+ <20200620230719.32139-8-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4442b9bc-fbc6-3f9a-0c22-2d761286b223@amsat.org>
+Date: Sun, 21 Jun 2020 18:52:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200620230719.32139-8-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=noh4hss@gmail.com; helo=mail-lf1-x142.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Sun, 21 Jun 2020 12:30:17 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,146 +104,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, amit@kernel.org, mst@redhat.com,
- Szymon Lukasz <noh4hss@gmail.com>, marcandre.lureau@redhat.com,
- pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a virtio serial port is a console port forward terminal resize
-messages from the chardev backend to the guest.
+On 6/21/20 1:07 AM, Philippe Mathieu-Daudé wrote:
+> The recently added LED device reports LED status changes with
+> the 'led_set_intensity' trace event. It is less invasive than
+> the fprintf() calls. We need however to have a binary built
+> with tracing support.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/arm/tosa.c  | 40 +++++++++++++---------------------------
+>  hw/arm/Kconfig |  1 +
+>  2 files changed, 14 insertions(+), 27 deletions(-)
+> 
+> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+> index 5dee2d76c6..74b5fd1049 100644
+> --- a/hw/arm/tosa.c
+> +++ b/hw/arm/tosa.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/ssi/ssi.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/misc/led.h"
+>  #include "exec/address-spaces.h"
+>  
+>  #define TOSA_RAM    0x04000000
+> @@ -65,27 +66,6 @@ static void tosa_microdrive_attach(PXA2xxState *cpu)
+>      pxa2xx_pcmcia_attach(cpu->pcmcia[0], md);
+>  }
+>  
+> -static void tosa_out_switch(void *opaque, int line, int level)
+> -{
+> -    switch (line) {
+> -        case 0:
+> -            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
+> -            break;
+> -        case 1:
+> -            fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
+> -            break;
+> -        case 2:
+> -            fprintf(stderr, "amber LED %s.\n", level ? "on" : "off");
+> -            break;
+> -        case 3:
+> -            fprintf(stderr, "wlan LED %s.\n", level ? "on" : "off");
+> -            break;
+> -        default:
+> -            fprintf(stderr, "Uhandled out event: %d = %d\n", line, level);
+> -            break;
+> -    }
+> -}
+> -
+>  static void tosa_reset(void *opaque, int line, int level)
+>  {
+>      if (level) {
+> @@ -98,7 +78,6 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
+>                  DeviceState *scp1,
+>                  TC6393xbState *tmio)
+>  {
+> -    qemu_irq *outsignals = qemu_allocate_irqs(tosa_out_switch, cpu, 4);
+>      qemu_irq reset;
+>  
+>      /* MMC/SD host */
+> @@ -119,11 +98,6 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
+>                          qdev_get_gpio_in(cpu->gpio, TOSA_GPIO_JC_CF_IRQ),
+>                          NULL);
+>  
+> -    qdev_connect_gpio_out(scp1, TOSA_GPIO_BT_LED, outsignals[0]);
+> -    qdev_connect_gpio_out(scp1, TOSA_GPIO_NOTE_LED, outsignals[1]);
+> -    qdev_connect_gpio_out(scp1, TOSA_GPIO_CHRG_ERR_LED, outsignals[2]);
+> -    qdev_connect_gpio_out(scp1, TOSA_GPIO_WLAN_LED, outsignals[3]);
+> -
+>      qdev_connect_gpio_out(scp1, TOSA_GPIO_TC6393XB_L3V_ON, tc6393xb_l3v_get(tmio));
+>  
+>      /* UDC Vbus */
+> @@ -234,6 +208,18 @@ static void tosa_init(MachineState *machine)
+>  
+>      scp0 = sysbus_create_simple("scoop", 0x08800000, NULL);
+>      scp1 = sysbus_create_simple("scoop", 0x14800040, NULL);
+> +    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
+> +                          TOSA_GPIO_BT_LED,
+> +                          LED_COLOR_BLUE, "bluetooth", 0);
+> +    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
+> +                          TOSA_GPIO_NOTE_LED,
+> +                          LED_COLOR_GREEN, "note", 1);
+> +    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
+> +                          TOSA_GPIO_CHRG_ERR_LED,
+> +                          LED_COLOR_AMBER, "charger-error", 2);
+> +    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
+> +                          TOSA_GPIO_WLAN_LED,
+> +                          LED_COLOR_GREEN, "wlan", 3);
 
-Signed-off-by: Szymon Lukasz <noh4hss@gmail.com>
----
- hw/char/virtio-console.c | 64 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 60 insertions(+), 4 deletions(-)
+Oops, wrong last argument...
 
-diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-index 97b9240ef5..1ea06aad08 100644
---- a/hw/char/virtio-console.c
-+++ b/hw/char/virtio-console.c
-@@ -29,6 +29,7 @@ typedef struct VirtConsole {
- 
-     CharBackend chr;
-     guint watch;
-+    uint16_t cols, rows;
- } VirtConsole;
- 
- /*
-@@ -104,6 +105,36 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
-     return ret;
- }
- 
-+static void virtconsole_send_resize(VirtIOSerialPort *port)
-+{
-+    uint16_t cols, rows;
-+    VirtConsole *vcon = VIRTIO_CONSOLE(port);
-+
-+    /*
-+     * We probably shouldn't send these messages before
-+     * we told the guest it is a console port (which we do
-+     * by sending VIRTIO_CONSOLE_CONSOLE_PORT message).
-+     * Instead of adding a new field to the device state
-+     * lets just use the guest_connected field for that purpose
-+     * since the guest should not care about the terminal size
-+     * before opening the port.
-+     */
-+    if (!port->guest_connected) {
-+        return;
-+    }
-+
-+    if (qemu_chr_fe_get_winsize(&vcon->chr, &cols, &rows) < 0) {
-+        cols = 0;
-+        rows = 0;
-+    }
-+
-+    if (cols != vcon->cols || rows != vcon->rows) {
-+        vcon->cols = cols;
-+        vcon->rows = rows;
-+        virtio_serial_send_console_resize(port, cols, rows);
-+    }
-+}
-+
- /* Callback function that's called when the guest opens/closes the port */
- static void set_guest_connected(VirtIOSerialPort *port, int guest_connected)
- {
-@@ -111,7 +142,9 @@ static void set_guest_connected(VirtIOSerialPort *port, int guest_connected)
-     DeviceState *dev = DEVICE(port);
-     VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
- 
--    if (!k->is_console) {
-+    if (k->is_console) {
-+        virtconsole_send_resize(port);
-+    } else {
-         qemu_chr_fe_set_open(&vcon->chr, guest_connected);
-     }
- 
-@@ -171,6 +204,22 @@ static void chr_event(void *opaque, QEMUChrEvent event)
-     }
- }
- 
-+static void chr_event_console(void *opaque, QEMUChrEvent event)
-+{
-+    VirtConsole *vcon = opaque;
-+    VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
-+
-+    switch (event) {
-+    case CHR_EVENT_OPENED:
-+    case CHR_EVENT_RESIZE:
-+        trace_virtio_console_chr_event(port->id, event);
-+        virtconsole_send_resize(port);
-+        break;
-+    default:
-+        break;
-+    }
-+}
-+
- static int chr_be_change(void *opaque)
- {
-     VirtConsole *vcon = opaque;
-@@ -179,7 +228,9 @@ static int chr_be_change(void *opaque)
- 
-     if (k->is_console) {
-         qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                 NULL, chr_be_change, vcon, NULL, true);
-+                                 chr_event_console, chr_be_change,
-+                                 vcon, NULL, true);
-+        virtconsole_send_resize(port);
-     } else {
-         qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-                                  chr_event, chr_be_change, vcon, NULL, false);
-@@ -207,7 +258,7 @@ static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
-         VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
- 
-         qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                 k->is_console ? NULL : chr_event,
-+                                 k->is_console ? chr_event_console : chr_event,
-                                  chr_be_change, vcon, NULL, false);
-     } else {
-         qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL, NULL,
-@@ -227,6 +278,11 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (k->is_console) {
-+        vcon->cols = (uint16_t) -1;
-+        vcon->rows = (uint16_t) -1;
-+    }
-+
-     if (qemu_chr_fe_backend_connected(&vcon->chr)) {
-         /*
-          * For consoles we don't block guest data transfer just
-@@ -239,7 +295,7 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-          */
-         if (k->is_console) {
-             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                     NULL, chr_be_change,
-+                                     chr_event_console, chr_be_change,
-                                      vcon, NULL, true);
-             virtio_serial_open(port);
-         } else {
--- 
-2.27.0
+>  
+>      tosa_gpio_setup(mpu, scp0, scp1, tmio);
+>  
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 1a57a861ac..057c869d65 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -150,6 +150,7 @@ config TOSA
+>      select ZAURUS  # scoop
+>      select MICRODRIVE
+>      select PXA2XX
+> +    select LED
+>  
+>  config SPITZ
+>      bool
+> 
 
 
