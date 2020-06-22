@@ -2,84 +2,88 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF2BC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A241C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55AF6206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 143A1206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lSfpnUNw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55AF6206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fG8dEkqW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143A1206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJcV-00074j-HF
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:24:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36122)
+	id 1jnJdC-00080K-CR
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:24:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnJbp-0006Tx-Pw
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:25 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:33736)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnJbn-0002F8-Sl
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:25 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id v1so3245559ooh.0
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 03:23:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IWc/AAgYABcsDglxNPozLD/Yro+ORza0yWE34N177zQ=;
- b=lSfpnUNwqj22ezy4jvntzCiwzm9tC1d6fqXEQzXr2nlfxLPA0DCjbLGQ6kKdg6nGGG
- p0cJHYHLdFFWe+86O9aVXaoUr56CBBkRUB0EeDC05UVTHYnrAMWeknxIvMABZ2KBeooL
- 6LN9TAdVDCdP9D/lyIE0mCItx2kd41Di9SqGPuO7/Gm0tIRxhiaIeHsQRkpcdxF9AklA
- PJW83CEq6j/U6kadJ1b2g7yuCHt5HAn53/YqxxHhCr4qhgngtBOcvKQNW9lAP5ZtLZuq
- XKPX5tOvI9gkIet/lSwpY0tU6/PJYvchpNulO5Yw5uUnG4dvLfcqFq623KctWEJ0U0xv
- +JVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=IWc/AAgYABcsDglxNPozLD/Yro+ORza0yWE34N177zQ=;
- b=gCe0a7T69+pL9tNqeESE2G3eA7mHGFeVMh2IZfrrgb34W3ezBGgIY5j4KNMGBIwCgB
- wffA5/6ZkMQn80W7pBse0VIRXMJGhaj3wOfFsQ/niYBzJewyCdBe1667BchBdft8dNEy
- /VgPK4gaOK/GnH4A4rXzIYMYlG7CZAEa/1OgS2UrS/kZcimuOuovw0cfqxX/crYOQyzX
- uZLt1StnC0lUURSWrCRrcRmUN7dSHcv6iyT89JY3IlJDTX+uNXWLc1DRAIJPz0J2Ugm6
- yV9MbSlcfBwlxFqanwt3oEwJxhg9y1ofQglLICmAT3nBF0Hh82TpC71y0+VnXqT+crse
- qYtA==
-X-Gm-Message-State: AOAM532QXbbO0HPHzLfSx3YvAHCSFUY7qDAoDXTxbqbehgsZ79npBau1
- 1tZKMkVkGgAQTxBwnPlcwrW94ghUYzrHRzd5a9r6Uw==
-X-Google-Smtp-Source: ABdhPJwezVKuVFimO54de1RHHczwnda5Bs2yQIwGjWmlSbkNslzgn2wclfbzuwzgrLX62PuNX+KfbwKiwtdmcQv30bQ=
-X-Received: by 2002:a4a:221a:: with SMTP id f26mr13537883ooa.69.1592821402024; 
- Mon, 22 Jun 2020 03:23:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnJcJ-00073t-E7
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31203
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnJcG-0002JH-Q9
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592821431;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eN7N7NU/KJXTHsq4zOw7nWw/vHOCrRmLaL5p9CvbjA4=;
+ b=fG8dEkqWI3KELDYs2aww6SWEIpmGIztUZKaz8ZUmYPjabKHTll8PI3SaTVc5Q/LofVDX67
+ giHndnUIMtqlxN+rQCK5K/65fR02xkNXvgObU6x9R4nT6fGTSXBbzznJfHVpz5bpLr+Ol1
+ WizVN76NkPEZ+7ayU6O4g3u6nQrOTvA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-WQjcwv-gMxqXAF5T7d997A-1; Mon, 22 Jun 2020 06:23:49 -0400
+X-MC-Unique: WQjcwv-gMxqXAF5T7d997A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14EA805738;
+ Mon, 22 Jun 2020 10:23:48 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-179.ams2.redhat.com [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D93510002A5;
+ Mon, 22 Jun 2020 10:23:43 +0000 (UTC)
+Date: Mon, 22 Jun 2020 12:23:42 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3 12/16] python/machine.py: Add _qmp access shim
+Message-ID: <20200622102342.GB5707@linux.fritz.box>
+References: <20200604202236.25039-1-jsnow@redhat.com>
+ <20200604202236.25039-13-jsnow@redhat.com>
+ <659c7e95-54c3-dc20-02e3-86ce4ca74a5f@redhat.com>
+ <CAP+75-UDM0zxzBWze2NvuJPQ3ezZDn3r-SsrM2q_7JU3ANiYaA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200622053537.25245-1-jcmvbkbc@gmail.com>
-In-Reply-To: <20200622053537.25245-1-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 22 Jun 2020 11:23:11 +0100
-Message-ID: <CAFEAcA-+L7=-TYqeiX8gVEx_vXqB5AkQ4gqGwKN4TgK3GDcrmw@mail.gmail.com>
-Subject: Re: [PATCH] target/xtensa: drop gen_io_end call
-To: Max Filippov <jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAP+75-UDM0zxzBWze2NvuJPQ3ezZDn3r-SsrM2q_7JU3ANiYaA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,30 +96,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 22 Jun 2020 at 06:36, Max Filippov <jcmvbkbc@gmail.com> wrote:
->
-> Since commit
-> ba3e7926691e ("icount: clean up cpu_can_io at the entry to the block")
-> it has been unnecessary for target code to call gen_io_end() after an IO
-> instruction in icount mode; it is sufficient to call gen_io_start()
-> before it and to force the end of the TB.
-> Remaining call in xtensa target translator is for the opcodes that may
-> change IRQ state. All of them end current TB, so gen_io_end is not
-> needed. Drop gen_io_end call from the xtensa target translator.
+Am 20.06.2020 um 10:20 hat Philippe Mathieu-Daudé geschrieben:
+> On Sat, Jun 20, 2020 at 10:14 AM Philippe Mathieu-Daudé
+> <philmd@redhat.com> wrote:
+> >
+> > On 6/4/20 10:22 PM, John Snow wrote:
+> > > Like many other Optional[] types, it's not always a given that this
+> > > object will be set. Wrap it in a type-shim that raises a meaningful
+> > > error and will always return a concrete type.
+> > >
+> > > Signed-off-by: John Snow <jsnow@redhat.com>
+> > > ---
+> > >  python/qemu/machine.py | 12 +++++++++---
+> > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+> > > index d8289936816..a451f9000d6 100644
+> > > --- a/python/qemu/machine.py
+> > > +++ b/python/qemu/machine.py
+> > > @@ -118,7 +118,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+> > >          self._events = []
+> > >          self._iolog = None
+> > >          self._qmp_set = True   # Enable QMP monitor by default.
+> > > -        self._qmp = None
+> > > +        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
+> > >          self._qemu_full_args = None
+> > >          self._temp_dir = None
+> > >          self._launched = False
+> > > @@ -285,7 +285,7 @@ def _pre_launch(self):
+> > >              if self._remove_monitor_sockfile:
+> > >                  assert isinstance(self._monitor_address, str)
+> > >                  self._remove_files.append(self._monitor_address)
+> > > -            self._qmp = qmp.QEMUMonitorProtocol(
+> > > +            self._qmp_connection = qmp.QEMUMonitorProtocol(
+> > >                  self._monitor_address,
+> > >                  server=True,
+> > >                  nickname=self._name
+> > > @@ -455,7 +455,13 @@ def set_qmp_monitor(self, enabled=True):
+> > >              self._qmp_set = True
+> > >          else:
+> > >              self._qmp_set = False
+> > > -            self._qmp = None
+> > > +            self._qmp_connection = None
+> > > +
+> > > +    @property
+> > > +    def _qmp(self) -> qmp.QEMUMonitorProtocol:
+> > > +        if self._qmp_connection is None:
+> > > +            raise QEMUMachineError("Attempt to access QMP with no connection")
+> > > +        return self._qmp_connection
+> > >
+> > >      @classmethod
+> > >      def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
+> > >
+> >
+> > This patch breaks the EmptyCPUModel test:
+> >
+> > (043/101) tests/acceptance/empty_cpu_model.py:EmptyCPUModel.test:
+> > ERROR: Attempt to access QMP with no connection (0.03 s)
+> 
+> Fixed with:
+> 
+> -- >8 --
+> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+> index ba6397dd7e..26ae7be89b 100644
+> --- a/python/qemu/machine.py
+> +++ b/python/qemu/machine.py
+> @@ -480,7 +480,7 @@ def set_qmp_monitor(self, enabled: bool = True) -> None:
+> 
+>      @property
+>      def _qmp(self) -> qmp.QEMUMonitorProtocol:
+> -        if self._qmp_connection is None:
+> +        if self._qmp_set and self._qmp_connection is None:
+>              raise QEMUMachineError("Attempt to access QMP with no connection")
+>          return self._qmp_connection
+> 
+> ---
+> 
+> Does that sound reasonable to you?
 
-Most of the insns which set XTENSA_OP_CHECK_INTERRUPTS in their
-.op_flags also set XTENSA_OP_EXIT_TB_M1 or XTENSA_OP_EXIT_TB_0;
-the ones which don't are "rfe", "rfi", "rfwo" and "rfwu". Looking
-through what they do, they all end up calling gen_jump(), which
-will end the TB.
+Wouldn't that make the return type Optional[qmp.QEMUMonitorProtocol]?
+Maybe this is what we want, but then we don't need the shim that this
+patch adds but can just declare the variable this way.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+And why does the feeling code even try to acess _qmp when _qmp_set is
+False? Shouldn't it first check whether it's even valid?
 
-thanks
--- PMM
+Or maybe going a step back, why do we even have a separate _qmp_set
+instead of only using None for _qmp?
+
+Kevin
+
 
