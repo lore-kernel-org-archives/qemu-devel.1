@@ -2,78 +2,76 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1441AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD0FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:00:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D54CE20716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57255206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:00:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGFl6s1x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54CE20716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHOKtDtk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57255206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnKBA-00088M-3l
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40216)
+	id 1jnKBe-0000Pj-Hw
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:00:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJuw-0007Xa-VL
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59237
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJvP-000822-Ks
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:40 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41984
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJuo-0005O5-Fo
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:10 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJvK-0005SV-RD
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592822581;
+ s=mimecast20190719; t=1592822614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qzTw6UxJ8L4OXqqhniWyy68EfIosOn665HgoDeJSQZw=;
- b=IGFl6s1xM2XU8pj2YW9RTlBiiXRfk2r+yxqpo7uAC6kTTA10D/I2mHLSXBlKm0v9ILfYrj
- 7bWQJStRA6abpvU4x8SnPEujfwjrFeNbDfa4pbuGCXQ+PvLJRmBoe0LRbCY0Td4uo6EzcJ
- z1XrVbRqGj2m5bn1OpDvVOruwJvKEAo=
+ bh=x8jroUMTtqHgyfj6zDgLfj7JEy6m2gxBWWnqpZyXCGM=;
+ b=MHOKtDtk/z2YrCdkFUO/ZOw0XKjbT/EQaYuJyqpekA97DUL9GRnT0BXG3GztTRaTa7aQiP
+ Zczr5z/R1YZ6WWLxtEA56QdbweiD3PPVBgH/ObpOwystQjByLeAlOMp92UDwMypSF3DZhh
+ xNXwptfQhTHvg7Mo8oghiExfjTYiiPw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-msETBKloPhaXSZvw_92fXg-1; Mon, 22 Jun 2020 06:42:58 -0400
-X-MC-Unique: msETBKloPhaXSZvw_92fXg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-251-HcCQDzt-OgihJduhhATavQ-1; Mon, 22 Jun 2020 06:43:30 -0400
+X-MC-Unique: HcCQDzt-OgihJduhhATavQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD3C58014D4;
- Mon, 22 Jun 2020 10:42:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 76A2E60C05;
- Mon, 22 Jun 2020 10:42:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 501DE1138484; Mon, 22 Jun 2020 12:42:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 22/22] amd_iommu: Fix amdvi_realize() error API violation
-Date: Mon, 22 Jun 2020 12:42:50 +0200
-Message-Id: <20200622104250.1404835-23-armbru@redhat.com>
-In-Reply-To: <20200622104250.1404835-1-armbru@redhat.com>
-References: <20200622104250.1404835-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3955B1005513;
+ Mon, 22 Jun 2020 10:43:29 +0000 (UTC)
+Received: from gondolin (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46FA37167B;
+ Mon, 22 Jun 2020 10:43:21 +0000 (UTC)
+Date: Mon, 22 Jun 2020 12:43:09 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v3 3/8] s390/sclp: rework sclp boundary and length checks
+Message-ID: <20200622124309.62c5bfb3.cohuck@redhat.com>
+In-Reply-To: <afb07359-bfaf-90ee-f68b-9b31e6a7445e@linux.ibm.com>
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-4-walling@linux.ibm.com>
+ <afb07359-bfaf-90ee-f68b-9b31e6a7445e@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: multipart/signed; boundary="Sig_/qMY4.gWpLFqevOO+wE1EhxE";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -95,57 +93,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Collin Walling <walling@linux.ibm.com>, david@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, svens@linux.ibm.com, thuth@redhat.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-pointer to a variable containing NULL.  Passing an argument of the
-latter kind twice without clearing it in between is wrong: if the
-first call sets an error, it no longer points to NULL for the second
-call.
+--Sig_/qMY4.gWpLFqevOO+wE1EhxE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-amdvi_realize() is wrong that way: it passes @errp to qdev_realize(),
-object_property_get_int(), and msi_init() without checking it.  I
-can't tell offhand whether qdev_realize() can fail here.  Fix by
-checking it for failure.  object_property_get_int() can't.  Fix by
-passing &error_abort instead.
+On Fri, 19 Jun 2020 12:50:11 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/i386/amd_iommu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> On 6/19/20 12:22 AM, Collin Walling wrote:
+> > Rework the SCLP boundary check to account for different SCLP commands
+> > (eventually) allowing different boundary sizes.
+> >=20
+> > Move the length check code into a separate function, and introduce a
+> > new function to determine the length of the read SCP data (i.e. the siz=
+e
+> > from the start of the struct to where the CPU entries should begin).
+> >=20
+> > The format of read CPU info is unlikely to change in the future,
+> > so we do not require a separate function to calculate its length.
+> >=20
+> > Signed-off-by: Collin Walling <walling@linux.ibm.com> =20
+>=20
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>=20
+> > --- =20
+> [...]
+> > +/*
+> > + * The data length denotes the start of the struct to where the first
+> > + * CPU entry is to be allocated. This value also denotes the offset_cp=
+u
+> > + * field.
+> > + */
+> > +static inline int get_read_scp_info_data_len(void)
+> > +{
+> > +    return offsetof(ReadInfo, entries);
+> > +}
+> > +
+> >  /* Provide information about the configuration, CPUs and storage */
+> >  static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> >  {
+> > @@ -74,17 +112,16 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *=
+sccb)
+> >      int cpu_count;
+> >      int rnsize, rnmax;
+> >      IplParameterBlock *ipib =3D s390_ipl_get_iplb();
+> > +    int data_len =3D get_read_scp_info_data_len(); =20
+>=20
+> Does somebody have a better name than data_len at hand?
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index b26d30da57..087f601666 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1549,7 +1549,9 @@ static void amdvi_realize(DeviceState *dev, Error **errp)
- 
-     /* This device should take care of IOMMU PCI properties */
-     x86_iommu->type = TYPE_AMD;
--    qdev_realize(DEVICE(&s->pci), &bus->qbus, errp);
-+    if (!qdev_realize(DEVICE(&s->pci), &bus->qbus, errp)) {
-+        return;
-+    }
-     ret = pci_add_capability(&s->pci.dev, AMDVI_CAPAB_ID_SEC, 0,
-                                          AMDVI_CAPAB_SIZE, errp);
-     if (ret < 0) {
-@@ -1578,7 +1580,7 @@ static void amdvi_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->mmio);
-     sysbus_mmio_map(SYS_BUS_DEVICE(s), 0, AMDVI_BASE_ADDR);
-     pci_setup_iommu(bus, amdvi_host_dma_iommu, s);
--    s->devid = object_property_get_int(OBJECT(&s->pci), "addr", errp);
-+    s->devid = object_property_get_int(OBJECT(&s->pci), "addr", &error_abort);
-     msi_init(&s->pci.dev, 0, 1, true, false, errp);
-     amdvi_init(s);
- }
--- 
-2.26.2
+I could not come up with anything better, either :(
+
+(...)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+--Sig_/qMY4.gWpLFqevOO+wE1EhxE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl7wiz0ACgkQ3s9rk8bw
+L6+RWQ//YzOSCM3+QNfvTY9C0iVNWLXaBccDeJOc4vv3jgUzVxj6LKU3koYAhtCb
+StC5cuoySvXPwdQzmWcoXdg+0LlocxhOiMUzP/J8jTROwesyZ9bCJ1QqbC4zxbqp
+fVriB1juSo8ZRNbRI8H6gsbL7KTjFiOXGx6k2AKnXsC/CWrzpXzjpmTKk9kokWg6
+I8XQaNUCqnOxqFRvqJGMpIPfTq2nNRva6RYbkPH6XcVtjAesLNasjr4CHvOnfbYT
+jzIbJo51cBDsxkl5eOCTcDGJPZPJ1Tsy47qBaB8eSNvILNvjDJy83ToVKj2nNCgV
+u61d/fZ7T5/AD+Uq8taL+5ZQGOkpgj7hHmO50b5iMDQuZ6v49G3wPWy/Zod1GZO6
+4PNYUjnhzTsXqjf/M71xTtWtkPo5wwX4rVrfUkdFbthIwjBxvB+FhmNZm2/wfuAG
+URXngfh0t9n2EJeVRD9hGZTwsFRLdjEfEcmRsoIVxjI2eCPt2Jf//5L2mxrrYz0N
+lIgO5qPp/lJBXJZs4UTa/uIyLl1/2aRKWExVIvDOmnkPCwNDj87qyz9nuqFD3SZM
+7XudvDedFMKeJgKS5MDFAinAmqQ9We0JN3sByJKPS2Tu/UEjjFiNpUh+ZhfBWKsl
+hyHXRHFwf7mUrnSmavW9op1THd7IBJYWUJdnJfW32bpUROrr/zo=
+=GSva
+-----END PGP SIGNATURE-----
+
+--Sig_/qMY4.gWpLFqevOO+wE1EhxE--
 
 
