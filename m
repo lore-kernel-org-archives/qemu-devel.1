@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5248FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8358AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:31:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2056220708
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:31:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BAFF20708
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:31:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKpISNvy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2056220708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJNCCuYq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BAFF20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnKfL-0004oU-6M
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:31:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46804)
+	id 1jnKfW-0005DW-9x
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:31:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnKdn-0002wM-II
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:29:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42952
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnKdq-00031L-M2
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:29:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56556
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnKdl-0008Qy-1v
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:29:31 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnKdn-0008SD-P9
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:29:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592825367;
+ s=mimecast20190719; t=1592825371;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=1Vv9AT621ICkypcsTO25i0HBy7rRbjf8YKBPKUfrZtM=;
- b=AKpISNvy5YeEms6ReEy1hxvPTvx/89FeYHwk3B/4NSZWBN2/XWGe2U/VtIzLXnJtUgYyeP
- WK7RtZCankQqAHGmNsJervdQpGoAgAtLIiImWro05Ck72QfUlwHPJof+xoyMK1W7dUS/yX
- tPIlmNaheNAk1d1nsjMOdRVGAtSIOGI=
+ references:references; bh=zMOpcVUnJEc4LJFOQxqPXo76bEz8HhyTBI4AjEu4EkI=;
+ b=ZJNCCuYqWKD77IORMwHqW5HoLWij+aLmc8dDYbNhcVVu7coa2pJyQ7cxwMqRuhEoog76+o
+ Nob7l8ia1snkH3sWmbZq+mIyjX4xAuHMoCQSQgh+b4wYM6/0TWxfYddiDHLxop+m+UlNID
+ XefduLrRs9Kmmiwj3lIeAo7RZ9mUv5s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-_ngKzXs2PB6BByAjpTA5oQ-1; Mon, 22 Jun 2020 07:29:25 -0400
-X-MC-Unique: _ngKzXs2PB6BByAjpTA5oQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-437-o1JVkhN_OaquSahm5IGgyQ-1; Mon, 22 Jun 2020 07:29:27 -0400
+X-MC-Unique: o1JVkhN_OaquSahm5IGgyQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6FB68005AD;
- Mon, 22 Jun 2020 11:29:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C6D419200C1;
+ Mon, 22 Jun 2020 11:29:26 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48A965C1BD;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 333C15D9DD;
  Mon, 22 Jun 2020 11:29:16 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 344079D8F; Mon, 22 Jun 2020 13:29:14 +0200 (CEST)
+ id 29BC31753D; Mon, 22 Jun 2020 13:29:14 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/19] audio: deprecate -soundhw ac97
-Date: Mon, 22 Jun 2020 13:28:59 +0200
-Message-Id: <20200622112914.30454-5-kraxel@redhat.com>
+Subject: [PATCH v3 03/19] audio: add deprecated_register_soundhw
+Date: Mon, 22 Jun 2020 13:28:58 +0200
+Message-Id: <20200622112914.30454-4-kraxel@redhat.com>
 In-Reply-To: <20200622112914.30454-1-kraxel@redhat.com>
 References: <20200622112914.30454-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,54 +100,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch to deprecated_register_soundhw().  Remove the now obsolete init
-function.  Add an alias so both ac97 and AC97 are working with -device.
+Add helper function for -soundhw deprecation.  It can replace the
+simple init functions which just call {isa,pci}_create_simple()
+with a hardcoded type.  It also prints a deprecation message.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/ac97.c | 9 ++-------
- qdev-monitor.c  | 1 +
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ include/hw/audio/soundhw.h |  2 ++
+ hw/audio/soundhw.c         | 24 +++++++++++++++++++++++-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
-index 8a9b9924c495..38522cf0ba44 100644
---- a/hw/audio/ac97.c
-+++ b/hw/audio/ac97.c
-@@ -1393,12 +1393,6 @@ static void ac97_exit(PCIDevice *dev)
-     AUD_remove_card(&s->card);
+diff --git a/include/hw/audio/soundhw.h b/include/hw/audio/soundhw.h
+index c8eef8241846..f09a297854af 100644
+--- a/include/hw/audio/soundhw.h
++++ b/include/hw/audio/soundhw.h
+@@ -6,6 +6,8 @@ void isa_register_soundhw(const char *name, const char *descr,
+ 
+ void pci_register_soundhw(const char *name, const char *descr,
+                           int (*init_pci)(PCIBus *bus));
++void deprecated_register_soundhw(const char *name, const char *descr,
++                                 int isa, const char *typename);
+ 
+ void soundhw_init(void);
+ void select_soundhw(const char *optarg);
+diff --git a/hw/audio/soundhw.c b/hw/audio/soundhw.c
+index c750473c8f0c..173b674ff53a 100644
+--- a/hw/audio/soundhw.c
++++ b/hw/audio/soundhw.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/option.h"
+ #include "qemu/help_option.h"
+ #include "qemu/error-report.h"
+ #include "qom/object.h"
+@@ -32,6 +33,7 @@
+ struct soundhw {
+     const char *name;
+     const char *descr;
++    const char *typename;
+     int enabled;
+     int isa;
+     union {
+@@ -65,6 +67,17 @@ void pci_register_soundhw(const char *name, const char *descr,
+     soundhw_count++;
  }
  
--static int ac97_init (PCIBus *bus)
--{
--    pci_create_simple(bus, -1, TYPE_AC97);
--    return 0;
--}
--
- static Property ac97_properties[] = {
-     DEFINE_AUDIO_PROPERTIES(AC97LinkState, card),
-     DEFINE_PROP_END_OF_LIST (),
-@@ -1436,7 +1430,8 @@ static const TypeInfo ac97_info = {
- static void ac97_register_types (void)
++void deprecated_register_soundhw(const char *name, const char *descr,
++                                 int isa, const char *typename)
++{
++    assert(soundhw_count < ARRAY_SIZE(soundhw) - 1);
++    soundhw[soundhw_count].name = name;
++    soundhw[soundhw_count].descr = descr;
++    soundhw[soundhw_count].isa = isa;
++    soundhw[soundhw_count].typename = typename;
++    soundhw_count++;
++}
++
+ void select_soundhw(const char *optarg)
  {
-     type_register_static (&ac97_info);
--    pci_register_soundhw("ac97", "Intel 82801AA AC97 Audio", ac97_init);
-+    deprecated_register_soundhw("ac97", "Intel 82801AA AC97 Audio",
-+                                0, TYPE_AC97);
- }
+     struct soundhw *c;
+@@ -136,7 +149,16 @@ void soundhw_init(void)
  
- type_init (ac97_register_types)
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 22da107484c5..105d9792ecdf 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -53,6 +53,7 @@ typedef struct QDevAlias
- 
- /* Please keep this table sorted by typename. */
- static const QDevAlias qdev_alias_table[] = {
-+    { "AC97", "ac97" }, /* -soundhw name */
-     { "e1000", "e1000-82540em" },
-     { "ich9-ahci", "ahci" },
-     { "lsi53c895a", "lsi" },
+     for (c = soundhw; c->name; ++c) {
+         if (c->enabled) {
+-            if (c->isa) {
++            if (c->typename) {
++                warn_report("'-soundhw %s' is deprecated, "
++                            "please use '-device %s' instead",
++                            c->name, c->typename);
++                if (c->isa) {
++                    isa_create_simple(isa_bus, c->typename);
++                } else {
++                    pci_create_simple(pci_bus, -1, c->typename);
++                }
++            } else if (c->isa) {
+                 if (!isa_bus) {
+                     error_report("ISA bus not available for %s", c->name);
+                     exit(1);
 -- 
 2.18.4
 
