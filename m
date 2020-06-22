@@ -6,70 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 694BAC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D65D4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35D7620720
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3A2920706
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:59:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkhwQ7PC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35D7620720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WexksQG4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A2920706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnMy1-0008Ik-GJ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57130)
+	id 1jnMym-0000zF-Ua
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:59:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvl-0005JR-Ms
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41839
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvs-0005UT-8i
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60110
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvj-0007iP-SR
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:13 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvp-0007jd-EY
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592834171;
+ s=mimecast20190719; t=1592834176;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=qPB343KyU7kxiThl8E/iCJi0KCxYplSXSK26Hiy/p00=;
- b=SkhwQ7PCHZ33a15/aJkCrPuusoPj91Q/bozSlmmUk1xMAeswplbtV/9cWOKBSULTKkI9p0
- 5z2RZzQCWu0zpY+9yty6c0ACMzMduUSY0pUdqLvJqDko42n8fTnkoua2vE1WgsLas2+orE
- htpneVP06NTjW5WbuIofST95ra+2CFk=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+fe8BYH1YDyqVe9iNEOk6dpYQe4tDIxPQC7jVI46fPM=;
+ b=WexksQG42bkF4Co0NIIHTwBBLQoTi7ObuQG/kg+5XUO4uO3XxFQye1BJ2Ct0H8bIRmBRq/
+ pO9F//DH+wA8zmXHv2LZ/oXbntka+cRyLFO9IcZgXczzZp4c2dhih69CWwSSh37iM6u+lU
+ pjEQvTur8LRPLp/ILhuWA+m4qzXlXiQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-MDB3GZqrOZqSm5_343yTLA-1; Mon, 22 Jun 2020 09:56:09 -0400
-X-MC-Unique: MDB3GZqrOZqSm5_343yTLA-1
+ us-mta-134-doya-x_WMb28w69uh1wiDA-1; Mon, 22 Jun 2020 09:56:10 -0400
+X-MC-Unique: doya-x_WMb28w69uh1wiDA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D0BC18A072C
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 13:56:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D903107ACF7
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 13:56:09 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 56F207C1FE;
- Mon, 22 Jun 2020 13:56:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC34E707C6;
+ Mon, 22 Jun 2020 13:56:08 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 311101750C; Mon, 22 Jun 2020 15:56:01 +0200 (CEST)
+ id 665BA9D94; Mon, 22 Jun 2020 15:56:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/7] qdev: add support for device module loading
-Date: Mon, 22 Jun 2020 15:55:55 +0200
-Message-Id: <20200622135601.12433-2-kraxel@redhat.com>
+Subject: [PATCH v4 6/7] vga: build virtio-gpu only once
+Date: Mon, 22 Jun 2020 15:56:00 +0200
+Message-Id: <20200622135601.12433-7-kraxel@redhat.com>
 In-Reply-To: <20200622135601.12433-1-kraxel@redhat.com>
 References: <20200622135601.12433-1-kraxel@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -77,7 +81,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,215 +101,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When compiling devices as modules we'll need some infrastrtucture to
-actually load those modules if needed.  This patch adds it.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/qdev-core.h |  3 +++
- include/qemu/module.h  |  1 +
- hw/core/qdev.c         | 55 ++++++++++++++++++++++++++++++++++++++++++
- qdev-monitor.c         |  5 ++++
- qom/qom-qmp-cmds.c     |  5 ++++
- softmmu/vl.c           |  4 +++
- stubs/hw-module.c      | 10 ++++++++
- stubs/Makefile.objs    |  1 +
- 8 files changed, 84 insertions(+)
- create mode 100644 stubs/hw-module.c
+ hw/display/Makefile.objs | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 7dc10be46f8c..0a33939f4855 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -557,4 +557,7 @@ void device_listener_unregister(DeviceListener *listener);
-  */
- bool qdev_should_hide_device(QemuOpts *opts);
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 76b3571e4902..d619594ad4d3 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -49,12 +49,12 @@ common-obj-m += qxl.mo
+ qxl.mo-objs = qxl.o qxl-logger.o qxl-render.o
+ endif
  
-+void qdev_module_load_type(const char *type);
-+void qdev_module_load_all(void);
-+
- #endif
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 011ae1ae7605..077a6b09bca7 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -64,6 +64,7 @@ typedef enum {
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
- #define audio_module_load_one(lib) module_load_one("audio-", lib)
-+#define hw_module_load_one(lib) module_load_one("hw-", lib)
- 
- void register_module_init(void (*fn)(void), module_init_type type);
- void register_dso_module_init(void (*fn)(void), module_init_type type);
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 2131c7f951dd..6119e25e0eeb 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -137,6 +137,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-  */
- DeviceState *qdev_new(const char *name)
- {
-+    if (!object_class_by_name(name)) {
-+        qdev_module_load_type(name);
-+    }
-     return DEVICE(object_new(name));
- }
- 
-@@ -147,6 +150,9 @@ DeviceState *qdev_new(const char *name)
-  */
- DeviceState *qdev_try_new(const char *name)
- {
-+    if (!object_class_by_name(name)) {
-+        qdev_module_load_type(name);
-+    }
-     if (!object_class_by_name(name)) {
-         return NULL;
-     }
-@@ -154,6 +160,55 @@ DeviceState *qdev_try_new(const char *name)
-     return DEVICE(object_new(name));
- }
- 
-+/*
-+ * Building devices modular is mostly useful in case they have
-+ * dependencies to external shared libraries, so we can cut down the
-+ * core qemu library dependencies.  Which is the case for only a very
-+ * few devices.  So with the expectation that this will be rather the
-+ * exception than to rule go with a simple hardcoded list for now
-+ * (instead of generating it automatically somehow).
-+ */
-+static struct {
-+    const char *type;
-+    const char *mod;
-+} const hwmodules[] = {
-+};
-+
-+static bool qdev_module_loaded_all;
-+
-+void qdev_module_load_type(const char *type)
-+{
-+    int i;
-+
-+    if (qdev_module_loaded_all) {
-+        return;
-+    }
-+    for (i = 0; i < ARRAY_SIZE(hwmodules); i++) {
-+        if (strcmp(hwmodules[i].type, type) == 0) {
-+            hw_module_load_one(hwmodules[i].mod);
-+            return;
-+        }
-+    }
-+}
-+
-+void qdev_module_load_all(void)
-+{
-+    int i;
-+
-+    if (qdev_module_loaded_all) {
-+        return;
-+    }
-+    for (i = 0; i < ARRAY_SIZE(hwmodules); i++) {
-+        if (i > 0 && strcmp(hwmodules[i - 1].mod,
-+                            hwmodules[i].mod) == 0) {
-+            /* one module implementing multiple devices -> load only once */
-+            continue;
-+        }
-+        hw_module_load_one(hwmodules[i].mod);
-+    }
-+    qdev_module_loaded_all = true;
-+}
-+
- static QTAILQ_HEAD(, DeviceListener) device_listeners
-     = QTAILQ_HEAD_INITIALIZER(device_listeners);
- 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 22da107484c5..86f29daa7469 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -147,6 +147,7 @@ static void qdev_print_devinfos(bool show_no_user)
-     int i;
-     bool cat_printed;
- 
-+    qdev_module_load_all();
-     list = object_class_get_list_sorted(TYPE_DEVICE, false);
- 
-     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
-@@ -224,6 +225,10 @@ static DeviceClass *qdev_get_device_class(const char **driver, Error **errp)
-             oc = object_class_by_name(*driver);
-         }
-     }
-+    if (!oc) {
-+        qdev_module_load_type(*driver);
-+        oc = object_class_by_name(*driver);
-+    }
- 
-     if (!object_class_dynamic_cast(oc, TYPE_DEVICE)) {
-         if (*driver != original_name) {
-diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-index c5249e44d020..4e0d7e53cd16 100644
---- a/qom/qom-qmp-cmds.c
-+++ b/qom/qom-qmp-cmds.c
-@@ -116,6 +116,7 @@ ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
- {
-     ObjectTypeInfoList *ret = NULL;
- 
-+    qdev_module_load_all();
-     object_class_foreach(qom_list_types_tramp, implements, abstract, &ret);
- 
-     return ret;
-@@ -131,6 +132,10 @@ ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
-     ObjectPropertyInfoList *prop_list = NULL;
- 
-     klass = object_class_by_name(typename);
-+    if (klass == NULL) {
-+        qdev_module_load_type(typename);
-+        klass = object_class_by_name(typename);
-+    }
-     if (klass == NULL) {
-         error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-                   "Device '%s' not found", typename);
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f669c06ede4a..8d753ead5983 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -1770,6 +1770,10 @@ static bool vga_interface_available(VGAInterfaceType t)
- {
-     const VGAInterfaceInfo *ti = &vga_interfaces[t];
- 
-+    if (ti->class_names[0] && !object_class_by_name(ti->class_names[0])) {
-+        qdev_module_load_type(ti->class_names[0]);
-+    }
-+
-     assert(t < VGA_TYPE_MAX);
-     return !ti->class_names[0] ||
-            object_class_by_name(ti->class_names[0]) ||
-diff --git a/stubs/hw-module.c b/stubs/hw-module.c
-new file mode 100644
-index 000000000000..58b2160b97fe
---- /dev/null
-+++ b/stubs/hw-module.c
-@@ -0,0 +1,10 @@
-+#include "qemu/osdep.h"
-+#include "hw/qdev-core.h"
-+
-+void qdev_module_load_all(void)
-+{
-+}
-+
-+void qdev_module_load_type(const char *type)
-+{
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 28e48171d1f3..7a9f38f60b78 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -5,6 +5,7 @@ stub-obj-y += dump.o
- stub-obj-y += error-printf.o
- stub-obj-y += fdset.o
- stub-obj-y += gdbstub.o
-+stub-obj-y += hw-module.o
- stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
- stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+-obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
+-obj-$(CONFIG_VHOST_USER_GPU) += vhost-user-gpu.o
+-obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
+-obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) += vhost-user-gpu-pci.o
+-obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
+-obj-$(CONFIG_VHOST_USER_VGA) += vhost-user-vga.o
++common-obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
++common-obj-$(CONFIG_VHOST_USER_GPU) += vhost-user-gpu.o
++common-obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
++common-obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) += vhost-user-gpu-pci.o
++common-obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
++common-obj-$(CONFIG_VHOST_USER_VGA) += vhost-user-vga.o
+ virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
+ virtio-gpu.o-libs += $(VIRGL_LIBS)
+ virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
 -- 
 2.18.4
 
