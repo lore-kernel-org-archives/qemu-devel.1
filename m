@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA97C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1C722074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17D732070E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:51:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpUlCFmb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C722074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKUbW9xv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D732070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnLsn-00071A-1s
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38400)
+	id 1jnLv9-0000a3-AZ
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jnLrm-0005qE-T3
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:48:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51300
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jnLu4-00088a-5a
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:50:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39629
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jnLrl-0004G6-67
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:48:02 -0400
+ id 1jnLu0-0004Tk-Cm
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:50:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592830079;
+ s=mimecast20190719; t=1592830219;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=s0ZPOfoPHVpQEHMDzpyMK1YzLcvWcDZ/3xuGpHq/8dc=;
- b=cpUlCFmb8DvW485/gbPDyaYfgn6baQ7oragNJYYhfe4aBdqsQe7k5UjVeCa8le24t+Zu89
- WaRV/k+RF905xnrgXSer9dlVlOqnjpULE4UlxuABwVQ3trUUuij4RBuFcuo+TBVOhbLBr+
- 4tgx1ilgraaMLxoiWKERukHcDz8c9sY=
+ bh=6Goxg7m2zeMx37t4rw4fUt8sIIk2aeu5ecfkP8D9aos=;
+ b=VKUbW9xv1VB0v9G6QEkyaZSo/KBc6H2L0cQtuqsc1G7pYkuK1zPNWYU2rtjRwzsfgyOUVz
+ X51nON5DTvys5v1hl1P/h7aN+lL72Ux5jat4NFbqZAilYbuIYJcG2lUOZwdatrz9si+gp7
+ lCLpBg2fdXaLMiw4OHyFnhKbaSn7Sdg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-VAk09nz7M4S7C4yQX1T22w-1; Mon, 22 Jun 2020 08:47:56 -0400
-X-MC-Unique: VAk09nz7M4S7C4yQX1T22w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-157-HztKiya5PDaLykLIECnRxA-1; Mon, 22 Jun 2020 08:49:00 -0400
+X-MC-Unique: HztKiya5PDaLykLIECnRxA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1582E8014D4;
- Mon, 22 Jun 2020 12:47:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D9DE107ACCD;
+ Mon, 22 Jun 2020 12:48:59 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D59D05C1BD;
- Mon, 22 Jun 2020 12:47:42 +0000 (UTC)
-Date: Mon, 22 Jun 2020 14:47:41 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA21D26DF5;
+ Mon, 22 Jun 2020 12:48:45 +0000 (UTC)
+Date: Mon, 22 Jun 2020 14:48:44 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 3/3] docs/specs/tpm: ACPI boot now supported for TPM/ARM
-Message-ID: <20200622144741.7c5e788a@redhat.com>
-In-Reply-To: <20200619141851.16272-4-eric.auger@redhat.com>
+Subject: Re: [PATCH v6 2/3] arm/acpi: Add the TPM2.0 device under the DSDT
+Message-ID: <20200622144844.6f19cac0@redhat.com>
+In-Reply-To: <20200619141851.16272-3-eric.auger@redhat.com>
 References: <20200619141851.16272-1-eric.auger@redhat.com>
- <20200619141851.16272-4-eric.auger@redhat.com>
+ <20200619141851.16272-3-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,40 +95,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, thuth@redhat.com, drjones@redhat.com,
- mst@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
+ mst@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org,
  shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
- eric.auger.pro@gmail.com, philmd@redhat.com, ardb@kernel.org,
+ eric.auger.pro@gmail.com, lersek@redhat.com, ardb@kernel.org,
  stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 19 Jun 2020 16:18:51 +0200
+On Fri, 19 Jun 2020 16:18:50 +0200
 Eric Auger <eric.auger@redhat.com> wrote:
 
-> ACPI boot now is supported. Let's remove the comment
-> saying it is not.
+> In case it is dynamically instantiated, add the TPM 2.0 device object
+> under the DSDT table in the ACPI namespace. Its HID is MSFT0101
+> while its current resource settings (CRS) property is initialized
+> with the guest physical address and MMIO size of the device.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> ---
->  docs/specs/tpm.rst | 2 --
->  1 file changed, 2 deletions(-)
 > 
-> diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
-> index 5e61238bc5..eeeb93730a 100644
-> --- a/docs/specs/tpm.rst
-> +++ b/docs/specs/tpm.rst
-> @@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
->      -drive if=pflash,format=raw,file=flash0.img,readonly \
->      -drive if=pflash,format=raw,file=flash1.img
+> ---
+> 
+> v3 -> v4:
+> - check the presence of the tpm in acpi_dsdt_add_tpm
+>   as it was done in v2
+> 
+> v2 -> v3:
+> - use SYS_BUS_DEVICE() instead of
+>   (SysBusDevice *)object_dynamic_cast(OBJECT())
+> 
+> v1 -> v2:
+> - use memory_region_size
+> - fix mingw compilation issue by casting to uint32_t
+> - added Stefan's R-b
+> ---
+>  hw/arm/virt-acpi-build.c | 34 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index ca31f70f7f..1384a2cf2a 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -46,6 +46,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/arm/virt.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "hw/platform-bus.h"
+>  #include "sysemu/numa.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/tpm.h"
+> @@ -364,6 +365,38 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>      aml_append(scope, dev);
+>  }
 >  
-> -  On Arm, ACPI boot with TPM is not yet supported.
-> -
->  In case SeaBIOS is used as firmware, it should show the TPM menu item
->  after entering the menu with 'ESC'.
+> +static void acpi_dsdt_add_tpm(Aml *scope, VirtMachineState *vms)
+> +{
+> +    PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(vms->platform_bus_dev);
+> +    hwaddr pbus_base = vms->memmap[VIRT_PLATFORM_BUS].base;
+> +    SysBusDevice *sbdev = SYS_BUS_DEVICE(tpm_find());
+> +    MemoryRegion *sbdev_mr;
+> +    hwaddr tpm_base;
+> +
+> +    if (!sbdev) {
+> +        return;
+> +    }
+> +
+> +    tpm_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
+> +    assert(tpm_base != -1);
+> +
+> +    tpm_base += pbus_base;
+> +
+> +    sbdev_mr = sysbus_mmio_get_region(sbdev, 0);
+> +
+> +    Aml *dev = aml_device("TPM0");
+> +    aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
+> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+> +
+> +    Aml *crs = aml_resource_template();
+> +    aml_append(crs,
+> +               aml_memory32_fixed(tpm_base,
+> +                                  (uint32_t)memory_region_size(sbdev_mr),
+> +                                  AML_READ_WRITE));
+> +    aml_append(dev, aml_name_decl("_CRS", crs));
+> +    aml_append(scope, dev);
+> +}
+> +
+>  static void
+>  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+> @@ -762,6 +795,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      }
+>  
+>      acpi_dsdt_add_power_button(scope);
+> +    acpi_dsdt_add_tpm(scope, vms);
+>  
+>      aml_append(dsdt, scope);
 >  
 
 
