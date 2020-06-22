@@ -2,89 +2,97 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4508EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011B5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E5B7206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C08F12073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:47:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMRgN0vj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E5B7206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoempcsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08F12073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnPLB-0004cf-7D
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 12:30:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44076)
+	id 1jnPb2-0003qB-0v
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 12:47:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jnPKF-0003l3-Af
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:29:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26178
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jnPKD-0004qQ-4L
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:29:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592843376;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QxMSxIEl1mTwu1IGLBIbaCltyG0xW+MDMWV+nA3sYPA=;
- b=eMRgN0vjgQAl1B8RZgBn4rAZez0Yn9EEsaz9LGhB0zJ5WvLQMdLHhXk1aq4JJfY60cIyeu
- gK7mRGJ1iaXpi7uojnBI2X/YeHiKi8pvjsmMMjZwWAUv+hSia61YZ74GfWb368Te8i7/W1
- cxUaCyLNckbWF8hnZvybF31/Osvco04=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-IUPYoB6UP_q_Lcy_Tk7eIA-1; Mon, 22 Jun 2020 12:29:21 -0400
-X-MC-Unique: IUPYoB6UP_q_Lcy_Tk7eIA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F748800053;
- Mon, 22 Jun 2020 16:29:19 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D5AF10013D7;
- Mon, 22 Jun 2020 16:29:16 +0000 (UTC)
-Date: Mon, 22 Jun 2020 17:29:13 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH  v1 14/18] .gitignore: un-ignore .gitlab-ci.d
-Message-ID: <20200622162913.GK736373@redhat.com>
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-15-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jnPZU-0002Ub-Bx
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:45:24 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jnPZS-0008Fy-J3
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:45:24 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v3so9898360wrc.1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 09:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zqxE+SqsntXFGDof21TROGBk05gG/0WdoxKbuB+qg9I=;
+ b=MoempcsEm+w67EaMk0WVVUxgtHSIMIk0GaOlPrwqmFfesTP240OkjYM10U8q7fdVyi
+ mWzRmhvVw/XE+VF5FQP3czxyBi9/TJ13MR4S0/ouMRB4W5D9gZLTJDLzvmfNcvl8TJJh
+ jFaf80KQ6fhqZC86JuxJQjjaxLOnGTZp8i8PNHzDxfHxUb17/ZL8R5MaWyksXBDZ32/x
+ 7F/rVWsEt12shBPmwVmuhIaLxwCnZI2+i98ZMBVpG5urEGC+0uPpsoM+sxs2XcKYe6+m
+ WIaGT2RbhOgEcON0zwQiHKXa/ksHvxBEmIhFyIDZSwUpBjBHOpU0D43g5iAyfngw0JVE
+ L+FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zqxE+SqsntXFGDof21TROGBk05gG/0WdoxKbuB+qg9I=;
+ b=N5+h9aXb/xZk7FSvD1QeL4A/MSrP8wCWN9krOs3hX56A56U43jdQBkU/ftqGswBVo2
+ LV0eSYMKML6h0ycAgGoNrP8hFBYnaaHRxopLqCFoocZIZdndreUdKhGiWeZ07pq8O9pr
+ /kLdBpxP5aBnEuiI6R8Lc9+IFdbQ+TWKJBr8LAO5ienDKxFujNzGAFzXWukW0ovYYxAj
+ XdGWCgpvcMno7Bj5FpXmKrRO+niW2dZ1PxITv4gU42SZ+u0eaQdoPBmnyCvgnN8CmJmB
+ Yxj84WZr2/sfiRr1+uChoZba7966z093h5+81jq5x4lXivcvzAxmfvrcDEJDt66qdsa2
+ co0A==
+X-Gm-Message-State: AOAM532hZNc4T7qPL7p1fgQJVC6OD4GRQH54qqbxznACCEpII+wXGjyZ
+ duq0XaYpQBFsqJSNuK7NoDk=
+X-Google-Smtp-Source: ABdhPJykwIcoqbg40xcOMqb/jF5ReOSopAqbdFfsg5IqO0piPbhoIRkqxdVD6sr2VY3FTMFWMFnTEw==
+X-Received: by 2002:adf:f450:: with SMTP id f16mr20229294wrp.307.1592844321128; 
+ Mon, 22 Jun 2020 09:45:21 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id n8sm15541105wrj.44.2020.06.22.09.45.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 22 Jun 2020 09:45:20 -0700 (PDT)
+Subject: Re: [PULL 00/15] Renesas hardware patches for 2020-06-21
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20200621124807.17226-1-f4bug@amsat.org>
+ <CAFEAcA_5663fFNVqcr1maATB6v8R297LmJEtD+8V4LvhaSkjPA@mail.gmail.com>
+ <CAFEAcA-w4DGH2wEwySZd+zj-m+YpL39tog9S9LNH2iTcL84F9Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8ec1ccc2-7e7f-94cf-dedf-86c09832c0f7@amsat.org>
+Date: Mon, 22 Jun 2020 18:45:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200622143204.12921-15-alex.bennee@linaro.org>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA-w4DGH2wEwySZd+zj-m+YpL39tog9S9LNH2iTcL84F9Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,47 +106,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: fam@euphon.net, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 22, 2020 at 03:32:00PM +0100, Alex Bennée wrote:
-> The sooner we deprecate in-tree builds the sooner this mess of regexes
-> can be thrown away.
++Thomas
+
+On 6/22/20 6:19 PM, Peter Maydell wrote:
+> On Mon, 22 Jun 2020 at 17:01, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>
+>> On Sun, 21 Jun 2020 at 13:50, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>> Renesas hardware patches
+>>>
+>>> - Add a common entry for Renesas hardware in MAINTAINERS
+>>> - Trivial SH4 cleanups
+>>> - Add RX GDB simulator from Yoshinori Sato
+>>>
+>>> The Renesas RX target emulation was added in commit c8c35e5f51,
+>>> these patches complete the target by adding the hardware emulation.
+>>>
+>>> Thank you Yoshinori for adding this code to QEMU, and your patience
+>>> during the review process. Now your port is fully integrated.
+>>>
+>>> Travis-CI:
+>>> https://travis-ci.org/github/philmd/qemu/builds/700461815
+>>
+>> Hi; I'm afraid there's a format-string issue here (manifests
+>> on OSX, openbsd, and 32-bit platforms):
+>>
+>> /home/peter.maydell/qemu/hw/rx/rx-gdbsim.c: In function 'rx_gdbsim_init':
+>> /home/peter.maydell/qemu/hw/rx/rx-gdbsim.c:93:22: error: format '%lli'
+>> expects argument of type 'long long int', but argument 2 has type
+>> 'ram_addr_t {aka unsigned int}' [-Werror=format=]
+>>          error_report("Invalid RAM size, should be more than %" PRIi64 " Bytes",
+>>                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>                       mc->default_ram_size);
+>>                       ~~~~~~~~~~~~~~~~~~~~
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  .gitignore | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Also there appears to be a makefile/dependency bug somewhere,
+> because when I drop this merge attempt and retry building
+> with current master I get this error:
 > 
-> diff --git a/.gitignore b/.gitignore
-> index 90acb4347d4..9016ee0a0b4 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -92,7 +92,7 @@
->  *.toc
->  *.tp
->  *.vr
-> -*.d
-> +!\.*.d
+> make[1]: Entering directory '/home/petmay01/qemu-for-merges/slirp'
+> make[1]: Nothing to be done for 'all'.
+> make[1]: Leaving directory '/home/petmay01/qemu-for-merges/slirp'
+>   CC      qga/main.o
+>   CC      qemu-io.o
+>   CC      monitor/qmp-cmds-control.o
+> make: *** No rule to make target
+> '/home/petmay01/qemu-for-merges/hw/rx/Kconfig', needed by
+> 'aarch64-softmmu/config-devices.mak'.  Stop.
+> make: *** Waiting for unfinished jobs....
+> make: Leaving directory '/home/petmay01/qemu-for-merges/build/w64'
+> 
+> This seems to be because aarch64-softmmu/config-devices.mak.d
+> in the build tree says that aarch64-softmmu/config-devices.mak
+> depends on all the Kconfig files; this means that if a Kconfig
+> file gets deleted then incremental build stops working?
 
-This doesn't look quite right to me. After this all the .d files are
-marked as untracked.
-
-I think you need something more like
-
-  *.d
-  !/.gitlab-ci.d
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+This seems the same problem previously discussed here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg676319.html
 
