@@ -7,74 +7,76 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D266EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0AADC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:50:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98B3220716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98066206EB
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DR9OqH6e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98B3220716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d5K8GTzK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98066206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnKx8-0004p4-T1
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:49:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49580)
+	id 1jnKxp-0005NE-Rr
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:50:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnKom-0003Li-4j
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:40:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57580
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnKwI-0004M8-TZ
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:48:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57275
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnKok-00020Y-25
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:40:51 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnKwE-00038W-C7
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:48:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592826048;
+ s=mimecast20190719; t=1592826513;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=h2ttrwrCozwSsSgrj+2Ve9p4KKb7etod7Sxow9XQVBA=;
- b=DR9OqH6eHPPtv/167p3l4YQRj02mPe4XsAzquBh1Cx3QzHhbzLQbKVxiRVajBVpoAX/sSD
- 0KRqPVDAhQAHAnBycW3Hp543VtEfrkKDv+FR3T/2rRGi2ABWZwLlIcue8Wp1tD8QAvtnT9
- pL5B/DdBblrpMgYcKIsVL626o33AzzA=
+ bh=a2DOp/fkqTuEubMOU2RUpBwzkH1zydI7663MmnBMKAM=;
+ b=d5K8GTzKfrIJlenqO/mRYpFlIFkVpCZnNovIbo+IFLe9qPlY8Uto/aKSRPyS+jbazAd+nD
+ E+cpJHdVVfcah45B5qGka6JNyWHnSHXX9Opj2jkX0XxWk16ir4Q2Sc8owo16ehgkJ8g+37
+ GzN7eVSZdnwSp/1gHQWrRvgvYLGMQh4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-1yN2_A2lOVOk-ZSRICJ3XA-1; Mon, 22 Jun 2020 07:40:46 -0400
-X-MC-Unique: 1yN2_A2lOVOk-ZSRICJ3XA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-66-RR_ZeIYfOuO7VkhQ9lYOLQ-1; Mon, 22 Jun 2020 07:48:30 -0400
+X-MC-Unique: RR_ZeIYfOuO7VkhQ9lYOLQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D3AAA0BD7;
- Mon, 22 Jun 2020 11:40:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37A11800053;
+ Mon, 22 Jun 2020 11:48:29 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-125.ams2.redhat.com [10.36.112.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 817A07167A;
- Mon, 22 Jun 2020 11:40:41 +0000 (UTC)
-Subject: Re: [PATCH v4 5/9] pc-bios: s390x: Rename and use PSW_MASK_ZMODE
- constant
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8641D7C1F3;
+ Mon, 22 Jun 2020 11:48:24 +0000 (UTC)
+Subject: Re: [PATCH v4 7/9] pc-bios: s390x: Move panic() into header and add
+ infinite loop
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200622074235.32528-1-frankja@linux.ibm.com>
- <20200622074235.32528-6-frankja@linux.ibm.com>
+ <20200622074235.32528-8-frankja@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <5990e65c-732a-e3c1-bd4c-1fb870e8f567@redhat.com>
-Date: Mon, 22 Jun 2020 13:40:39 +0200
+Message-ID: <e162af39-d54e-e419-9da0-c3d35d1d892b@redhat.com>
+Date: Mon, 22 Jun 2020 13:48:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622074235.32528-6-frankja@linux.ibm.com>
+In-Reply-To: <20200622074235.32528-8-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
@@ -105,74 +107,41 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 22/06/2020 09.42, Janosch Frank wrote:
-> ZMODE has a lot of ambiguity with the ESAME architecture mode, but is
-> actually 64 bit addressing.
+> panic() was defined for the ccw and net bios, i.e. twice, so it's
+> cleaner to rather put it into the header.
 > 
-> As PSW_MASK_64 is now effectively 33 bit long and the PSWLegacy struct
-> has 2 32 bit members, let's also use a unsigned long pointer in
-> dasd-ipl.c instead when oring the constant into a 8 byte PSW.
+> Also let's add an infinite loop into the assembly of disabled_wait() so
+> the caller doesn't need to take care of it.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 > Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  pc-bios/s390-ccw/dasd-ipl.c  | 5 ++---
->  pc-bios/s390-ccw/s390-arch.h | 2 +-
->  2 files changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-> index 0fc879bb8e..0dbad051a2 100644
-> --- a/pc-bios/s390-ccw/dasd-ipl.c
-> +++ b/pc-bios/s390-ccw/dasd-ipl.c
-> @@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
+>  pc-bios/s390-ccw/main.c     | 7 -------
+>  pc-bios/s390-ccw/netmain.c  | 8 --------
+>  pc-bios/s390-ccw/s390-ccw.h | 9 +++++++--
+>  pc-bios/s390-ccw/start.S    | 5 +++--
+>  4 files changed, 10 insertions(+), 19 deletions(-)
+[...]
+> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+> index aa8fceb19d..35be141d8d 100644
+> --- a/pc-bios/s390-ccw/start.S
+> +++ b/pc-bios/s390-ccw/start.S
+> @@ -47,8 +47,9 @@ memsetxc:
 >   */
->  void dasd_ipl(SubChannelId schid, uint16_t cutype)
->  {
-> -    PSWLegacy *pswl = (PSWLegacy *) 0x00;
-> +    unsigned long *pswl = 0x0;
+>  	.globl disabled_wait
+>  disabled_wait:
+> -        larl %r1,disabled_wait_psw
+> -        lpswe   0(%r1)
+> +        larl	%r1,disabled_wait_psw
+> +        lpswe	0(%r1)
+> +1:	j	1b
 
-... or we could use the "lowcore" pointer from s390-arch.h ... though
-that's PSWLegacy again...
+Could you please fix the white spaces here while you're at it (TABs vs.
+spaces).
 
->      uint32_t ipl2_addr;
->  
->      /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
-> @@ -229,7 +229,6 @@ void dasd_ipl(SubChannelId schid, uint16_t cutype)
->      run_ipl2(schid, cutype, ipl2_addr);
->  
->      /* Transfer control to the guest operating system */
-> -    pswl->mask |= PSW_MASK_EAMODE;   /* Force z-mode */
-
-Wait, PSW_MASK_EAMODE was 0x0000000100000000 and ->mask was only a
-32-bit value ... how was that ever supposed to work correctly?
-
-> -    pswl->addr |= PSW_MASK_BAMODE;   /* ...          */
-> +    *pswl |= PSW_MASK_64;   /* Force 64 bit addressing */
-
-So is this even a bug fix and not only a cosmetic change?
-
-... the whole logic here looks fishy to me ... do we need this PSW
-modification at all? Shouldn't the guest decide which mode it wants to
-use in its startup code?
-
- Thomas
-
-
->      jump_to_low_kernel();
->  }
-> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-> index 5f36361c02..73852029d4 100644
-> --- a/pc-bios/s390-ccw/s390-arch.h
-> +++ b/pc-bios/s390-ccw/s390-arch.h
-> @@ -29,7 +29,7 @@ _Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
->  #define PSW_MASK_WAIT       0x0002000000000000ULL
->  #define PSW_MASK_EAMODE     0x0000000100000000ULL
->  #define PSW_MASK_BAMODE     0x0000000080000000ULL
-> -#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-> +#define PSW_MASK_64         (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
->  
->  /* Low core mapping */
->  typedef struct LowCore {
-> 
+ Thanks,
+  Thomas
 
 
