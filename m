@@ -2,92 +2,86 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFDBC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16282C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B51C420716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D48EC20716
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="q945bKmj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51C420716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MU1rudWM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48EC20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnU5D-0005z7-QN
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:34:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39856)
+	id 1jnU5N-0006Nk-Uq
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:34:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
- id 1jnU3b-0004CF-E0
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:32:47 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39640)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jnU44-0004Tg-R1; Mon, 22 Jun 2020 17:33:16 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34749)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
- id 1jnU3W-000640-Me
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:32:46 -0400
-Received: by mail-oi1-x243.google.com with SMTP id d67so16978889oig.6
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 14:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=a1lkXyQ9aSVkgk0mGXS9UNgX64K5VdRMoBWw1iXHdaw=;
- b=q945bKmjtdBzXdK9vxfQYEoBcHZaZHBHuQrhXNMOsd7lZ3WMJSn5KirlPoZMCBdJKP
- Rxrsm0pvZuwPtf+TJ4C94Nd+smFkLhtl+UbrR8d1oZgs9rzqsWmLAPU0nDcNL/xkJ4TI
- +LdU2Xi5yZ17BcheEdgAa/stkH/DsDb59R7ZqZudL+hEC9jCD/cShlyWQFqYTptGMQZ4
- Rzd8ZzOGBGl20RwrV0N5itGtU9pwIxfyiUC12goYo0u6D4ncas+sH8NtN04DFL899NtK
- 3PRzEZfzoWMpPdXyFSRVbY6z8nqUGhVS6bKvtjSxsdq30mPL++Th4co/tkZpzLj1xwe+
- s1wg==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jnU43-0006Nx-0b; Mon, 22 Jun 2020 17:33:16 -0400
+Received: by mail-il1-x143.google.com with SMTP id x18so17426214ilp.1;
+ Mon, 22 Jun 2020 14:33:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rubvoy2h9dj43M6haU17R2Jj0U2JGfulVap4b2+HV3E=;
+ b=MU1rudWMMjLWg3D6rZjVl0BxvQ+V5vIb/5gcRp017isnGCtSUqZ+ceCQyyAOlLo8ZM
+ 6T1Y07AZ9O9EFIDCv6j8uzrvuYIiFaTVru770EYko5pUeLrF7Tg7fXD3empyg4d/DgQT
+ Dte7lJijv85lHtto7IMfxLhbUhMs8kVtZsWLS3tjl45DVDPaeToAayFfP/CEPwNye0AB
+ 5y3XzsmrN2vIcv4oloStXXSdfnR79N17HeQbxCR4Y6T65d1E1ccHY3zew8k3prIeXfOf
+ q+Cjamr5VQXtu8Z3LJ2/geXCFTcOBGSZ8k5l2B67DVW5RTbae5shgyXrWMD/3VHPbgOZ
+ Biow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=a1lkXyQ9aSVkgk0mGXS9UNgX64K5VdRMoBWw1iXHdaw=;
- b=oQocCez5MpOwPpoyBqlygc1A6mXGTnz9917Gbyog4+ldhAKJmrTyBltFr3N/5/deXV
- gXS7oxKaCEN9JTTjoS4F+9DVDBnO9WVXiP2rI+BnHJ/kcZUm2d+tPZZF+RYHh20A1acD
- npE2BPcauQnCDMSqfFCHSkcyDVAGjQF6/KH+hwgYe53ZoP7Jj+47zGVrdAz5/Y/QZuvW
- DB51fHgvE6PR/rD9Uv6shWKloNxuSQ1awX+QOWHBmgBoD3m1Mr8Mlsyc384C0Wo/oNuG
- YOF42AmjK7IMdflTMxpnNYkLvJBTEkwNQrwBL8Q6svopP+dB3pviGy/JKVXProtjE01Z
- wixg==
-X-Gm-Message-State: AOAM531Q7O2vvO1uKyXm0joh/wpTP0PnYiZrmmbyYGkmUOIMUrVWszsx
- TQQN9ORBre3wG/1hDtkb0e3kaA==
-X-Google-Smtp-Source: ABdhPJyZGqPr6GJa21asZITlwkTlYoMY9xfBPvqK/QY86/A9rFYDCPFGmXurjL7CwSIJhOTZ9KOg5A==
-X-Received: by 2002:aca:554c:: with SMTP id j73mr14628599oib.172.1592861560253; 
- Mon, 22 Jun 2020 14:32:40 -0700 (PDT)
-Received: from minyard.net ([2001:470:b8f6:1b:acca:171:3424:849f])
- by smtp.gmail.com with ESMTPSA id z5sm3568876otp.28.2020.06.22.14.32.39
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 22 Jun 2020 14:32:39 -0700 (PDT)
-Date: Mon, 22 Jun 2020 16:32:37 -0500
-From: Corey Minyard <cminyard@mvista.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] i2c: Match parameters of i2c_start_transfer and
- i2c_send_recv
-Message-ID: <20200622213237.GB3258@minyard.net>
-References: <20200621145235.9E241745712@zero.eik.bme.hu>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rubvoy2h9dj43M6haU17R2Jj0U2JGfulVap4b2+HV3E=;
+ b=ICejKYHAA6bAeONNlmF7FjcrLcUUJS+9VEys//3wRr63bICTuVJSgeao+VC1ZerTeP
+ i/2P2LECi4U1roDjYaW2bz50qtUcCcnXE4Q1dGPtXrJ98YrJgpJ9K3CBwC1ap2r80oRI
+ xQ/QcZVvoTbC0G0kQSizeKffoTMfbEX3/MVHuWx2HHlN0SmxzBT7q3Ti6f6E8ouygCNr
+ 81tH3fZGezzAsd4wagEIWzfAuGGToUh5bT7gUzUvFaffJ/f77i3EYmqhUEXHFsQCERQj
+ MYdztij438jfJeJgycfnUS2mgCy+X+1xhJltnwq8GAfDC2PNHk3QcYiYTdgagp6R86Kv
+ In5Q==
+X-Gm-Message-State: AOAM531XSe8WgsOiqT5U+nvvC0dNc79JQrzGMGawaVYK9NGic+7WXtmx
+ 8uLrzmJkjAVxJ7kPPLr6OLZr0nClHd174YrRIBjH6SZx
+X-Google-Smtp-Source: ABdhPJx3zLP+jqYHUX5mL1kxyY+1K1xfY7PZrzBQN/RhbkbOsL1DkVvf18FOy+Jg5dDPOIqIlRAEdBHnftZbw88DC5Q=
+X-Received: by 2002:a92:d647:: with SMTP id x7mr19941431ilp.267.1592861588354; 
+ Mon, 22 Jun 2020 14:33:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200621145235.9E241745712@zero.eik.bme.hu>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: permerror client-ip=2607:f8b0:4864:20::243;
- envelope-from=cminyard@mvista.com; helo=mail-oi1-x243.google.com
+References: <20200622104250.1404835-1-armbru@redhat.com>
+ <20200622104250.1404835-19-armbru@redhat.com>
+In-Reply-To: <20200622104250.1404835-19-armbru@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 22 Jun 2020 14:23:36 -0700
+Message-ID: <CAKmqyKOhfK2FcibsM_LxhcpekWZw=0S6+BsjL22xowzj0cX=5g@mail.gmail.com>
+Subject: Re: [PATCH 18/22] riscv/sifive_u: Fix sifive_u_soc_realize() error
+ API violations
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,168 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: cminyard@mvista.com
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 21, 2020 at 04:43:38PM +0200, BALATON Zoltan wrote:
-> These functions have a parameter that decides the direction of
-> transfer but totally confusingly they don't match but inverted sense.
-> To avoid frequent mistakes when using these functions change
-> i2c_send_recv to match i2c_start_transfer. Also use bool in
-> i2c_start_transfer instead of int to match i2c_send_recv.
+On Mon, Jun 22, 2020 at 3:55 AM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+> pointer to a variable containing NULL.  Passing an argument of the
+> latter kind twice without clearing it in between is wrong: if the
+> first call sets an error, it no longer points to NULL for the second
+> call.
+>
+> sifive_u_soc_realize() is wrong that way: it passes &err to
+> sysbus_realize() three times before checking it.  Harmless, because
+> the first two can't actually fail (I think).
+>
+> Fix by checking for failure right away.
+>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Bin Meng <bmeng.cn@gmail.com>
+> Cc: qemu-riscv@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Hmm, I have to admit that this is a little better.  Indeed the
-hw/misc/auxbus.c looks suspicious.  I can't imagine that code has ever
-been tested.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-I don't know the policy on changing an API like this with silent
-semantic changes.  You've gotten all the internal ones; I'm wondering if
-we worry about silently breaking out of tree things.
+Alistair
 
-I'll pull this into my tree, but hopefully others will comment on this.
-
--corey
-
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
-> Looks like hw/misc/auxbus.c already got this wrong and calls both
-> i2c_start_transfer and i2c_send_recv with same is_write parameter.
-> Although the name of the is_write variable suggest this may need to be
-> inverted I'm not sure what that value actially means and which usage
-> was correct so I did not touch it. Someone knowing this device might
-> want to review and fix it.
-> 
->  hw/display/sm501.c   |  2 +-
->  hw/i2c/core.c        | 34 +++++++++++++++++-----------------
->  hw/i2c/ppc4xx_i2c.c  |  2 +-
->  include/hw/i2c/i2c.h |  4 ++--
->  4 files changed, 21 insertions(+), 21 deletions(-)
-> 
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 2db347dcbc..ccd0a6e376 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -1034,7 +1034,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
->                      int i;
->                      for (i = 0; i <= s->i2c_byte_count; i++) {
->                          res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-> -                                            !(s->i2c_addr & 1));
-> +                                            s->i2c_addr & 1);
->                          if (res) {
->                              s->i2c_status |= SM501_I2C_STATUS_ERROR;
->                              return;
-> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-> index 1aac457a2a..c9d01df427 100644
-> --- a/hw/i2c/core.c
-> +++ b/hw/i2c/core.c
-> @@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
->   * without releasing the bus.  If that fails, the bus is still
->   * in a transaction.
->   */
-> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
-> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
->  {
->      BusChild *kid;
->      I2CSlaveClass *sc;
-> @@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
->      bus->broadcast = false;
->  }
->  
-> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
-> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
->  {
->      I2CSlaveClass *sc;
->      I2CSlave *s;
->      I2CNode *node;
->      int ret = 0;
->  
-> -    if (send) {
-> -        QLIST_FOREACH(node, &bus->current_devs, next) {
-> -            s = node->elt;
-> -            sc = I2C_SLAVE_GET_CLASS(s);
-> -            if (sc->send) {
-> -                trace_i2c_send(s->address, *data);
-> -                ret = ret || sc->send(s, *data);
-> -            } else {
-> -                ret = -1;
-> -            }
-> -        }
-> -        return ret ? -1 : 0;
-> -    } else {
-> +    if (recv) {
->          ret = 0xff;
->          if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
->              sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
-> @@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
->          }
->          *data = ret;
->          return 0;
-> +    } else {
-> +        QLIST_FOREACH(node, &bus->current_devs, next) {
-> +            s = node->elt;
-> +            sc = I2C_SLAVE_GET_CLASS(s);
-> +            if (sc->send) {
-> +                trace_i2c_send(s->address, *data);
-> +                ret = ret || sc->send(s, *data);
-> +            } else {
-> +                ret = -1;
-> +            }
-> +        }
-> +        return ret ? -1 : 0;
->      }
->  }
->  
->  int i2c_send(I2CBus *bus, uint8_t data)
->  {
-> -    return i2c_send_recv(bus, &data, true);
-> +    return i2c_send_recv(bus, &data, false);
->  }
->  
->  uint8_t i2c_recv(I2CBus *bus)
->  {
->      uint8_t data = 0xff;
->  
-> -    i2c_send_recv(bus, &data, false);
-> +    i2c_send_recv(bus, &data, true);
->      return data;
->  }
->  
-> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> index c0a8e04567..d3899203a4 100644
-> --- a/hw/i2c/ppc4xx_i2c.c
-> +++ b/hw/i2c/ppc4xx_i2c.c
-> @@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->                      }
->                  }
->                  if (!(i2c->sts & IIC_STS_ERR) &&
-> -                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
-> +                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
->                      i2c->sts |= IIC_STS_ERR;
->                      i2c->extsts |= IIC_EXTSTS_XFRA;
->                      break;
-> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> index 4117211565..a09ab9230b 100644
-> --- a/include/hw/i2c/i2c.h
-> +++ b/include/hw/i2c/i2c.h
-> @@ -72,10 +72,10 @@ struct I2CBus {
->  I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
->  void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
->  int i2c_bus_busy(I2CBus *bus);
-> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
-> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
->  void i2c_end_transfer(I2CBus *bus);
->  void i2c_nack(I2CBus *bus);
-> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
-> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
->  int i2c_send(I2CBus *bus, uint8_t data);
->  uint8_t i2c_recv(I2CBus *bus);
->  
-> -- 
-> 2.21.3
-> 
+>  hw/riscv/sifive_u.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index ea197ab64f..3857b92d9a 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -587,11 +587,15 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>          memmap[SIFIVE_U_CLINT].size, ms->smp.cpus,
+>          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, false);
+>
+> -    sysbus_realize(SYS_BUS_DEVICE(&s->prci), &err);
+> +    if (!sysbus_realize(SYS_BUS_DEVICE(&s->prci), errp)) {
+> +        return;
+> +    }
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
+>
+>      qdev_prop_set_uint32(DEVICE(&s->otp), "serial", s->serial);
+> -    sysbus_realize(SYS_BUS_DEVICE(&s->otp), &err);
+> +    if (!sysbus_realize(SYS_BUS_DEVICE(&s->otp), errp)) {
+> +        return;
+> +    }
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
+>
+>      for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
+> --
+> 2.26.2
+>
+>
 
