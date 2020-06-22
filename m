@@ -6,76 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8E7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8ABC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:45:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9AB42071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F0F2206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:45:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ejfR3EiY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9AB42071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d5Plj+xg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0F2206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJ0q-0007ET-T0
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:45:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53850)
+	id 1jnJ0s-0007Ki-F7
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:45:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyM-0001Ym-Ie
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38830
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyP-0001fH-HT
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31749
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyH-0003um-Pk
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:38 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyJ-0003vd-4H
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592818952;
+ s=mimecast20190719; t=1592818954;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r3ziOl0TQtuN8Hk5VE8mKCHKuPJz/7ZXzmfJOEGhKDY=;
- b=ejfR3EiYA4qBw6v54AHgcOkAjhlVn/eutP0fVVuYTP0NKqeC0FZgj9Z2yNKZTBKSCXKaY2
- B0M2yEtPx7JMWP0yRYOYapcHobWXDF7ENbFhhlq962yWCDpfC5N3A3NowBgfqtssqYFxOi
- slmWwkqF0v9igoqVb/j6nvk6/o80WzI=
+ bh=JJcyVEfmpUlPXV+7Txg+19ksSRhNUXebEHc8TmRn96A=;
+ b=d5Plj+xgo9M/ZPyxoDeAjY5ASD8oA8InfhP6hBRs2eWZMWzJfmK6LYGF8IewYXccdYbXX/
+ 2KATBdUJOtBmUDcglwO8ozJO9c4uv88jq8XV6qD1kvjUyke4PBzK5pQWy58ypa+orYSRDU
+ k8JitkN323AZFLSJ3VUUNDVmDFK8Cbo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-wYf7G-ebOvSiyrtzUfWR9w-1; Mon, 22 Jun 2020 05:42:30 -0400
-X-MC-Unique: wYf7G-ebOvSiyrtzUfWR9w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-262-DXpjWq38NZe_ccnLI573zA-1; Mon, 22 Jun 2020 05:42:32 -0400
+X-MC-Unique: DXpjWq38NZe_ccnLI573zA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E62C6107ACF3;
- Mon, 22 Jun 2020 09:42:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70F42EC1A0;
+ Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D3155BACF;
- Mon, 22 Jun 2020 09:42:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 123AF1A265;
+ Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BCB18113846F; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
+ id D87D01138476; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/16] iotests/172: Include "info block" in test output
-Date: Mon, 22 Jun 2020 11:42:12 +0200
-Message-Id: <20200622094227.1271650-2-armbru@redhat.com>
+Subject: [PATCH v2 08/16] blockdev: Deprecate -drive with bogus interface type
+Date: Mon, 22 Jun 2020 11:42:19 +0200
+Message-Id: <20200622094227.1271650-9-armbru@redhat.com>
 In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
 References: <20200622094227.1271650-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,759 +101,150 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The additional output demonstrates we screw up when -global isa-fdc
-clashes with -drive if=floppy or its sugared forms: according to "info
-qtree", only the latter backend is attached, but according to "info
-block", both are.  For instance:
+Drives with interface types other than if=none are for onboard
+devices.  Unfortunately, any such drives the board doesn't pick up can
+still be used with -device, like this:
 
-    Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
+    $ qemu-system-x86_64 -nodefaults -display none -S -drive if=floppy,id=bogus,unit=7 -device ide-cd,drive=bogus -monitor stdio
+    QEMU 5.0.50 monitor - type 'help' for more information
+    (qemu) info block
+    bogus: [not inserted]
+	Attached to:      /machine/peripheral-anon/device[0]
+	Removable device: not locked, tray closed
+    (qemu) info qtree
+    bus: main-system-bus
+      type System
+      [...]
+	    bus: ide.1
+	      type IDE
+	      dev: ide-cd, id ""
+--->		drive = "bogus"
+		[...]
+		unit = 0 (0x0)
+      [...]
 
-	      dev: isa-fdc, id ""
-	        [...]
-		driveA = ""
-		driveB = ""
-                [...]
-                bus: floppy-bus.0
-                  type floppy-bus
-                  dev: floppy, id ""
-                    unit = 0 (0x0)
---->                drive = "floppy0"
-    [...]
-    floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
---->    Attached to:      /machine/unattached/device[15]
-        Removable device: not locked, tray closed
-        Cache mode:       writeback
+This kind of abuse has always worked.  Deprecate it:
 
-    none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
---->    Attached to:      /machine/unattached/device[14]
-        Cache mode:       writeback
-
-/machine/unattached/device[15] is floppy, and
-/machine/unattached/device[14] is isa-fdc.
+    qemu-system-x86_64: -drive if=floppy,id=bogus,unit=7: warning: bogus if=floppy is deprecated, use if=none
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/qemu-iotests/172     |   5 +-
- tests/qemu-iotests/172.out | 486 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 489 insertions(+), 2 deletions(-)
+ docs/system/deprecated.rst |  8 ++++++++
+ include/sysemu/blockdev.h  |  2 ++
+ blockdev.c                 | 27 +++++++++++++++++++++++++--
+ softmmu/vl.c               |  8 ++++++++
+ 4 files changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 7195fb895a..19c2516cf8 100755
---- a/tests/qemu-iotests/172
-+++ b/tests/qemu-iotests/172
-@@ -69,9 +69,10 @@ check_floppy_qtree()
-     #
-     # Apply the sed filter to stdout only, but keep the stderr output and
-     # filter the qemu program name in it.
--    echo "info qtree" |
-+    printf "info qtree\ninfo block\n" |
-     (QEMU_OPTIONS="" do_run_qemu "$@" |
--        sed -ne '/^          dev: isa-fdc/,/^          dev:/{x;p}' ) 2>&1 |
-+	_filter_testdir |_filter_generated_node_ids | _filter_hmp |
-+        sed -ne '/^          dev: isa-fdc/,/^          dev:/{x;p};/^[a-z][^ ]* (NODE_NAME):* /,/^(qemu)$/{p}') 2>&1 |
-     _filter_win32 | _filter_qemu
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 6f8bf19d37..728233a8ff 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -190,6 +190,14 @@ become
+ 
+     -device floppy,unit=1,drive=...
+ 
++``-drive`` with bogus interface type
++''''''''''''''''''''''''''''''''''''
++
++Drives with interface types other than ``if=none`` are for onboard
++devices.  It is possible to use drives the board doesn't pick up with
++-device.  This usage is now deprecated.  Use ``if=none`` instead.
++
++
+ QEMU Machine Protocol (QMP) commands
+ ------------------------------------
+ 
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index a86d99b3d8..3b5fcda08d 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -35,6 +35,7 @@ struct DriveInfo {
+     bool is_default;            /* Added by default_drive() ?  */
+     int media_cd;
+     QemuOpts *opts;
++    bool claimed_by_board;
+     QTAILQ_ENTRY(DriveInfo) next;
+ };
+ 
+@@ -45,6 +46,7 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo);
+ void override_max_devs(BlockInterfaceType type, int max_devs);
+ 
+ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
++void drive_mark_claimed_by_board(void);
+ void drive_check_orphaned(void);
+ DriveInfo *drive_get_by_index(BlockInterfaceType type, int index);
+ int drive_get_max_bus(BlockInterfaceType type);
+diff --git a/blockdev.c b/blockdev.c
+index 72df193ca7..31d5eaf6bf 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -239,6 +239,19 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
+     return NULL;
  }
  
-diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-index e782c5957e..a315866e17 100644
---- a/tests/qemu-iotests/172.out
-+++ b/tests/qemu-iotests/172.out
-@@ -62,6 +62,19 @@ Testing: -fda TEST_DIR/t.qcow2
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
++void drive_mark_claimed_by_board(void)
++{
++    BlockBackend *blk;
++    DriveInfo *dinfo;
 +
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
++    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
++        dinfo = blk_legacy_dinfo(blk);
++        if (dinfo && blk_get_attached_dev(blk)) {
++            dinfo->claimed_by_board = true;
++        }
++    }
++}
 +
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
+ void drive_check_orphaned(void)
+ {
+     BlockBackend *blk;
+@@ -248,8 +261,10 @@ void drive_check_orphaned(void)
  
- Testing: -fdb TEST_DIR/t.qcow2
+     for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+         dinfo = blk_legacy_dinfo(blk);
+-        if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+-            dinfo->type != IF_NONE) {
++        if (dinfo->is_default || dinfo->type == IF_NONE) {
++            continue;
++        }
++        if (!blk_get_attached_dev(blk)) {
+             loc_push_none(&loc);
+             qemu_opts_loc_restore(dinfo->opts);
+             error_report("machine type does not support"
+@@ -257,6 +272,14 @@ void drive_check_orphaned(void)
+                          if_name[dinfo->type], dinfo->bus, dinfo->unit);
+             loc_pop(&loc);
+             orphans = true;
++            continue;
++        }
++        if (!dinfo->claimed_by_board && dinfo->type != IF_VIRTIO) {
++            loc_push_none(&loc);
++            qemu_opts_loc_restore(dinfo->opts);
++            warn_report("bogus if=%s is deprecated, use if=none",
++                        if_name[dinfo->type]);
++            loc_pop(&loc);
+         }
+     }
  
-@@ -100,6 +113,23 @@ Testing: -fdb TEST_DIR/t.qcow2
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "288"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+floppy0: [not inserted]
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f669c06ede..3e15ee2435 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -4347,6 +4347,14 @@ void qemu_init(int argc, char **argv, char **envp)
+     /* from here on runstate is RUN_STATE_PRELAUNCH */
+     machine_run_board_init(current_machine);
  
- Testing: -fda TEST_DIR/t.qcow2 -fdb TEST_DIR/t.qcow2.2
++    /*
++     * TODO To drop support for deprecated bogus if=..., move
++     * drive_check_orphaned() here, replacing this call.  Also drop
++     * its deprecation warning, along with DriveInfo member
++     * @claimed_by_board.
++     */
++    drive_mark_claimed_by_board();
++
+     realtime_init();
  
-@@ -138,6 +168,24 @@ Testing: -fda TEST_DIR/t.qcow2 -fdb TEST_DIR/t.qcow2.2
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Using -drive options ===
-@@ -168,6 +216,19 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=floppy,file=TEST_DIR/t.qcow2,index=1
- 
-@@ -206,6 +267,23 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2,index=1
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "288"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+floppy0: [not inserted]
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=floppy,file=TEST_DIR/t.qcow2.2,index=1
- 
-@@ -244,6 +322,24 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=floppy,file=TEST_DIR/t
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Using -drive if=none and -global ===
-@@ -274,6 +370,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
- 
-@@ -301,6 +410,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
- 
-@@ -339,6 +461,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Using -drive if=none and -device ===
-@@ -369,6 +509,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
- 
-@@ -396,6 +549,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0 -device floppy,drive=none1,unit=1
- 
-@@ -434,6 +600,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[1]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Mixing -fdX and -global ===
-@@ -475,6 +659,24 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
- 
-@@ -513,6 +715,24 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[16]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[23]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
- 
-@@ -540,6 +760,23 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[14]
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
- 
-@@ -567,6 +804,23 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/unattached/device[14]
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Mixing -fdX and -device ===
-@@ -608,6 +862,24 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device fl
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=1
- 
-@@ -646,6 +918,24 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device fl
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0
- 
-@@ -684,6 +974,24 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device fl
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
- 
-@@ -722,6 +1030,24 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device fl
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
- QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
-@@ -769,6 +1095,24 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.q
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=1
- 
-@@ -807,6 +1151,24 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.q
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
- QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
-@@ -851,6 +1213,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
- 
-@@ -889,6 +1269,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
- 
-@@ -927,6 +1325,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
- 
-@@ -965,6 +1381,24 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/unattached/device[15]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[22]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
- QEMU_PROG: -device floppy,drive=none1,unit=0: Floppy unit 0 is in use
-@@ -1118,6 +1552,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,drive-t
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "120"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,drive-type=288
- 
-@@ -1145,6 +1592,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,drive-t
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "288"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- 
- === Try passing different block sizes ===
-@@ -1175,6 +1635,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,logical
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physical_block_size=512
- 
-@@ -1202,6 +1675,19 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physica
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
-+    Attached to:      /machine/peripheral-anon/device[0]
-+    Removable device: not locked, tray closed
-+    Cache mode:       writeback
-+
-+ide1-cd0: [not inserted]
-+    Attached to:      /machine/unattached/device[21]
-+    Removable device: not locked, tray closed
-+
-+sd0: [not inserted]
-+    Removable device: not locked, tray closed
-+(qemu) quit
-+
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,logical_block_size=4096
- QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: logical_block_size > physical_block_size not supported
+     soundhw_init();
 -- 
 2.26.2
 
