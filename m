@@ -6,70 +6,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB0DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F77C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A36206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:50:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0233206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NaquBRfe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A36206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjhRUcwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0233206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJ6B-0007p2-BO
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54136)
+	id 1jnJ7A-0000fB-SI
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:51:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyX-00022p-SO
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56934
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyQ-0001i4-Mu
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31778
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyL-0003xN-KJ
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:49 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyJ-0003vm-8g
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592818957;
+ s=mimecast20190719; t=1592818954;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PNSUg65sBMztUOY92rbEKRLBu711gTzd5r/0Dot1g54=;
- b=NaquBRfeA2yysdciK2MtL2m6x4kt5YQsAdQ/rUulzrzHi5hr1u8T3Nnx616ZjzLHoZsG3v
- t9q4pgnNl9xUbGiXbNlPhglbOm2LEgbkn/iwUeaJLTevRr8x/dVvy0VTV1MmwhbisMwbFK
- Snt3vqLe1IGvM1JB8OdDUeecCOTYRo8=
+ bh=BJFUTQwdKeAYezPL2T3uhjJOrjxgznocTtN32T4xqA0=;
+ b=SjhRUcwk2Skfg219f8HYCkX2/SJfjaix3OibVjXFZ0hDe2ksFyq8ZhEjES9RqjvXnwrbmm
+ lR1vxLNVUoWMYCGIN7MaTYpZTV4/Yq1yBQWqFLWdxsaNVkfoiOXJRwPtEYWykk1G3xn+BM
+ inwyRhoi6TXsgWJ6vhf+Vjvv4NqLI/k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-vRzIwnufPoGp5Pl1IH7JHw-1; Mon, 22 Jun 2020 05:42:35 -0400
-X-MC-Unique: vRzIwnufPoGp5Pl1IH7JHw-1
+ us-mta-43-JX1X9CmaMqqHYlF6aNiWRQ-1; Mon, 22 Jun 2020 05:42:32 -0400
+X-MC-Unique: JX1X9CmaMqqHYlF6aNiWRQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5921C835B42;
- Mon, 22 Jun 2020 09:42:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 501968018AB;
+ Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A33F10002BC;
- Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E412710013D2;
+ Mon, 22 Jun 2020 09:42:30 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0A884113847A; Mon, 22 Jun 2020 11:42:28 +0200 (CEST)
+ id D0B591138474; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/16] qdev: Reject chardev property override
-Date: Mon, 22 Jun 2020 11:42:23 +0200
-Message-Id: <20200622094227.1271650-13-armbru@redhat.com>
+Subject: [PATCH v2 06/16] fdc: Deprecate configuring floppies with -global
+ isa-fdc
+Date: Mon, 22 Jun 2020 11:42:17 +0200
+Message-Id: <20200622094227.1271650-7-armbru@redhat.com>
 In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
 References: <20200622094227.1271650-1-armbru@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -95,62 +98,265 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, mreitz@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- pbonzini@redhat.com, jsnow@redhat.com
+ qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qdev_prop_set_chr() screws up when the property already has a non-null
-value: it neglects to release the old value.  Both the old and the new
-backend become attached to the same device.  Unlike for block devices
-(see previous commit), this can't be observed from the monitor (I
-think).
+Deprecate
 
-Example: -serial null -chardev null,id=chr0 -global isa-serial.chardev=chr0
+    -global isa-fdc.driveA=...
+    -global isa-fdc.driveB=...
 
-Special case: attempting to use the same backend both times crashes:
+in favour of
 
-    $ qemu-system-x86_64 --nodefaults -serial null -global isa-serial.chardev=serial0
-    Unexpected error in qemu_chr_fe_init() at /work/armbru/qemu/chardev/char-fe.c:220:
-    qemu-system-x86_64: Device 'serial0' is in use
-    Aborted (core dumped)
+    -device floppy,unit=0,drive=...
+    -device floppy,unit=1,drive=...
 
-Yet another example: -device with multiple chardev=... (but not
-device_add, which silently drops all but the last duplicate property).
+Same for the other floppy controller devices.
 
-Perhaps chardev property override could be made to work.  Perhaps it
-should.  I can't afford the time to figure this out now.  What I can
-do reject usage that leaves backends in unhealthy states.  For what
-it's worth, we've long done the same for netdev properties.
-
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: John Snow <jsnow@redhat.com>
 ---
- hw/core/qdev-properties-system.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ docs/qdev-device-use.txt   | 13 ++++---------
+ docs/system/deprecated.rst | 26 ++++++++++++++++++++++++++
+ hw/block/fdc.c             | 17 +++++++++++++++++
+ tests/qemu-iotests/172.out | 30 ++++++++++++++++++++++++++++++
+ 4 files changed, 77 insertions(+), 9 deletions(-)
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index 6b5fc59901..2561fa09a8 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -244,6 +244,14 @@ static void set_chr(Object *obj, Visitor *v, const char *name, void *opaque,
-         return;
-     }
+diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
+index cc53e97dcd..3d781be547 100644
+--- a/docs/qdev-device-use.txt
++++ b/docs/qdev-device-use.txt
+@@ -104,15 +104,10 @@ The -device argument differs in detail for each type of drive:
  
-+    /*
-+     * TODO Should this really be an error?  If no, the old value
-+     * needs to be released before we store the new one.
-+     */
-+    if (!check_prop_still_unset(dev, name, be->chr, str, errp)) {
-+        return;
-+    }
+ * if=floppy
+ 
+-  -global isa-fdc.driveA=DRIVE-ID
+-  -global isa-fdc.driveB=DRIVE-ID
++  -device floppy,unit=UNIT,drive=DRIVE-ID
+ 
+-  This is -global instead of -device, because the floppy controller is
+-  created automatically, and we want to configure that one, not create
+-  a second one (which isn't possible anyway).
+-
+-  Without any -global isa-fdc,... you get an empty driveA and no
+-  driveB.  You can use -nodefaults to suppress the default driveA, see
++  Without any -device floppy,... you get an empty unit 0 and no unit
++  1.  You can use -nodefaults to suppress the default unit 0, see
+   "Default Devices".
+ 
+ * if=virtio
+@@ -385,7 +380,7 @@ some DEVNAMEs:
+ 
+     default device      suppressing DEVNAMEs
+     CD-ROM              ide-cd, ide-drive, ide-hd, scsi-cd, scsi-hd
+-    isa-fdc's driveA    floppy, isa-fdc
++    floppy              floppy, isa-fdc
+     parallel            isa-parallel
+     serial              isa-serial
+     VGA                 VGA, cirrus-vga, isa-vga, isa-cirrus-vga,
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 3a255591c3..6f8bf19d37 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -164,6 +164,32 @@ previously available ``-tb-size`` option.
+ Use ``-display sdl,show-cursor=on`` or
+  ``-display gtk,show-cursor=on`` instead.
+ 
++``Configuring floppies with ``-global``
++'''''''''''''''''''''''''''''''''''''''
 +
-     if (!*str) {
-         g_free(str);
-         be->chr = NULL;
++Use ``-device floppy,...`` instead:
++::
++
++    -global isa-fdc.driveA=...
++    -global sysbus-fdc.driveA=...
++    -global SUNW,fdtwo.drive=...
++
++become
++::
++
++    -device floppy,unit=0,drive=...
++
++and
++::
++
++    -global isa-fdc.driveB=...
++    -global sysbus-fdc.driveB=...
++
++become
++::
++
++    -device floppy,unit=1,drive=...
++
+ QEMU Machine Protocol (QMP) commands
+ ------------------------------------
+ 
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index d1f7722cff..7e143cbab0 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -2528,6 +2528,7 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+     DeviceState *dev;
+     BlockBackend *blk;
+     Error *local_err = NULL;
++    const char *fdc_name, *drive_suffix;
+ 
+     for (i = 0; i < MAX_FD; i++) {
+         drive = &fdctrl->drives[i];
+@@ -2542,10 +2543,26 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+             continue;
+         }
+ 
++        fdc_name = object_get_typename(OBJECT(fdc_dev));
++        drive_suffix = !strcmp(fdc_name, "SUNW,fdtwo") ? "" : i ? "B" : "A";
++        warn_report("warning: property %s.drive%s is deprecated",
++                    fdc_name, drive_suffix);
++        error_printf("Use -device floppy,unit=%d,drive=... instead.\n", i);
++
+         dev = qdev_new("floppy");
+         qdev_prop_set_uint32(dev, "unit", i);
+         qdev_prop_set_enum(dev, "drive-type", fdctrl->qdev_for_drives[i].type);
+ 
++        /*
++         * Hack alert: we move the backend from the floppy controller
++         * device to the floppy device.  We first need to detach the
++         * controller, or else floppy_create()'s qdev_prop_set_drive()
++         * will die when it attaches floppy device.  We also need to
++         * take another reference so that blk_detach_dev() doesn't
++         * free blk while we still need it.
++         *
++         * The hack is probably a bad idea.
++         */
+         blk_ref(blk);
+         blk_detach_dev(blk, fdc_dev);
+         fdctrl->qdev_for_drives[i].blk = NULL;
+diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
+index 340dbd39cb..778406e4bf 100644
+--- a/tests/qemu-iotests/172.out
++++ b/tests/qemu-iotests/172.out
+@@ -383,6 +383,8 @@ sd0: [not inserted]
+ === Using -drive if=none and -global ===
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -423,6 +425,8 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -463,6 +467,10 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -661,6 +669,8 @@ sd0: [not inserted]
+ === Mixing -fdX and -global ===
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -717,6 +727,8 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -773,9 +785,13 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ QEMU_PROG: Floppy unit 0 is in use
+ 
+ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ QEMU_PROG: Floppy unit 1 is in use
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0
+@@ -1177,6 +1193,8 @@ QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
+ === Mixing -global and -device ===
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -1233,6 +1251,8 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -1289,6 +1309,8 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -1345,6 +1367,8 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -1441,9 +1465,13 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
++QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
++Use -device floppy,unit=0,drive=... instead.
+ QEMU_PROG: -device floppy,drive=none1,unit=0: Floppy unit 0 is in use
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=1
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ QEMU_PROG: -device floppy,drive=none1,unit=1: Floppy unit 1 is in use
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0 -device floppy,drive=none1,unit=0
+@@ -1512,6 +1540,8 @@ QEMU_PROG: -device floppy,drive=floppy0: Property 'floppy.drive' can't find valu
+ === Too many floppy drives ===
+ 
+ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -drive if=none,file=TEST_DIR/t.qcow2.3 -global isa-fdc.driveB=none0 -device floppy,drive=none1
++QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
++Use -device floppy,unit=1,drive=... instead.
+ QEMU_PROG: -device floppy,drive=none1: Can't create floppy unit 2, bus supports only 2 units
+ 
+ 
 -- 
 2.26.2
 
