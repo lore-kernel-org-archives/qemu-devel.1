@@ -2,58 +2,150 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DATE_IN_PAST_03_06,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CEFEC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE631C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7338C20720
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:31:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7338C20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 6FE4B20720
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:32:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FE4B20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnNUL-0005lg-Nh
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:31:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38362)
+	id 1jnNUj-00065g-BD
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:32:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jnNOt-0005Bu-3j
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:26:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47422)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jnNQJ-0007o0-19; Mon, 22 Jun 2020 10:27:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58194)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jnNOq-0004pC-IE
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:26:18 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 9DB39C1C7;
- Mon, 22 Jun 2020 14:26:13 +0000 (UTC)
-From: Claudio Fontana <cfontana@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- Markus Armbruster <armbru@redhat.com>
-Subject: [RFC v7 0/4] QEMU cpus.c refactoring
-Date: Mon, 22 Jun 2020 12:11:06 +0200
-Message-Id: <20200622101110.3263-1-cfontana@suse.de>
-X-Mailer: git-send-email 2.16.4
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 06:47:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jnNQG-0004xR-W6; Mon, 22 Jun 2020 10:27:46 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05ME2Lic190982; Mon, 22 Jun 2020 10:27:35 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31swph2j8q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 22 Jun 2020 10:27:35 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05ME2xjG193904;
+ Mon, 22 Jun 2020 10:27:34 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31swph2j77-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 22 Jun 2020 10:27:34 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEPFuJ010868;
+ Mon, 22 Jun 2020 14:27:32 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03fra.de.ibm.com with ESMTP id 31sa381crj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 22 Jun 2020 14:27:32 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05MERTTs65077266
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 22 Jun 2020 14:27:29 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2F3BAAE045;
+ Mon, 22 Jun 2020 14:27:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6B043AE04D;
+ Mon, 22 Jun 2020 14:27:28 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 22 Jun 2020 14:27:28 +0000 (GMT)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
+ dgilbert@redhat.com, frankja@linux.ibm.com
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
+Date: Mon, 22 Jun 2020 16:27:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-22_07:2020-06-22,
+ 2020-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 suspectscore=0
+ spamscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 clxscore=1011 malwarescore=0 adultscore=0
+ priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006220102
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 09:01:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,287 +158,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
- haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>, Claudio Fontana <cfontana@suse.de>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ david@redhat.com, cohuck@redhat.com, mdroth@linux.vnet.ibm.com,
+ pasic@linux.ibm.com, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-s390x@nongnu.org, mst@redhat.com, qemu-ppc@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Motivation and higher level steps:
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
-
-MAIN OPEN POINTS:
-
-* confirmation on hvf state (Roman).
-
-* missing reviewed-by for patch 4 in the series
-
-OTHER DISCUSSIONS:
-
-* naming of "cpus.c" and functions, more cpus_ prefix use? (Roman)
-
-* should we accept the addional clunkyness and overhead for each call of
-  the kick and CPU sync state for all archs/accels of putting CpusAccel
-  inside AccelClass? I would tend towards no here, but welcome further
-  opinions or data if any. (Roman)
-
-* should we reorder patches or moves inside patches to avoid code going
-  from cpus.c to softmmu/cpus.c and then again to softmmu/somethingelse.c ?
-  (Philippe)
-
-* some questions about headers in include/softmmu (Philippe)
-
-----
-
-v6 -> v7:
-
-* rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
-  "icount: make dma reads deterministic"
-
-----
-
-v5 -> v6:
-
-* rebased changes on top of Emilio G. Cota changes to cpus.c
-  "cpu: convert queued work to a QSIMPLEQ"
-
-* keep a pointer in cpus.c instead of a copy of CpusAccel
-  (Alex)
-
-----
-
-
-v4 -> v5: rebase on latest master
-
-* rebased changes on top of roman series to remove one of the extra states for hvf.
-  (Is the result now functional for HVF?)
-
-* rebased changes on top of icount changes and fixes to icount_configure and
-  the new shift vmstate. (Markus)
-
-v3 -> v4:
-
-* overall: added copyright headers to all files that were missing them
-  (used copyright and license of the module the stuff was extracted from).
-  For the new interface files, added SUSE LLC.
-
-* 1/4 (move softmmu only files from root):
-
-  MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
-
-* 2/4 (cpu-throttle):
-
-  MAINTAINERS (to patch 1),
-  copyright Fabrice Bellard and license from cpus.c
-
-* 3/4 (cpu-timers, icount):
-
-  - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
-
-  - break very long lines (patchew)
-
-  - add copyright SUSE LLC, GPLv2 to cpu-timers.h
-
-  - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
-    as it is lifted from cpus.c
-
-  - vl.c: in configure_accelerators bail out if icount_enabled()
-    and !tcg_enabled() as qtest does not enable icount anymore.
-
-* 4/4 (accel stuff to accel):
-
-  - add copyright SUSE LLC to files that mostly only consist of the
-    new interface. Add whatever copyright was in the accelerator code
-    if instead they mostly consist of accelerator code.
-
-  - change a comment to mention the result of the AccelClass experiment
-
-  - moved qtest accelerator into accel/qtest/ , make it like the others.
-
-  - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
-
-  - rename accel_int to cpus_accel
-
-  - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
-
-
---------
-
-v2 -> v3:
-
-* turned into a 4 patch series, adding a first patch moving
-  softmmu code currently in top_srcdir to softmmu/
-
-* cpu-throttle: moved to softmmu/
-
-* cpu-timers, icount:
-
-  - moved to softmmu/
-
-  - fixed assumption of qtest_enabled() => icount_enabled()
-  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
-
-  Fix is in hw/core/ptimer.c,
-
-  where the artificial timeout rate limit should not be applied
-  under qtest_enabled(), in a similar way to how it is not applied
-  for icount_enabled().
-
-* CpuAccelInterface: no change.
-
-
---------
-
-
-v1 -> v2:
-
-* 1/3 (cpu-throttle): provide a description in the commit message
-
-* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
-  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
-
-  To do this, qtest had to be detached from icount. To this end, a
-  trivial global counter for qtest has been introduced.
-
-* 3/3 (CpuAccelInterface): provided a description.
-
-This is point 8) in that plan. The idea is to extract the unrelated parts
-in cpus, and register interfaces from each single accelerator to the main
-cpus module (cpus.c).
-
-While doing this RFC, I noticed some assumptions about Windows being
-either TCG or HAX (not considering WHPX) that might need to be revisited.
-I added a comment there.
-
-The thing builds successfully based on Linux cross-compilations for
-windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
-
-Tests run successully for tcg and kvm configurations, but did not test on
-windows or darwin.
-
-Welcome your feedback and help on this,
-
-Claudio
-
-Claudio Fontana (4):
-  softmmu: move softmmu only files from root
-  cpu-throttle: new module, extracted from cpus.c
-  cpu-timers, icount: new modules
-  cpus: extract out accel-specific code to each accel
-
- MAINTAINERS                                  |   14 +-
- Makefile.target                              |    7 +-
- accel/kvm/Makefile.objs                      |    2 +
- accel/kvm/kvm-all.c                          |   15 +-
- accel/kvm/kvm-cpus-interface.c               |   94 ++
- accel/kvm/kvm-cpus-interface.h               |    8 +
- accel/qtest.c                                |   88 +-
- accel/stubs/kvm-stub.c                       |    3 +-
- accel/tcg/Makefile.objs                      |    1 +
- accel/tcg/cpu-exec.c                         |   43 +-
- accel/tcg/tcg-all.c                          |   19 +-
- accel/tcg/tcg-cpus-interface.c               |  523 ++++++
- accel/tcg/tcg-cpus-interface.h               |    8 +
- accel/tcg/translate-all.c                    |    3 +-
- cpus.c                                       | 2290 --------------------------
- docs/replay.txt                              |    6 +-
- exec.c                                       |    4 -
- hw/core/cpu.c                                |    1 +
- hw/core/ptimer.c                             |    6 +-
- hw/i386/x86.c                                |    1 +
- include/exec/cpu-all.h                       |    4 +
- include/exec/exec-all.h                      |    4 +-
- include/hw/core/cpu.h                        |   37 -
- include/qemu/main-loop.h                     |    5 +
- include/qemu/timer.h                         |   22 +-
- include/sysemu/cpu-throttle.h                |   50 +
- include/sysemu/cpu-timers.h                  |   72 +
- include/sysemu/cpus.h                        |   44 +-
- include/sysemu/hvf.h                         |    1 -
- include/sysemu/hw_accel.h                    |   57 +-
- include/sysemu/kvm.h                         |    2 +-
- include/sysemu/qtest.h                       |    2 +
- include/sysemu/replay.h                      |    4 +-
- migration/migration.c                        |    1 +
- migration/ram.c                              |    1 +
- replay/replay.c                              |    6 +-
- softmmu/Makefile.objs                        |   13 +
- arch_init.c => softmmu/arch_init.c           |    0
- balloon.c => softmmu/balloon.c               |    0
- softmmu/cpu-throttle.c                       |  122 ++
- softmmu/cpu-timers.c                         |  267 +++
- softmmu/cpus.c                               |  741 +++++++++
- softmmu/icount.c                             |  496 ++++++
- ioport.c => softmmu/ioport.c                 |    0
- memory.c => softmmu/memory.c                 |    0
- memory_mapping.c => softmmu/memory_mapping.c |    0
- qtest.c => softmmu/qtest.c                   |   34 +-
- softmmu/timers-state.h                       |   45 +
- softmmu/vl.c                                 |    8 +-
- stubs/Makefile.objs                          |    4 +-
- stubs/clock-warp.c                           |    4 +-
- stubs/cpu-get-clock.c                        |    3 +-
- stubs/cpu-get-icount.c                       |   21 -
- stubs/cpu-synchronize-state.c                |   15 +
- stubs/icount.c                               |   22 +
- stubs/qemu-timer-notify-cb.c                 |    8 +
- stubs/qtest.c                                |    5 +
- target/alpha/translate.c                     |    3 +-
- target/arm/helper.c                          |    7 +-
- target/i386/Makefile.objs                    |    7 +-
- target/i386/hax-all.c                        |    6 +-
- target/i386/hax-cpus-interface.c             |   85 +
- target/i386/hax-cpus-interface.h             |    8 +
- target/i386/hax-i386.h                       |    2 +
- target/i386/hax-posix.c                      |   12 +
- target/i386/hax-windows.c                    |   20 +
- target/i386/hvf/Makefile.objs                |    2 +-
- target/i386/hvf/hvf-cpus-interface.c         |   92 ++
- target/i386/hvf/hvf-cpus-interface.h         |    8 +
- target/i386/hvf/hvf.c                        |    5 +-
- target/i386/whpx-all.c                       |    3 +
- target/i386/whpx-cpus-interface.c            |   96 ++
- target/i386/whpx-cpus-interface.h            |    8 +
- target/riscv/csr.c                           |    8 +-
- tests/ptimer-test-stubs.c                    |    7 +-
- tests/test-timed-average.c                   |    2 +-
- util/main-loop.c                             |    4 +-
- util/qemu-timer.c                            |   12 +-
- 78 files changed, 3136 insertions(+), 2517 deletions(-)
- create mode 100644 accel/kvm/kvm-cpus-interface.c
- create mode 100644 accel/kvm/kvm-cpus-interface.h
- create mode 100644 accel/tcg/tcg-cpus-interface.c
- create mode 100644 accel/tcg/tcg-cpus-interface.h
- delete mode 100644 cpus.c
- create mode 100644 include/sysemu/cpu-throttle.h
- create mode 100644 include/sysemu/cpu-timers.h
- rename arch_init.c => softmmu/arch_init.c (100%)
- rename balloon.c => softmmu/balloon.c (100%)
- create mode 100644 softmmu/cpu-throttle.c
- create mode 100644 softmmu/cpu-timers.c
- create mode 100644 softmmu/cpus.c
- create mode 100644 softmmu/icount.c
- rename ioport.c => softmmu/ioport.c (100%)
- rename memory.c => softmmu/memory.c (100%)
- rename memory_mapping.c => softmmu/memory_mapping.c (100%)
- rename qtest.c => softmmu/qtest.c (95%)
- create mode 100644 softmmu/timers-state.h
- delete mode 100644 stubs/cpu-get-icount.c
- create mode 100644 stubs/cpu-synchronize-state.c
- create mode 100644 stubs/icount.c
- create mode 100644 stubs/qemu-timer-notify-cb.c
- create mode 100644 target/i386/hax-cpus-interface.c
- create mode 100644 target/i386/hax-cpus-interface.h
- create mode 100644 target/i386/hvf/hvf-cpus-interface.c
- create mode 100644 target/i386/hvf/hvf-cpus-interface.h
- create mode 100644 target/i386/whpx-cpus-interface.c
- create mode 100644 target/i386/whpx-cpus-interface.h
-
--- 
-2.16.4
-
+On 19.06.20 04:05, David Gibson wrote:
+> A number of hardware platforms are implementing mechanisms whereby the
+> hypervisor does not have unfettered access to guest memory, in order
+> to mitigate the security impact of a compromised hypervisor.
+> 
+> AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> its own memory encryption mechanism.  POWER has an upcoming mechanism
+> to accomplish this in a different way, using a new memory protection
+> level plus a small trusted ultravisor.  s390 also has a protected
+> execution environment.
+> 
+> The current code (committed or draft) for these features has each
+> platform's version configured entirely differently.  That doesn't seem
+> ideal for users, or particularly for management layers.
+> 
+> AMD SEV introduces a notionally generic machine option
+> "machine-encryption", but it doesn't actually cover any cases other
+> than SEV.
+> 
+> This series is a proposal to at least partially unify configuration
+> for these mechanisms, by renaming and generalizing AMD's
+> "memory-encryption" property.  It is replaced by a
+> "host-trust-limitation" property pointing to a platform specific
+> object which configures and manages the specific details.
+> 
+> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> can be extended to cover the Intel and s390 mechanisms as well,
+> though.
+
+Let me try to summarize what I understand what you try to achieve:
+one command line parameter for all platforms that 
+
+common across all platforms:
+- disable KSM
+- by default enables iommu_platform
+
+
+per platform:
+- setup the necessary encryption scheme when appropriate
+- block migration
+-....
+
+
+The tricky part is certainly the per platform thing. For example on
+s390 we just have a cpumodel flag that provides interfaces to the guest
+to switch into protected mode via the ultravisor. This works perfectly
+fine with the host model, so no need to configure anything.  The platform
+code then disables KSM _on_switchover_ and not in general. Because the 
+guest CAN switch into protected, but it does not have to.
+
+So this feels really hard to do right. Would a virtual BoF on KVM forum
+be too late? We had a BoF on protected guests last year and that was
+valuable.
 
