@@ -2,82 +2,85 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4856CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF37C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:59:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FA762075A
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:46:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 310882073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:59:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dzEeF9Ri"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA762075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CsuEx4+m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310882073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnUHF-0006Ca-C6
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:46:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50998)
+	id 1jnUT5-00036L-CS
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:59:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUFj-00052C-5A
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:45:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33125
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUSR-0002bE-2H
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:58:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50005
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUFh-0003SP-E4
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:45:18 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUSO-0002ys-26
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:58:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592862316;
+ s=mimecast20190719; t=1592863102;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=F7b2L76ec7ZiuEmQG3XcrTAChe/iYKjbA5c3cGtWyOI=;
- b=dzEeF9RirBm0brSocFJW/raMLYi/cx8YTf7MH0gnHqX7GjAS7KKBEr6tdBjB4vUVKP9k7T
- iEuNzP6Tza5H0H7GjIUh13/zpMnu1u7BxDwJNo43JpP86VFg2iPTusRF6SPXWpTVEkfBtG
- Gi94hVZooky1XItKSTyOs627e1pf/g8=
+ bh=2+yE1VubM5pxCtxtLrx2VdTR3Sril9U01rglh/dXVi0=;
+ b=CsuEx4+m7lU+nLH7sBjyVcxO1hiuzXk7ksI7cyoGuRdssPFfrYliz48veuXuGvIb347kIf
+ 7eqHeUFkta7lG3TMvzNwQ75zpmp9E1aP58OKs/fSYOju45e1bek4oUkMwrv/Xjq2upc2sk
+ 5hAiNayVU2HqNwgktm7Aq5tBXRe6Ve4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-y52ScPvMMcu-jb_RSErFzA-1; Mon, 22 Jun 2020 17:45:12 -0400
-X-MC-Unique: y52ScPvMMcu-jb_RSErFzA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-121-ZLMu9g2CPe-nbsfayEzOGA-1; Mon, 22 Jun 2020 17:58:20 -0400
+X-MC-Unique: ZLMu9g2CPe-nbsfayEzOGA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBE628005AD;
- Mon, 22 Jun 2020 21:45:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D62A805EEE;
+ Mon, 22 Jun 2020 21:58:19 +0000 (UTC)
 Received: from [10.3.114.4] (ovpn-114-4.phx2.redhat.com [10.3.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E50B71667;
- Mon, 22 Jun 2020 21:45:07 +0000 (UTC)
-Subject: Re: [PATCH v3 2/6] blockdev: combine DriveBackupState and
- BlockdevBackupState
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200619195621.58740-1-eblake@redhat.com>
- <20200619195621.58740-3-eblake@redhat.com>
- <a30c1068-300c-31df-cf98-c70d08725d3c@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B1FC10013D2;
+ Mon, 22 Jun 2020 21:58:16 +0000 (UTC)
+Subject: Re: [PATCH v5 3/7] qcow: Tolerate backing_fmt=, but warn on
+ backing_fmt=raw
 From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200403175859.863248-1-eblake@redhat.com>
+ <20200403175859.863248-4-eblake@redhat.com>
+ <20200505073542.GA5759@linux.fritz.box>
+ <4b4f83fb-eb3d-6ae5-116a-da921ee2b403@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <a79c9361-1652-4e55-04bb-48dc8178f5e8@redhat.com>
-Date: Mon, 22 Jun 2020 16:45:07 -0500
+Message-ID: <8c8e6d46-ad18-96a2-3d40-630566082ff5@redhat.com>
+Date: Mon, 22 Jun 2020 16:58:15 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <a30c1068-300c-31df-cf98-c70d08725d3c@virtuozzo.com>
+In-Reply-To: <4b4f83fb-eb3d-6ae5-116a-da921ee2b403@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -99,23 +102,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Cc: libvir-list@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 12:12 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 19.06.2020 22:56, Eric Blake wrote:
->> From: John Snow <jsnow@redhat.com>
+On 5/5/20 10:30 AM, Eric Blake wrote:
+> On 5/5/20 2:35 AM, Kevin Wolf wrote:
+>> Am 03.04.2020 um 19:58 hat Eric Blake geschrieben:
+>>> qcow has no space in the metadata to store a backing format, and there
+>>> are existing qcow images backed both by raw or by other formats
+>>> (usually qcow) images, reliant on probing to tell the difference.
+>>> While we don't recommend the creation of new qcow images (as qcow2 is
+>>> hands-down better), we can at least insist that if the user does
+>>> request a specific format without using -u, then it must be non-raw
+>>> (as a raw backing file that gets inadvertently edited into some other
+>>> format can form a security hole); if the user does not request a
+>>> specific format or lies when using -u, then the status quo of probing
+>>> for the backing format remains intact (although an upcoming patch will
+>>> warn when omitting a format request).  Thus, when this series is
+>>> complete, the only way to use a backing file for qcow without
+>>> triggering a warning is when using -F if the backing file is non-raw
+>>> to begin with.  Note that this is only for QemuOpts usage; there is no
+>>> change to the QAPI to allow a format through -blockdev.
+>>>
+>>> Add a new iotest 290 just for qcow, to demonstrate the new warning.
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
 >>
->> They have the same fields -- rename it BlockJobActionState.
+>> Somehow this feels backwards. Not specifying the backing file format at
+>> all isn't any safer than explicitly specifying raw.
+>>
+>> If there is a difference at all, I would say that explicitly specifying
+>> raw means that the user is aware what they are doing. So we would have
+>> more reason to warn against raw images if the backing format isn't
+>> specified at all because then the user might not be aware that they are
+>> using a backing file that probes as raw.
 > 
-> commit/abort/clean functions are identical after it. I think better to 
-> combine them as well here
+> Prior to this patch, -F does not work with qcow.  And even with this 
+> patch, we still cannot store the explicit value of -F in the qcow file. 
+> Anything that does not use -F must continue to work for now (although it 
+> may now warn, and in fact must warn if we deprecate it), while anything 
+> explicit is free to fail (since it failed already), but could also be 
+> made to work (if letting it work is nicer than making it fail, and where 
+> "work" may still include a warning, although it's pointless to have 
+> something brand new that works but is deprecated out of the box).  So 
+> the following is my summary of the two options we can choose between:
+> 
+> Option 1, qcow backed by raw is more common than qcow backed by other, 
+> so we want:
+> raw <- qcow, no -F: work without warning (but if backing file is edited, 
+> a future probe seeing non-raw would break image)
+> raw <- qcow, with -F: work without warning (but if backing file is 
+> edited, a future probe seeing non-raw would break image)
+> other <- qcow, no -F: works but issues a warning (but backing file will 
+> always probe correctly)
+> other <- qcow, with -F: fails (we cannot honor the user's explicit 
+> request, because we would still have to probe)
+> 
+> Option 2, qcow backed by other is more common than qcow backed by raw, 
+> so we want:
+> raw <- qcow, no -F: works but issues a warning (using a raw backing file 
+> without explicit buy-in is risky)
+> raw <- qcow, with -F: works but issues a warning (explicit buy-in will 
+> still require subsequent probing, and a backing file could change which 
+> would break image)
+> other <- qcow, no -F: works without warning
+> other <- qcow, with -F: works without warning (later probing will still 
+> see non-raw)
+> 
+> It looks like you are leaning more towards option 1, while my patch 
+> leaned more towards option 2.  Anyone else want to chime in with an 
+> opinion on which is safer vs. easier?
 
-I'll give it a shot in v4 (may be done as a separate patch for ease of 
-review, though).
+> Option 3:
+> completely deprecate qcow images with backing files, as there is no safe 
+> way to do things favoring either raw (option 1) or non-raw (option 2), 
+> and therefore accept -F solely for convenience with the rest of the 
+> series, but always issue a warning regardless of whether -F was present.
+
+
+Hearing no other opinion in the meantime, I've come up with option 4:
+
+raw <- qcow, no -F: works but issues a warning to use -F (the user 
+should be explicit that they know they are using raw)
+raw <- qcow, with -F raw: a probe is attempted, if it returns anything 
+other than raw, then fail (since we can't store the backing type, and 
+the user's explicit type didn't match reality); otherwise works without 
+warning (users tend to treat backing files as read-only, so even though 
+editing a backing file could make it appear non-raw, that's less likely 
+to happen)
+other <- qcow, no -F: works without warning (we'll probe in future 
+opens, but the probe will see the same file type and not corrupt user data)
+other <- qcow, with -F: a probe is attempted and must match, but 
+otherwise works without warning (we'll still have to probe in future 
+opens, but it's no worse than before)
+
+
 
 -- 
 Eric Blake, Principal Software Engineer
