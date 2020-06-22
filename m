@@ -2,103 +2,79 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 770F3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC8CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4176B206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67412206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SiYGi36s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4176B206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TUeudm12"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67412206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJ7h-0001Uv-HQ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:52:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54920)
+	id 1jnJ8T-0002uo-Mh
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:53:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnJ3J-0003WM-1m
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:47:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56690
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyR-0001l2-N1
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44050
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnJ3F-0004dj-IF
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:47:44 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyJ-0003w5-FQ
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592819260;
+ s=mimecast20190719; t=1592818954;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=IG0xyW8Y+2IhjrkUff/gvAIPuJaTf/JbQT5eqrRgUHk=;
- b=SiYGi36sy4Cpm0+UB2VUJUrs7QZrLX3UbdSWMJHWEI0KFyc3VLK5vYkwvQ1VctEjWdAzLl
- ++DCl/PcjbaENd7HrYUoKck+Boe/kvxCHCxdz8QtiKuUSxLZa/h70cbR9jElzTAMcOZ/lk
- vnlXWE4yubOKUXSV+sTawW/xaLLPKq8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ErjRx8lQeXJ4rlKO7FLKrqKbwU/dbyuW7Z+8P1qnssU=;
+ b=TUeudm12U88CysGyN/ih0wKjEsSzWmLPbUK4XbYZFrH8XQHL3l2lcqIFsrZ2Awhzy8o+0i
+ PerOAgN1hEzRwQcnPEYT4jDs2oR+dWRpeSMgE8QZkHeXwQ2wix9WFBG1NHopUsxob0i/Xp
+ exsEyHdb+698KcE2ljwWkggft/TsArc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-KGs0P0iDNeizKhGRgf2rGg-1; Mon, 22 Jun 2020 05:47:36 -0400
-X-MC-Unique: KGs0P0iDNeizKhGRgf2rGg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-256-nJW1g7g3MLi_HqT2b4Plrw-1; Mon, 22 Jun 2020 05:42:30 -0400
+X-MC-Unique: nJW1g7g3MLi_HqT2b4Plrw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75A9D1005512;
- Mon, 22 Jun 2020 09:47:35 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-85.ams2.redhat.com
- [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5624760C05;
- Mon, 22 Jun 2020 09:47:34 +0000 (UTC)
-Subject: Re: [PATCH 0/2] qcow2: Force preallocation with data-file-raw
-To: Nir Soffer <nsoffer@redhat.com>
-References: <20200619104012.235977-1-mreitz@redhat.com>
- <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <72eb5700-faf6-22ee-69be-1e7653cf06c6@redhat.com>
-Date: Mon, 22 Jun 2020 11:47:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5CF3835B43;
+ Mon, 22 Jun 2020 09:42:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D1965C1BD;
+ Mon, 22 Jun 2020 09:42:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C8F681138472; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 04/16] fdc: Reject clash between -drive if=floppy and
+ -global isa-fdc
+Date: Mon, 22 Jun 2020 11:42:15 +0200
+Message-Id: <20200622094227.1271650-5-armbru@redhat.com>
+In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
+References: <20200622094227.1271650-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -119,152 +95,504 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607
-Content-Type: multipart/mixed; boundary="X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY"
+The floppy controller devices desugar their drive properties into
+floppy devices (since commit a92bd191a4 "fdc: Move qdev properties to
+FloppyDrive", v2.8.0).  This involves some bad magic in
+fdctrl_connect_drives(), and exists for backward compatibility.
 
---X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The functions for boards to create floppy controller devices
+fdctrl_init_isa(), fdctrl_init_sysbus(), and sun4m_fdctrl_init()
+desugar -drive if=floppy to these floppy controller drive properties.
 
-On 22.06.20 00:25, Nir Soffer wrote:
-> On Fri, Jun 19, 2020 at 1:40 PM Max Reitz <mreitz@redhat.com> wrote:
->>
->> Hi,
->>
->> As discussed here:
->>
->> https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
->> https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
->> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00240.html
->>
->> I think that qcow2 images with data-file-raw should always have
->> preallocated 1:1 L1/L2 tables, so that the image always looks the same
->> whether you respect or ignore the qcow2 metadata.
->=20
-> I don't know the internals of qcow2 data_file, but are we really using
-> qcow2 metadata when accessing the data file?
+If you use both -drive if=floppy (or its -fda / -fdb sugar) and
+-global isa-fdc for the same floppy device, -global silently loses the
+conflict, and both backends involved end up with the floppy device
+frontend attached, as demonstrated by iotest 172 (see commit before
+previous).  This is wrong.
 
-Yes.
+Desugar -drive if=floppy straight to floppy devices instead, with
+helper fdctrl_init_drives().  The conflict now gets rejected cleanly:
+first, fdctrl_connect_drives() creates the floppy for the controller's
+property, then fdctrl_init_drives() attempts to create the floppy for
+-drive if=floppy, but fails because the unit is already in use.
 
-> This may have unwanted performance consequences.
+Output of iotest 172 changes in three ways:
 
-I don=E2=80=99t think so, because in practice normal lookups of L1/L2 mappi=
-ngs
-generally don=E2=80=99t cost that much performance.
+1. The clash gets rejected.
 
-> If I understand correctly, qcow2 metadata is needed only for keeping
-> bitmaps (or maybe
-> future extensions) for raw data file, and reading from the qcow2 image
-> should be read
-> directly from the raw file without any extra work.
->=20
-> Writing to the data file should also bypass the qcow2 metadata, since the=
- bitmap
-> is updated in memory.
+2. In one test case, "info qtree" has the floppy devices swapped, and
+   "info block" has their QOM paths swapped.  This is because the
+   floppy device for -fda now gets created after the one for -global
+   isa-fdc.driveB.
 
-Well, with this series, writing would no longer update the metadata at
-least, because it would always be preallocated already.
+3. The error message for -global floppy.drive=floppy0 changes.  Before
+   the patch, we set isa-fdc.driveA to -fda's block backend, then
+   create the floppy device for it, then move the backend from
+   isa-fdc.driveA to floppy.drive.  Floppy creation fails when
+   applying -global floppy.drive=floppy0, because floppy0 is still
+   attached to isa-fdc.  After the patch, we create the floppy for
+   -fda, then set its drive property to floppy0.  Now floppy creation
+   succeeds, but setting the drive property fails, because -global
+   already set it.  Yes, this is exasperatingly complicated.
 
->>  The easiest way to
->> achieve that is to enforce at least metadata preallocation whenever
->> data-file-raw is given.
->=20
-> But preallocation is not free, even on file systems, it can be even
-> slow (NFS < 4.2).
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/hw/block/fdc.h     |   1 +
+ hw/block/fdc.c             |  51 ++++++------
+ hw/isa/isa-superio.c       |  18 ++--
+ hw/sparc64/sun4u.c         |   9 +-
+ tests/qemu-iotests/172     |   3 +-
+ tests/qemu-iotests/172.out | 164 ++++++++++---------------------------
+ 6 files changed, 79 insertions(+), 167 deletions(-)
 
-Metadata preallocation with an external data file should be the same
-speed on every file system.  We only need to create the metadata
-structures, which, with the default cluster size (64k) take up a bit
-more than 1/8192 of the full image size.
-
-Sure, it=E2=80=99s not free.  But if we decide we should indeed fully ignor=
-e the
-L1/L2 tables for data-file-raw images, the qcow2 spec must be amended.
-As I can read it, it currently doesn=E2=80=99t say so.
-
-(By the way, this is not a trivial change.  Right now, data-file-raw is
-an autoclear flag: If a version of qemu that doesn=E2=80=99t support it acc=
-esses
-the image, it will automatically clear the flag, but the image stays
-valid.  If we decide to completely ignore the L1/L2 tables (i.e. not
-even create them), then this can no longer be an autoclear flag.  We=E2=80=
-=99d
-need a new incompatible flag.  (Because without L1/L2 tables, the image
-becomes useless to older qemu versions.))
-
-> With block storage this means you need to allocate the entire image size =
-on
-> storage for writing the metadata.
->=20
-> While oVirt does not use qcow2 with data_file, having preallocated qcow2
-> will make this very hard to use, for example for 500 GiB disk we will hav=
-e to
-> allocate 500 GiB disk for the raw data file and 500 GiB disk for the qcow=
-2
-> metadata disk which will be 99% unused.
-
-I don=E2=80=99t understand this.  When you use an external data file, the q=
-cow2
-file will only contain the metadata:
-
-$ qemu-img create -f qcow2 \
-    -o data_file=3Dfoo.data,data_file_raw=3Don,preallocation=3Dmetadata \
-    foo.qcow2 8G
-Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D8589934592 data_file=3Dfoo.data
-data_file_raw=3Don cluster_size=3D65536 preallocation=3Dmetadata
-lazy_refcounts=3Doff refcount_bits=3D16
-$ ls -l foo.qcow2
-... 1310720 ... foo.qcow2
-$ ls -l foo.data
-... 8589934592 ... foo.data
-
-> I don't think that kubevirt is planning to use this either, but if
-> they decide to use
-> this it may be a problem for them as well when using block storage.
->=20
-> It looks like we abuse preallocation for getting the side effect that
-> the backing file
-> will be rejected, instead of adding the validation rejecting backing
-> file in this case.
-
-That isn=E2=80=99t the case.
-
-I want to use preallocation because I interpret the spec such that it
-requires metadata preallocation.  It says when accessing a qcow2 file
-with data-file-raw, you can ignore the L1/L2 tables.  To me, that means
-that the L1/L2 tables must give a 1:1 mapping so that you get the same
-result whether you interpret them or not.
-
-Max
-
-
---X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY--
-
---GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7wfjQACgkQ9AfbAGHV
-z0CL+gf+Km/T8DxYdnd+fwqQ92dBh/dslXTbHdzY9WvxmrWRnc102j/tJqFLxkil
-in1uy67UReMGVpJyY1lcFGxN7TrMXwnY2t9pBJGIpEe81PlXY3ENKDWIeXqLAPtN
-Di6sKBW3Ar+/b+p5b4a5ywgIqx3uUgqKAjQVRrZID3mLLnoMWiHkrmfRmdRpXZYN
-ljQh1wr4RDZp7W52VkYU6k217oTzZWviK64WMapqZ0M7EQNbsBGgOOztBgSXZBws
-iaCcFIkQ0S/iugXnDm6E1AaUG1zvw2YXc+zGVqMeyuYUbE9ut8yCWzwe/GSOhAC9
-+mnrP8PugwO0lv5QTYfINYiiTz1HBQ==
-=hJJ6
------END PGP SIGNATURE-----
-
---GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607--
+diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+index c15ff4c623..8855d3476c 100644
+--- a/include/hw/block/fdc.h
++++ b/include/hw/block/fdc.h
+@@ -9,6 +9,7 @@
+ 
+ #define TYPE_ISA_FDC "isa-fdc"
+ 
++void isa_fdc_init_drives(ISADevice *fdc, DriveInfo **fds);
+ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds);
+ void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
+                         hwaddr mmio_base, DriveInfo **fds);
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index be0674e4aa..2650dcb0df 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -2497,6 +2497,29 @@ static void fdctrl_result_timer(void *opaque)
+ }
+ 
+ /* Init functions */
++
++static void fdctrl_init_drives(FloppyBus *bus, DriveInfo **fds)
++{
++    DeviceState *dev;
++    int i;
++
++    for (i = 0; i < MAX_FD; i++) {
++        if (fds[i]) {
++            dev = qdev_new("floppy");
++            qdev_prop_set_uint32(dev, "unit", i);
++            qdev_prop_set_enum(dev, "drive-type", FLOPPY_DRIVE_TYPE_AUTO);
++            qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(fds[i]),
++                                &error_fatal);
++            qdev_realize_and_unref(dev, &bus->bus, &error_fatal);
++        }
++    }
++}
++
++void isa_fdc_init_drives(ISADevice *fdc, DriveInfo **fds)
++{
++    fdctrl_init_drives(&ISA_FDC(fdc)->state.bus, fds);
++}
++
+ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+                                   Error **errp)
+ {
+@@ -2544,25 +2567,15 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+ 
+ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds)
+ {
+-    DeviceState *dev;
+     ISADevice *isadev;
+ 
+     isadev = isa_try_new(TYPE_ISA_FDC);
+     if (!isadev) {
+         return NULL;
+     }
+-    dev = DEVICE(isadev);
+-
+-    if (fds[0]) {
+-        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fds[0]),
+-                            &error_fatal);
+-    }
+-    if (fds[1]) {
+-        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fds[1]),
+-                            &error_fatal);
+-    }
+     isa_realize_and_unref(isadev, bus, &error_fatal);
+ 
++    isa_fdc_init_drives(isadev, fds);
+     return isadev;
+ }
+ 
+@@ -2578,18 +2591,12 @@ void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
+     sys = SYSBUS_FDC(dev);
+     fdctrl = &sys->state;
+     fdctrl->dma_chann = dma_chann; /* FIXME */
+-    if (fds[0]) {
+-        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fds[0]),
+-                            &error_fatal);
+-    }
+-    if (fds[1]) {
+-        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fds[1]),
+-                            &error_fatal);
+-    }
+     sbd = SYS_BUS_DEVICE(dev);
+     sysbus_realize_and_unref(sbd, &error_fatal);
+     sysbus_connect_irq(sbd, 0, irq);
+     sysbus_mmio_map(sbd, 0, mmio_base);
++
++    fdctrl_init_drives(&sys->state.bus, fds);
+ }
+ 
+ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
+@@ -2599,15 +2606,13 @@ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
+     FDCtrlSysBus *sys;
+ 
+     dev = qdev_new("SUNW,fdtwo");
+-    if (fds[0]) {
+-        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(fds[0]),
+-                            &error_fatal);
+-    }
+     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+     sys = SYSBUS_FDC(dev);
+     sysbus_connect_irq(SYS_BUS_DEVICE(sys), 0, irq);
+     sysbus_mmio_map(SYS_BUS_DEVICE(sys), 0, io_base);
+     *fdc_tc = qdev_get_gpio_in(dev, 0);
++
++    fdctrl_init_drives(&sys->state.bus, fds);
+ }
+ 
+ static void fdctrl_realize_common(DeviceState *dev, FDCtrl *fdctrl,
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index d3d58f9f16..e2e47d8fd9 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -17,6 +17,7 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/blockdev.h"
+ #include "chardev/char.h"
++#include "hw/block/fdc.h"
+ #include "hw/isa/superio.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/input/i8042.h"
+@@ -31,7 +32,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+     ISADevice *isa;
+     DeviceState *d;
+     Chardev *chr;
+-    DriveInfo *drive;
++    DriveInfo *fd[MAX_FD];
+     char *name;
+     int i;
+ 
+@@ -115,7 +116,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+ 
+     /* Floppy disc */
+     if (!k->floppy.is_enabled || k->floppy.is_enabled(sio, 0)) {
+-        isa = isa_new("isa-fdc");
++        isa = isa_new(TYPE_ISA_FDC);
+         d = DEVICE(isa);
+         if (k->floppy.get_iobase) {
+             qdev_prop_set_uint32(d, "iobase", k->floppy.get_iobase(sio, 0));
+@@ -124,19 +125,12 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+             qdev_prop_set_uint32(d, "irq", k->floppy.get_irq(sio, 0));
+         }
+         /* FIXME use a qdev drive property instead of drive_get() */
+-        drive = drive_get(IF_FLOPPY, 0, 0);
+-        if (drive != NULL) {
+-            qdev_prop_set_drive(d, "driveA", blk_by_legacy_dinfo(drive),
+-                                &error_fatal);
+-        }
+-        /* FIXME use a qdev drive property instead of drive_get() */
+-        drive = drive_get(IF_FLOPPY, 0, 1);
+-        if (drive != NULL) {
+-            qdev_prop_set_drive(d, "driveB", blk_by_legacy_dinfo(drive),
+-                                &error_fatal);
++        for (i = 0; i < MAX_FD; i++) {
++            fd[i] = drive_get(IF_FLOPPY, 0, i);
+         }
+         object_property_add_child(OBJECT(sio), "isa-fdc", OBJECT(isa));
+         isa_realize_and_unref(isa, bus, &error_fatal);
++        isa_fdc_init_drives(isa, fd);
+         sio->floppy = isa;
+         trace_superio_create_floppy(0,
+                                     k->floppy.get_iobase ?
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 97e6d3a025..9c8655cffc 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -341,16 +341,9 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+     }
+     isa_dev = isa_new(TYPE_ISA_FDC);
+     dev = DEVICE(isa_dev);
+-    if (fd[0]) {
+-        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fd[0]),
+-                            &error_abort);
+-    }
+-    if (fd[1]) {
+-        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fd[1]),
+-                            &error_abort);
+-    }
+     qdev_prop_set_uint32(dev, "dma", -1);
+     isa_realize_and_unref(isa_dev, s->isa_bus, &error_fatal);
++    isa_fdc_init_drives(isa_dev, fd);
+ 
+     /* Power */
+     dev = qdev_new(TYPE_SUN4U_POWER);
+diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
+index 18056bcef7..3abfa72948 100755
+--- a/tests/qemu-iotests/172
++++ b/tests/qemu-iotests/172
+@@ -148,9 +148,10 @@ echo === Mixing -fdX and -global ===
+ check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
+ check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
+ 
+-# Conflicting (-fdX wins)
++# Conflicting
+ check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
+ check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
++# Conflicting, -fdX wins
+ check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global floppy.drive=none0
+ 
+ echo
+diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
+index 68e7a5ea5f..340dbd39cb 100644
+--- a/tests/qemu-iotests/172.out
++++ b/tests/qemu-iotests/172.out
+@@ -205,22 +205,22 @@ Testing: -fdb
+               dev: floppy, id ""
+                 unit = 1 (0x1)
+                 drive = "floppy1"
+-                logical_block_size = 512 (0x200)
+-                physical_block_size = 512 (0x200)
+-                min_io_size = 0 (0x0)
+-                opt_io_size = 0 (0x0)
+-                discard_granularity = 4294967295 (0xffffffff)
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "288"
+               dev: floppy, id ""
+                 unit = 0 (0x0)
+                 drive = "floppy0"
+-                logical_block_size = 512 (0x200)
+-                physical_block_size = 512 (0x200)
+-                min_io_size = 0 (0x0)
+-                opt_io_size = 0 (0x0)
+-                discard_granularity = 4294967295 (0xffffffff)
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "288"
+@@ -675,17 +675,6 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
+             isa irq 6
+             bus: floppy-bus.0
+               type floppy-bus
+-              dev: floppy, id ""
+-                unit = 1 (0x1)
+-                drive = "none0"
+-                logical_block_size = 512 (512 B)
+-                physical_block_size = 512 (512 B)
+-                min_io_size = 0 (0 B)
+-                opt_io_size = 0 (0 B)
+-                discard_granularity = 4294967295 (4 GiB)
+-                write-cache = "auto"
+-                share-rw = false
+-                drive-type = "144"
+               dev: floppy, id ""
+                 unit = 0 (0x0)
+                 drive = "floppy0"
+@@ -697,13 +686,24 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "144"
++              dev: floppy, id ""
++                unit = 1 (0x1)
++                drive = "none0"
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
++                write-cache = "auto"
++                share-rw = false
++                drive-type = "144"
+ floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
+-    Attached to:      /machine/unattached/device[15]
++    Attached to:      /machine/unattached/device[16]
+     Removable device: not locked, tray closed
+     Cache mode:       writeback
+ 
+ none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
+-    Attached to:      /machine/unattached/device[16]
++    Attached to:      /machine/unattached/device[15]
+     Removable device: not locked, tray closed
+     Cache mode:       writeback
+ 
+@@ -773,92 +773,10 @@ sd0: [not inserted]
+ 
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
+-
+-          dev: isa-fdc, id ""
+-            iobase = 1008 (0x3f0)
+-            irq = 6 (0x6)
+-            dma = 2 (0x2)
+-            driveA = ""
+-            driveB = ""
+-            check_media_rate = true
+-            fdtypeA = "auto"
+-            fdtypeB = "auto"
+-            fallback = "288"
+-            isa irq 6
+-            bus: floppy-bus.0
+-              type floppy-bus
+-              dev: floppy, id ""
+-                unit = 0 (0x0)
+-                drive = "floppy0"
+-                logical_block_size = 512 (512 B)
+-                physical_block_size = 512 (512 B)
+-                min_io_size = 0 (0 B)
+-                opt_io_size = 0 (0 B)
+-                discard_granularity = 4294967295 (4 GiB)
+-                write-cache = "auto"
+-                share-rw = false
+-                drive-type = "144"
+-floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
+-    Attached to:      /machine/unattached/device[15]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-
+-none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
+-    Attached to:      /machine/unattached/device[14]
+-    Cache mode:       writeback
+-
+-ide1-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[22]
+-    Removable device: not locked, tray closed
+-
+-sd0: [not inserted]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
++QEMU_PROG: Floppy unit 0 is in use
+ 
+ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
+-
+-          dev: isa-fdc, id ""
+-            iobase = 1008 (0x3f0)
+-            irq = 6 (0x6)
+-            dma = 2 (0x2)
+-            driveA = ""
+-            driveB = ""
+-            check_media_rate = true
+-            fdtypeA = "auto"
+-            fdtypeB = "auto"
+-            fallback = "288"
+-            isa irq 6
+-            bus: floppy-bus.0
+-              type floppy-bus
+-              dev: floppy, id ""
+-                unit = 1 (0x1)
+-                drive = "floppy1"
+-                logical_block_size = 512 (512 B)
+-                physical_block_size = 512 (512 B)
+-                min_io_size = 0 (0 B)
+-                opt_io_size = 0 (0 B)
+-                discard_granularity = 4294967295 (4 GiB)
+-                write-cache = "auto"
+-                share-rw = false
+-                drive-type = "144"
+-floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
+-    Attached to:      /machine/unattached/device[15]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-
+-none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
+-    Attached to:      /machine/unattached/device[14]
+-    Cache mode:       writeback
+-
+-ide1-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[22]
+-    Removable device: not locked, tray closed
+-
+-sd0: [not inserted]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
++QEMU_PROG: Floppy unit 1 is in use
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0
+ 
+@@ -878,11 +796,11 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global fl
+               dev: floppy, id ""
+                 unit = 0 (0x0)
+                 drive = "floppy0"
+-                logical_block_size = 512 (0x200)
+-                physical_block_size = 512 (0x200)
+-                min_io_size = 0 (0x0)
+-                opt_io_size = 0 (0x0)
+-                discard_granularity = 4294967295 (0xffffffff)
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "144"
+@@ -1500,11 +1418,11 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global floppy.drive=none0 -device
+               dev: floppy, id ""
+                 unit = 0 (0x0)
+                 drive = "none0"
+-                logical_block_size = 512 (0x200)
+-                physical_block_size = 512 (0x200)
+-                min_io_size = 0 (0x0)
+-                opt_io_size = 0 (0x0)
+-                discard_granularity = 4294967295 (0xffffffff)
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "144"
+@@ -1546,11 +1464,11 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+               dev: floppy, id ""
+                 unit = 0 (0x0)
+                 drive = "none1"
+-                logical_block_size = 512 (0x200)
+-                physical_block_size = 512 (0x200)
+-                min_io_size = 0 (0x0)
+-                opt_io_size = 0 (0x0)
+-                discard_granularity = 4294967295 (0xffffffff)
++                logical_block_size = 512 (512 B)
++                physical_block_size = 512 (512 B)
++                min_io_size = 0 (0 B)
++                opt_io_size = 0 (0 B)
++                discard_granularity = 4294967295 (4 GiB)
+                 write-cache = "auto"
+                 share-rw = false
+                 drive-type = "144"
+@@ -1585,7 +1503,7 @@ Testing: -fda  -device floppy,drive=floppy0
+ QEMU_PROG: -device floppy,drive=floppy0: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
+ 
+ Testing: -fda  -global floppy.drive=floppy0
+-QEMU_PROG: can't apply global floppy.drive=floppy0: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
++QEMU_PROG: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
+ 
+ Testing: -device floppy,drive=floppy0
+ QEMU_PROG: -device floppy,drive=floppy0: Property 'floppy.drive' can't find value 'floppy0'
+-- 
+2.26.2
 
 
