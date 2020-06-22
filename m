@@ -2,75 +2,74 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5110AC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AABC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:57:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D96520732
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E53C20706
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:57:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hK3xV5iK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D96520732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPzP9Dxu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E53C20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnMww-0006kk-Cl
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57202)
+	id 1jnMxE-0007Nj-KN
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:57:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvp-0005PE-A9
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53395
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvn-0005NA-R5
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22822
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvn-0007iu-BE
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:16 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnMvm-0007ii-9k
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:56:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592834174;
+ s=mimecast20190719; t=1592834173;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=koPta83YrvYTu3iosfVuLysO1zTX+p+Br2Szbh760II=;
- b=hK3xV5iKqnkZDSdzLfWl5R06mkXGB/yDooAN45B+Jbze6COoc1F+blWja6rtdXX/nKNlR3
- ClHRlMCFZRNbgjSLrwDYDv+G4DvRdYEFFgqdcv4bZv4FsuJS5KjxFJ1pjDCpvCh71hgUzm
- m42MPDhRpXaVYIVbgyS2xJtnvNtTvcs=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=4+/WITPq33oOuq4ULbgpiAQx/AA+X0qzxS870TvpddY=;
+ b=YPzP9DxuRImIggSQOKYnti09OKSCYCgzi60ajGliv9VPZ1aGuKkXDzHEeuTKJp/X6+loiz
+ Y4VLQHvO5HMVdk0NdAyx1PyM7xVMfaYX/unonfC+kkCvHk/ba4Z8qL7qeoEZAW4GBCJ41Z
+ Rp1RNebmr2MVIdorB1OP/KXlObXGIyI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-hGMWWiCnN-SY3IZcr19uBw-1; Mon, 22 Jun 2020 09:56:08 -0400
-X-MC-Unique: hGMWWiCnN-SY3IZcr19uBw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-367-hbTFzSpDNsm3E1dnbxv89Q-1; Mon, 22 Jun 2020 09:56:09 -0400
+X-MC-Unique: hbTFzSpDNsm3E1dnbxv89Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D32A18005AD
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 13:56:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74AFA801503
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 13:56:08 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4EB9B5D9E2;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5353F10013D7;
  Mon, 22 Jun 2020 13:56:02 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1DED117477; Mon, 22 Jun 2020 15:56:01 +0200 (CEST)
+ id 399B41753C; Mon, 22 Jun 2020 15:56:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/7] build some devices as modules.
-Date: Mon, 22 Jun 2020 15:55:54 +0200
-Message-Id: <20200622135601.12433-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Subject: [PATCH v4 2/7] build: fix device module builds
+Date: Mon, 22 Jun 2020 15:55:56 +0200
+Message-Id: <20200622135601.12433-3-kraxel@redhat.com>
+In-Reply-To: <20200622135601.12433-1-kraxel@redhat.com>
+References: <20200622135601.12433-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,48 +97,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Specifically devices which depend on shared libraries,
-to reduce the runtime dependencies of core qemu.
+See comment.  Feels quite hackish.  Better ideas anyone?
 
-v2:
- - better commit messages.
- - add some more devices.
- - general tidy up.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ Makefile.target | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-v3:
- - rebase, solve stubs conflict.
- - fix -vga $name
- - fix -device $name,help
-
-v4:
- - rebase to latest master
- - adapt to armbru's device init changes
-
-Gerd Hoffmann (7):
-  qdev: add support for device module loading
-  build: fix device module builds
-  ccid: build smartcard as module
-  usb: build usb-redir as module
-  vga: build qxl as module
-  vga: build virtio-gpu only once
-  vga: build virtio-gpu as module
-
- Makefile.objs            |  1 +
- Makefile.target          |  7 +++++
- include/hw/qdev-core.h   |  3 ++
- include/qemu/module.h    |  1 +
- hw/core/qdev.c           | 66 ++++++++++++++++++++++++++++++++++++++++
- qdev-monitor.c           |  5 +++
- qom/qom-qmp-cmds.c       |  5 +++
- softmmu/vl.c             |  4 +++
- stubs/hw-module.c        | 10 ++++++
- hw/Makefile.objs         |  2 ++
- hw/display/Makefile.objs | 28 ++++++++++-------
- hw/usb/Makefile.objs     | 13 +++++---
- stubs/Makefile.objs      |  1 +
- 13 files changed, 131 insertions(+), 15 deletions(-)
- create mode 100644 stubs/hw-module.c
-
+diff --git a/Makefile.target b/Makefile.target
+index 8ed1eba95b9c..c70325df5796 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -179,6 +179,13 @@ endif # CONFIG_SOFTMMU
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
+ 
++#
++# common-obj-m has some crap here, probably as side effect from
++# filling obj-y.  Clear it.  Fixes suspious dependency errors when
++# building devices as modules.
++#
++common-obj-m :=
++
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call unnest-vars,.., \
+                authz-obj-y \
 -- 
 2.18.4
 
