@@ -2,154 +2,81 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B511FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:54:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 834C420767
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4868C20707
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iFKHB6Ih"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834C420767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtZqlCRh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4868C20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnQdg-0002mD-RC
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 13:53:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34454)
+	id 1jnQeO-0004Iy-Jm
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 13:54:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jnQcu-0001xz-9P
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:53:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53571
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jnQdm-0003JA-3u
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:53:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59447
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jnQcq-0001n4-Gp
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:52:59 -0400
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jnQdk-0001uE-GS
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:53:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592848375;
+ s=mimecast20190719; t=1592848431;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Fg3/hJBxanoydg3oHPXUdEhTMRlhVXQqJRlTVIccCsg=;
- b=iFKHB6Ih2HackTwve3Nm01mZ/XqiReB927WYzVgPPNTZ/RPjtTYD7eJJsP0gWwNHEzdbTw
- A2JmOIbcImIWBIGS0RSBiCtmGOxe5BgBFvBBGKYsPokGrV3rfpDXJJs/oPIDRSx/mLqLVm
- XxK0upI0+i6bydOG708TUxZUJUobBME=
+ in-reply-to:in-reply-to:references:references;
+ bh=Si5RagssVRK7mG7a8Kccd6W6xViV2hQuD9neCJNnbNg=;
+ b=GtZqlCRhmxLVjJPeCy1Z/fR+4qmahq4Q4PboNObvN1kO2oVV0o15/ye9y/agk4M7RZqYVn
+ 3nZKpiKhLPtQDJ0cnCGfBOedwEFvhHHvhzK4mWDYfnMzTqfacwIfW7NM56cG3h0sivx7Eu
+ JPWlHhEdeZiM/pJjuMTtvgtR1i742jg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-Jy8GBxH1OqyToS2XMB4A-Q-1; Mon, 22 Jun 2020 13:52:51 -0400
-X-MC-Unique: Jy8GBxH1OqyToS2XMB4A-Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-152-pYkpUqGKM4ORXg01Jy8LTQ-1; Mon, 22 Jun 2020 13:53:46 -0400
+X-MC-Unique: pYkpUqGKM4ORXg01Jy8LTQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 136B4464;
- Mon, 22 Jun 2020 17:52:50 +0000 (UTC)
-Received: from [10.10.119.184] (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0F795D9E2;
- Mon, 22 Jun 2020 17:52:47 +0000 (UTC)
-Subject: Re: [PATCH v1 01/18] iotests: Fix 051 output after qdev_init_nofail()
- removal
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-2-alex.bennee@linaro.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9ad1234e-bbb7-9396-21e1-58041cffd847@redhat.com>
-Date: Mon, 22 Jun 2020 13:52:47 -0400
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ED6A85B681;
+ Mon, 22 Jun 2020 17:53:45 +0000 (UTC)
+Received: from [10.40.194.228] (unknown [10.40.194.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E191D7CAD8;
+ Mon, 22 Jun 2020 17:53:41 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] util: Introduce qemu_get_host_name()
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <cover.1592846572.git.mprivozn@redhat.com>
+ <567f969602c1742e23c7760944e909346b2d012b.1592846572.git.mprivozn@redhat.com>
+ <20200622173849.GN736373@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <80586aa2-c02b-54a3-cf10-d7cda297cfbd@redhat.com>
+Date: Mon, 22 Jun 2020 19:53:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622143204.12921-2-alex.bennee@linaro.org>
+In-Reply-To: <20200622173849.GN736373@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mprivozn@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -172,66 +99,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, Max Reitz <mreitz@redhat.com>,
- cota@braap.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: vfeenstr@redhat.com, sw@weilnetz.de, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/22/20 10:31 AM, Alex Bennée wrote:
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 6/22/20 7:38 PM, Daniel P. Berrangé wrote:
+> On Mon, Jun 22, 2020 at 07:26:44PM +0200, Michal Privoznik wrote:
+>> This function offers operating system agnostic way to fetch host
+>> name. It is implemented for both POSIX-like and Windows systems.
+>>
+>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+>> ---
+>>   include/qemu/osdep.h | 10 ++++++++++
+>>   util/oslib-posix.c   | 32 ++++++++++++++++++++++++++++++++
+>>   util/oslib-win32.c   | 13 +++++++++++++
+>>   3 files changed, 55 insertions(+)
+>>
+>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>> index ff7c17b857..a795d46b28 100644
+>> --- a/include/qemu/osdep.h
+>> +++ b/include/qemu/osdep.h
+>> @@ -607,4 +607,14 @@ static inline void qemu_reset_optind(void)
+>>   #endif
+>>   }
+>>   
+>> +/**
+>> + * qemu_get_host_name:
+>> + * @errp: Error object
+>> + *
+>> + * Operating system agnostic way of querying host name.
+>> + *
+>> + * Returns allocated hostname (caller should free), NULL on failure.
+>> + */
+>> +char *qemu_get_host_name(Error **errp);
+>> +
+>>   #endif
+>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>> index 916f1be224..865a3d71a7 100644
+>> --- a/util/oslib-posix.c
+>> +++ b/util/oslib-posix.c
+>> @@ -761,3 +761,35 @@ void sigaction_invoke(struct sigaction *action,
+>>       }
+>>       action->sa_sigaction(info->ssi_signo, &si, NULL);
+>>   }
+>> +
+>> +#ifndef HOST_NAME_MAX
+>> +# ifdef _POSIX_HOST_NAME_MAX
+>> +#  define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+>> +# else
+>> +#  define HOST_NAME_MAX 255
+>> +# endif
+>> +#endif
+>> +
+>> +char *qemu_get_host_name(Error **errp)
+>> +{
+>> +    long len = -1;
+>> +    char *hostname;
+>> +
+>> +#ifdef _SC_HOST_NAME_MAX
+>> +    len = sysconf(_SC_HOST_NAME_MAX);
+>> +#endif /* _SC_HOST_NAME_MAX */
+>> +
+>> +    if (len < 0) {
+>> +        len = HOST_NAME_MAX;
+>> +    }
+>> +
+>> +    hostname = g_malloc0(len + 1);
 > 
-> Commit 96927c744 replaced qdev_init_nofail() call by
-> isa_realize_and_unref() which has a different error
-> message. Update the test output accordingly.
+> Nitpick, generally qemu prefers g_new0
 > 
-> Gitlab CI error after merging b77b5b3dc7:
-> https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
+>> +
+>> +    if (gethostname(hostname, len) < 0) {
+>> +        error_setg_errno(errp, errno,
+>> +                         "cannot get hostname");
+>> +        return NULL;
+>> +    }
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Message-Id: <20200616154949.6586-1-philmd@redhat.com>
-> ---
->  tests/qemu-iotests/051.pc.out | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> According to my man page, it is undefined by POSIX whether there's a
+> trailing NUL when  hostname exceeds the buffer, so the paranoid thing
+> todo is to add
 > 
-> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-> index 0ea80d35f0e..da8ad871876 100644
-> --- a/tests/qemu-iotests/051.pc.out
-> +++ b/tests/qemu-iotests/051.pc.out
-> @@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
->  
->  Testing: -drive if=ide
->  QEMU X.Y.Z monitor - type 'help' for more information
-> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
-> +(qemu) QEMU_PROG: Device needs media, but drive is empty
->  
->  Testing: -drive if=virtio
->  QEMU X.Y.Z monitor - type 'help' for more information
-> @@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
->  
->  Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
->  QEMU X.Y.Z monitor - type 'help' for more information
-> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
-> +(qemu) QEMU_PROG: Block node is read-only
->  
->  Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
->  QEMU X.Y.Z monitor - type 'help' for more information
-> 
+>    hostname[len] = '\0';
 
-Just ran into this and wrote an identical fix. The error is not in
-051.out so the pc-only fix appears to be fine.
+Isn't this guaranteed by allocating len + 1 bytes? I mean, g_malloc0() 
+and g_new0() will memset() the memory to zero. And since I tell 
+gethostname() the buf is only len bytes long I am guaranteed to have 0 
+at the end of it, aren't I? Maybe I should put a comment just before 
+g_malloc0() or g_new0() that documents this thought.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-(There seem to be other problems with the CI at the moment, but the
-failures I am seeing are not related to this, so I think it's probably fine)
+Michal
 
 
