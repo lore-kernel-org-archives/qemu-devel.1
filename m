@@ -2,60 +2,92 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AD7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 03:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE588C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 03:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8F825376
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 03:23:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8F825376
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id AA50525376
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 03:24:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BV48AOLR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA50525376
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnD30-00004s-J0
-	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 23:23:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
+	id 1jnD43-0001PX-0p
+	for qemu-devel@archiver.kernel.org; Sun, 21 Jun 2020 23:24:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
- id 1jnD2K-0007yt-GY; Sun, 21 Jun 2020 23:22:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3712 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
- id 1jnD2I-0007rh-5o; Sun, 21 Jun 2020 23:22:20 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id D1A51BA96CBD8B5F43E1;
- Mon, 22 Jun 2020 11:22:04 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 22 Jun 2020 11:21:57 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v3] migration: Count new_dirty instead of real_dirty
-Date: Mon, 22 Jun 2020 11:20:37 +0800
-Message-ID: <20200622032037.31112-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnD3K-0000Xu-20
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 23:23:22 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:47080)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnD3I-0007w4-4S
+ for qemu-devel@nongnu.org; Sun, 21 Jun 2020 23:23:21 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id k18so8341322ybm.13
+ for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 20:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ql4Psp1MJn0Sbda/hirf2+oPjyFqchvpFA+ijYuIgVE=;
+ b=BV48AOLRHb0k4dskfJMulB4ioOcGq5XCydQHdL4JKj8+QLkwTtMbFsc8y5AH+83jQC
+ +vgoWTUUwNbcmjt1mqQarAYZhSfaldRTcSQRKfIkJ1QgKMFjHJHVvYbNVavag0tTZ5PS
+ BQhfU2aSFOJjvxx7IxJ36/3CBNPt1/QvC86VjvAZxYLc27zGgpHIhe1P++lyBheqJOXw
+ faL2117zMsWvAf9K39LWw/3OrHySgU1Ht1B4ym1zMlDjdMCs9laaqgzkca5K6snPK7Vb
+ H0tJpT4wO3lqEfqOoeyY5JutWwb4r6hi9R4QmsftnUU/euTQ54Ie2lihfq354J+wHSfF
+ AnPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ql4Psp1MJn0Sbda/hirf2+oPjyFqchvpFA+ijYuIgVE=;
+ b=e5P8fjXgCSAyoYlz/V6TKoNOyrFdF2nlFVWZTfk4R33NH/+HOcyaZDwdSmVg72Ns0R
+ rOrRSHLQLDrU/L9+7zo1r1INubE+FaA1hNhnQZ0I9AdQbcgTMMRtuiv23MDp8ftt6bSq
+ BdedJ01OOCcmPlrJ81Yx8wxIbQLatUnsimKi9hyZV+JvY0pdtfJRlBDUUaOlswaJZcNa
+ Bv7RZEo4GyoCNSYN0ur6kjksdTI4EvUxruVy7R8I8qHm3fbJK2myqvd97IAX9WuveJiB
+ BhK7jognLEzloW3XMvYfBufcS75Ee/AKem7g+JATsCLaom95ZtEHiejuTi2LWaiST+ok
+ vjuA==
+X-Gm-Message-State: AOAM5327uegR+Ssm3XAN4/joy8s8j2wXGO8pfxwt7i13rtQlsjU5AYDi
+ EhE4+2xr6ArgxRdKCjTcxZI8F72nNgGajS0//7w=
+X-Google-Smtp-Source: ABdhPJwxPud/GFWBee6Yv2ZB0lqOluPh5tMzm0HSthgk/Nwj/+KevqJuzFmlEAEMQotFgWLnS27uYRhM8hetnG64Jzk=
+X-Received: by 2002:a25:da44:: with SMTP id n65mr26381861ybf.387.1592796198585; 
+ Sun, 21 Jun 2020 20:23:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhukeqian1@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/21 23:22:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <003101d5ab71$8424dc40$8c6e94c0$@protonmail.com>
+ <20191205143622.GB3080934@redhat.com>
+ <000101d5ac55$f8422620$e8c67260$@protonmail.com>
+ <20191206170747.GD3291374@redhat.com>
+ <000001d5acc2$e7e07ee0$b7a17ca0$@protonmail.com>
+ <000001d5b312$8927d550$9b777ff0$@protonmail.com>
+In-Reply-To: <000001d5b312$8927d550$9b777ff0$@protonmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 22 Jun 2020 11:23:07 +0800
+Message-ID: <CAEUhbmXbEJPwMttTpSYSwOm+Cm+LfwZOoSSfxHuOp_u+eU2_=A@mail.gmail.com>
+Subject: Re: Error compiling Qemu-4.1 on Linux
+To: Aijaz.Baig@protonmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,87 +100,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>,
- wanghaibin.wang@huawei.com, Chao
- Fan <fanc.fnst@cn.fujitsu.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- jianjay.zhou@huawei.com, Paolo Bonzini <pbonzini@redhat.com>,
- Keqian Zhu <zhukeqian1@huawei.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-real_dirty_pages becomes equal to total ram size after dirty log sync
-in ram_init_bitmaps, the reason is that the bitmap of ramblock is
-initialized to be all set, so old path counts them as "real dirty" at
-beginning.
+Hi,
 
-This causes wrong dirty rate and false positive throttling.
+On Sun, Dec 15, 2019 at 2:40 PM <Aijaz.Baig@protonmail.com> wrote:
+>
+> Hello
+>
+> Anything suspicious that anyone can spot in here?? Still cannot get qemu =
+to compile
+>
+> Keen to hear
+>
+> -----Original Message-----
+> From: Aijaz.Baig@protonmail.com <Aijaz.Baig@protonmail.com>
+> Sent: Saturday, December 7, 2019 11:25 AM
+> To: 'Daniel P. Berrang=C3=A9' <berrange@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Subject: RE: Error compiling Qemu-4.1 on Linux
+>
+>
+> That file IS present and its contents are:
+>
+> prefix=3D/usr
+> exec_prefix=3D${prefix}
+> libdir=3D${prefix}/lib/x86_64-linux-gnu
+> includedir=3D${prefix}/include
+>
+> Name: GThread
+> Description: Thread support for GLib
+> Requires: glib-2.0
+> Version: 2.50.3
+> Libs: -L${libdir} -lgthread-2.0 -pthread
+> Cflags: -pthread
+>
+> Let me know what is falling short here
+>
+> Regards
+>
+> -----Original Message-----
+> From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Sent: Friday, December 6, 2019 10:38 PM
+> To: Aijaz.Baig@protonmail.com
+> Cc: qemu-devel@nongnu.org
+> Subject: Re: Error compiling Qemu-4.1 on Linux
+>
+>
+> On Fri, Dec 06, 2019 at 04:55:37PM +0000, Aijaz.Baig@protonmail.com wrote=
+:
+> > Here is the content of config.log: https://pastebin.com/6zrSXWAG
+> >
+> > I am configuring it for 'arm-softmmu'  as can be seen from the above
+> > paste
+>
+> Looks like it is failing on
+>
+>   $ pkg-config  --atleast-version=3D2.40 gthread-2.0
+>
+> returning non-zero exit status.
+>
+>
+> This suggests the file:
+>
+>   /usr/lib/x86_64-linux-gnu/pkgconfig/gthread-2.0.pc
+>
+> is missing on your install.
+>
+> Or do you have some PKG_CONFIG_LIBDIR env variable set that is mistakenly=
+ pointing to a different directory.
+>
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
-Changelog:
+This is failing for me today after I cleaned up my build directory and
+re-configured everything from scratch. Something is wrong in the
+configure scripts?
 
-v3:
- - Address Dave's comments.
-
-v2:
- - Use new_dirty_pages instead of accu_dirty_pages.
- - Adjust commit messages.
----
- include/exec/ram_addr.h | 5 +----
- migration/ram.c         | 8 +++++---
- 2 files changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 7b5c24e928..3ef729a23c 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -442,8 +442,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
- static inline
- uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                                                ram_addr_t start,
--                                               ram_addr_t length,
--                                               uint64_t *real_dirty_pages)
-+                                               ram_addr_t length)
- {
-     ram_addr_t addr;
-     unsigned long word = BIT_WORD((start + rb->offset) >> TARGET_PAGE_BITS);
-@@ -469,7 +468,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-             if (src[idx][offset]) {
-                 unsigned long bits = atomic_xchg(&src[idx][offset], 0);
-                 unsigned long new_dirty;
--                *real_dirty_pages += ctpopl(bits);
-                 new_dirty = ~dest[k];
-                 dest[k] |= bits;
-                 new_dirty &= bits;
-@@ -502,7 +500,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                         start + addr + offset,
-                         TARGET_PAGE_SIZE,
-                         DIRTY_MEMORY_MIGRATION)) {
--                *real_dirty_pages += 1;
-                 long k = (start + addr) >> TARGET_PAGE_BITS;
-                 if (!test_and_set_bit(k, dest)) {
-                     num_dirty++;
-diff --git a/migration/ram.c b/migration/ram.c
-index 069b6e30bc..5554a7d2d8 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -859,9 +859,11 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
- /* Called with RCU critical section */
- static void ramblock_sync_dirty_bitmap(RAMState *rs, RAMBlock *rb)
- {
--    rs->migration_dirty_pages +=
--        cpu_physical_memory_sync_dirty_bitmap(rb, 0, rb->used_length,
--                                              &rs->num_dirty_pages_period);
-+    uint64_t new_dirty_pages =
-+        cpu_physical_memory_sync_dirty_bitmap(rb, 0, rb->used_length);
-+
-+    rs->migration_dirty_pages += new_dirty_pages;
-+    rs->num_dirty_pages_period += new_dirty_pages;
- }
- 
- /**
--- 
-2.19.1
-
+Regards,
+Bin
 
