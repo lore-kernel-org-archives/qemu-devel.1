@@ -2,75 +2,109 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B81EBC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F72C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C9BF206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:25:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9BF206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E57EB206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 13:27:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RoM3EXOS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57EB206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnMSL-0006ag-TN
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:25:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49896)
+	id 1jnMTb-0007on-8W
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 09:27:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnMRe-00060i-MD
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:25:07 -0400
-Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:56342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnMRb-0002d1-C8
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:25:06 -0400
-Received: from player739.ha.ovh.net (unknown [10.108.42.176])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id A251F21B491
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 15:25:00 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-921-245.w86-210.abo.wanadoo.fr
- [86.210.152.245]) (Authenticated sender: clg@kaod.org)
- by player739.ha.ovh.net (Postfix) with ESMTPSA id 5E07CF968D33;
- Mon, 22 Jun 2020 13:24:52 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-99G0035aca5aa9-3126-4c04-8516-1a592f4e1f32,D5B34DF2F1998B4AFDB97B5973F1BB92C24DD330)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v4 4/8] hw/misc/pca9552: Add a 'description' property for
- debugging purpose
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200620225854.31160-1-f4bug@amsat.org>
- <20200620225854.31160-5-f4bug@amsat.org>
- <4d335933-9669-43e1-0966-5f0255142012@kaod.org>
- <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <deccf836-48ef-7112-d66e-a8d3cc4a9681@kaod.org>
-Date: Mon, 22 Jun 2020 15:24:50 +0200
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jnMSk-00076D-F6
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:26:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59602
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jnMSA-0002mf-Bl
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 09:26:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592832337;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dk52xw64vWxDGhlIinGMYjMjksVgyjUu9/7WgThL+jQ=;
+ b=RoM3EXOS7bPSbwCTzmiLO1wfCtsc19pR76HJg9l08VE96rMk3a85exiSwFXdq6dYe7n4s3
+ t4CwfUywdempHD6HcI/MpIT3k8I9UA4HCkrOskPMGHtuB8D56Wdz4Ts2KT2Dump8dtvS9g
+ 6vw4g9vWRsToJiwiR8vi+EGvhaZw0GI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-gHDcV2yMN9uxsBRf6Z0sig-1; Mon, 22 Jun 2020 09:25:35 -0400
+X-MC-Unique: gHDcV2yMN9uxsBRf6Z0sig-1
+Received: by mail-wr1-f71.google.com with SMTP id r5so10866031wrt.9
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 06:25:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dk52xw64vWxDGhlIinGMYjMjksVgyjUu9/7WgThL+jQ=;
+ b=p4LARRsgsjZlkjTB43RETQMB5veXdmlz+QdfdRimm8EEL1Oy3S11nNbJbRFxsmoPsN
+ 8lJIC6iDCOPDdpdwwFEj+11PBSfSyKd03g6nDYZ4BiyKDQKEigY0k0X9ujsVdjefr0uv
+ T7AzrmURZ4U4wgpBOxxYgj/+YakIkqsFMOTnZf2xDt+41F8Qxiow0/BD6uG1j8r5bQfg
+ QZT7DjXlmcajmI2VeVmHinLAKvVJGsCTY4lfFGPwr7zwFDO3/yBiDOd1lYKFuf5Xh1Vh
+ Oobr2CKAnJydBf2hbt8rciv+jJXcV1Znfy3GMe9bF+FuKfK7BvpDuEYiPSybnnyWvPrZ
+ zGJg==
+X-Gm-Message-State: AOAM531IBAnD0JNx00Yn0g4NKyZyUBlmordGcjmjK/2KIwFfzRQrQ858
+ R0x2BdcB6PQLvEVRjdk/JM1L/e2+Vf6/o8nkJehgGm1o+o/eFO5C89ItDIh81PvF+gFkH6P17R5
+ UN8W+0cIOt5H+g7M=
+X-Received: by 2002:a1c:9804:: with SMTP id a4mr18438941wme.109.1592832334652; 
+ Mon, 22 Jun 2020 06:25:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxdkLbETQVdBp1mhtno8kUMzL8M3aqTykHL205yKdj1D0iW3lq3gjW6deRLOaNKe8D7EURyA==
+X-Received: by 2002:a1c:9804:: with SMTP id a4mr18438911wme.109.1592832334285; 
+ Mon, 22 Jun 2020 06:25:34 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id v20sm4058601wmh.26.2020.06.22.06.25.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 22 Jun 2020 06:25:33 -0700 (PDT)
+Subject: Re: [PATCH v3 11/19] audio: deprecate -soundhw pcspk
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+References: <20200622112914.30454-1-kraxel@redhat.com>
+ <20200622112914.30454-12-kraxel@redhat.com>
+ <47fe0fd8-ab19-b35d-0808-d9a83201c530@redhat.com>
+ <1bc80fe2-6ec4-000d-483d-70b34ff15adc@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f58d6bd4-95c7-2356-583b-f1fe5e8a236a@redhat.com>
+Date: Mon, 22 Jun 2020 15:25:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1bc80fe2-6ec4-000d-483d-70b34ff15adc@redhat.com>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 12766579047821970193
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekvddgieeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkeeirddvuddtrdduhedvrddvgeehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.36.150; envelope-from=clg@kaod.org;
- helo=17.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 09:25:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,98 +117,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Corey Minyard <cminyard@mvista.com>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ libvir-list@redhat.com,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 10:31 AM, Philippe Mathieu-Daudé wrote:
-> On 6/22/20 8:27 AM, Cédric Le Goater wrote:
->> On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
->>> Add a description field to distinguish between multiple devices.
->>
->> Reviewed-by: Cédric Le Goater <clg@kaod.org>
->>
->> Could it be a QOM attribute ? 
-> 
-> What do you call a 'QOM attribute'?
-> Is it what qdev properties implement?
-> (in this case via DEFINE_PROP_STRING).
-
-I meant a default Object property, which would apply to all Objects. 
-
-What you did is fine, so :
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
-but, may be, a well defined child name is enough for the purpose.
-
-C.
-
-
-> 
->>
->> C.
->>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>>  include/hw/misc/pca9552.h |  1 +
->>>  hw/misc/pca9552.c         | 10 ++++++++++
->>>  2 files changed, 11 insertions(+)
->>>
->>> diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
->>> index ef6da4988f..c5be7f1c5e 100644
->>> --- a/include/hw/misc/pca9552.h
->>> +++ b/include/hw/misc/pca9552.h
->>> @@ -27,6 +27,7 @@ typedef struct PCA9552State {
->>>  
->>>      uint8_t regs[PCA9552_NR_REGS];
->>>      uint8_t max_reg;
->>> +    char *description; /* For debugging purpose only */
->>>      uint8_t nr_leds;
->>>  } PCA9552State;
->>>  
->>> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
->>> index b97fc2893c..54ccdcf6d4 100644
->>> --- a/hw/misc/pca9552.c
->>> +++ b/hw/misc/pca9552.c
->>> @@ -12,6 +12,7 @@
->>>  #include "qemu/osdep.h"
->>>  #include "qemu/log.h"
->>>  #include "qemu/module.h"
->>> +#include "hw/qdev-properties.h"
->>>  #include "hw/misc/pca9552.h"
->>>  #include "hw/misc/pca9552_regs.h"
->>>  #include "migration/vmstate.h"
->>> @@ -312,8 +313,16 @@ static void pca9552_realize(DeviceState *dev, Error **errp)
->>>                     __func__, s->nr_leds, PCA9552_PIN_COUNT);
->>>          return;
->>>      }
->>> +    if (!s->description) {
->>> +        s->description = g_strdup("pca-unspecified");
->>> +    }
->>>  }
->>>  
->>> +static Property pca9552_properties[] = {
->>> +    DEFINE_PROP_STRING("description", PCA9552State, description),
->>> +    DEFINE_PROP_END_OF_LIST(),
->>> +};
+On 22/06/20 15:07, Philippe Mathieu-Daudé wrote:
+>>> +static int pcspk_audio_init_soundhw(ISABus *bus)
+>>> +{
+>>> +    PCSpkState *s = pcspk_state;
 >>> +
->>>  static void pca9552_class_init(ObjectClass *klass, void *data)
->>>  {
->>>      DeviceClass *dc = DEVICE_CLASS(klass);
->>> @@ -325,6 +334,7 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
->>>      dc->realize = pca9552_realize;
->>>      dc->reset = pca9552_reset;
->>>      dc->vmsd = &pca9552_vmstate;
->>> +    device_class_set_props(dc, pca9552_properties);
->>>  }
->>>  
->>>  static const TypeInfo pca9552_info = {
->>>
->>
->>
+>>> +    warn_report("'-soundhw pcspk' is deprecated, "
+>>> +                "please set a backend using '-global isa-pcspk.audiodev=<name>' instead");
+> Markus's "Crazy shit around -global (pardon my french)"
+> series instead suggest to use '-device ...':
+> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06667.html
+> Could that work here?
+
+No, this is a different issue.  The problem with the floppy is that it
+conflated two devices in one (controller and drive), while here the
+device is builtin.
+
+In this case -global could be replaced by a machine property, similar to
+what is done for the block devices that back parallel flash.  That
+however is orthogonal to providing a good CLI for configuring audio.
+
+Paolo
 
 
