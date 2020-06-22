@@ -2,101 +2,65 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C450C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 07:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F433C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 07:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 512E325478
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 07:49:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512E325478
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5DE620E65
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 07:51:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DE620E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnHCw-0005ts-Iv
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 03:49:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52428)
+	id 1jnHEP-000753-6X
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 03:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jnH6Z-0002ud-5j; Mon, 22 Jun 2020 03:42:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9420)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jnH6W-0001vT-Mc; Mon, 22 Jun 2020 03:42:58 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05M7X0lC040433; Mon, 22 Jun 2020 03:42:55 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31svf0ygf5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 03:42:55 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05M7YgKC045313;
- Mon, 22 Jun 2020 03:42:54 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31svf0yge2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 03:42:54 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05M7fAYl020087;
- Mon, 22 Jun 2020 07:42:52 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma03fra.de.ibm.com with ESMTP id 31sa3815gp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 07:42:52 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05M7gnuH62783590
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 22 Jun 2020 07:42:50 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E15B9A4054;
- Mon, 22 Jun 2020 07:42:49 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 319BBA4060;
- Mon, 22 Jun 2020 07:42:49 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 22 Jun 2020 07:42:49 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 8/9] pc-bios: s390x: Use ebcdic2ascii table
-Date: Mon, 22 Jun 2020 03:42:34 -0400
-Message-Id: <20200622074235.32528-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200622074235.32528-1-frankja@linux.ibm.com>
-References: <20200622074235.32528-1-frankja@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <dovgaluk@ispras.ru>)
+ id 1jnHDp-0006ZJ-Vk
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 03:50:29 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:50298)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dovgaluk@ispras.ru>)
+ id 1jnHDo-0003Fy-4x
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 03:50:29 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id DF57D40A6332;
+ Mon, 22 Jun 2020 07:50:24 +0000 (UTC)
+Subject: Re: what are the requirements on target/ code for -icount to work
+ correctly?
+To: Max Filippov <jcmvbkbc@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <CAFEAcA_HOxdK5rgKVnww6Bum3vGb=TrhDEp7oqDwsd=UbHmC_g@mail.gmail.com>
+ <c47e9e4e-49eb-88c5-fdc7-8ebec121c165@ispras.ru>
+ <f4fc4a1b-4054-cffd-0272-22c28d656aba@redhat.com>
+ <CAFEAcA_OfF2pBPCv7Wj+u4Rm3fjtApzfiE9WYhiGeEzffd60Kw@mail.gmail.com>
+ <CAMo8BfKTMfZY_2RBncoWpZHcLQ7ug+LPxnUaS9pHe8AiAQL-0w@mail.gmail.com>
+From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <9698cdc6-e3f8-877f-2ca9-3b60e7694f48@ispras.ru>
+Date: Mon, 22 Jun 2020 10:50:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-22_02:2020-06-22,
- 2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=1
- mlxlogscore=999 malwarescore=0 impostorscore=0 priorityscore=1501
- adultscore=0 spamscore=0 cotscore=-2147483648 lowpriorityscore=0
- bulkscore=0 clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006220056
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:42:49
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAMo8BfKTMfZY_2RBncoWpZHcLQ7ug+LPxnUaS9pHe8AiAQL-0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84; envelope-from=dovgaluk@ispras.ru;
+ helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,38 +73,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- thuth@redhat.com, david@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Why should we do conversion of a ebcdic value if we have a handy table
-where we could look up the ascii value instead?
+On 22.06.2020 08:24, Max Filippov wrote:
+> On Fri, Jun 19, 2020 at 10:05 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>> I've just sent a patch that removes the target/arm gen_io_end() calls.
+>> I had a quick look at sparc, xtensa and ppc, but they were too complicated
+>> for a quick look to be sufficient :-)
+> 
+> I've checked the xtensa translator. The only gen_io_end() is for
+> opcodes that end TB when a full instruction is translated, because
+> they can change active interrupt requests. So it can be removed.
+> I'll send a patch.
+> 
+> One instance of gen_io_start is for the rsr.ccount opcode that reads
+> current cycle counter that translates to reading
+> QEMU_CLOCK_VIRTUAL clock.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/bootmap.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Right, this is documented by Alex in the new document recently sent into 
+the mailing list:
+https://lore.kernel.org/qemu-devel/7611429f-ec38-554d-3aec-e4a2f456a1ea@linaro.org/T/#mff14f2e3dc2cedd7cc6b1356985a0454e4772202
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index d13b7cbd15..97205674e5 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -328,9 +328,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
-         msg[0] = '2';
-         break;
-     default:
--        msg[0] = vlbl->LDL_version;
--        msg[0] &= 0x0f; /* convert EBCDIC   */
--        msg[0] |= 0x30; /* to ASCII (digit) */
-+        msg[0] = ebc2asc[vlbl->LDL_version];
-         msg[1] = '?';
-         break;
-     }
--- 
-2.25.1
+> Looks like this adds one more case to the
+> following list:
+> 
+>> As I understand it, the definition of "I/O insn" is anything that can
+>> either:
+>>
+>> - affect the icount deadline (e.g. by setting or removing a
+>> QEMU_CLOCK_VIRTUAL timer)
+>>
+>> - interrupt the current translation block with cpu_loop_exit,
+>> cpu_restore_state or similar.
+> 
 
 
