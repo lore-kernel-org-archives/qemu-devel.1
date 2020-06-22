@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A241C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB017C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143A1206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:24:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74C50206E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:27:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fG8dEkqW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143A1206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCNLX7t3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74C50206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJdC-00080K-CR
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:24:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36216)
+	id 1jnJfW-00012K-Oa
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:27:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnJcJ-00073t-E7
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:55 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31203
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jnJeR-0000Xa-SU
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:26:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20768
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnJcG-0002JH-Q9
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:23:54 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jnJeP-0002i4-5b
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:26:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592821431;
+ s=mimecast20190719; t=1592821563;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eN7N7NU/KJXTHsq4zOw7nWw/vHOCrRmLaL5p9CvbjA4=;
- b=fG8dEkqWI3KELDYs2aww6SWEIpmGIztUZKaz8ZUmYPjabKHTll8PI3SaTVc5Q/LofVDX67
- giHndnUIMtqlxN+rQCK5K/65fR02xkNXvgObU6x9R4nT6fGTSXBbzznJfHVpz5bpLr+Ol1
- WizVN76NkPEZ+7ayU6O4g3u6nQrOTvA=
+ bh=N/s4YO3j05UONHII8zu7zZsNYCcXnN+4hjmy1cFeepc=;
+ b=eCNLX7t3Zbi/lhMcdW2+n2CSmRo1s9b5wqVUbwH/97yKorsQ7ygpcqGd0VnxjirveRcikx
+ KSpNqx7bOXc3acX4tj4pDeUIkzVmFAq5Qbpp2hEZVOKjfmLmhOkTuNazK4vQtOhnMlIOoi
+ lJvpNLM3oeYs2845DI/xpFL/xXHtEFk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-WQjcwv-gMxqXAF5T7d997A-1; Mon, 22 Jun 2020 06:23:49 -0400
-X-MC-Unique: WQjcwv-gMxqXAF5T7d997A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-421-8tDlOyKAMdWeel_1A2GvkA-1; Mon, 22 Jun 2020 06:26:01 -0400
+X-MC-Unique: 8tDlOyKAMdWeel_1A2GvkA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14EA805738;
- Mon, 22 Jun 2020 10:23:48 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-179.ams2.redhat.com [10.36.113.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D93510002A5;
- Mon, 22 Jun 2020 10:23:43 +0000 (UTC)
-Date: Mon, 22 Jun 2020 12:23:42 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 12/16] python/machine.py: Add _qmp access shim
-Message-ID: <20200622102342.GB5707@linux.fritz.box>
-References: <20200604202236.25039-1-jsnow@redhat.com>
- <20200604202236.25039-13-jsnow@redhat.com>
- <659c7e95-54c3-dc20-02e3-86ce4ca74a5f@redhat.com>
- <CAP+75-UDM0zxzBWze2NvuJPQ3ezZDn3r-SsrM2q_7JU3ANiYaA@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F7D8018AB;
+ Mon, 22 Jun 2020 10:26:00 +0000 (UTC)
+Received: from localhost (ovpn-115-184.ams2.redhat.com [10.36.115.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A0D47C1FD;
+ Mon, 22 Jun 2020 10:25:59 +0000 (UTC)
+Date: Mon, 22 Jun 2020 11:25:58 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Lin Ma <lma@suse.com>
+Subject: Re: [PATCH v2 1/3] block: Add bdrv_co_get_lba_status
+Message-ID: <20200622102558.GA13543@stefanha-x1.localdomain>
+References: <20200617103018.18026-1-lma@suse.com>
+ <20200617103018.18026-2-lma@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-UDM0zxzBWze2NvuJPQ3ezZDn3r-SsrM2q_7JU3ANiYaA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200617103018.18026-2-lma@suse.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="1yeeQ81UyVL57Vl7"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -83,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,103 +95,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.06.2020 um 10:20 hat Philippe Mathieu-Daudé geschrieben:
-> On Sat, Jun 20, 2020 at 10:14 AM Philippe Mathieu-Daudé
-> <philmd@redhat.com> wrote:
-> >
-> > On 6/4/20 10:22 PM, John Snow wrote:
-> > > Like many other Optional[] types, it's not always a given that this
-> > > object will be set. Wrap it in a type-shim that raises a meaningful
-> > > error and will always return a concrete type.
-> > >
-> > > Signed-off-by: John Snow <jsnow@redhat.com>
-> > > ---
-> > >  python/qemu/machine.py | 12 +++++++++---
-> > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> > > index d8289936816..a451f9000d6 100644
-> > > --- a/python/qemu/machine.py
-> > > +++ b/python/qemu/machine.py
-> > > @@ -118,7 +118,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-> > >          self._events = []
-> > >          self._iolog = None
-> > >          self._qmp_set = True   # Enable QMP monitor by default.
-> > > -        self._qmp = None
-> > > +        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
-> > >          self._qemu_full_args = None
-> > >          self._temp_dir = None
-> > >          self._launched = False
-> > > @@ -285,7 +285,7 @@ def _pre_launch(self):
-> > >              if self._remove_monitor_sockfile:
-> > >                  assert isinstance(self._monitor_address, str)
-> > >                  self._remove_files.append(self._monitor_address)
-> > > -            self._qmp = qmp.QEMUMonitorProtocol(
-> > > +            self._qmp_connection = qmp.QEMUMonitorProtocol(
-> > >                  self._monitor_address,
-> > >                  server=True,
-> > >                  nickname=self._name
-> > > @@ -455,7 +455,13 @@ def set_qmp_monitor(self, enabled=True):
-> > >              self._qmp_set = True
-> > >          else:
-> > >              self._qmp_set = False
-> > > -            self._qmp = None
-> > > +            self._qmp_connection = None
-> > > +
-> > > +    @property
-> > > +    def _qmp(self) -> qmp.QEMUMonitorProtocol:
-> > > +        if self._qmp_connection is None:
-> > > +            raise QEMUMachineError("Attempt to access QMP with no connection")
-> > > +        return self._qmp_connection
-> > >
-> > >      @classmethod
-> > >      def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
-> > >
-> >
-> > This patch breaks the EmptyCPUModel test:
-> >
-> > (043/101) tests/acceptance/empty_cpu_model.py:EmptyCPUModel.test:
-> > ERROR: Attempt to access QMP with no connection (0.03 s)
-> 
-> Fixed with:
-> 
-> -- >8 --
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index ba6397dd7e..26ae7be89b 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -480,7 +480,7 @@ def set_qmp_monitor(self, enabled: bool = True) -> None:
-> 
->      @property
->      def _qmp(self) -> qmp.QEMUMonitorProtocol:
-> -        if self._qmp_connection is None:
-> +        if self._qmp_set and self._qmp_connection is None:
->              raise QEMUMachineError("Attempt to access QMP with no connection")
->          return self._qmp_connection
-> 
+--1yeeQ81UyVL57Vl7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 17, 2020 at 06:30:16PM +0800, Lin Ma wrote:
+> The get lba status wrapper based on the bdrv_block_status. The following
+> patches will add GET LBA STATUS 16 support for scsi emulation layer.
+>=20
+> Signed-off-by: Lin Ma <lma@suse.com>
 > ---
-> 
-> Does that sound reasonable to you?
+>  block/io.c                | 43 +++++++++++++++++++++++++++++++++++++++
+>  include/block/block_int.h |  5 +++++
+>  2 files changed, 48 insertions(+)
+>=20
+> diff --git a/block/io.c b/block/io.c
+> index df8f2a98d4..2064016b19 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2208,6 +2208,49 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *=
+child, int64_t offset,
+>                             BDRV_REQ_ZERO_WRITE | flags);
+>  }
+> =20
+> +int coroutine_fn
+> +bdrv_co_get_lba_status(BdrvChild *child, int64_t offset, int64_t bytes,
+> +                       uint32_t *num_blocks, uint32_t *is_deallocated)
 
-Wouldn't that make the return type Optional[qmp.QEMUMonitorProtocol]?
-Maybe this is what we want, but then we don't need the shim that this
-patch adds but can just declare the variable this way.
+Missing doc comments.
 
-And why does the feeling code even try to acess _qmp when _qmp_set is
-False? Shouldn't it first check whether it's even valid?
+> +{
+> +    BlockDriverState *bs =3D child->bs;
 
-Or maybe going a step back, why do we even have a separate _qmp_set
-instead of only using None for _qmp?
+Why does this function take a BdrvChild argument instead of
+BlockDriverState? Most I/O functions take BlockDriverState.
 
-Kevin
+> +    int ret =3D 0;
+> +    int64_t target_size, count =3D 0;
+> +    bool first =3D true;
+> +    uint8_t wanted_bit1 =3D 0;
+> +
+> +    target_size =3D bdrv_getlength(bs);
+> +    if (target_size < 0) {
+> +        return -EIO;
+> +    }
+> +
+> +    if (offset < 0 || bytes < 0) {
+> +        return -EIO;
+> +    }
+> +
+> +    for ( ; offset <=3D target_size - bytes; offset +=3D count) {
+> +        ret =3D bdrv_block_status(bs, offset, bytes, &count, NULL, NULL)=
+;
+> +        if (ret < 0) {
+> +            goto out;
+> +        }
+> +        if (first) {
+> +            if (ret & BDRV_BLOCK_ZERO) {
+> +                wanted_bit1 =3D BDRV_BLOCK_ZERO >> 1;
+> +                *is_deallocated =3D 1;
+
+This is a boolean. Please use bool instead of uint32_t.
+
+Please initialize is_deallocated to false at the beginning of the
+function to avoid accidental uninitialized variable accesses in the
+caller.
+
+> +            } else {
+> +                wanted_bit1 =3D 0;
+> +            }
+> +            first =3D false;
+> +        }
+> +        if ((ret & BDRV_BLOCK_ZERO) >> 1 =3D=3D wanted_bit1) {
+> +            (*num_blocks)++;
+
+If there is a long span of allocated/deallocated blocks then this
+function only increments num_blocks once without counting the number of
+blocks. I expected something like num_blocks +=3D pnum / block_size.  What
+is the relationship between bytes, count, and blocks in this function?
+
+> +        } else {
+> +            break;
+> +        }
+> +    }
+> +out:
+> +    return ret;
+> +}
+> +
+>  /*
+>   * Flush ALL BDSes regardless of if they are reachable via a BlkBackend =
+or not.
+>   */
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 791de6a59c..43f90591b9 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -1296,6 +1296,11 @@ int coroutine_fn bdrv_co_block_status_from_backing=
+(BlockDriverState *bs,
+>                                                     int64_t *pnum,
+>                                                     int64_t *map,
+>                                                     BlockDriverState **fi=
+le);
+> +int coroutine_fn bdrv_co_get_lba_status(BdrvChild *child,
+> +                                        int64_t offset,
+> +                                        int64_t bytes,
+> +                                        uint32_t *num_blocks,
+> +                                        uint32_t *is_deallocated);
+
+Should this function be in include/block/block.h (the public API) so
+that any part of QEMU can call it? It's not an internal API.
+
+--1yeeQ81UyVL57Vl7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7whzUACgkQnKSrs4Gr
+c8gYdAgAudHT7n+s61+IaL9iTnUtDYoeqPgLRMjl1GXwaGt+NGdeUBlUAStKKX+6
+4p3Bm9+FmxcC3RUwuRK4XMrFz0nmZrz4k2iRzvivjPWCJMwscJLynkK5r/UEscih
+wcEq+SUcERCDNNa7Te4cCLZ2FdtRLvQBW6CcDoY5sqDKy4JQYDdTWfpJcWPVpyEa
+d2ZKqg1C/4PEzyu18EsKxXE5lPwq4UWSx4qa1ozlxdp68Ivx52KW6zNsn8H1gjvq
+owxsP+mio8cJVfZxu/6mu5mT5hiYqiUAFsShWU5yKLv494Ss1xO89LQUwSYqPFCc
+1A0abaDzDOSbrQOUPqD6Yo0pIypE+w==
+=tcV6
+-----END PGP SIGNATURE-----
+
+--1yeeQ81UyVL57Vl7--
 
 
