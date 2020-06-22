@@ -2,81 +2,84 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F273AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC717C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:35:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE30020732
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6CE82078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:35:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKMm217G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE30020732
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B45PiL5Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CE82078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnG3D-0008N9-VR
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:35:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37060)
+	id 1jnG3I-0008SU-U3
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jnG1R-0006R9-6v; Mon, 22 Jun 2020 02:33:37 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37916)
+ id 1jnG1U-0006RS-Kc; Mon, 22 Jun 2020 02:33:40 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37919)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jnG1P-0007u1-Ha; Mon, 22 Jun 2020 02:33:36 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z13so3624694wrw.5;
- Sun, 21 Jun 2020 23:33:34 -0700 (PDT)
+ id 1jnG1R-0007uD-Q1; Mon, 22 Jun 2020 02:33:40 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z13so3624780wrw.5;
+ Sun, 21 Jun 2020 23:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=dGGddd8XMjE/mRc8huN4p5tMSlKo19awy1ee6h65k6Y=;
- b=gKMm217GKPwPpiCaC+x53jM+csQRZ/vVK0bY+U4Cb2wvojJOL5tT4pnzErxb4YQxw+
- 71DMj0fkCWHwNR0KHYM5REMF6uVI9+eDgZJARC3oH0Qd6EJeiUJpnF1Dfod/Wxh+spY8
- XWqo6LYwVXxyAzhDc7ctmGuGfG3s6GxrE1goZznlka4xgvZjWq7R72BbQLd3DV5rmKMt
- aDqXouGx3EBxk7roleDywgqhPy+cVzWfSOMdPtBh6NNd8ZLaNXzRmJIEwwnBfNQWaFv0
- qbvlle0TcRKnAvvlqO4vG2JaLndpMfSqPpWgrBiWI0obxXMdg2mYQ+vcyqSiTNCxLWqZ
- 8wvw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=6N1jZ1+6HSSEfbc/nt6q5ecEC/Qcja+N9BUymVZyGyo=;
+ b=B45PiL5Q5pvMakAzx/6cvQYbj15+y5W6pjVphLYSz+3erY68io+KkzvY9y261Cf8Xk
+ UQrphtUVhNWr5H7a8CR4sb+13K+dlrzTiGrvlO8a5vFJVnrhUJqqUsIoEabEEQQxXK3P
+ /B1Y3SI6LmrEPvgHVDzZYVo2uBImBvGM/wup2z5Vjul+n6zBngxw8FB6wM0pnKDn95oy
+ RqNA9c+JI4nSdKflA4b9JYegYTpA0aELXf5qTJprbCilAFrfqB6j2Pgeu1Dbyn2hZsmp
+ qEcuN80S9RsJimrTwwB/LKQLOGbbpeF/fB9LdVwbF8BeGPbGkMbZnL6tIblKTAKCInnl
+ z9dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=dGGddd8XMjE/mRc8huN4p5tMSlKo19awy1ee6h65k6Y=;
- b=S0HBvy6+lvkEwck1SMyM97T3iptnZvT6xHJJ6uzZr1JHSvBsgxdNoVwr78y4+Mj4js
- L9K9ULj1juDEFSW2pSqrJ82dMHIj5B6hl/BjvSBr2vX2nIvFJzXGQK5H38ZGre1XA3qo
- v9Vw/uuwHFBgsQ83lUrY8NbuXIT0jQwtTB31uNJnlSZ/176ofwxOvlE0J+syhbbOQ+IK
- vhOhKnpuzdBk5x2y7kvwsrPa5sHJxnExmrVcWueHWRmirJDoBS081hrVKg3yRCwtbVTd
- t3qL8fUPqn7Xk+zUkJmQVgDDMp836YOGzxL9WaPDcc0Mc0n57KL95so2oqcvNWXilSe4
- KcVw==
-X-Gm-Message-State: AOAM532W6hbCM8B4H1ZfRJE7Ea/qbR07NUD1K1Kk5agwIW83AcRrHSQh
- Tjc1YQ3CgqerpcCiUqZjaR8=
-X-Google-Smtp-Source: ABdhPJxdR34+94oVPZUUOvpzHZyQtDgsO6X9ik9s9cXcw/86v/xCkxF8/y3N/4cixurv8luvsfUHDw==
-X-Received: by 2002:adf:e4ce:: with SMTP id v14mr17962639wrm.64.1592807613588; 
- Sun, 21 Jun 2020 23:33:33 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=6N1jZ1+6HSSEfbc/nt6q5ecEC/Qcja+N9BUymVZyGyo=;
+ b=qYkxjjcoSwtfY5H2/hNeNMU0gjZKRsI4vjxhT1XdNHZdtJpCFUJn4pJ8ssCQOBe0Cj
+ rpsPenx6ktBVhPOlGKbz6u9FTka0Wg3Sw8FeaPQe1plSMzQfhjPUf/xLWGGVtKY1qlIA
+ NB41/1BnUg/pdq+O+/kHnXwh/oxWBBzTaoEdzaa9oRmbHQukprEjaD8FZ5/ZE0m/n8wE
+ jUNmjS32agVAnMwg5K7Mf4eY32NHbgdDfKzfWxX154snoGonB4r81UPReT3y0/RUFOEF
+ IJAVid6YQRwz9kmME+gQPN2VmeadC5iYjPuCIQU66hVqHxf/54SOaNGeKBS6uUBxFfiG
+ nJ5g==
+X-Gm-Message-State: AOAM531A55tCk0HM0+VPzESniULONWrTnphMV296kk5J1z7gA3dobXQ4
+ Ieg/omUWYDEn3iHjiG66ke4=
+X-Google-Smtp-Source: ABdhPJykUFhAByiso6aoz8U476t9+5VPw3jxDjrWYnvWK+Z3gfMWsVHh+5Ivj8C7di/NGz1DrBiujg==
+X-Received: by 2002:a5d:5449:: with SMTP id w9mr17505899wrv.106.1592807615974; 
+ Sun, 21 Jun 2020 23:33:35 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id a10sm16684240wrm.21.2020.06.21.23.33.31
+ by smtp.gmail.com with ESMTPSA id a10sm16684240wrm.21.2020.06.21.23.33.33
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Sun, 21 Jun 2020 23:33:33 -0700 (PDT)
+ Sun, 21 Jun 2020 23:33:35 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmerdabbelt@google.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi bios
- images
-Date: Sun, 21 Jun 2020 23:33:17 -0700
-Message-Id: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH v2 1/7] configure: Create symbolic links for pc-bios/*.elf
+ files
+Date: Sun, 21 Jun 2020 23:33:18 -0700
+Message-Id: <1592807604-20805-2-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=bmeng.cn@gmail.com; helo=mail-wr1-x441.google.com
+In-Reply-To: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+References: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,60 +108,32 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-The RISC-V generic platform is a flattened device tree (FDT) based
-platform where all platform specific functionality is provided based
-on FDT passed by previous booting stage. The support was added in
-the upstream OpenSBI v0.8 release recently.
+Now we need to ship the OpenSBI fw_jump.elf image for the
+RISC-V Spike machine, it requires us to create symbolic
+links for pc-bios/*.elf files.
 
-This series updates QEMU to switch to use generic platform of opensbi
-bios images.
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-The patch emails do not contain binary bits, please grab all updates
-at https://github.com/lbmeng/qemu.git bios branch.
+---
 
 Changes in v2:
 - new patch: configure: Create symbolic links for pc-bios/*.elf files
-- Upgrade OpenSBI to v0.8 release
-- Copy the ELF images too in the make rules
-- Include ELF images in the artifacts
-- new patch: Makefile: Ship the generic platform bios images for RISC-V
 
-Bin Meng (7):
-  configure: Create symbolic links for pc-bios/*.elf files
-  roms/opensbi: Upgrade from v0.7 to v0.8
-  roms/Makefile: Build the generic platform for RISC-V OpenSBI firmware
-  hw/riscv: Use pre-built bios image of generic platform for virt &
-    sifive_u
-  hw/riscv: spike: Change the default bios to use generic platform image
-  gitlab-ci/opensbi: Update GitLab CI to build generic platform
-  Makefile: Ship the generic platform bios images for RISC-V
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
- .gitlab-ci.d/opensbi.yml                     |  28 +++++++++--------------
- Makefile                                     |   4 ++--
- configure                                    |   1 +
- hw/riscv/sifive_u.c                          |   4 ++--
- hw/riscv/spike.c                             |   9 ++++++--
- hw/riscv/virt.c                              |   4 ++--
- pc-bios/opensbi-riscv32-generic-fw_jump.bin  | Bin 0 -> 58048 bytes
- pc-bios/opensbi-riscv32-generic-fw_jump.elf  | Bin 0 -> 554156 bytes
- pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49520 -> 0 bytes
- pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 49504 -> 0 bytes
- pc-bios/opensbi-riscv64-generic-fw_jump.bin  | Bin 0 -> 70792 bytes
- pc-bios/opensbi-riscv64-generic-fw_jump.elf  | Bin 0 -> 619960 bytes
- pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 57936 -> 0 bytes
- pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 57920 -> 0 bytes
- roms/Makefile                                |  32 +++++++++------------------
- roms/opensbi                                 |   2 +-
- 16 files changed, 35 insertions(+), 49 deletions(-)
- create mode 100644 pc-bios/opensbi-riscv32-generic-fw_jump.bin
- create mode 100644 pc-bios/opensbi-riscv32-generic-fw_jump.elf
- delete mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
- delete mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
- create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.bin
- create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.elf
- delete mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
- delete mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
-
+diff --git a/configure b/configure
+index ba88fd1..4a1514a 100755
+--- a/configure
++++ b/configure
+@@ -8399,6 +8399,7 @@ LINKS="$LINKS tests/qemu-iotests/check"
+ LINKS="$LINKS python"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
++    $source_path/pc-bios/*.elf \
+     $source_path/pc-bios/*.lid \
+     $source_path/pc-bios/*.rom \
+     $source_path/pc-bios/*.dtb \
 -- 
 2.7.4
 
