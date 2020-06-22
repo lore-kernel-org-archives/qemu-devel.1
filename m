@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 261D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFFAC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1B062071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58D6B2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="On6WfGCB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B062071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODl2UkT5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58D6B2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnINh-0005gs-14
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:04:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41062)
+	id 1jnINn-0005w6-Gv
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ4-0000as-7j
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:59:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57291
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ7-0000lD-MF
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:00:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43160
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ2-0004wZ-BB
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:59:57 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ5-0004wy-OH
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:00:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592816395;
+ s=mimecast20190719; t=1592816399;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aySqTw94TJE6dGdR+I3DuxPagwCXJ7ddJdX68nA3YAI=;
- b=On6WfGCBR2xHYLbx+20ebnkOCUqKyyxpbdVhHos2dFOMGVvYW9H9skJ2kBt544WsqILGx7
- ElYZG5Iz+eckOjogeCGkOQv7NzgLFSjsdewb2V+6syCyfhfQM5hxULY+fuLBn5pw9M0yfR
- m92z5sWrEpKLeN45+NeBuN0rudjEEHc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-57Im9wIIMYqVXVmzXJ5_lg-1; Mon, 22 Jun 2020 04:59:52 -0400
-X-MC-Unique: 57Im9wIIMYqVXVmzXJ5_lg-1
-Received: by mail-wm1-f70.google.com with SMTP id h25so6732829wmb.0
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 01:59:52 -0700 (PDT)
+ bh=qvzPrjknpHhvnClu+pyh7kfIagFIHhbvIfdKUMdjTJU=;
+ b=ODl2UkT5NNPkV01bCY5/Q7ejBI5yEE9fTPEtSirt71J8d8Z7INrGEGFWQ4VObVu9/U/HNs
+ Darm+guXId69F27GUWUJujO0aeYRqMJxaEvuLtJrFN0udMiiSWde4KYHAH8JLxHUf12nz1
+ LvwnrWnSGRQtq3IWG3Nf4Hzv4rgoY/U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-VH3zPBDuOr2QU8cwdGFyug-1; Mon, 22 Jun 2020 04:59:56 -0400
+X-MC-Unique: VH3zPBDuOr2QU8cwdGFyug-1
+Received: by mail-wr1-f69.google.com with SMTP id o25so8684254wro.16
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 01:59:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=aySqTw94TJE6dGdR+I3DuxPagwCXJ7ddJdX68nA3YAI=;
- b=cM67Vg0redCS1sI8QnHolh8XovccgPQZ2mDudEyhDK3a03/I9TbkRZAy5SBWXIQrxK
- jENIeOzT/6skDjqokIuTQZ3GgwQIHq9a5i1e7U9Qp78bcZXoUsZA0pekfeuaXPU2TCm5
- nR3X1Hd46d5Hx0vl2jhSt8utAebmmhzCmUWAZ0X6CoK8MK9n5tUJkZB+uW7gZOa6n66k
- KPbX5w8ZsBrU9lJFo1nPCupSH51kfdcl492G8lWuMtXQIlTjmk9DLWhGulotMoJnob/s
- NBV2HmWfGfrMoEZy1WOaeDLnB3bE5iD8JKBtwLWiuXIZHaGF7ZfULetZGBcbOAdrRSq/
- 07EQ==
-X-Gm-Message-State: AOAM530pObxdIKRrf/N54weJZ3ShroynMIMbAGSketLJrnNpGLL1SnCR
- cixs1sgla8ND2CJKQGYvVp/L//dMz+xImMvVLg8DxNqdHTPX0yvcCXdgkx48lilCzXfd2AvJXVL
- wzE39yNwE62ZI4yg=
-X-Received: by 2002:a5d:6a01:: with SMTP id m1mr18765409wru.115.1592816390768; 
- Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWFzCsKQ36XkKF6tWm4lHCmGqc2UKuDfevVpxq6/Bo5DQl0tc0ko9uBP5badTYXC2rqoYKBw==
-X-Received: by 2002:a5d:6a01:: with SMTP id m1mr18765390wru.115.1592816390615; 
- Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
+ bh=qvzPrjknpHhvnClu+pyh7kfIagFIHhbvIfdKUMdjTJU=;
+ b=IimqgVs2cjx9BPfxQN6pM/v+Xu6nmga2/cZQDvbeR9Ei9j+8YssNPnLxWa3msVKsag
+ 0l2fVbbi5vvGhMwyu+1TAv9lrdBjzMDHumD4J9H/l+uycBVfHKH0bRdc/2O3whpiyd3i
+ VfO6a/aNmqKDLW2N+eeUVU8bAPOlEqKoSn4idDmjl+d+mjRaqNdacwvVXfx8J6iDYpA2
+ x8XqzOSvtvVmzYZ+tGnuCqnhWXPFk7BXJuwuUtgBs5srJV6qPqU9iZ1q2eVHjtVExJSv
+ RIBOn7Xk2C98uPBPSFaXz1y4D/IvNRj/IF15VyyFQst2PVBzL1zdn1syx5nQtYE0gIqT
+ rZVA==
+X-Gm-Message-State: AOAM530QG+osbteXz8c71Gk/d3h9Q7mmXMUkToy2iHA/nw6KVGqZvCAL
+ VdtDC+Fr2TIgsvINg61OOZ/mCXjAVFITRfO2TuOnFIbVn0IYVvYMWXhg0Bwnty6rpQT8b+iYzv4
+ BIts1dmtfcAUVrNo=
+X-Received: by 2002:adf:f445:: with SMTP id f5mr9404556wrp.339.1592816395413; 
+ Mon, 22 Jun 2020 01:59:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2tp/8zBlUJ2WvQOpuU8+jKgHNmfs4tsHjNPhC7/gxRUJ9wWHLic6YLwsk7BVnFVidi2u+gg==
+X-Received: by 2002:adf:f445:: with SMTP id f5mr9404534wrp.339.1592816395196; 
+ Mon, 22 Jun 2020 01:59:55 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id m65sm15492287wmf.17.2020.06.22.01.59.49
+ by smtp.gmail.com with ESMTPSA id o9sm16835964wrs.1.2020.06.22.01.59.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
+ Mon, 22 Jun 2020 01:59:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/8] tests/acceptance: add kernel record/replay test for x86_64
-Date: Mon, 22 Jun 2020 10:59:29 +0200
-Message-Id: <20200622085934.16441-4-philmd@redhat.com>
+Subject: [PULL 4/8] tests/acceptance: add record/replay test for aarch64
+Date: Mon, 22 Jun 2020 10:59:30 +0200
+Message-Id: <20200622085934.16441-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200622085934.16441-1-philmd@redhat.com>
 References: <20200622085934.16441-1-philmd@redhat.com>
@@ -87,16 +87,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -121,53 +121,45 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 
-This patch adds a test for record/replay an execution of x86_64 machine.
-Execution scenario includes simple kernel boot, which allows testing
-basic hardware interaction in RR mode.
+This patch adds a test for record/replay of the kernel
+image boot for aarch64 platform.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
-Message-Id: <159073589656.20809.14010247947948822435.stgit@pasha-ThinkPad-X280>
+Message-Id: <159073590231.20809.9842179251741585482.stgit@pasha-ThinkPad-X280>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-[PMD: Skip test_x86_64_pc on Travis-CI]
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/acceptance/replay_kernel.py | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ tests/acceptance/replay_kernel.py | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-index 90986ca503..64956e85f1 100644
+index 64956e85f1..60559a13ad 100644
 --- a/tests/acceptance/replay_kernel.py
 +++ b/tests/acceptance/replay_kernel.py
-@@ -12,6 +12,7 @@
- import logging
- import time
+@@ -89,3 +89,22 @@ def test_x86_64_pc(self):
+         console_pattern = 'VFS: Cannot open root device'
  
-+from avocado import skipIf
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import archive
- from avocado.utils import process
-@@ -71,3 +72,20 @@ def run_rr(self, kernel_path, kernel_command_line, console_pattern,
-                          False, shift, args, replay_path)
-         logger = logging.getLogger('replay')
-         logger.info('replay overhead {:.2%}'.format(t2 / t1 - 1))
+         self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=5)
 +
-+    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    def test_x86_64_pc(self):
++    def test_aarch64_virt(self):
 +        """
-+        :avocado: tags=arch:x86_64
-+        :avocado: tags=machine:pc
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:virt
++        :avocado: tags=cpu:cortex-a53
 +        """
 +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
-+                      '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
++                      '/linux/releases/29/Everything/aarch64/os/images/pxeboot'
 +                      '/vmlinuz')
-+        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
++        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
 +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
 +
-+        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyAMA0')
 +        console_pattern = 'VFS: Cannot open root device'
 +
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=5)
++        self.run_rr(kernel_path, kernel_command_line, console_pattern,
++                    args=('-cpu', 'cortex-a53'))
 -- 
 2.21.3
 
