@@ -2,71 +2,86 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C41C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:30:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D11BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:39:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C244720776
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:30:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C244720776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0662D20767
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:39:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pwZwflhk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0662D20767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnS9g-00074S-1B
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:30:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54302)
+	id 1jnSHv-0001Vh-8D
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:39:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jnS8q-0006Oc-DB; Mon, 22 Jun 2020 15:30:04 -0400
-Resent-Date: Mon, 22 Jun 2020 15:30:04 -0400
-Resent-Message-Id: <E1jnS8q-0006Oc-DB@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21312)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jnS8l-0008Py-Us; Mon, 22 Jun 2020 15:30:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592854188; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MI4e4Q8LqJt4G8Eu6gYJkjzWzdWnvUuSl8pjBq3vb+/c/wzn81eTXSBDGUfxIU5iImMCgVpLMuh9hbhjiOfCPelR0MfVDWImcdYr77HJrts1mBvMbCluTsgR4eZyq9l65jcoT/sWoAfyWO0PqkET4HqBKxlguJfaBmJ71YXJ98M=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592854188;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=3MPeH3HDrcSDUVIQ7Jq+q2AxJGN+FXNFHyHYl4H/1CM=; 
- b=M9gGZyHruhdiHWciW0FGrUhndvRARFDjzJeiFOCTHWJnEwE3IRejEhtoNUW0qdmY4BIKlQVMtuwI/smCctltGWJc68SqM87LBg0LDcIqRYM78DzR4mI/6W00jfLywysYtgcyy0yQ2ishaThHVKGJkRsCtPjg2wxNvZIkQCF4h5U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159285418668134.59254481803805;
- Mon, 22 Jun 2020 12:29:46 -0700 (PDT)
-Message-ID: <159285418534.26976.9118471574939171262@d1fd068a5071>
-Subject: Re: [PULL 00/18] Block patches
-In-Reply-To: <20200622151059.921191-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnSHE-00015z-VO
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:38:45 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41029)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnSHD-0001Yp-42
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:38:44 -0400
+Received: by mail-ot1-x341.google.com with SMTP id k15so14127818otp.8
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:38:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QJWkn9zt4ilJDPW4zjmy+57fNYr+r7Hwk9Zenipgmbs=;
+ b=pwZwflhkImZttMjdC4yjwxZ3v2og7XY4A1tOz8rELUWOGxydu13nR1mt31250yD97u
+ ichLKPrRTCvjWkfo9/CD/PleTBO5WtEKeVZQP9l2KDMyrXx0p78Mk5nO17j1U2IrWXv/
+ YAZ67t8JgRq1VsOgE7ByWDykt5FRyyFe7XM5BnEB7NToULbPj7flwTJeiFEF96NwQn8q
+ XPbQH3IFEavfxPBs+x8rY/LBKtUJEUSzP3e++MwdLYu6QABGa8V+WzbSlxXcOHFylwLH
+ dylur7pkOMTWmCARTaqWOvffqBg2wZoGrg7VI2a5n3w6dQjEKHzw/kme2bV5nVlGYo/K
+ IMWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QJWkn9zt4ilJDPW4zjmy+57fNYr+r7Hwk9Zenipgmbs=;
+ b=moYK2xg+PqTmjPhnOtXyA4SBNa7svcyjG9S/7uWUlhuVchsu7FJvqbwLvOGJ9S/0tv
+ hOzDpott4G+p0koSXiS+7XaR0TbKAgRLPVcaUyyNhjzzhRcn2EaA9osgfjMzkHURloy9
+ bRhfycgDY91Url6dYoDB0hStkCT4zU7y7n3o5q93mWN5gRPq3wepvIkXg32QXG1lHCVi
+ kzm/UIn+re4D3GwD614bdWD4o1lpJ96KJiv7a++vom0nJdaQB44zgoJGkAVZo8H9rTED
+ 04hZipQ0j27NJgGEX756OKaVEadlXBqdvPkj2q8dkB+epHqnI3oIKq4ew1sucZAyQKHx
+ wBIQ==
+X-Gm-Message-State: AOAM532msad7EZ5NIq1Jy3kEyRmBzqb8v9P8Gl7O4dG/Ul+7G2t0mcfq
+ L1gb+YHLPUVn1Opv2+5VLbNgZVDG4Dp1VPXf4ULYtA==
+X-Google-Smtp-Source: ABdhPJxA4spKQNLZjhBsBWf10VhQsIn0r79DddpPf1O9pfGORIc2N6oNwMC05aS3WfrweJjGQOVeMrZDWZ3FPycwQsY=
+X-Received: by 2002:a05:6830:8d:: with SMTP id
+ a13mr15207929oto.91.1592854721585; 
+ Mon, 22 Jun 2020 12:38:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Mon, 22 Jun 2020 12:29:46 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 15:29:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <cover.1592686588.git.balaton@eik.bme.hu>
+ <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
+In-Reply-To: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jun 2020 20:38:30 +0100
+Message-ID: <CAFEAcA8J-CTYXxGEsuFF0Oc2DE-PuK3BYmosSSmRhQSCc5sjXQ@mail.gmail.com>
+Subject: Re: [PATCH v3 9/9] sm501: Fix and optimize overlap check
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,196 +94,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyMjE1MTA1OS45MjEx
-OTEtMS1tcmVpdHpAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMThdIEJsb2NrIHBhdGNoZXMKVHlwZTogc2Vy
-aWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNjIyMTUxMDU5LjkyMTE5MS0xLW1yZWl0ekByZWRoYXQuY29t
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
-ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0JwozMTcwOTg5IGlvdGVzdHM6IGRvbid0IHRlc3QgcWNvdzIucHkgaW5zaWRl
-IDI5MQowNGFkZTFjIGlvdGVzdHM6IEZpeCAwNTEgb3V0cHV0IGFmdGVyIHFkZXZfaW5pdF9ub2Zh
-aWwoKSByZW1vdmFsCmUxMjY1MTcgaW90ZXN0czogYWRkIHRlc3RzIGZvciBibG9ja2Rldi1hbWVu
-ZAowNGUyZGM0IGJsb2NrL3Fjb3cyOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQKNGU0Mzg3OSBi
-bG9jay9jcnlwdG86IGltcGxlbWVudCBibG9ja2Rldi1hbWVuZAo5MjA3MjQ3IGJsb2NrL2NvcmU6
-IGFkZCBnZW5lcmljIGluZnJhc3RydWN0dXJlIGZvciB4LWJsb2NrZGV2LWFtZW5kIHFtcCBjb21t
-YW5kCjVkYTFjNzUgaW90ZXN0czogcWVtdS1pbWcgdGVzdHMgZm9yIGx1a3Mga2V5IG1hbmFnZW1l
-bnQKN2E2MWMwYyBibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVyZmFjZSB3
-aXRoIGNyeXB0byBvcHRpb25zCjkxZDM1MjMgYmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgdGhlIGVu
-Y3J5cHRpb24ga2V5IG1hbmFnZW1lbnQKYjg3NDE5YSBibG9jay9jcnlwdG86IHJlbmFtZSB0d28g
-ZnVuY3Rpb25zCjIwNGU4MjQgYmxvY2svYW1lbmQ6IHJlZmFjdG9yIHFjb3cyIGFtZW5kIG9wdGlv
-bnMKNjI2NGNjYiBibG9jay9hbWVuZDogc2VwYXJhdGUgYW1lbmQgYW5kIGNyZWF0ZSBvcHRpb25z
-IGZvciBxZW11LWltZwo1MmY4MzQzIGJsb2NrL2FtZW5kOiBhZGQgJ2ZvcmNlJyBvcHRpb24KNjEw
-MjllMiBxY3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50CjRj
-ZTM1OWQgcWNyeXB0by9jb3JlOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgY3J5cHRv
-IG9wdGlvbnMgYW1lbmRtZW50CjU1NWUwOWUgYmxvY2svYmxvY2stY29weTogYmxvY2tfY29weV9k
-aXJ0eV9jbHVzdGVyczogZml4IGZhaWx1cmUgY2hlY2sKM2RlNWNhYiBpb3Rlc3RzOiBmaWx0ZXIg
-ZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUgb3B0aW9ucwphZDc1ZWVhIGlvdGVzdHM6IE1h
-a2UgX2ZpbHRlcl9pbWdfY3JlYXRlIG1vcmUgYWN0aXZlCgo9PT0gT1VUUFVUIEJFR0lOID09PQox
-LzE4IENoZWNraW5nIGNvbW1pdCBhZDc1ZWVhM2QyYjIgKGlvdGVzdHM6IE1ha2UgX2ZpbHRlcl9p
-bWdfY3JlYXRlIG1vcmUgYWN0aXZlKQoyLzE4IENoZWNraW5nIGNvbW1pdCAzZGU1Y2FiNThiNTIg
-KGlvdGVzdHM6IGZpbHRlciBmZXcgbW9yZSBsdWtzIHNwZWNpZmljIGNyZWF0ZSBvcHRpb25zKQoz
-LzE4IENoZWNraW5nIGNvbW1pdCA1NTVlMDllYWFiZDUgKGJsb2NrL2Jsb2NrLWNvcHk6IGJsb2Nr
-X2NvcHlfZGlydHlfY2x1c3RlcnM6IGZpeCBmYWlsdXJlIGNoZWNrKQo0LzE4IENoZWNraW5nIGNv
-bW1pdCA0Y2UzNTlkMDI4ZmYgKHFjcnlwdG8vY29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1
-cmUgZm9yIGNyeXB0byBvcHRpb25zIGFtZW5kbWVudCkKNS8xOCBDaGVja2luZyBjb21taXQgNjEw
-MjllMjQxMzk4IChxY3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2Vt
-ZW50KQo2LzE4IENoZWNraW5nIGNvbW1pdCA1MmY4MzQzNWUwZTggKGJsb2NrL2FtZW5kOiBhZGQg
-J2ZvcmNlJyBvcHRpb24pCjcvMTggQ2hlY2tpbmcgY29tbWl0IDYyNjRjY2I5NjMzMyAoYmxvY2sv
-YW1lbmQ6IHNlcGFyYXRlIGFtZW5kIGFuZCBjcmVhdGUgb3B0aW9ucyBmb3IgcWVtdS1pbWcpCkVS
-Uk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBp
-biBhIGRvIC0gd2hpbGUgbG9vcAojMzQ6IEZJTEU6IGJsb2NrL3Fjb3cyLmM6NTY1MjoKKyNkZWZp
-bmUgUUNPV19DT01NT05fT1BUSU9OUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1NJWkUsICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1V
-X09QVF9TSVpFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
-ICAuaGVscCA9ICJWaXJ0dWFsIGRpc2sgc2l6ZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NL
-X09QVF9DT01QQVRfTEVWRUwsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
-IC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICAgICAgLmhlbHAgPSAiQ29tcGF0aWJpbGl0eSBsZXZlbCAodjIgWzAuMTBdIG9y
-IHYzIFsxLjFdKSIgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAg
-Lm5hbWUgPSBCTE9DS19PUFRfQkFDS0lOR19GSUxFLCAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkZpbGUgbmFtZSBvZiBhIGJhc2Ug
-aW1hZ2UiICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0JBQ0tJTkdfRk1ULCAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJJbWFnZSBm
-b3JtYXQgb2YgdGhlIGJhc2UgaW1hZ2UiICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9EQVRBX0ZJTEUsICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRf
-U1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhl
-bHAgPSAiRmlsZSBuYW1lIG9mIGFuIGV4dGVybmFsIGRhdGEgZmlsZSIgICAgICAgICAgICAgICAg
-XAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRf
-REFUQV9GSUxFX1JBVywgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlw
-ZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
-CisgICAgICAgIC5oZWxwID0gIlRoZSBleHRlcm5hbCBkYXRhIGZpbGUgbXVzdCBzdGF5IHZhbGlk
-ICIgICAgICAgICAgIFwKKyAgICAgICAgICAgICAgICAiYXMgYSByYXcgaW1hZ2UiICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
-KyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5DUllQVCwgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhl
-IGltYWdlIHdpdGggZm9ybWF0ICdhZXMnLiAoRGVwcmVjYXRlZCAiIFwKKyAgICAgICAgICAgICAg
-ICAiaW4gZmF2b3Igb2YgIiBCTE9DS19PUFRfRU5DUllQVF9GT1JNQVQgIj1hZXMpIiwgICAgXAor
-ICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5D
-UllQVF9GT1JNQVQsICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9
-IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
-ICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhlIGltYWdlLCBmb3JtYXQgY2hvaWNlczogJ2Flcycs
-ICdsdWtzJyIsIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0tFWV9T
-RUNSRVQoImVuY3J5cHQuIiwgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgICJJRCBvZiBz
-ZWNyZXQgcHJvdmlkaW5nIHFjb3cgQUVTIGtleSBvciBMVUtTIHBhc3NwaHJhc2UiKSwgIFwKKyAg
-ICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtTX0NJUEhFUl9BTEcoImVuY3J5cHQuIiksICAgICAg
-ICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX01PREUoImVu
-Y3J5cHQuIiksICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19J
-VkdFTl9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9f
-T1BUX0RFRl9MVUtTX0lWR0VOX0hBU0hfQUxHKCJlbmNyeXB0LiIpLCAgICAgICAgICAgXAorICAg
-IEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAgICAg
-ICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVEVSX1RJTUUoImVuY3J5
-cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJM
-T0NLX09QVF9DTFVTVEVSX1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
-ICAgIC50eXBlID0gUUVNVV9PUFRfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAicWNvdzIgY2x1c3RlciBzaXplIiwgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9IHN0cmluZ2lm
-eShERUZBVUxUX0NMVVNURVJfU0laRSkgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9QUkVBTExPQywgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUHJl
-YWxsb2NhdGlvbiBtb2RlIChhbGxvd2VkIHZhbHVlczogb2ZmLCAiICAgICAgICAgXAorICAgICAg
-ICAgICAgICAgICJtZXRhZGF0YSwgZmFsbG9jLCBmdWxsKSIgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NL
-X09QVF9MQVpZX1JFRkNPVU5UUywgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
-IC50eXBlID0gUUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUG9zdHBvbmUgcmVmY291bnQgdXBkYXRlcyIsICAgICAg
-ICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9ICJvZmYiICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9SRUZDT1VOVF9CSVRTLCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiV2lkdGgg
-b2YgYSByZWZlcmVuY2UgY291bnQgZW50cnkgaW4gYml0cyIsICAgICAgICAgXAorICAgICAgICAu
-ZGVmX3ZhbHVlX3N0ciA9ICIxNiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09Q
-VF9DT01QUkVTU0lPTl9UWVBFLCAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50
-eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKKyAgICAgICAgLmhlbHAgPSAiQ29tcHJlc3Npb24gbWV0aG9kIHVzZWQgZm9yIGltYWdlIGNs
-dXN0ZXIgIiAgICAgICAgXAorICAgICAgICAgICAgICAgICJjb21wcmVzc2lvbiIsICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0g
-InpsaWIiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9Cgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0NCBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzE4IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzE4IENoZWNraW5nIGNvbW1pdCAyMDRlODI0MWM0
-Y2YgKGJsb2NrL2FtZW5kOiByZWZhY3RvciBxY293MiBhbWVuZCBvcHRpb25zKQo5LzE4IENoZWNr
-aW5nIGNvbW1pdCBiODc0MTlhYTQwZGEgKGJsb2NrL2NyeXB0bzogcmVuYW1lIHR3byBmdW5jdGlv
-bnMpCjEwLzE4IENoZWNraW5nIGNvbW1pdCA5MWQzNTIzMGJlZWEgKGJsb2NrL2NyeXB0bzogaW1w
-bGVtZW50IHRoZSBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50KQoxMS8xOCBDaGVja2luZyBjb21t
-aXQgN2E2MWMwYzAzM2E1IChibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVy
-ZmFjZSB3aXRoIGNyeXB0byBvcHRpb25zKQoxMi8xOCBDaGVja2luZyBjb21taXQgNWRhMWM3NTU4
-MzVlIChpb3Rlc3RzOiBxZW11LWltZyB0ZXN0cyBmb3IgbHVrcyBrZXkgbWFuYWdlbWVudCkKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojMTc6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA0MzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KMTMvMTggQ2hlY2tpbmcgY29tbWl0IDkyMDcyNDczZmNkMSAoYmxvY2sv
-Y29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1cmUgZm9yIHgtYmxvY2tkZXYtYW1lbmQgcW1w
-IGNvbW1hbmQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjIxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzE4
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE0LzE4IENoZWNraW5nIGNvbW1pdCA0ZTQzODc5
-NDliY2MgKGJsb2NrL2NyeXB0bzogaW1wbGVtZW50IGJsb2NrZGV2LWFtZW5kKQoxNS8xOCBDaGVj
-a2luZyBjb21taXQgMDRlMmRjNDZkZmI0IChibG9jay9xY293MjogaW1wbGVtZW50IGJsb2NrZGV2
-LWFtZW5kKQoxNi8xOCBDaGVja2luZyBjb21taXQgZTEyNjUxN2U5NzM3IChpb3Rlc3RzOiBhZGQg
-dGVzdHMgZm9yIGJsb2NrZGV2LWFtZW5kKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRl
-ZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxl
-IG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU5MiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxNi8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8xOCBDaGVja2lu
-ZyBjb21taXQgMDRhZGUxYzA5MzU3IChpb3Rlc3RzOiBGaXggMDUxIG91dHB1dCBhZnRlciBxZGV2
-X2luaXRfbm9mYWlsKCkgcmVtb3ZhbCkKMTgvMTggQ2hlY2tpbmcgY29tbWl0IDMxNzA5ODk1MzUx
-YiAoaW90ZXN0czogZG9uJ3QgdGVzdCBxY293Mi5weSBpbnNpZGUgMjkxKQo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYyMjE1MTA1OS45MjEx
-OTEtMS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On Sat, 20 Jun 2020 at 22:04, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>
+> When doing reverse blit we need to check if source and dest overlap
+> but it is not trivial due to possible different base and pitch of
+> source and dest. Do rectangle overlap if base and pitch match,
+> otherwise just check if memory area containing the rects overlaps so
+> rects could possibly overlap.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/display/sm501.c | 26 ++++++++++++++++----------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> index 2db347dcbc..e7c69bf7fd 100644
+> --- a/hw/display/sm501.c
+> +++ b/hw/display/sm501.c
+> @@ -690,6 +690,7 @@ static void sm501_2d_operation(SM501State *s)
+>      unsigned int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
+>      int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
+>      int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
+> +    bool overlap = false;
+>
+>      if ((s->twoD_stretch >> 16) & 0xF) {
+>          qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
+> @@ -784,16 +785,21 @@ static void sm501_2d_operation(SM501State *s)
+>                           ldn_he_p(&s->local_mem[src_base + si], bypp));
+>                  break;
+>              }
+> -            /* Check for overlaps, this could be made more exact */
+> -            uint32_t sb, se, db, de;
+> -            sb = src_base + src_x + src_y * (width + src_pitch);
+> -            se = sb + width + height * (width + src_pitch);
+> -            db = dst_base + dst_x + dst_y * (width + dst_pitch);
+> -            de = db + width + height * (width + dst_pitch);
+> -            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+> -                /* regions may overlap: copy via temporary */
+> -                int llb = width * bypp;
+> -                int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
+> +            /* If reverse blit do simple check for overlaps */
+> +            if (rtl && src_base == dst_base && src_pitch == dst_pitch) {
+> +                overlap = (src_x < dst_x + width && src_x + width > dst_x &&
+> +                           src_y < dst_y + height && src_y + height > dst_y);
+
+This part looks good...
+
+> +            } else if (rtl) {
+> +                unsigned int sb, se, db, de;
+> +                sb = src_base + (src_x + src_y * src_pitch) * bypp;
+> +                se = sb + (width + height * src_pitch) * bypp;
+> +                db = dst_base + (dst_x + dst_y * dst_pitch) * bypp;
+> +                de = db + (width + height * dst_pitch) * bypp;
+> +                overlap = (db >= sb && db <= se) || (de >= sb && de <= se);
+
+...but this part I think the overlap calculation isn't right. Consider
+ db=5, de=15, sb=10, se=12. This gives overlap=false but
+the two regions do overlap because [sb,se] is entirely inside [db,de].
+I think you want
+  overlap = (db < se && sb < de);
+(this is the same logic as each of the x/y range checks in the rectangle
+overlap test. put another way, if !(db<se) then we can't have an overlap
+because the dest range starts after the source range ends; similarly if
+!(sb<de) then the source range begins after the dest range ends and
+there's no overlap. So for an overlap to be possible we must have both
+db<se && sb<de.)
+Here I'm using a definition of the "end" de and se which is that they point
+to the byte *after* the last one used (ie that we're really working with
+"half-open" ranges [db, de)  and [sb, se) where de and se aren't in the
+range), because that's easier to calculate given that we need to account
+for bypp and it's more natural when dealing with "start, length" pairs.
+
+Also and less importantly (because it's wrong in the "safe" direction) I think
+your se and de are overestimates, because one-past-the-last-used-byte in each
+case is
+   sb + (width + (height-1) * src_pitch) * bypp
+(consider width=1 height=1, where one-past-the-last-used-byte is sb + bypp
+because there's only one pixel involved).
+
+> +            }
+> +            if (overlap) {
+> +                /* pixman can't do reverse blit: copy via temporary */
+> +                int tmp_stride = DIV_ROUND_UP(width * bypp, sizeof(uint32_t));
+>                  uint32_t *tmp = tmp_buf;
+>
+>                  if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
+
+PS: why do we care about overlap only for right-to-left blits and not
+left-to-right blits ?
+
+thanks
+-- PMM
 
