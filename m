@@ -2,94 +2,89 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF37C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A2AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 22:38:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 310882073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17B222073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 22:38:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CsuEx4+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310882073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Veq88ijf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B222073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnUT5-00036L-CS
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:59:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37086)
+	id 1jnV5F-00060j-8r
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 18:38:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUSR-0002bE-2H
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:58:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50005
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnUSO-0002ys-26
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:58:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592863102;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2+yE1VubM5pxCtxtLrx2VdTR3Sril9U01rglh/dXVi0=;
- b=CsuEx4+m7lU+nLH7sBjyVcxO1hiuzXk7ksI7cyoGuRdssPFfrYliz48veuXuGvIb347kIf
- 7eqHeUFkta7lG3TMvzNwQ75zpmp9E1aP58OKs/fSYOju45e1bek4oUkMwrv/Xjq2upc2sk
- 5hAiNayVU2HqNwgktm7Aq5tBXRe6Ve4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-ZLMu9g2CPe-nbsfayEzOGA-1; Mon, 22 Jun 2020 17:58:20 -0400
-X-MC-Unique: ZLMu9g2CPe-nbsfayEzOGA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D62A805EEE;
- Mon, 22 Jun 2020 21:58:19 +0000 (UTC)
-Received: from [10.3.114.4] (ovpn-114-4.phx2.redhat.com [10.3.114.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B1FC10013D2;
- Mon, 22 Jun 2020 21:58:16 +0000 (UTC)
-Subject: Re: [PATCH v5 3/7] qcow: Tolerate backing_fmt=, but warn on
- backing_fmt=raw
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200403175859.863248-1-eblake@redhat.com>
- <20200403175859.863248-4-eblake@redhat.com>
- <20200505073542.GA5759@linux.fritz.box>
- <4b4f83fb-eb3d-6ae5-116a-da921ee2b403@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8c8e6d46-ad18-96a2-3d40-630566082ff5@redhat.com>
-Date: Mon, 22 Jun 2020 16:58:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jnV4V-0005Ba-LF
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 18:37:47 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:40527)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jnV4T-000528-OS
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 18:37:47 -0400
+Received: by mail-io1-xd41.google.com with SMTP id q8so21465482iow.7
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 15:37:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZUc6PzHoklkAYjHt4GLbLcCSLWqB51SmmJc8uMdR910=;
+ b=Veq88ijfb6Lk+hPPmn5WSJyJWplVZ9A55d0//YPBxGfxB+piNco2PDEmXHGx01AX+c
+ iFagrH+qzUCp1kcQqvI31WVDj/XIy9vZRhEIGy6l3rGI8QJmjxwQ+GvnSkrlUSuLKn0X
+ Y+kHQXQGhmz/Lt/X1mfi4JZy0kxxBOlsZm08qQcYxxBkDWL+qrRQJMns8HiKZV5XHuao
+ kXaTBcc2PnfoSsSrVyewKCppbPH6t3ZnIk+1d3rRjaAD+Wr2jQ+3xaIXfwVx1p3Esoge
+ vUQILMilarBqkjeJHtq+N7VU/VJwmdvYj9N6x8BwMPTgFbRUdIx/BAM2tE8NYeQt+RJG
+ 2DFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZUc6PzHoklkAYjHt4GLbLcCSLWqB51SmmJc8uMdR910=;
+ b=jTGPoBx6gOtl//5e1pWL7CBHRHHLtNy49zTBLl5scl4t14a74GIJKT95eIH6bQxfWs
+ TFSWbkAkShLjxjWOGYRiN4z7QD5W6+gobSnPM2go2LytPe5wBPxn9AZ4+bM8TCegGF4R
+ GUNNiHpib/NjH9gbn8Y0Ug025hPMboES7R41dd2M44XHOmwcx+S08T3M/feT8nwMVbZR
+ PT6U/4hUsL7EK/dKT4NlplokkNzL+3CrNVlND/4V+yL+bWClxlLEp8gdrCLZ8DsaNk6a
+ ppAJdjMEyRHRngSw/y+8gLxam8QB8qhAjtvk4OPTgxAQklLhafzOxbJwJMsPsmKFmB6m
+ WUCQ==
+X-Gm-Message-State: AOAM533mHWSdrKTQheK6Q0yGnQnUhvWIsp3S6MGX7S+cH/iMEQjvpUsi
+ 6JOPNGwvVtYwjYyASrFMuX+0cO1rhg5+xWOhO04=
+X-Google-Smtp-Source: ABdhPJzT5t2pC3lddUxk7uEUYs20C9nV9SvbCBASt14DMh+Pt8Sx5+8xt4tD0/IEZYfWT/O4CKed0+X8T7xj44lfBrQ=
+X-Received: by 2002:a05:6638:cc7:: with SMTP id
+ e7mr18302308jak.87.1592865463988; 
+ Mon, 22 Jun 2020 15:37:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4b4f83fb-eb3d-6ae5-116a-da921ee2b403@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200619214912.25598.8400.stgit@localhost.localdomain>
+ <20200619215309.25598.7553.stgit@localhost.localdomain>
+ <acac152a-8be5-aa5c-ca52-e5ffc90b6ed4@redhat.com>
+In-Reply-To: <acac152a-8be5-aa5c-ca52-e5ffc90b6ed4@redhat.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 22 Jun 2020 15:37:33 -0700
+Message-ID: <CAKgT0UcP6gGK_X80pepwpsC=JFmL9+n61ow-HEJMKbFVZ4Jh8g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] virtio-balloon: Prevent guest from starting a report
+ when we didn't request one
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alexander.duyck@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,108 +97,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 10:30 AM, Eric Blake wrote:
-> On 5/5/20 2:35 AM, Kevin Wolf wrote:
->> Am 03.04.2020 um 19:58 hat Eric Blake geschrieben:
->>> qcow has no space in the metadata to store a backing format, and there
->>> are existing qcow images backed both by raw or by other formats
->>> (usually qcow) images, reliant on probing to tell the difference.
->>> While we don't recommend the creation of new qcow images (as qcow2 is
->>> hands-down better), we can at least insist that if the user does
->>> request a specific format without using -u, then it must be non-raw
->>> (as a raw backing file that gets inadvertently edited into some other
->>> format can form a security hole); if the user does not request a
->>> specific format or lies when using -u, then the status quo of probing
->>> for the backing format remains intact (although an upcoming patch will
->>> warn when omitting a format request).  Thus, when this series is
->>> complete, the only way to use a backing file for qcow without
->>> triggering a warning is when using -F if the backing file is non-raw
->>> to begin with.  Note that this is only for QemuOpts usage; there is no
->>> change to the QAPI to allow a format through -blockdev.
->>>
->>> Add a new iotest 290 just for qcow, to demonstrate the new warning.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> Somehow this feels backwards. Not specifying the backing file format at
->> all isn't any safer than explicitly specifying raw.
->>
->> If there is a difference at all, I would say that explicitly specifying
->> raw means that the user is aware what they are doing. So we would have
->> more reason to warn against raw images if the backing format isn't
->> specified at all because then the user might not be aware that they are
->> using a backing file that probes as raw.
-> 
-> Prior to this patch, -F does not work with qcow.  And even with this 
-> patch, we still cannot store the explicit value of -F in the qcow file. 
-> Anything that does not use -F must continue to work for now (although it 
-> may now warn, and in fact must warn if we deprecate it), while anything 
-> explicit is free to fail (since it failed already), but could also be 
-> made to work (if letting it work is nicer than making it fail, and where 
-> "work" may still include a warning, although it's pointless to have 
-> something brand new that works but is deprecated out of the box).  So 
-> the following is my summary of the two options we can choose between:
-> 
-> Option 1, qcow backed by raw is more common than qcow backed by other, 
-> so we want:
-> raw <- qcow, no -F: work without warning (but if backing file is edited, 
-> a future probe seeing non-raw would break image)
-> raw <- qcow, with -F: work without warning (but if backing file is 
-> edited, a future probe seeing non-raw would break image)
-> other <- qcow, no -F: works but issues a warning (but backing file will 
-> always probe correctly)
-> other <- qcow, with -F: fails (we cannot honor the user's explicit 
-> request, because we would still have to probe)
-> 
-> Option 2, qcow backed by other is more common than qcow backed by raw, 
-> so we want:
-> raw <- qcow, no -F: works but issues a warning (using a raw backing file 
-> without explicit buy-in is risky)
-> raw <- qcow, with -F: works but issues a warning (explicit buy-in will 
-> still require subsequent probing, and a backing file could change which 
-> would break image)
-> other <- qcow, no -F: works without warning
-> other <- qcow, with -F: works without warning (later probing will still 
-> see non-raw)
-> 
-> It looks like you are leaning more towards option 1, while my patch 
-> leaned more towards option 2.  Anyone else want to chime in with an 
-> opinion on which is safer vs. easier?
+On Mon, Jun 22, 2020 at 1:10 AM David Hildenbrand <david@redhat.com> wrote:
+>
+> On 19.06.20 23:53, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> >
+> > Based on code review it appears possible for the driver to force the device
+> > out of a stopped state when hinting by repeating the last ID it was
+> > provided.
+>
+> Indeed, thanks for noticing.
+>
+> >
+> > Prevent this by only allowing a transition to the start state when we are
+> > in the requested state. This way the driver is only allowed to send one
+> > descriptor that will transition the device into the start state. All others
+> > will leave it in the stop state once it has finished.
+> >
+> > In addition add the necessary locking to provent any potential races
+>
+> s/provent/prevent/
 
-> Option 3:
-> completely deprecate qcow images with backing files, as there is no safe 
-> way to do things favoring either raw (option 1) or non-raw (option 2), 
-> and therefore accept -F solely for convenience with the rest of the 
-> series, but always issue a warning regardless of whether -F was present.
+Thanks for catching that. I will fix the typo.
 
+> > between the accesses of the cmd_id and the status.
+> >
+> > Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > ---
+> >  hw/virtio/virtio-balloon.c |   11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> > index 10507b2a430a..7f3af266f674 100644
+> > --- a/hw/virtio/virtio-balloon.c
+> > +++ b/hw/virtio/virtio-balloon.c
+> > @@ -527,7 +527,8 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
+> >              ret = false;
+> >              goto out;
+> >          }
+> > -        if (id == dev->free_page_report_cmd_id) {
+> > +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED &&
+> > +            id == dev->free_page_report_cmd_id) {
+> >              dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+> >          } else {
+> >              /*
+>
+> But doesn't that mean that, after the first hint, all further ones will
+> be discarded and we'll enter the STOP state in the else case? Or am I
+> missing something?
+>
+> Shouldn't this be something like
+>
+> if (id == dev->free_page_report_cmd_id) {
+>     if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+>         dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>     }
+>     /* Stay in FREE_PAGE_REPORT_S_START as long as the cmd_id match .*/
+> } else { ...
 
-Hearing no other opinion in the meantime, I've come up with option 4:
+There should only be one element containing an outbuf at the start of
+the report. Once that is processed we should not see the driver
+sending additional outbufs unless it is sending the STOP command ID.
 
-raw <- qcow, no -F: works but issues a warning to use -F (the user 
-should be explicit that they know they are using raw)
-raw <- qcow, with -F raw: a probe is attempted, if it returns anything 
-other than raw, then fail (since we can't store the backing type, and 
-the user's explicit type didn't match reality); otherwise works without 
-warning (users tend to treat backing files as read-only, so even though 
-editing a backing file could make it appear non-raw, that's less likely 
-to happen)
-other <- qcow, no -F: works without warning (we'll probe in future 
-opens, but the probe will see the same file type and not corrupt user data)
-other <- qcow, with -F: a probe is attempted and must match, but 
-otherwise works without warning (we'll still have to probe in future 
-opens, but it's no worse than before)
+> > @@ -592,14 +593,16 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+> >          return;
+> >      }
+> >
+> > -    if (s->free_page_report_cmd_id == UINT_MAX) {
+> > +    qemu_mutex_lock(&s->free_page_lock);
+> > +
+> > +    if (s->free_page_report_cmd_id++ == UINT_MAX) {
+> >          s->free_page_report_cmd_id =
+> >                         VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+> > -    } else {
+> > -        s->free_page_report_cmd_id++;
+> >      }
+>
+> Somewhat unrelated cleanup.
 
+Agreed. I can drop it if preferred. I just took care of it because I
+was adding the lock above and below to prevent us from getting into
+any wierd states where the command ID might be updated but the report
+status was not.
 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> >
+> >      s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
+> > +    qemu_mutex_unlock(&s->free_page_lock);
+> > +
+> >      virtio_notify_config(vdev);
+> >  }
+> >
+> >
+>
+>
+> --
+> Thanks,
+>
+> David / dhildenb
+>
 
