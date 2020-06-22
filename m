@@ -2,94 +2,71 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5442BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C41C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C1FE2073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:20:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VY4YqhVw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C1FE2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id C244720776
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:30:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C244720776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnRzN-0001OR-AR
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:20:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51576)
+	id 1jnS9g-00074S-1B
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:30:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRxF-000755-1p
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:18:05 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39789)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRxD-0006b2-1N
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:18:04 -0400
-Received: by mail-wm1-x333.google.com with SMTP id t194so670570wmt.4
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+Zt+EZ+kZCCgucfdo2suNkhWGfqldDdE6uP603AALas=;
- b=VY4YqhVwXeBxFBwy3246qYFfQCo3OPeekD8yqbQJYkX4x04INaVXtCbT/VbwK2DXMC
- hoFwqouK6sLli+aLAufAMGwqyRWo9wKxSpXOI18oPbysPv7toyT+4BnSEvGp33HxosYb
- qd6EGFx7WLXbqoWWKPNUVWUH/X+LkFe5jDKUjYVCMLlbTUJHepOYNFHBWeHJCZlqD5oE
- 4aQlwPVGPp++tQU0kDDUVxg3/4MM7FV5wWJiz5BpG3UbM88rnNyECZApx1Xym2m5MenB
- 8qM1nVtD/qQ4rfPE4tPopiyeWzzL7z4kVKT4fWEGgJBbQ221eqXBXv3ZGJJr4TpaRkz6
- M03g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=+Zt+EZ+kZCCgucfdo2suNkhWGfqldDdE6uP603AALas=;
- b=aF84aM0XojlXRDWqb7gdkZoI/FbjoFP3ebLJbBPiQgasNVOJ4YKI8cRmV0n8kfVtY2
- YT0uGLyuyO1Gyb22mvsDGq23awrTKQfGz9j4n1/A9OWEFuTYhVw88xU7a2KZJfTKjYox
- xTKGnVAjGcKBDCC5hZr5f52SMxZyrjMGyRuhxNe7nJfMC9AxWvqFBCsMs+kaqRIx6jFF
- PpCTdZFUSIJTdQUfD7q6aAdYollFkgcVuh5hBYsjQ3bMDkWq0p8YG0dX9gqtrYTMn/gf
- Y3fktBaZgazbRxPgBRy41wwni0QwEbIToEdREOlhgzUTkkAl9camWFQMLn4SaogVjcwu
- SwaQ==
-X-Gm-Message-State: AOAM5309xWrXfab+mWRf2xQqfZrHG1dALb2sNKwGYVlUQfuWEANoPF6W
- Uz6Y62q2vsFxahY6JN2/ZVVJmBZ5
-X-Google-Smtp-Source: ABdhPJz6ddQUqmzbz1ibFO+LqsnW32CD1AgvkJ/PVEZL7ppxfIvvFQTLzdA31xZGV8Ey9jah6KxrcA==
-X-Received: by 2002:a1c:bb43:: with SMTP id l64mr18443720wmf.151.1592853481190; 
- Mon, 22 Jun 2020 12:18:01 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e12sm19133236wro.52.2020.06.22.12.18.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 12:18:00 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 13/15] hw/rx: Add RX GDB simulator
-Date: Mon, 22 Jun 2020 21:17:46 +0200
-Message-Id: <20200622191746.18031-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200622191746.18031-1-f4bug@amsat.org>
-References: <20200622191746.18031-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnS8q-0006Oc-DB; Mon, 22 Jun 2020 15:30:04 -0400
+Resent-Date: Mon, 22 Jun 2020 15:30:04 -0400
+Resent-Message-Id: <E1jnS8q-0006Oc-DB@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21312)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnS8l-0008Py-Us; Mon, 22 Jun 2020 15:30:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592854188; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=MI4e4Q8LqJt4G8Eu6gYJkjzWzdWnvUuSl8pjBq3vb+/c/wzn81eTXSBDGUfxIU5iImMCgVpLMuh9hbhjiOfCPelR0MfVDWImcdYr77HJrts1mBvMbCluTsgR4eZyq9l65jcoT/sWoAfyWO0PqkET4HqBKxlguJfaBmJ71YXJ98M=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592854188;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=3MPeH3HDrcSDUVIQ7Jq+q2AxJGN+FXNFHyHYl4H/1CM=; 
+ b=M9gGZyHruhdiHWciW0FGrUhndvRARFDjzJeiFOCTHWJnEwE3IRejEhtoNUW0qdmY4BIKlQVMtuwI/smCctltGWJc68SqM87LBg0LDcIqRYM78DzR4mI/6W00jfLywysYtgcyy0yQ2ishaThHVKGJkRsCtPjg2wxNvZIkQCF4h5U=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 159285418668134.59254481803805;
+ Mon, 22 Jun 2020 12:29:46 -0700 (PDT)
+Message-ID: <159285418534.26976.9118471574939171262@d1fd068a5071>
+Subject: Re: [PULL 00/18] Block patches
+In-Reply-To: <20200622151059.921191-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mreitz@redhat.com
+Date: Mon, 22 Jun 2020 12:29:46 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 15:29:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,306 +79,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Magnus Damm <magnus.damm@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-
-Add the RX machine internally simulated in GDB.
-
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Use TYPE_RX62N_CPU, use #define for RX62N_NR_TMR/CMT/SCI,
- renamed CPU -> MCU, device -> microcontroller]
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224141923.82118-18-ysato@users.sourceforge.jp>
-[PMD: Split of MCU, rename gdbsim, Add gdbsim-r5f562n7/r5f562n8]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- default-configs/rx-softmmu.mak |   1 +
- include/hw/rx/rx62n.h          |   4 +
- hw/rx/rx-gdbsim.c              | 198 +++++++++++++++++++++++++++++++++
- MAINTAINERS                    |   7 ++
- hw/rx/Kconfig                  |   4 +
- hw/rx/Makefile.objs            |   1 +
- 6 files changed, 215 insertions(+)
- create mode 100644 hw/rx/rx-gdbsim.c
-
-diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.mak
-index 7c4eb2c1a0..df2b4e4f42 100644
---- a/default-configs/rx-softmmu.mak
-+++ b/default-configs/rx-softmmu.mak
-@@ -1,2 +1,3 @@
- # Default configuration for rx-softmmu
- 
-+CONFIG_RX_GDBSIM=y
-diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-index 1d3e6a5cad..aa94758c27 100644
---- a/include/hw/rx/rx62n.h
-+++ b/include/hw/rx/rx62n.h
-@@ -37,6 +37,10 @@
- #define TYPE_R5F562N7_MCU "r5f562n7-mcu"
- #define TYPE_R5F562N8_MCU "r5f562n8-mcu"
- 
-+#define EXT_CS_BASE         0x01000000
-+#define VECTOR_TABLE_BASE   0xffffff80
-+#define RX62N_CFLASH_BASE   0xfff80000
-+
- #define RX62N_NR_TMR    2
- #define RX62N_NR_CMT    2
- #define RX62N_NR_SCI    6
-diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
-new file mode 100644
-index 0000000000..b8a56fa7af
---- /dev/null
-+++ b/hw/rx/rx-gdbsim.c
-@@ -0,0 +1,198 @@
-+/*
-+ * RX QEMU GDB simulator
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/loader.h"
-+#include "hw/rx/rx62n.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/device_tree.h"
-+#include "hw/boards.h"
-+
-+/* Same address of GDB integrated simulator */
-+#define SDRAM_BASE  EXT_CS_BASE
-+
-+typedef struct RxGdbSimMachineClass {
-+    /*< private >*/
-+    MachineClass parent_class;
-+    /*< public >*/
-+    const char *mcu_name;
-+    uint32_t xtal_freq_hz;
-+} RxGdbSimMachineClass;
-+
-+typedef struct RxGdbSimMachineState {
-+    /*< private >*/
-+    MachineState parent_obj;
-+    /*< public >*/
-+    RX62NState mcu;
-+} RxGdbSimMachineState;
-+
-+#define TYPE_RX_GDBSIM_MACHINE MACHINE_TYPE_NAME("rx62n-common")
-+
-+#define RX_GDBSIM_MACHINE(obj) \
-+    OBJECT_CHECK(RxGdbSimMachineState, (obj), TYPE_RX_GDBSIM_MACHINE)
-+
-+#define RX_GDBSIM_MACHINE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(RxGdbSimMachineClass, (klass), TYPE_RX_GDBSIM_MACHINE)
-+#define RX_GDBSIM_MACHINE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RxGdbSimMachineClass, (obj), TYPE_RX_GDBSIM_MACHINE)
-+
-+static void rx_load_image(RXCPU *cpu, const char *filename,
-+                          uint32_t start, uint32_t size)
-+{
-+    static uint32_t extable[32];
-+    long kernel_size;
-+    int i;
-+
-+    kernel_size = load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
-+    }
-+    cpu->env.pc = start;
-+
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i = 0; i < ARRAY_SIZE(extable); i++) {
-+        extable[i] = cpu_to_le32(0x10 + i * 4);
-+    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), VECTOR_TABLE_BASE);
-+}
-+
-+static void rx_gdbsim_init(MachineState *machine)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    RxGdbSimMachineState *s = RX_GDBSIM_MACHINE(machine);
-+    RxGdbSimMachineClass *rxc = RX_GDBSIM_MACHINE_GET_CLASS(machine);
-+    MemoryRegion *sysmem = get_system_memory();
-+    const char *kernel_filename = machine->kernel_filename;
-+    const char *dtb_filename = machine->dtb;
-+
-+    if (machine->ram_size < mc->default_ram_size) {
-+        char *sz = size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be more than %s", sz);
-+        g_free(sz);
-+    }
-+
-+    /* Allocate memory space */
-+    memory_region_add_subregion(sysmem, SDRAM_BASE, machine->ram);
-+
-+    /* Initialize MCU */
-+    object_initialize_child(OBJECT(machine), "mcu", &s->mcu, rxc->mcu_name);
-+    object_property_set_link(OBJECT(&s->mcu), OBJECT(sysmem),
-+                             "main-bus", &error_abort);
-+    object_property_set_uint(OBJECT(&s->mcu), rxc->xtal_freq_hz,
-+                             "xtal-frequency-hz", &error_abort);
-+    object_property_set_bool(OBJECT(&s->mcu), kernel_filename != NULL,
-+                             "load-kernel", &error_abort);
-+    qdev_realize(DEVICE(&s->mcu), NULL, &error_abort);
-+
-+    /* Load kernel and dtb */
-+    if (kernel_filename) {
-+        ram_addr_t kernel_offset;
-+
-+        /*
-+         * The kernel image is loaded into
-+         * the latter half of the SDRAM space.
-+         */
-+        kernel_offset = machine->ram_size / 2;
-+        rx_load_image(RXCPU(first_cpu), kernel_filename,
-+                      SDRAM_BASE + kernel_offset, kernel_offset);
-+        if (dtb_filename) {
-+            ram_addr_t dtb_offset;
-+            int dtb_size;
-+            void *dtb;
-+
-+            dtb = load_device_tree(dtb_filename, &dtb_size);
-+            if (dtb == NULL) {
-+                error_report("Couldn't open dtb file %s", dtb_filename);
-+                exit(1);
-+            }
-+            if (machine->kernel_cmdline &&
-+                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
-+                                        machine->kernel_cmdline) < 0) {
-+                error_report("Couldn't set /chosen/bootargs");
-+                exit(1);
-+            }
-+            /* DTB is located at the end of SDRAM space. */
-+            dtb_offset = machine->ram_size - dtb_size;
-+            rom_add_blob_fixed("dtb", dtb, dtb_size,
-+                               SDRAM_BASE + dtb_offset);
-+            /* Set dtb address to R1 */
-+            RXCPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
-+        }
-+    }
-+}
-+
-+static void rx_gdbsim_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->init = rx_gdbsim_init;
-+    mc->default_cpu_type = TYPE_RX62N_CPU;
-+    mc->default_ram_size = 16 * MiB;
-+    mc->default_ram_id = "ext-sdram";
-+}
-+
-+static void rx62n7_class_init(ObjectClass *oc, void *data)
-+{
-+    RxGdbSimMachineClass *rxc = RX_GDBSIM_MACHINE_CLASS(oc);
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    rxc->mcu_name = TYPE_R5F562N7_MCU;
-+    rxc->xtal_freq_hz = 12 * 1000 * 1000;
-+    mc->desc = "gdb simulator (R5F562N7 MCU and external RAM)";
-+};
-+
-+static void rx62n8_class_init(ObjectClass *oc, void *data)
-+{
-+    RxGdbSimMachineClass *rxc = RX_GDBSIM_MACHINE_CLASS(oc);
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    rxc->mcu_name = TYPE_R5F562N8_MCU;
-+    rxc->xtal_freq_hz = 12 * 1000 * 1000;
-+    mc->desc = "gdb simulator (R5F562N8 MCU and external RAM)";
-+};
-+
-+static const TypeInfo rx_gdbsim_types[] = {
-+    {
-+        .name           = MACHINE_TYPE_NAME("gdbsim-r5f562n7"),
-+        .parent         = TYPE_RX_GDBSIM_MACHINE,
-+        .class_init     = rx62n7_class_init,
-+    }, {
-+        .name           = MACHINE_TYPE_NAME("gdbsim-r5f562n8"),
-+        .parent         = TYPE_RX_GDBSIM_MACHINE,
-+        .class_init     = rx62n8_class_init,
-+    }, {
-+        .name           = TYPE_RX_GDBSIM_MACHINE,
-+        .parent         = TYPE_MACHINE,
-+        .instance_size  = sizeof(RxGdbSimMachineState),
-+        .class_size     = sizeof(RxGdbSimMachineClass),
-+        .class_init     = rx_gdbsim_class_init,
-+        .abstract       = true,
-+     }
-+};
-+
-+DEFINE_TYPES(rx_gdbsim_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 570807936c..dc0203784a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1256,6 +1256,13 @@ F: include/hw/riscv/opentitan.h
- F: include/hw/char/ibex_uart.h
- F: include/hw/intc/ibex_plic.h
- 
-+RX Machines
-+-----------
-+rx-gdbsim
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: hw/rx/rx-gdbsim.c
-+
- SH4 Machines
- ------------
- R2D
-diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
-index e7b1c59516..2b297c5a6a 100644
---- a/hw/rx/Kconfig
-+++ b/hw/rx/Kconfig
-@@ -4,3 +4,7 @@ config RX62N_MCU
-     select RENESAS_TMR
-     select RENESAS_CMT
-     select RENESAS_SCI
-+
-+config RX_GDBSIM
-+    bool
-+    select RX62N_MCU
-diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
-index fe19ee7984..4ef6b9e5b1 100644
---- a/hw/rx/Makefile.objs
-+++ b/hw/rx/Makefile.objs
-@@ -1 +1,2 @@
- obj-$(CONFIG_RX62N_MCU) += rx62n.o
-+obj-$(CONFIG_RX_GDBSIM) += rx-gdbsim.o
--- 
-2.21.3
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyMjE1MTA1OS45MjEx
+OTEtMS1tcmVpdHpAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMThdIEJsb2NrIHBhdGNoZXMKVHlwZTogc2Vy
+aWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNjIyMTUxMDU5LjkyMTE5MS0xLW1yZWl0ekByZWRoYXQuY29t
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
+ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwozMTcwOTg5IGlvdGVzdHM6IGRvbid0IHRlc3QgcWNvdzIucHkgaW5zaWRl
+IDI5MQowNGFkZTFjIGlvdGVzdHM6IEZpeCAwNTEgb3V0cHV0IGFmdGVyIHFkZXZfaW5pdF9ub2Zh
+aWwoKSByZW1vdmFsCmUxMjY1MTcgaW90ZXN0czogYWRkIHRlc3RzIGZvciBibG9ja2Rldi1hbWVu
+ZAowNGUyZGM0IGJsb2NrL3Fjb3cyOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQKNGU0Mzg3OSBi
+bG9jay9jcnlwdG86IGltcGxlbWVudCBibG9ja2Rldi1hbWVuZAo5MjA3MjQ3IGJsb2NrL2NvcmU6
+IGFkZCBnZW5lcmljIGluZnJhc3RydWN0dXJlIGZvciB4LWJsb2NrZGV2LWFtZW5kIHFtcCBjb21t
+YW5kCjVkYTFjNzUgaW90ZXN0czogcWVtdS1pbWcgdGVzdHMgZm9yIGx1a3Mga2V5IG1hbmFnZW1l
+bnQKN2E2MWMwYyBibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVyZmFjZSB3
+aXRoIGNyeXB0byBvcHRpb25zCjkxZDM1MjMgYmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgdGhlIGVu
+Y3J5cHRpb24ga2V5IG1hbmFnZW1lbnQKYjg3NDE5YSBibG9jay9jcnlwdG86IHJlbmFtZSB0d28g
+ZnVuY3Rpb25zCjIwNGU4MjQgYmxvY2svYW1lbmQ6IHJlZmFjdG9yIHFjb3cyIGFtZW5kIG9wdGlv
+bnMKNjI2NGNjYiBibG9jay9hbWVuZDogc2VwYXJhdGUgYW1lbmQgYW5kIGNyZWF0ZSBvcHRpb25z
+IGZvciBxZW11LWltZwo1MmY4MzQzIGJsb2NrL2FtZW5kOiBhZGQgJ2ZvcmNlJyBvcHRpb24KNjEw
+MjllMiBxY3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50CjRj
+ZTM1OWQgcWNyeXB0by9jb3JlOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgY3J5cHRv
+IG9wdGlvbnMgYW1lbmRtZW50CjU1NWUwOWUgYmxvY2svYmxvY2stY29weTogYmxvY2tfY29weV9k
+aXJ0eV9jbHVzdGVyczogZml4IGZhaWx1cmUgY2hlY2sKM2RlNWNhYiBpb3Rlc3RzOiBmaWx0ZXIg
+ZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUgb3B0aW9ucwphZDc1ZWVhIGlvdGVzdHM6IE1h
+a2UgX2ZpbHRlcl9pbWdfY3JlYXRlIG1vcmUgYWN0aXZlCgo9PT0gT1VUUFVUIEJFR0lOID09PQox
+LzE4IENoZWNraW5nIGNvbW1pdCBhZDc1ZWVhM2QyYjIgKGlvdGVzdHM6IE1ha2UgX2ZpbHRlcl9p
+bWdfY3JlYXRlIG1vcmUgYWN0aXZlKQoyLzE4IENoZWNraW5nIGNvbW1pdCAzZGU1Y2FiNThiNTIg
+KGlvdGVzdHM6IGZpbHRlciBmZXcgbW9yZSBsdWtzIHNwZWNpZmljIGNyZWF0ZSBvcHRpb25zKQoz
+LzE4IENoZWNraW5nIGNvbW1pdCA1NTVlMDllYWFiZDUgKGJsb2NrL2Jsb2NrLWNvcHk6IGJsb2Nr
+X2NvcHlfZGlydHlfY2x1c3RlcnM6IGZpeCBmYWlsdXJlIGNoZWNrKQo0LzE4IENoZWNraW5nIGNv
+bW1pdCA0Y2UzNTlkMDI4ZmYgKHFjcnlwdG8vY29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1
+cmUgZm9yIGNyeXB0byBvcHRpb25zIGFtZW5kbWVudCkKNS8xOCBDaGVja2luZyBjb21taXQgNjEw
+MjllMjQxMzk4IChxY3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2Vt
+ZW50KQo2LzE4IENoZWNraW5nIGNvbW1pdCA1MmY4MzQzNWUwZTggKGJsb2NrL2FtZW5kOiBhZGQg
+J2ZvcmNlJyBvcHRpb24pCjcvMTggQ2hlY2tpbmcgY29tbWl0IDYyNjRjY2I5NjMzMyAoYmxvY2sv
+YW1lbmQ6IHNlcGFyYXRlIGFtZW5kIGFuZCBjcmVhdGUgb3B0aW9ucyBmb3IgcWVtdS1pbWcpCkVS
+Uk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBhIGRvIC0gd2hpbGUgbG9vcAojMzQ6IEZJTEU6IGJsb2NrL3Fjb3cyLmM6NTY1MjoKKyNkZWZp
+bmUgUUNPV19DT01NT05fT1BUSU9OUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1NJWkUsICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1V
+X09QVF9TSVpFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
+ICAuaGVscCA9ICJWaXJ0dWFsIGRpc2sgc2l6ZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NL
+X09QVF9DT01QQVRfTEVWRUwsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
+IC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFwKKyAgICAgICAgLmhlbHAgPSAiQ29tcGF0aWJpbGl0eSBsZXZlbCAodjIgWzAuMTBdIG9y
+IHYzIFsxLjFdKSIgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAg
+Lm5hbWUgPSBCTE9DS19PUFRfQkFDS0lOR19GSUxFLCAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkZpbGUgbmFtZSBvZiBhIGJhc2Ug
+aW1hZ2UiICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0JBQ0tJTkdfRk1ULCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJJbWFnZSBm
+b3JtYXQgb2YgdGhlIGJhc2UgaW1hZ2UiICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9EQVRBX0ZJTEUsICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRf
+U1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhl
+bHAgPSAiRmlsZSBuYW1lIG9mIGFuIGV4dGVybmFsIGRhdGEgZmlsZSIgICAgICAgICAgICAgICAg
+XAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRf
+REFUQV9GSUxFX1JBVywgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlw
+ZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
+CisgICAgICAgIC5oZWxwID0gIlRoZSBleHRlcm5hbCBkYXRhIGZpbGUgbXVzdCBzdGF5IHZhbGlk
+ICIgICAgICAgICAgIFwKKyAgICAgICAgICAgICAgICAiYXMgYSByYXcgaW1hZ2UiICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5DUllQVCwgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhl
+IGltYWdlIHdpdGggZm9ybWF0ICdhZXMnLiAoRGVwcmVjYXRlZCAiIFwKKyAgICAgICAgICAgICAg
+ICAiaW4gZmF2b3Igb2YgIiBCTE9DS19PUFRfRU5DUllQVF9GT1JNQVQgIj1hZXMpIiwgICAgXAor
+ICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5D
+UllQVF9GT1JNQVQsICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9
+IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhlIGltYWdlLCBmb3JtYXQgY2hvaWNlczogJ2Flcycs
+ICdsdWtzJyIsIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0tFWV9T
+RUNSRVQoImVuY3J5cHQuIiwgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgICJJRCBvZiBz
+ZWNyZXQgcHJvdmlkaW5nIHFjb3cgQUVTIGtleSBvciBMVUtTIHBhc3NwaHJhc2UiKSwgIFwKKyAg
+ICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtTX0NJUEhFUl9BTEcoImVuY3J5cHQuIiksICAgICAg
+ICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX01PREUoImVu
+Y3J5cHQuIiksICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19J
+VkdFTl9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9f
+T1BUX0RFRl9MVUtTX0lWR0VOX0hBU0hfQUxHKCJlbmNyeXB0LiIpLCAgICAgICAgICAgXAorICAg
+IEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAgICAg
+ICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVEVSX1RJTUUoImVuY3J5
+cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJM
+T0NLX09QVF9DTFVTVEVSX1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
+ICAgIC50eXBlID0gUUVNVV9PUFRfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAicWNvdzIgY2x1c3RlciBzaXplIiwgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9IHN0cmluZ2lm
+eShERUZBVUxUX0NMVVNURVJfU0laRSkgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9QUkVBTExPQywgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUHJl
+YWxsb2NhdGlvbiBtb2RlIChhbGxvd2VkIHZhbHVlczogb2ZmLCAiICAgICAgICAgXAorICAgICAg
+ICAgICAgICAgICJtZXRhZGF0YSwgZmFsbG9jLCBmdWxsKSIgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NL
+X09QVF9MQVpZX1JFRkNPVU5UUywgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
+IC50eXBlID0gUUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUG9zdHBvbmUgcmVmY291bnQgdXBkYXRlcyIsICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9ICJvZmYiICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9SRUZDT1VOVF9CSVRTLCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLCAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiV2lkdGgg
+b2YgYSByZWZlcmVuY2UgY291bnQgZW50cnkgaW4gYml0cyIsICAgICAgICAgXAorICAgICAgICAu
+ZGVmX3ZhbHVlX3N0ciA9ICIxNiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09Q
+VF9DT01QUkVTU0lPTl9UWVBFLCAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50
+eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICAgICAgLmhlbHAgPSAiQ29tcHJlc3Npb24gbWV0aG9kIHVzZWQgZm9yIGltYWdlIGNs
+dXN0ZXIgIiAgICAgICAgXAorICAgICAgICAgICAgICAgICJjb21wcmVzc2lvbiIsICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0g
+InpsaWIiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9Cgp0b3Rh
+bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI0NCBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzE4IGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzE4IENoZWNraW5nIGNvbW1pdCAyMDRlODI0MWM0
+Y2YgKGJsb2NrL2FtZW5kOiByZWZhY3RvciBxY293MiBhbWVuZCBvcHRpb25zKQo5LzE4IENoZWNr
+aW5nIGNvbW1pdCBiODc0MTlhYTQwZGEgKGJsb2NrL2NyeXB0bzogcmVuYW1lIHR3byBmdW5jdGlv
+bnMpCjEwLzE4IENoZWNraW5nIGNvbW1pdCA5MWQzNTIzMGJlZWEgKGJsb2NrL2NyeXB0bzogaW1w
+bGVtZW50IHRoZSBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50KQoxMS8xOCBDaGVja2luZyBjb21t
+aXQgN2E2MWMwYzAzM2E1IChibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVy
+ZmFjZSB3aXRoIGNyeXB0byBvcHRpb25zKQoxMi8xOCBDaGVja2luZyBjb21taXQgNWRhMWM3NTU4
+MzVlIChpb3Rlc3RzOiBxZW11LWltZyB0ZXN0cyBmb3IgbHVrcyBrZXkgbWFuYWdlbWVudCkKV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojMTc6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKdG90YWw6IDAgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCA0MzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KMTMvMTggQ2hlY2tpbmcgY29tbWl0IDkyMDcyNDczZmNkMSAoYmxvY2sv
+Y29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1cmUgZm9yIHgtYmxvY2tkZXYtYW1lbmQgcW1w
+IGNvbW1hbmQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
+TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjIxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzE4
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE0LzE4IENoZWNraW5nIGNvbW1pdCA0ZTQzODc5
+NDliY2MgKGJsb2NrL2NyeXB0bzogaW1wbGVtZW50IGJsb2NrZGV2LWFtZW5kKQoxNS8xOCBDaGVj
+a2luZyBjb21taXQgMDRlMmRjNDZkZmI0IChibG9jay9xY293MjogaW1wbGVtZW50IGJsb2NrZGV2
+LWFtZW5kKQoxNi8xOCBDaGVja2luZyBjb21taXQgZTEyNjUxN2U5NzM3IChpb3Rlc3RzOiBhZGQg
+dGVzdHMgZm9yIGJsb2NrZGV2LWFtZW5kKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRl
+ZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxl
+IG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU5MiBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAxNi8xOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8xOCBDaGVja2lu
+ZyBjb21taXQgMDRhZGUxYzA5MzU3IChpb3Rlc3RzOiBGaXggMDUxIG91dHB1dCBhZnRlciBxZGV2
+X2luaXRfbm9mYWlsKCkgcmVtb3ZhbCkKMTgvMTggQ2hlY2tpbmcgY29tbWl0IDMxNzA5ODk1MzUx
+YiAoaW90ZXN0czogZG9uJ3QgdGVzdCBxY293Mi5weSBpbnNpZGUgMjkxKQo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYyMjE1MTA1OS45MjEx
+OTEtMS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
