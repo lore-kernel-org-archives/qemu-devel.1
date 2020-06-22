@@ -2,71 +2,144 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2532C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B729DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 782D4206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:08:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782D4206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 80C9B206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:10:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ReuBAE8U";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zI5pcz+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C9B206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJNn-0007A4-Px
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60946)
+	id 1jnJPe-0008MF-Ph
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:10:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jnJMz-0006eR-8a; Mon, 22 Jun 2020 06:08:05 -0400
-Resent-Date: Mon, 22 Jun 2020 06:08:05 -0400
-Resent-Message-Id: <E1jnJMz-0006eR-8a@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21712)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jnJMw-00087Q-5e; Mon, 22 Jun 2020 06:08:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592820463; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MaU9ilwCXN6Zot7vgsFX5d/ldVUzKqa2//HmDo7YHmp9qBFE1KxAYy2WmTTSaBA2CjvusBOkf1EsjTD+/a7z2ZoJ4tcqrmQgo5V1rGQYDFV8T8ADdkCuxPtHa6CptNXCH7Rns6eHcd3U0v4fc27gUzzn4eNDhjtOKX8YyMFnRsE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592820463;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ckSkDl82RIG/nEfmO1G1NDCoB2UavNsKqSGbD3VcQL8=; 
- b=YEv+tOdwbMU/2hQhHJ6bmh/tpolYSuYuKA09jSKe/foth9E6GvnDJUCBbPZMALhYCEHRYYNoLloiElKj98wjgn4cWVS/QgzUlxaqRql0H7KfhIkLvdd09vjd7td1VPwIXvtPPJq9u+e1M+DstYZYDOv6S7SGPnQqJ1IK5PmJJmc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592820460140147.3537947176353;
- Mon, 22 Jun 2020 03:07:40 -0700 (PDT)
-Message-ID: <159282045857.26976.16461708676100945910@d1fd068a5071>
-Subject: Re: [PATCH v2 00/16] Crazy shit around -global (pardon my french)
-In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <prvs=435c605ae=Anup.Patel@wdc.com>)
+ id 1jnJOm-0007gD-Vb; Mon, 22 Jun 2020 06:09:57 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:43054)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <prvs=435c605ae=Anup.Patel@wdc.com>)
+ id 1jnJOj-0008I9-Vu; Mon, 22 Jun 2020 06:09:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1592820593; x=1624356593;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=RWN8JAWGEmGlLhlMCfdbnIKFaMvQtgb+tnOupQ8LP7w=;
+ b=ReuBAE8UIE+9hwVD1/NozRiCFnkxLeMEcl3U0Reu7pQay/bdYndIVevj
+ lYAd0qn+OSbcPvIgrsOLq1yYm4QO9GglCtnBvt6b0NtKC5Ly8j5oDaK1k
+ YlxYdh688pJP20Lri1ZgWnAOd4JC1FvY6i2/BMhY2ErkL1m5EyemaY4tZ
+ dhY5ysOeMFe+DZmW7wFlNR4wDD9vLYMcuTz73g2QioMhhwZ1RNxPPA5mh
+ FTSRQKgXiUwkQjsARfnCUZqmSMbHwkpLmVzMj7mlmuud8GJspToF4dtoV
+ 8w7JuakfWlysAmMLBCIXvsVAecNzZbjLgHsLT2MJT7UhR35suJEwkWR3d A==;
+IronPort-SDR: WqFpz9w1rPQUserzTI4BrnovhxzZZUKpb5rCjMDaUeFJ5p7Oq3jvjPA/6RphRXjtSFMtSxqE0c
+ KLDKRvuXjHmg0YmZ9FlEHXLTW1TAMJ2v49yOXchQvhoe8PkJ5/08UyvUfEYyZ2IQ/dkvAUbm+g
+ pbLVbfYIWWwaD0Fpck5S2rwIdV7p1Cr0DiAJrohpdBq5BlhShkRittlUZ6Vl6pgI8J+fVs5Peg
+ PdBexjSuBDyN+xs5Pl6rTpqX5EZ5FAICkv/O+DGk8y/IR6fCy8kQCRRxaSElR6VQ5LGQwZjQGW
+ Ai8=
+X-IronPort-AV: E=Sophos;i="5.75,266,1589212800"; d="scan'208";a="249801140"
+Received: from mail-mw2nam12lp2049.outbound.protection.outlook.com (HELO
+ NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.49])
+ by ob1.hgst.iphmx.com with ESMTP; 22 Jun 2020 18:09:48 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IamLkJIlMq2PkVV4kTNJ4wgV8nr9dMLtvJsJame5bNmtOy3w9tZz988tx8Rry818hqmdZQLvV31l6FNu4qtidAqBzdn5idXImpWcJbrFDrEy3nrCWxVjA5VVGCYX96ig9mMMMNeUNoh1uuVW0ZtZYcB8TJJ3kchK98PmIRQ7T1LPS1AXj5yA5eR4in+PMFzSmEA4yOGfN9YFSms0K185Sjy2X+ZWWaGvKSPqwSJ/vdIOvWDjhfozkQIH+nPxtoNNrWKrTaXkoBGIw1iGc1oEBtVwSI4zK32hkp9NusCMJCUWeLD/Dn5g7tqKDFzFBv603GePcClytoCDdlKvbSPOBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RvoA6XrG9g4pAF/gHWoQ437tF/AL/fMxW8DAxgBYtMQ=;
+ b=Zp2eGMWxAp5MNU0BEKSoa5JIUaDPw3NW1TyIVSEP/DeU8imEyj2t5t6VtRmAgUHGJ+oFGkJupPAE5nLZhsXxlbSxpEGT09SC+6Sp2DnvV8Ipk04hx/bx1QNDl0Xt2IA/KoSrajv0f+WD2eeYYRk4up9UiwWb62nv9h4GTDSr+DL8dLvIFQwzYhbH8YndWwKU94qVnXg/3TI122PQjnMs6F/vXDHaDyHMXpKkSfmzjeZsCqgrjH/FrzhTK7oNYoBCb2tVfdeLWi2ac0xWnxHwFU7RvuiLa/mkae419mxVF9RPrmgTI0GgR5S7tuQF2Vusxqya3DDZQIShNlN39Hft9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RvoA6XrG9g4pAF/gHWoQ437tF/AL/fMxW8DAxgBYtMQ=;
+ b=zI5pcz+R4MHS7WAbjqNI3EDp6MlI3rrHkTOg27Aw6+ESTBcME0Mz1YPTJCzxFQHo2qme299RhLHexTNHq6XMUuTmCrUhStWzA+Q447n7ZZyL1U64uQsb4wE0xfksSdlNJsNdrfOCVIaZ9VtYcJ0b3QegweTjdoaQifpoyzA1Twg=
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
+ by DM6PR04MB6633.namprd04.prod.outlook.com (2603:10b6:5:24a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.21; Mon, 22 Jun
+ 2020 10:09:47 +0000
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::e0a4:aa82:1847:dea5]) by DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::e0a4:aa82:1847:dea5%7]) with mapi id 15.20.3109.027; Mon, 22 Jun 2020
+ 10:09:47 +0000
+From: Anup Patel <Anup.Patel@wdc.com>
+To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
+ <Alistair.Francis@wdc.com>, Bastian Koppelmann
+ <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmerdabbelt@google.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Subject: RE: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
+ bios images
+Thread-Topic: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
+ bios images
+Thread-Index: AQHWSF8bvVpcQ8q0fEm5PQ775A0UKqjkaUTQ
+Date: Mon, 22 Jun 2020 10:09:47 +0000
+Message-ID: <DM6PR04MB620142B152292DD3945E4D3C8D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+References: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [103.56.182.118]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: da7c642c-d636-4f51-e6bb-08d8169464cb
+x-ms-traffictypediagnostic: DM6PR04MB6633:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR04MB6633997717F22B84544B63778D970@DM6PR04MB6633.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0442E569BC
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: lmvWrk8kk3UcZqndFImuHbRMGU0yjFO0sd7ngO563yXTAScS9N2psxcHkLqIIRLSiLxm1crhKZOwnQ1M8Yj4RwD8FdkuDof4S70PVM3W17kA1itlrNvWS5VTDAt+7XTslfQllnAUQKuOPkV/M9ISRRZwMKf+t0OzGI8aeGPX9B6vNTRBuSkNTTgDYIa/msAAQZ1cyZ0H842z83AZ6DUMzWt/8lF9eC7cnXmzhu0jGKNh5Je06mROnuyW1vIJI1Pwgkxtw90n1/WLXq4TDTHSi/fCyCJEm55lsXEwIZwVnekd61ecG3YHkJQtxDNqEZ1mVpqvbSxsM/K1H1mstfvpLEaK8zNkbWVzXA3kHTReFCpTth6/vvkSv4ogPnnJJ1u3z4fM3wKn03xJxrSdM+Ea17W8xRJnbuKVaaQQeltADGrYhMmCu2zWFMWcVEFuKS0s
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(376002)(136003)(366004)(39860400002)(396003)(2906002)(86362001)(8676002)(8936002)(66556008)(64756008)(5660300002)(71200400001)(76116006)(4326008)(66476007)(66446008)(83380400001)(66946007)(52536014)(478600001)(9686003)(7696005)(55016002)(54906003)(110136005)(966005)(316002)(186003)(26005)(33656002)(6506007)(53546011)(41533002);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: KJnRT7gyuU4K1Tz63Wx3uhhaJg9Zl41/62JCDnvdaIBlhWMzpBeNXU27Ed2zBVp2rbwxmYY/tBsa+P38bFUPEgZ0s+phKzjMnnxY/RvDl3vE28gtS06x9JuXM7+BeAq15TWm9onwvHXa5qpepHHIKzVjvcEriAyJHLEH81Wtz/E+UWcVdTGwhn69CfcZ2fzF9vws/xhUHT9duQEp6kjtjDuT4KXYvL2C64zSopl7kmkGmuSKUC3zMNJqh0bVJBASLEBNM1PnFqo0C80bwXS2558Mga7K/LKDMtyOjVM/Kw0UAjX9eAbQ+wAYnlFpstTCOu/Egh/PjeMQFDDmp25KMIxLlBNJzHI1Zl+PtVw5qE4rtOgfqAJOzIEBw1S+giVbsKK033UIIlEfhLLTnhdos44GhiKIYhscizkwJLDZfgxAYq3sokhsf3kLLl0nP0J+uXi9oUE082aXvZBTxYvnLy7dcDKtH+i0c2OuyiWxvro=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Mon, 22 Jun 2020 03:07:40 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 06:07:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da7c642c-d636-4f51-e6bb-08d8169464cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2020 10:09:47.4151 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5agqQNN3/pwwJZQAR2FQ7TN1Gzd5ZzKI+3gBfQeR0SfIZJzT5I1L1dqvo1ZHVX/8Hm3P0K23tL954p8PcCvOdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6633
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=435c605ae=Anup.Patel@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 06:09:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,78 +152,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- pbonzini@redhat.com, jsnow@redhat.com
+Cc: Anup Patel <anup@brainfault.org>, Bin Meng <bin.meng@windriver.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyMjA5NDIyNy4xMjcx
-NjUwLTEtYXJtYnJ1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MiAwMC8xNl0gQ3Jhenkgc2hpdCBhcm91bmQg
-LWdsb2JhbCAocGFyZG9uIG15IGZyZW5jaCkKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAw
-NjIyMDk0MjI3LjEyNzE2NTAtMS1hcm1icnVAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA2MjIwOTQyMjcuMTI3MTY1
-MC0xLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDA2MjIwOTQyMjcuMTI3MTY1MC0x
-LWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjAxMTZl
-ZSBzZC9taWxreW1pc3QtbWVtY2FyZDogRml4IGVycm9yIEFQSSB2aW9sYXRpb24KM2NlMDViNCBz
-ZC9weGEyeHhfbW1jaTogRG9uJ3QgY3Jhc2ggb24gcHhhMnh4X21tY2lfaW5pdCgpIGVycm9yCjdi
-YjM4MmUgYXJtL2FzcGVlZDogRHJvcCBhc3BlZWRfYm9hcmRfaW5pdF9mbGFzaGVzKCkgcGFyYW1l
-dGVyIEBlcnJwCjdmYzM5ZjggcWRldjogTWFrZSBxZGV2X3Byb3Bfc2V0X2RyaXZlKCkgbWF0Y2gg
-dGhlIG90aGVyIGhlbHBlcnMKYTFiYWQ5MCBxZGV2OiBSZWplY3QgY2hhcmRldiBwcm9wZXJ0eSBv
-dmVycmlkZQpiNzM3NjVlIHFkZXY6IFJlamVjdCBkcml2ZSBwcm9wZXJ0eSBvdmVycmlkZQozNDA3
-MmFlIHFkZXY6IEltcHJvdmUgbmV0ZGV2IHByb3BlcnR5IG92ZXJyaWRlIGVycm9yIGEgYml0CmZh
-NmJjM2UgcWRldjogRWxpbWluYXRlIGdldF9wb2ludGVyKCksIHNldF9wb2ludGVyKCkKMmUyMmFk
-MiBibG9ja2RldjogRGVwcmVjYXRlIC1kcml2ZSB3aXRoIGJvZ3VzIGludGVyZmFjZSB0eXBlCjJm
-ZGQ0ZjQgZG9jcy9xZGV2LWRldmljZS11c2UudHh0OiBVcGRhdGUgc2VjdGlvbiAiRGVmYXVsdCBE
-ZXZpY2VzIgozYmI2MTMxIGZkYzogRGVwcmVjYXRlIGNvbmZpZ3VyaW5nIGZsb3BwaWVzIHdpdGgg
-LWdsb2JhbCBpc2EtZmRjCjE0NDJlZjUgZmRjOiBPcGVuLWNvZGUgZmRjdHJsX2luaXRfaXNhKCkK
-NmFiOWRjMiBmZGM6IFJlamVjdCBjbGFzaCBiZXR3ZWVuIC1kcml2ZSBpZj1mbG9wcHkgYW5kIC1n
-bG9iYWwgaXNhLWZkYwowMGU2NGEyIGlvdGVzdHMvMTcyOiBDb3ZlciAtZ2xvYmFsIGZsb3BweS5k
-cml2ZT0uLi4KNDBjMjg0NCBpb3Rlc3RzLzE3MjogQ292ZXIgZW1wdHkgZmlsZW5hbWUgYW5kIG11
-bHRpcGxlIHVzZSBvZiBkcml2ZXMKYmE4NjhiYSBpb3Rlc3RzLzE3MjogSW5jbHVkZSAiaW5mbyBi
-bG9jayIgaW4gdGVzdCBvdXRwdXQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcg
-Y29tbWl0IGJhODY4YmFmNDRmNyAoaW90ZXN0cy8xNzI6IEluY2x1ZGUgImluZm8gYmxvY2siIGlu
-IHRlc3Qgb3V0cHV0KQoyLzE2IENoZWNraW5nIGNvbW1pdCA0MGMyODQ0MmY1NDYgKGlvdGVzdHMv
-MTcyOiBDb3ZlciBlbXB0eSBmaWxlbmFtZSBhbmQgbXVsdGlwbGUgdXNlIG9mIGRyaXZlcykKRVJS
-T1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQ4OiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMTcy
-Lm91dDoxOTA6CitUZXN0aW5nOiAtZmRiICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-ODYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-My8xNiBDaGVja2luZyBjb21taXQgMDBlNjRhMmIxYTk5IChpb3Rlc3RzLzE3MjogQ292ZXIgLWds
-b2JhbCBmbG9wcHkuZHJpdmU9Li4uKQo0LzE2IENoZWNraW5nIGNvbW1pdCA2YWI5ZGMyOTZkMDgg
-KGZkYzogUmVqZWN0IGNsYXNoIGJldHdlZW4gLWRyaXZlIGlmPWZsb3BweSBhbmQgLWdsb2JhbCBp
-c2EtZmRjKQo1LzE2IENoZWNraW5nIGNvbW1pdCAxNDQyZWY1YzFkYWQgKGZkYzogT3Blbi1jb2Rl
-IGZkY3RybF9pbml0X2lzYSgpKQo2LzE2IENoZWNraW5nIGNvbW1pdCAzYmI2MTMxOGQ2MDcgKGZk
-YzogRGVwcmVjYXRlIGNvbmZpZ3VyaW5nIGZsb3BwaWVzIHdpdGggLWdsb2JhbCBpc2EtZmRjKQo3
-LzE2IENoZWNraW5nIGNvbW1pdCAyZmRkNGY0NWIzNTUgKGRvY3MvcWRldi1kZXZpY2UtdXNlLnR4
-dDogVXBkYXRlIHNlY3Rpb24gIkRlZmF1bHQgRGV2aWNlcyIpCjgvMTYgQ2hlY2tpbmcgY29tbWl0
-IDJlMjJhZDJjZjQwZCAoYmxvY2tkZXY6IERlcHJlY2F0ZSAtZHJpdmUgd2l0aCBib2d1cyBpbnRl
-cmZhY2UgdHlwZSkKOS8xNiBDaGVja2luZyBjb21taXQgZmE2YmMzZWEwNDFmIChxZGV2OiBFbGlt
-aW5hdGUgZ2V0X3BvaW50ZXIoKSwgc2V0X3BvaW50ZXIoKSkKMTAvMTYgQ2hlY2tpbmcgY29tbWl0
-IDM0MDcyYWU4MjhjYSAocWRldjogSW1wcm92ZSBuZXRkZXYgcHJvcGVydHkgb3ZlcnJpZGUgZXJy
-b3IgYSBiaXQpCjExLzE2IENoZWNraW5nIGNvbW1pdCBiNzM3NjVlMmQ4NmMgKHFkZXY6IFJlamVj
-dCBkcml2ZSBwcm9wZXJ0eSBvdmVycmlkZSkKMTIvMTYgQ2hlY2tpbmcgY29tbWl0IGExYmFkOTBm
-ZmZlYiAocWRldjogUmVqZWN0IGNoYXJkZXYgcHJvcGVydHkgb3ZlcnJpZGUpCjEzLzE2IENoZWNr
-aW5nIGNvbW1pdCA3ZmMzOWY4NTU1YjEgKHFkZXY6IE1ha2UgcWRldl9wcm9wX3NldF9kcml2ZSgp
-IG1hdGNoIHRoZSBvdGhlciBoZWxwZXJzKQoxNC8xNiBDaGVja2luZyBjb21taXQgN2JiMzgyZTMx
-YmY0IChhcm0vYXNwZWVkOiBEcm9wIGFzcGVlZF9ib2FyZF9pbml0X2ZsYXNoZXMoKSBwYXJhbWV0
-ZXIgQGVycnApCjE1LzE2IENoZWNraW5nIGNvbW1pdCAzY2UwNWI0ZTEwOGUgKHNkL3B4YTJ4eF9t
-bWNpOiBEb24ndCBjcmFzaCBvbiBweGEyeHhfbW1jaV9pbml0KCkgZXJyb3IpCjE2LzE2IENoZWNr
-aW5nIGNvbW1pdCBmMDExNmVlMTQxZWUgKHNkL21pbGt5bWlzdC1tZW1jYXJkOiBGaXggZXJyb3Ig
-QVBJIHZpb2xhdGlvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAyMDA2MjIwOTQyMjcuMTI3MTY1MC0xLWFybWJydUByZWRoYXQuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+> -----Original Message-----
+> From: Qemu-riscv <qemu-riscv-
+> bounces+anup.patel=3Dwdc.com@nongnu.org> On Behalf Of Bin Meng
+> Sent: 22 June 2020 12:03
+> To: Alistair Francis <Alistair.Francis@wdc.com>; Bastian Koppelmann
+> <kbastian@mail.uni-paderborn.de>; Palmer Dabbelt
+> <palmerdabbelt@google.com>; Sagar Karandikar
+> <sagark@eecs.berkeley.edu>; qemu-devel@nongnu.org; qemu-
+> riscv@nongnu.org
+> Cc: Anup Patel <anup@brainfault.org>; Bin Meng
+> <bin.meng@windriver.com>
+> Subject: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi =
+bios
+> images
+>=20
+> From: Bin Meng <bin.meng@windriver.com>
+>=20
+> The RISC-V generic platform is a flattened device tree (FDT) based platfo=
+rm
+> where all platform specific functionality is provided based on FDT passed=
+ by
+> previous booting stage. The support was added in the upstream OpenSBI
+> v0.8 release recently.
+>=20
+> This series updates QEMU to switch to use generic platform of opensbi bio=
+s
+> images.
+>=20
+> The patch emails do not contain binary bits, please grab all updates at
+> https://github.com/lbmeng/qemu.git bios branch.
+
+It will be nice to have this series updated to for fw_dynamic.bin .
+
+Maybe you can rebase your series on top of Atish's patches ??=20
+
+Regards,
+Anup
+
+>=20
+> Changes in v2:
+> - new patch: configure: Create symbolic links for pc-bios/*.elf files
+> - Upgrade OpenSBI to v0.8 release
+> - Copy the ELF images too in the make rules
+> - Include ELF images in the artifacts
+> - new patch: Makefile: Ship the generic platform bios images for RISC-V
+>=20
+> Bin Meng (7):
+>   configure: Create symbolic links for pc-bios/*.elf files
+>   roms/opensbi: Upgrade from v0.7 to v0.8
+>   roms/Makefile: Build the generic platform for RISC-V OpenSBI firmware
+>   hw/riscv: Use pre-built bios image of generic platform for virt &
+>     sifive_u
+>   hw/riscv: spike: Change the default bios to use generic platform image
+>   gitlab-ci/opensbi: Update GitLab CI to build generic platform
+>   Makefile: Ship the generic platform bios images for RISC-V
+>=20
+>  .gitlab-ci.d/opensbi.yml                     |  28 +++++++++------------=
+--
+>  Makefile                                     |   4 ++--
+>  configure                                    |   1 +
+>  hw/riscv/sifive_u.c                          |   4 ++--
+>  hw/riscv/spike.c                             |   9 ++++++--
+>  hw/riscv/virt.c                              |   4 ++--
+>  pc-bios/opensbi-riscv32-generic-fw_jump.bin  | Bin 0 -> 58048 bytes  pc-
+> bios/opensbi-riscv32-generic-fw_jump.elf  | Bin 0 -> 554156 bytes  pc-
+> bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49520 -> 0 bytes
+>  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 49504 -> 0 bytes
+>  pc-bios/opensbi-riscv64-generic-fw_jump.bin  | Bin 0 -> 70792 bytes  pc-
+> bios/opensbi-riscv64-generic-fw_jump.elf  | Bin 0 -> 619960 bytes  pc-
+> bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 57936 -> 0 bytes
+>  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 57920 -> 0 bytes
+>  roms/Makefile                                |  32 +++++++++------------=
+------
+>  roms/opensbi                                 |   2 +-
+>  16 files changed, 35 insertions(+), 49 deletions(-)  create mode 100644 =
+pc-
+> bios/opensbi-riscv32-generic-fw_jump.bin
+>  create mode 100644 pc-bios/opensbi-riscv32-generic-fw_jump.elf
+>  delete mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
+>  delete mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
+>  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.bin
+>  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.elf
+>  delete mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+>  delete mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
+>=20
+> --
+> 2.7.4
+>=20
+
 
