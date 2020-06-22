@@ -4,126 +4,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6717C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD913C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71FFA2073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 885222073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 16:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WX9N3rsi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FFA2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HaaET52v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885222073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnPcC-0004mL-Nn
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 12:48:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48488)
+	id 1jnPdv-00066Z-Qt
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 12:49:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnPbM-0004Al-07
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:47:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38958
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnPbJ-000077-4r
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:47:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592844435;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=juAVvUIzyXni73krAXQGWCdU82IZVVNicili/GTJSxE=;
- b=WX9N3rsiruugRZOMBkf/by/zZcPVemhZPkJDhx57poxcmQMYvZZGAEev/+pdiqGoi3xrHG
- Td+UmGxaPOQtZ5eOScFT5DGek5C8DnVOfRVk2PjAbt15mi3N3F5gYlpnrmmwrpTarKLnjn
- c1sTq29866rhKWXiRqXCCqG138gRCcE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-YqqU7WQfMtqKttHZtqBeaQ-1; Mon, 22 Jun 2020 12:47:07 -0400
-X-MC-Unique: YqqU7WQfMtqKttHZtqBeaQ-1
-Received: by mail-wr1-f70.google.com with SMTP id j5so8764270wro.6
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 09:47:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnPcG-0004yc-DC
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:48:16 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33874)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnPcE-0000DD-Lj
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 12:48:15 -0400
+Received: by mail-pg1-x541.google.com with SMTP id t6so582699pgq.1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 09:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=chQukggTmBstdzLo3UKBwExa9l0BhvgfjiYmy6JIZfU=;
+ b=HaaET52vjWBIDH9iY7y2TUFZYmFNAc5N+TBtCuRqOhVkhiJrVaXojOiTA0HVPhqlUI
+ fCW7Yi02jeGoghDCCwL1WbOX0R9HOK/UsLL8RQ94eURYMzDjb/bes7LMbGZK7yT1xO5T
+ hMuVkX+TQnWpZfqLVYaO8HoNEeDQPsjB3r1KLzXV5a+sTCFfKCvM91n6cQA978u3AJEH
+ zzE2cfD9J0MQZNN+z5yK2QoAUtzU5AeTrgFwZ+x+fAA3hIkayjMHSSRKpDQnSYcVkv2N
+ QzYRAnB0f3d7VuELBEfQiAUINhgfVrjIzCVXjdpcbrEon7krV+ofUQljRYTs/lY8sXv9
+ n+kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=juAVvUIzyXni73krAXQGWCdU82IZVVNicili/GTJSxE=;
- b=rbKoTYcVrw63upE20rNlgX8aKsXUo5ImyUgW7C94VOa2ouxFotK38zlFu5vyoCZn9Z
- Ekec7od8zLLdxV/Sfdh04HbSFWtrt3/pan2JwjkqjfEANQjA2VcSH6qEbTyaUmVryxa1
- 3o6l4rt458g9JWNQeDBpsEkRWmH/3OZbwM2drd1r4pnmGuutkB80NF8/4RombSGfRVF2
- jCkQzRBPC0OG6AUJxgMD27nanpRXiOagwBMevQjrUYfSuHovWfLPwiqtyOOf8FAaZ4hv
- lxFK42LmP0FImrtrOb9jhqGGiyWtdgxhf4kBavAzA/xsmYh4nz+86K9Kj9CPZJaQlDWU
- NiCA==
-X-Gm-Message-State: AOAM533GOym317K+mirR/xIniWsRZDq/wVeSTKu8LN1zG5osQgq3T5+F
- D3D27pxmazHyKZBRVf1FwYKFv6KEvlMkddVBH3p1kqnjG4qzaNiqU/sIUTMrPHH9uxrm8T+ROY3
- NkCag+kllSioOIGE=
-X-Received: by 2002:a05:600c:2313:: with SMTP id
- 19mr20357340wmo.51.1592844425742; 
- Mon, 22 Jun 2020 09:47:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTNaM7zL/AWhhDPZaRjFT0E91MXpy2Zr4UWZTQmJZDWxR9n/FiiFLjhwF+CELfNaoSDaIGow==
-X-Received: by 2002:a05:600c:2313:: with SMTP id
- 19mr20357324wmo.51.1592844425477; 
- Mon, 22 Jun 2020 09:47:05 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id 125sm155500wmc.23.2020.06.22.09.47.04
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=chQukggTmBstdzLo3UKBwExa9l0BhvgfjiYmy6JIZfU=;
+ b=NqdDBvwraLD0sExg9N4xdC9BcT/RXeP4OYKnNRj6jU5jQyIRiJIdMV6XNk43trDC+b
+ aqwlXv0N3QQkkODx1/D4s/crumpjG3yss1ne7KFbtrYd90A8wcE7dF6hQzlqRC13s3aj
+ /1krKKTTV02utAQw14GHDjitxcn91vLbV1JtnfVCBA8A4J7l4/jPf/rTuA/JFDKRK8F3
+ W3ArGKuyL3f5alxcfvwZdHKGCkx3f2Ot1VS+c//n3n6xvlygO55lGQXjbE3l9x52wyQ/
+ hFkhWFDvyldsU0YI3ezvaL7VJrG8WFUIPWk9LnDvqy00x0gW7YGvDhPiAsa9xE2hDKyd
+ IOvQ==
+X-Gm-Message-State: AOAM531NL82Q//+12FpsKZSeQFltMyWrFkFQxWu4arNyvXqlW3hBmpEJ
+ SBBoR2G2lZK2DAMaFvVxgzHPZg==
+X-Google-Smtp-Source: ABdhPJz7+V31if5rIH4eA8VtJoq/Az6prc3umnIcaI3Z25dSj7meMozg0AG1mi1A6iuX08bpwTyT+Q==
+X-Received: by 2002:a63:ff54:: with SMTP id s20mr14239378pgk.251.1592844492393; 
+ Mon, 22 Jun 2020 09:48:12 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id f191sm14016103pfa.82.2020.06.22.09.48.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 22 Jun 2020 09:47:04 -0700 (PDT)
-Subject: Re: [PATCH v9 00/10] accel: Allow targets to use Kconfig
-To: qemu-devel@nongnu.org
-References: <20200618123342.10693-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <5332815d-49d7-21da-e752-c39c5b35adc4@redhat.com>
-Date: Mon, 22 Jun 2020 18:47:04 +0200
+ Mon, 22 Jun 2020 09:48:11 -0700 (PDT)
+Subject: Re: [PATCH v3 3/7] hw/misc/led: Emit a trace event when LED intensity
+ has changed
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200620230719.32139-1-f4bug@amsat.org>
+ <20200620230719.32139-4-f4bug@amsat.org>
+ <ae4a7411-7042-3530-3faf-e25368080820@linaro.org>
+ <c9e3897b-c711-f59b-d400-0bd01fd320b5@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <191eaa28-7ff4-38f6-9489-612ac984f20f@linaro.org>
+Date: Mon, 22 Jun 2020 09:48:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200618123342.10693-1-philmd@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <c9e3897b-c711-f59b-d400-0bd01fd320b5@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,88 +107,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, haxm-team <haxm-team@intel.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/18/20 2:33 PM, Philippe Mathieu-Daudé wrote:
-> Missing review:
-> - 03/10 MAINTAINERS: Cover the HAX accelerator stub
+On 6/21/20 3:25 PM, Philippe Mathieu-Daudé wrote:
+> Anyway I switched to a percent value. What is better to hold
+> it, an 'unsigned' or 'uint8_t' type?
 
-I forgot again to include the HAXM team...
+Might as well use unsigned; you'll not be saving space with uint8_t.
 
-> - 04/10 configure: Generate rule to calculate base arch of target
-> 
-> This series include generic patches I took of the KVM/ARM
-> specific series which will follow.
-> 
-> - Update accelerators in MAINTAINERS
-> - Add accel/Kconfig
-> - Allow targets to use their how Kconfig
-> 
-> Since v8:
-> - Fixed typo in patch 10 (Stefan)
-> 
-> Since v7:
-> - Generate base-arch() (Alex)
-> - Do not deprecate HAXM
-> 
-> Since v6:
-> - Fixed typo 'startwith' -> 'startswith' (armbru)
-> 
-> Since v5:
-> - Fixed typo in patch #4 subject
-> - Added David R-b tag
-> - Stripped --- comments
-> 
-> Since v4:
-> - Addressed rth review comments in rules.mak
-> 
-> Since v3:
-> - Fixed base-arch() rule (rth)
-> - Dropped 'semihosting: Make the feature depend of TCG'
-> 
-> Since v2:
-> - Addressed Thomas review comments
-> - Fixed problem when including TARGET instead of BASE_TARGET
-> 
-> Since v1:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg689024.html
-> - Drop HVF MAINTAINERS patch (merged elsewhere)
-> - Kconfig-select SEMIHOSTING (bonzini)
-> - Drop user-mode selection patches
-> - consider m68k/nios2/xtensa/riscv (pm215)
-> - reword Kconfig SEMIHOSTING description (pm215)
-> - reset some of rth R-b tags
-> 
-> Previous RFC for semihosting posted earlier:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg631218.html
-> 
-> Alex Bennée (1):
->   configure: Generate rule to calculate the base architecture of a
->     target
-> 
-> Philippe Mathieu-Daudé (9):
->   MAINTAINERS: Fix KVM path expansion glob
->   MAINTAINERS: Add an 'overall' entry for accelerators
->   MAINTAINERS: Cover the HAX accelerator stub
->   Makefile: Remove dangerous EOL trailing backslash
->   Makefile: Write MINIKCONF variables as one entry per line
->   accel/Kconfig: Extract accel selectors into their own config
->   accel/Kconfig: Add the TCG selector
->   Makefile: Allow target-specific optional Kconfig
->   accel/tcg: Add stub for probe_access()
-> 
->  configure              | 19 +++++++++++++++++++
->  Makefile               | 15 +++++++++++----
->  accel/stubs/tcg-stub.c |  7 +++++++
->  Kconfig.host           |  7 -------
->  MAINTAINERS            | 14 +++++++++++++-
->  accel/Kconfig          |  9 +++++++++
->  6 files changed, 59 insertions(+), 12 deletions(-)
->  create mode 100644 accel/Kconfig
-> 
 
+r~
 
