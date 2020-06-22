@@ -2,90 +2,69 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C206C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4769C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7181A25431
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:53:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7181A25431
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9DD772543D
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD772543D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnGKb-0004f9-PZ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:53:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41804)
+	id 1jnGPY-0007QA-TR
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jnGK3-0004Fo-AM
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:52:51 -0400
-Received: from mga07.intel.com ([134.134.136.100]:60634)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jnGK0-0002tw-MC
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:52:51 -0400
-IronPort-SDR: 0nbeW0z563HQIjawGqkrza5Yc4qc896ibAXO75X1S/T2ILOZP/F3BbPjbpNUrowPZHZrU+hpFD
- LdNYGXXNyBTw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="208886117"
-X-IronPort-AV: E=Sophos;i="5.75,266,1589266800"; d="scan'208";a="208886117"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 21 Jun 2020 23:52:43 -0700
-IronPort-SDR: /G8uJOYrLUSZBqzcak/vmkz8DTLnDtHh+3bZmKtWqRaiZZbnxHQdSdmLC2Gd60lt9a6Bp06sLX
- n9jN5iL2BJCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,266,1589266800"; d="scan'208";a="300740537"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by fmsmga004.fm.intel.com with ESMTP; 21 Jun 2020 23:52:43 -0700
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 21 Jun 2020 23:52:42 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 22 Jun 2020 14:52:40 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Mon, 22 Jun 2020 14:52:40 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: RE: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
-Thread-Topic: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
-Thread-Index: AQHWPQXUSKAMWxVp4EWHfvIjGmZAKajRXpJwgArmGoCAAXaSIA==
-Date: Mon, 22 Jun 2020 06:52:40 +0000
-Message-ID: <f02f06aa12cd406db9f681d11a2b3b47@intel.com>
-References: <20200607194611.24763-1-chen.zhang@intel.com>
- <d1b031b8c9f241d4af843392d8091a18@intel.com> <20200617122541.GD2776@work-vm>
-In-Reply-To: <20200617122541.GD2776@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jnGOh-000705-Ie
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:57:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43042
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jnGOg-0003Z6-0M
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:57:39 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-ZBPEIf9cMi-YTRN5FrbMbg-1; Mon, 22 Jun 2020 02:57:22 -0400
+X-MC-Unique: ZBPEIf9cMi-YTRN5FrbMbg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A607319057A0;
+ Mon, 22 Jun 2020 06:57:20 +0000 (UTC)
+Received: from bahia.lan (ovpn-113-133.ams2.redhat.com [10.36.113.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 280F771676;
+ Mon, 22 Jun 2020 06:57:19 +0000 (UTC)
+Subject: [PATCH] ppc/pnv: Silence missing BMC warning with qtest
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 22 Jun 2020 08:57:18 +0200
+Message-ID: <159280903824.485572.831378159272329707.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=chen.zhang@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:52:44
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=207.211.31.120; envelope-from=groug@kaod.org;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -12
+X-Spam_score: -1.3
+X-Spam_bar: -
+X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,80 +77,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-ppc@nongnu.org,
+ =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?utf-8?q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The device introspect test in qtest emits some warnings with the
+the pnv machine types during the "nodefaults" phase:
 
+TEST check-qtest-ppc64: tests/qtest/device-introspect-test
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device
+ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
+one
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device
+ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
+one
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device
+ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
+one
 
-> -----Original Message-----
-> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Sent: Wednesday, June 17, 2020 8:26 PM
-> To: Zhang, Chen <chen.zhang@intel.com>
-> Cc: qemu-dev <qemu-devel@nongnu.org>; Zhang Chen
-> <zhangckid@gmail.com>; Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Subject: Re: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
->=20
-> * Zhang, Chen (chen.zhang@intel.com) wrote:
-> > Hi Dave,
-> >
->=20
-> I think it's OK; I guess Zhanghailiang is going to do a pull for it?
-> One thought about the change of use of MIGRATION_STATUS_ACTIVE; I
-> think it's OK at the moment - but the migration states and the way they
-> change becomes part of the API - changing which states we use can confuse
-> management applications; since there's no libvirt support, I'll leave it =
-to
-> Zhanghailiang to know if that's OK.
+This is expected since the pnv machine doesn't create the internal
+BMC simulator fallback when "-nodefaults" is passed on the command
+line, but these warnings appear in ci logs and confuse people.
 
-Hi Hailiang/Dave,
+Not having a BMC isn't recommended but it is still a supported
+configuration, so a straightforward fix is to just silent this
+warning when qtest is enabled.
 
-Current upstream libvirt can't support COLO, it looks no new issue for norm=
-al migration process.
-For the future, new COLO migration status is good for COLO enable work on l=
-ibvirt and upper layer.
+Fixes: 25f3170b0654 ("ppc/pnv: Create BMC devices only when defaults are en=
+abled")
+Reported-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/pnv.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Thanks
-Zhang Chen
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 806a5d9a8d34..1622d29b4ba7 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -21,6 +21,7 @@
+ #include "qemu-common.h"
+ #include "qemu/units.h"
+ #include "qapi/error.h"
++#include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+ #include "sysemu/reset.h"
+@@ -587,9 +588,11 @@ static void pnv_reset(MachineState *machine)
+     bmc =3D pnv_bmc_find(&error_fatal);
+     if (!pnv->bmc) {
+         if (!bmc) {
+-            warn_report("machine has no BMC device. Use '-device "
+-                        "ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3D=
+bmc0,irq=3D10' "
+-                        "to define one");
++            if (!qtest_enabled()) {
++                warn_report("machine has no BMC device. Use '-device "
++                            "ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bm=
+c=3Dbmc0,irq=3D10' "
++                            "to define one");
++            }
+         } else {
+             pnv_bmc_set_pnor(bmc, pnv->pnor);
+             pnv->bmc =3D bmc;
 
->=20
-> Dave
->=20
->=20
-> >
-> > Thanks
-> > Zhang Chen
-> >
-> > > -----Original Message-----
-> > > From: Zhang, Chen <chen.zhang@intel.com>
-> > > Sent: Monday, June 8, 2020 3:46 AM
-> > > To: Dr . David Alan Gilbert <dgilbert@redhat.com>; qemu-dev <qemu-
-> > > devel@nongnu.org>
-> > > Cc: Zhang Chen <zhangckid@gmail.com>; Zhanghailiang
-> > > <zhang.zhanghailiang@huawei.com>; Zhang, Chen
-> <chen.zhang@intel.com>
-> > > Subject: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
-> > >
-> > > From: Zhang Chen <chen.zhang@intel.com>
-> > >
-> > > This series optimize some code of COLO, please review.
-> > >
-> > > Zhang Chen (3):
-> > >   migration/colo: Optimize COLO boot code path
-> > >   migration/colo: Update checkpoint time lately
-> > >   migration/migration.c: Remove MIGRATION_STATUS_ACTIVE in
-> > >     migration_iteration_finish
-> > >
-> > >  migration/colo.c      |  7 ++-----
-> > >  migration/migration.c | 12 +++++-------
-> > >  2 files changed, 7 insertions(+), 12 deletions(-)
-> > >
-> > > --
-> > > 2.17.1
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
