@@ -2,79 +2,122 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30464C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2320C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE2F420708
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EF172068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 11:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LHJP/31m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2F420708
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBEDpmb4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EF172068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnKYz-0005ZK-7T
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:24:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43436)
+	id 1jnKb7-0008GS-Lp
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 07:26:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnKXe-0004b4-IZ
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:23:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33693
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnKXr-0004hf-4L
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:23:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29268
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnKXW-0007FK-6n
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:23:08 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnKXe-0007Gf-Li
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 07:23:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592824979;
+ s=mimecast20190719; t=1592824988;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TjN9niWCYIS4eow/uuCs74h2CERnYyO6Wpq+y+Da3P0=;
- b=LHJP/31mUvn+omAGjZUMSQg/rENo7T18J9aySLio1Rslvgw0arl/JKcrjzWVa4No6Imvsj
- 8iqpsYO4NUCQYiDZmJVUdCvHoEQPD377IuSjCkhgKI8tuVW6LSNBM/zqKKeuNig27umr+J
- UKEQEFuccWS8BdNFZ0bkrLIO2Ut/RXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-wSm1QWw6MGaKtkYbtY1_xQ-1; Mon, 22 Jun 2020 07:22:55 -0400
-X-MC-Unique: wSm1QWw6MGaKtkYbtY1_xQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7998C8005AD;
- Mon, 22 Jun 2020 11:22:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA0D31A8F5;
- Mon, 22 Jun 2020 11:22:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4F733113846D; Mon, 22 Jun 2020 13:22:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
-References: <20200611151209.22547-1-eric.auger@redhat.com>
- <20200611151209.22547-2-eric.auger@redhat.com>
-Date: Mon, 22 Jun 2020 13:22:46 +0200
-In-Reply-To: <20200611151209.22547-2-eric.auger@redhat.com> (Eric Auger's
- message of "Thu, 11 Jun 2020 17:12:05 +0200")
-Message-ID: <87k0zzz6nt.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=SuXi+u+3wqoHLgRNaz6sY5d4KjJWozGDun9NYB6juTg=;
+ b=PBEDpmb433yKkMcZsPIJT3A1XVOOYV17JCdWt/uEl0u/Khc9WYQ0grLHuz9Qm4vdTqQgY0
+ PJKHBfNQHMpyJtPxtKmOqBY2Phiju1tnam+F8uJvHOwYhvZnqOqQN5BPYLCEvrDVSd7kIZ
+ 5AGiOgy7X3YD0tvODLlnnHR5ouKbxHc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-LY3emnygMZG6wdBBXBEpmw-1; Mon, 22 Jun 2020 07:23:06 -0400
+X-MC-Unique: LY3emnygMZG6wdBBXBEpmw-1
+Received: by mail-wr1-f71.google.com with SMTP id p9so10719473wrx.10
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 04:23:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=SuXi+u+3wqoHLgRNaz6sY5d4KjJWozGDun9NYB6juTg=;
+ b=E50K5NaajeX1UeV9iIyH62nU++gDH1mPKX3nU57Tr5PyaUEQSorVo41bFinTKcISiR
+ 71jq5p3mmUNxh9GwE5tObt/+qH09wrMCBxL5TcaNQ1sDNYbmBktYcCTZ4fPT7FrgULxu
+ ch11PTPtx7yTB43t5yk6YohogLBCGHS0P3kENqeK11F+1wCX7EbLosuN7Z1359MgrbnT
+ JnS8qZ4BJWSzTuUBHpsUw5Z5WPMhDTpM096k4bh3eXGe+wh37QOhjEK7ANfK/93mNIN7
+ gOMM+nZOyLwnx/W54aWIszkx0UPef5pLIv5LkUnuGiilZWz0qJs74avMHLq8hErRbcZl
+ 26nw==
+X-Gm-Message-State: AOAM533Fypzei0KFSIEKGsx7R1QHsgx0uAPJqIqQfMgkt30Eazs+b2dO
+ eQxUwkFNvMXgy/7CD0r2vJu29yz/EB6fTW9ILdrNs6lH1GQRLA/vTm4Z7iTKADLgDnHWRisweJ8
+ 4vvR/d1+l0x2pHsg=
+X-Received: by 2002:a1c:e285:: with SMTP id
+ z127mr13639655wmg.162.1592824984662; 
+ Mon, 22 Jun 2020 04:23:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXNeJ9odxZkUsgwFO4XCabGq8PohNJg8c+jfFkJsMvyLaguySwVpemgxWq0BQbwtuskj/sFw==
+X-Received: by 2002:a1c:e285:: with SMTP id
+ z127mr13639628wmg.162.1592824984443; 
+ Mon, 22 Jun 2020 04:23:04 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id l190sm5240687wml.12.2020.06.22.04.23.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 22 Jun 2020 04:23:03 -0700 (PDT)
+Subject: Re: [PATCH] tests/qtest: Unify the test for the xenfv and xenpv
+ machines
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200622104339.21000-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <17ab5c19-a387-e5aa-e7a3-cd4a3aee8d1c@redhat.com>
+Date: Mon, 22 Jun 2020 13:23:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200622104339.21000-1-thuth@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,268 +138,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, jean-philippe@linaro.org, qemu-arm@nongnu.org,
- pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> writes:
-
-> Introduce a new property defining a reserved region:
-> <low address>, <high address>, <type>.
->
-> This will be used to encode reserved IOVA regions.
->
-> For instance, in virtio-iommu use case, reserved IOVA regions
-> will be passed by the machine code to the virtio-iommu-pci
-> device (an array of those). The type of the reserved region
-> will match the virtio_iommu_probe_resv_mem subtype value:
-> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
-> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
->
-> on PC/Q35 machine, this will be used to inform the
-> virtio-iommu-pci device it should bypass the MSI region.
-> The reserved region will be: 0xfee00000, 0xfeefffff, 1.
->
-> On ARM, we can declare the ITS MSI doorbell as an MSI
-> region to prevent MSIs from being mapped on guest side.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+On 6/22/20 12:43 PM, Thomas Huth wrote:
+> We have the same check in three places. Let's unify it in a central
+> place instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->
-> v11 -> v12:
-> - rename into DEFINE_PROP_RESERVED_REGION
-> - do not use g_strsplit anymore, use endptr instead
-> - remove 0x references
-> ---
->  include/exec/memory.h        |  6 +++
->  include/hw/qdev-properties.h |  3 ++
->  include/qemu/typedefs.h      |  1 +
->  hw/core/qdev-properties.c    | 89 ++++++++++++++++++++++++++++++++++++
->  4 files changed, 99 insertions(+)
->
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 3e00cdbbfa..3ee8224fa7 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -57,6 +57,12 @@ struct MemoryRegionMmio {
->      CPUWriteMemoryFunc *write[3];
->  };
+>  tests/qtest/device-introspect-test.c | 5 -----
+>  tests/qtest/libqtest.c               | 4 ++++
+>  tests/qtest/qom-test.c               | 5 -----
+>  tests/qtest/test-hmp.c               | 5 -----
+>  4 files changed, 4 insertions(+), 15 deletions(-)
+> 
+> diff --git a/tests/qtest/device-introspect-test.c b/tests/qtest/device-introspect-test.c
+> index f2c1576cae..9abb5ec889 100644
+> --- a/tests/qtest/device-introspect-test.c
+> +++ b/tests/qtest/device-introspect-test.c
+> @@ -287,11 +287,6 @@ static void add_machine_test_case(const char *mname)
+>  {
+>      char *path, *args;
 >  
-> +struct ReservedRegion {
-> +    hwaddr low;
-> +    hwaddr high;
-> +    unsigned int type;
-> +};
-> +
->  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+> -    /* Ignore blacklisted machines */
+> -    if (!memcmp("xenfv", mname, 5) || g_str_equal("xenpv", mname)) {
+> -        return;
+> -    }
+> -
+>      path = g_strdup_printf("device/introspect/concrete/defaults/%s", mname);
+>      args = g_strdup_printf("-M %s", mname);
+>      qtest_add_data_func(path, args, test_device_intro_concrete);
+> diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+> index 49075b55a1..fd4680590d 100644
+> --- a/tests/qtest/libqtest.c
+> +++ b/tests/qtest/libqtest.c
+> @@ -1232,6 +1232,10 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
+>          qstr = qobject_to(QString, qobj);
+>          g_assert(qstr);
+>          mname = qstring_get_str(qstr);
+> +        /* Ignore machines that cannot be used for qtests */
+> +        if (!memcmp("xenfv", mname, 5) || g_str_equal("xenpv", mname)) {
+> +            continue;
+> +        }
+
+The patch is correct.
+
+Since qtest uses QMP introspection, it would be cleaner to have
+a MachineClass::qtest_allowed property (default to true), set
+it to false in the xenfv/pv machines, and either check the property
+here or have a query-qtest-machines QMP command.
+Just thinking loudly.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>          if (!skip_old_versioned || !qtest_is_old_versioned_machine(mname)) {
+>              cb(mname);
+>          }
+> diff --git a/tests/qtest/qom-test.c b/tests/qtest/qom-test.c
+> index e338a41194..1acf0d7369 100644
+> --- a/tests/qtest/qom-test.c
+> +++ b/tests/qtest/qom-test.c
+> @@ -81,11 +81,6 @@ static void add_machine_test_case(const char *mname)
+>  {
+>      char *path;
 >  
->  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index f161604fb6..03bf850a7e 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -19,6 +19,7 @@ extern const PropertyInfo qdev_prop_string;
->  extern const PropertyInfo qdev_prop_chr;
->  extern const PropertyInfo qdev_prop_tpm;
->  extern const PropertyInfo qdev_prop_macaddr;
-> +extern const PropertyInfo qdev_prop_reserved_region;
->  extern const PropertyInfo qdev_prop_on_off_auto;
->  extern const PropertyInfo qdev_prop_multifd_compression;
->  extern const PropertyInfo qdev_prop_losttickpolicy;
-> @@ -183,6 +184,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
->      DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
->  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
->      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
-> +#define DEFINE_PROP_RESERVED_REGION(_n, _s, _f)         \
-> +    DEFINE_PROP(_n, _s, _f, qdev_prop_reserved_region, ReservedRegion)
->  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
->      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
->  #define DEFINE_PROP_MULTIFD_COMPRESSION(_n, _s, _f, _d) \
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index ecf3cde26c..85c4f891f4 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -59,6 +59,7 @@ typedef struct ISABus ISABus;
->  typedef struct ISADevice ISADevice;
->  typedef struct IsaDma IsaDma;
->  typedef struct MACAddr MACAddr;
-> +typedef struct ReservedRegion ReservedRegion;
->  typedef struct MachineClass MachineClass;
->  typedef struct MachineState MachineState;
->  typedef struct MemoryListener MemoryListener;
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index cc924815da..15b84adbee 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -14,6 +14,7 @@
->  #include "qapi/visitor.h"
->  #include "chardev/char.h"
->  #include "qemu/uuid.h"
-> +#include "qemu/cutils.h"
+> -    /* Ignore blacklisted machines that have known problems */
+> -    if (!memcmp("xenfv", mname, 5) || g_str_equal("xenpv", mname)) {
+> -        return;
+> -    }
+> -
+>      path = g_strdup_printf("qom/%s", mname);
+>      qtest_add_data_func(path, g_strdup(mname), test_machine);
+>      g_free(path);
+> diff --git a/tests/qtest/test-hmp.c b/tests/qtest/test-hmp.c
+> index b8b1271b9e..d5e7ebd176 100644
+> --- a/tests/qtest/test-hmp.c
+> +++ b/tests/qtest/test-hmp.c
+> @@ -143,11 +143,6 @@ static void add_machine_test_case(const char *mname)
+>  {
+>      char *path;
 >  
->  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->                                    Error **errp)
-> @@ -577,6 +578,94 @@ const PropertyInfo qdev_prop_macaddr = {
->      .set   = set_mac,
->  };
->  
-> +/* --- Reserved Region --- */
-> +
-> +/*
-> + * accepted syntax version:
-> + *   <low address>,<high address>,<type>
-> + *   where low/high addresses are uint64_t in hexadecimal
-> + *   and type is an unsigned integer in decimal
-> + */
-> +static void get_reserved_region(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    DeviceState *dev = DEVICE(obj);
-> +    Property *prop = opaque;
-> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
-> +    char buffer[64];
-> +    char *p = buffer;
-> +
-> +    snprintf(buffer, sizeof(buffer), "0x%"PRIx64",0x%"PRIx64",%u",
-> +             rr->low, rr->high, rr->type);
-
-Matches existing practice in other getters.  Nevertheless, I'd suggest
-something like
-
-       n = snprintf(buffer, sizeof(buffer), ...);
-       assert(n < sizeof(buffer);
-
-> +
-> +    visit_type_str(v, name, &p, errp);
-> +}
-> +
-> +static void set_reserved_region(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    DeviceState *dev = DEVICE(obj);
-> +    Property *prop = opaque;
-> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
-> +    Error *local_err = NULL;
-> +    const char *endptr;
-> +    char *str;
-> +    int ret;
-> +
-> +    if (dev->realized) {
-> +        qdev_prop_set_after_realize(dev, name, errp);
-> +        return;
-> +    }
-> +
-> +    visit_type_str(v, name, &str, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    ret = qemu_strtou64(str, &endptr, 16, &rr->low);
-> +    if (ret) {
-> +        error_setg(errp, "Failed to decode reserved region low addr");
-> +        error_append_hint(errp,
-> +                          "should be an address in hexadecimal\n");
-
-Comes out like this:
-
-    qemu-system-x86_64: -device ...: Failed to decode reserved region low addr
-    should be an address in hexadecimal
-
-I'd capitalize the other way, to get
-
-    qemu-system-x86_64: -device ...: failed to decode reserved region low addr
-    Should be an address in hexadecimal
-
-Note: output is made up; I failed at figuring out how to use the new
-property.  An example in PATCH 4's commit message might help.
-
-Since the error message fails to mention @name, the user is left
-guessing unless "-device ..." contains just one reserved region
-parameter.
-
-What about something like this:
-
-           error_setg(errp, "start address of reserved region '%s'"
-                      " must be a hexadecimal integer",
-                      name);
-
-No need to mess around with error_append_hint() then.
-
-Same for the other error messages.
-
-> +        goto out;
-> +    }
-> +    if (*endptr != ',') {
-> +        goto separator_error;
-> +    }
-> +
-> +    ret = qemu_strtou64(endptr + 1, &endptr, 16, &rr->high);
-> +    if (ret) {
-> +        error_setg(errp, "Failed to decode reserved region high addr");
-> +        error_append_hint(errp,
-> +                          "should be an address in hexadecimal\n");
-> +        goto out;
-> +    }
-> +    if (*endptr != ',') {
-> +        goto separator_error;
-> +    }
-> +
-> +    ret = qemu_strtoui(endptr + 1, &endptr, 10, &rr->type);
-> +    if (ret) {
-> +        error_setg(errp, "Failed to decode reserved region type");
-> +        error_append_hint(errp, "should be an unsigned integer in decimal\n");
-> +    }
-
-I dimly remember discussing the wisdom of numeric type here, dig, dig,
-..., aha:
-
-    Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
-    Date: Fri, 13 Dec 2019 11:03:02 +0100
-    Message-ID: <87y2vg4k6h.fsf@dusky.pond.sub.org>
-
-    >> So the "label" part of "<low address>,<high address>,label" is a number?
-    > yes it is.
-    >> 
-    >> Is a number appropriate for your use case, or would an enum be better?
-    > I think a number is OK. There might be other types of reserved regions
-    > in the future. Also if we want to allow somebody else to reuse that
-    > property in another context, I would rather leave it open?
-
-    I'd prioritize the user interface over possible reuse (which might never
-    happen).  Mind, I'm not telling you using numbers is a bad user
-    interface.  In general, enums are nicer, but I don't know enough about
-    this particular case.
-
-> +    goto out;
-> +
-> +separator_error:
-> +    error_setg(errp, "reserved region fields must be separated with commas");
-
-I'm not sure de-duplicating this error message is worth the extra goto.
-
-> +out:
-> +    g_free(str);
-> +    return;
-> +}
-> +
-> +const PropertyInfo qdev_prop_reserved_region = {
-> +    .name  = "reserved_region",
-> +    .description = "Reserved Region, example: 0xFEE00000,0xFEEFFFFF,0",
-> +    .get   = get_reserved_region,
-> +    .set   = set_reserved_region,
-> +};
-> +
->  /* --- on/off/auto --- */
->  
->  const PropertyInfo qdev_prop_on_off_auto = {
-
-Can't find anything that's actually wrong, so
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> -    /* Ignore blacklisted machines that have known problems */
+> -    if (!memcmp("xenfv", mname, 5) || g_str_equal("xenpv", mname)) {
+> -        return;
+> -    }
+> -
+>      path = g_strdup_printf("hmp/%s", mname);
+>      qtest_add_data_func(path, g_strdup(mname), test_machine);
+>      g_free(path);
+> 
 
 
