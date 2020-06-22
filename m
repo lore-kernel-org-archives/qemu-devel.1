@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C6EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA63C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:14:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4080206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:13:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D07D206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:14:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmWDGje3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4080206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jvly9iLx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D07D206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnO8N-0002y8-Vz
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:13:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50854)
+	id 1jnO9i-0005hW-Fw
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:14:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO6u-0000So-HU
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:11:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60578
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO6r-0000Kd-Vy
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:11:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38808
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO6q-00061U-CD
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:11:48 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO6p-000616-Ox
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:11:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592838703;
+ s=mimecast20190719; t=1592838702;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j0s7PIFpwKJzAeMYCEDW5l1CJcqt2ghjNiVNPqlVX5c=;
- b=HmWDGje3qMwA4AaliS2zq/BIa8Z4gtSAl3gbMXXzA2C+slK+RdrlTOcKfepaeLzbr+l3eO
- OHV/kZzBElsfGLH+sK9G0Zli4Q99QqF8H6glK/ThTdivuJF0pqiftFpx/paUOPB8BI6SAj
- tXC5YBB6d0pjmFhAe4Eg+HjwT1k/Wpo=
+ bh=BfkMTw3gf8IVjYDyvCljQ1qYksnvvnYbFOXo27YLMdU=;
+ b=Jvly9iLxZM+1eqqHZ+Dhx6a/YoZc9/NFIcVMUjTy5K3lxpEss72DDIwe3m/gxXgHoLgSbU
+ baZIZq3SGKT6a/ydlPkORhj9CxbYbJzKwGi0LDMdErW4Az8eB1ACXtWMCMO9fmtU2d8npd
+ S4a1u2tG4/gixkfjufaVYE4nFnPj4B8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-cGb8XccROpu3eN3m6IeOUw-1; Mon, 22 Jun 2020 11:11:16 -0400
-X-MC-Unique: cGb8XccROpu3eN3m6IeOUw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-443-r00M66XJPDyZPSEDMFRsTg-1; Mon, 22 Jun 2020 11:11:06 -0400
+X-MC-Unique: r00M66XJPDyZPSEDMFRsTg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6E2688EA25;
- Mon, 22 Jun 2020 15:11:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6D5088EA20;
+ Mon, 22 Jun 2020 15:11:05 +0000 (UTC)
 Received: from localhost (ovpn-114-85.ams2.redhat.com [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 839D61DC;
- Mon, 22 Jun 2020 15:11:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3673E10013D7;
+ Mon, 22 Jun 2020 15:11:05 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/18] block/amend: add 'force' option
-Date: Mon, 22 Jun 2020 17:10:47 +0200
-Message-Id: <20200622151059.921191-7-mreitz@redhat.com>
+Subject: [PULL 02/18] iotests: filter few more luks specific create options
+Date: Mon, 22 Jun 2020 17:10:43 +0200
+Message-Id: <20200622151059.921191-3-mreitz@redhat.com>
 In-Reply-To: <20200622151059.921191-1-mreitz@redhat.com>
 References: <20200622151059.921191-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -99,168 +99,214 @@ Sender: "Qemu-devel"
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-'force' option will be used for some unsafe amend operations.
-
-This includes things like erasing last keyslot in luks based formats
-(which destroys the data, unless the master key is backed up
-by external means), but that _might_ be desired result.
+This allows more tests to be able to have same output on both qcow2 luks encrypted images
+and raw luks images
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200608094030.670121-4-mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20200618150628.2169239-3-mreitz@redhat.com>
 ---
- docs/tools/qemu-img.rst   | 5 ++++-
- include/block/block.h     | 1 +
- include/block/block_int.h | 1 +
- block.c                   | 4 +++-
- block/qcow2.c             | 1 +
- qemu-img.c                | 8 +++++++-
- qemu-img-cmds.hx          | 4 ++--
- 7 files changed, 19 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/087.out       | 6 +++---
+ tests/qemu-iotests/134.out       | 2 +-
+ tests/qemu-iotests/158.out       | 4 ++--
+ tests/qemu-iotests/188.out       | 2 +-
+ tests/qemu-iotests/189.out       | 4 ++--
+ tests/qemu-iotests/198.out       | 4 ++--
+ tests/qemu-iotests/263.out       | 4 ++--
+ tests/qemu-iotests/284.out       | 6 +++---
+ tests/qemu-iotests/common.filter | 5 +----
+ 9 files changed, 17 insertions(+), 20 deletions(-)
 
-diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index 7f0737488a..e33f5575e3 100644
---- a/docs/tools/qemu-img.rst
-+++ b/docs/tools/qemu-img.rst
-@@ -253,11 +253,14 @@ Command description:
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index 2d92ea847b..b61ba638af 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -34,7 +34,7 @@ QMP_VERSION
  
- .. program:: qemu-img-commands
+ === Encrypted image QCow ===
  
--.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
-+.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] [--force] -o OPTIONS FILENAME
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -46,7 +46,7 @@ QMP_VERSION
  
-   Amends the image format specific *OPTIONS* for the image file
-   *FILENAME*. Not all file formats support this operation.
+ === Encrypted image LUKS ===
  
-+  --force allows some unsafe operations. Currently for -f luks, it allows to
-+  erase the last encryption key, and to overwrite an active encryption key.
-+
- .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=FLUSH_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encrypt.format=luks encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -58,7 +58,7 @@ QMP_VERSION
  
-   Run a simple sequential I/O benchmark on the specified image. If ``-w`` is
-diff --git a/include/block/block.h b/include/block/block.h
-index 25e299605e..86f9728f00 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -450,6 +450,7 @@ typedef void BlockDriverAmendStatusCB(BlockDriverState *bs, int64_t offset,
-                                       int64_t total_work_size, void *opaque);
- int bdrv_amend_options(BlockDriverState *bs_new, QemuOpts *opts,
-                        BlockDriverAmendStatusCB *status_cb, void *cb_opaque,
-+                       bool force,
-                        Error **errp);
+ === Missing driver ===
  
- /* check if a named node can be replaced when doing drive-mirror */
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 791de6a59c..066b9eaa40 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -440,6 +440,7 @@ struct BlockDriver {
-     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
-                               BlockDriverAmendStatusCB *status_cb,
-                               void *cb_opaque,
-+                              bool force,
-                               Error **errp);
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
+ Testing: -S
+ QMP_VERSION
+ {"return": {}}
+diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
+index 09d46f6b17..4abc5b5f7d 100644
+--- a/tests/qemu-iotests/134.out
++++ b/tests/qemu-iotests/134.out
+@@ -1,5 +1,5 @@
+ QA output created by 134
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
  
-     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
-diff --git a/block.c b/block.c
-index 6dbcb7e083..144f52e413 100644
---- a/block.c
-+++ b/block.c
-@@ -6482,6 +6482,7 @@ void bdrv_remove_aio_context_notifier(BlockDriverState *bs,
+ == reading whole image ==
+ read 134217728/134217728 bytes at offset 0
+diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
+index 6def216e55..f28a17626b 100644
+--- a/tests/qemu-iotests/158.out
++++ b/tests/qemu-iotests/158.out
+@@ -1,6 +1,6 @@
+ QA output created by 158
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on
  
- int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                        BlockDriverAmendStatusCB *status_cb, void *cb_opaque,
-+                       bool force,
-                        Error **errp)
- {
-     if (!bs->drv) {
-@@ -6493,7 +6494,8 @@ int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                    bs->drv->format_name);
-         return -ENOTSUP;
-     }
--    return bs->drv->bdrv_amend_options(bs, opts, status_cb, cb_opaque, errp);
-+    return bs->drv->bdrv_amend_options(bs, opts, status_cb,
-+                                       cb_opaque, force, errp);
- }
+ == writing whole image ==
+ wrote 134217728/134217728 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
+ read 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on
  
- /*
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0cd2e6757e..2ab0c382f7 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -5340,6 +5340,7 @@ static void qcow2_amend_helper_cb(BlockDriverState *bs,
- static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                                BlockDriverAmendStatusCB *status_cb,
-                                void *cb_opaque,
-+                               bool force,
-                                Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-diff --git a/qemu-img.c b/qemu-img.c
-index d7e846e607..10d81f09db 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -79,6 +79,7 @@ enum {
-     OPTION_DISABLE = 273,
-     OPTION_MERGE = 274,
-     OPTION_BITMAPS = 275,
-+    OPTION_FORCE = 276,
- };
+ == writing part of a cluster ==
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+index c568ef3701..5426861b18 100644
+--- a/tests/qemu-iotests/188.out
++++ b/tests/qemu-iotests/188.out
+@@ -1,5 +1,5 @@
+ QA output created by 188
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216
  
- typedef enum OutputFormat {
-@@ -4099,6 +4100,7 @@ static int img_amend(int argc, char **argv)
-     BlockBackend *blk = NULL;
-     BlockDriverState *bs = NULL;
-     bool image_opts = false;
-+    bool force = false;
+ == reading whole image ==
+ read 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
+index a0b7c9c24c..bc213cbe14 100644
+--- a/tests/qemu-iotests/189.out
++++ b/tests/qemu-iotests/189.out
+@@ -1,6 +1,6 @@
+ QA output created by 189
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
  
-     cache = BDRV_DEFAULT_CACHE;
-     for (;;) {
-@@ -4106,6 +4108,7 @@ static int img_amend(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"force", no_argument, 0, OPTION_FORCE},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":ho:f:t:pq",
-@@ -4153,6 +4156,9 @@ static int img_amend(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_FORCE:
-+            force = true;
-+            break;
-         }
-     }
+ == writing whole image ==
+ wrote 16777216/16777216 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
+ read 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
  
-@@ -4230,7 +4236,7 @@ static int img_amend(int argc, char **argv)
+ == writing part of a cluster ==
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+index 6280ae6eed..4b800e70db 100644
+--- a/tests/qemu-iotests/198.out
++++ b/tests/qemu-iotests/198.out
+@@ -1,12 +1,12 @@
+ QA output created by 198
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
  
-     /* In case the driver does not call amend_status_cb() */
-     qemu_progress_print(0.f, 0);
--    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL, &err);
-+    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL, force, &err);
-     qemu_progress_print(100.f, 0);
-     if (ret < 0) {
-         error_report_err(err);
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 10b910b67c..b89c019b76 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -10,9 +10,9 @@ HXCOMM When amending the rST sections, please remember to copy the usage
- HXCOMM over to the per-command sections in docs/tools/qemu-img.rst.
+ == writing whole image base ==
+ wrote 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
  
- DEF("amend", img_amend,
--    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
-+    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] [--force] -o options filename")
- SRST
--.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
-+.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] [--force] -o OPTIONS FILENAME
- ERST
+ == writing whole image layer ==
+ wrote 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
+index 0c982c55cb..54bfbeeff8 100644
+--- a/tests/qemu-iotests/263.out
++++ b/tests/qemu-iotests/263.out
+@@ -2,7 +2,7 @@ QA output created by 263
  
- DEF("bench", img_bench,
+ testing LUKS qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ == reading the whole image ==
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
+ 
+ testing legacy AES qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=aes encrypt.key-secret=sec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ == reading the whole image ==
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/284.out b/tests/qemu-iotests/284.out
+index 48216f5742..a929239302 100644
+--- a/tests/qemu-iotests/284.out
++++ b/tests/qemu-iotests/284.out
+@@ -2,7 +2,7 @@ QA output created by 284
+ 
+ testing LUKS qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 512
+ == checking image refcounts ==
+@@ -21,7 +21,7 @@ wrote 1/1 bytes at offset 512
+ 
+ == rechecking image refcounts ==
+ No errors were found on the image.
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 2048
+ == checking image refcounts ==
+@@ -40,7 +40,7 @@ wrote 1/1 bytes at offset 2048
+ 
+ == rechecking image refcounts ==
+ No errors were found on the image.
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 32768
+ == checking image refcounts ==
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 6cbd5ebba6..3a4becebb0 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -165,16 +165,13 @@ _filter_img_create()
+         echo "$options" \
+         | tr '\n' '\0' \
+         | $SED -e 's/\x0$//' -e 's/ \([a-z0-9_.-]*\)=/\n\1=/g' \
+-        | grep -ae "^\(fmt\\|size\\|backing\\|preallocation\\|encrypt$grep_data_file\\)" \
++        | grep -ae "^\(fmt\\|size\\|backing\\|preallocation\\|encryption$grep_data_file\\)" \
+         | $SED "${filename_filters[@]}" \
+             -e 's/^\(fmt\)/0-\1/' \
+             -e 's/^\(size\)/1-\1/' \
+             -e 's/^\(backing\)/2-\1/' \
+             -e 's/^\(data_file\)/3-\1/' \
+             -e 's/^\(encryption\)/4-\1/' \
+-            -e 's/^\(encrypt\.format\)/5-\1/' \
+-            -e 's/^\(encrypt\.key-secret\)/6-\1/' \
+-            -e 's/^\(encrypt\.iter-time\)/7-\1/' \
+             -e 's/^\(preallocation\)/8-\1/' \
+         | sort \
+         | $SED -e 's/^[0-9]-//' \
 -- 
 2.26.2
 
