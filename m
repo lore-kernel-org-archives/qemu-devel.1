@@ -4,65 +4,88 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD83C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 08:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97305C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 08:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58326206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 08:12:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 615B9206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 08:13:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DAB+J14D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58326206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iw2ynLgB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 615B9206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnHYl-0003Bk-La
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 04:12:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58720)
+	id 1jnHZv-0004A5-NC
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 04:13:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jnHXN-0001s2-Uk; Mon, 22 Jun 2020 04:10:41 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60537 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jnHXJ-0006Fd-KP; Mon, 22 Jun 2020 04:10:41 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49r2CS4lcvz9sSd; Mon, 22 Jun 2020 18:10:28 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1592813428;
- bh=Rn0WlC5NdVJOxpVIEIKwBJEf5DsssHRiGOqgtD6ip0M=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=DAB+J14DyD696nbBF0rFxt0S5Bgv03kpFbNpRriiIDmIaMtwTOtmLntV4uqARvlSy
- KngmoXYAt1hgTfSHuJEPl0O5LaECO9pe9I/iAVD25zDTwdYnWAkT5OO3EQ9e7lin61
- GQZkL4aDFQiWJUk0WMLrQtox7NyI2FzI+3xqeNeI=
-Date: Mon, 22 Jun 2020 17:50:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] ppc/pnv: Silence missing BMC warning with qtest
-Message-ID: <20200622075059.GS17085@umbus.fritz.box>
-References: <159280903824.485572.831378159272329707.stgit@bahia.lan>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnHYs-0003S3-5H
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:12:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46026
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnHYq-0006MS-AY
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:12:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592813531;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ln6sPXc1yu1Wx8IzGGYx4x46BuVGfWg9Mnw7BZnmYV4=;
+ b=iw2ynLgBD3I1dlKsnXBrkMq6EU7bYfEDSw+i4RRBiV+YXcIZoobUTGxG8GFDAhpDvrPMQf
+ uNS+LvbdMfgJWSXviZnr2ZqUjLsQhSnsc4Hk8J0faxwykMHK+YEYnkPYbhTgoEz606TVvu
+ Ag3cDxak3IbLTXpdXd0d6ntRFlOQuF0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-qRiW5apiNcez3ztuSBJoZQ-1; Mon, 22 Jun 2020 04:12:07 -0400
+X-MC-Unique: qRiW5apiNcez3ztuSBJoZQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA462107ACF3;
+ Mon, 22 Jun 2020 08:12:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BBD2A5C220;
+ Mon, 22 Jun 2020 08:12:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 30F96113846D; Mon, 22 Jun 2020 10:12:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>
+Subject: Re: [PATCH v2 2/2] qemu-options.hx: Document hmat-lb and hmat-cache
+ order
+References: <cover.1591794890.git.mprivozn@redhat.com>
+ <5bd3f4a03227658cbdb1d184518c7805c1c0122f.1591794890.git.mprivozn@redhat.com>
+ <877dw8bvu5.fsf@dusky.pond.sub.org>
+ <8de1babf-0925-eda0-9d30-a765aff0c4df@redhat.com>
+Date: Mon, 22 Jun 2020 10:12:02 +0200
+In-Reply-To: <8de1babf-0925-eda0-9d30-a765aff0c4df@redhat.com> (Michal
+ Privoznik's message of "Tue, 16 Jun 2020 08:46:11 +0200")
+Message-ID: <878sgfr031.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="A3RWl4qWgABmkY4K"
-Content-Disposition: inline
-In-Reply-To: <159280903824.485572.831378159272329707.stgit@bahia.lan>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,110 +98,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, Tao Xu <tao3.xu@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Liu Jingqi <jingqi.liu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Michal Privoznik <mprivozn@redhat.com> writes:
 
---A3RWl4qWgABmkY4K
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 6/15/20 10:02 AM, Markus Armbruster wrote:
+>> Michal Privoznik <mprivozn@redhat.com> writes:
+>>
+>>> To simplify internal implementation the hmat-cache parsing code
+>>> expects hmat-lb to be already parsed. This means, that hmat-lb
+>>> arguments must come before hmat-cache. Document this restriction
+>>> so that management applications can follow it.
+>>>
+>>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+>>> ---
+>>>   qemu-options.hx | 3 +++
+>>>   1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/qemu-options.hx b/qemu-options.hx
+>>> index b1a399079a..3fe9e6d6a0 100644
+>>> --- a/qemu-options.hx
+>>> +++ b/qemu-options.hx
+>>> @@ -319,6 +319,9 @@ SRST
+>>>       'none/direct(direct-mapped)/complex(complex cache indexing)'. policy
+>>>       is the write policy. line is the cache Line size in bytes.
+>>>   +    Please note, that due to internal implementation, '\
+>>> ``hmat-cache``\ '
+>>> +    must be configured only after '\ ``hmat-lb``\ ' option.
+>>> +
+>>>       For example, the following options describe 2 NUMA nodes. Node 0 has
+>>>       2 cpus and a ram, node 1 has only a ram. The processors in node 0
+>>>       access memory in node 0 with access-latency 5 nanoseconds,
+>>
+>> What happens when we do it wrong?
+>>
+>
+> We error out.
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg08409.html
 
-On Mon, Jun 22, 2020 at 08:57:18AM +0200, Greg Kurz wrote:
-> The device introspect test in qtest emits some warnings with the
-> the pnv machine types during the "nodefaults" phase:
->=20
-> TEST check-qtest-ppc64: tests/qtest/device-introspect-test
-> qemu-system-ppc64: warning: machine has no BMC device. Use '-device
-> ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
-> one
-> qemu-system-ppc64: warning: machine has no BMC device. Use '-device
-> ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
-> one
-> qemu-system-ppc64: warning: machine has no BMC device. Use '-device
-> ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define
-> one
->=20
-> This is expected since the pnv machine doesn't create the internal
-> BMC simulator fallback when "-nodefaults" is passed on the command
-> line, but these warnings appear in ci logs and confuse people.
->=20
-> Not having a BMC isn't recommended but it is still a supported
-> configuration, so a straightforward fix is to just silent this
-> warning when qtest is enabled.
->=20
-> Fixes: 25f3170b0654 ("ppc/pnv: Create BMC devices only when defaults are =
-enabled")
-> Reported-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Good.
 
-Applied to ppc-for-5.1, thanks.
+>> Can we catch doing it wrong somehow?  I figure that would be much better
+>> than merely documenting it.
+>>
+>
+> Sure, but that would require some more code (according to Igor's
+> e-mail and discussion linked from the linked document). And frankly,
+> to libvirt it doesn't matter. For everybody else, let's document it at
+> least and if somebody ever writes the missing piece we can remove the
+> restriction from the docs.
 
-> ---
->  hw/ppc/pnv.c |    9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 806a5d9a8d34..1622d29b4ba7 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -21,6 +21,7 @@
->  #include "qemu-common.h"
->  #include "qemu/units.h"
->  #include "qapi/error.h"
-> +#include "sysemu/qtest.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/numa.h"
->  #include "sysemu/reset.h"
-> @@ -587,9 +588,11 @@ static void pnv_reset(MachineState *machine)
->      bmc =3D pnv_bmc_find(&error_fatal);
->      if (!pnv->bmc) {
->          if (!bmc) {
-> -            warn_report("machine has no BMC device. Use '-device "
-> -                        "ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=
-=3Dbmc0,irq=3D10' "
-> -                        "to define one");
-> +            if (!qtest_enabled()) {
-> +                warn_report("machine has no BMC device. Use '-device "
-> +                            "ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,=
-bmc=3Dbmc0,irq=3D10' "
-> +                            "to define one");
-> +            }
->          } else {
->              pnv_bmc_set_pnor(bmc, pnv->pnor);
->              pnv->bmc =3D bmc;
->=20
->=20
+Misunderstanding.  By "catch doing it wrong", I mean "error out when
+hmat-cache is configured before hmat-lb".  I understand we do that.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Avoiding the restriction entirely would be even better, but the
+maintainer obviously decided it was not worth the trouble.  I gladly
+defer to the maintainer here.
 
---A3RWl4qWgABmkY4K
-Content-Type: application/pgp-signature; name="signature.asc"
+Given the general undocumentedness of similar restrictions elsewhere, I
+can't bring myself to care for documenting this one.  Up to the
+maintainer.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7wYuEACgkQbDjKyiDZ
-s5JGmw/9HGJP8EC44LkaUmadz174zyRx9n1UmUnueaBEH3OpdFVcQBAct/Q7zrl2
-Fnc2+NORWUy21L/Ec/hb/GZClqK02QX1gNoxX7X16dsHbobw7i2Ghy0EH/fFRDU6
-TDHZw25jOm+SFeLGjR7T0XRkZ4DWpS4oFaN1o9C31T/FCqDKGQssv1tvZdcjAbed
-CBpZYdcuSqQJM1g2HiAvVWskWjobi1WuvJmmOsm8G3Oc7xrHB0DQrdSNz/A6BZoL
-i2Kiic8ejicBY7yMhRvuLP8jQFh5y4mmBDtN2g/OWPjIdWGmxRGQ4kbMGYtr5Q9q
-ALF3O2qBbBLEo3/19YEF+Vm89u0W7r5Z4Yw+Fuss2daLtAGEkOiGjxchAd4xgDur
-VOgQZVocFV8g2RRpCrzSs7n15qyl0NYXYCtEGNdaFjS9f6AFa/3qAGwpTchisNlP
-Nxao+Q+RIvAqwL1o4IrKsgxmRIO6l4DEYVFluY5LrLQcOQSCj8aQL62XJ75LfOND
-6vUip5ZMgTqTF8qnxzxsk4KIa1Dg//tRZ1TPZx2MMPkaJNc/tXJmzZV97plFjZsp
-WvU5YSESxGYD5MCgGA918EtvqBWDMFLWz5rwoShK5W27m4KDTXZQGh7tD17rKMvI
-mWBe4cED5DkK8qDdFNvj08hJCR/59sS83nk/Vt75htim8KEXSpY=
-=xKEo
------END PGP SIGNATURE-----
-
---A3RWl4qWgABmkY4K--
 
