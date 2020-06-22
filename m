@@ -2,99 +2,71 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F64C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DA7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6163F20732
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 921AD2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKpuHn+D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6163F20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="lRXmMa3O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921AD2071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnNkh-0008ME-KS
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43186)
+	id 1jnNkx-0000cK-RT
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnNif-0003hP-9d
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:46:45 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41089)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jnNiU-0003Ij-Gz; Mon, 22 Jun 2020 10:46:35 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:43124)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnNid-0007yF-PE
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:46:45 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q2so14528502wrv.8
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 07:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Qi/0e/MFri87LCuOb+a8jEdahJIOH8EELnd/YUdgNnc=;
- b=FKpuHn+DzAr9dqQZq3DuTWuSeuOvSUgbXGYhjid+TzBXx+4Zrxldi9An4cQ4IROOJC
- U44yANeg/WHoz3pv/fW5dpKMdPvYvmJ2/dWGIfivpWc+5LSguzID8eQDjB9n2U72VZyE
- mLNlHBhBRtMTOhFnroGVD8hSMPf1LmQwi5aKbsHMr0ejTBPmKqvXtzS+z5K+a5HLXfbm
- xpfBMN5l79/N83MgKQq0bEnJzpDslGRqo7nk2GnA6mbrbXSJJxR5seaJBftCt9n+8q73
- coqFsbwJID2nugh14trUjbYgtAnoyWundAxM+FLBTltDnX+d+DVdjLsaO/G1kBEpWmXD
- ZFPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Qi/0e/MFri87LCuOb+a8jEdahJIOH8EELnd/YUdgNnc=;
- b=ak/axiGPMcsbcgja4KaJ+n/oBVHGGUXG9iYCW72DNLiUCwDNWvozSHqZvTVZbS34lX
- 7Uh0YO4pDSJQPnXQkXnSxwJQGaXa08AFxxyFQ9fnx5Lt2eRI402uq8M2goqWd68QE4gg
- t2jUG1sFXtcuCDKFD4nhFhmTRa6Nh6ezcpgCs8o0tz/0Na+yyzVFODIw+yeYTF5Csgrl
- 9Z9Nt85yjTBYNlvqRkwrHqcc1mpub78buD1iHtYhaqV+k6s0MB5l7a61q2VGE3/MgOJN
- e5AvzLm4zcgWm9qRPpowkUn/xMzFeZDcimqaPa+75AWL3KlI7jWgnX/xhfEwneth2zfk
- pGIQ==
-X-Gm-Message-State: AOAM531o9PtHrG2b+IH91lm3xcI1ASrV/gtv+qi6v2S2icvq3y145E1W
- ayGVkQSLBLRRB/0TVCxveIA=
-X-Google-Smtp-Source: ABdhPJxE6T//FchXl+coejelHUHYNdSi2rgsLpfNjDbhjy7kR/HoaMzQ2768MUm/FCS5ShZEdFoKIg==
-X-Received: by 2002:adf:97d6:: with SMTP id t22mr18568338wrb.385.1592837202371; 
- Mon, 22 Jun 2020 07:46:42 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l8sm18122064wrq.15.2020.06.22.07.46.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 22 Jun 2020 07:46:41 -0700 (PDT)
-Subject: Re: [PATCH v1 13/18] tests/docker: check for an parameters not empty
- string
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-14-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f1f7a40d-85bb-f8b5-cc0e-298090cb3f64@amsat.org>
-Date: Mon, 22 Jun 2020 16:46:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jnNiS-0007rI-1v; Mon, 22 Jun 2020 10:46:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=MCDsdn9l/8SiTeZRPDjBzDQ7YykFf/5v/rkXmycZU/g=; 
+ b=lRXmMa3OYnawqxd0UvElkGvLIpLtAx855NsSxXYJiiIy6EMmi6Ks1GN+UefexnQKyDheZxMG2nOb3lvAhbpu4xi25A+pWLeunnnqcj3oAA5++4HSGn6XDP+0LiGHlMQBpAphIzVkbA99n0Bd3X0uJlP75vJGe+KzEVWO2E1HGzPT9MCW3XwhvazLg5HhA5yLTh+z7lcXIJ6/kFSnpR4xVEG5gf9xooQhno+ud9Jox0/gFML1z/bbybWJMMli+sP36OuIs1d9ypbBwikFCo4B5mVXbCcW9yMzvpE+Ep97GkLne5ktvs+k5/CcG2h48Zf5fm/e3iSichaWlDz3ekYZ0A==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jnNi4-00030B-5r; Mon, 22 Jun 2020 16:46:08 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jnNi3-0003YZ-ST; Mon, 22 Jun 2020 16:46:07 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Subject: Re: [PATCH 1/2] qcow2: Force preallocation with data-file-raw
+In-Reply-To: <9c14c622-eb30-4619-d33a-b59395a397be@redhat.com>
+References: <20200619104012.235977-1-mreitz@redhat.com>
+ <20200619104012.235977-2-mreitz@redhat.com>
+ <w51eeqb9f43.fsf@maestria.local.igalia.com>
+ <9c14c622-eb30-4619-d33a-b59395a397be@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Mon, 22 Jun 2020 16:46:07 +0200
+Message-ID: <w51r1u788gg.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200622143204.12921-14-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 10:46:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,36 +79,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, cota@braap.org, aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 4:31 PM, Alex Bennée wrote:
-> Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Mon 22 Jun 2020 11:35:59 AM CEST, Max Reitz wrote:
+>>> +    if (qcow2_opts->data_file_raw &&
+>>> +        qcow2_opts->preallocation =3D=3D PREALLOC_MODE_OFF)
+>>> +    {
+>>> +        /*
+>>> +         * data-file-raw means that "the external data file can be
+>>> +         * read as a consistent standalone raw image without looking
+>>> +         * at the qcow2 metadata."  It does not say that the metadata
+>>> +         * must be ignored, though (and the qcow2 driver in fact does
+>>> +         * not ignore it), so the L1/L2 tables must be present and
+>>> +         * give a 1:1 mapping, so you get the same result regardless
+>>> +         * of whether you look at the metadata or whether you ignore
+>>> +         * it.
+>>> +         */
+>>> +        qcow2_opts->preallocation =3D PREALLOC_MODE_METADATA;
+>>=20
+>> I'm not convinced by this,
+>
+> Why not?
+>
+> This is how I read the spec.  Furthermore, I see two problems that we
+> have right now that are fixed by this patch (namely (1) using a device
+> file as the external data file, which may have non-zero data at
+> creation; and (2) assigning a backing file at runtime must not show
+> the data).
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+What happens if you first create the image (which would be preallocated
+with this patch), then you resize it and finally you assign the backing
+file? Would the resized part be preallocated?
 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/docker/common.rc | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-> index 02cd67a8c5e..b27ce17e333 100755
-> --- a/tests/docker/common.rc
-> +++ b/tests/docker/common.rc
-> @@ -47,7 +47,7 @@ build_qemu()
->  check_qemu()
->  {
->      # default to make check unless the caller specifies
-> -    if test -z "$@"; then
-> +    if [ $# == 0 ]; then
->          INVOCATION="check"
->      else
->          INVOCATION="$@"
-> 
+>> but your comment made me think of another possible alternative: in
+>> qcow2_get_cluster_offset(), if the cluster is unallocated and we are
+>> using a raw data file then we return _ZERO_PLAIN:
+>>=20
+>> --- a/block/qcow2-cluster.c
+>> +++ b/block/qcow2-cluster.c
+>> @@ -654,6 +654,10 @@ out:
+>>      assert(bytes_available - offset_in_cluster <=3D UINT_MAX);
+>>      *bytes =3D bytes_available - offset_in_cluster;
+>>=20=20
+>> +    if (type =3D=3D QCOW2_CLUSTER_UNALLOCATED && data_file_is_raw(bs)) {
+>> +        type =3D QCOW2_CLUSTER_ZERO_PLAIN;
+>> +    }
+>> +
+>>      return type;
+>>=20
+>> You could even add a '&& bs->backing' to the condition and emit a
+>> warning to make it more explicit.
+>
+> No, this is wrong.  This still wouldn=E2=80=99t fix the problem of having=
+ a
+> device file as the external data file, when it already has non-zero
+> data during creation.  (Reading the qcow2 file would return zeroes,
+> but reading the device would not.)
+
+But you wouldn't fix that preallocating the metadata either, you would
+need to fill the device with zeroes.
+
+> I interpret the spec in that the metadata can be ignored, but it does
+> not need to be ignored.  So the L1/L2 tables must be 1:1 mapping of
+> QCOW2_CLUSTER_NORMAL entries.
+>
+> We could also choose to interpret it as =E2=80=9CWith data-file-raw, the =
+L1/L2
+> tables must be ignored=E2=80=9D.  In that case, our qcow2 driver would ne=
+ed to
+> be modified to indeed fully ignore the L1/L2 tables with
+> data-file-raw.  (I certainly don=E2=80=99t interpret the spec this way, b=
+ut I
+> suppose we could call it a bug fix and amend it.)
+
+The way I interpret it is that regardless of whether you read the data
+through the qcow2 file or directly from the data file you should get the
+same results, but how that should be reflected in the L1/L2 metadata is
+not specified.
+
+Berto
 
