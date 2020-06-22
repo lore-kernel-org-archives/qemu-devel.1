@@ -6,72 +6,69 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9563AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A7FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:22:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60A87206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:21:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3899206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:22:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbnLBv8i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A87206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cWjYTA3U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3899206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnOGO-0000wS-4w
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:21:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51052)
+	id 1jnOHK-0002Vg-4N
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:22:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO79-0000s7-HD
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:12:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36154
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnO7K-0000y5-TG
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:12:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27852
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnO75-00064F-6H
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:12:02 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnO7I-00066M-9s
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:12:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592838717;
+ s=mimecast20190719; t=1592838731;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=izuy53HpCfbY4Wj31Xz6HKjJGdWIlXO7S22gmtfVZB4=;
- b=fbnLBv8iHu+EhkH4UDQzA7Ds5iAM7VUn4Bey2esIPbR7PtUguWPqVNLJWFILxBT9XpVDc2
- Q+wdhONlpEkXwIota6E79L0us7oon9VcYPqun+OR+ZR81Uy3LWs3B9KDznq0BrBl3Uaaqo
- 6DgYjrcqf5bdn0DEg70BIwRcdnZXGhI=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=BNvSGC9nTqGGUEXPC0RjFmoV3QN006CFzuU+WpDEcQc=;
+ b=cWjYTA3UOUbqoSjTDmI9R7TyksS35lhHJ7v02/MMKS3wyoHi740Ns8jClBmyHt/NyYY0M6
+ o03Gq8yrxghORpodi9izduMqOX6KRV0aqkFmwwusqZ+HVPx74B/cb/oDYMogDrZgORdaB1
+ xDs8BRBquDvPCjbsx/fzpEuWWNFw9EI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-5N-L3DWTM6mSIBhgtMWoBg-1; Mon, 22 Jun 2020 11:11:34 -0400
-X-MC-Unique: 5N-L3DWTM6mSIBhgtMWoBg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-454-wjSteQknO2OK6vy50U3u1A-1; Mon, 22 Jun 2020 11:12:10 -0400
+X-MC-Unique: wjSteQknO2OK6vy50U3u1A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65D6ABFC0;
- Mon, 22 Jun 2020 15:11:33 +0000 (UTC)
-Received: from localhost (ovpn-114-85.ams2.redhat.com [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D18C31974D;
- Mon, 22 Jun 2020 15:11:32 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04A52A0BEB;
+ Mon, 22 Jun 2020 15:12:09 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-179.ams2.redhat.com
+ [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5775471676;
+ Mon, 22 Jun 2020 15:12:07 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 13/18] block/core: add generic infrastructure for
- x-blockdev-amend qmp command
-Date: Mon, 22 Jun 2020 17:10:54 +0200
-Message-Id: <20200622151059.921191-14-mreitz@redhat.com>
-In-Reply-To: <20200622151059.921191-1-mreitz@redhat.com>
-References: <20200622151059.921191-1-mreitz@redhat.com>
+Subject: [PATCH] qemu-img convert: Don't pre-zero images
+Date: Mon, 22 Jun 2020 17:12:03 +0200
+Message-Id: <20200622151203.35624-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -92,282 +89,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, pl@kamp.de, qemu-devel@nongnu.org, mreitz@redhat.com,
+ nsoffer@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Since commit 5a37b60a61c, qemu-img create will pre-zero the target image
+if it isn't already zero-initialised (most importantly, for host block
+devices, but also iscsi etc.), so that writing explicit zeros wouldn't
+be necessary later.
 
-blockdev-amend will be used similiar to blockdev-create
-to allow on the fly changes of the structure of the format based block devices.
+This could speed up the operation significantly, in particular when the
+source image file was only sparsely populated. However, it also means
+that some block are written twice: Once when pre-zeroing them, and then
+when they are overwritten with actual data. On a full image, the
+pre-zeroing is wasted work because everything will be overwritten.
 
-Current plan is to first support encryption keyslot management for luks
-based formats (raw and embedded in qcow2)
+In practice, write_zeroes typically turns out faster than writing
+explicit zero buffers, but slow enough that first zeroing everything and
+then overwriting parts can be a significant net loss.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200608094030.670121-12-mlevitsk@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Meanwhile, qemu-img convert was rewritten in 690c7301600 and zero blocks
+are now written to the target using bdrv_co_pwrite_zeroes() if the
+target could be pre-zeroed. This way we already make use of the faster
+write_zeroes operation, but avoid writing any blocks twice.
+
+Remove the pre-zeroing because these days this former optimisation has
+actually turned into a pessimisation in the common case.
+
+Reported-by: Nir Soffer <nsoffer@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json      |  42 ++++++++++++++
- qapi/job.json             |   4 +-
- include/block/block_int.h |  21 +++++--
- block/amend.c             | 113 ++++++++++++++++++++++++++++++++++++++
- block/Makefile.objs       |   2 +-
- 5 files changed, 174 insertions(+), 8 deletions(-)
- create mode 100644 block/amend.c
+ qemu-img.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0e1c6a59f2..c22996282f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4674,6 +4674,48 @@
-   'data': { 'job-id': 'str',
-             'options': 'BlockdevCreateOptions' } }
+diff --git a/qemu-img.c b/qemu-img.c
+index d7e846e607..bdb9f6aa46 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2084,15 +2084,6 @@ static int convert_do_copy(ImgConvertState *s)
+         s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+     }
  
-+##
-+# @BlockdevAmendOptions:
-+#
-+# Options for amending an image format
-+#
-+# @driver:          Block driver of the node to amend.
-+#
-+# Since: 5.1
-+##
-+{ 'union': 'BlockdevAmendOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+  } }
-+
-+##
-+# @x-blockdev-amend:
-+#
-+# Starts a job to amend format specific options of an existing open block device
-+# The job is automatically finalized, but a manual job-dismiss is required.
-+#
-+# @job-id:          Identifier for the newly created job.
-+#
-+# @node-name:       Name of the block node to work on
-+#
-+# @options:         Options (driver specific)
-+#
-+# @force:           Allow unsafe operations, format specific
-+#                   For luks that allows erase of the last active keyslot
-+#                   (permanent loss of data),
-+#                   and replacement of an active keyslot
-+#                   (possible loss of data if IO error happens)
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'x-blockdev-amend',
-+  'data': { 'job-id': 'str',
-+            'node-name': 'str',
-+            'options': 'BlockdevAmendOptions',
-+            '*force': 'bool' } }
-+
- ##
- # @BlockErrorAction:
- #
-diff --git a/qapi/job.json b/qapi/job.json
-index 5e658281f5..c48a0c3e34 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -19,10 +19,12 @@
- #
- # @create: image creation job type, see "blockdev-create" (since 3.0)
- #
-+# @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
-+#
- # Since: 1.7
- ##
- { 'enum': 'JobType',
--  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
-+  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
- 
- ##
- # @JobStatus:
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ed335519cc..1b86b59af1 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -141,12 +141,27 @@ struct BlockDriver {
-     int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp);
-     void (*bdrv_close)(BlockDriverState *bs);
-+
-+
-     int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
-                                        Error **errp);
-     int coroutine_fn (*bdrv_co_create_opts)(BlockDriver *drv,
-                                             const char *filename,
-                                             QemuOpts *opts,
-                                             Error **errp);
-+
-+    int coroutine_fn (*bdrv_co_amend)(BlockDriverState *bs,
-+                                      BlockdevAmendOptions *opts,
-+                                      bool force,
-+                                      Error **errp);
-+
-+    int (*bdrv_amend_options)(BlockDriverState *bs,
-+                              QemuOpts *opts,
-+                              BlockDriverAmendStatusCB *status_cb,
-+                              void *cb_opaque,
-+                              bool force,
-+                              Error **errp);
-+
-     int (*bdrv_make_empty)(BlockDriverState *bs);
- 
-     /*
-@@ -441,12 +456,6 @@ struct BlockDriver {
-                                       BdrvCheckResult *result,
-                                       BdrvCheckMode fix);
- 
--    int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
--                              BlockDriverAmendStatusCB *status_cb,
--                              void *cb_opaque,
--                              bool force,
--                              Error **errp);
+-    if (!s->has_zero_init && !s->target_has_backing &&
+-        bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
+-    {
+-        ret = blk_make_zero(s->target, BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK);
+-        if (ret == 0) {
+-            s->has_zero_init = true;
+-        }
+-    }
 -
-     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
- 
-     /* TODO Better pass a option string/QDict/QemuOpts to add any rule? */
-diff --git a/block/amend.c b/block/amend.c
-new file mode 100644
-index 0000000000..f4612dcf08
---- /dev/null
-+++ b/block/amend.c
-@@ -0,0 +1,113 @@
-+/*
-+ * Block layer code related to image options amend
-+ *
-+ * Copyright (c) 2018 Kevin Wolf <kwolf@redhat.com>
-+ * Copyright (c) 2020 Red Hat. Inc
-+ *
-+ * Heavily based on create.c
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qemu/job.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qapi-visit-block-core.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/error.h"
-+
-+typedef struct BlockdevAmendJob {
-+    Job common;
-+    BlockdevAmendOptions *opts;
-+    BlockDriverState *bs;
-+    bool force;
-+} BlockdevAmendJob;
-+
-+static int coroutine_fn blockdev_amend_run(Job *job, Error **errp)
-+{
-+    BlockdevAmendJob *s = container_of(job, BlockdevAmendJob, common);
-+    int ret;
-+
-+    job_progress_set_remaining(&s->common, 1);
-+    ret = s->bs->drv->bdrv_co_amend(s->bs, s->opts, s->force, errp);
-+    job_progress_update(&s->common, 1);
-+    qapi_free_BlockdevAmendOptions(s->opts);
-+    return ret;
-+}
-+
-+static const JobDriver blockdev_amend_job_driver = {
-+    .instance_size = sizeof(BlockdevAmendJob),
-+    .job_type      = JOB_TYPE_AMEND,
-+    .run           = blockdev_amend_run,
-+};
-+
-+void qmp_x_blockdev_amend(const char *job_id,
-+                          const char *node_name,
-+                          BlockdevAmendOptions *options,
-+                          bool has_force,
-+                          bool force,
-+                          Error **errp)
-+{
-+    BlockdevAmendJob *s;
-+    const char *fmt = BlockdevDriver_str(options->driver);
-+    BlockDriver *drv = bdrv_find_format(fmt);
-+    BlockDriverState *bs = bdrv_find_node(node_name);
-+
-+
-+    if (!drv) {
-+        error_setg(errp, "Block driver '%s' not found or not supported", fmt);
-+        return;
-+    }
-+
-+    /*
-+     * If the driver is in the schema, we know that it exists. But it may not
-+     * be whitelisted.
-+     */
-+    if (bdrv_uses_whitelist() && !bdrv_is_whitelisted(drv, false)) {
-+        error_setg(errp, "Driver is not whitelisted");
-+        return;
-+    }
-+
-+    if (bs->drv != drv) {
-+        error_setg(errp,
-+                   "x-blockdev-amend doesn't support changing the block driver");
-+        return;
-+    }
-+
-+    /* Error out if the driver doesn't support .bdrv_co_amend */
-+    if (!drv->bdrv_co_amend) {
-+        error_setg(errp, "Driver does not support x-blockdev-amend");
-+        return;
-+    }
-+
-+    /* Create the block job */
-+    s = job_create(job_id, &blockdev_amend_job_driver, NULL,
-+                   bdrv_get_aio_context(bs), JOB_DEFAULT | JOB_MANUAL_DISMISS,
-+                   NULL, NULL, errp);
-+    if (!s) {
-+        return;
-+    }
-+
-+    s->bs = bs,
-+    s->opts = QAPI_CLONE(BlockdevAmendOptions, options),
-+    s->force = has_force ? force : false;
-+    job_start(&s->common);
-+}
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 96028eedce..577e578bc2 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -19,7 +19,7 @@ block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
- block-obj-$(CONFIG_POSIX) += file-posix.o
- block-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- block-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
--block-obj-y += null.o mirror.o commit.o io.o create.o
-+block-obj-y += null.o mirror.o commit.o io.o create.o amend.o
- block-obj-y += throttle-groups.o
- block-obj-$(CONFIG_LINUX) += nvme.o
- 
+     /* Allocate buffer for copied data. For compressed images, only one cluster
+      * can be copied at a time. */
+     if (s->compressed) {
 -- 
-2.26.2
+2.25.4
 
 
