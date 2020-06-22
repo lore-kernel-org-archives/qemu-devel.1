@@ -2,108 +2,79 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B122C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 23:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B35C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 23:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A79920738
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 23:47:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA0820708
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 23:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="DY7Vq3rG";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QQUwbrPc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A79920738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	dkim=pass (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="WfjsZNpb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA0820708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnWA4-0003r3-H2
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 19:47:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58746)
+	id 1jnWDz-000648-9d
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 19:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jnW8t-00038p-Nw; Mon, 22 Jun 2020 19:46:23 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:56371)
+ (Exim 4.90_1)
+ (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
+ id 1jnWDA-0005d5-Ps
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 19:50:48 -0400
+Received: from o1.dev.nutanix.com ([198.21.4.205]:38838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jnW8q-0001Vb-MM; Mon, 22 Jun 2020 19:46:23 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
- by mailnew.nyi.internal (Postfix) with ESMTP id 177425802D4;
- Mon, 22 Jun 2020 19:46:19 -0400 (EDT)
-Received: from imap2 ([10.202.2.52])
- by compute3.internal (MEProxy); Mon, 22 Jun 2020 19:46:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type:content-transfer-encoding; s=fm3; bh=mLKEw
- f2cevhwCtO32RUnIKwLIQNtA+ThnXTkkf8u7VQ=; b=DY7Vq3rGKcDN2lEu7NT9D
- BtocmjOxYJXEnupE5tEVioG4mRkJVbYL0tIDm3f6HXDiyb3qed4M9Z0J5wvA95oU
- dQYwabklnPMdzickGVAlTW6M5gj/Hp2c97EQVJWj2ZL6MnWK6IeYCjN16pusnodX
- IfdItQvyUzmvNJf7KMLnSVaZeoJhJugtxs+HqY0LlHRud9zYBHLIWgScuR+XaWVy
- GLpZFQAf2yu+TTApGwcvol2cFNB+hjYRi13G8MNTI0BIduoqLH3jTNlxUhZOQuXV
- wCL+jODEQI9Vrri6aIwAgtxMeVJD4ZKdTykSEXmJDa1GsUkYUc17321uYeUrmOZp
- g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm3; bh=mLKEwf2cevhwCtO32RUnIKwLIQNtA+ThnXTkkf8u7
- VQ=; b=QQUwbrPcN8uGp3bOfd9+BbkApS3p4Kd5PCsh0QllJPSKJTeupL0faCILF
- sr/XrFR8xWhi9O0zoWVqAu4VG6rGBP9SPspGBVLsZimasYhpqrhWbkNWzbHwERKj
- eW04ayYlIxc7lmBDr4FKtNZrBHi11YZS8hvr2dpy1Op8cTPR9IK9ga/7UXbeEgnk
- x9UFVOegysJayp4YuEE9uWqtDGxgjKWLM7QwNdMSgOcU/J+qVCrQnuQ0oyTBDzZ+
- H8DSmaKxZ/sTEba/s35AYKZPsvTcX/fPqCUNg4uPbJOCUSTEz28moelX6K56P3l3
- RE3Kh4wtTPn7pYlt4BPhxhDahi9CA==
-X-ME-Sender: <xms:ykLxXtsij1GEdn-G7c2DR0dVMshWsI7Wdi2LiGXdgE2kKk3v0M52mA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudekfedgvdehucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
- ughrvgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucggtf
- frrghtthgvrhhnpedvgeekheegfedvhfethefhudetteegueeggfeiieegueehkedugedt
- kefglefgheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
- hmpegrnhgurhgvfiesrghjrdhiugdrrghu
-X-ME-Proxy: <xmx:ykLxXme1HKcFfXujCn1GO53UX0R0_z_WPdCE05AKvOUnmS-xb_Pilg>
- <xmx:ykLxXgwfiHbDNODRmbMh5FLn9JmCCAq9rddmWEq_koZz6VSWIAIp7g>
- <xmx:ykLxXkNszQ-Y0LWb3gCbdgEoAVuUQZeK26mZ6yqOCakccZiMqAHtRw>
- <xmx:y0LxXu0WF1JZyjX6o9WJr3ADDMDvS8Qk3sj3PGF_0-KkQN2-pGaFwg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 41C0AE00A8; Mon, 22 Jun 2020 19:46:18 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-543-gda70334-fm-20200618.004-gda703345
-Mime-Version: 1.0
-Message-Id: <e1fba66a-8c7e-4b15-9f6e-5e1957555088@www.fastmail.com>
-In-Reply-To: <3e3459aa-7179-56e5-3e4d-b25f2ea3b450@amsat.org>
-References: <20200616075121.12837-1-f4bug@amsat.org>
- <20200616075121.12837-8-f4bug@amsat.org>
- <914f089d-e81e-4b01-bd70-4702d8b39724@www.fastmail.com>
- <ad812821-8b06-bb82-d336-ffb1e7c14839@amsat.org>
- <1acc89c9-8a5c-4ba5-9201-2f0124cd7969@www.fastmail.com>
- <3e3459aa-7179-56e5-3e4d-b25f2ea3b450@amsat.org>
-Date: Tue, 23 Jun 2020 09:15:58 +0930
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "Cameron Esfahani via" <qemu-devel@nongnu.org>
-Subject: =?UTF-8?Q?Re:_[PATCH_7/7]_hw/watchdog/wdt=5Faspeed:_Reduce_timer_precisi?=
- =?UTF-8?Q?on_to_micro-second?=
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=66.111.4.229; envelope-from=andrew@aj.id.au;
- helo=new3-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 19:46:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1)
+ (envelope-from <bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net>)
+ id 1jnWD8-0004NV-Ig
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 19:50:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
+ h=from:subject:to:cc:content-type:content-transfer-encoding;
+ s=smtpapi; bh=2EK/TVrJ0nlzGGWoinbFck4ynoGiAbDO7j4h+VsciZc=;
+ b=WfjsZNpbtuKM34qhGFzNCL2tmxo0tw3MtyIjfZAy8LPi8x4ZEzZqaH60axMBIJ8EYc8Z
+ UebyV56KQ8nINbFMQ6ztBkn8tLn5B+yfLxd1NxLZHl0i0iXApmLdun+0rck0wLno2QkuC0
+ uki0DwcM74Yr7XEzdAp+ZWcEwALglP93I=
+Received: by filter0084p3las1.sendgrid.net with SMTP id
+ filter0084p3las1-29588-5EF143D4-A1
+ 2020-06-22 23:50:44.93605569 +0000 UTC m=+364819.999495779
+Received: from localhost.localdomain.com (unknown)
+ by ismtpd0003p1sjc2.sendgrid.net (SG) with ESMTP
+ id xCd9yGn6RbO8znAgWlQ83w Mon, 22 Jun 2020 23:50:44.767 +0000 (UTC)
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Subject: [PATCH v2] Stop vhost-user sending uninitialized mmap_offsets
+Date: Mon, 22 Jun 2020 23:50:44 +0000 (UTC)
+Message-Id: <1592650156-25845-1-git-send-email-raphael.norwitz@nutanix.com>
+X-Mailer: git-send-email 1.8.3.1
+X-SG-EID: =?us-ascii?Q?YCLURHX+pjNDm1i7d69iKyMnQi=2FdvWah9veFa8nllaoUC0ScIWrCgiaWGu43Vg?=
+ =?us-ascii?Q?xFdB4istXUBpN9H93OJgc8zXOvSrqN=2FYuTjgVlA?=
+ =?us-ascii?Q?o8+DJJPqp3vSods6DHufD52bIq=2F4OhO6pTm0kt4?=
+ =?us-ascii?Q?rlVyAlSqhXrDEKHtz4daGWq=2FDMP7aAgP0j25T3b?=
+ =?us-ascii?Q?X5B3EyBGMNNi6iUPDEtc6pwCU7LP3tCvI9jmeCi?=
+ =?us-ascii?Q?IB3ngse5Qip8R23X89fm87hGVBF06gpyIdU16E?=
+To: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=198.21.4.205;
+ envelope-from=bounces+16159052-3d09-qemu-devel=nongnu.org@sendgrid.net;
+ helo=o1.dev.nutanix.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 19:50:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,66 +87,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Corey Minyard <minyard@acm.org>,
- David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: marcandre.lureau@redhat.com, Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Prior to this change, the vhost_user_fill_msg_region function filled out
+all elements of the VhostUserMemoryRegion struct except the mmap_offset.
 
+This function is often called on uninitialized structs, which are then
+copied into VHOST_USER_SET_MEM_TABLE and VHOST_USER_ADD/REM_MEM_REG
+messages. In some cases, where the mmap_offset was not needed, it was
+left uninitialized, causing QEMU to send the backend uninitialized data,
+which Coverity flagged as a series of issues.
 
-On Mon, 22 Jun 2020, at 18:13, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 6/22/20 2:21 AM, Andrew Jeffery wrote:
-> > On Wed, 17 Jun 2020, at 13:11, Philippe Mathieu-Daud=C3=A9 wrote:
-> >> Hi Andrew,
-> >>
-> >> On 6/17/20 3:18 AM, Andrew Jeffery wrote:
-> >>> On Tue, 16 Jun 2020, at 17:21, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>> The current implementation uses nano-second precision, while
-> >>>> the watchdog can not be more precise than a micro-second.
-> >>>
-> >>> What's the basis for this assertion? It's true for the AST2500 and=
- AST2600, but=20
-> >>> the AST2400 can run the watchdog from either a 1MHz clock source o=
-r the APB=20
-> >>> clock (which must be at least 16.5MHz on palmetto). The reset stat=
-e on the
-> >>> AST2400 configures the watchdog for the APB clock rate.
-> >>>
-> >>> The Linux driver will eventually configure the watchdog for 1MHz m=
-ode
-> >>> regardless so perhaps the AST2400 reset state is a bit of a corner=
- case, but
-> >>> I feel the assertion should be watered down a bit?
-> >>
-> >> What about this description?
-> >>
-> >> "The current implementation uses nano-second precision, but
-> >>  is not more precise than micro-second precision.
-> >>  Simplify by using a micro-second based timer.
-> >>  Rename the timer 'timer_us' to have the unit explicit."
-> >=20
-> > So is this a limitation of QEMUTimer? I was establishing that the ha=
-rdware can=20
-> > operate at greater than 1 micro-second precision.
->=20
-> No, I misread your comment about the AST2400 timer which can run
-> at more than 1Mhz.
->=20
-> The QEMUTimer doesn't have a such limitation; this patch
-> aimed to simplify the code for reviewers, but you proved
-> it incorrect, so let's disregard it.
->=20
-> Thanks for your careful review!
+This change augments the vhost_user_fill_msg_region API, adding a
+mmap_offset paramenter, forcing the caller to initialize mmap_offset.
 
-Ah, great, I was wondering where my misunderstanding was.
+Fixes: ece99091c2d0aeb23734289a50ef2ff4e0a08929
+Fixes: f1aeb14b0809e313c74244d838645ed25e85ea63
+Reported-by: Coverity (CIDs 1429802, 1429803 and 1429804)
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+---
+ hw/virtio/vhost-user.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Thanks for clearing that up.
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 4d6cd4e..3123121 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -460,12 +460,14 @@ static MemoryRegion *vhost_user_get_mr_data(uint64_t addr, ram_addr_t *offset,
+ }
+ 
+ static void vhost_user_fill_msg_region(VhostUserMemoryRegion *dst,
+-                                       struct vhost_memory_region *src)
++                                       struct vhost_memory_region *src,
++                                       uint64_t mmap_offset)
+ {
+     assert(src != NULL && dst != NULL);
+     dst->userspace_addr = src->userspace_addr;
+     dst->memory_size = src->memory_size;
+     dst->guest_phys_addr = src->guest_phys_addr;
++    dst->mmap_offset = mmap_offset;
+ }
+ 
+ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
+@@ -500,9 +502,8 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
+                 error_report("Failed preparing vhost-user memory table msg");
+                 return -1;
+             }
+-            vhost_user_fill_msg_region(&region_buffer, reg);
++            vhost_user_fill_msg_region(&region_buffer, reg, offset);
+             msg->payload.memory.regions[*fd_num] = region_buffer;
+-            msg->payload.memory.regions[*fd_num].mmap_offset = offset;
+             fds[(*fd_num)++] = fd;
+         } else if (track_ramblocks) {
+             u->region_rb_offset[i] = 0;
+@@ -649,7 +650,7 @@ static int send_remove_regions(struct vhost_dev *dev,
+ 
+         if (fd > 0) {
+             msg->hdr.request = VHOST_USER_REM_MEM_REG;
+-            vhost_user_fill_msg_region(&region_buffer, shadow_reg);
++            vhost_user_fill_msg_region(&region_buffer, shadow_reg, 0);
+             msg->payload.mem_reg.region = region_buffer;
+ 
+             if (vhost_user_write(dev, msg, &fd, 1) < 0) {
+@@ -709,9 +710,8 @@ static int send_add_regions(struct vhost_dev *dev,
+                 u->region_rb[reg_idx] = mr->ram_block;
+             }
+             msg->hdr.request = VHOST_USER_ADD_MEM_REG;
+-            vhost_user_fill_msg_region(&region_buffer, reg);
++            vhost_user_fill_msg_region(&region_buffer, reg, offset);
+             msg->payload.mem_reg.region = region_buffer;
+-            msg->payload.mem_reg.region.mmap_offset = offset;
+ 
+             if (vhost_user_write(dev, msg, &fd, 1) < 0) {
+                 return -1;
+-- 
+1.8.3.1
 
-Andrew
 
