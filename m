@@ -2,78 +2,77 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF2FBC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23EFC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:49:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 797CA206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B792206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:49:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WzF75BM1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 797CA206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/z2np1O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B792206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJze-000708-LQ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:48:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40034)
+	id 1jnK12-00012Z-KB
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:49:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJun-0007P9-Ov
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:01 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59358
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJzZ-0007VE-Mv
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:47:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41844
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJuk-0005M9-6z
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:01 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJzY-00063Y-15
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:47:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592822577;
+ s=mimecast20190719; t=1592822875;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qdZrGRWK0pCBmLrox63Bp3XBBsnlXRTh2MNWVXmBCxg=;
- b=WzF75BM14GjTNh2xAxLTunEPYXSBd6niHVIis+idIBn9GGnS+ld+p/eEsZYUtCh6tVyQH/
- +H/PnnJ+wjsF6Lyfly09prQ4povvtLu7s87/FR+lTHnO2RS/Er3je3Aqn6VM8p6Xdu7xwK
- tYFstTQNJiIBzvWkcJALGrelAmmbxRg=
+ bh=irU8Zm4FqoBeBQCZOhnKEykj7gskTBEcgU8sLlOp1Mg=;
+ b=b/z2np1OA4ng+osxfBiCL05XjLNfYvMVbfFThAD09y1QRrksZz8KkAOadBYrjmJUTboimz
+ 0GWsOE7YSewEYsqXkkRojGOXVbebJqDoMF32tNJHaf6lRKi8doYdQ4Sza2opw2aEEu2mIQ
+ 6hUQvzSk2oVR4QFQf4WrvdYRQ1tHD1E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-TJMPkiegN2uQ8p7x63Cckg-1; Mon, 22 Jun 2020 06:42:53 -0400
-X-MC-Unique: TJMPkiegN2uQ8p7x63Cckg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-30-xyEKxh9jM5mPWNDjpFmaow-1; Mon, 22 Jun 2020 06:47:54 -0400
+X-MC-Unique: xyEKxh9jM5mPWNDjpFmaow-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBCF810059A3;
- Mon, 22 Jun 2020 10:42:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 900397166A;
- Mon, 22 Jun 2020 10:42:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0BCD61138471; Mon, 22 Jun 2020 12:42:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 03/22] Clean up some calls to ignore Error objects the right
- way
-Date: Mon, 22 Jun 2020 12:42:31 +0200
-Message-Id: <20200622104250.1404835-4-armbru@redhat.com>
-In-Reply-To: <20200622104250.1404835-1-armbru@redhat.com>
-References: <20200622104250.1404835-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C0D8464;
+ Mon, 22 Jun 2020 10:47:52 +0000 (UTC)
+Received: from gondolin (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D68C75BAE6;
+ Mon, 22 Jun 2020 10:47:26 +0000 (UTC)
+Date: Mon, 22 Jun 2020 12:47:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Subject: Re: [PATCH v3 5/8] s390/sclp: use cpu offset to locate cpu entries
+Message-ID: <20200622124723.38c72cba.cohuck@redhat.com>
+In-Reply-To: <20200618222258.23287-6-walling@linux.ibm.com>
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-6-walling@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,135 +95,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jerome Forissier <jerome@forissier.org>,
- "Daniel P . Berrange" <berrange@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
+ mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Receiving the error in a local variable only to free it is less clear
-(and also less efficient) than passing NULL.  Clean up.
+On Thu, 18 Jun 2020 18:22:55 -0400
+Collin Walling <walling@linux.ibm.com> wrote:
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Cc: Jerome Forissier <jerome@forissier.org>
-CC: Greg Kurz <groug@kaod.org>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- chardev/char-socket.c | 6 ++----
- hw/9pfs/9p.c          | 6 ++----
- hw/arm/virt.c         | 4 +---
- hw/ppc/spapr_drc.c    | 4 +---
- ui/vnc.c              | 3 +--
- 5 files changed, 7 insertions(+), 16 deletions(-)
+> The start of the CPU entry region in the Read SCP Info response data is
+> denoted by the offset_cpu field. As such, QEMU needs to begin creating
+> entries at this address. Note that the length of the Read SCP Info data
+> (data_len) denotes the same value as the cpu offset.
+> 
+> This is in preparation of when Read SCP Info inevitably introduces new
+> bytes that push the start of the CPUEntry field further away.
+> 
+> Read CPU Info is unlikely to ever change, so let's not bother
+> accounting for the offset there.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/sclp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index afebeec5c3..b0cae97960 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -815,22 +815,20 @@ static void tcp_chr_tls_init(Chardev *chr)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
-     QIOChannelTLS *tioc;
--    Error *err = NULL;
-     gchar *name;
- 
-     if (s->is_listen) {
-         tioc = qio_channel_tls_new_server(
-             s->ioc, s->tls_creds,
-             s->tls_authz,
--            &err);
-+            NULL);
-     } else {
-         tioc = qio_channel_tls_new_client(
-             s->ioc, s->tls_creds,
-             s->addr->u.inet.host,
--            &err);
-+            NULL);
-     }
-     if (tioc == NULL) {
--        error_free(err);
-         tcp_chr_disconnect(chr);
-         return;
-     }
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 45a788f6e6..9755fba9a9 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1399,7 +1399,6 @@ static void coroutine_fn v9fs_attach(void *opaque)
-     size_t offset = 7;
-     V9fsQID qid;
-     ssize_t err;
--    Error *local_err = NULL;
- 
-     v9fs_string_init(&uname);
-     v9fs_string_init(&aname);
-@@ -1437,9 +1436,8 @@ static void coroutine_fn v9fs_attach(void *opaque)
-         error_setg(&s->migration_blocker,
-                    "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
-                    s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
--        err = migrate_add_blocker(s->migration_blocker, &local_err);
--        if (local_err) {
--            error_free(local_err);
-+        err = migrate_add_blocker(s->migration_blocker, NULL);
-+        if (err < 0) {
-             error_free(s->migration_blocker);
-             s->migration_blocker = NULL;
-             clunk_fid(s, fid);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index caceb1e4a0..29b9d5b2e6 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -217,11 +217,9 @@ static bool cpu_type_valid(const char *cpu)
- 
- static void create_kaslr_seed(VirtMachineState *vms, const char *node)
- {
--    Error *err = NULL;
-     uint64_t seed;
- 
--    if (qemu_guest_getrandom(&seed, sizeof(seed), &err)) {
--        error_free(err);
-+    if (qemu_guest_getrandom(&seed, sizeof(seed), NULL)) {
-         return;
-     }
-     qemu_fdt_setprop_u64(vms->fdt, node, "kaslr-seed", seed);
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 2689104295..951bcdf2c0 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -1163,16 +1163,14 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
- 
-     if (!drc->fdt) {
--        Error *local_err = NULL;
-         void *fdt;
-         int fdt_size;
- 
-         fdt = create_device_tree(&fdt_size);
- 
-         if (drck->dt_populate(drc, spapr, fdt, &drc->fdt_start_offset,
--                              &local_err)) {
-+                              NULL)) {
-             g_free(fdt);
--            error_free(local_err);
-             rc = SPAPR_DR_CC_RESPONSE_ERROR;
-             goto out;
-         }
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 12a12714e1..0702a76cce 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -458,9 +458,8 @@ static VncServerInfo2List *qmp_query_server_entry(QIOChannelSocket *ioc,
-     Error *err = NULL;
-     SocketAddress *addr;
- 
--    addr = qio_channel_socket_get_local_address(ioc, &err);
-+    addr = qio_channel_socket_get_local_address(ioc, NULL);
-     if (!addr) {
--        error_free(err);
-         return prev;
-     }
- 
--- 
-2.26.2
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
