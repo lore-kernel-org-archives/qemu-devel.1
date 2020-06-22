@@ -2,79 +2,91 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC92C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:14:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D379620708
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:06:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D379620708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CAEC3206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:14:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlERDvQO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAEC3206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnLE3-0005FY-1d
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:06:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55666)
+	id 1jnLLH-0000h7-2s
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:14:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnLCp-0004K9-Dk
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:05:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52714)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnLJw-00088i-FX; Mon, 22 Jun 2020 08:13:04 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:35680)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnLCl-0005z9-I2
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:05:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnLCj-0007gq-Cz
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:05:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 506CC2E8109
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:05:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnLJu-0007Fi-L1; Mon, 22 Jun 2020 08:13:04 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id 187so8984364ybq.2;
+ Mon, 22 Jun 2020 05:13:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/NN/9u77e9B+qXaVahDiUEE7BSunPhSjs0zadeZbxpY=;
+ b=MlERDvQO7WjxcKiIsBzKp9AgiSk3Y4ZTYK2CQcj3cWLFGShZJNq8rEt/vYv42edOwk
+ mL8a/56RH+tPSR/oRP1CaIdM14eT4R7jmy/UoCdPft/z0ReRr3jxWrDQ3K6jY4Dd9CmQ
+ xnlcqY9dfQBROe6qshe5IVPFU5PUbHtmuBiyN5W+FMDWRKcXMMTINQHFBZffAT4mCf+L
+ lXJPvBjKMBw3tw2/YCkbssiVbg2Jb+1urb8FGKwXgsxdJTy6IZxNGQp0CCHQJ1j/BNf9
+ I8Cip/LMkwXE1vf+WJzzkK19MM8JUb4077oG8gm1kgZm48AdhriUOMNWOVuTmBUqh/04
+ o34A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/NN/9u77e9B+qXaVahDiUEE7BSunPhSjs0zadeZbxpY=;
+ b=NFYWoT79XqMmsmAWXcOTir9Li0CZ7Yk8ZnrW02DyEGXx1CDEAQE7Oxg2sQUiS/YUdF
+ xIa6VNWDwKKwpDuB3l1OzQ2L78SA0Vl0z5Bxp0FUYzIXbVP12warkecFYy94ojPZAl+0
+ wRSG9NlxwzNKLRQMpHjfIfFx7rGm8rsynnhb/GinMR4nI82l2VyZbybtXGXboRyke7U/
+ fXeMpw6flIwZx6MwOtYrPJf1IQpwE/G+BdQovUyyEdMq4VsAJetznRs9lMsm7tznSJ8+
+ oRbljQ/+PcJNXL7Pz5dnTH4RfLP5SCFbosdUDdZ5hSdAcDwbEtMnSIiyYzYvPwsCjeFq
+ 6xKg==
+X-Gm-Message-State: AOAM531vLOv1lTLJByETWBYY3VQhNY1pVadwaPaiYJUVKGb3HxSMQ6Td
+ 81R9VyFcPrnAjTdkVa8DsPveZqchm6YOQv3pV9U=
+X-Google-Smtp-Source: ABdhPJzttXwSNeg2qZd84dunUK+aTi1nsKoTGmOD1Fd9ujZC/ZaYn3lAwiUbx+ZARzwJbBeVEhgYlnlrnoFfZ1MP4uw=
+X-Received: by 2002:a25:38c5:: with SMTP id
+ f188mr27878031yba.332.1592827981324; 
+ Mon, 22 Jun 2020 05:13:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Jun 2020 12:00:11 -0000
-From: Francesco Turco <1884302@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fturco kraxel-redhat
-X-Launchpad-Bug-Reporter: Francesco Turco (fturco)
-X-Launchpad-Bug-Modifier: Francesco Turco (fturco)
-References: <159259247450.25654.11249497243330169394.malonedeb@gac.canonical.com>
-Message-Id: <159282721117.5653.421297417198178540.malone@soybean.canonical.com>
-Subject: [Bug 1884302] Re: disable automatic mouse grabbing
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d8f80f3a6d0e9f2a6dac93ca6b76bf51e06236a7
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 08:05:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+References: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+ <DM6PR04MB620142B152292DD3945E4D3C8D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+In-Reply-To: <DM6PR04MB620142B152292DD3945E4D3C8D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 22 Jun 2020 20:12:49 +0800
+Message-ID: <CAEUhbmVhHKy70dA5dyQCiWeYk1nbhXHnZH8JBxmRJP6EUb2z9g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
+ bios images
+To: Anup Patel <Anup.Patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,58 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884302 <1884302@bugs.launchpad.net>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for the info, but I prefer to continue using the SDL interface, if p=
-ossible.
-Is there a plan to add the grab-on-hover=3Doff option to the SDL interface?
+Hi Anup,
 
--- =
+On Mon, Jun 22, 2020 at 6:09 PM Anup Patel <Anup.Patel@wdc.com> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Qemu-riscv <qemu-riscv-
+> > bounces+anup.patel=wdc.com@nongnu.org> On Behalf Of Bin Meng
+> > Sent: 22 June 2020 12:03
+> > To: Alistair Francis <Alistair.Francis@wdc.com>; Bastian Koppelmann
+> > <kbastian@mail.uni-paderborn.de>; Palmer Dabbelt
+> > <palmerdabbelt@google.com>; Sagar Karandikar
+> > <sagark@eecs.berkeley.edu>; qemu-devel@nongnu.org; qemu-
+> > riscv@nongnu.org
+> > Cc: Anup Patel <anup@brainfault.org>; Bin Meng
+> > <bin.meng@windriver.com>
+> > Subject: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi bios
+> > images
+> >
+> > From: Bin Meng <bin.meng@windriver.com>
+> >
+> > The RISC-V generic platform is a flattened device tree (FDT) based platform
+> > where all platform specific functionality is provided based on FDT passed by
+> > previous booting stage. The support was added in the upstream OpenSBI
+> > v0.8 release recently.
+> >
+> > This series updates QEMU to switch to use generic platform of opensbi bios
+> > images.
+> >
+> > The patch emails do not contain binary bits, please grab all updates at
+> > https://github.com/lbmeng/qemu.git bios branch.
+>
+> It will be nice to have this series updated to for fw_dynamic.bin .
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884302
+Do you mean we include fw_dynamic.bin for virt & sifive_u, and
+fw_dynamic.elf for spike?
 
-Title:
-  disable automatic mouse grabbing
+But previously we agreed to include only generic platform BIN and ELF files.
+See https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg00664.html
 
-Status in QEMU:
-  New
+>
+> Maybe you can rebase your series on top of Atish's patches ??
 
-Bug description:
-  I'm using QEMU 5.0.0 on a Gentoo Linux host system. Guest is an Arch
-  Linux system.
-
-  I'd like to disable automatic mouse grabbing when the QEMU window is focu=
-sed.
-  I would prefer for QEMU to grab the mouse only after a click.
-
-  I use the i3 window manager on my host system.
-  Suppose I'm in workspace 1, while the QEMU window is in workspace 2.
-  In order to switch to workspace 2, I need to press the "Win+2" key combin=
-ation ("Win" is the Windows key).
-  The problem is that the character "2" (from "Win+2") will get transferred=
- to the guest system.
-  For example, if I have a text editor opened under the guest system, the c=
-haracter "2" will be pasted inside the document I'm working on, which is pr=
-etty annoying.
-
-  I would like instead to press the "Win+2" key combination and then
-  explicitely click on the QEMU window with the mouse before grabbing
-  it.
-
-  Command line:
-
-  qemu-system-x86_64 -drive
-  file=3D/home/fturco/qemu/arch.img,media=3Ddisk,index=3D0,if=3Dvirtio,form=
-at=3Draw,cache=3Dnone
-  -cpu host -m 2G -k it -enable-kvm -net nic,model=3Dvirtio -net user -vga
-  virtio -display sdl -usb -rtc base=3Dutc -soundhw ac97 -monitor stdio
-  -no-quit
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884302/+subscriptions
+Regards,
+Bin
 
