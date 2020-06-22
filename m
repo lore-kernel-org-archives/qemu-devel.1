@@ -2,144 +2,127 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B729DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2151C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80C9B206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE97D20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:17:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ReuBAE8U";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zI5pcz+R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C9B206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2WcQ9CG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE97D20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJPe-0008MF-Ph
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:10:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33142)
+	id 1jnJWW-0003nN-1Q
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=435c605ae=Anup.Patel@wdc.com>)
- id 1jnJOm-0007gD-Vb; Mon, 22 Jun 2020 06:09:57 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:43054)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=435c605ae=Anup.Patel@wdc.com>)
- id 1jnJOj-0008I9-Vu; Mon, 22 Jun 2020 06:09:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592820593; x=1624356593;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=RWN8JAWGEmGlLhlMCfdbnIKFaMvQtgb+tnOupQ8LP7w=;
- b=ReuBAE8UIE+9hwVD1/NozRiCFnkxLeMEcl3U0Reu7pQay/bdYndIVevj
- lYAd0qn+OSbcPvIgrsOLq1yYm4QO9GglCtnBvt6b0NtKC5Ly8j5oDaK1k
- YlxYdh688pJP20Lri1ZgWnAOd4JC1FvY6i2/BMhY2ErkL1m5EyemaY4tZ
- dhY5ysOeMFe+DZmW7wFlNR4wDD9vLYMcuTz73g2QioMhhwZ1RNxPPA5mh
- FTSRQKgXiUwkQjsARfnCUZqmSMbHwkpLmVzMj7mlmuud8GJspToF4dtoV
- 8w7JuakfWlysAmMLBCIXvsVAecNzZbjLgHsLT2MJT7UhR35suJEwkWR3d A==;
-IronPort-SDR: WqFpz9w1rPQUserzTI4BrnovhxzZZUKpb5rCjMDaUeFJ5p7Oq3jvjPA/6RphRXjtSFMtSxqE0c
- KLDKRvuXjHmg0YmZ9FlEHXLTW1TAMJ2v49yOXchQvhoe8PkJ5/08UyvUfEYyZ2IQ/dkvAUbm+g
- pbLVbfYIWWwaD0Fpck5S2rwIdV7p1Cr0DiAJrohpdBq5BlhShkRittlUZ6Vl6pgI8J+fVs5Peg
- PdBexjSuBDyN+xs5Pl6rTpqX5EZ5FAICkv/O+DGk8y/IR6fCy8kQCRRxaSElR6VQ5LGQwZjQGW
- Ai8=
-X-IronPort-AV: E=Sophos;i="5.75,266,1589212800"; d="scan'208";a="249801140"
-Received: from mail-mw2nam12lp2049.outbound.protection.outlook.com (HELO
- NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.49])
- by ob1.hgst.iphmx.com with ESMTP; 22 Jun 2020 18:09:48 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IamLkJIlMq2PkVV4kTNJ4wgV8nr9dMLtvJsJame5bNmtOy3w9tZz988tx8Rry818hqmdZQLvV31l6FNu4qtidAqBzdn5idXImpWcJbrFDrEy3nrCWxVjA5VVGCYX96ig9mMMMNeUNoh1uuVW0ZtZYcB8TJJ3kchK98PmIRQ7T1LPS1AXj5yA5eR4in+PMFzSmEA4yOGfN9YFSms0K185Sjy2X+ZWWaGvKSPqwSJ/vdIOvWDjhfozkQIH+nPxtoNNrWKrTaXkoBGIw1iGc1oEBtVwSI4zK32hkp9NusCMJCUWeLD/Dn5g7tqKDFzFBv603GePcClytoCDdlKvbSPOBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RvoA6XrG9g4pAF/gHWoQ437tF/AL/fMxW8DAxgBYtMQ=;
- b=Zp2eGMWxAp5MNU0BEKSoa5JIUaDPw3NW1TyIVSEP/DeU8imEyj2t5t6VtRmAgUHGJ+oFGkJupPAE5nLZhsXxlbSxpEGT09SC+6Sp2DnvV8Ipk04hx/bx1QNDl0Xt2IA/KoSrajv0f+WD2eeYYRk4up9UiwWb62nv9h4GTDSr+DL8dLvIFQwzYhbH8YndWwKU94qVnXg/3TI122PQjnMs6F/vXDHaDyHMXpKkSfmzjeZsCqgrjH/FrzhTK7oNYoBCb2tVfdeLWi2ac0xWnxHwFU7RvuiLa/mkae419mxVF9RPrmgTI0GgR5S7tuQF2Vusxqya3DDZQIShNlN39Hft9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RvoA6XrG9g4pAF/gHWoQ437tF/AL/fMxW8DAxgBYtMQ=;
- b=zI5pcz+R4MHS7WAbjqNI3EDp6MlI3rrHkTOg27Aw6+ESTBcME0Mz1YPTJCzxFQHo2qme299RhLHexTNHq6XMUuTmCrUhStWzA+Q447n7ZZyL1U64uQsb4wE0xfksSdlNJsNdrfOCVIaZ9VtYcJ0b3QegweTjdoaQifpoyzA1Twg=
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
- by DM6PR04MB6633.namprd04.prod.outlook.com (2603:10b6:5:24a::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.21; Mon, 22 Jun
- 2020 10:09:47 +0000
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::e0a4:aa82:1847:dea5]) by DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::e0a4:aa82:1847:dea5%7]) with mapi id 15.20.3109.027; Mon, 22 Jun 2020
- 10:09:47 +0000
-From: Anup Patel <Anup.Patel@wdc.com>
-To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
- <Alistair.Francis@wdc.com>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmerdabbelt@google.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Subject: RE: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
- bios images
-Thread-Topic: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
- bios images
-Thread-Index: AQHWSF8bvVpcQ8q0fEm5PQ775A0UKqjkaUTQ
-Date: Mon, 22 Jun 2020 10:09:47 +0000
-Message-ID: <DM6PR04MB620142B152292DD3945E4D3C8D970@DM6PR04MB6201.namprd04.prod.outlook.com>
-References: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [103.56.182.118]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: da7c642c-d636-4f51-e6bb-08d8169464cb
-x-ms-traffictypediagnostic: DM6PR04MB6633:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR04MB6633997717F22B84544B63778D970@DM6PR04MB6633.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0442E569BC
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lmvWrk8kk3UcZqndFImuHbRMGU0yjFO0sd7ngO563yXTAScS9N2psxcHkLqIIRLSiLxm1crhKZOwnQ1M8Yj4RwD8FdkuDof4S70PVM3W17kA1itlrNvWS5VTDAt+7XTslfQllnAUQKuOPkV/M9ISRRZwMKf+t0OzGI8aeGPX9B6vNTRBuSkNTTgDYIa/msAAQZ1cyZ0H842z83AZ6DUMzWt/8lF9eC7cnXmzhu0jGKNh5Je06mROnuyW1vIJI1Pwgkxtw90n1/WLXq4TDTHSi/fCyCJEm55lsXEwIZwVnekd61ecG3YHkJQtxDNqEZ1mVpqvbSxsM/K1H1mstfvpLEaK8zNkbWVzXA3kHTReFCpTth6/vvkSv4ogPnnJJ1u3z4fM3wKn03xJxrSdM+Ea17W8xRJnbuKVaaQQeltADGrYhMmCu2zWFMWcVEFuKS0s
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(376002)(136003)(366004)(39860400002)(396003)(2906002)(86362001)(8676002)(8936002)(66556008)(64756008)(5660300002)(71200400001)(76116006)(4326008)(66476007)(66446008)(83380400001)(66946007)(52536014)(478600001)(9686003)(7696005)(55016002)(54906003)(110136005)(966005)(316002)(186003)(26005)(33656002)(6506007)(53546011)(41533002);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: KJnRT7gyuU4K1Tz63Wx3uhhaJg9Zl41/62JCDnvdaIBlhWMzpBeNXU27Ed2zBVp2rbwxmYY/tBsa+P38bFUPEgZ0s+phKzjMnnxY/RvDl3vE28gtS06x9JuXM7+BeAq15TWm9onwvHXa5qpepHHIKzVjvcEriAyJHLEH81Wtz/E+UWcVdTGwhn69CfcZ2fzF9vws/xhUHT9duQEp6kjtjDuT4KXYvL2C64zSopl7kmkGmuSKUC3zMNJqh0bVJBASLEBNM1PnFqo0C80bwXS2558Mga7K/LKDMtyOjVM/Kw0UAjX9eAbQ+wAYnlFpstTCOu/Egh/PjeMQFDDmp25KMIxLlBNJzHI1Zl+PtVw5qE4rtOgfqAJOzIEBw1S+giVbsKK033UIIlEfhLLTnhdos44GhiKIYhscizkwJLDZfgxAYq3sokhsf3kLLl0nP0J+uXi9oUE082aXvZBTxYvnLy7dcDKtH+i0c2OuyiWxvro=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnJTl-0001BR-Kl
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:15:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60892
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnJTj-0000nJ-IA
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:15:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592820902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4YVoT+3J1q1vx0VdtUzgkPmVz3LPW5cTTx/GWKxpQcQ=;
+ b=S2WcQ9CGD8V/eTEYNtf4vUg/b+A8NabDlxZBT3o1rGOqi+0febiAmg/nEul99PX5QaHIhp
+ VIOGxVMYE9JzTvmZaogj1fmwbqxyMp6nl+G3hFv7uGSH2nGAW2m6m3Ql07KKRPcSvTLwhi
+ FbdhjLAme+evcdMSnQ1JfwNb4ejCZWs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-y_imuVGiOqe2P5Tk5b2qRQ-1; Mon, 22 Jun 2020 06:15:00 -0400
+X-MC-Unique: y_imuVGiOqe2P5Tk5b2qRQ-1
+Received: by mail-wm1-f71.google.com with SMTP id p24so6645980wma.4
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 03:15:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=4YVoT+3J1q1vx0VdtUzgkPmVz3LPW5cTTx/GWKxpQcQ=;
+ b=L02RVv6NxE1hKWZFCc0cd4RgcYrhrEb0gmi5hM0xJ8GOY3HvjJ/BJYCj4j2weD2Z95
+ ziGqm0ONzBK42js74kTSSgaJJhH71q7y9pxBGJzcwchjb+9nqLA7lV+l1eFyd4gLjnyw
+ YsSIC18tMIqYzAa0aYzLw6PdNhxAxdF55dNGAcZgjoDnxuIsse71YRJbAiL9dPPO6R2j
+ gaQmZXIIu6pnvTERACXa3BDQTKNWb34nDPnSYXm0ZqnHnNYmLSCQdZAZgqpQKa7GsjZ8
+ z4KUFSpRNrQvJP1BdDH6heQ5VaH/FhsI0qNh/fyc8vWfdMHbCuNjs2AslneRCTog9Tz6
+ 2o2g==
+X-Gm-Message-State: AOAM5333ExZf/Ql6nojxOLwjC1rjSQWqKxeBCIQv2q2kiM+dEFgs+k8W
+ GRKuQM5EusHBhlt3+hhpG6gnkp/O4fxFQv537QQ+qHZ14DoRAghnL18QzX0+l2d57CdAtnnsQL9
+ xv7IcbfcMUisAw+k=
+X-Received: by 2002:adf:f7c6:: with SMTP id a6mr11159080wrq.355.1592820899471; 
+ Mon, 22 Jun 2020 03:14:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVeiYicOpT3Vg+X0VNMUsoKm63hDNmh4olGs+AhyDzTmWcdcR/clNtAyepqE7lhGhVGEAy/g==
+X-Received: by 2002:adf:f7c6:: with SMTP id a6mr11159058wrq.355.1592820899195; 
+ Mon, 22 Jun 2020 03:14:59 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id n1sm17087458wrp.10.2020.06.22.03.14.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 22 Jun 2020 03:14:58 -0700 (PDT)
+Subject: Re: [PATCH] qga: Use gethostname() instead of g_get_host_name()
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
+References: <8e73f685e10c684eb5e2c88c2185504d26f024fc.1592296355.git.mprivozn@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <7e31a988-7d6f-7bc5-3563-e77efff87ca3@redhat.com>
+Date: Mon, 22 Jun 2020 12:14:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da7c642c-d636-4f51-e6bb-08d8169464cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2020 10:09:47.4151 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5agqQNN3/pwwJZQAR2FQ7TN1Gzd5ZzKI+3gBfQeR0SfIZJzT5I1L1dqvo1ZHVX/8Hm3P0K23tL954p8PcCvOdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6633
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=435c605ae=Anup.Patel@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 06:09:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <8e73f685e10c684eb5e2c88c2185504d26f024fc.1592296355.git.mprivozn@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -152,100 +135,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anup Patel <anup@brainfault.org>, Bin Meng <bin.meng@windriver.com>
+Cc: vfeenstr@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Michal,
 
+On 6/16/20 10:34 AM, Michal Privoznik wrote:
+> Problem with g_get_host_name() is that on the first call it saves
+> the hostname into a global variable and from then on, every
+> subsequent call returns the saved hostname. Even if the hostname
+> changes. This doesn't play nicely with guest agent, because if
+> the hostname is acquired before the guest is set up (e.g. on the
+> first boot, or before DHCP) we will report old, invalid hostname.
+> 
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1845127
+> 
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> ---
+>  qga/commands.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 52 insertions(+), 4 deletions(-)
+> 
+> diff --git a/qga/commands.c b/qga/commands.c
+> index efc8b90281..ce3c2041a6 100644
+> --- a/qga/commands.c
+> +++ b/qga/commands.c
+> @@ -512,14 +512,62 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
+>      return -1;
+>  }
+>  
+> +#ifndef HOST_NAME_MAX
+> +# ifdef _POSIX_HOST_NAME_MAX
+> +#  define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+> +# else
+> +#  define HOST_NAME_MAX 255
+> +# endif
+> +#endif
+> +
+>  GuestHostName *qmp_guest_get_host_name(Error **errp)
+>  {
+>      GuestHostName *result = NULL;
+> -    gchar const *hostname = g_get_host_name();
+> -    if (hostname != NULL) {
+> -        result = g_new0(GuestHostName, 1);
+> -        result->host_name = g_strdup(hostname);
+> +    g_autofree char *hostname = NULL;
+> +
+> +    /*
+> +     * We want to avoid using g_get_host_name() because that
+> +     * caches the result and we wouldn't reflect changes in the
+> +     * host name.
+> +     */
 
-> -----Original Message-----
-> From: Qemu-riscv <qemu-riscv-
-> bounces+anup.patel=3Dwdc.com@nongnu.org> On Behalf Of Bin Meng
-> Sent: 22 June 2020 12:03
-> To: Alistair Francis <Alistair.Francis@wdc.com>; Bastian Koppelmann
-> <kbastian@mail.uni-paderborn.de>; Palmer Dabbelt
-> <palmerdabbelt@google.com>; Sagar Karandikar
-> <sagark@eecs.berkeley.edu>; qemu-devel@nongnu.org; qemu-
-> riscv@nongnu.org
-> Cc: Anup Patel <anup@brainfault.org>; Bin Meng
-> <bin.meng@windriver.com>
-> Subject: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi =
-bios
-> images
->=20
-> From: Bin Meng <bin.meng@windriver.com>
->=20
-> The RISC-V generic platform is a flattened device tree (FDT) based platfo=
-rm
-> where all platform specific functionality is provided based on FDT passed=
- by
-> previous booting stage. The support was added in the upstream OpenSBI
-> v0.8 release recently.
->=20
-> This series updates QEMU to switch to use generic platform of opensbi bio=
-s
-> images.
->=20
-> The patch emails do not contain binary bits, please grab all updates at
-> https://github.com/lbmeng/qemu.git bios branch.
+I see there is only one g_get_host_name() call in the
+codebase, but can we have a generic qemu_get_host_name()
+helper implemented in util/oslib-*c instead?
 
-It will be nice to have this series updated to for fw_dynamic.bin .
-
-Maybe you can rebase your series on top of Atish's patches ??=20
-
-Regards,
-Anup
-
->=20
-> Changes in v2:
-> - new patch: configure: Create symbolic links for pc-bios/*.elf files
-> - Upgrade OpenSBI to v0.8 release
-> - Copy the ELF images too in the make rules
-> - Include ELF images in the artifacts
-> - new patch: Makefile: Ship the generic platform bios images for RISC-V
->=20
-> Bin Meng (7):
->   configure: Create symbolic links for pc-bios/*.elf files
->   roms/opensbi: Upgrade from v0.7 to v0.8
->   roms/Makefile: Build the generic platform for RISC-V OpenSBI firmware
->   hw/riscv: Use pre-built bios image of generic platform for virt &
->     sifive_u
->   hw/riscv: spike: Change the default bios to use generic platform image
->   gitlab-ci/opensbi: Update GitLab CI to build generic platform
->   Makefile: Ship the generic platform bios images for RISC-V
->=20
->  .gitlab-ci.d/opensbi.yml                     |  28 +++++++++------------=
---
->  Makefile                                     |   4 ++--
->  configure                                    |   1 +
->  hw/riscv/sifive_u.c                          |   4 ++--
->  hw/riscv/spike.c                             |   9 ++++++--
->  hw/riscv/virt.c                              |   4 ++--
->  pc-bios/opensbi-riscv32-generic-fw_jump.bin  | Bin 0 -> 58048 bytes  pc-
-> bios/opensbi-riscv32-generic-fw_jump.elf  | Bin 0 -> 554156 bytes  pc-
-> bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49520 -> 0 bytes
->  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 49504 -> 0 bytes
->  pc-bios/opensbi-riscv64-generic-fw_jump.bin  | Bin 0 -> 70792 bytes  pc-
-> bios/opensbi-riscv64-generic-fw_jump.elf  | Bin 0 -> 619960 bytes  pc-
-> bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 57936 -> 0 bytes
->  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 57920 -> 0 bytes
->  roms/Makefile                                |  32 +++++++++------------=
-------
->  roms/opensbi                                 |   2 +-
->  16 files changed, 35 insertions(+), 49 deletions(-)  create mode 100644 =
-pc-
-> bios/opensbi-riscv32-generic-fw_jump.bin
->  create mode 100644 pc-bios/opensbi-riscv32-generic-fw_jump.elf
->  delete mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
->  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.bin
->  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.elf
->  delete mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
->=20
-> --
-> 2.7.4
->=20
+> +
+> +#ifndef G_OS_WIN32
+> +    long len = -1;
+> +
+> +#ifdef _SC_HOST_NAME_MAX
+> +    len = sysconf(_SC_HOST_NAME_MAX);
+> +#endif /* _SC_HOST_NAME_MAX */
+> +
+> +    if (len < 0) {
+> +        len = HOST_NAME_MAX;
+>      }
+> +
+> +    hostname = g_malloc0(len + 1);
+> +
+> +    if (gethostname(hostname, len) < 0) {
+> +        return NULL;
+> +    }
+> +
+> +#else /* G_OS_WIN32 */
+> +
+> +    wchar_t tmp[MAX_COMPUTERNAME_LENGTH + 1];
+> +    DWORD size = G_N_ELEMENTS(tmp);
+> +
+> +    if (GetComputerNameW(tmp, &size) != 0) {
+> +        /*
+> +         * Indeed, on Windows retval of zero means failure
+> +         * and nonzero means success.
+> +         */
+> +        hostname = g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
+> +    }
+> +#endif /* G_OS_WIN32 */
+> +
+> +    if (!hostname) {
+> +        hostname = g_strdup("localhost");
+> +    }
+> +
+> +    result = g_new0(GuestHostName, 1);
+> +    result->host_name = g_steal_pointer(&hostname);
+>      return result;
+>  }
+>  
+> 
 
 
