@@ -2,100 +2,84 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49570C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83078C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:19:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1226320768
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D8F62075A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 19:19:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+O8tltO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1226320768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tg5TkvMX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8F62075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnRxj-0007HX-77
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:18:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51496)
+	id 1jnRyE-00084Y-Gc
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 15:19:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRwi-0006PV-8W
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:17:32 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35395)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnRx2-0006jw-H9
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:17:52 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44623)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRwg-0006ZN-B1
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:17:32 -0400
-Received: by mail-wm1-x344.google.com with SMTP id g21so697131wmg.0
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=glkQR/ZJqHbpelX/uXLYv84sEBk88reV/4ztPSkNgIs=;
- b=o+O8tltO6J8zUd61c2G7SUgTN15InFzq9w7B/ISW5uVkvzwpFWRntC+yNpJdqu9qcI
- OW2gGmR6tr7Vi/A7oqSaHwHDXt/bE7woZLb6Z17au2YKOzrxQ2+ObEDHNJdpz1JQ5lcC
- vV3NDDD5kPT8r/HfB2eS4vQkoY21xMJUpjXyeWU6/pDzlQM9a4vflABWDEbo+oZaIX6B
- axSqv7CKZYupb+t5eWZJyd1dSjsVdBSjLZq9v9kgtUlMCZmdM8wtrD49LXK/q4VAjE25
- 5THG1z35dL8E6ifTzfPCWQcD7BWHGRnhALXpl6TwNfdpK+Dcb8v/nh891fkLgR1Oa6Rn
- havw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnRx0-0006aC-JE
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 15:17:52 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e5so14028902ote.11
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 12:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Bphi//UCJWdgiGIhoGNfVCxrpEYRFAwyzF+EmT3tJeg=;
+ b=Tg5TkvMXO7Y4qbxIaCt0ipCycnU2B0H33p1vr9oyp7ldMU8O//q1DAAhVQX/SjupvU
+ 9Rbacppft0QJ/xpduHWeGR2/In0Njssij+EXywpxTXg7RshvEa7EzRrDlqVlAd0k3ptH
+ bzRnNLgSV8+FiAy1TsDi4dUD5IfjnGhxLRbOqLN5MaSDm5OUMjzzj9lHahCI+2Cv6lxm
+ PDeacrS9LRJmzaRPx1n9fdacL1WgquttaJGL+PGeLvcR5SNM3+X9LpQe3u0n0B+Rh4OH
+ /diyQ8Wy6VayC9G19lZpq576DCPuUtxExiUwPIsKgrfYIO+jXjelBxX66vQsez7I+KM0
+ gh+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=glkQR/ZJqHbpelX/uXLYv84sEBk88reV/4ztPSkNgIs=;
- b=bcFf0TJE5vvQWLlNpLqe+rX46OQOnBNBvwM/MPS8ga6TZY13XffGsmvkvNhYz5JSU2
- a9J/o2pR2JC9hzmypRBrputGxfHt4mZIu7X91LNlxr+NgBydTq43fKzfSfDNPTMiS8Gg
- OGjh0pm9Ih+PqfCHfWA9QtcOcE8aJczlWW8u7szqvneTHywhIRo9rbtH/g6zhKBuT6wD
- RXxAgCnK5Sm+eLHa/S2VAhJnlRtmcET05qdXv7TVGRn+70qIZYjoD4wOkn1Uc3BG3/9X
- bEgybJB0NXBKX6k4BOH0GFW2f9Ejy1aaKs0aOaBx1GqdEM9J3TzktKJQcf+A/qpgUjQm
- //yg==
-X-Gm-Message-State: AOAM530jinoRx4/gs2Ez2zbQ7KdIrfuTR6yUccBr+H5VP7ihd6nS+3P0
- Xmp5dF76QQt7DGjrRjyY+GU=
-X-Google-Smtp-Source: ABdhPJw7g53cD0Lz8R0/lZ+Dyk108FS271RX4uzqwe92lpSwbTFZHZSpNFsAPoL57ZmaxnK/VsLQeA==
-X-Received: by 2002:a1c:2602:: with SMTP id m2mr20782547wmm.50.1592853447783; 
- Mon, 22 Jun 2020 12:17:27 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id d9sm18975835wre.28.2020.06.22.12.17.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 22 Jun 2020 12:17:26 -0700 (PDT)
-Subject: Re: [PULL 00/15] Renesas hardware patches for 2020-06-21
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200621124807.17226-1-f4bug@amsat.org>
- <CAFEAcA_5663fFNVqcr1maATB6v8R297LmJEtD+8V4LvhaSkjPA@mail.gmail.com>
- <CAFEAcA-w4DGH2wEwySZd+zj-m+YpL39tog9S9LNH2iTcL84F9Q@mail.gmail.com>
- <8ec1ccc2-7e7f-94cf-dedf-86c09832c0f7@amsat.org>
- <CAHiYmc7V0Be1i67ZscrvsKyDEXw7aWz1vJHJ3eEPgcyPELLyYw@mail.gmail.com>
- <CAHiYmc4+B22-0AjLMYnJmcAVVYxzKKiPnbViuR-9kBYJrpOK0A@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2741a5b7-91dc-4087-e9e5-9a17da353072@amsat.org>
-Date: Mon, 22 Jun 2020 21:17:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Bphi//UCJWdgiGIhoGNfVCxrpEYRFAwyzF+EmT3tJeg=;
+ b=E7BZS9GxuBRn5LRMNKumvaozpZQlxGqxpuzvtGvs3T702Nyd1hbQQrLsyz5ZYViIAf
+ 9OOInRcJ6gWWJg0PT5l3S1X270XxdqRT0b2OvLxymDUezzLDh+FgHJjumwDf88ULKdP1
+ qaZL9mItXXbuY83Pp1GON29NOOy5TxrwmheJXvCRp+f7QjMXOXOnhniq9TAIsoSlSvCQ
+ yEl7Axb3PME5heICqICDj7VCav3v1HBwH/M2D38dWP975NjKtIk5DClE1TU66rm1E3xv
+ sN4x4PnB+dHh61sllgixZdYIWuvScprc9J2iSeRWytEYrsJyCiowzp0fBnuSBwoQCAzQ
+ bqkQ==
+X-Gm-Message-State: AOAM5323V12uzAJn8+BViPuKMaThRIYTmuZhJEuVGZj8b7/Yr8APBapS
+ 5VgXGw4laWqhWSROPp2V3EGRTbLhCX/OhJHQ7iuCdg==
+X-Google-Smtp-Source: ABdhPJwpXtFuR8fkRN67XlXHmgIWLp+Srzw0q0TpZ6ylSVdaYzgIY4x3QRSJAHr2yJBkW/tOPvFh5ucVYE39StMgVwM=
+X-Received: by 2002:a4a:2f15:: with SMTP id p21mr4666605oop.20.1592853468697; 
+ Mon, 22 Jun 2020 12:17:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc4+B22-0AjLMYnJmcAVVYxzKKiPnbViuR-9kBYJrpOK0A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+References: <20200522023440.26261-1-richard.henderson@linaro.org>
+In-Reply-To: <20200522023440.26261-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 22 Jun 2020 20:17:37 +0100
+Message-ID: <CAFEAcA_rnDDCTBQDEfbx5qzFFmkyeo9D_NdEC-v52i3wgKjApw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/25] risu cleanups and improvements
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,119 +92,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Ahmed Karaman <ahmed.khaled.karaman@gmail.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar,
+Just a note that I'm assuming this is still on Alex's plate to review.
+Ping me if it gets reviews and is ready to apply.
 
-On 6/22/20 7:30 PM, Aleksandar Markovic wrote:
-> понедељак, 22. јун 2020., Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com
-> <mailto:aleksandar.qemu.devel@gmail.com>> је написао/ла:
-> 
-> 
-> 
->     понедељак, 22. јун 2020., Philippe Mathieu-Daudé <f4bug@amsat.org
->     <mailto:f4bug@amsat.org>> је написао/ла:
-> 
->         +Thomas
-> 
->         On 6/22/20 6:19 PM, Peter Maydell wrote:
->         > On Mon, 22 Jun 2020 at 17:01, Peter Maydell
->         <peter.maydell@linaro.org <mailto:peter.maydell@linaro.org>> wrote:
->         >>
->         >> On Sun, 21 Jun 2020 at 13:50, Philippe Mathieu-Daudé
->         <f4bug@amsat.org <mailto:f4bug@amsat.org>> wrote:
->         >>> Renesas hardware patches
->         >>>
->         >>> - Add a common entry for Renesas hardware in MAINTAINERS
->         >>> - Trivial SH4 cleanups
->         >>> - Add RX GDB simulator from Yoshinori Sato
->         >>>
-> 
-> 
-> 
->     Can this rx patch be included in this pull request: (it was r-b-ed a
->     couple of weeks ago already):
-> 
->     https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08581.html
->     <https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08581.html>
+thanks
+-- PMM
 
-This pull request only contains hardware emulation patches (files under
-hw/, not the TCG code from target/).
-
-> R-b by Richard is here:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00229.html
-> 
-> The two messages are not directly connected on the list, since r-b was
-> in June, and the patch was in May.
-> 
->  
-> 
->     Thanks in advance!
-> 
->     Aleksandar
-> 
-> 
->      
-> 
->         >>> The Renesas RX target emulation was added in commit c8c35e5f51,
->         >>> these patches complete the target by adding the hardware
->         emulation.
->         >>>
->         >>> Thank you Yoshinori for adding this code to QEMU, and your
->         patience
->         >>> during the review process. Now your port is fully integrated.
->         >>>
->         >>> Travis-CI:
->         >>> https://travis-ci.org/github/philmd/qemu/builds/700461815
->         <https://travis-ci.org/github/philmd/qemu/builds/700461815>
->         >>
->         >> Hi; I'm afraid there's a format-string issue here (manifests
->         >> on OSX, openbsd, and 32-bit platforms):
->         >>
->         >> /home/peter.maydell/qemu/hw/rx/rx-gdbsim.c: In function
->         'rx_gdbsim_init':
->         >> /home/peter.maydell/qemu/hw/rx/rx-gdbsim.c:93:22: error:
->         format '%lli'
->         >> expects argument of type 'long long int', but argument 2 has type
->         >> 'ram_addr_t {aka unsigned int}' [-Werror=format=]
->         >>          error_report("Invalid RAM size, should be more than
->         %" PRIi64 " Bytes",
->         >>                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->         >>                       mc->default_ram_size);
->         >>                       ~~~~~~~~~~~~~~~~~~~~
->         >
->         > Also there appears to be a makefile/dependency bug somewhere,
->         > because when I drop this merge attempt and retry building
->         > with current master I get this error:
->         >
->         > make[1]: Entering directory '/home/petmay01/qemu-for-merges/slirp'
->         > make[1]: Nothing to be done for 'all'.
->         > make[1]: Leaving directory '/home/petmay01/qemu-for-merges/slirp'
->         >   CC      qga/main.o
->         >   CC      qemu-io.o
->         >   CC      monitor/qmp-cmds-control.o
->         > make: *** No rule to make target
->         > '/home/petmay01/qemu-for-merges/hw/rx/Kconfig', needed by
->         > 'aarch64-softmmu/config-devices.mak'.  Stop.
->         > make: *** Waiting for unfinished jobs....
->         > make: Leaving directory '/home/petmay01/qemu-for-merges/build/w64'
->         >
->         > This seems to be because aarch64-softmmu/config-devices.mak.d
->         > in the build tree says that aarch64-softmmu/config-devices.mak
->         > depends on all the Kconfig files; this means that if a Kconfig
->         > file gets deleted then incremental build stops working?
-> 
->         This seems the same problem previously discussed here:
->         https://www.mail-archive.com/qemu-devel@nongnu.org/msg676319.html <https://www.mail-archive.com/qemu-devel@nongnu.org/msg676319.html>
-> 
+On Fri, 22 May 2020 at 03:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Version 3 changes the --dump option to --fulldump and --diffdump,
+> after an off-hand suggestion by Alex.
+>
+> These are now mode options, similar to --master.  Which means that
+> dumping is an orthogonal apprentice type, which means that we can
+> dump from a socket.  I'm not sure that will be useful as such, but
+> I think it makes main be a bit cleaner.
+>
+> If using old trace files with the new risu, you get
+>
+>   Unexpected magic number: 0x000078
+>
+> If for somehow you use different risu for master and apprentice on
+> sockets, the apprentice will hang waiting for data that the master
+> will never write.  This is less than helpful, but should be trivial
+> to avoid.
+>
+> While cleaning up the interface for reginfo_dump_mismatch(), I
+> noticed some bugs on the ppc64 side.
+>
+> The patches without reviews are:
+>
+> 0014-Merge-reginfo.c-into-risu.c.patch
+> 0015-Rearrange-reginfo-and-memblock-buffers.patch
+> 0016-Split-out-recv_register_info.patch
+> 0017-Add-magic-and-size-to-the-trace-header.patch
+> 0018-Compute-reginfo_size-based-on-the-reginfo.patch
+> 0019-aarch64-Reorg-sve-reginfo-to-save-space.patch
+> 0020-aarch64-Use-arch_init-to-configure-sve.patch
+> 0021-ppc64-Use-uint64_t-to-represent-double.patch
+> 0022-Standardize-reginfo_dump_mismatch-printing.patch
+> 0023-Add-fulldump-and-diffdup-options.patch
+> 0024-Remove-return-value-from-reginfo_dump.patch
+> 0025-ppc64-Clean-up-reginfo-handling.patch
+>
+> most of which are new, and those that aren't new have had
+> significant modifications.
+>
+>
+> r~
+>
+>
+> Richard Henderson (25):
+>   Use bool for tracing variables
+>   Unify master_fd and apprentice_fd to comm_fd
+>   Hoist trace file and socket opening
+>   Adjust tracefile open for write
+>   Use EXIT_FAILURE, EXIT_SUCCESS
+>   Make some risu.c symbols static
+>   Add enum RisuOp
+>   Add enum RisuResult
+>   Unify i/o functions and use RisuResult
+>   Pass non-OK result back through siglongjmp
+>   Always write for --master
+>   Simplify syncing with master
+>   Split RES_MISMATCH for registers and memory
+>   Merge reginfo.c into risu.c
+>   Rearrange reginfo and memblock buffers
+>   Split out recv_register_info
+>   Add magic and size to the trace header
+>   Compute reginfo_size based on the reginfo
+>   aarch64: Reorg sve reginfo to save space
+>   aarch64: Use arch_init to configure sve
+>   ppc64: Use uint64_t to represent double
+>   Standardize reginfo_dump_mismatch printing
+>   Add --fulldump and --diffdup options
+>   Remove return value from reginfo_dump
+>   ppc64: Clean up reginfo handling
+>
+>  Makefile               |   2 +-
+>  risu.h                 | 103 +++----
+>  risu_reginfo_aarch64.h |  16 +-
+>  risu_reginfo_ppc64.h   |   3 +-
+>  comms.c                |  34 +--
+>  reginfo.c              | 183 -----------
+>  risu.c                 | 676 ++++++++++++++++++++++++++++++-----------
+>  risu_aarch64.c         |   6 +-
+>  risu_arm.c             |   6 +-
+>  risu_i386.c            |   4 +-
+>  risu_m68k.c            |   4 +-
+>  risu_ppc64.c           |   4 +-
+>  risu_reginfo_aarch64.c | 212 +++++++------
+>  risu_reginfo_arm.c     |  32 +-
+>  risu_reginfo_i386.c    |  22 +-
+>  risu_reginfo_m68k.c    |  37 +--
+>  risu_reginfo_ppc64.c   | 183 +++++------
+>  17 files changed, 803 insertions(+), 724 deletions(-)
+>  delete mode 100644 reginfo.c
+>
+> --
+> 2.20.1
 
