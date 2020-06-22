@@ -2,98 +2,88 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 014A0C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CCBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD08A20716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:25:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11A3520716
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 12:28:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IM4cS/pF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD08A20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4ylWXtO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A3520716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnLVj-0001Yl-1u
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:25:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60454)
+	id 1jnLYi-0003aW-BK
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 08:28:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jnLUw-0000f3-5D
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:24:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60451
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jnLUu-0000XE-3k
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 08:24:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592828662;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XctQSOer6J/cqWiZAOXKuu2iqgH7bUnuIb05z5YrR0o=;
- b=IM4cS/pFwqVkdvCjJAQxZN1EZdGHEPeo8Xt68WPvK+lmMf53O4c64Ss6eFeJP3E/eHDF+R
- P7SsQSuWQa25Pd0wZWdjFTxkyLx5OOJNTfE58H4VbRDrRk5Jh0o/83zYLXCcmxL/A+7kKY
- 8XF3pROFmpy7G+ZQWbaRsyoqnCry7wo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-_xfPtL5NM1muFTT6vcjh6g-1; Mon, 22 Jun 2020 08:24:16 -0400
-X-MC-Unique: _xfPtL5NM1muFTT6vcjh6g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8219F107ACCD;
- Mon, 22 Jun 2020 12:24:14 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 485727C1FE;
- Mon, 22 Jun 2020 12:24:06 +0000 (UTC)
-Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200611135917.18300-1-eric.auger@redhat.com>
- <20200611135917.18300-2-eric.auger@redhat.com>
- <20200616143327.2ee38a48@redhat.com>
- <3c3b466a-c965-e3f6-9bd6-74fce9c424c8@linux.ibm.com>
- <ed1b453d-2568-2134-3e86-c268e82a90f8@redhat.com>
- <ded58c6b-dcea-67ef-4f3c-b8af9f149ae8@redhat.com>
- <44663542-8352-2398-a297-3e1fe7f4bfd5@redhat.com>
- <ce60f439-fd2a-a72b-f004-44a01f4c5bdf@linux.ibm.com>
- <20200622113915.1dce2989@redhat.com>
- <d9d263ba-fc1e-d3af-857b-4d77c190bb73@redhat.com>
- <20200622141412.0e5640f8@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <c90fb01b-cfdf-4538-e256-b5c117da82df@redhat.com>
-Date: Mon, 22 Jun 2020 14:24:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnLXz-0002ki-Sd; Mon, 22 Jun 2020 08:27:35 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:33214)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jnLXy-00016M-3r; Mon, 22 Jun 2020 08:27:35 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id o4so9000880ybp.0;
+ Mon, 22 Jun 2020 05:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dbgCV2QuhV7by47lTsxGvt9QQgdOQSbItV55nFxX3Hc=;
+ b=A4ylWXtO+WUCwDryuywF2HBBIUFlXfS7hZVcwq/xqHxJLhzlGXDusxQnVihBBNkh5B
+ yuK9ORO1jpiGa37L7VL5Dm8Vx4tX184ooWNx22qt5WGTdFEPaPRdiLwfkd36XS0sKvJl
+ 2P2DGx2Qb2ybT0DvM5HKI28DviOP5BPr3D1xdZH0TNxW8waHl1yXjq6kxo3SvAzTp8po
+ vdiOqSsv2nqXmk8MZlYQBbR39omj9qzUFU5vLvcMX95UgoqVa/t/MWwHJU4I9B7UOLLh
+ 8KXc1iIsofTcvXmUqr7BHTABnVVCTe9tAX/4pZEc4e7KlyVuBJOhJL1vXtWOktodmlAk
+ jakA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dbgCV2QuhV7by47lTsxGvt9QQgdOQSbItV55nFxX3Hc=;
+ b=QlkHnN0SbUDyW6ajhEnvqJ3U1Gja3oQ+PoEKA7mX1PN6TSGDTbUKCL7f0mr0B9aS69
+ IbXKkIeOpdfGhDCeX+v+VSNYomHqlE47pLQ2Mz4gXqxtTCWxc3jUwT30RDwK/oNehojD
+ ndVcRxjnQsy0l3NHuX4OgTdhzD/hSlvpCkF0Un3Z0wM6mmN57rMW2Rqq0o5f/5Tv1TGZ
+ rebs9l921/0WmT7F6nG9niz9p58SWcZUEhuaGGhim1kuq42ZY0vIqHDRRmHISRqcue3q
+ O4gbin6qVwDjjnb+5ay3imh2Ne78RdEdIxPDtH747BxulFkfHxbj2k04CfBBs/apfDlh
+ t4wA==
+X-Gm-Message-State: AOAM532mjs78z7v+v4T3UHyW4n3Rs0wtNQ97wp4jQHbMCYpWyOyUCzCM
+ Frtc8pRDggicSx6etoCe/PxmxGVKc2EZrIcTQWc=
+X-Google-Smtp-Source: ABdhPJxx50hlcMEIpxjrLpSe8F5MZTlyfAcOKIqWdeZZj9keV+f7esdy3tTlCeG2rdgL7KdZySrJxy/X6Qis+Arpqy8=
+X-Received: by 2002:a25:da44:: with SMTP id n65mr29302786ybf.387.1592828852576; 
+ Mon, 22 Jun 2020 05:27:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200622141412.0e5640f8@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <1592807604-20805-1-git-send-email-bmeng.cn@gmail.com>
+ <DM6PR04MB620142B152292DD3945E4D3C8D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+ <CAEUhbmVhHKy70dA5dyQCiWeYk1nbhXHnZH8JBxmRJP6EUb2z9g@mail.gmail.com>
+ <DM6PR04MB62013393F37DC653A1D3F1B28D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+In-Reply-To: <DM6PR04MB62013393F37DC653A1D3F1B28D970@DM6PR04MB6201.namprd04.prod.outlook.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 22 Jun 2020 20:27:21 +0800
+Message-ID: <CAEUhbmUQKv9tJfCeWYnO59AoqOHah8J6T0g2zVBnujmSdYtAfg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
+ bios images
+To: Anup Patel <Anup.Patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,124 +96,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
- Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
- eric.auger.pro@gmail.com, philmd@redhat.com, ardb@kernel.org,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
+Hi Anup,
 
-On 6/22/20 2:14 PM, Igor Mammedov wrote:
-> On Mon, 22 Jun 2020 11:47:26 +0200
-> Auger Eric <eric.auger@redhat.com> wrote:
-> 
->> Hi Igor,
->>
->> On 6/22/20 11:39 AM, Igor Mammedov wrote:
->>> On Fri, 19 Jun 2020 07:19:51 -0400
->>> Stefan Berger <stefanb@linux.ibm.com> wrote:
->>>   
->>>> On 6/19/20 5:43 AM, Auger Eric wrote:  
->>>>> Hi Laszlo,
->>>>>
->>>>> On 6/19/20 11:38 AM, Laszlo Ersek wrote:    
->>>>>> On 06/18/20 09:50, Auger Eric wrote:    
->>>>>>> Hi Stefan, Igor,
->>>>>>>
->>>>>>> On 6/16/20 4:11 PM, Stefan Berger wrote:    
->>>>>>>> On 6/16/20 8:33 AM, Igor Mammedov wrote:    
->>>>>>>>> nevertheless looks like faithfull conversion,
->>>>>>>>> btw why you didn't drop Acpi20TPM2 structure definition?
->>>>>>>>>    
->>>>>>>> If we get rid of the table we should keep a reference to this document,
->>>>>>>> table 7: "TCG ACPI Specification; Family 1.2 and 2.0; Level 00 Revision
->>>>>>>> 00.37, December 19, 2014"
->>>>>>>>
->>>>>>>> https://trustedcomputinggroup.org/wp-content/uploads/TCG_ACPIGeneralSpecification_1-10_0-37-Published.pdf
->>>>>>>>
->>>>>>>>
->>>>>>>>    
->>>>>>> Further looking at this spec, the log_area_minimum_length and
->>>>>>> log_area_start_address only are described in
->>>>>>> - Table 2 (TCG Hardware InterfaceDescription Table Format for TPM 1.2
->>>>>>> Clients)
->>>>>>> - Table 4 (TCG Hardware Interface Description Table Format for TPM 1.2
->>>>>>> Servers)
->>>>>>> but not in Table 7, ie. not for TPM 2.0.
->>>>>>>
->>>>>>> Are they really needed for TPM2 or what do I miss?    
->>>>>> (side comment:
->>>>>>
->>>>>> LASA and LAML are optional with TPM-2.0. From the discussion at
->>>>>> <https://bugzilla.tianocore.org/show_bug.cgi?id=978>.    
->>>>
->>>>
->>>> They are needed for (x86) BIOS, such as SeaBIOS, not for UEFI, though. I 
->>>> do not know about ARM.
->>>>
->>>>  
->>>>> Thank you for the pointer and info. I failed to find this info in the
->>>>> spec. Given the risk of confusion, I would personally keep struct
->>>>> Acpi20TPM2 and maybe add a comment. Stefan?    
->>>>
->>>> Either way is fine with me for as long as we know where to find the 
->>>> layout of the structure.  
->>> I'd remove Acpi20TPM2 as it hardly documents anything, and add a comment
->>> pointing to the concrete spec that has these fields.
->>>
->>> TCGTCG ACPI SpecificationFamily “1.2” and “2.0”Version 1.2,Revision 8  
->>
->> [PATCH v6 0/3] vTPM/aarch64 ACPI support was posted.
->>
->> As documented in the cover letter (history log), the presence of the
->> LAML and LASA fields in the TPM2 table is not clearly documented in the
->> spec (at least I failed to find it). It is for TPM 1.2. On the other
->> hand, Stefan said it is mandated for some x86 BIOS to work. Given this
->> weirdness I think keeping the  Acpi20TPM2 struct is not too bad. See v6 ...
-> 
-> Laszlo pointed to spec version where LAML/LASA in TPM2 are documented,
-> so I'd just use that as a spec this code is based on.
+On Mon, Jun 22, 2020 at 8:20 PM Anup Patel <Anup.Patel@wdc.com> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Bin Meng <bmeng.cn@gmail.com>
+> > Sent: 22 June 2020 17:43
+> > To: Anup Patel <Anup.Patel@wdc.com>
+> > Cc: Alistair Francis <Alistair.Francis@wdc.com>; Bastian Koppelmann
+> > <kbastian@mail.uni-paderborn.de>; Palmer Dabbelt
+> > <palmerdabbelt@google.com>; Sagar Karandikar
+> > <sagark@eecs.berkeley.edu>; qemu-devel@nongnu.org; qemu-
+> > riscv@nongnu.org; Anup Patel <anup@brainfault.org>; Bin Meng
+> > <bin.meng@windriver.com>
+> > Subject: Re: [PATCH v2 0/7] riscv: Switch to use generic platform of opensbi
+> > bios images
+> >
+> > Hi Anup,
+> >
+> > On Mon, Jun 22, 2020 at 6:09 PM Anup Patel <Anup.Patel@wdc.com> wrote:
+> > >
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Qemu-riscv <qemu-riscv-
+> > > > bounces+anup.patel=wdc.com@nongnu.org> On Behalf Of Bin Meng
+> > > > Sent: 22 June 2020 12:03
+> > > > To: Alistair Francis <Alistair.Francis@wdc.com>; Bastian Koppelmann
+> > > > <kbastian@mail.uni-paderborn.de>; Palmer Dabbelt
+> > > > <palmerdabbelt@google.com>; Sagar Karandikar
+> > > > <sagark@eecs.berkeley.edu>; qemu-devel@nongnu.org; qemu-
+> > > > riscv@nongnu.org
+> > > > Cc: Anup Patel <anup@brainfault.org>; Bin Meng
+> > > > <bin.meng@windriver.com>
+> > > > Subject: [PATCH v2 0/7] riscv: Switch to use generic platform of
+> > > > opensbi bios images
+> > > >
+> > > > From: Bin Meng <bin.meng@windriver.com>
+> > > >
+> > > > The RISC-V generic platform is a flattened device tree (FDT) based
+> > > > platform where all platform specific functionality is provided based
+> > > > on FDT passed by previous booting stage. The support was added in
+> > > > the upstream OpenSBI
+> > > > v0.8 release recently.
+> > > >
+> > > > This series updates QEMU to switch to use generic platform of
+> > > > opensbi bios images.
+> > > >
+> > > > The patch emails do not contain binary bits, please grab all updates
+> > > > at https://github.com/lbmeng/qemu.git bios branch.
+> > >
+> > > It will be nice to have this series updated to for fw_dynamic.bin .
+> >
+> > Do you mean we include fw_dynamic.bin for virt & sifive_u, and
+> > fw_dynamic.elf for spike?
+> >
+> > But previously we agreed to include only generic platform BIN and ELF files.
+> > See https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg00664.html
+>
+> I am suggesting to use Generic platform fw_dynamic.bin and fw_dynamic.elf
+> for QEMU virt, QEMU spike, and QEMU sifive_u machines.
 
-OK I missed that, indeed in the version the 2 fields are documented.
-https://trustedcomputinggroup.org/wp-content/uploads/TCG_ACPIGeneralSpecification_v1.20_r8.pdf
+Do you mean we replace fw_jump.bin with fw_dynamic.bin in QEMU? If
+everyone agrees this is the way to go, I can rebase this series on top
+of Atish's fw_dynamic.bin support series.
 
-in table 7:TCG Hardware Interface Description Table Format for TPM 2.0
-
-I will use that ref and remove the Acpi20TPM2 struct then.
-
-Thanks
-
-Eric
-
-> 
-> PS:
-> Acpi20TPM2 struct doesn't document anything, it's just another way to do
-> the same thing as build_appen_* calls do. Having it just adds to confusion. 
-> 
->>
->> Thanks
->>
->> Eric
->>>   
->>>>
->>>>    Stefan
->>>>  
->>>>>
->>>>> Thanks
->>>>>
->>>>> Eric    
->>>>>> )
->>>>>>
->>>>>> Thanks
->>>>>> Laszlo
->>>>>>    
->>>>  
->>>
->>>   
-> 
-
+Regards,
+Bin
 
