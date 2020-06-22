@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B38CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:41:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 435F8206EB
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1393206EB
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:41:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FT8eoR4B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435F8206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9PJbjsr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1393206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnOZ2-00082o-Er
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:40:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58884)
+	id 1jnOZb-0000OG-TP
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:41:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOXS-0005Xx-Iu
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:39:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43203
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOYW-0007Pu-5I
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:40:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46812
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOXR-0003PU-0b
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:39:14 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOYU-0003ZN-6F
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:40:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592840352;
+ s=mimecast20190719; t=1592840417;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6j1pA8flFXxKFgGD7KGcZegLUTAz9cG1BpLNQLqPNk0=;
- b=FT8eoR4BZCQ6kVFhqvMUSn/xuF3DO2G9o1PELzTp6Je7ZXhX6M9lmGenrPW128aH+SWBeb
- Lsxj4QIklWlYCsvWEdIRQyv0K3hGrXsqDpQwCEptJanUXcDzCYlpZv1O5+8JpQWmxhAN/f
- 7C2G2qt2ds9kn2DGOO0qx+dSUaQ5Qzo=
+ bh=w7ONpZZjErZHFUYN7YfFgaMMb15Ej0bi5uA6s5ZasrY=;
+ b=D9PJbjsreLOIEedqsyurz+Ru+2jOBVFRSDZf/7SlKZ7GbF+EH1zA0aPqNlCOCvIUheVpJM
+ 94ui+BzNM4fhx4fAcatVG3do1L0AgGL7DNl5YwttcPPRhV3ENSYPTUMbnrBC5Cx/ECwyf1
+ X3zEEMhX17GzjeiHVgUdkuWTZfGEqTI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-j4mNxZEmNR2FIK0oYu3SfA-1; Mon, 22 Jun 2020 11:39:10 -0400
-X-MC-Unique: j4mNxZEmNR2FIK0oYu3SfA-1
+ us-mta-446-wOAhls_zNha9fqcms68PcA-1; Mon, 22 Jun 2020 11:40:12 -0400
+X-MC-Unique: wOAhls_zNha9fqcms68PcA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C20AF1883607;
- Mon, 22 Jun 2020 15:39:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F787184D147;
+ Mon, 22 Jun 2020 15:40:10 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-13-110.pek2.redhat.com [10.72.13.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55C6171679;
- Mon, 22 Jun 2020 15:38:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8731A71679;
+ Mon, 22 Jun 2020 15:39:49 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v1 02/10] vhost_net: use the function qemu_get_peer
-Date: Mon, 22 Jun 2020 23:37:48 +0800
-Message-Id: <20200622153756.19189-3-lulu@redhat.com>
+Subject: [PATCH v1 05/10] vhost-backend: export the vhost backend helper
+Date: Mon, 22 Jun 2020 23:37:51 +0800
+Message-Id: <20200622153756.19189-6-lulu@redhat.com>
 In-Reply-To: <20200622153756.19189-1-lulu@redhat.com>
 References: <20200622153756.19189-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -69,9 +69,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:17:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,69 +104,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-user the qemu_get_peer to replace the old process
+export the helper then we can reuse them in other backend
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- hw/net/vhost_net.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ hw/virtio/vhost-backend.c         | 18 +++++++++---------
+ include/hw/virtio/vhost-backend.h | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 9 deletions(-)
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index 6b82803fa7..4096d64aaf 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-+    struct vhost_net *net;
-     int r, e, i;
-+    NetClientState *peer;
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 48905383f8..660e9e8588 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -89,7 +89,7 @@ static int vhost_kernel_scsi_get_abi_version(struct vhost_dev *dev, int *version
+     return vhost_kernel_call(dev, VHOST_SCSI_GET_ABI_VERSION, version);
+ }
  
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
-@@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
+-static int vhost_kernel_set_log_base(struct vhost_dev *dev, uint64_t base,
++int vhost_kernel_set_log_base(struct vhost_dev *dev, uint64_t base,
+                                      struct vhost_log *log)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_LOG_BASE, &base);
+@@ -101,7 +101,7 @@ static int vhost_kernel_set_mem_table(struct vhost_dev *dev,
+     return vhost_kernel_call(dev, VHOST_SET_MEM_TABLE, mem);
+ }
  
-     for (i = 0; i < total_queues; i++) {
--        struct vhost_net *net;
+-static int vhost_kernel_set_vring_addr(struct vhost_dev *dev,
++int vhost_kernel_set_vring_addr(struct vhost_dev *dev,
+                                        struct vhost_vring_addr *addr)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_VRING_ADDR, addr);
+@@ -113,31 +113,31 @@ static int vhost_kernel_set_vring_endian(struct vhost_dev *dev,
+     return vhost_kernel_call(dev, VHOST_SET_VRING_ENDIAN, ring);
+ }
  
--        net = get_vhost_net(ncs[i].peer);
-+        peer = qemu_get_peer(ncs, i);
-+        net = get_vhost_net(peer);
-         vhost_net_set_vq_index(net, i * 2);
+-static int vhost_kernel_set_vring_num(struct vhost_dev *dev,
++int vhost_kernel_set_vring_num(struct vhost_dev *dev,
+                                       struct vhost_vring_state *ring)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_VRING_NUM, ring);
+ }
  
-         /* Suppress the masking guest notifiers on vhost user
-@@ -335,15 +337,16 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
+-static int vhost_kernel_set_vring_base(struct vhost_dev *dev,
++int vhost_kernel_set_vring_base(struct vhost_dev *dev,
+                                        struct vhost_vring_state *ring)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_VRING_BASE, ring);
+ }
  
-     for (i = 0; i < total_queues; i++) {
--        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs, i);
-+        r = vhost_net_start_one(get_vhost_net(peer), dev);
+-static int vhost_kernel_get_vring_base(struct vhost_dev *dev,
++int vhost_kernel_get_vring_base(struct vhost_dev *dev,
+                                        struct vhost_vring_state *ring)
+ {
+     return vhost_kernel_call(dev, VHOST_GET_VRING_BASE, ring);
+ }
  
-         if (r < 0) {
-             goto err_start;
-         }
+-static int vhost_kernel_set_vring_kick(struct vhost_dev *dev,
++int vhost_kernel_set_vring_kick(struct vhost_dev *dev,
+                                        struct vhost_vring_file *file)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_VRING_KICK, file);
+ }
  
--        if (ncs[i].peer->vring_enable) {
-+        if (peer->vring_enable) {
-             /* restore vring enable state */
--            r = vhost_set_vring_enable(ncs[i].peer, ncs[i].peer->vring_enable);
-+            r = vhost_set_vring_enable(peer, peer->vring_enable);
+-static int vhost_kernel_set_vring_call(struct vhost_dev *dev,
++int vhost_kernel_set_vring_call(struct vhost_dev *dev,
+                                        struct vhost_vring_file *file)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_VRING_CALL, file);
+@@ -155,13 +155,13 @@ static int vhost_kernel_set_features(struct vhost_dev *dev,
+     return vhost_kernel_call(dev, VHOST_SET_FEATURES, &features);
+ }
  
-             if (r < 0) {
-                 goto err_start;
-@@ -355,7 +358,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+-static int vhost_kernel_get_features(struct vhost_dev *dev,
++int vhost_kernel_get_features(struct vhost_dev *dev,
+                                      uint64_t *features)
+ {
+     return vhost_kernel_call(dev, VHOST_GET_FEATURES, features);
+ }
  
- err_start:
-     while (--i >= 0) {
--        vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs , i);
-+        vhost_net_stop_one(get_vhost_net(peer), dev);
-     }
-     e = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
-     if (e < 0) {
+-static int vhost_kernel_set_owner(struct vhost_dev *dev)
++int vhost_kernel_set_owner(struct vhost_dev *dev)
+ {
+     return vhost_kernel_call(dev, VHOST_SET_OWNER, NULL);
+ }
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 6f6670783f..300b59c172 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -172,4 +172,32 @@ int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+ 
+ int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd);
+ 
++
++int vhost_kernel_set_log_base(struct vhost_dev *dev, uint64_t base,
++                                     struct vhost_log *log);
++
++int vhost_kernel_set_vring_addr(struct vhost_dev *dev,
++                                       struct vhost_vring_addr *addr);
++
++int vhost_kernel_set_vring_num(struct vhost_dev *dev,
++                                      struct vhost_vring_state *ring);
++
++int vhost_kernel_set_vring_base(struct vhost_dev *dev,
++                                       struct vhost_vring_state *ring);
++
++int vhost_kernel_get_vring_base(struct vhost_dev *dev,
++                                       struct vhost_vring_state *ring);
++
++int vhost_kernel_set_vring_kick(struct vhost_dev *dev,
++                                       struct vhost_vring_file *file);
++
++int vhost_kernel_set_vring_call(struct vhost_dev *dev,
++                                       struct vhost_vring_file *file);
++
++int vhost_kernel_set_owner(struct vhost_dev *dev);
++
++int vhost_kernel_get_features(struct vhost_dev *dev,
++                                     uint64_t *features);
++
++
+ #endif /* VHOST_BACKEND_H */
 -- 
 2.21.1
 
