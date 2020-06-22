@@ -2,150 +2,95 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE631C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDA2C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:34:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FE4B20720
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:32:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FE4B20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A0EF20720
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:34:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SEir2Ahm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0EF20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnNUj-00065g-BD
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38824)
+	id 1jnNWZ-0000ET-JB
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:34:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jnNQJ-0007o0-19; Mon, 22 Jun 2020 10:27:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58194)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jnNQG-0004xR-W6; Mon, 22 Jun 2020 10:27:46 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05ME2Lic190982; Mon, 22 Jun 2020 10:27:35 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31swph2j8q-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 10:27:35 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05ME2xjG193904;
- Mon, 22 Jun 2020 10:27:34 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31swph2j77-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 10:27:34 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEPFuJ010868;
- Mon, 22 Jun 2020 14:27:32 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma03fra.de.ibm.com with ESMTP id 31sa381crj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 22 Jun 2020 14:27:32 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05MERTTs65077266
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 22 Jun 2020 14:27:29 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2F3BAAE045;
- Mon, 22 Jun 2020 14:27:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6B043AE04D;
- Mon, 22 Jun 2020 14:27:28 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 22 Jun 2020 14:27:28 +0000 (GMT)
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
- dgilbert@redhat.com, frankja@linux.ibm.com
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
-Date: Mon, 22 Jun 2020 16:27:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jnNUg-0006vn-8p
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:18 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33186)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jnNUd-0005eu-Sw
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:17 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id l11so16942929wru.0
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 07:32:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yfaWvkBHiSQ15nCnLOaiCfwwNxNyBgCuiCJ/EYYdU+8=;
+ b=SEir2Ahmo7Nd8yYiRd1WY5NTq6XP8EapsZxIfXHKNxxTIH4rVqBKKe+lqTPduXe/aB
+ GJcuInCEAuGbIuxTUT5opCJYtM+gLX5EzbvZ8dpV0amp1aqGid/NT5xzD+8Fi59HZDkl
+ c5fa6gQZQN4HdR9t8Tz7XpvW/wq6BNV2pN31BrmEq9fza7BZJb/C6lPG75LI1ZAJWzzM
+ nOJV0oRsV/VCsqlpFyGN0aajuwrE7TYZGhkA3ejQUr7FRCRBArZuzScFX+ZqU/Ah8pft
+ IRvEffzjCrM/aezdP+1Qjw7FXfCr3Sc2LeLgESQSEi+kVp4yA5b666OgwJQbR703zD3C
+ ejEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=yfaWvkBHiSQ15nCnLOaiCfwwNxNyBgCuiCJ/EYYdU+8=;
+ b=DZdTIXg/HadSrWOkXeK4N+8BpYNumUfbXvvdDtkhq4EonSx4oTgxc3dzbgohVjDIfG
+ 3qnQtTgAfUaf4xbI9o/Xshond5zCVTjBgnbtQxpLgXSmTgL7D9NatCJm/x3Js3sHL+bL
+ ohxH2q9vSGQj5gToSqpJdUIJgdI7fXcLqXvTb7cQYVaI419iQDjOeZuu65lpSFmnFw5C
+ 8irrZjIbk1gvr2Z3bkzZgbXiOS+DMY6Hq7ZiK9YufIWN9+ul1qfsGo/MeUcWzQrOccrJ
+ PM/XlPiXNFba955y8miMxwarHGgPuXcWszDsH7j4LTlClpu9q6MMub9VBLs+Jq2zHHdF
+ 55Eg==
+X-Gm-Message-State: AOAM533zpFlqyadootKqoMGUF7QcNFUYeeXyQsg4i/0tQeVoV6bGpQOP
+ XvPBmQJQVTD3BbxO03NKAXUXISI4y20=
+X-Google-Smtp-Source: ABdhPJwYHQcPL2toOToigrRr178+6cFvpKM8wpnjdasMqS4n/aHvaayMXVt+USBCSt+ed5hBivo+sw==
+X-Received: by 2002:a5d:4687:: with SMTP id u7mr4093252wrq.357.1592836334123; 
+ Mon, 22 Jun 2020 07:32:14 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v20sm18654864wrb.51.2020.06.22.07.32.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 22 Jun 2020 07:32:10 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3BDB11FF91;
+ Mon, 22 Jun 2020 15:32:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 05/18] tests/vm: Add common Ubuntu python module
+Date: Mon, 22 Jun 2020 15:31:51 +0100
+Message-Id: <20200622143204.12921-6-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200622143204.12921-1-alex.bennee@linaro.org>
+References: <20200622143204.12921-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-22_07:2020-06-22,
- 2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=0
- spamscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 clxscore=1011 malwarescore=0 adultscore=0
- priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006220102
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 09:01:08
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -158,66 +103,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- david@redhat.com, cohuck@redhat.com, mdroth@linux.vnet.ibm.com,
- pasic@linux.ibm.com, Janosch Frank <frankja@linux.ibm.com>,
- qemu-s390x@nongnu.org, mst@redhat.com, qemu-ppc@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.06.20 04:05, David Gibson wrote:
-> A number of hardware platforms are implementing mechanisms whereby the
-> hypervisor does not have unfettered access to guest memory, in order
-> to mitigate the security impact of a compromised hypervisor.
-> 
-> AMD's SEV implements this with in-cpu memory encryption, and Intel has
-> its own memory encryption mechanism.  POWER has an upcoming mechanism
-> to accomplish this in a different way, using a new memory protection
-> level plus a small trusted ultravisor.  s390 also has a protected
-> execution environment.
-> 
-> The current code (committed or draft) for these features has each
-> platform's version configured entirely differently.  That doesn't seem
-> ideal for users, or particularly for management layers.
-> 
-> AMD SEV introduces a notionally generic machine option
-> "machine-encryption", but it doesn't actually cover any cases other
-> than SEV.
-> 
-> This series is a proposal to at least partially unify configuration
-> for these mechanisms, by renaming and generalizing AMD's
-> "memory-encryption" property.  It is replaced by a
-> "host-trust-limitation" property pointing to a platform specific
-> object which configures and manages the specific details.
-> 
-> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
-> can be extended to cover the Intel and s390 mechanisms as well,
-> though.
+From: Robert Foley <robert.foley@linaro.org>
 
-Let me try to summarize what I understand what you try to achieve:
-one command line parameter for all platforms that 
+Add a common Ubuntu python module and make use of
+it with the ubuntu.i386 script.
+This is preparation for adding an Ubuntu script
+ubuntu.aarch64.  Splitting out the common
+logic such as build_image() will reduce duplication.
 
-common across all platforms:
-- disable KSM
-- by default enables iommu_platform
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200601211421.1277-5-robert.foley@linaro.org>
+---
+ tests/vm/ubuntu.i386 | 46 +++++++++------------------------
+ tests/vm/ubuntuvm.py | 60 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+), 34 deletions(-)
+ create mode 100644 tests/vm/ubuntuvm.py
 
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index 24527cc78c7..5ce72610a6c 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -11,15 +11,22 @@
+ # the COPYING file in the top-level directory.
+ #
+ 
+-import os
+ import sys
+-import subprocess
+ import basevm
+-import time
++import ubuntuvm
+ 
+-class UbuntuX86VM(basevm.BaseVM):
++DEFAULT_CONFIG = {
++    'install_cmds' : "apt-get update,"\
++                     "apt-get build-dep -y qemu,"\
++                     "apt-get install -y libfdt-dev language-pack-en",
++}
++
++class UbuntuX86VM(ubuntuvm.UbuntuVM):
+     name = "ubuntu.i386"
+     arch = "i386"
++    image_link="https://cloud-images.ubuntu.com/releases/bionic/"\
++               "release-20191114/ubuntu-18.04-server-cloudimg-i386.img"
++    image_sha256="28969840626d1ea80bb249c08eef1a4533e8904aa51a327b40f37ac4b4ff04ef"
+     BUILD_SCRIPT = """
+         set -e;
+         cd $(mktemp -d);
+@@ -29,34 +36,5 @@ class UbuntuX86VM(basevm.BaseVM):
+         make --output-sync {target} -j{jobs} {verbose};
+     """
+ 
+-    def build_image(self, img):
+-        cimg = self._download_with_cache(
+-            "https://cloud-images.ubuntu.com/releases/bionic/release-20191114/ubuntu-18.04-server-cloudimg-i386.img",
+-            sha256sum="28969840626d1ea80bb249c08eef1a4533e8904aa51a327b40f37ac4b4ff04ef")
+-        img_tmp = img + ".tmp"
+-        subprocess.check_call(["cp", "-f", cimg, img_tmp])
+-        self.exec_qemu_img("resize", img_tmp, "50G")
+-        self.boot(img_tmp, extra_args = [
+-            "-device", "VGA",
+-            "-cdrom", self.gen_cloud_init_iso()
+-        ])
+-        self.wait_ssh()
+-        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+-        self.ssh_root_check("apt-get update")
+-        self.ssh_root_check("apt-get install -y cloud-initramfs-growroot")
+-        # Don't check the status in case the guest hang up too quickly
+-        self.ssh_root("sync && reboot")
+-        time.sleep(5)
+-        self.wait_ssh()
+-        # The previous update sometimes doesn't survive a reboot, so do it again
+-        self.ssh_root_check("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
+-        self.ssh_root_check("apt-get update")
+-        self.ssh_root_check("apt-get build-dep -y qemu")
+-        self.ssh_root_check("apt-get install -y libfdt-dev language-pack-en")
+-        self.ssh_root("poweroff")
+-        self.wait()
+-        os.rename(img_tmp, img)
+-        return 0
+-
+ if __name__ == "__main__":
+-    sys.exit(basevm.main(UbuntuX86VM))
++    sys.exit(basevm.main(UbuntuX86VM, DEFAULT_CONFIG))
+diff --git a/tests/vm/ubuntuvm.py b/tests/vm/ubuntuvm.py
+new file mode 100644
+index 00000000000..6689ad87aa8
+--- /dev/null
++++ b/tests/vm/ubuntuvm.py
+@@ -0,0 +1,60 @@
++#!/usr/bin/env python3
++#
++# Ubuntu VM testing library
++#
++# Copyright 2017 Red Hat Inc.
++# Copyright 2020 Linaro
++#
++# Authors:
++#  Robert Foley <robert.foley@linaro.org>
++#  Originally based on ubuntu.i386 Fam Zheng <famz@redhat.com>
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++
++import os
++import subprocess
++import basevm
++
++class UbuntuVM(basevm.BaseVM):
++
++    def __init__(self, args, config=None):
++        self.login_prompt = "ubuntu-{}-guest login:".format(self.arch)
++        basevm.BaseVM.__init__(self, args, config)
++
++    def build_image(self, img):
++        """Build an Ubuntu VM image.  The child class will
++           define the install_cmds to init the VM."""
++        os_img = self._download_with_cache(self.image_link,
++                                           sha256sum=self.image_sha256)
++        img_tmp = img + ".tmp"
++        subprocess.check_call(["cp", "-f", os_img, img_tmp])
++        self.exec_qemu_img("resize", img_tmp, "+50G")
++        ci_img = self.gen_cloud_init_iso()
++
++        self.boot(img_tmp, extra_args = [ "-device", "VGA", "-cdrom", ci_img, ])
++
++        # First command we issue is fix for slow ssh login.
++        self.wait_ssh(wait_root=True,
++                      cmd="chmod -x /etc/update-motd.d/*")
++        # Wait for cloud init to finish
++        self.wait_ssh(wait_root=True,
++                      cmd="ls /var/lib/cloud/instance/boot-finished")
++        self.ssh_root("touch /etc/cloud/cloud-init.disabled")
++        # Disable auto upgrades.
++        # We want to keep the VM system state stable.
++        self.ssh_root('sed -ie \'s/"1"/"0"/g\' '\
++                      '/etc/apt/apt.conf.d/20auto-upgrades')
++        self.ssh_root("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
++
++        # If the user chooses not to do the install phase,
++        # then we will jump right to the graceful shutdown
++        if self._config['install_cmds'] != "":
++            # Issue the install commands.
++            # This can be overriden by the user in the config .yml.
++            install_cmds = self._config['install_cmds'].split(',')
++            for cmd in install_cmds:
++                self.ssh_root(cmd)
++        self.graceful_shutdown()
++        os.rename(img_tmp, img)
++        return 0
+-- 
+2.20.1
 
-per platform:
-- setup the necessary encryption scheme when appropriate
-- block migration
--....
-
-
-The tricky part is certainly the per platform thing. For example on
-s390 we just have a cpumodel flag that provides interfaces to the guest
-to switch into protected mode via the ultravisor. This works perfectly
-fine with the host model, so no need to configure anything.  The platform
-code then disables KSM _on_switchover_ and not in general. Because the 
-guest CAN switch into protected, but it does not have to.
-
-So this feels really hard to do right. Would a virtual BoF on KVM forum
-be too late? We had a BoF on protected guests last year and that was
-valuable.
 
