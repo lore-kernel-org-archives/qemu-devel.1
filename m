@@ -2,82 +2,82 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8077DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 261D6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4087E206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1B062071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:04:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcUNwTtb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4087E206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="On6WfGCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B062071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnILQ-0002n4-8i
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41154)
+	id 1jnINh-0005gs-14
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:04:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJH-0000wq-L3
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:00:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35514
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ4-0000as-7j
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:59:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57291
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJF-0004zw-J2
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:00:11 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnIJ2-0004wZ-BB
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 04:59:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592816408;
+ s=mimecast20190719; t=1592816395;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FlCLYqnyC4KOoHC6MnLT/maL0ukmI8qUjgkm25Wbdkw=;
- b=LcUNwTtbrwkOXNVaTRa1z803kCnmYJraq1uQ3wIA5Hv1F6a458+G1kqU4PnOlYhWVmB0j/
- XvN9FkivyaKBhK+EKC4TmL2y/ZrHalVQYYPzL2vHrNrfS6vtIArzxgvoAjXkDk1wWLaLDW
- sg5ThQQNpD6+7rT/5ITC/YyZTYa2y1I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-Z3K6TjtmOGep8pyBlPD_fg-1; Mon, 22 Jun 2020 05:00:01 -0400
-X-MC-Unique: Z3K6TjtmOGep8pyBlPD_fg-1
-Received: by mail-wm1-f72.google.com with SMTP id a7so6574536wmf.1
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 02:00:01 -0700 (PDT)
+ bh=aySqTw94TJE6dGdR+I3DuxPagwCXJ7ddJdX68nA3YAI=;
+ b=On6WfGCBR2xHYLbx+20ebnkOCUqKyyxpbdVhHos2dFOMGVvYW9H9skJ2kBt544WsqILGx7
+ ElYZG5Iz+eckOjogeCGkOQv7NzgLFSjsdewb2V+6syCyfhfQM5hxULY+fuLBn5pw9M0yfR
+ m92z5sWrEpKLeN45+NeBuN0rudjEEHc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-57Im9wIIMYqVXVmzXJ5_lg-1; Mon, 22 Jun 2020 04:59:52 -0400
+X-MC-Unique: 57Im9wIIMYqVXVmzXJ5_lg-1
+Received: by mail-wm1-f70.google.com with SMTP id h25so6732829wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 01:59:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FlCLYqnyC4KOoHC6MnLT/maL0ukmI8qUjgkm25Wbdkw=;
- b=ZUXjq0S8WRPcuT3SS6TY67mltPXRbXGFSpmZaghEWQKCFjLNWPwr02mH49BsTCArPz
- NBMOSZ+kxHJc6vKrQHiOT29YSa9dldS7KFeO027rmdi+ZcUu6qp+mIuQvPuoK6o0Pgaj
- cFhHbRiNwaIKlzKxd9sJ+B7f1L8e5zyc3w/dZJYDJ3+/LO8TCg2inVU6Sc3EA6L8lETS
- ek30yTMbXzunbd1ztTPG9cT77sPwptToZUhrXxrS1DQWUXB6ILXVLeedMWnw5jeWdSR4
- Xfvad85SFEZJ3WXQhI+yjhCxrMaAiVAD3HTqPMZ2BpmQ7D+2f4NSb8PM4g7s/o3guE4P
- jyEg==
-X-Gm-Message-State: AOAM531KDPCbmUeX4KoCJ5TPsSF39lPwmWPCagGjjIMHM+7AMxTv/hmi
- WJU38ZnTIidrkxMEGP+Nni2eTBkCNxQRoAh3uS0yTUl4gVM6zNQm1AYT3SpmlZb2YOZuNIpZQUt
- AUUAgI8cSS/AVIls=
-X-Received: by 2002:a5d:4e87:: with SMTP id e7mr18548846wru.12.1592816400154; 
- Mon, 22 Jun 2020 02:00:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGTR7W5WX1HUX+v8kDUFeutnhdi8sFWaZnz8XKCfrxA36RF5Tr3Ek58dwn1EZzn9pQ54Hgxw==
-X-Received: by 2002:a5d:4e87:: with SMTP id e7mr18548821wru.12.1592816399887; 
- Mon, 22 Jun 2020 01:59:59 -0700 (PDT)
+ bh=aySqTw94TJE6dGdR+I3DuxPagwCXJ7ddJdX68nA3YAI=;
+ b=cM67Vg0redCS1sI8QnHolh8XovccgPQZ2mDudEyhDK3a03/I9TbkRZAy5SBWXIQrxK
+ jENIeOzT/6skDjqokIuTQZ3GgwQIHq9a5i1e7U9Qp78bcZXoUsZA0pekfeuaXPU2TCm5
+ nR3X1Hd46d5Hx0vl2jhSt8utAebmmhzCmUWAZ0X6CoK8MK9n5tUJkZB+uW7gZOa6n66k
+ KPbX5w8ZsBrU9lJFo1nPCupSH51kfdcl492G8lWuMtXQIlTjmk9DLWhGulotMoJnob/s
+ NBV2HmWfGfrMoEZy1WOaeDLnB3bE5iD8JKBtwLWiuXIZHaGF7ZfULetZGBcbOAdrRSq/
+ 07EQ==
+X-Gm-Message-State: AOAM530pObxdIKRrf/N54weJZ3ShroynMIMbAGSketLJrnNpGLL1SnCR
+ cixs1sgla8ND2CJKQGYvVp/L//dMz+xImMvVLg8DxNqdHTPX0yvcCXdgkx48lilCzXfd2AvJXVL
+ wzE39yNwE62ZI4yg=
+X-Received: by 2002:a5d:6a01:: with SMTP id m1mr18765409wru.115.1592816390768; 
+ Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWFzCsKQ36XkKF6tWm4lHCmGqc2UKuDfevVpxq6/Bo5DQl0tc0ko9uBP5badTYXC2rqoYKBw==
+X-Received: by 2002:a5d:6a01:: with SMTP id m1mr18765390wru.115.1592816390615; 
+ Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id y14sm15357965wma.25.2020.06.22.01.59.58
+ by smtp.gmail.com with ESMTPSA id m65sm15492287wmf.17.2020.06.22.01.59.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 01:59:59 -0700 (PDT)
+ Mon, 22 Jun 2020 01:59:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 5/8] tests/acceptance: add record/replay test for arm
-Date: Mon, 22 Jun 2020 10:59:31 +0200
-Message-Id: <20200622085934.16441-6-philmd@redhat.com>
+Subject: [PULL 3/8] tests/acceptance: add kernel record/replay test for x86_64
+Date: Mon, 22 Jun 2020 10:59:29 +0200
+Message-Id: <20200622085934.16441-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200622085934.16441-1-philmd@redhat.com>
 References: <20200622085934.16441-1-philmd@redhat.com>
@@ -97,7 +97,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,74 +121,53 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 
-This patch adds a test for record/replay of the kernel
-image boot for two different arm platforms.
+This patch adds a test for record/replay an execution of x86_64 machine.
+Execution scenario includes simple kernel boot, which allows testing
+basic hardware interaction in RR mode.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Tested-by: Philippe Mathieu-Daude <philmd@redhat.com>
-Message-Id: <159073590785.20809.17654573764167037499.stgit@pasha-ThinkPad-X280>
+Message-Id: <159073589656.20809.14010247947948822435.stgit@pasha-ThinkPad-X280>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+[PMD: Skip test_x86_64_pc on Travis-CI]
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/acceptance/replay_kernel.py | 48 +++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ tests/acceptance/replay_kernel.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-index 60559a13ad..748c780575 100644
+index 90986ca503..64956e85f1 100644
 --- a/tests/acceptance/replay_kernel.py
 +++ b/tests/acceptance/replay_kernel.py
-@@ -108,3 +108,51 @@ def test_aarch64_virt(self):
+@@ -12,6 +12,7 @@
+ import logging
+ import time
  
-         self.run_rr(kernel_path, kernel_command_line, console_pattern,
-                     args=('-cpu', 'cortex-a53'))
++from avocado import skipIf
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import archive
+ from avocado.utils import process
+@@ -71,3 +72,20 @@ def run_rr(self, kernel_path, kernel_command_line, console_pattern,
+                          False, shift, args, replay_path)
+         logger = logging.getLogger('replay')
+         logger.info('replay overhead {:.2%}'.format(t2 / t1 - 1))
 +
-+    def test_arm_virt(self):
++    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
++    def test_x86_64_pc(self):
 +        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:virt
++        :avocado: tags=arch:x86_64
++        :avocado: tags=machine:pc
 +        """
 +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora'
-+                      '/linux/releases/29/Everything/armhfp/os/images/pxeboot'
++                      '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
 +                      '/vmlinuz')
-+        kernel_hash = 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
++        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
 +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
 +
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyAMA0')
++        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
 +        console_pattern = 'VFS: Cannot open root device'
 +
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=1)
-+
-+    def test_arm_cubieboard_initrd(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:cubieboard
-+        """
-+        deb_url = ('https://apt.armbian.com/pool/main/l/'
-+                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-+        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        kernel_path = self.extract_from_deb(deb_path,
-+                                            '/boot/vmlinuz-4.20.7-sunxi')
-+        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
-+        dtb_path = self.extract_from_deb(deb_path, dtb_path)
-+        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-+                      '2eb0a73b5d5a28df3170c546ddaaa9757e1e0848/rootfs/'
-+                      'arm/rootfs-armv5.cpio.gz')
-+        initrd_hash = '2b50f1873e113523967806f4da2afe385462ff9b'
-+        initrd_path_gz = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-+        initrd_path = os.path.join(self.workdir, 'rootfs.cpio')
-+        archive.gzip_uncompress(initrd_path_gz, initrd_path)
-+
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200 '
-+                               'usbcore.nousb '
-+                               'panic=-1 noreboot')
-+        console_pattern = 'Boot successful.'
-+        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=1,
-+                    args=('-dtb', dtb_path,
-+                          '-initrd', initrd_path,
-+                          '-no-reboot'))
++        self.run_rr(kernel_path, kernel_command_line, console_pattern, shift=5)
 -- 
 2.21.3
 
