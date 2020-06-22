@@ -2,92 +2,59 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DATE_IN_PAST_03_06,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFAEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF05FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56D472073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:37:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8jyAKDX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56D472073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 80AFC2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:38:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80AFC2071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnNZY-00057F-HZ
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:37:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39896)
+	id 1jnNaF-0006GN-N5
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:38:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnNUc-0006sa-1e
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:14 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53281)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnNUX-0005eA-Pe
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:13 -0400
-Received: by mail-wm1-x342.google.com with SMTP id j18so1550025wmi.3
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 07:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=2TP59sqRa7ULiuhCAr8UN3lNhG3MyXFocIyac3d81uM=;
- b=B8jyAKDXjne3qOU/amyQVFR19dSgKlZUYG73ypDwzXxGE9m2LBUKo5ZU4TCGgOzBl+
- VsEm92bD1Vx4b3TEl1P4GBnfu0kA1yjP7u7ow0HP7cQyv9t4B5YX0022q5z/3RZkm6Ye
- pnDgp7XbdsfvcSDUA+hsH7/kJULZVhL73+YMc6nZCit4zfmP5bKfoGpiKIepqKkk90tk
- eK/2NSIMIWeFxqKgxix6gMBG1wCmguFodiD+y0RILWbFpaJMZbDXcdb+rya+mnwioAFO
- Z/0V/apq1AvnKn47ZWZsdJdl4heUzsvVo8RmthEqt5KtvbDJCC6V3TeQ9Ewzq+DkfK9q
- ywcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=2TP59sqRa7ULiuhCAr8UN3lNhG3MyXFocIyac3d81uM=;
- b=OYdnAKQztiU8MQ57TElUta6lBQJcQV73yRFjb1xI70hXDS8xsoEu0lu2xyhhnHF/Qn
- uhduJxQl4CN3kLx6Av9JufIt1QInbYkjLyS5Qdoa5H8CRoAhnF/XypT7MdUTPQcBAEjP
- BWOdP/5YfmZ+IdfTa8ZTWeGuTsR2ynuWkyuceXggC5zW5fJwi5D5hKGXacCStrC94ptW
- KjPtJYoFEb2QjaSAZuPAIymDlmiV2ttIWZffzSegeotoMfcgEgpCGKXU8V4RNoCKxrId
- +GM4qaSZna92x85KDdCNBqDaeY3k0LaD2urtrRxHMC6XdHlfOKi5Z77uYySgt/ylp3L7
- 0/yg==
-X-Gm-Message-State: AOAM530CQiJ4H/ABWu8I4SFIuGGQQuGzgI2HaI4RkjJwV8G8RUBqGJJK
- 5Aa+NRa3t0rdmtl5dqIHUhXFvA==
-X-Google-Smtp-Source: ABdhPJy2djkyIgOyrSHMTj8QFeknCEKEUaHpnWn3OxsDwfxt97iNDdc3QvZk9FKkFMSGGQBe04YShg==
-X-Received: by 2002:a1c:4e10:: with SMTP id g16mr18015641wmh.98.1592836327955; 
- Mon, 22 Jun 2020 07:32:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u4sm18570781wmb.48.2020.06.22.07.32.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 07:32:05 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B70AE1FF7E;
- Mon, 22 Jun 2020 15:32:04 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 00/18] testing/next (vm, gitlab)
-Date: Mon, 22 Jun 2020 15:31:46 +0100
-Message-Id: <20200622143204.12921-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jnNPS-0006Ff-06
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:26:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jnNPP-0004t9-Hz
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:26:53 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id C60F5C1AC;
+ Mon, 22 Jun 2020 14:26:48 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+Subject: [RFC RESEND v7 0/4] QEMU cpus.c refactoring
+Date: Mon, 22 Jun 2020 12:15:05 +0200
+Message-Id: <20200622101509.3409-1-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 06:47:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,91 +67,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- aurelien@aurel32.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Claudio Fontana <cfontana@suse.de>, Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Motivation and higher level steps:
 
-This is the current state of my testing/next queue. In brief:
+https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
 
-  - tests/vm updates for aarch64 VMs
-  - moving check-acceptance to gitlab
-  - some minor fixes going in via other trees
+MAIN OPEN POINTS:
 
-Most of tests/vm are well reviewed but I added a few clean-ups that
-need review alongside the gitlab stuff:
+* confirmation on hvf state (Roman).
 
- - .gitlab: add avocado asset caching
- - .gitlab: tag remaining jobs as builds
- - .gitlab: split fedora-misc-disabled
- - .gitlab: add acceptance testing to system builds
- - .gitignore: un-ignore .gitlab-ci.d
- - tests/docker: check for an parameters not empty string
- - tests/vm: allow us to take advantage of MTTCG
- - tests/vm: switch from optsparse to  argparse
+* missing reviewed-by for patch 4 in the series
 
-Alex Bennée (8):
-  tests/vm: switch from optsparse to  argparse
-  tests/vm: allow us to take advantage of MTTCG
-  tests/docker: check for an parameters not empty string
-  .gitignore: un-ignore .gitlab-ci.d
-  .gitlab: add acceptance testing to system builds
-  .gitlab: split fedora-misc-disabled
-  .gitlab: tag remaining jobs as builds
-  .gitlab: add avocado asset caching
+OTHER DISCUSSIONS:
 
-Philippe Mathieu-Daudé (1):
-  iotests: Fix 051 output after qdev_init_nofail() removal
+* naming of "cpus.c" and functions, more cpus_ prefix use? (Roman)
 
-Robert Foley (9):
-  tests/vm: pass args through to BaseVM's __init__
-  tests/vm: Add configuration to basevm.py
-  tests/vm: Added configuration file support
-  tests/vm: Add common Ubuntu python module
-  tests/vm: Added a new script for ubuntu.aarch64.
-  tests/vm: Added a new script for centos.aarch64.
-  tests/vm: change scripts to use self._config
-  python/qemu: Add ConsoleSocket for optional use in QEMUMachine
-  tests/vm: Add workaround to consume console
+* should we accept the addional clunkyness and overhead for each call of
+  the kick and CPU sync state for all archs/accels of putting CpusAccel
+  inside AccelClass? I would tend towards no here, but welcome further
+  opinions or data if any. (Roman)
 
- configure                         |  29 +++
- .gitignore                        |   2 +-
- .gitlab-ci.yml                    | 149 +++++++++++++-
- .travis.yml                       |  23 ---
- python/qemu/console_socket.py     | 110 ++++++++++
- python/qemu/machine.py            |  23 ++-
- tests/docker/common.rc            |   2 +-
- tests/qemu-iotests/051.pc.out     |   4 +-
- tests/vm/Makefile.include         |  22 ++
- tests/vm/aarch64vm.py             | 106 ++++++++++
- tests/vm/basevm.py                | 332 ++++++++++++++++++++++--------
- tests/vm/centos-8-aarch64.ks      |  51 +++++
- tests/vm/centos.aarch64           | 227 ++++++++++++++++++++
- tests/vm/conf_example_aarch64.yml |  51 +++++
- tests/vm/conf_example_x86.yml     |  50 +++++
- tests/vm/fedora                   |  17 +-
- tests/vm/freebsd                  |  16 +-
- tests/vm/netbsd                   |  19 +-
- tests/vm/openbsd                  |  17 +-
- tests/vm/ubuntu.aarch64           |  68 ++++++
- tests/vm/ubuntu.i386              |  46 ++---
- tests/vm/ubuntuvm.py              |  60 ++++++
- 22 files changed, 1230 insertions(+), 194 deletions(-)
- create mode 100644 python/qemu/console_socket.py
- create mode 100644 tests/vm/aarch64vm.py
- create mode 100644 tests/vm/centos-8-aarch64.ks
- create mode 100755 tests/vm/centos.aarch64
- create mode 100644 tests/vm/conf_example_aarch64.yml
- create mode 100644 tests/vm/conf_example_x86.yml
- create mode 100755 tests/vm/ubuntu.aarch64
- create mode 100644 tests/vm/ubuntuvm.py
+* should we reorder patches or moves inside patches to avoid code going
+  from cpus.c to softmmu/cpus.c and then again to softmmu/somethingelse.c ?
+  (Philippe)
+
+* some questions about headers in include/softmmu (Philippe)
+
+----
+
+v6 -> v7:
+
+* rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
+  "icount: make dma reads deterministic"
+
+----
+
+v5 -> v6:
+
+* rebased changes on top of Emilio G. Cota changes to cpus.c
+  "cpu: convert queued work to a QSIMPLEQ"
+
+* keep a pointer in cpus.c instead of a copy of CpusAccel
+  (Alex)
+
+----
+
+
+v4 -> v5: rebase on latest master
+
+* rebased changes on top of roman series to remove one of the extra states for hvf.
+  (Is the result now functional for HVF?)
+
+* rebased changes on top of icount changes and fixes to icount_configure and
+  the new shift vmstate. (Markus)
+
+v3 -> v4:
+
+* overall: added copyright headers to all files that were missing them
+  (used copyright and license of the module the stuff was extracted from).
+  For the new interface files, added SUSE LLC.
+
+* 1/4 (move softmmu only files from root):
+
+  MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
+
+* 2/4 (cpu-throttle):
+
+  MAINTAINERS (to patch 1),
+  copyright Fabrice Bellard and license from cpus.c
+
+* 3/4 (cpu-timers, icount):
+
+  - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
+
+  - break very long lines (patchew)
+
+  - add copyright SUSE LLC, GPLv2 to cpu-timers.h
+
+  - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
+    as it is lifted from cpus.c
+
+  - vl.c: in configure_accelerators bail out if icount_enabled()
+    and !tcg_enabled() as qtest does not enable icount anymore.
+
+* 4/4 (accel stuff to accel):
+
+  - add copyright SUSE LLC to files that mostly only consist of the
+    new interface. Add whatever copyright was in the accelerator code
+    if instead they mostly consist of accelerator code.
+
+  - change a comment to mention the result of the AccelClass experiment
+
+  - moved qtest accelerator into accel/qtest/ , make it like the others.
+
+  - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
+
+  - rename accel_int to cpus_accel
+
+  - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
+
+
+--------
+
+v2 -> v3:
+
+* turned into a 4 patch series, adding a first patch moving
+  softmmu code currently in top_srcdir to softmmu/
+
+* cpu-throttle: moved to softmmu/
+
+* cpu-timers, icount:
+
+  - moved to softmmu/
+
+  - fixed assumption of qtest_enabled() => icount_enabled()
+  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
+
+  Fix is in hw/core/ptimer.c,
+
+  where the artificial timeout rate limit should not be applied
+  under qtest_enabled(), in a similar way to how it is not applied
+  for icount_enabled().
+
+* CpuAccelInterface: no change.
+
+
+--------
+
+
+v1 -> v2:
+
+* 1/3 (cpu-throttle): provide a description in the commit message
+
+* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
+  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
+
+  To do this, qtest had to be detached from icount. To this end, a
+  trivial global counter for qtest has been introduced.
+
+* 3/3 (CpuAccelInterface): provided a description.
+
+This is point 8) in that plan. The idea is to extract the unrelated parts
+in cpus, and register interfaces from each single accelerator to the main
+cpus module (cpus.c).
+
+While doing this RFC, I noticed some assumptions about Windows being
+either TCG or HAX (not considering WHPX) that might need to be revisited.
+I added a comment there.
+
+The thing builds successfully based on Linux cross-compilations for
+windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
+
+Tests run successully for tcg and kvm configurations, but did not test on
+windows or darwin.
+
+Welcome your feedback and help on this,
+
+Claudio
+
+Claudio Fontana (4):
+  softmmu: move softmmu only files from root
+  cpu-throttle: new module, extracted from cpus.c
+  cpu-timers, icount: new modules
+  cpus: extract out accel-specific code to each accel
+
+ MAINTAINERS                                  |   14 +-
+ Makefile.target                              |    7 +-
+ accel/kvm/Makefile.objs                      |    2 +
+ accel/kvm/kvm-all.c                          |   15 +-
+ accel/kvm/kvm-cpus-interface.c               |   94 ++
+ accel/kvm/kvm-cpus-interface.h               |    8 +
+ accel/qtest.c                                |   88 +-
+ accel/stubs/kvm-stub.c                       |    3 +-
+ accel/tcg/Makefile.objs                      |    1 +
+ accel/tcg/cpu-exec.c                         |   43 +-
+ accel/tcg/tcg-all.c                          |   19 +-
+ accel/tcg/tcg-cpus-interface.c               |  523 ++++++
+ accel/tcg/tcg-cpus-interface.h               |    8 +
+ accel/tcg/translate-all.c                    |    3 +-
+ cpus.c                                       | 2290 --------------------------
+ docs/replay.txt                              |    6 +-
+ exec.c                                       |    4 -
+ hw/core/cpu.c                                |    1 +
+ hw/core/ptimer.c                             |    6 +-
+ hw/i386/x86.c                                |    1 +
+ include/exec/cpu-all.h                       |    4 +
+ include/exec/exec-all.h                      |    4 +-
+ include/hw/core/cpu.h                        |   37 -
+ include/qemu/main-loop.h                     |    5 +
+ include/qemu/timer.h                         |   22 +-
+ include/sysemu/cpu-throttle.h                |   50 +
+ include/sysemu/cpu-timers.h                  |   72 +
+ include/sysemu/cpus.h                        |   44 +-
+ include/sysemu/hvf.h                         |    1 -
+ include/sysemu/hw_accel.h                    |   57 +-
+ include/sysemu/kvm.h                         |    2 +-
+ include/sysemu/qtest.h                       |    2 +
+ include/sysemu/replay.h                      |    4 +-
+ migration/migration.c                        |    1 +
+ migration/ram.c                              |    1 +
+ replay/replay.c                              |    6 +-
+ softmmu/Makefile.objs                        |   13 +
+ arch_init.c => softmmu/arch_init.c           |    0
+ balloon.c => softmmu/balloon.c               |    0
+ softmmu/cpu-throttle.c                       |  122 ++
+ softmmu/cpu-timers.c                         |  267 +++
+ softmmu/cpus.c                               |  741 +++++++++
+ softmmu/icount.c                             |  496 ++++++
+ ioport.c => softmmu/ioport.c                 |    0
+ memory.c => softmmu/memory.c                 |    0
+ memory_mapping.c => softmmu/memory_mapping.c |    0
+ qtest.c => softmmu/qtest.c                   |   34 +-
+ softmmu/timers-state.h                       |   45 +
+ softmmu/vl.c                                 |    8 +-
+ stubs/Makefile.objs                          |    4 +-
+ stubs/clock-warp.c                           |    4 +-
+ stubs/cpu-get-clock.c                        |    3 +-
+ stubs/cpu-get-icount.c                       |   21 -
+ stubs/cpu-synchronize-state.c                |   15 +
+ stubs/icount.c                               |   22 +
+ stubs/qemu-timer-notify-cb.c                 |    8 +
+ stubs/qtest.c                                |    5 +
+ target/alpha/translate.c                     |    3 +-
+ target/arm/helper.c                          |    7 +-
+ target/i386/Makefile.objs                    |    7 +-
+ target/i386/hax-all.c                        |    6 +-
+ target/i386/hax-cpus-interface.c             |   85 +
+ target/i386/hax-cpus-interface.h             |    8 +
+ target/i386/hax-i386.h                       |    2 +
+ target/i386/hax-posix.c                      |   12 +
+ target/i386/hax-windows.c                    |   20 +
+ target/i386/hvf/Makefile.objs                |    2 +-
+ target/i386/hvf/hvf-cpus-interface.c         |   92 ++
+ target/i386/hvf/hvf-cpus-interface.h         |    8 +
+ target/i386/hvf/hvf.c                        |    5 +-
+ target/i386/whpx-all.c                       |    3 +
+ target/i386/whpx-cpus-interface.c            |   96 ++
+ target/i386/whpx-cpus-interface.h            |    8 +
+ target/riscv/csr.c                           |    8 +-
+ tests/ptimer-test-stubs.c                    |    7 +-
+ tests/test-timed-average.c                   |    2 +-
+ util/main-loop.c                             |    4 +-
+ util/qemu-timer.c                            |   12 +-
+ 78 files changed, 3136 insertions(+), 2517 deletions(-)
+ create mode 100644 accel/kvm/kvm-cpus-interface.c
+ create mode 100644 accel/kvm/kvm-cpus-interface.h
+ create mode 100644 accel/tcg/tcg-cpus-interface.c
+ create mode 100644 accel/tcg/tcg-cpus-interface.h
+ delete mode 100644 cpus.c
+ create mode 100644 include/sysemu/cpu-throttle.h
+ create mode 100644 include/sysemu/cpu-timers.h
+ rename arch_init.c => softmmu/arch_init.c (100%)
+ rename balloon.c => softmmu/balloon.c (100%)
+ create mode 100644 softmmu/cpu-throttle.c
+ create mode 100644 softmmu/cpu-timers.c
+ create mode 100644 softmmu/cpus.c
+ create mode 100644 softmmu/icount.c
+ rename ioport.c => softmmu/ioport.c (100%)
+ rename memory.c => softmmu/memory.c (100%)
+ rename memory_mapping.c => softmmu/memory_mapping.c (100%)
+ rename qtest.c => softmmu/qtest.c (95%)
+ create mode 100644 softmmu/timers-state.h
+ delete mode 100644 stubs/cpu-get-icount.c
+ create mode 100644 stubs/cpu-synchronize-state.c
+ create mode 100644 stubs/icount.c
+ create mode 100644 stubs/qemu-timer-notify-cb.c
+ create mode 100644 target/i386/hax-cpus-interface.c
+ create mode 100644 target/i386/hax-cpus-interface.h
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.c
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.h
+ create mode 100644 target/i386/whpx-cpus-interface.c
+ create mode 100644 target/i386/whpx-cpus-interface.h
 
 -- 
-2.20.1
+2.16.4
 
 
