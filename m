@@ -2,108 +2,94 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D0FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 789FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:52:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8261320716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:51:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EC9020716
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:52:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBaF9EqN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8261320716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yx7xcZNQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EC9020716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnOjL-00031l-P4
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60932)
+	id 1jnOkY-0004F2-HG
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:52:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnOgQ-0000ah-LY
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:48:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42826
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jnOij-0002j6-Um
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:50:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44816
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnOgM-0005CW-PD
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:48:30 -0400
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jnOii-0005eu-1S
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:50:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592840906;
+ s=mimecast20190719; t=1592841051;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=d57/k2JCwPxn1stBr0kvmNsgwhh1ecHpLdF357Nu6o4=;
- b=QBaF9EqN9i6tepbGfCH4RI5Y3nkZMKRw0t+4oQICtxymn4O7n07JLzHWNy+CcGj6ppbrhZ
- GWwXVXwqcqNhJnCRNxPDCXVRn1PpyQ7CBVlQINvPthzvpsYUlfA1BE5QjkKhfj5F3PPGb7
- GIxiJrKJ9gwrTNDldTpp0ZTFOAkcKxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-RPud_qyQO0OQz9zV0HtmaQ-1; Mon, 22 Jun 2020 11:48:19 -0400
-X-MC-Unique: RPud_qyQO0OQz9zV0HtmaQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AD028005AD;
- Mon, 22 Jun 2020 15:48:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-85.ams2.redhat.com
- [10.36.114.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BDECA6FDD1;
- Mon, 22 Jun 2020 15:48:15 +0000 (UTC)
-Subject: Re: [PATCH 1/2] qcow2: Force preallocation with data-file-raw
-To: Nir Soffer <nsoffer@redhat.com>
-References: <20200619104012.235977-1-mreitz@redhat.com>
- <20200619104012.235977-2-mreitz@redhat.com>
- <w51eeqb9f43.fsf@maestria.local.igalia.com>
- <9c14c622-eb30-4619-d33a-b59395a397be@redhat.com>
- <w51r1u788gg.fsf@maestria.local.igalia.com>
- <2d35fdff-6230-18b9-cf99-ca72be53267f@redhat.com>
- <CAMRbyytkKjdAqH0hFiiAUEv7NeA9beC5CXx9LmBBSJd0r=5qQA@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3b4353d4-cbf1-df89-7f5f-1a1454cfe174@redhat.com>
-Date: Mon, 22 Jun 2020 17:48:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eUmD0SmFLVtA9AhJZISVPng0qT+tx3SIDalKpUzlpeU=;
+ b=Yx7xcZNQx1x0N+H+kpbaQT5KIzagiAgAn5g8tRHKx18bYsjhw1XTNOBrHqJENwhRgV+Pbr
+ bfKdMnxizlTLsRyiQe+N+9JqyZeOPnFj9Y4ra8rWBmVSeQY+CsXvxw0otnLwuAhQBUdL0t
+ y2i23jodrqoPGjg+rsD67blTST5iyLY=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-oNog-at1MYyjLm329jsvEg-1; Mon, 22 Jun 2020 11:50:34 -0400
+X-MC-Unique: oNog-at1MYyjLm329jsvEg-1
+Received: by mail-oi1-f198.google.com with SMTP id m22so8197567oih.21
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 08:50:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eUmD0SmFLVtA9AhJZISVPng0qT+tx3SIDalKpUzlpeU=;
+ b=a25cx5jjDDKZdotunoV9sYEifRvTbWQVnckFp1ag8uq9CnNhgBA5b7gFwGrzwGyY2T
+ 5wOE2gLEYOOs1CIq3EZw04wNEdxEeN+1nUa2cy9Fn6kHRZebqewsBnsSFt6BjhUUaLHl
+ PNBpKcEeV3xMviDbNwQ2fuEsPBVFbRVSsYHmBRKhk91xPK97VNM0SUdrdnlTz1T5VlY6
+ qUHgOUuLDmLuc7xOcbsNhzXYklngirhPUq7LQQdpviA+/S1uOpU1gFIuQ0KE+FYUI3ui
+ U6HioCfWJ29m43hZ7vjgBTlfWMordO9WKgjkKaPWrfXvWf7b3RbUAwbxAtTZTLVrwSRn
+ Mseg==
+X-Gm-Message-State: AOAM533I/IoV1KgBANgc0RD39kPQtTknmDQtZDCh8y90ZqV95fgZhpBr
+ gNYxHJJwdtjHn4CY63L/IbL8XqzuMUHyxy4LHoluwtky20uv6R1D8WBy69hMFs6Csrlpjqc7UWi
+ r7BALrFaYlNl2xrOrfUX5U/rnjN41bdw=
+X-Received: by 2002:a05:6808:2d5:: with SMTP id
+ a21mr12496686oid.156.1592841032080; 
+ Mon, 22 Jun 2020 08:50:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdmg9qBApAcVPgRHpHcQ9hTMcGgelC3lvBTeKJMs96v7Qxzor7kqwyWCJOOldp0TLYY/BLJmTtns6Msj60Z+s=
+X-Received: by 2002:a05:6808:2d5:: with SMTP id
+ a21mr12496666oid.156.1592841031698; 
+ Mon, 22 Jun 2020 08:50:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAMRbyytkKjdAqH0hFiiAUEv7NeA9beC5CXx9LmBBSJd0r=5qQA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20200619104012.235977-1-mreitz@redhat.com>
+ <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
+ <72eb5700-faf6-22ee-69be-1e7653cf06c6@redhat.com>
+In-Reply-To: <72eb5700-faf6-22ee-69be-1e7653cf06c6@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Mon, 22 Jun 2020 18:50:14 +0300
+Message-ID: <CAMRbyyu+tkhZLJXKiuDRxRixZqsXgzQ3GzgcnP0pXN2-r6Xagw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] qcow2: Force preallocation with data-file-raw
+To: Max Reitz <mreitz@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="h80jyoe7vcqva2Bashz0CytxRRbcXEp03"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=nsoffer@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,7 +97,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,180 +110,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---h80jyoe7vcqva2Bashz0CytxRRbcXEp03
-Content-Type: multipart/mixed; boundary="ySLDnbZaK4JkW03nut6kObhS5qIYc3NkH"
+On Mon, Jun 22, 2020 at 12:47 PM Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 22.06.20 00:25, Nir Soffer wrote:
+> > On Fri, Jun 19, 2020 at 1:40 PM Max Reitz <mreitz@redhat.com> wrote:
+> >>
+> >> Hi,
+> >>
+> >> As discussed here:
+> >>
+> >> https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
+> >> https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
+> >> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00240.html
+> >>
+> >> I think that qcow2 images with data-file-raw should always have
+> >> preallocated 1:1 L1/L2 tables, so that the image always looks the same
+> >> whether you respect or ignore the qcow2 metadata.
+> >
+> > I don't know the internals of qcow2 data_file, but are we really using
+> > qcow2 metadata when accessing the data file?
+>
+> Yes.
+>
+> > This may have unwanted performance consequences.
+>
+> I don=E2=80=99t think so, because in practice normal lookups of L1/L2 map=
+pings
+> generally don=E2=80=99t cost that much performance.
+>
+> > If I understand correctly, qcow2 metadata is needed only for keeping
+> > bitmaps (or maybe
+> > future extensions) for raw data file, and reading from the qcow2 image
+> > should be read
+> > directly from the raw file without any extra work.
+> >
+> > Writing to the data file should also bypass the qcow2 metadata, since t=
+he bitmap
+> > is updated in memory.
+>
+> Well, with this series, writing would no longer update the metadata at
+> least, because it would always be preallocated already.
+>
+> >>  The easiest way to
+> >> achieve that is to enforce at least metadata preallocation whenever
+> >> data-file-raw is given.
+> >
+> > But preallocation is not free, even on file systems, it can be even
+> > slow (NFS < 4.2).
+>
+> Metadata preallocation with an external data file should be the same
+> speed on every file system.  We only need to create the metadata
+> structures, which, with the default cluster size (64k) take up a bit
+> more than 1/8192 of the full image size.
+>
+> Sure, it=E2=80=99s not free.  But if we decide we should indeed fully ign=
+ore the
+> L1/L2 tables for data-file-raw images, the qcow2 spec must be amended.
+> As I can read it, it currently doesn=E2=80=99t say so.
+>
+> (By the way, this is not a trivial change.  Right now, data-file-raw is
+> an autoclear flag: If a version of qemu that doesn=E2=80=99t support it a=
+ccesses
+> the image, it will automatically clear the flag, but the image stays
+> valid.  If we decide to completely ignore the L1/L2 tables (i.e. not
+> even create them), then this can no longer be an autoclear flag.  We=E2=
+=80=99d
+> need a new incompatible flag.  (Because without L1/L2 tables, the image
+> becomes useless to older qemu versions.))
+>
+> > With block storage this means you need to allocate the entire image siz=
+e on
+> > storage for writing the metadata.
+> >
+> > While oVirt does not use qcow2 with data_file, having preallocated qcow=
+2
+> > will make this very hard to use, for example for 500 GiB disk we will h=
+ave to
+> > allocate 500 GiB disk for the raw data file and 500 GiB disk for the qc=
+ow2
+> > metadata disk which will be 99% unused.
+>
+> I don=E2=80=99t understand this.  When you use an external data file, the=
+ qcow2
+> file will only contain the metadata:
+>
+> $ qemu-img create -f qcow2 \
+>     -o data_file=3Dfoo.data,data_file_raw=3Don,preallocation=3Dmetadata \
+>     foo.qcow2 8G
+> Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D8589934592 data_file=3Dfoo.dat=
+a
+> data_file_raw=3Don cluster_size=3D65536 preallocation=3Dmetadata
+> lazy_refcounts=3Doff refcount_bits=3D16
+> $ ls -l foo.qcow2
+> ... 1310720 ... foo.qcow2
+> $ ls -l foo.data
+> ... 8589934592 ... foo.data
 
---ySLDnbZaK4JkW03nut6kObhS5qIYc3NkH
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+When allocating metadata in regular qcow2, need the to allocate the
+entire device
+(+ extra space for metadata overhead):
 
-On 22.06.20 17:15, Nir Soffer wrote:
-> On Mon, Jun 22, 2020 at 6:07 PM Max Reitz <mreitz@redhat.com> wrote:
->>
->> On 22.06.20 16:46, Alberto Garcia wrote:
->>> On Mon 22 Jun 2020 11:35:59 AM CEST, Max Reitz wrote:
->>>>>> +    if (qcow2_opts->data_file_raw &&
->>>>>> +        qcow2_opts->preallocation =3D=3D PREALLOC_MODE_OFF)
->>>>>> +    {
->>>>>> +        /*
->>>>>> +         * data-file-raw means that "the external data file can be
->>>>>> +         * read as a consistent standalone raw image without lookin=
-g
->>>>>> +         * at the qcow2 metadata."  It does not say that the metada=
-ta
->>>>>> +         * must be ignored, though (and the qcow2 driver in fact do=
-es
->>>>>> +         * not ignore it), so the L1/L2 tables must be present and
->>>>>> +         * give a 1:1 mapping, so you get the same result regardles=
-s
->>>>>> +         * of whether you look at the metadata or whether you ignor=
-e
->>>>>> +         * it.
->>>>>> +         */
->>>>>> +        qcow2_opts->preallocation =3D PREALLOC_MODE_METADATA;
->>>>>
->>>>> I'm not convinced by this,
->>>>
->>>> Why not?
->>>>
->>>> This is how I read the spec.  Furthermore, I see two problems that we
->>>> have right now that are fixed by this patch (namely (1) using a device
->>>> file as the external data file, which may have non-zero data at
->>>> creation; and (2) assigning a backing file at runtime must not show
->>>> the data).
->>>
->>> What happens if you first create the image (which would be preallocated
->>> with this patch), then you resize it and finally you assign the backing
->>> file? Would the resized part be preallocated?
->>
->> Good point, when resizing an image with data-file-raw we also need to
->> preallocate the L2 tables.
->>
->>>>> but your comment made me think of another possible alternative: in
->>>>> qcow2_get_cluster_offset(), if the cluster is unallocated and we are
->>>>> using a raw data file then we return _ZERO_PLAIN:
->>>>>
->>>>> --- a/block/qcow2-cluster.c
->>>>> +++ b/block/qcow2-cluster.c
->>>>> @@ -654,6 +654,10 @@ out:
->>>>>      assert(bytes_available - offset_in_cluster <=3D UINT_MAX);
->>>>>      *bytes =3D bytes_available - offset_in_cluster;
->>>>>
->>>>> +    if (type =3D=3D QCOW2_CLUSTER_UNALLOCATED && data_file_is_raw(bs=
-)) {
->>>>> +        type =3D QCOW2_CLUSTER_ZERO_PLAIN;
->>>>> +    }
->>>>> +
->>>>>      return type;
->>>>>
->>>>> You could even add a '&& bs->backing' to the condition and emit a
->>>>> warning to make it more explicit.
->>>>
->>>> No, this is wrong.  This still wouldn=E2=80=99t fix the problem of hav=
-ing a
->>>> device file as the external data file, when it already has non-zero
->>>> data during creation.  (Reading the qcow2 file would return zeroes,
->>>> but reading the device would not.)
->>>
->>> But you wouldn't fix that preallocating the metadata either, you would
->>> need to fill the device with zeroes.
->>
->> What it fixes is that reading the qcow2 image and the raw device returns
->> the same data.
->>
->> Initially, I also thought that we should initialize raw data files to be
->> zero during creation, but Eric changed my mind:
->>
->> https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00223.html
->>
->>>> I interpret the spec in that the metadata can be ignored, but it does
->>>> not need to be ignored.  So the L1/L2 tables must be 1:1 mapping of
->>>> QCOW2_CLUSTER_NORMAL entries.
->>>>
->>>> We could also choose to interpret it as =E2=80=9CWith data-file-raw, t=
-he L1/L2
->>>> tables must be ignored=E2=80=9D.  In that case, our qcow2 driver would=
- need to
->>>> be modified to indeed fully ignore the L1/L2 tables with
->>>> data-file-raw.  (I certainly don=E2=80=99t interpret the spec this way=
-, but I
->>>> suppose we could call it a bug fix and amend it.)
->>>
->>> The way I interpret it is that regardless of whether you read the data
->>> through the qcow2 file or directly from the data file you should get th=
-e
->>> same results, but how that should be reflected in the L1/L2 metadata is
->>> not specified.
->>
->> That=E2=80=99s an absolute given, but the question is what does =E2=80=
-=9Creading through
->> the qcow2 file=E2=80=9D mean.  Respecting the metadata?  Ignoring it?  S=
-omething
->> in between?
->>
->> As I noted in my reply to myself, data-file-raw is an autoclear flag.
->> That means, an old version of qemu that doesn=E2=80=99t recognize the fl=
-ag must
->> read the same data as a new version.  It follows that the the L2 tables
->> must be a 1:1 mapping.  (Or the flag can=E2=80=99t be an autoclear flag.=
-)
->=20
-> Being able to read sounds like a nice to have feature, but what about wri=
-ting?
->=20
-> I hope that the image is not writable by older versions that do not under=
-stand
-> data_file. Otherwise older qemu versions can corrupt the image silently.
+# qemu-img create -f qcow2 -o preallocation=3Dmetadata foo.qcow2 500g
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D536870912000 cluster_size=3D6553=
+6
+preallocation=3Dmetadata lazy_refcounts=3Doff refcount_bits=3D16
 
-It=E2=80=99s an autoclear flag.  That means such versions of qemu will
-automatically clear the flag.
+# qemu-img check foo.qcow2
+No errors were found on the image.
+8192000/8192000 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
+lusters
+Image end offset: 536953094144
 
-(To elaborate, there are three kinds of flags for qcow2 images:
-Incompatible flags, compatible flags, and autoclear flags.
+But I see that with metadata file we allocate much less:
 
-When qemu encounters an image with an unknown incompatible flag, it
-refuses to open the image.
+# qemu-img create -f qcow2 -o
+data_file=3Dfoo.data,data_file_raw=3Don,preallocation=3Dmetadata foo.qcow2
+500g
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D536870912000 data_file=3Dfoo.dat=
+a
+data_file_raw=3Don cluster_size=3D65536 preallocation=3Dmetadata
+lazy_refcounts=3Doff refcount_bits=3D16
 
-When it encounters an unknown compatible flag, it just ignores that flag
-(but keeps it set).
+# qemu-img check foo.qcow2
+No errors were found on the image.
+8192000/8192000 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
+lusters
+Image end offset: 65798144
 
-When it encounters an unknown autoclear flag, it will clear that flag
-and then continue as if it hadn=E2=80=99t been present.
+I tested this also with block device:
 
-So autoclear flags are useful for features that are optional, but that
-may be broken when the image is written to by versions of qemu that
-don=E2=80=99t understand them.)
+# lvcreate --size 500g --name foo.data test
+  Logical volume "foo.data" created.
 
-Max
+ lvcreate --size 128m --name foo.qcow2 test
+  Logical volume "foo.qcow2" created.
+
+# time qemu-img create -f qcow2 -o
+data_file=3D/dev/test/foo.data,data_file_raw=3Don,preallocation=3Dmetadata
+/dev/test/foo.qcow2 500g
+Formatting '/dev/test/foo.qcow2', fmt=3Dqcow2 size=3D536870912000
+data_file=3D/dev/test/foo.data data_file_raw=3Don cluster_size=3D65536
+preallocation=3Dmetadata lazy_refcounts=3Doff refcount_bits=3D16
+
+real 0m4.263s
+user 0m0.149s
+sys 0m0.387s
+
+# qemu-img info /dev/test/foo.qcow2
+image: /dev/test/foo.qcow2
+file format: qcow2
+virtual size: 500 GiB (536870912000 bytes)
+disk size: 0 B
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    data file: /dev/test/foo.data
+    data file raw: true
+    corrupt: false
+
+# qemu-img check /dev/test/foo.qcow2
+No errors were found on the image.
+8192000/8192000 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
+lusters
+Image end offset: 65798144
 
 
---ySLDnbZaK4JkW03nut6kObhS5qIYc3NkH--
+The overhead 63 MiB per 500 GiB seems reasonable and preallocating the meta=
+data
+is not that bad.
 
---h80jyoe7vcqva2Bashz0CytxRRbcXEp03
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> > I don't think that kubevirt is planning to use this either, but if
+> > they decide to use
+> > this it may be a problem for them as well when using block storage.
+> >
+> > It looks like we abuse preallocation for getting the side effect that
+> > the backing file
+> > will be rejected, instead of adding the validation rejecting backing
+> > file in this case.
+>
+> That isn=E2=80=99t the case.
+>
+> I want to use preallocation because I interpret the spec such that it
+> requires metadata preallocation.  It says when accessing a qcow2 file
+> with data-file-raw, you can ignore the L1/L2 tables.  To me, that means
+> that the L1/L2 tables must give a 1:1 mapping so that you get the same
+> result whether you interpret them or not.
 
------BEGIN PGP SIGNATURE-----
+I agree that this is reasonable, and we will be able to use this if we need=
+.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7w0r4ACgkQ9AfbAGHV
-z0C57Af/U1ZMQ2EDE0VMI1yhgSUU3msYdX7tHcFovYZq4CFVRcN3qopxQlpOsWMV
-ikohmSAh1ZQ8UzsC++DTgJyUlhZR2b4QSF5mDDadpbc6Ns7JOXpzRRJBz0Tgx4NF
-qf6K9lKzhisdWvy1rXCLfTV45avqZ+GhtiaSrG8g7TuWoS5NYZMkY9cKomrAjN/Y
-WOoyIqOlacKY6R+V+A5E259t7BizjaRBoHyAwAUkAaOSEoFQhamPgOghsfUEV56F
-OsOoHj256fVWjnFTvfHEKGCp2uRt+i0O4chiV/ttmk9KfZo0ulGIBh+4oh8qLRg7
-aPyOwx5/ftKX4L7tTP+lGt57seQhOA==
-=Nudi
------END PGP SIGNATURE-----
+Not having to allocate metadata at all and never using the 1:1 mapping
+would be even better.
 
---h80jyoe7vcqva2Bashz0CytxRRbcXEp03--
+Nir
 
 
