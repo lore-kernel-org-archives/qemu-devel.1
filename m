@@ -7,61 +7,61 @@ X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C247EC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A821CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:04:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82CBF20716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:15:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6243F2070E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:04:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="eOnxrVs+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CBF20716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="JeRILZ5N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6243F2070E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJUX-0001Z4-IN
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:15:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34110)
+	id 1jnNzV-0003RT-NF
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:04:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jnJTg-00017b-2d
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:15:00 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:23112)
+ id 1jnNyZ-0002dZ-91
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:03:11 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:55839)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jnJTc-0000ln-E0
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:14:59 -0400
+ id 1jnNyP-0003RT-8v
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:03:11 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1592820897; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1592838184; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=ExHDBc54EnszINXhUdICQZfh0klYsmrtTX/9XlNpuxI=;
- b=eOnxrVs+tG5T9NICRo64PFOZNqTYN/UhdO/80f5WqDjzTM7jZA9lmcrNsjT52lHLAUzdJWpf
- tKQqXPVtMciAtCdHhr/2C2IBP4OFnrBE0JytOZQv7kGNPbAwhpgBv5wrYNLUNxJe/9ooL5JK
- hr2xHTegMu2BaYVHCvHfI9Cpxr0=
+ Sender; bh=7OrDi4NLp+QiT4M7XQoj/xLICc0ykqBGRbaSFeqQ0jU=;
+ b=JeRILZ5NA/vzGh9YhwuTyn7rtM62WZhsHVfnq3XsLL2TSEYgYIVEBttcAdJUol91CtfcnXzW
+ 5TF7R/5IGt+h088iXPOI7og+7Ru97Mlm8oN1W2RcEs9sqpzFq6MleiBqs7hIF44QoGbLOUmW
+ yvY7WB/5jmccdtS7UOkcByfs8g0=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (69.90.74.34.bc.googleusercontent.com
- [34.74.90.69]) by smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 5ef084943a8a8b20b8d66a13 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Mon, 22 Jun 2020 10:14:44 GMT
-Date: Mon, 22 Jun 2020 10:14:42 +0000
-Message-ID: <5ef08492e64b7_2be83fb856c2b00c34739c@sidekiq-catchall-06-sv-gprd.mail>
-Subject: QEMU | Pipeline #158179489 has failed for master | 06c4cc36
+Received: from mg.gitlab.com (75.90.74.34.bc.googleusercontent.com
+ [34.74.90.75]) by smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 5ef0c81a8fe116ddd9209735 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Mon, 22 Jun 2020 15:02:50 GMT
+Date: Mon, 22 Jun 2020 15:02:50 +0000
+Message-ID: <5ef0c81a43637_461a3f9a09082964323371@sidekiq-catchall-07-sv-gprd.mail>
+Subject: QEMU | Pipeline #158813270 has failed for master | bae31bfa
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5ef08492dab1a_2be83fb856c2b00c34728f";
+ boundary="--==_mimepart_5ef0c81a36a73_461a3f9a09082964323252";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 158179489
+X-GitLab-Pipeline-Id: 158813270
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -69,7 +69,7 @@ X-Auto-Response-Suppress: All
 Received-SPF: pass client-ip=192.237.158.143;
  envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
  helo=do158-143.mg.gitlab.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:58:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 11:03:00
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -1
 X-Spam_score: -0.2
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5ef08492dab1a_2be83fb856c2b00c34728f
+----==_mimepart_5ef0c81a36a73_461a3f9a09082964323252
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,27 +111,22 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 06c4cc36 ( https://gitlab.com/qemu-project/qemu/-/commit/06c4cc36=
-60b366278bdc7bc8b6677032d7b1118c )
-Commit Message: qht: Fix threshold rate calculation
+Commit: bae31bfa ( https://gitlab.com/qemu-project/qemu/-/commit/bae31bfa=
+48b9caecee25da3d5333901a126a06b4 )
+Commit Message: Merge remote-tracking branch 'remotes/kraxel/ta...
+Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-tests/qht-...
-Commit Author: Richard Henderson ( https://gitlab.com/rth7680 )
-Committed by: Peter Maydell ( https://gitlab.com/pm215 )
-
-Pipeline #158179489 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
-8179489 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #158813270 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
+8813270 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 2 failed builds.
 
-Job #605436374 ( https://gitlab.com/qemu-project/qemu/-/jobs/605436374/ra=
+Job #605985278 ( https://gitlab.com/qemu-project/qemu/-/jobs/605985278/ra=
 w )
 
 Stage: test
 Name: build-disabled
-Trace: qemu-system-i386: falling back to tcg
-Could not access KVM kernel module: No such file or directory
-qemu-system-i386: -accel kvm: failed to initialize kvm: No such file or d=
-irectory
+Trace: qemu-system-i386: -accel kvm: failed to initialize kvm: No such fi=
+le or directory
 qemu-system-i386: falling back to tcg
   TEST    check-qtest-i386: tests/qtest/device-introspect-test
   TEST    check-qtest-i386: tests/qtest/machine-none-test
@@ -160,149 +155,151 @@ bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
   TEST    check-qtest-ppc64: tests/qtest/qmp-test
   TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
   TEST    check-qtest-ppc64: tests/qtest/qom-test
-section_end:1592820790:step_script
+  TEST    check-qtest-ppc64: tests/qtest/test-hmp
+  TEST    check-qtest-ppc64: tests/qtest/qos-test
+section_end:1592838169:step_script
 =1B[0K=1B[31;1mERROR: Job failed: execution took longer than 1h0m0s secon=
 ds
 =1B[0;m
 
-Job #603546725 ( https://gitlab.com/qemu-project/qemu/-/jobs/603546725/ra=
+Job #605985284 ( https://gitlab.com/qemu-project/qemu/-/jobs/605985284/ra=
 w )
 
 Stage: test
 Name: build-tcg-disabled
-Trace: 208      ...        [19:33:53]             ...              =
+Trace: 208      ...        [14:23:48]             ...              =
 
-208      =1B[32mpass      =1B[0m [19:33:53] [19:33:53]   0s              =
+208      =1B[32mpass      =1B[0m [14:23:48] [14:23:48]   0s              =
  =
 
-209      ...        [19:33:53]             ...              =
+209      ...        [14:23:48]             ...              =
 
-209      =1B[32mpass      =1B[0m [19:33:53] [19:33:54]   1s              =
+209      =1B[32mpass      =1B[0m [14:23:48] [14:23:48]   0s              =
  =
 
-215      ...        [19:33:54]             ...              =
+215      ...        [14:23:48]             ...              =
 
-215      =1B[32mpass      =1B[0m [19:33:54] [19:35:15]  81s              =
+215      =1B[32mpass      =1B[0m [14:23:48] [14:25:10]  81s              =
  =
 
-216      ...        [19:35:15]             ...              =
+216      ...        [14:25:10]             ...              =
 
-216      =1B[32mpass      =1B[0m [19:35:15] [19:35:19]   4s              =
+216      =1B[32mpass      =1B[0m [14:25:10] [14:25:13]   3s              =
  =
 
-218      ...        [19:35:19]             ...              =
+218      ...        [14:25:13]             ...              =
 
-218      =1B[32mpass      =1B[0m [19:35:19] [19:35:20]   1s              =
+218      =1B[32mpass      =1B[0m [14:25:13] [14:25:15]   2s              =
  =
 
-222      ...        [19:35:20]             ...              =
+222      ...        [14:25:15]             ...              =
 
-222      =1B[32mpass      =1B[0m [19:35:20] [19:35:21]   1s              =
+222      =1B[32mpass      =1B[0m [14:25:15] [14:25:15]   0s              =
  =
 
-227      ...        [19:35:21]             ...              =
+227      ...        [14:25:15]             ...              =
 
-227      =1B[32mpass      =1B[0m [19:35:21] [19:35:21]   0s              =
+227      =1B[32mpass      =1B[0m [14:25:15] [14:25:16]   1s              =
  =
 
-234      ...        [19:35:21]             ...              =
+234      ...        [14:25:16]             ...              =
 
-234      =1B[32mpass      =1B[0m [19:35:21] [19:35:22]   1s              =
+234      =1B[32mpass      =1B[0m [14:25:16] [14:25:16]   0s              =
  =
 
-246      ...        [19:35:22]             ...              =
+246      ...        [14:25:16]             ...              =
 
-246      =1B[32mpass      =1B[0m [19:35:22] [19:35:23]   1s              =
+246      =1B[32mpass      =1B[0m [14:25:16] [14:25:17]   1s              =
  =
 
-247      ...        [19:35:23]             ...              =
+247      ...        [14:25:17]             ...              =
 
-247      =1B[32mpass      =1B[0m [19:35:23] [19:35:24]   1s              =
+247      =1B[32mpass      =1B[0m [14:25:17] [14:25:18]   1s              =
  =
 
-248      ...        [19:35:24]             ...              =
+248      ...        [14:25:18]             ...              =
 
-248      =1B[32mpass      =1B[0m [19:35:24] [19:35:24]   0s              =
+248      =1B[32mpass      =1B[0m [14:25:18] [14:25:19]   1s              =
  =
 
-250      ...        [19:35:24]             ...              =
+250      ...        [14:25:19]             ...              =
 
-250      =1B[32mpass      =1B[0m [19:35:24] [19:35:25]   1s              =
+250      =1B[32mpass      =1B[0m [14:25:19] [14:25:19]   0s              =
  =
 
-254      ...        [19:35:25]             ...              =
+254      ...        [14:25:19]             ...              =
 
-254      =1B[32mpass      =1B[0m [19:35:25] [19:35:25]   0s              =
+254      =1B[32mpass      =1B[0m [14:25:19] [14:25:19]   0s              =
  =
 
-255      ...        [19:35:25]             ...              =
+255      ...        [14:25:19]             ...              =
 
-255      =1B[32mpass      =1B[0m [19:35:25] [19:35:27]   2s              =
+255      =1B[32mpass      =1B[0m [14:25:19] [14:25:21]   2s              =
  =
 
-257      ...        [19:35:27]             ...              =
+257      ...        [14:25:21]             ...              =
 
-257      =1B[32mpass      =1B[0m [19:35:27] [19:35:37]  10s              =
+257      =1B[32mpass      =1B[0m [14:25:21] [14:25:31]  10s              =
  =
 
-258      ...        [19:35:37]             ...              =
+258      ...        [14:25:31]             ...              =
 
-258      =1B[32mpass      =1B[0m [19:35:37] [19:35:38]   1s              =
+258      =1B[32mpass      =1B[0m [14:25:31] [14:25:31]   0s              =
  =
 
-260      ...        [19:35:38]             ...              =
+260      ...        [14:25:32]             ...              =
 
-260      =1B[32mpass      =1B[0m [19:35:38] [19:35:38]   0s              =
+260      =1B[32mpass      =1B[0m [14:25:32] [14:25:32]   0s              =
  =
 
-261      ...        [19:35:38]             ...              =
+261      ...        [14:25:32]             ...              =
 
-261      =1B[32mpass      =1B[0m [19:35:38] [19:36:03]  25s              =
+261      =1B[32mpass      =1B[0m [14:25:32] [14:25:57]  25s              =
  =
 
-262      ...        [19:36:03]             ...              =
+262      ...        [14:25:57]             ...              =
 
-262      =1B[32mpass      =1B[0m [19:36:03] [19:36:04]   1s              =
+262      =1B[32mpass      =1B[0m [14:25:57] [14:25:57]   0s              =
  =
 
-263      ...        [19:36:04]             ...              =
+263      ...        [14:25:57]             ...              =
 
-263      =1B[32mpass      =1B[0m [19:36:04] [19:36:06]   2s              =
+263      =1B[32mpass      =1B[0m [14:25:57] [14:26:00]   3s              =
  =
 
-264      ...        [19:36:06]             ...              =
+264      ...        [14:26:00]             ...              =
 
-264      =1B[32mpass      =1B[0m [19:36:06] [19:36:10]   4s              =
+264      =1B[32mpass      =1B[0m [14:26:00] [14:26:04]   4s              =
  =
 
-270      ...        [19:36:10]             ...              =
+270      ...        [14:26:04]             ...              =
 
-270      =1B[32mpass      =1B[0m [19:36:10] [19:36:12]   2s              =
+270      =1B[32mpass      =1B[0m [14:26:04] [14:26:06]   2s              =
  =
 
-272      ...        [19:36:12]             ...              =
+272      ...        [14:26:06]             ...              =
 
-272      =1B[32mpass      =1B[0m [19:36:12] [19:36:13]   1s              =
+272      =1B[32mpass      =1B[0m [14:26:06] [14:26:06]   0s              =
  =
 
-273      ...        [19:36:13]             ...              =
+273      ...        [14:26:06]             ...              =
 
-273      =1B[32mpass      =1B[0m [19:36:13] [19:36:13]   0s              =
+273      =1B[32mpass      =1B[0m [14:26:06] [14:26:07]   1s              =
  =
 
-277      ...        [19:36:13]             ...              =
+277      ...        [14:26:07]             ...              =
 
-277      =1B[32mpass      =1B[0m [19:36:13] [19:36:14]   1s              =
+277      =1B[32mpass      =1B[0m [14:26:07] [14:26:08]   1s              =
  =
 
-279      ...        [19:36:14]             ...              =
+279      ...        [14:26:08]             ...              =
 
-279      =1B[32mpass      =1B[0m [19:36:14] [19:36:14]   0s              =
+279      =1B[32mpass      =1B[0m [14:26:08] [14:26:08]   0s              =
  =
 
 Failures: 051
 Failed 1 of 57 iotests
-section_end:1592595388:step_script
+section_end:1592835981:step_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -314,7 +311,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5ef08492dab1a_2be83fb856c2b00c34728f
+----==_mimepart_5ef0c81a36a73_461a3f9a09082964323252
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -329,7 +326,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #158179489 has failed for master | 06c4cc36</title=
+<title>QEMU | Pipeline #158813270 has failed for master | bae31bfa</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -497,19 +494,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/06c4cc3660b36627=
-8bdc7bc8b6677032d7b1118c" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/bae31bfa48b9caec=
+ee25da3d5333901a126a06b4" style=3D"color: #3777b0; text-decoration: none;=
 ">
-06c4cc36
+bae31bfa
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-qht: Fix threshold rate calculation
-
-tests/qht-...
+Merge remote-tracking branch 'remotes/kraxel/ta...
 </div>
 </td>
 </tr>
@@ -518,38 +513,6 @@ tests/qht-...
 nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; border=
 -top-width: 1px; border-top-color: #ededed; border-top-style: solid; marg=
 in: 0; padding: 14px 0;">Commit Author</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
-nt-size: 15px; line-height: 1.4; font-weight: 500; color: #333333; width:=
- 75%; border-top-width: 1px; border-top-color: #ededed; border-top-style:=
- solid; margin: 0; padding: 14px 0 14px 5px;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
-nt-size: 15px; line-height: 1.4; padding-right: 5px;" valign=3D"middle">
-<img alt=3D"" class=3D"avatar" height=3D"24" src=3D"https://secure.gravat=
-ar.com/avatar/b725160a480d51c1f98761d799d7a682?s=3D48&amp;d=3Didenticon" =
-style=3D"display: block; border-radius: 12px; margin: -2px 0;" width=3D"2=
-4" />
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
-nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a class=3D"muted" href=3D"https://gitlab.com/rth7680" style=3D"color: #3=
-33333; text-decoration: none;">
-Richard Henderson
-</a>
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
-nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; border=
--top-width: 1px; border-top-color: #ededed; border-top-style: solid; marg=
-in: 0; padding: 14px 0;">Committed by</td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4; font-weight: 500; color: #333333; width:=
  75%; border-top-width: 1px; border-top-color: #ededed; border-top-style:=
@@ -598,9 +561,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/158179489" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/158813270" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#158179489
+#158813270
 </a>
 triggered by
 </td>
@@ -677,7 +640,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/605436374" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/605985278" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-disabled
 </a>
@@ -691,33 +654,33 @@ sans-serif; padding: 0 0 16px;">
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
 ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>qemu-syst=
-em-i386: falling back to tcg<br />Could not access KVM kernel module: No =
-such file or directory<br />qemu-system-i386: -accel kvm: failed to initi=
-alize kvm: No such file or directory<br />qemu-system-i386: falling back =
-to tcg<br />  TEST    check-qtest-i386: tests/qtest/device-introspect-tes=
-t<br />  TEST    check-qtest-i386: tests/qtest/machine-none-test<br />  T=
-EST    check-qtest-i386: tests/qtest/qmp-test<br />  TEST    check-qtest-=
-i386: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-i386: tests/qte=
-st/qom-test<br />  TEST    check-qtest-i386: tests/qtest/test-hmp<br />  =
-TEST    check-qtest-i386: tests/qtest/qos-test<br />  TEST    check-qtest=
--mips64: tests/qtest/endianness-test<br />  TEST    check-qtest-mips64: t=
-ests/qtest/display-vga-test<br />  TEST    check-qtest-mips64: tests/qtes=
-t/cdrom-test<br />  TEST    check-qtest-mips64: tests/qtest/device-intros=
-pect-test<br />  TEST    check-qtest-mips64: tests/qtest/machine-none-tes=
-t<br />  TEST    check-qtest-mips64: tests/qtest/qmp-test<br />  TEST    =
-check-qtest-mips64: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-m=
-ips64: tests/qtest/qom-test<br />  TEST    check-qtest-mips64: tests/qtes=
-t/test-hmp<br />  TEST    check-qtest-mips64: tests/qtest/qos-test<br />q=
-emu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-b=
-mc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one<b=
-r />qemu-system-ppc64: warning: machine has no BMC device. Use '-device i=
-pmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define =
-one<br />qemu-system-ppc64: warning: machine has no BMC device. Use '-dev=
-ice ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to de=
-fine one<br />  TEST    check-qtest-ppc64: tests/qtest/machine-none-test<=
-br />  TEST    check-qtest-ppc64: tests/qtest/qmp-test<br />  TEST    che=
-ck-qtest-ppc64: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-ppc64=
-: tests/qtest/qom-test<br /></span><span class=3D"term-fg-l-red term-bold=
+em-i386: -accel kvm: failed to initialize kvm: No such file or directory<=
+br />qemu-system-i386: falling back to tcg<br />  TEST    check-qtest-i38=
+6: tests/qtest/device-introspect-test<br />  TEST    check-qtest-i386: te=
+sts/qtest/machine-none-test<br />  TEST    check-qtest-i386: tests/qtest/=
+qmp-test<br />  TEST    check-qtest-i386: tests/qtest/qmp-cmd-test<br /> =
+ TEST    check-qtest-i386: tests/qtest/qom-test<br />  TEST    check-qtes=
+t-i386: tests/qtest/test-hmp<br />  TEST    check-qtest-i386: tests/qtest=
+/qos-test<br />  TEST    check-qtest-mips64: tests/qtest/endianness-test<=
+br />  TEST    check-qtest-mips64: tests/qtest/display-vga-test<br />  TE=
+ST    check-qtest-mips64: tests/qtest/cdrom-test<br />  TEST    check-qte=
+st-mips64: tests/qtest/device-introspect-test<br />  TEST    check-qtest-=
+mips64: tests/qtest/machine-none-test<br />  TEST    check-qtest-mips64: =
+tests/qtest/qmp-test<br />  TEST    check-qtest-mips64: tests/qtest/qmp-c=
+md-test<br />  TEST    check-qtest-mips64: tests/qtest/qom-test<br />  TE=
+ST    check-qtest-mips64: tests/qtest/test-hmp<br />  TEST    check-qtest=
+-mips64: tests/qtest/qos-test<br />qemu-system-ppc64: warning: machine ha=
+s no BMC device. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,=
+bmc=3Dbmc0,irq=3D10' to define one<br />qemu-system-ppc64: warning: machi=
+ne has no BMC device. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipm=
+i-bt,bmc=3Dbmc0,irq=3D10' to define one<br />qemu-system-ppc64: warning: =
+machine has no BMC device. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device is=
+a-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one<br />  TEST    check-qtest-p=
+pc64: tests/qtest/machine-none-test<br />  TEST    check-qtest-ppc64: tes=
+ts/qtest/qmp-test<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-t=
+est<br />  TEST    check-qtest-ppc64: tests/qtest/qom-test<br />  TEST   =
+ check-qtest-ppc64: tests/qtest/test-hmp<br />  TEST    check-qtest-ppc64=
+: tests/qtest/qos-test<br /></span><span class=3D"term-fg-l-red term-bold=
 ">ERROR: Job failed: execution took longer than 1h0m0s seconds<br /></spa=
 n></pre>
 </td>
@@ -748,7 +711,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/603546725" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/605985284" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-tcg-disabled
 </a>
@@ -762,110 +725,110 @@ sans-serif; padding: 0 0 16px;">
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
 ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>208      =
-...        [19:33:53]             ...              =
+...        [14:23:48]             ...              =
 
-208      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:33:53] [19:33:53]   0s               <br />209      ...        [19:33:53=
+208      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:23:48] [14:23:48]   0s               <br />209      ...        [14:23:48=
 ]             ...              =
 
-209      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:33:53] [19:33:54]   1s               <br />215      ...        [19:33:54=
+209      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:23:48] [14:23:48]   0s               <br />215      ...        [14:23:48=
 ]             ...              =
 
-215      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:33:54] [19:35:15]  81s               <br />216      ...        [19:35:15=
+215      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:23:48] [14:25:10]  81s               <br />216      ...        [14:25:10=
 ]             ...              =
 
-216      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:15] [19:35:19]   4s               <br />218      ...        [19:35:19=
+216      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:10] [14:25:13]   3s               <br />218      ...        [14:25:13=
 ]             ...              =
 
-218      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:19] [19:35:20]   1s               <br />222      ...        [19:35:20=
+218      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:13] [14:25:15]   2s               <br />222      ...        [14:25:15=
 ]             ...              =
 
-222      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:20] [19:35:21]   1s               <br />227      ...        [19:35:21=
+222      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:15] [14:25:15]   0s               <br />227      ...        [14:25:15=
 ]             ...              =
 
-227      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:21] [19:35:21]   0s               <br />234      ...        [19:35:21=
+227      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:15] [14:25:16]   1s               <br />234      ...        [14:25:16=
 ]             ...              =
 
-234      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:21] [19:35:22]   1s               <br />246      ...        [19:35:22=
+234      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:16] [14:25:16]   0s               <br />246      ...        [14:25:16=
 ]             ...              =
 
-246      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:22] [19:35:23]   1s               <br />247      ...        [19:35:23=
+246      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:16] [14:25:17]   1s               <br />247      ...        [14:25:17=
 ]             ...              =
 
-247      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:23] [19:35:24]   1s               <br />248      ...        [19:35:24=
+247      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:17] [14:25:18]   1s               <br />248      ...        [14:25:18=
 ]             ...              =
 
-248      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:24] [19:35:24]   0s               <br />250      ...        [19:35:24=
+248      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:18] [14:25:19]   1s               <br />250      ...        [14:25:19=
 ]             ...              =
 
-250      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:24] [19:35:25]   1s               <br />254      ...        [19:35:25=
+250      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:19] [14:25:19]   0s               <br />254      ...        [14:25:19=
 ]             ...              =
 
-254      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:25] [19:35:25]   0s               <br />255      ...        [19:35:25=
+254      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:19] [14:25:19]   0s               <br />255      ...        [14:25:19=
 ]             ...              =
 
-255      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:25] [19:35:27]   2s               <br />257      ...        [19:35:27=
+255      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:19] [14:25:21]   2s               <br />257      ...        [14:25:21=
 ]             ...              =
 
-257      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:27] [19:35:37]  10s               <br />258      ...        [19:35:37=
+257      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:21] [14:25:31]  10s               <br />258      ...        [14:25:31=
 ]             ...              =
 
-258      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:37] [19:35:38]   1s               <br />260      ...        [19:35:38=
+258      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:31] [14:25:31]   0s               <br />260      ...        [14:25:32=
 ]             ...              =
 
-260      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:38] [19:35:38]   0s               <br />261      ...        [19:35:38=
+260      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:32] [14:25:32]   0s               <br />261      ...        [14:25:32=
 ]             ...              =
 
-261      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:35:38] [19:36:03]  25s               <br />262      ...        [19:36:03=
+261      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:32] [14:25:57]  25s               <br />262      ...        [14:25:57=
 ]             ...              =
 
-262      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:03] [19:36:04]   1s               <br />263      ...        [19:36:04=
+262      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:57] [14:25:57]   0s               <br />263      ...        [14:25:57=
 ]             ...              =
 
-263      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:04] [19:36:06]   2s               <br />264      ...        [19:36:06=
+263      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:25:57] [14:26:00]   3s               <br />264      ...        [14:26:00=
 ]             ...              =
 
-264      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:06] [19:36:10]   4s               <br />270      ...        [19:36:10=
+264      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:00] [14:26:04]   4s               <br />270      ...        [14:26:04=
 ]             ...              =
 
-270      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:10] [19:36:12]   2s               <br />272      ...        [19:36:12=
+270      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:04] [14:26:06]   2s               <br />272      ...        [14:26:06=
 ]             ...              =
 
-272      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:12] [19:36:13]   1s               <br />273      ...        [19:36:13=
+272      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:06] [14:26:06]   0s               <br />273      ...        [14:26:06=
 ]             ...              =
 
-273      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:13] [19:36:13]   0s               <br />277      ...        [19:36:13=
+273      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:06] [14:26:07]   1s               <br />277      ...        [14:26:07=
 ]             ...              =
 
-277      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:13] [19:36:14]   1s               <br />279      ...        [19:36:14=
+277      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:07] [14:26:08]   1s               <br />279      ...        [14:26:08=
 ]             ...              =
 
-279      </span><span class=3D"term-fg-green">pass      </span><span> [19=
-:36:14] [19:36:14]   0s               <br />Failures: 051<br />Failed 1 o=
+279      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:26:08] [14:26:08]   0s               <br />Failures: 051<br />Failed 1 o=
 f 57 iotests<br /></span><span class=3D"term-fg-l-red term-bold">ERROR: J=
 ob failed: exit code 1<br /></span></pre>
 </td>
@@ -915,5 +878,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5ef08492dab1a_2be83fb856c2b00c34728f--
+----==_mimepart_5ef0c81a36a73_461a3f9a09082964323252--
 
