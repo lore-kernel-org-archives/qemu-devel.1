@@ -2,76 +2,81 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9085BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1346FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:09:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C893206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC465206E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:09:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8e3xmlX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C893206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ami9S5zS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC465206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnN8F-0005X1-KR
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:09:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60906)
+	id 1jnN8k-0006Rk-4b
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:09:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jnN5w-0001Nf-5c
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:06:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51290
+ id 1jnN6C-0001ma-O7
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:07:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60159
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jnN5t-0001LL-H5
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:06:43 -0400
+ id 1jnN6A-0001Nx-CC
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:07:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592834800;
+ s=mimecast20190719; t=1592834817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Kb4b2u2D+hDVjMK3AtOKfyuntg0TCQsTrXWQeVXOQDs=;
- b=S8e3xmlXL/ylILDhcoQa8qkDx+UWNENe1kVYgw+aaT5XOvjX8PUEn/kSyvz4ruVHO4GV6z
- sS2TbRbGjyqBjGfg2sF9/iXkRq94q+2Z81IErcGv9jhR8VI7MtoM6vTOK4rFRUq5iQ3RM7
- BjEefyEHZ0dqT5YgIcAc6hgsK4kDjfc=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AGCYoDDWC27/vDqcwRPzgnEr51neGV9WUERuFPPBHcw=;
+ b=ami9S5zSs+fDJE/E1UGQS2so2mMFcuHWQugioD12P8Ii6vRREd9B85CH+hF7LrLeyxHMcR
+ wUEz1d/Sq2T/AUh7oGVr7+hfeC/eMm5TRsBw1rxF1bkM9toO56ROQFOvWnSkLMhw+b4Z9g
+ aJnjwKj1B3cgf6cMm8scj+m/ect9Fu8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-ljpBv7fKOGq170MQPSkLAQ-1; Mon, 22 Jun 2020 10:06:36 -0400
-X-MC-Unique: ljpBv7fKOGq170MQPSkLAQ-1
+ us-mta-5-6RkE_tS-MCCz0lH8I1ureQ-1; Mon, 22 Jun 2020 10:06:55 -0400
+X-MC-Unique: 6RkE_tS-MCCz0lH8I1ureQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4B4F107ACCD;
- Mon, 22 Jun 2020 14:06:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0211801503;
+ Mon, 22 Jun 2020 14:06:53 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98F2D27CC9;
- Mon, 22 Jun 2020 14:06:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78AE02B4A6;
+ Mon, 22 Jun 2020 14:06:42 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
  mst@redhat.com, imammedo@redhat.com
-Subject: [PATCH v7 0/3] vTPM/aarch64 ACPI support
-Date: Mon, 22 Jun 2020 16:06:17 +0200
-Message-Id: <20200622140620.17229-1-eric.auger@redhat.com>
+Subject: [PATCH v7 3/3] docs/specs/tpm: ACPI boot now supported for TPM/ARM
+Date: Mon, 22 Jun 2020 16:06:20 +0200
+Message-Id: <20200622140620.17229-4-eric.auger@redhat.com>
+In-Reply-To: <20200622140620.17229-1-eric.auger@redhat.com>
+References: <20200622140620.17229-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
+Received-SPF: pass client-ip=207.211.31.120;
  envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -99,70 +104,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Those patches bring MMIO TPM TIS ACPI support in machvirt.
+ACPI boot now is supported. Let's remove the comment
+saying it is not.
 
-On ARM, the TPM2 table is added when the TPM TIS sysbus
-device is dynamically instantiated in machvirt.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ docs/specs/tpm.rst | 2 --
+ 1 file changed, 2 deletions(-)
 
-Also the TPM2 device object is described in the DSDT.
-
-Many thanks to Ard for his support.
-
-Tested with LUKS partition automatic decryption. Also
-tested with new bios-tables-test dedicated tests,
-sent separately.
-
-Best Regards
-
-Eric
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v5.0-tpm-acpi-v7
-
-History:
-
-v6 -> v7:
-- Collected Stefan and Igor's R-bs
-- Eventually removed Acpi20TPM2 struct
-- Updated the reference to the spec v1.2 rev8
-
-v5 -> v6:
-- added reference to the spec
-- add some comments about LAML and LASA fields which are
-  strangely undocumented in the spec for TPM2.0. So I kept
-  the decision to keep the Acpi20TPM2 struct for documentation
-  purpose.
-
-v4 -> v5:
-- Move of build_tpm2() in the generic acpi code was upstreamed
-  but this does not correspond to latest proposed version.
-- Rebase on top of edfcb1f21a
-
-v3 -> v4:
-- some rework in build_tpm2() as suggested by Igor
-- Restored tpm presence check in acpi_dsdt_add_tpm()
-- add the doc related patch
-
-v2 -> v3:
-- Rebase on top of Stefan's
-  "acpi: tpm: Do not build TCPA table for TPM 2"
-- brings conversion to build_append
-
-v1 -> v2:
-- move build_tpm2() in the generic code (Michael)
-- collect Stefan's R-b on 3/3
-
-Eric Auger (3):
-  acpi: Some build_tpm2() code reshape
-  arm/acpi: Add the TPM2.0 device under the DSDT
-  docs/specs/tpm: ACPI boot now supported for TPM/ARM
-
- docs/specs/tpm.rst          |  2 --
- include/hw/acpi/acpi-defs.h | 18 -------------
- hw/acpi/aml-build.c         | 51 +++++++++++++++++++++++--------------
- hw/arm/virt-acpi-build.c    | 34 +++++++++++++++++++++++++
- 4 files changed, 66 insertions(+), 39 deletions(-)
-
+diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+index 5e61238bc5..eeeb93730a 100644
+--- a/docs/specs/tpm.rst
++++ b/docs/specs/tpm.rst
+@@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
+     -drive if=pflash,format=raw,file=flash0.img,readonly \
+     -drive if=pflash,format=raw,file=flash1.img
+ 
+-  On Arm, ACPI boot with TPM is not yet supported.
+-
+ In case SeaBIOS is used as firmware, it should show the TPM menu item
+ after entering the menu with 'ESC'.
+ 
 -- 
 2.20.1
 
