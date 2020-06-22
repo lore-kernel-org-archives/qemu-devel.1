@@ -2,95 +2,70 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B4FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4168AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D342220732
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:47:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WIFkl2vj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D342220732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 134B72071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 14:47:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134B72071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnNjL-0004Ye-WE
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:47:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39998)
+	id 1jnNjh-0005b7-9u
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 10:47:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnNUj-0006yg-IL
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:21 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33404)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnNUh-0005fj-5N
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:32:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l11so16943158wru.0
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 07:32:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qDw5tmNjtaEA2MrxzXTWX9WRb/d3hDPxln94PjTXX2k=;
- b=WIFkl2vjy4nRo12cfiqpis7I8EBiDRf1kMgpIKp3Zvqw7aGIf7Cx5dgCgcvN2nBfys
- vt5JknOSKx1eUCcBq5cBrQSm70KIwbokh7Kqtu4m0BAbK9uD14LH4cbVHT9b/FpZiiJF
- FPWf+b+MwNBUuAIWiSqd5J9XWE/nbvXBZMY8xv2Ef1Uc9acoKKEkobYf4YsSHcbYKY98
- fBjpTGYEaClD7z0dwIOTyDiDDleK4XOlcXZRwJjc5fwNwqjDZPhfSb+TDI2JRnCgMW2y
- pZ947rgna5VzwZC9YBRgs4av80mUEWSkqo0czd8DjFpxrQIzDEXwikzD8G2GY4wYuK/h
- 2erw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qDw5tmNjtaEA2MrxzXTWX9WRb/d3hDPxln94PjTXX2k=;
- b=C0y9nlNKOsUuJOMCik3rEnM1sNSFbEiBSoCUB/3ZX5Ed9OJ8sHvsrMVHQ2b4NV3dZd
- sil2xAVQb2qTgqehQbiQ/K0vK7Vd1PQME4NBIxwI/vRpHPDnl0/Zf5zLUpaP5lmMNOdU
- lFFtcr4njjZiDib36vpF1BmeLa5y6MqDeWCCMp/yyCVqkbg7a2Gvwv1t06aDM0GYInwt
- zfISf2+505YntIV1vhCX2lz/e5rw4UMVm7up53LpXTC6/9qnp37psfFJ6hiuUD5NrUc/
- 4OQDCPP3lIBTvvO8sJS6rICERluD6LwPBw2r4JYugAa9T12OFGAGK0x6Gzq5i2mUsvyo
- sHJw==
-X-Gm-Message-State: AOAM531JdbeId3gVjX5mcyhGJm7A5LsiyeiI7XiJlpvSxLr/PQGMHbeI
- rb55bWPx/gEKsjZsI44GfHzHfzLQ3Ho=
-X-Google-Smtp-Source: ABdhPJy8CgEJl92OHA/lXqu7MWdUg5+8WbM1jVbLgsEQE0XFsgx+R46xTLnQ1YyJNBzqRjub5xGOSQ==
-X-Received: by 2002:a5d:4607:: with SMTP id t7mr10974843wrq.251.1592836337667; 
- Mon, 22 Jun 2020 07:32:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h2sm5654429wrw.62.2020.06.22.07.32.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 07:32:11 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 90D031FF96;
- Mon, 22 Jun 2020 15:32:05 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 08/18] tests/vm: change scripts to use self._config
-Date: Mon, 22 Jun 2020 15:31:54 +0100
-Message-Id: <20200622143204.12921-9-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200622143204.12921-1-alex.bennee@linaro.org>
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jnNfT-0007dQ-E5
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:43:27 -0400
+Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:48882)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jnNfQ-0007F8-O1
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 10:43:27 -0400
+Received: from player734.ha.ovh.net (unknown [10.110.171.212])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id CD69125A2B1
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 16:43:21 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player734.ha.ovh.net (Postfix) with ESMTPSA id 1FA7813796292;
+ Mon, 22 Jun 2020 14:43:18 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G00392a1cec4-e548-4159-80de-9f92e98c7a14,6D3CA472F13BA58F0C95800BF735BE34A93B107C)
+ smtp.auth=groug@kaod.org
+Date: Mon, 22 Jun 2020 16:43:17 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 03/22] Clean up some calls to ignore Error objects the
+ right way
+Message-ID: <20200622164317.679021ee@bahia.lan>
+In-Reply-To: <20200622104250.1404835-4-armbru@redhat.com>
+References: <20200622104250.1404835-1-armbru@redhat.com>
+ <20200622104250.1404835-4-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 14089792909325539726
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekvddgkeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepteekgeejiedvteeufeekfffhtddtgfegkeekkefgleefheejgfehtdelheeivefhnecuffhomhgrihhnpehinhgvthdrhhhoshhtnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.75.36; envelope-from=groug@kaod.org;
+ helo=2.mo3.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 10:43:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,282 +78,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- Peter Puhov <peter.puhov@linaro.org>, aurelien@aurel32.net
+Cc: "Daniel
+ P . Berrange" <berrange@redhat.com>, Jerome Forissier <jerome@forissier.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+On Mon, 22 Jun 2020 12:42:31 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-This change converts existing scripts to using for example self.ROOT_PASS,
-to self._config['root_pass'].
-We made similar changes for GUEST_USER, and GUEST_PASS.
-This allows us also to remove the change in basevm.py,
-which adds __getattr__ for backwards compatibility.
+> Receiving the error in a local variable only to free it is less clear
+> (and also less efficient) than passing NULL.  Clean up.
+> 
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Cc: Jerome Forissier <jerome@forissier.org>
+> CC: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200601211421.1277-8-robert.foley@linaro.org>
----
- tests/vm/basevm.py | 11 ++---------
- tests/vm/fedora    | 17 +++++++++--------
- tests/vm/freebsd   | 16 ++++++++--------
- tests/vm/netbsd    | 19 ++++++++++---------
- tests/vm/openbsd   | 17 +++++++++--------
- 5 files changed, 38 insertions(+), 42 deletions(-)
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 5fd66f6b26a..f716798b405 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -183,13 +183,6 @@ class BaseVM(object):
-         self.console_init(timeout=timeout)
-         self.console_wait(wait_string)
- 
--    def __getattr__(self, name):
--        # Support direct access to config by key.
--        # for example, access self._config['cpu'] by self.cpu
--        if name.lower() in self._config.keys():
--            return self._config[name.lower()]
--        return object.__getattribute__(self, name)
--
-     def _download_with_cache(self, url, sha256sum=None, sha512sum=None):
-         def check_sha256sum(fname):
-             if not sha256sum:
-@@ -239,13 +232,13 @@ class BaseVM(object):
-         return r
- 
-     def ssh(self, *cmd):
--        return self._ssh_do(self.GUEST_USER, cmd, False)
-+        return self._ssh_do(self._config["guest_user"], cmd, False)
- 
-     def ssh_root(self, *cmd):
-         return self._ssh_do("root", cmd, False)
- 
-     def ssh_check(self, *cmd):
--        self._ssh_do(self.GUEST_USER, cmd, True)
-+        self._ssh_do(self._config["guest_user"], cmd, True)
- 
-     def ssh_root_check(self, *cmd):
-         self._ssh_do("root", cmd, True)
-diff --git a/tests/vm/fedora b/tests/vm/fedora
-index a9195670f4b..b2b478fdbca 100755
---- a/tests/vm/fedora
-+++ b/tests/vm/fedora
-@@ -108,20 +108,20 @@ class FedoraVM(basevm.BaseVM):
- 
-         self.console_wait_send("7) [!] Root password",     "7\n")
-         self.console_wait("Password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait("Password (confirm):")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
- 
-         self.console_wait_send("8) [ ] User creation",     "8\n")
-         self.console_wait_send("1) [ ] Create user",       "1\n")
-         self.console_wait_send("3) User name",             "3\n")
--        self.console_wait_send("ENTER:", "%s\n" % self.GUEST_USER)
-+        self.console_wait_send("ENTER:", "%s\n" % self._config["guest_user"])
-         self.console_wait_send("4) [ ] Use password",      "4\n")
-         self.console_wait_send("5) Password",              "5\n")
-         self.console_wait("Password:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("Password (confirm):")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait_send("7) Groups",                "c\n")
- 
-         while True:
-@@ -139,7 +139,7 @@ class FedoraVM(basevm.BaseVM):
-             if good:
-                 break
-             time.sleep(10)
--            self.console_send("r\n" % self.GUEST_PASS)
-+            self.console_send("r\n" % self._config["guest_pass"])
- 
-         self.console_wait_send("'b' to begin install",     "b\n")
- 
-@@ -150,12 +150,13 @@ class FedoraVM(basevm.BaseVM):
- 
-         # setup qemu user
-         prompt = " ~]$"
--        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_ssh_init(prompt, self._config["guest_user"],
-+                                      self._config["guest_pass"])
-         self.console_wait_send(prompt, "exit\n")
- 
-         # setup root user
-         prompt = " ~]#"
--        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_ssh_init(prompt, "root", self._config["root_pass"])
-         self.console_sshd_config(prompt)
- 
-         # setup virtio-blk #1 (tarfile)
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index f87db2b126e..29252fa4a64 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -113,9 +113,9 @@ class FreeBSDVM(basevm.BaseVM):
- 
-         # post-install configuration
-         self.console_wait("New Password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait("Retype New Password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
- 
-         self.console_wait_send("Network Configuration", "\n")
-         self.console_wait_send("IPv4",                  "y")
-@@ -134,9 +134,9 @@ class FreeBSDVM(basevm.BaseVM):
-         # qemu user
-         self.console_wait_send("Add User Accounts", "y")
-         self.console_wait("Username")
--        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_send("%s\n" % self._config["guest_user"])
-         self.console_wait("Full name")
--        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_send("%s\n" % self._config["guest_user"])
-         self.console_wait_send("Uid",                   "\n")
-         self.console_wait_send("Login group",           "\n")
-         self.console_wait_send("Login group",           "\n")
-@@ -148,9 +148,9 @@ class FreeBSDVM(basevm.BaseVM):
-         self.console_wait_send("Use an empty password", "\n")
-         self.console_wait_send("Use a random password", "\n")
-         self.console_wait("Enter password:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("Enter password again:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait_send("Lock out",              "\n")
-         self.console_wait_send("OK",                    "yes\n")
-         self.console_wait_send("Add another user",      "no\n")
-@@ -164,12 +164,12 @@ class FreeBSDVM(basevm.BaseVM):
- 
-         # setup qemu user
-         prompt = "$"
--        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_ssh_init(prompt, self._config["guest_user"], self._config["guest_pass"])
-         self.console_wait_send(prompt, "exit\n")
- 
-         # setup root user
-         prompt = "root@freebsd:~ #"
--        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_ssh_init(prompt, "root", self._config["root_pass"])
-         self.console_sshd_config(prompt)
- 
-         # setup serial console
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index cdac502dad8..dc0e45c1d45 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -120,24 +120,24 @@ class NetBSDVM(basevm.BaseVM):
-         self.console_wait_send("d: Change root password",  "d\n")
-         self.console_wait_send("a: Yes",                   "a\n")
-         self.console_wait("New password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait("New password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait("Retype new password:")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
- 
-         self.console_wait_send("o: Add a user",            "o\n")
-         self.console_wait("username")
--        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("to group wheel")
-         self.console_wait_send("a: Yes",                   "a\n")
-         self.console_wait_send("a: /bin/sh",               "a\n")
-         self.console_wait("New password:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("New password:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("Retype new password:")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
- 
-         self.console_wait_send("a: Configure network",     "a\n")
-         self.console_wait_send("a: vioif0",                "a\n")
-@@ -170,12 +170,13 @@ class NetBSDVM(basevm.BaseVM):
- 
-         # setup qemu user
-         prompt = "localhost$"
--        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_ssh_init(prompt, self._config["guest_user"],
-+                                      self._config["guest_pass"])
-         self.console_wait_send(prompt, "exit\n")
- 
-         # setup root user
-         prompt = "localhost#"
--        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_ssh_init(prompt, "root", self._config["root_pass"])
-         self.console_sshd_config(prompt)
- 
-         # setup virtio-blk #1 (tarfile)
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 13e7f9a6d56..dfe633e4532 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -98,9 +98,9 @@ class OpenBSDVM(basevm.BaseVM):
-         self.console_wait_send("Which network interface", "done\n")
-         self.console_wait_send("DNS domain name",         "localnet\n")
-         self.console_wait("Password for root account")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait("Password for root account")
--        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_send("%s\n" % self._config["root_pass"])
-         self.console_wait_send("Start sshd(8)",           "yes\n")
-         self.console_wait_send("X Window System",         "\n")
-         self.console_wait_send("xenodm",                  "\n")
-@@ -108,13 +108,13 @@ class OpenBSDVM(basevm.BaseVM):
-         self.console_wait_send("Which speed",             "\n")
- 
-         self.console_wait("Setup a user")
--        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_send("%s\n" % self._config["guest_user"])
-         self.console_wait("Full name")
--        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_send("%s\n" % self._config["guest_user"])
-         self.console_wait("Password")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
-         self.console_wait("Password")
--        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_send("%s\n" % self._config["guest_pass"])
- 
-         self.console_wait_send("Allow root ssh login",    "yes\n")
-         self.console_wait_send("timezone",                "UTC\n")
-@@ -135,12 +135,13 @@ class OpenBSDVM(basevm.BaseVM):
- 
-         # setup qemu user
-         prompt = "$"
--        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_ssh_init(prompt, self._config["guest_user"],
-+                                      self._config["guest_pass"])
-         self.console_wait_send(prompt, "exit\n")
- 
-         # setup root user
-         prompt = "openbsd#"
--        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_ssh_init(prompt, "root", self._config["root_pass"])
-         self.console_sshd_config(prompt)
- 
-         # setup virtio-blk #1 (tarfile)
--- 
-2.20.1
+and
+
+Acked-by: Greg Kurz <groug@kaod.org> # for 9pfs
+
+>  chardev/char-socket.c | 6 ++----
+>  hw/9pfs/9p.c          | 6 ++----
+>  hw/arm/virt.c         | 4 +---
+>  hw/ppc/spapr_drc.c    | 4 +---
+>  ui/vnc.c              | 3 +--
+>  5 files changed, 7 insertions(+), 16 deletions(-)
+> 
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index afebeec5c3..b0cae97960 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -815,22 +815,20 @@ static void tcp_chr_tls_init(Chardev *chr)
+>  {
+>      SocketChardev *s = SOCKET_CHARDEV(chr);
+>      QIOChannelTLS *tioc;
+> -    Error *err = NULL;
+>      gchar *name;
+>  
+>      if (s->is_listen) {
+>          tioc = qio_channel_tls_new_server(
+>              s->ioc, s->tls_creds,
+>              s->tls_authz,
+> -            &err);
+> +            NULL);
+>      } else {
+>          tioc = qio_channel_tls_new_client(
+>              s->ioc, s->tls_creds,
+>              s->addr->u.inet.host,
+> -            &err);
+> +            NULL);
+>      }
+>      if (tioc == NULL) {
+> -        error_free(err);
+>          tcp_chr_disconnect(chr);
+>          return;
+>      }
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 45a788f6e6..9755fba9a9 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -1399,7 +1399,6 @@ static void coroutine_fn v9fs_attach(void *opaque)
+>      size_t offset = 7;
+>      V9fsQID qid;
+>      ssize_t err;
+> -    Error *local_err = NULL;
+>  
+>      v9fs_string_init(&uname);
+>      v9fs_string_init(&aname);
+> @@ -1437,9 +1436,8 @@ static void coroutine_fn v9fs_attach(void *opaque)
+>          error_setg(&s->migration_blocker,
+>                     "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
+>                     s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
+> -        err = migrate_add_blocker(s->migration_blocker, &local_err);
+> -        if (local_err) {
+> -            error_free(local_err);
+> +        err = migrate_add_blocker(s->migration_blocker, NULL);
+> +        if (err < 0) {
+>              error_free(s->migration_blocker);
+>              s->migration_blocker = NULL;
+>              clunk_fid(s, fid);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index caceb1e4a0..29b9d5b2e6 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -217,11 +217,9 @@ static bool cpu_type_valid(const char *cpu)
+>  
+>  static void create_kaslr_seed(VirtMachineState *vms, const char *node)
+>  {
+> -    Error *err = NULL;
+>      uint64_t seed;
+>  
+> -    if (qemu_guest_getrandom(&seed, sizeof(seed), &err)) {
+> -        error_free(err);
+> +    if (qemu_guest_getrandom(&seed, sizeof(seed), NULL)) {
+>          return;
+>      }
+>      qemu_fdt_setprop_u64(vms->fdt, node, "kaslr-seed", seed);
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 2689104295..951bcdf2c0 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -1163,16 +1163,14 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+>      drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+>  
+>      if (!drc->fdt) {
+> -        Error *local_err = NULL;
+>          void *fdt;
+>          int fdt_size;
+>  
+>          fdt = create_device_tree(&fdt_size);
+>  
+>          if (drck->dt_populate(drc, spapr, fdt, &drc->fdt_start_offset,
+> -                              &local_err)) {
+> +                              NULL)) {
+>              g_free(fdt);
+> -            error_free(local_err);
+>              rc = SPAPR_DR_CC_RESPONSE_ERROR;
+>              goto out;
+>          }
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 12a12714e1..0702a76cce 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -458,9 +458,8 @@ static VncServerInfo2List *qmp_query_server_entry(QIOChannelSocket *ioc,
+>      Error *err = NULL;
+>      SocketAddress *addr;
+>  
+> -    addr = qio_channel_socket_get_local_address(ioc, &err);
+> +    addr = qio_channel_socket_get_local_address(ioc, NULL);
+>      if (!addr) {
+> -        error_free(err);
+>          return prev;
+>      }
+>  
 
 
