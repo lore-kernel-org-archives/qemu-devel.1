@@ -6,76 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B76AC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61823C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:49:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B46E20708
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A3D3206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:49:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/j6jPaf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B46E20708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zo+ph4V5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A3D3206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJ33-0002fw-BL
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:47:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53848)
+	id 1jnJ4m-0004oE-DL
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyM-0001Yc-E7
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47439
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyV-0001x4-VI
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31368
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyI-0003v9-KI
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:38 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyL-0003xI-Hq
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592818954;
+ s=mimecast20190719; t=1592818956;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RUHJwPWCe2tvoP+H6+xUiXRwWmUIzR8hNTogSta+uJ4=;
- b=U/j6jPafYJM/6FisiEFk5WLpDpzV3ILRomPseq0aq1pyWbdyf1er1rvv9vmjLXCxX1eCQf
- WIUtp7lltRbxni+JB7YZs8ei2YPPIimlzV3SZoi8X3VLLqAnUDF+mR8XOuDA+sGpgs7g0Q
- v+30OR/LiwdoR3Hik3ea+5ZcY530ebw=
+ bh=kH+hi5yUqUayhk5cEMDm64N69EOnffyXDQvM0/Phrho=;
+ b=Zo+ph4V5cv1TjKBGgSjCkEuFylBxARyWnck9HM3a3gz68udsIOXEMxrQEqweaL73EfiY/1
+ bsGiosgWcKyDZiLZsDR2l47hfltPwlczZheg6JY6OD2Pp2LD0F6qgnfx3W3SEZS1xw2gfK
+ Vj8DCcnW5eaVvrRImpc5N60NyR+uikk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-XiXzyxaVOJic9W0HcLJHuw-1; Mon, 22 Jun 2020 05:42:32 -0400
-X-MC-Unique: XiXzyxaVOJic9W0HcLJHuw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-415-ASeyQAZQMVGO-Ta571Nqwg-1; Mon, 22 Jun 2020 05:42:32 -0400
+X-MC-Unique: ASeyQAZQMVGO-Ta571Nqwg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B3CA184D147;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95348835B41;
  Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C5CB1C94D;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39AC071683;
  Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EDBA71138478; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
+ id 020281138479; Mon, 22 Jun 2020 11:42:28 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/16] qdev: Improve netdev property override error a bit
-Date: Mon, 22 Jun 2020 11:42:21 +0200
-Message-Id: <20200622094227.1271650-11-armbru@redhat.com>
+Subject: [PATCH v2 11/16] qdev: Reject drive property override
+Date: Mon, 22 Jun 2020 11:42:22 +0200
+Message-Id: <20200622094227.1271650-12-armbru@redhat.com>
 In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
 References: <20200622094227.1271650-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,143 +95,168 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
- pbonzini@redhat.com, jsnow@redhat.com
+ qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qdev_prop_set_netdev() fails when the property already has a non-null
-value.  Seems to go back to commit 30c367ed44
-"qdev-properties-system.c: Allow vlan or netdev for -device, not
-both", v1.7.0.  Board code doesn't expect failure, and crashes:
+qdev_prop_set_drive() screws up when the property already has a
+non-null value: it neglects to release the old value.  Both the old
+and the new backend become attached to the same device.
 
-    $ qemu-system-x86_64 --nodefaults -nic user -netdev user,id=nic0 -global e1000.netdev=nic0
-    Unexpected error in error_set_from_qdev_prop_error() at /work/armbru/qemu/hw/core/qdev-properties.c:1101:
-    qemu-system-x86_64: Property 'e1000.netdev' doesn't take value '__org.qemu.nic0
-    '
-    Aborted (core dumped)
+Example (taken from iotest 172): -fda ... -drive if=none,... -global
+floppy.drive=none0.
 
--device and device_add handle the failure:
+Special case: attempting to use the same backend both times fails.
+Example (also from iotest 172): -fda ... -global floppy.drive=floppy0.
 
-    $ qemu-system-x86_64 -nodefaults -netdev user,id=net0 -netdev user,id=net1 -device e1000,netdev=net0,netdev=net1
-    qemu-system-x86_64: -device e1000,netdev=net0,netdev=net1: Property 'e1000.netdev' doesn't take value 'net1'
-    $ qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -netdev user,id=net0 -netdev user,id=net1 -global e1000.netdev=net0
-    QEMU 5.0.50 monitor - type 'help' for more information
-    (qemu) qemu-system-x86_64: warning: netdev net0 has no peer
-    qemu-system-x86_64: warning: netdev net1 has no peer
-    device_add e1000,netdev=net1
-    Error: Property 'e1000.netdev' doesn't take value 'net1'
+Yet another example: -device with multiple drive=... (but not
+device_add, which silently drops all but the last duplicate property).
 
-Perhaps netdev property override could be made to work.  Perhaps it
-should.  I'm not the right guy to figure this out.  What I can do is
-improve the error message a bit:
+Perhaps drive property override could be made to work.  Perhaps it
+should.  I can't afford the time to figure this out now.  What I can
+do is reject usage that leaves backends in unhealthy states.  For what
+it's worth, we've long done the same for netdev properties.
 
-    (qemu) device_add e1000,netdev=net1
-    Error: -global e1000.netdev=... conflicts with netdev=net1
-
-Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/hw/qdev-properties.h     |  2 ++
- hw/core/qdev-properties-system.c | 30 +++++++++++++++++++++++++++---
- hw/core/qdev-properties.c        | 17 +++++++++++++++++
- 3 files changed, 46 insertions(+), 3 deletions(-)
+ hw/core/qdev-properties-system.c |  8 +++
+ tests/qemu-iotests/172.out       | 88 ++------------------------------
+ 2 files changed, 11 insertions(+), 85 deletions(-)
 
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 5252bb6b1a..fc0b2f6b45 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -251,6 +251,8 @@ void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
- void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
- 
- void qdev_prop_register_global(GlobalProperty *prop);
-+const GlobalProperty *qdev_find_global_prop(DeviceState *dev,
-+                                            const char *name);
- int qdev_prop_check_globals(void);
- void qdev_prop_set_globals(DeviceState *dev);
- void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
 diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index 9aa80495ee..3f84309b7e 100644
+index 3f84309b7e..6b5fc59901 100644
 --- a/hw/core/qdev-properties-system.c
 +++ b/hw/core/qdev-properties-system.c
-@@ -25,6 +25,28 @@
- #include "sysemu/iothread.h"
- #include "sysemu/tpm_backend.h"
- 
-+static bool check_prop_still_unset(DeviceState *dev, const char *name,
-+                                   const void *old_val, const char *new_val,
-+                                   Error **errp)
-+{
-+    const GlobalProperty *prop = qdev_find_global_prop(dev, name);
-+
-+    if (!old_val) {
-+        return true;
-+    }
-+
-+    if (prop) {
-+        error_setg(errp, "-global %s.%s=... conflicts with %s=%s",
-+                   prop->driver, prop->property, name, new_val);
-+    } else {
-+        /* Error message is vague, but a better one would be hard */
-+        error_setg(errp, "%s=%s conflicts, and override is not implemented",
-+                   name, new_val);
-+    }
-+    return false;
-+}
-+
-+
- /* --- drive --- */
- 
- static void get_drive(Object *obj, Visitor *v, const char *name, void *opaque,
-@@ -299,14 +321,16 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
+@@ -98,6 +98,14 @@ static void set_drive_helper(Object *obj, Visitor *v, const char *name,
+         return;
      }
  
-     for (i = 0; i < queues; i++) {
--
-         if (peers[i]->peer) {
-             err = -EEXIST;
-             goto out;
-         }
- 
--        if (ncs[i]) {
--            err = -EINVAL;
-+        /*
-+         * TODO Should this really be an error?  If no, the old value
-+         * needs to be released before we store the new one.
-+         */
-+        if (!check_prop_still_unset(dev, name, ncs[i], str, errp)) {
-             goto out;
-         }
- 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index ead35d7ffd..71f8aca7c6 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -1246,6 +1246,23 @@ void qdev_prop_register_global(GlobalProperty *prop)
-     g_ptr_array_add(global_props(), prop);
- }
- 
-+const GlobalProperty *qdev_find_global_prop(DeviceState *dev,
-+                                            const char *name)
-+{
-+    GPtrArray *props = global_props();
-+    const GlobalProperty *p;
-+    int i;
-+
-+    for (i = 0; i < props->len; i++) {
-+        p = g_ptr_array_index(props, i);
-+        if (object_dynamic_cast(OBJECT(dev), p->driver)
-+            && !strcmp(p->property, name)) {
-+            return p;
-+        }
++    /*
++     * TODO Should this really be an error?  If no, the old value
++     * needs to be released before we store the new one.
++     */
++    if (!check_prop_still_unset(dev, name, *ptr, str, errp)) {
++        return;
 +    }
-+    return NULL;
-+}
 +
- int qdev_prop_check_globals(void)
- {
-     int i, ret = 0;
+     if (!*str) {
+         g_free(str);
+         *ptr = NULL;
+diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
+index 778406e4bf..cca2894af0 100644
+--- a/tests/qemu-iotests/172.out
++++ b/tests/qemu-iotests/172.out
+@@ -795,48 +795,7 @@ Use -device floppy,unit=1,drive=... instead.
+ QEMU_PROG: Floppy unit 1 is in use
+ 
+ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0
+-
+-          dev: isa-fdc, id ""
+-            iobase = 1008 (0x3f0)
+-            irq = 6 (0x6)
+-            dma = 2 (0x2)
+-            driveA = ""
+-            driveB = ""
+-            check_media_rate = true
+-            fdtypeA = "auto"
+-            fdtypeB = "auto"
+-            fallback = "288"
+-            isa irq 6
+-            bus: floppy-bus.0
+-              type floppy-bus
+-              dev: floppy, id ""
+-                unit = 0 (0x0)
+-                drive = "floppy0"
+-                logical_block_size = 512 (512 B)
+-                physical_block_size = 512 (512 B)
+-                min_io_size = 0 (0 B)
+-                opt_io_size = 0 (0 B)
+-                discard_granularity = 4294967295 (4 GiB)
+-                write-cache = "auto"
+-                share-rw = false
+-                drive-type = "144"
+-floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
+-    Attached to:      /machine/unattached/device[15]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-
+-none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
+-    Attached to:      /machine/unattached/device[15]
+-    Cache mode:       writeback
+-
+-ide1-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[22]
+-    Removable device: not locked, tray closed
+-
+-sd0: [not inserted]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
++QEMU_PROG: -global floppy.drive=... conflicts with drive=floppy0
+ 
+ 
+ === Mixing -fdX and -device ===
+@@ -1475,48 +1434,7 @@ Use -device floppy,unit=1,drive=... instead.
+ QEMU_PROG: -device floppy,drive=none1,unit=1: Floppy unit 1 is in use
+ 
+ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0 -device floppy,drive=none1,unit=0
+-
+-          dev: isa-fdc, id ""
+-            iobase = 1008 (0x3f0)
+-            irq = 6 (0x6)
+-            dma = 2 (0x2)
+-            driveA = ""
+-            driveB = ""
+-            check_media_rate = true
+-            fdtypeA = "auto"
+-            fdtypeB = "auto"
+-            fallback = "288"
+-            isa irq 6
+-            bus: floppy-bus.0
+-              type floppy-bus
+-              dev: floppy, id ""
+-                unit = 0 (0x0)
+-                drive = "none1"
+-                logical_block_size = 512 (512 B)
+-                physical_block_size = 512 (512 B)
+-                min_io_size = 0 (0 B)
+-                opt_io_size = 0 (0 B)
+-                discard_granularity = 4294967295 (4 GiB)
+-                write-cache = "auto"
+-                share-rw = false
+-                drive-type = "144"
+-none0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
+-    Attached to:      /machine/peripheral-anon/device[0]
+-    Cache mode:       writeback
+-
+-none1 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
+-    Attached to:      /machine/peripheral-anon/device[0]
+-    Removable device: not locked, tray closed
+-    Cache mode:       writeback
+-
+-ide1-cd0: [not inserted]
+-    Attached to:      /machine/unattached/device[21]
+-    Removable device: not locked, tray closed
+-
+-sd0: [not inserted]
+-    Removable device: not locked, tray closed
+-(qemu) quit
+-
++QEMU_PROG: -device floppy,drive=none1,unit=0: -global floppy.drive=... conflicts with drive=none1
+ 
+ 
+ === Attempt to use drive twice ===
+@@ -1531,7 +1449,7 @@ Testing: -fda  -device floppy,drive=floppy0
+ QEMU_PROG: -device floppy,drive=floppy0: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
+ 
+ Testing: -fda  -global floppy.drive=floppy0
+-QEMU_PROG: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
++QEMU_PROG: -global floppy.drive=... conflicts with drive=floppy0
+ 
+ Testing: -device floppy,drive=floppy0
+ QEMU_PROG: -device floppy,drive=floppy0: Property 'floppy.drive' can't find value 'floppy0'
 -- 
 2.26.2
 
