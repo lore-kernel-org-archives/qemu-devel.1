@@ -2,73 +2,90 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BCEC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C206C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BD9521532
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:50:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD9521532
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7181A25431
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7181A25431
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnGI8-0002yw-DS
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:50:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41134)
+	id 1jnGKb-0004f9-PZ
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:53:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnGHO-0002GH-DT
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:50:06 -0400
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:43544)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jnGK3-0004Fo-AM
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:52:51 -0400
+Received: from mga07.intel.com ([134.134.136.100]:60634)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnGHM-0002Hs-9i
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:50:06 -0400
-Received: from player718.ha.ovh.net (unknown [10.108.54.209])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 53A9E9689B
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 08:50:02 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-921-245.w86-210.abo.wanadoo.fr
- [86.210.152.245]) (Authenticated sender: clg@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id A1702137FE343;
- Mon, 22 Jun 2020 06:49:54 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R005d4bac214-8a1f-4a5f-a845-aac5f99c9e56,D5B34DF2F1998B4AFDB97B5973F1BB92C24DD330)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v4 6/8] hw/arm/aspeed: Describe each PCA9552 device
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200620225854.31160-1-f4bug@amsat.org>
- <20200620225854.31160-7-f4bug@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <38918d0a-272f-c05c-6a03-c6ddd8cc592e@kaod.org>
-Date: Mon, 22 Jun 2020 08:49:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200620225854.31160-7-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jnGK0-0002tw-MC
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:52:51 -0400
+IronPort-SDR: 0nbeW0z563HQIjawGqkrza5Yc4qc896ibAXO75X1S/T2ILOZP/F3BbPjbpNUrowPZHZrU+hpFD
+ LdNYGXXNyBTw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="208886117"
+X-IronPort-AV: E=Sophos;i="5.75,266,1589266800"; d="scan'208";a="208886117"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Jun 2020 23:52:43 -0700
+IronPort-SDR: /G8uJOYrLUSZBqzcak/vmkz8DTLnDtHh+3bZmKtWqRaiZZbnxHQdSdmLC2Gd60lt9a6Bp06sLX
+ n9jN5iL2BJCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,266,1589266800"; d="scan'208";a="300740537"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by fmsmga004.fm.intel.com with ESMTP; 21 Jun 2020 23:52:43 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 21 Jun 2020 23:52:42 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 22 Jun 2020 14:52:40 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Mon, 22 Jun 2020 14:52:40 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
+Thread-Topic: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
+Thread-Index: AQHWPQXUSKAMWxVp4EWHfvIjGmZAKajRXpJwgArmGoCAAXaSIA==
+Date: Mon, 22 Jun 2020 06:52:40 +0000
+Message-ID: <f02f06aa12cd406db9f681d11a2b3b47@intel.com>
+References: <20200607194611.24763-1-chen.zhang@intel.com>
+ <d1b031b8c9f241d4af843392d8091a18@intel.com> <20200617122541.GD2776@work-vm>
+In-Reply-To: <20200617122541.GD2776@work-vm>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 6095903570880990123
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekuddguddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepkefhtedufeffvedvleejgeeghedvgeeuieeufeejueeltddugeduhedvveelgfehnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpkeeirddvuddtrdduhedvrddvgeehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedukedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.43.105; envelope-from=clg@kaod.org;
- helo=5.mo69.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:50:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Received-SPF: pass client-ip=134.134.136.100;
+ envelope-from=chen.zhang@intel.com; helo=mga07.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:52:44
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,65 +98,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Corey Minyard <cminyard@mvista.com>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
-> We have 2 distinct PCA9552 devices. Set their description
-> to distinguish them when looking at the trace events.
 
-It's nice and usefull but couldn't we do the same with a QOM object name ? 
 
-C. 
+> -----Original Message-----
+> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Sent: Wednesday, June 17, 2020 8:26 PM
+> To: Zhang, Chen <chen.zhang@intel.com>
+> Cc: qemu-dev <qemu-devel@nongnu.org>; Zhang Chen
+> <zhangckid@gmail.com>; Zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Subject: Re: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
+>=20
+> * Zhang, Chen (chen.zhang@intel.com) wrote:
+> > Hi Dave,
+> >
+>=20
+> I think it's OK; I guess Zhanghailiang is going to do a pull for it?
+> One thought about the change of use of MIGRATION_STATUS_ACTIVE; I
+> think it's OK at the moment - but the migration states and the way they
+> change becomes part of the API - changing which states we use can confuse
+> management applications; since there's no libvirt support, I'll leave it =
+to
+> Zhanghailiang to know if that's OK.
 
-> 
-> Description name taken from:
-> https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/arm/aspeed.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 6b7533aeee..3d5dec4692 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -508,12 +508,15 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
->  {
->      AspeedSoCState *soc = &bmc->soc;
->      uint8_t *eeprom_buf = g_malloc0(8 * 1024);
-> +    DeviceState *dev;
->  
->      /* Bus 3: TODO bmp280@77 */
->      /* Bus 3: TODO max31785@52 */
->      /* Bus 3: TODO dps310@76 */
-> -    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), TYPE_PCA9552,
-> -                     0x60);
-> +    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
-> +    qdev_prop_set_string(dev, "description", "pca1");
-> +    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3),
-> +                          &error_fatal);
->  
->      i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423", 0x4c);
->      i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423", 0x4c);
-> @@ -528,8 +531,10 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
->  
->      smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), 0x51,
->                            eeprom_buf);
-> -    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), TYPE_PCA9552,
-> -                     0x60);
-> +    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
-> +    qdev_prop_set_string(dev, "description", "pca0");
-> +    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11),
-> +                          &error_fatal);
->      /* Bus 11: TODO ucd90160@64 */
->  }
->  
-> 
+Hi Hailiang/Dave,
+
+Current upstream libvirt can't support COLO, it looks no new issue for norm=
+al migration process.
+For the future, new COLO migration status is good for COLO enable work on l=
+ibvirt and upper layer.
+
+Thanks
+Zhang Chen
+
+>=20
+> Dave
+>=20
+>=20
+> >
+> > Thanks
+> > Zhang Chen
+> >
+> > > -----Original Message-----
+> > > From: Zhang, Chen <chen.zhang@intel.com>
+> > > Sent: Monday, June 8, 2020 3:46 AM
+> > > To: Dr . David Alan Gilbert <dgilbert@redhat.com>; qemu-dev <qemu-
+> > > devel@nongnu.org>
+> > > Cc: Zhang Chen <zhangckid@gmail.com>; Zhanghailiang
+> > > <zhang.zhanghailiang@huawei.com>; Zhang, Chen
+> <chen.zhang@intel.com>
+> > > Subject: [PATCH V3 0/3] migration/colo: Optimize COLO framework code
+> > >
+> > > From: Zhang Chen <chen.zhang@intel.com>
+> > >
+> > > This series optimize some code of COLO, please review.
+> > >
+> > > Zhang Chen (3):
+> > >   migration/colo: Optimize COLO boot code path
+> > >   migration/colo: Update checkpoint time lately
+> > >   migration/migration.c: Remove MIGRATION_STATUS_ACTIVE in
+> > >     migration_iteration_finish
+> > >
+> > >  migration/colo.c      |  7 ++-----
+> > >  migration/migration.c | 12 +++++-------
+> > >  2 files changed, 7 insertions(+), 12 deletions(-)
+> > >
+> > > --
+> > > 2.17.1
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
