@@ -2,92 +2,72 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD03FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 05:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C54BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9571124640
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 05:36:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JX1AoW6o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9571124640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1046420B80
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 06:26:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1046420B80
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnF8F-00026Q-PH
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 01:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55464)
+	id 1jnFuM-0002EC-C8
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 02:26:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jnF7Z-00017E-Bn
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 01:35:53 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33850)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jnF7X-00006q-UQ
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 01:35:53 -0400
-Received: by mail-pl1-x642.google.com with SMTP id d12so1114743ply.1
- for <qemu-devel@nongnu.org>; Sun, 21 Jun 2020 22:35:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Wqn23dWLQBVrm3Ttu4og8XpwbXOSCRZTvr72KoqoT+4=;
- b=JX1AoW6oiFbWqjH+KqqMsxKBgHkXFvAGDxOsqVuIuae/xbTC39nkSE9yAjklNnswnU
- MzzoTgP6FcnfGo3YX4JlD/ghS7WiAAhsPaRZ6oRvH9p2kgdSebzdlIuFjgcUlCRs1mFF
- 8BE4kwwCvU/AGKvI7DwC5msfAkRfWY3U6S+NvpiUMWZan+YNkQwE1AE2/2QVy/WQazNu
- zphy6jQy02ZX6H/EJh8bQM0BEqHek6DoPI0Gyp/iIo/SbqM1LzRqIGHbS2Oh6Pc9rHlO
- RrjU7u6EnA9ko+jVaaWk7pGaykFBXa55Z33WQWaFqn5GUP3KmxkdDMb1kGvsUX8qwdIP
- Q9Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Wqn23dWLQBVrm3Ttu4og8XpwbXOSCRZTvr72KoqoT+4=;
- b=uComfl9ON1en7QLpoqoEfSTWtmFBsg/FpYmxvSj6HfnKiQLzIQiWUpO/SUUGkDVftm
- zg6zUks5ky1mP2fpMme2JEfgPyQ1C6Dv8Uda0wWDxUwAYTMf3qfB4wpmCOy0FSCNZwRy
- 4WRi1pIeWZt8s44qvhcgQkjjk7cLNV4veKwK5jiZA30WxsLkpzIjf+Il9F6xHOEDfebR
- yRwZpw4RgZELmEKOvgxIaEagtnx2gtZysogh8X/axip4/56aeym6DH0hJ9tMnD3ZNuNE
- LW+CkjEBLGosSihjTgO7gimjtUuxpbPY5NWDBouOFxRYILjTDFKde2xWdsx82enpVpyj
- syAw==
-X-Gm-Message-State: AOAM531+hVNZzb0Sm2kdEqacOXmLUpNNaWUrV0lbOjxD6lnga7FOT17D
- zfZsd1HNWL+MBknyXi25LKaoV3yF
-X-Google-Smtp-Source: ABdhPJxMIipFXtrye+VIpPS87VIRhtt4VPdpHEZG6H5fDTdV6IzGr5fjcNY8gRI9ic1CeeVqz8gklg==
-X-Received: by 2002:a17:90b:4c0b:: with SMTP id
- na11mr16363830pjb.176.1592804150417; 
- Sun, 21 Jun 2020 22:35:50 -0700 (PDT)
-Received: from octofox.hsd1.ca.comcast.net
- ([2601:641:400:e00:dc59:7b7e:f4cf:4ab8])
- by smtp.gmail.com with ESMTPSA id f205sm12378740pfa.218.2020.06.21.22.35.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 21 Jun 2020 22:35:50 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/xtensa: drop gen_io_end call
-Date: Sun, 21 Jun 2020 22:35:37 -0700
-Message-Id: <20200622053537.25245-1-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnFtY-0001Io-RQ
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:25:30 -0400
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:36134)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jnFtW-0006Xk-Ap
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 02:25:28 -0400
+Received: from player761.ha.ovh.net (unknown [10.108.35.240])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 8FD8316BFCF
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 08:25:15 +0200 (CEST)
+Received: from kaod.org (lfbn-tou-1-921-245.w86-210.abo.wanadoo.fr
+ [86.210.152.245]) (Authenticated sender: clg@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id 4B3AB13982B4B;
+ Mon, 22 Jun 2020 06:25:07 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G00126b615f3-24cf-4752-9ec2-ae0a62459b26,D5B34DF2F1998B4AFDB97B5973F1BB92C24DD330)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v4 3/8] hw/misc/pca9552: Use the PCA9552_PIN_COUNT
+ definition
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200620225854.31160-1-f4bug@amsat.org>
+ <20200620225854.31160-4-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4628bf30-9b56-a470-afc2-f140690cc002@kaod.org>
+Date: Mon, 22 Jun 2020 08:25:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <20200620225854.31160-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Ovh-Tracer-Id: 5677631757440289707
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekuddguddttdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekiedrvddutddrudehvddrvdegheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.75.26; envelope-from=clg@kaod.org;
+ helo=8.mo179.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:25:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,40 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Corey Minyard <cminyard@mvista.com>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit
-ba3e7926691e ("icount: clean up cpu_can_io at the entry to the block")
-it has been unnecessary for target code to call gen_io_end() after an IO
-instruction in icount mode; it is sufficient to call gen_io_start()
-before it and to force the end of the TB.
-Remaining call in xtensa target translator is for the opcodes that may
-change IRQ state. All of them end current TB, so gen_io_end is not
-needed. Drop gen_io_end call from the xtensa target translator.
+On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
+> The current code models the PCA9552, but there are comments
+> saying the code could be easily adapted for the rest of the
+> PCA955x family.
+> Since we assume we have at most 16 pins (for the PCA9552),
+> add a definition and check the instance doesn't use more than
+> this number. This makes the code a bit safer in case other
+> PCA955x devices are added.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/translate.c | 3 ---
- 1 file changed, 3 deletions(-)
+I would introduce a PCA9552Class and move nr_leds under the class. 
 
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 4bc15252c8a5..6346b2eef014 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -595,9 +595,6 @@ static int gen_postprocess(DisasContext *dc, int slot)
-             gen_io_start();
-         }
-         gen_helper_check_interrupts(cpu_env);
--        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
--            gen_io_end();
--        }
-     }
- #endif
-     if (op_flags & XTENSA_OP_SYNC_REGISTER_WINDOW) {
--- 
-2.20.1
+C. 
+
+
+> ---
+>  hw/misc/pca9552.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+> index cfefb8fce8..b97fc2893c 100644
+> --- a/hw/misc/pca9552.c
+> +++ b/hw/misc/pca9552.c
+> @@ -303,6 +303,17 @@ static void pca9552_initfn(Object *obj)
+>      }
+>  }
+>  
+> +static void pca9552_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PCA9552State *s = PCA9552(dev);
+> +
+> +    if (s->nr_leds > PCA9552_PIN_COUNT) {
+> +        error_setg(errp, "%s invalid led count %u (max: %u)",
+> +                   __func__, s->nr_leds, PCA9552_PIN_COUNT);
+> +        return;
+> +    }
+> +}
+> +
+>  static void pca9552_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -311,6 +322,7 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
+>      k->event = pca9552_event;
+>      k->recv = pca9552_recv;
+>      k->send = pca9552_send;
+> +    dc->realize = pca9552_realize;
+>      dc->reset = pca9552_reset;
+>      dc->vmsd = &pca9552_vmstate;
+>  }
+> 
 
 
