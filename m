@@ -2,87 +2,85 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A92C5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B48C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73CE920738
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F54920738
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 17:58:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QXTD79lj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73CE920738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kptsenwb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F54920738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnQgJ-0006Mp-Pt
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 13:56:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
+	id 1jnQi4-0007lo-DY
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 13:58:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnQfi-0005rH-BW
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:55:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59581
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnQhA-0006qe-F7
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:57:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43682
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnQfg-0002Ly-Ln
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:55:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnQh8-0002Ro-1S
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 13:57:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592848551;
+ s=mimecast20190719; t=1592848641;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=mnjwY2n0UUMuclsz5CPHpJzLhWT9RFjA4K/+DESNbLg=;
- b=QXTD79ljdlFX1DwM6B79HQjMLYud9X7AhVqc/GPf/CndCMLB3Sal4KW4QRD+dySY/IUN+a
- saXTuMU5Fk1FjjTKo7/QXSGcW/Ho8Z4Z9VSMpbApdTPB/E/tfOG26hjmhOYcl9gAUZ+JQH
- a/AD0deT2HOJXShXmO71yh8tQEhZNfs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-FeLV3HsWM_WSc3FXcBtEvA-1; Mon, 22 Jun 2020 13:55:49 -0400
-X-MC-Unique: FeLV3HsWM_WSc3FXcBtEvA-1
-Received: by mail-wr1-f71.google.com with SMTP id b14so11099723wrp.0
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 10:55:49 -0700 (PDT)
+ bh=KUNTLOIEQg28i2cPiGf3dEdk6QIvKYDn6l3MKevpGq0=;
+ b=Kptsenwb9b2JyDZ2o+8QAy09+KtFGFkBLzrAFQqDYZEdepBnQ43MkyJAcPho2XWDIloXZX
+ tMZvmVoWJRo7RtHwfuEdb8TybmX0rRcKTKwaGe32eNMAPTDppaZD5oX6FCf02s79P7dOUQ
+ hH0n2espuQ6Z9IHPhVw4DeTgL8PbDdc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-ZqA4La1iNam9xSMCnzNKug-1; Mon, 22 Jun 2020 13:57:19 -0400
+X-MC-Unique: ZqA4La1iNam9xSMCnzNKug-1
+Received: by mail-wm1-f70.google.com with SMTP id 23so258225wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 10:57:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=mnjwY2n0UUMuclsz5CPHpJzLhWT9RFjA4K/+DESNbLg=;
- b=rkSBR7YyliWDeJSp9X9xAFLlFNdsB4RNS2M54m7sn+4gYXSI27e+RSdbXXbGoQi9a8
- 8V17Gpm0wZtrjX8XyLjADn+CJuBfgIbkyexrjSH0rF41nKm5eAk0S4vSUxhbPXIv6RRh
- cxSy3qg4DQrqL9+94xP2SkYV1sw33J7j8c8iko+5ZEToOBStDsBEKGVbOGYKIdAxTw9a
- 3FhYr715QfnzRzNd4azB64dpZoe5Q6RTit+C1Ortzw7WejznjQIYPh7fFDihjYa12XgM
- KaA1EmPvW4i0/TDh9z1MmjFirqY/RhIHiuEp9QIs+OXkl54w1TXi+RME6oPNENQb4y7T
- hw1g==
-X-Gm-Message-State: AOAM5329gtOEi+xneQcKUnAOQo9xfItcymbWg4fVC5FUVl8ypTNvJMRE
- kuhkV1JvUp2Mo3JPn2Kk2JXEkFCgCrDM/sdnDxBAsRpg6077rI5gUWFxC9hzJNvYNgB+b8SGmw2
- fO+LU0QSdR7iZbTg=
-X-Received: by 2002:a1c:2987:: with SMTP id p129mr19930010wmp.49.1592848548523; 
- Mon, 22 Jun 2020 10:55:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8H+ARXDIXwBwRXjY+npX2LybVNp0TV6PRxOQBZbEp6j6hqmYcdlplI88lgX3CWF99eSQ9xw==
-X-Received: by 2002:a1c:2987:: with SMTP id p129mr19929986wmp.49.1592848548237; 
- Mon, 22 Jun 2020 10:55:48 -0700 (PDT)
+ bh=KUNTLOIEQg28i2cPiGf3dEdk6QIvKYDn6l3MKevpGq0=;
+ b=Vr1HrjkYLopxuJ5wZbIYvqltnwOnTgp/9zbeHXb9rbBz7spZke4zT6qZM81YzhnO1F
+ jqei14gVRXIVK7HWhml6l+bodMAZmqrp+PPC/dM7txHMhkt6Hs6kpH5wA0xQEyNFa//C
+ mSdSRf74A1Ct8yem2xooj5c7OjMUw94XW7yJYDV/4kFBNlxAfPxQZbvISniVwq8ueHco
+ NcHfFXdxREcTmbK5y/liu5fH9bXYrYCxjt5Qye6B2Auz2ehB3zZ3bweSrF/BCkBHb7ub
+ /+JLUaoeNdqoi8qdJrhu8t3M5WJvQe0bAtXllAzX//Rt6ij4TbumNsUtvVOuTbVUfw0U
+ YlBw==
+X-Gm-Message-State: AOAM530CPW4VTrJ4jGqGoQQHrGSyVTCCZXKHxgQdfBTaP+qxz00v72BK
+ 3PZ7Mzm/9xV8DTcSY2jGkYXIvzG4akqpaUBK8M7lDta2Pagoji1guHdgZMToQXVf/mzXu/rafbl
+ trk2A5Sb1lmSUXFU=
+X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr3899980wmf.0.1592848638183; 
+ Mon, 22 Jun 2020 10:57:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIpsotOCNhxH6O07emTNEStkCh9yN8Nc0mgFP6A5Jey5/11MsecS6/ZhAyO7MnkgV114CLsA==
+X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr3899959wmf.0.1592848637969; 
+ Mon, 22 Jun 2020 10:57:17 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u74sm358568wmu.31.2020.06.22.10.55.47
+ by smtp.gmail.com with ESMTPSA id v24sm21673688wrd.92.2020.06.22.10.57.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 22 Jun 2020 10:55:47 -0700 (PDT)
-Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
-To: John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>
-References: <20200604195252.20739-1-jsnow@redhat.com>
- <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
- <4012de28-5837-889a-eda1-b9957cbbbad1@redhat.com>
- <5d20012b-923c-0bf4-232d-272977087fe3@redhat.com>
- <20200616214900.GA347659@localhost.localdomain>
- <fd9c8f22-77fe-9689-9445-416fad9ff0fa@redhat.com>
- <19227083-5e99-e08f-4a6d-8d2edcdeacf8@redhat.com>
- <536b1d29-f3e0-4c28-e294-3cd83885323e@redhat.com>
+ Mon, 22 Jun 2020 10:57:17 -0700 (PDT)
+Subject: Re: [PATCH v1 01/18] iotests: Fix 051 output after qdev_init_nofail()
+ removal
+To: John Snow <jsnow@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+References: <20200622143204.12921-1-alex.bennee@linaro.org>
+ <20200622143204.12921-2-alex.bennee@linaro.org>
+ <9ad1234e-bbb7-9396-21e1-58041cffd847@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -107,16 +105,16 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7c989539-8b81-89db-5d29-0e66c83b1201@redhat.com>
-Date: Mon, 22 Jun 2020 19:55:46 +0200
+Message-ID: <75400a0b-7544-cd45-c4d3-e523a1791263@redhat.com>
+Date: Mon, 22 Jun 2020 19:57:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <536b1d29-f3e0-4c28-e294-3cd83885323e@redhat.com>
+In-Reply-To: <9ad1234e-bbb7-9396-21e1-58041cffd847@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -128,7 +126,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,28 +139,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, Max Reitz <mreitz@redhat.com>,
+ cota@braap.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 7:51 PM, John Snow wrote:
+On 6/22/20 7:52 PM, John Snow wrote:
 > 
 > 
-> On 6/20/20 6:14 AM, Philippe Mathieu-Daudé wrote:
->> Still doesn't work...
->> https://travis-ci.org/github/philmd/qemu/jobs/700309163#L5445
+> On 6/22/20 10:31 AM, Alex Bennée wrote:
+>> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+>> Commit 96927c744 replaced qdev_init_nofail() call by
+>> isa_realize_and_unref() which has a different error
+>> message. Update the test output accordingly.
+>>
+>> Gitlab CI error after merging b77b5b3dc7:
+>> https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
+>>
+>> Reported-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Message-Id: <20200616154949.6586-1-philmd@redhat.com>
+>> ---
+>>  tests/qemu-iotests/051.pc.out | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+>> index 0ea80d35f0e..da8ad871876 100644
+>> --- a/tests/qemu-iotests/051.pc.out
+>> +++ b/tests/qemu-iotests/051.pc.out
+>> @@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>  
+>>  Testing: -drive if=ide
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
+>> +(qemu) QEMU_PROG: Device needs media, but drive is empty
+>>  
+>>  Testing: -drive if=virtio
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> @@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>  
+>>  Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
+>> +(qemu) QEMU_PROG: Block node is read-only
+>>  
+>>  Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>
 > 
-> I tried running from master with just these patches applied. So far, the
-> only failures I am seeing on gitlab/travis are job timeouts.
+> Just ran into this and wrote an identical fix. The error is not in
+> 051.out so the pc-only fix appears to be fine.
 > 
-> Are you doing something special to avoid timeout failures?
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-Unfortunately no :S Cleber tried too and couldn't reproduce,
-I'm the only one lucky enough to win the race condition...
+Also:
 
-Retrying the acceptance tests on Travis-CI is painful, yes,
-I know...
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+> 
+> (There seem to be other problems with the CI at the moment, but the
+> failures I am seeing are not related to this, so I think it's probably fine)
+> 
 
 
