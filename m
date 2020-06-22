@@ -2,79 +2,116 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5321AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12D0C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27FEE206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:36:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27FEE206F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AD74E20716
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:36:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YogcXWk2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD74E20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnIsE-0006EW-BH
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52274)
+	id 1jnIsr-0007OR-10
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:36:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnIrc-0005WJ-Aa
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:35:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45402)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnIra-0002oX-Ax
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:35:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnIrY-0002jY-PS
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 09:35:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BB4452E80E7
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 09:35:36 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnIs7-0006KQ-By
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:36:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28710
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnIs4-0002wj-Al
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:36:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592818567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=W4/WQVChYIKC4dNBwDYzCBPtQ50VXEnYVKIvz/t5JNE=;
+ b=YogcXWk2VB4UJi+auAfuxIY6n1zfwVRUMkTu1EnHx1pyovfGKl2dzIX9RL///rwYEkX7Nt
+ n4qoCP4eKZO7x8uTfA4KMRm6rvQbVJjionVl8doNdQuAkylpVLNXeRXxvQ1LX3/0ii86wd
+ b6hRct804O2gd6i4g7+D4X/EahfrPTw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-FDwl0Rp-PLWcPEWqAz9ABw-1; Mon, 22 Jun 2020 05:36:03 -0400
+X-MC-Unique: FDwl0Rp-PLWcPEWqAz9ABw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1454A8005AD;
+ Mon, 22 Jun 2020 09:36:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-85.ams2.redhat.com
+ [10.36.114.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BF8910013D7;
+ Mon, 22 Jun 2020 09:36:00 +0000 (UTC)
+Subject: Re: [PATCH 1/2] qcow2: Force preallocation with data-file-raw
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+References: <20200619104012.235977-1-mreitz@redhat.com>
+ <20200619104012.235977-2-mreitz@redhat.com>
+ <w51eeqb9f43.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9c14c622-eb30-4619-d33a-b59395a397be@redhat.com>
+Date: Mon, 22 Jun 2020 11:35:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Jun 2020 09:29:42 -0000
-From: Gerd Hoffmann <1884302@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fturco kraxel-redhat
-X-Launchpad-Bug-Reporter: Francesco Turco (fturco)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <159259247450.25654.11249497243330169394.malonedeb@gac.canonical.com>
-Message-Id: <159281818225.16499.12489907977909126827.malone@chaenomeles.canonical.com>
-Subject: [Bug 1884302] Re: disable automatic mouse grabbing
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0ff0e1f1c94a028d0bf30a6bcb494981392a1ca3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 03:50:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <w51eeqb9f43.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="BeAfxXwZQfghERXyozGwQ4Icu0DtWUrdy"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,57 +120,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884302 <1884302@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FYI:  The gtk ui has support for that.  Try "-display gtk,grab-on-
-hover=3Doff".  You can also toggle it in the "view" menu.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BeAfxXwZQfghERXyozGwQ4Icu0DtWUrdy
+Content-Type: multipart/mixed; boundary="2NwBpEMxt8UHHI8qqPebGOLYhSuFSE7LY"
 
--- =
+--2NwBpEMxt8UHHI8qqPebGOLYhSuFSE7LY
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884302
+On 19.06.20 18:47, Alberto Garcia wrote:
+> On Fri 19 Jun 2020 12:40:11 PM CEST, Max Reitz wrote:
+>> +    if (qcow2_opts->data_file_raw &&
+>> +        qcow2_opts->preallocation =3D=3D PREALLOC_MODE_OFF)
+>> +    {
+>> +        /*
+>> +         * data-file-raw means that "the external data file can be
+>> +         * read as a consistent standalone raw image without looking
+>> +         * at the qcow2 metadata."  It does not say that the metadata
+>> +         * must be ignored, though (and the qcow2 driver in fact does
+>> +         * not ignore it), so the L1/L2 tables must be present and
+>> +         * give a 1:1 mapping, so you get the same result regardless
+>> +         * of whether you look at the metadata or whether you ignore
+>> +         * it.
+>> +         */
+>> +        qcow2_opts->preallocation =3D PREALLOC_MODE_METADATA;
+>=20
+> I'm not convinced by this,
 
-Title:
-  disable automatic mouse grabbing
+Why not?
 
-Status in QEMU:
-  New
+This is how I read the spec.  Furthermore, I see two problems that we
+have right now that are fixed by this patch (namely (1) using a device
+file as the external data file, which may have non-zero data at
+creation; and (2) assigning a backing file at runtime must not show the
+data).
 
-Bug description:
-  I'm using QEMU 5.0.0 on a Gentoo Linux host system. Guest is an Arch
-  Linux system.
+> but your comment made me think of another
+> possible alternative: in qcow2_get_cluster_offset(), if the cluster is
+> unallocated and we are using a raw data file then we return _ZERO_PLAIN:
+>=20
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -654,6 +654,10 @@ out:
+>      assert(bytes_available - offset_in_cluster <=3D UINT_MAX);
+>      *bytes =3D bytes_available - offset_in_cluster;
+> =20
+> +    if (type =3D=3D QCOW2_CLUSTER_UNALLOCATED && data_file_is_raw(bs)) {
+> +        type =3D QCOW2_CLUSTER_ZERO_PLAIN;
+> +    }
+> +
+>      return type;
+>=20
+> You could even add a '&& bs->backing' to the condition and emit a
+> warning to make it more explicit.
 
-  I'd like to disable automatic mouse grabbing when the QEMU window is focu=
-sed.
-  I would prefer for QEMU to grab the mouse only after a click.
+No, this is wrong.  This still wouldn=E2=80=99t fix the problem of having a
+device file as the external data file, when it already has non-zero data
+during creation.  (Reading the qcow2 file would return zeroes, but
+reading the device would not.)
 
-  I use the i3 window manager on my host system.
-  Suppose I'm in workspace 1, while the QEMU window is in workspace 2.
-  In order to switch to workspace 2, I need to press the "Win+2" key combin=
-ation ("Win" is the Windows key).
-  The problem is that the character "2" (from "Win+2") will get transferred=
- to the guest system.
-  For example, if I have a text editor opened under the guest system, the c=
-haracter "2" will be pasted inside the document I'm working on, which is pr=
-etty annoying.
+So it would need to be QCOW2_CLUSTER_NORMAL.  Which is kind of the
+point, when you think about it =E2=80=93 with data-file-raw, all clusters m=
+ust
+always effectively be QCOW2_CLUSTER_NORMAL and be mapped 1:1.
 
-  I would like instead to press the "Win+2" key combination and then
-  explicitely click on the QEMU window with the mouse before grabbing
-  it.
+Well, and that=E2=80=99s in turn the point of this patch.
 
-  Command line:
+I interpret the spec in that the metadata can be ignored, but it does
+not need to be ignored.  So the L1/L2 tables must be 1:1 mapping of
+QCOW2_CLUSTER_NORMAL entries.
 
-  qemu-system-x86_64 -drive
-  file=3D/home/fturco/qemu/arch.img,media=3Ddisk,index=3D0,if=3Dvirtio,form=
-at=3Draw,cache=3Dnone
-  -cpu host -m 2G -k it -enable-kvm -net nic,model=3Dvirtio -net user -vga
-  virtio -display sdl -usb -rtc base=3Dutc -soundhw ac97 -monitor stdio
-  -no-quit
+We could also choose to interpret it as =E2=80=9CWith data-file-raw, the L1=
+/L2
+tables must be ignored=E2=80=9D.  In that case, our qcow2 driver would need=
+ to
+be modified to indeed fully ignore the L1/L2 tables with data-file-raw.
+ (I certainly don=E2=80=99t interpret the spec this way, but I suppose we c=
+ould
+call it a bug fix and amend it.)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884302/+subscriptions
+Max
+
+
+--2NwBpEMxt8UHHI8qqPebGOLYhSuFSE7LY--
+
+--BeAfxXwZQfghERXyozGwQ4Icu0DtWUrdy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7we38ACgkQ9AfbAGHV
+z0ASgwf/Yrrzv5x92i239eXyD00vIDtxAxlCPxXANpPRWUPZIVyEOx8QXOqsWhaF
+R94zKK8DIA3VTQlJ14sx+vmkv1ccWRIMfkzSsiS/6bD6eVR5b9DJTIMwF/WapKNa
+wtwK+OAe1S3W6a5CB/pvxukNNm5HSOuLhc2bciDOp0TPTosuN4TcKpfeMiTpVBiO
+omhikpfKtRn7Oa9/vvtLzZC2nSzfXbGC+3rrtFYa7coG3vA7iAYSZC7YNCfrIWTf
+dxkT+DNRwtwNgZl76wiRykv3c5DI4j2nInE5bdMk++5hwUowtAiXWsCvV1xHRjKJ
+l2kfSHgLWV7VgQXIC2SFheNbO53hMA==
+=psJO
+-----END PGP SIGNATURE-----
+
+--BeAfxXwZQfghERXyozGwQ4Icu0DtWUrdy--
+
 
