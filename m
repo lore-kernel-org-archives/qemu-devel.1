@@ -2,79 +2,101 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F77C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 770F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0233206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4176B206F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 09:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjhRUcwk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0233206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SiYGi36s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4176B206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnJ7A-0000fB-SI
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:51:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53952)
+	id 1jnJ7h-0001Uv-HQ
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 05:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyQ-0001i4-Mu
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31778
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnJ3J-0003WM-1m
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:47:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56690
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnIyJ-0003vm-8g
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:42:42 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jnJ3F-0004dj-IF
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 05:47:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592818954;
+ s=mimecast20190719; t=1592819260;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BJFUTQwdKeAYezPL2T3uhjJOrjxgznocTtN32T4xqA0=;
- b=SjhRUcwk2Skfg219f8HYCkX2/SJfjaix3OibVjXFZ0hDe2ksFyq8ZhEjES9RqjvXnwrbmm
- lR1vxLNVUoWMYCGIN7MaTYpZTV4/Yq1yBQWqFLWdxsaNVkfoiOXJRwPtEYWykk1G3xn+BM
- inwyRhoi6TXsgWJ6vhf+Vjvv4NqLI/k=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=IG0xyW8Y+2IhjrkUff/gvAIPuJaTf/JbQT5eqrRgUHk=;
+ b=SiYGi36sy4Cpm0+UB2VUJUrs7QZrLX3UbdSWMJHWEI0KFyc3VLK5vYkwvQ1VctEjWdAzLl
+ ++DCl/PcjbaENd7HrYUoKck+Boe/kvxCHCxdz8QtiKuUSxLZa/h70cbR9jElzTAMcOZ/lk
+ vnlXWE4yubOKUXSV+sTawW/xaLLPKq8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-JX1X9CmaMqqHYlF6aNiWRQ-1; Mon, 22 Jun 2020 05:42:32 -0400
-X-MC-Unique: JX1X9CmaMqqHYlF6aNiWRQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-335-KGs0P0iDNeizKhGRgf2rGg-1; Mon, 22 Jun 2020 05:47:36 -0400
+X-MC-Unique: KGs0P0iDNeizKhGRgf2rGg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 501968018AB;
- Mon, 22 Jun 2020 09:42:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E412710013D2;
- Mon, 22 Jun 2020 09:42:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D0B591138474; Mon, 22 Jun 2020 11:42:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/16] fdc: Deprecate configuring floppies with -global
- isa-fdc
-Date: Mon, 22 Jun 2020 11:42:17 +0200
-Message-Id: <20200622094227.1271650-7-armbru@redhat.com>
-In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
-References: <20200622094227.1271650-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75A9D1005512;
+ Mon, 22 Jun 2020 09:47:35 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-85.ams2.redhat.com
+ [10.36.114.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5624760C05;
+ Mon, 22 Jun 2020 09:47:34 +0000 (UTC)
+Subject: Re: [PATCH 0/2] qcow2: Force preallocation with data-file-raw
+To: Nir Soffer <nsoffer@redhat.com>
+References: <20200619104012.235977-1-mreitz@redhat.com>
+ <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <72eb5700-faf6-22ee-69be-1e7653cf06c6@redhat.com>
+Date: Mon, 22 Jun 2020 11:47:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+In-Reply-To: <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,7 +106,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,267 +119,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
- jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deprecate
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607
+Content-Type: multipart/mixed; boundary="X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY"
 
-    -global isa-fdc.driveA=...
-    -global isa-fdc.driveB=...
+--X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-in favour of
+On 22.06.20 00:25, Nir Soffer wrote:
+> On Fri, Jun 19, 2020 at 1:40 PM Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> Hi,
+>>
+>> As discussed here:
+>>
+>> https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
+>> https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
+>> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00240.html
+>>
+>> I think that qcow2 images with data-file-raw should always have
+>> preallocated 1:1 L1/L2 tables, so that the image always looks the same
+>> whether you respect or ignore the qcow2 metadata.
+>=20
+> I don't know the internals of qcow2 data_file, but are we really using
+> qcow2 metadata when accessing the data file?
 
-    -device floppy,unit=0,drive=...
-    -device floppy,unit=1,drive=...
+Yes.
 
-Same for the other floppy controller devices.
+> This may have unwanted performance consequences.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: John Snow <jsnow@redhat.com>
----
- docs/qdev-device-use.txt   | 13 ++++---------
- docs/system/deprecated.rst | 26 ++++++++++++++++++++++++++
- hw/block/fdc.c             | 17 +++++++++++++++++
- tests/qemu-iotests/172.out | 30 ++++++++++++++++++++++++++++++
- 4 files changed, 77 insertions(+), 9 deletions(-)
+I don=E2=80=99t think so, because in practice normal lookups of L1/L2 mappi=
+ngs
+generally don=E2=80=99t cost that much performance.
 
-diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
-index cc53e97dcd..3d781be547 100644
---- a/docs/qdev-device-use.txt
-+++ b/docs/qdev-device-use.txt
-@@ -104,15 +104,10 @@ The -device argument differs in detail for each type of drive:
- 
- * if=floppy
- 
--  -global isa-fdc.driveA=DRIVE-ID
--  -global isa-fdc.driveB=DRIVE-ID
-+  -device floppy,unit=UNIT,drive=DRIVE-ID
- 
--  This is -global instead of -device, because the floppy controller is
--  created automatically, and we want to configure that one, not create
--  a second one (which isn't possible anyway).
--
--  Without any -global isa-fdc,... you get an empty driveA and no
--  driveB.  You can use -nodefaults to suppress the default driveA, see
-+  Without any -device floppy,... you get an empty unit 0 and no unit
-+  1.  You can use -nodefaults to suppress the default unit 0, see
-   "Default Devices".
- 
- * if=virtio
-@@ -385,7 +380,7 @@ some DEVNAMEs:
- 
-     default device      suppressing DEVNAMEs
-     CD-ROM              ide-cd, ide-drive, ide-hd, scsi-cd, scsi-hd
--    isa-fdc's driveA    floppy, isa-fdc
-+    floppy              floppy, isa-fdc
-     parallel            isa-parallel
-     serial              isa-serial
-     VGA                 VGA, cirrus-vga, isa-vga, isa-cirrus-vga,
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 3a255591c3..6f8bf19d37 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -164,6 +164,32 @@ previously available ``-tb-size`` option.
- Use ``-display sdl,show-cursor=on`` or
-  ``-display gtk,show-cursor=on`` instead.
- 
-+``Configuring floppies with ``-global``
-+'''''''''''''''''''''''''''''''''''''''
-+
-+Use ``-device floppy,...`` instead:
-+::
-+
-+    -global isa-fdc.driveA=...
-+    -global sysbus-fdc.driveA=...
-+    -global SUNW,fdtwo.drive=...
-+
-+become
-+::
-+
-+    -device floppy,unit=0,drive=...
-+
-+and
-+::
-+
-+    -global isa-fdc.driveB=...
-+    -global sysbus-fdc.driveB=...
-+
-+become
-+::
-+
-+    -device floppy,unit=1,drive=...
-+
- QEMU Machine Protocol (QMP) commands
- ------------------------------------
- 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index d1f7722cff..7e143cbab0 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2528,6 +2528,7 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-     DeviceState *dev;
-     BlockBackend *blk;
-     Error *local_err = NULL;
-+    const char *fdc_name, *drive_suffix;
- 
-     for (i = 0; i < MAX_FD; i++) {
-         drive = &fdctrl->drives[i];
-@@ -2542,10 +2543,26 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-             continue;
-         }
- 
-+        fdc_name = object_get_typename(OBJECT(fdc_dev));
-+        drive_suffix = !strcmp(fdc_name, "SUNW,fdtwo") ? "" : i ? "B" : "A";
-+        warn_report("warning: property %s.drive%s is deprecated",
-+                    fdc_name, drive_suffix);
-+        error_printf("Use -device floppy,unit=%d,drive=... instead.\n", i);
-+
-         dev = qdev_new("floppy");
-         qdev_prop_set_uint32(dev, "unit", i);
-         qdev_prop_set_enum(dev, "drive-type", fdctrl->qdev_for_drives[i].type);
- 
-+        /*
-+         * Hack alert: we move the backend from the floppy controller
-+         * device to the floppy device.  We first need to detach the
-+         * controller, or else floppy_create()'s qdev_prop_set_drive()
-+         * will die when it attaches floppy device.  We also need to
-+         * take another reference so that blk_detach_dev() doesn't
-+         * free blk while we still need it.
-+         *
-+         * The hack is probably a bad idea.
-+         */
-         blk_ref(blk);
-         blk_detach_dev(blk, fdc_dev);
-         fdctrl->qdev_for_drives[i].blk = NULL;
-diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-index 340dbd39cb..778406e4bf 100644
---- a/tests/qemu-iotests/172.out
-+++ b/tests/qemu-iotests/172.out
-@@ -383,6 +383,8 @@ sd0: [not inserted]
- === Using -drive if=none and -global ===
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -423,6 +425,8 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -463,6 +467,10 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -661,6 +669,8 @@ sd0: [not inserted]
- === Mixing -fdX and -global ===
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -717,6 +727,8 @@ sd0: [not inserted]
- 
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -773,9 +785,13 @@ sd0: [not inserted]
- 
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- QEMU_PROG: Floppy unit 0 is in use
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- QEMU_PROG: Floppy unit 1 is in use
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0
-@@ -1177,6 +1193,8 @@ QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
- === Mixing -global and -device ===
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -1233,6 +1251,8 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -1289,6 +1309,8 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -1345,6 +1367,8 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- 
-           dev: isa-fdc, id ""
-             iobase = 1008 (0x3f0)
-@@ -1441,9 +1465,13 @@ sd0: [not inserted]
- 
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
-+QEMU_PROG: warning: warning: property isa-fdc.driveA is deprecated
-+Use -device floppy,unit=0,drive=... instead.
- QEMU_PROG: -device floppy,drive=none1,unit=0: Floppy unit 0 is in use
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=1
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- QEMU_PROG: -device floppy,drive=none1,unit=1: Floppy unit 1 is in use
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0 -device floppy,drive=none1,unit=0
-@@ -1512,6 +1540,8 @@ QEMU_PROG: -device floppy,drive=floppy0: Property 'floppy.drive' can't find valu
- === Too many floppy drives ===
- 
- Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -drive if=none,file=TEST_DIR/t.qcow2.3 -global isa-fdc.driveB=none0 -device floppy,drive=none1
-+QEMU_PROG: warning: warning: property isa-fdc.driveB is deprecated
-+Use -device floppy,unit=1,drive=... instead.
- QEMU_PROG: -device floppy,drive=none1: Can't create floppy unit 2, bus supports only 2 units
- 
- 
--- 
-2.26.2
+> If I understand correctly, qcow2 metadata is needed only for keeping
+> bitmaps (or maybe
+> future extensions) for raw data file, and reading from the qcow2 image
+> should be read
+> directly from the raw file without any extra work.
+>=20
+> Writing to the data file should also bypass the qcow2 metadata, since the=
+ bitmap
+> is updated in memory.
+
+Well, with this series, writing would no longer update the metadata at
+least, because it would always be preallocated already.
+
+>>  The easiest way to
+>> achieve that is to enforce at least metadata preallocation whenever
+>> data-file-raw is given.
+>=20
+> But preallocation is not free, even on file systems, it can be even
+> slow (NFS < 4.2).
+
+Metadata preallocation with an external data file should be the same
+speed on every file system.  We only need to create the metadata
+structures, which, with the default cluster size (64k) take up a bit
+more than 1/8192 of the full image size.
+
+Sure, it=E2=80=99s not free.  But if we decide we should indeed fully ignor=
+e the
+L1/L2 tables for data-file-raw images, the qcow2 spec must be amended.
+As I can read it, it currently doesn=E2=80=99t say so.
+
+(By the way, this is not a trivial change.  Right now, data-file-raw is
+an autoclear flag: If a version of qemu that doesn=E2=80=99t support it acc=
+esses
+the image, it will automatically clear the flag, but the image stays
+valid.  If we decide to completely ignore the L1/L2 tables (i.e. not
+even create them), then this can no longer be an autoclear flag.  We=E2=80=
+=99d
+need a new incompatible flag.  (Because without L1/L2 tables, the image
+becomes useless to older qemu versions.))
+
+> With block storage this means you need to allocate the entire image size =
+on
+> storage for writing the metadata.
+>=20
+> While oVirt does not use qcow2 with data_file, having preallocated qcow2
+> will make this very hard to use, for example for 500 GiB disk we will hav=
+e to
+> allocate 500 GiB disk for the raw data file and 500 GiB disk for the qcow=
+2
+> metadata disk which will be 99% unused.
+
+I don=E2=80=99t understand this.  When you use an external data file, the q=
+cow2
+file will only contain the metadata:
+
+$ qemu-img create -f qcow2 \
+    -o data_file=3Dfoo.data,data_file_raw=3Don,preallocation=3Dmetadata \
+    foo.qcow2 8G
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D8589934592 data_file=3Dfoo.data
+data_file_raw=3Don cluster_size=3D65536 preallocation=3Dmetadata
+lazy_refcounts=3Doff refcount_bits=3D16
+$ ls -l foo.qcow2
+... 1310720 ... foo.qcow2
+$ ls -l foo.data
+... 8589934592 ... foo.data
+
+> I don't think that kubevirt is planning to use this either, but if
+> they decide to use
+> this it may be a problem for them as well when using block storage.
+>=20
+> It looks like we abuse preallocation for getting the side effect that
+> the backing file
+> will be rejected, instead of adding the validation rejecting backing
+> file in this case.
+
+That isn=E2=80=99t the case.
+
+I want to use preallocation because I interpret the spec such that it
+requires metadata preallocation.  It says when accessing a qcow2 file
+with data-file-raw, you can ignore the L1/L2 tables.  To me, that means
+that the L1/L2 tables must give a 1:1 mapping so that you get the same
+result whether you interpret them or not.
+
+Max
+
+
+--X1Hir02OSvdG7moJuO6lOKkrzbflM1mdY--
+
+--GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7wfjQACgkQ9AfbAGHV
+z0CL+gf+Km/T8DxYdnd+fwqQ92dBh/dslXTbHdzY9WvxmrWRnc102j/tJqFLxkil
+in1uy67UReMGVpJyY1lcFGxN7TrMXwnY2t9pBJGIpEe81PlXY3ENKDWIeXqLAPtN
+Di6sKBW3Ar+/b+p5b4a5ywgIqx3uUgqKAjQVRrZID3mLLnoMWiHkrmfRmdRpXZYN
+ljQh1wr4RDZp7W52VkYU6k217oTzZWviK64WMapqZ0M7EQNbsBGgOOztBgSXZBws
+iaCcFIkQ0S/iugXnDm6E1AaUG1zvw2YXc+zGVqMeyuYUbE9ut8yCWzwe/GSOhAC9
++mnrP8PugwO0lv5QTYfINYiiTz1HBQ==
+=hJJ6
+-----END PGP SIGNATURE-----
+
+--GCoYbktY6qXrOSVNuVgTu3bEnB2Unq607--
 
 
