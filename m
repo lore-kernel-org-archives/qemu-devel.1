@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 964C3C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2426C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B652073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C2802073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 15:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjV5/X5u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B652073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PaL3unSD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2802073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnOba-0003I9-Mo
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:43:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59432)
+	id 1jnObg-0003Ya-Lu
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 11:43:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOa8-0001bp-Eb
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:42:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54798
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOY7-0006jp-TX
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:39:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29464
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOa5-00043P-P0
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:42:00 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnOY6-0003Uu-8k
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 11:39:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592840516;
+ s=mimecast20190719; t=1592840393;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8ai1PmYpRauheJ6qtnyBbvWoo5KgsiIHoZlm60i9SQU=;
- b=GjV5/X5u5ZjmQPOHUoHx00CdkPFPkWEv0gIpUnIK3Ibtb4oZvBtte8B2o905ubNaVTCzaw
- EzqKN+cT59qkG3gT9AabLiAK4wa4XXkhOkUPEvjnYXQIPVvZj6jHyMrXYHyr84XNDqBbEN
- S/IxfzmKvfVHUqLgoVrp71UwCMqyZlI=
+ bh=mCMXojiD1+Nn3lnQMP2IDGa3qVqpRilydZorQ7YFUPE=;
+ b=PaL3unSDewwE7Lxwqqox78fpkxTeVSH5fNsDdPCA6V2WO/+MOj0cJDHC4DZ+0DaWPEpLmv
+ 4irVGczR8N27jzryTPanV9UgHCiQKUDTK7ep1O/5UqdfVqLJXTYkX7IvMG2aRMorUr7+ZE
+ 6TMrrHgCF5R/wCLa54Bad4ZQQOzFg/E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-kaWWLbqINTi9gRh3vvGLgA-1; Mon, 22 Jun 2020 11:41:52 -0400
-X-MC-Unique: kaWWLbqINTi9gRh3vvGLgA-1
+ us-mta-431-WaB1oGlGNraeSDCwhYcJ3g-1; Mon, 22 Jun 2020 11:39:49 -0400
+X-MC-Unique: WaB1oGlGNraeSDCwhYcJ3g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23BC610230C1;
- Mon, 22 Jun 2020 15:41:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5AC78018A5;
+ Mon, 22 Jun 2020 15:39:46 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-13-110.pek2.redhat.com [10.72.13.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D47C82026;
- Mon, 22 Jun 2020 15:41:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF74771677;
+ Mon, 22 Jun 2020 15:39:29 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v1 08/10] vhost: implement vhost_dev_start method
-Date: Mon, 22 Jun 2020 23:37:54 +0800
-Message-Id: <20200622153756.19189-9-lulu@redhat.com>
+Subject: [PATCH v1 04/10] virtio-pci: implement queue_enabled method
+Date: Mon, 22 Jun 2020 23:37:50 +0800
+Message-Id: <20200622153756.19189-5-lulu@redhat.com>
 In-Reply-To: <20200622153756.19189-1-lulu@redhat.com>
 References: <20200622153756.19189-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -69,9 +69,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,78 +104,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-use the vhost_dev_start callback to send the status to backend
+From: Jason Wang <jasowang@redhat.com>
 
+With version 1, we can detect whether a queue is enabled via
+queue_enabled.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- hw/virtio/vhost.c         | 17 +++++++++++++++++
- include/hw/virtio/vhost.h |  2 ++
- 2 files changed, 19 insertions(+)
+ hw/virtio/virtio-pci.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 01ebe12f28..bfd7f9ce1f 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -744,6 +744,7 @@ static void vhost_iommu_region_del(MemoryListener *listener,
-     }
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 4cb784389c..3918aa9f6c 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1107,6 +1107,23 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+     return pci_get_address_space(dev);
  }
  
-+
- static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
-                                     struct vhost_virtqueue *vq,
-                                     unsigned idx, bool enable_log)
-@@ -1661,6 +1662,11 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-         }
-     }
- 
-+    r = vhost_set_start(hdev, true);
-+    if (r) {
-+        goto fail_log;
-+    }
-+
-     if (vhost_dev_has_iommu(hdev)) {
-         hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
- 
-@@ -1697,6 +1703,8 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
-     /* should only be called after backend is connected */
-     assert(hdev->vhost_ops);
- 
-+    vhost_set_start(hdev, false);
-+
-     for (i = 0; i < hdev->nvqs; ++i) {
-         vhost_virtqueue_stop(hdev,
-                              vdev,
-@@ -1722,3 +1730,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
- 
-     return -1;
- }
-+
-+int vhost_set_start(struct vhost_dev *hdev, bool started)
++static bool  virtio_queue_check_enabled(VirtIODevice *vdev, int n)
 +{
-+
-+    if (hdev->vhost_ops->vhost_dev_start) {
-+        hdev->vhost_ops->vhost_dev_start(hdev, started);
-+    }
-+    return 0;
++    return  virtio_queue_get_desc_addr(vdev, n) != 0;
 +}
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 085450c6f8..59ea53f8c2 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -92,6 +92,7 @@ struct vhost_dev {
-     const VhostDevConfigOps *config_ops;
- };
- 
 +
- int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-                    VhostBackendType backend_type,
-                    uint32_t busyloop_timeout);
-@@ -137,4 +138,5 @@ int vhost_dev_set_inflight(struct vhost_dev *dev,
-                            struct vhost_inflight *inflight);
- int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
-                            struct vhost_inflight *inflight);
-+int vhost_set_start(struct vhost_dev *dev, bool started);
- #endif
++static bool virtio_pci_queue_enabled(DeviceState *d, int n)
++{
++    VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
++    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
++        return proxy->vqs[vdev->queue_sel].enabled;
++    }
++
++    return  virtio_queue_check_enabled(vdev, n);
++}
++
+ static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
+                                    struct virtio_pci_cap *cap)
+ {
+@@ -2059,6 +2076,7 @@ static void virtio_pci_bus_class_init(ObjectClass *klass, void *data)
+     k->ioeventfd_enabled = virtio_pci_ioeventfd_enabled;
+     k->ioeventfd_assign = virtio_pci_ioeventfd_assign;
+     k->get_dma_as = virtio_pci_get_dma_as;
++    k->queue_enabled = virtio_pci_queue_enabled;
+ }
+ 
+ static const TypeInfo virtio_pci_bus_info = {
 -- 
 2.21.1
 
