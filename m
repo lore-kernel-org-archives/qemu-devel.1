@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BBAC433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034A1C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B07A520738
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:39:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C757720738
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:39:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJMtl1ea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07A520738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WZeeyFf2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C757720738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnRLf-0005d6-UM
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 14:39:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43296)
+	id 1jnRLi-0005ge-1n
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 14:39:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRHE-0005PC-4U; Mon, 22 Jun 2020 14:34:40 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40185)
+ id 1jnRHJ-0005cN-Qs; Mon, 22 Jun 2020 14:34:45 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33389)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnRHC-00081R-7w; Mon, 22 Jun 2020 14:34:39 -0400
-Received: by mail-wm1-x336.google.com with SMTP id r15so525966wmh.5;
- Mon, 22 Jun 2020 11:34:37 -0700 (PDT)
+ id 1jnRHI-00082N-94; Mon, 22 Jun 2020 14:34:45 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a6so576466wmm.0;
+ Mon, 22 Jun 2020 11:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=R6bhbFUFHwbjFV9VtVCbzeaqKXg8WCcxdY6HM2ZAe0c=;
- b=QJMtl1eaH8K4HoaLvK/EAmlOnhgKV0xNPF5XzYqxJUtxyyw60uDmjApvvr3zYyEiMH
- 31ZrKSyAqL5x0MhgliC7qkZtudSXo4f5OL9PQqq44uiRR1U8E/WnSfJ0w6Jp20fsW+N3
- Kv4mLgd7WPQEEN67rGqLSPGU29oPGzMa3i2IrlhL5EMMqLA/dhytm4ge9tYrmGaPQG4o
- eHMmwAfSB2A5abmlmcxZ4ZeMdoufdV5t/CD0VAOl1VMzbHHbfgRNK6V42L7zbWJWjPyA
- aAk+i/6ixN6ZjcUw3QyTpbbv8Itxao0amxM3m1tI28XmmbzHIGErTwkC0Gx9W9qUSJz+
- TSDQ==
+ bh=2ixgx95fnOdvGl5LE4YjxXF8tARef+K7gPstTccWoAA=;
+ b=WZeeyFf2MH+aChgwu/H9gOEDqBPYPRspHorcMG/X2d8iUL4q0etQ9oCTymVFTWjz+C
+ IDJqT5JI7x2hdLezRYrMfC8tKmCWrdfoi1G1tO+o4qGMirA9h9oGacx2Wr+r+AxJyj/Z
+ i6jgZlIxCAvL3u3mREiHt7N56hxDIYdnLoSNXgjHbUBrMYu5R+Dgzw2GFEPeKzg0/JAa
+ DcYWFxBEmZKSLQjhX8qtfpsAXnQC4ocS+sVSsoEpXekQSmMgCJ+Ov4hlAXJPGkFBSQ4r
+ NRhZEVovfW37hd40DzjJRSaUv5OmwoJZo3f9Mg0q5CSil7A4rDVmh0f0qn/Hc5QWUxjl
+ fcpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=R6bhbFUFHwbjFV9VtVCbzeaqKXg8WCcxdY6HM2ZAe0c=;
- b=nohfQQtLlmJQSNtXXkkgzCgtEs8hKHA+XUBHscQdDsuXGALtuA18xIuP4cPEagkO7a
- ceE0wgm1O4sK76tkg55SodJcfH95z1NN/h1IOs6v1mh9pPBiYxKk1uNgm/iSKlXk8L0p
- 0ZkMX8Lr3WIfp1ZqJkjyixAq/PrFxD+ApYuiZZ/zjIIZ2faxZRV0bkxq8qk9QF9rzVv8
- 9r8Sj1C7FylgQQE3ViDUbpfTy0GxE5s/aWjFZGwE8B05naXrPClrgn6i2Kqty9Sx17an
- oJ3brA3VVb0Wo4m8y8OoNcTyku0uvYz+KI/1wFyIDAWZ9qpYnI5C+IQiLq4bLJfJLEEb
- Nkww==
-X-Gm-Message-State: AOAM530AysveJeCBHdvjoba85lZ05G00qRl7xcUvk2wdx/btklJIn+8p
- RVkH5jz6pkvInP0BFGF4uuHA4Abt
-X-Google-Smtp-Source: ABdhPJw9bpt+xJcKoVgf/eaLpDENtTj23Z89xheedBmOP7cKrJ7XrzS7G2eAE9SqN6w3tRw4C3ew2g==
-X-Received: by 2002:a7b:c248:: with SMTP id b8mr19050559wmj.2.1592850876092;
- Mon, 22 Jun 2020 11:34:36 -0700 (PDT)
+ bh=2ixgx95fnOdvGl5LE4YjxXF8tARef+K7gPstTccWoAA=;
+ b=EvBgZjSW+GNInajRo7PulT+ILdxEt/pRm1X0431w+bZCK8OzLX9yzAe+K8YWhk2bHz
+ ry83hpZdjnoJ/FTT1PtjL2BtaxqAwWXPgoj055oThk4tF3VKb6+ryhUDy7zL3hUJ5ZDy
+ 3oG/Xda4erSbVI2gAmpTY9ixeSyN0ebVC3LKMj8Ne92xUKaL55PuWJ5aDqpelc/FKrO+
+ BmjdyGizQqbHWnbzqV9uVtRXMwYYhJNTN3vGWmlhrthZvJr24QWgYvxCPW74Ap8h6zvn
+ 5nNP9AxY7yCsS83CSr0evw9Bh5z0HUYrdb0vHegZyq7f0qFAGaq9gz5jPCZq7/njar2U
+ 5lPw==
+X-Gm-Message-State: AOAM532P1TwD/z81778U1xEckR6hCwvFkS9o/rnEzPBqzCG9nEGDTC2N
+ n67LsasmtXwuzC2FenKfVAeqBtL+
+X-Google-Smtp-Source: ABdhPJy6fQG1B6XFuO9SOMdqc3N3Bcx8AWRS+lORlgoX8Uqb1EoVubl5OjB0kuT7pKoMf60ZK0HdNg==
+X-Received: by 2002:a1c:7414:: with SMTP id p20mr19560732wmc.124.1592850882298; 
+ Mon, 22 Jun 2020 11:34:42 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h29sm20286161wrc.78.2020.06.22.11.34.34
+ by smtp.gmail.com with ESMTPSA id h29sm20286161wrc.78.2020.06.22.11.34.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 11:34:35 -0700 (PDT)
+ Mon, 22 Jun 2020 11:34:41 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 4/9] hw/misc/pca9552: Add generic PCA955xClass,
- parent of TYPE_PCA9552
-Date: Mon, 22 Jun 2020 20:34:23 +0200
-Message-Id: <20200622183428.12255-5-f4bug@amsat.org>
+Subject: [PATCH v5 9/9] hw/misc/pca9552: Model qdev output GPIOs
+Date: Mon, 22 Jun 2020 20:34:28 +0200
+Message-Id: <20200622183428.12255-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200622183428.12255-1-f4bug@amsat.org>
 References: <20200622183428.12255-1-f4bug@amsat.org>
@@ -78,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x336.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -88,7 +87,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,214 +109,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extract the code common to the PCA955x family in PCA955xClass,
-keeping the PCA9552 specific parts into pca9552_class_init().
-Remove the 'TODO' comment added in commit 5141d4158cf.
+The PCA9552 has 16 GPIOs which can be used as input,
+output or PWM mode. QEMU models the output GPIO with
+the qemu_irq type. Let the device expose the 16 GPIOs
+to allow us to later connect LEDs to these outputs.
 
-Suggested-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/misc/pca9552.h |  6 ++--
- hw/misc/pca9552.c         | 72 ++++++++++++++++++++++++++++++---------
- 2 files changed, 58 insertions(+), 20 deletions(-)
+ include/hw/misc/pca9552.h | 1 +
+ hw/misc/pca9552.c         | 5 +++++
+ 2 files changed, 6 insertions(+)
 
 diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
-index db527595a3..90843b03b8 100644
+index bf1a589137..600356fbf9 100644
 --- a/include/hw/misc/pca9552.h
 +++ b/include/hw/misc/pca9552.h
-@@ -12,9 +12,11 @@
- #include "hw/i2c/i2c.h"
- 
- #define TYPE_PCA9552 "pca9552"
--#define PCA955X(obj) OBJECT_CHECK(PCA955xState, (obj), TYPE_PCA9552)
-+#define TYPE_PCA955X "pca955x"
-+#define PCA955X(obj) OBJECT_CHECK(PCA955xState, (obj), TYPE_PCA955X)
- 
- #define PCA955X_NR_REGS 10
-+#define PCA955X_PIN_COUNT_MAX 16
- 
- typedef struct PCA955xState {
-     /*< private >*/
-@@ -25,8 +27,6 @@ typedef struct PCA955xState {
+@@ -27,6 +27,7 @@ typedef struct PCA955xState {
      uint8_t pointer;
  
      uint8_t regs[PCA955X_NR_REGS];
--    uint8_t max_reg;
--    uint8_t pin_count;
++    qemu_irq gpio[PCA955X_PIN_COUNT_MAX];
+     char *description; /* For debugging purpose only */
  } PCA955xState;
  
- #endif
 diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-index 5681ff3b22..34062dbb69 100644
+index 5997eef8b2..38c04c54dc 100644
 --- a/hw/misc/pca9552.c
 +++ b/hw/misc/pca9552.c
-@@ -4,6 +4,7 @@
-  *     https://www.nxp.com/docs/en/application-note/AN264.pdf
-  *
-  * Copyright (c) 2017-2018, IBM Corporation.
-+ * Copyright (c) 2020 Philippe Mathieu-Daudé
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or
-  * later. See the COPYING file in the top-level directory.
-@@ -18,6 +19,20 @@
+@@ -17,6 +17,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/misc/pca9552.h"
+ #include "hw/misc/pca9552_regs.h"
++#include "hw/irq.h"
+ #include "migration/vmstate.h"
  #include "qapi/error.h"
  #include "qapi/visitor.h"
+@@ -111,9 +112,11 @@ static void pca955x_update_pin_input(PCA955xState *s)
  
-+typedef struct PCA955xClass {
-+    /*< private >*/
-+    I2CSlaveClass parent_class;
-+    /*< public >*/
-+
-+    uint8_t pin_count;
-+    uint8_t max_reg;
-+} PCA955xClass;
-+
-+#define PCA955X_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(PCA955xClass, (klass), TYPE_PCA955X)
-+#define PCA955X_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(PCA955xClass, (obj), TYPE_PCA955X)
-+
- #define PCA9552_LED_ON   0x0
- #define PCA9552_LED_OFF  0x1
- #define PCA9552_LED_PWM0 0x2
-@@ -35,9 +50,10 @@ static uint8_t pca955x_pin_get_config(PCA955xState *s, int pin)
+         switch (config) {
+         case PCA9552_LED_ON:
++            qemu_set_irq(s->gpio[i], 1);
+             s->regs[input_reg] |= 1 << input_shift;
+             break;
+         case PCA9552_LED_OFF:
++            qemu_set_irq(s->gpio[i], 0);
+             s->regs[input_reg] &= ~(1 << input_shift);
+             break;
+         case PCA9552_LED_PWM0:
+@@ -377,6 +380,8 @@ static void pca955x_realize(DeviceState *dev, Error **errp)
+     PCA955xState *s = PCA955X(dev);
  
- static void pca955x_update_pin_input(PCA955xState *s)
- {
-+    PCA955xClass *k = PCA955X_GET_CLASS(s);
-     int i;
- 
--    for (i = 0; i < s->pin_count; i++) {
-+    for (i = 0; i < k->pin_count; i++) {
-         uint8_t input_reg = PCA9552_INPUT0 + (i / 8);
-         uint8_t input_shift = (i % 8);
-         uint8_t config = pca955x_pin_get_config(s, i);
-@@ -112,10 +128,12 @@ static void pca955x_write(PCA955xState *s, uint8_t reg, uint8_t data)
-  */
- static void pca955x_autoinc(PCA955xState *s)
- {
-+    PCA955xClass *k = PCA955X_GET_CLASS(s);
+     assert(k->pin_count <= PCA955X_PIN_COUNT_MAX);
++    qdev_init_gpio_out(dev, s->gpio, k->pin_count);
 +
-     if (s->pointer != 0xFF && s->pointer & PCA9552_AUTOINC) {
-         uint8_t reg = s->pointer & 0xf;
- 
--        reg = (reg + 1) % (s->max_reg + 1);
-+        reg = (reg + 1) % (k->max_reg + 1);
-         s->pointer = reg | PCA9552_AUTOINC;
+     if (!s->description) {
+         s->description = g_strdup("pca-unspecified");
      }
- }
-@@ -176,6 +194,7 @@ static int pca955x_event(I2CSlave *i2c, enum i2c_event event)
- static void pca955x_get_led(Object *obj, Visitor *v, const char *name,
-                             void *opaque, Error **errp)
- {
-+    PCA955xClass *k = PCA955X_GET_CLASS(obj);
-     PCA955xState *s = PCA955X(obj);
-     int led, rc, reg;
-     uint8_t state;
-@@ -185,7 +204,7 @@ static void pca955x_get_led(Object *obj, Visitor *v, const char *name,
-         error_setg(errp, "%s: error reading %s", __func__, name);
-         return;
-     }
--    if (led < 0 || led > s->pin_count) {
-+    if (led < 0 || led > k->pin_count) {
-         error_setg(errp, "%s invalid led %s", __func__, name);
-         return;
-     }
-@@ -212,6 +231,7 @@ static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, int state)
- static void pca955x_set_led(Object *obj, Visitor *v, const char *name,
-                             void *opaque, Error **errp)
- {
-+    PCA955xClass *k = PCA955X_GET_CLASS(obj);
-     PCA955xState *s = PCA955X(obj);
-     Error *local_err = NULL;
-     int led, rc, reg, val;
-@@ -228,7 +248,7 @@ static void pca955x_set_led(Object *obj, Visitor *v, const char *name,
-         error_setg(errp, "%s: error reading %s", __func__, name);
-         return;
-     }
--    if (led < 0 || led > s->pin_count) {
-+    if (led < 0 || led > k->pin_count) {
-         error_setg(errp, "%s invalid led %s", __func__, name);
-         return;
-     }
-@@ -283,17 +303,10 @@ static void pca9552_reset(DeviceState *dev)
- 
- static void pca955x_initfn(Object *obj)
- {
--    PCA955xState *s = PCA955X(obj);
-+    PCA955xClass *k = PCA955X_GET_CLASS(obj);
-     int led;
- 
--    /* If support for the other PCA955X devices are implemented, these
--     * constant values might be part of class structure describing the
--     * PCA955X device
--     */
--    s->max_reg = PCA9552_LS3;
--    s->pin_count = 16;
--
--    for (led = 0; led < s->pin_count; led++) {
-+    for (led = 0; led < k->pin_count; led++) {
-         char *name;
- 
-         name = g_strdup_printf("led%d", led);
-@@ -303,7 +316,14 @@ static void pca955x_initfn(Object *obj)
-     }
- }
- 
--static void pca9552_class_init(ObjectClass *klass, void *data)
-+static void pca955x_realize(DeviceState *dev, Error **errp)
-+{
-+    PCA955xClass *k = PCA955X_GET_CLASS(dev);
-+
-+    assert(k->pin_count <= PCA955X_PIN_COUNT_MAX);
-+}
-+
-+static void pca955x_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
-@@ -311,20 +331,38 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
-     k->event = pca955x_event;
-     k->recv = pca955x_recv;
-     k->send = pca955x_send;
-+    dc->realize = pca955x_realize;
-+}
-+
-+static const TypeInfo pca955x_info = {
-+    .name          = TYPE_PCA955X,
-+    .parent        = TYPE_I2C_SLAVE,
-+    .instance_init = pca955x_initfn,
-+    .instance_size = sizeof(PCA955xState),
-+    .class_init    = pca955x_class_init,
-+    .abstract      = true,
-+};
-+
-+static void pca9552_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    PCA955xClass *pc = PCA955X_CLASS(oc);
-+
-     dc->reset = pca9552_reset;
-     dc->vmsd = &pca9552_vmstate;
-+    pc->max_reg = PCA9552_LS3;
-+    pc->pin_count = 16;
- }
- 
- static const TypeInfo pca9552_info = {
-     .name          = TYPE_PCA9552,
--    .parent        = TYPE_I2C_SLAVE,
--    .instance_init = pca955x_initfn,
--    .instance_size = sizeof(PCA955xState),
-+    .parent        = TYPE_PCA955X,
-     .class_init    = pca9552_class_init,
- };
- 
- static void pca955x_register_types(void)
- {
-+    type_register_static(&pca955x_info);
-     type_register_static(&pca9552_info);
- }
- 
 -- 
 2.21.3
 
