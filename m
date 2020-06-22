@@ -2,99 +2,72 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69828C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96282C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:25:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35ECF20732
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:24:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b4o0Abqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35ECF20732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6A23920732
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 18:25:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A23920732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnR7Z-00053J-D0
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 14:24:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41170)
+	id 1jnR7z-0005m9-Mb
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 14:25:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnR6M-0004BZ-9w
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 14:23:26 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37665)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnR6J-0006ZA-Tq
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 14:23:25 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a6so15716641wrm.4
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 11:23:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=3V/aEamdd1N9VTaMBbiv286XoNvjhToyRxQ/Rr6dphM=;
- b=b4o0AbqshxUldZHuFqfWn2BWPhnZHS9Ae5fPwjaPpR8a2FHk/eIwCtLHaHQWGql2bL
- dgFc/TgXtyhNn1XnVyxISzGEgsynJIFcUEcyNqSIC7ooLWSBr2BQs+GgS3lKH3ERcgan
- jQg+in9Xnx1Q3Dx/VIu3tJRa/OXIfvy28agPHE6b5ZxVGHJ9B35Rfnr/8xoMkq/Ykh4o
- Skvg6CxA3Jjhbq2Hv2kcLp/wEizkh8wqFGH83p2CSFoje6JpthkBKyNCauO/TgvPDKa4
- Y7HaVjx5/7exXj502ipgOxnrWnCaZ0H2D1QUEOUaS3Rcvq/QlsiBCriKC7SaJ+E1QAHT
- nc5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=3V/aEamdd1N9VTaMBbiv286XoNvjhToyRxQ/Rr6dphM=;
- b=lrlNLVwV9pc2TyoGr3PDAl+mSMoDCbXrUjO01EtxU2x1cJG712ggJ9kxvCIDc+XaOk
- H8Zhprl+FYEYDt8gw8masA9Ahs1fol8ejeQ85Gx6kU7/UZq6YVESofrw3gMTp9Bj/yPt
- D5sNkXgUx5N8qXkjXxxu/ZHLwIMMuV2HL/W2g2anUs1XEsEx7jIej7+5BnE5iJ3cTX4D
- AUzrAAljkHViJLAHf7R5qT0drT9EDFwb+NYbWPyfHv8A6Zmw6+460ZmmuiWjdN3ZTji1
- DyYptq49DWnEuVqbFm2IbjDC20NNSNnMP2XzoDHiaR/UHeiKHB0MzanxHS/EVR47t2d1
- Bxpg==
-X-Gm-Message-State: AOAM5311unizuHLJJRkicw0DjIZnFVm5AWw4bQa2zROvhRbRQ+KFa4RI
- lmU1mtmxnZ4jerd0ibXrM3ZjVA==
-X-Google-Smtp-Source: ABdhPJwGcUecJOAimEVh/Ks7sgznKj1wsdlzKYOBuBGNkbEazZDBsH3IpumZzaZM4bIQNtSYeaUKiA==
-X-Received: by 2002:a05:6000:12c8:: with SMTP id
- l8mr21045216wrx.148.1592850202266; 
- Mon, 22 Jun 2020 11:23:22 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u65sm482920wmg.5.2020.06.22.11.23.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 11:23:21 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 588B71FF7E;
- Mon, 22 Jun 2020 19:23:20 +0100 (BST)
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-2-alex.bennee@linaro.org>
- <9ad1234e-bbb7-9396-21e1-58041cffd847@redhat.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v1 01/18] iotests: Fix 051 output after
- qdev_init_nofail() removal
-In-reply-to: <9ad1234e-bbb7-9396-21e1-58041cffd847@redhat.com>
-Date: Mon, 22 Jun 2020 19:23:20 +0100
-Message-ID: <87d05r9cyv.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jnR6v-0004q6-Lz; Mon, 22 Jun 2020 14:24:01 -0400
+Received: from mga09.intel.com ([134.134.136.24]:56187)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jnR6t-0006d8-Nc; Mon, 22 Jun 2020 14:24:01 -0400
+IronPort-SDR: j5wwedQAkBjSVYh3/hpM+VlOSMMszvGGTmbWxt0wbimYxYOwX8cGmz5JSv1WDf7cWC5gRdRiqb
+ 7t6lT7uinIVg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="145349239"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="145349239"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Jun 2020 11:23:55 -0700
+IronPort-SDR: ECkXINR4FdqSCUcI62Lo+vlnpMlvjM+hEjjMvQVeh7jO7E8gg0gkQvfqXAAQFRxvMEyI+zDSnD
+ QNRThmpSvdEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="300930923"
+Received: from unknown (HELO localhost.ch.intel.com) ([10.2.61.79])
+ by fmsmga004.fm.intel.com with ESMTP; 22 Jun 2020 11:23:54 -0700
+From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+To: kbusch@kernel.org,
+	kwolf@redhat.com,
+	mreitz@redhat.com
+Subject: [PATCH v3 1/2] nvme: indicate CMB support through controller
+ capabilities register
+Date: Mon, 22 Jun 2020 11:25:10 -0700
+Message-Id: <20200622182511.17252-2-andrzej.jakowski@linux.intel.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200622182511.17252-1-andrzej.jakowski@linux.intel.com>
+References: <20200622182511.17252-1-andrzej.jakowski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=134.134.136.24;
+ envelope-from=andrzej.jakowski@linux.intel.com; helo=mga09.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 14:23:54
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,78 +80,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, berrange@redhat.com, "open list:Block
- layer core" <qemu-block@nongnu.org>, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org,
- Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: Klaus Jensen <k.jensen@samsung.com>,
+ Andrzej Jakowski <andrzej.jakowski@linux.intel.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch sets CMBS bit in controller capabilities register when user
+configures NVMe driver with CMB support, so capabilites are correctly
+reported to guest OS.
 
-John Snow <jsnow@redhat.com> writes:
+Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme.c      | 2 +-
+ include/block/nvme.h | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-> On 6/22/20 10:31 AM, Alex Benn=C3=A9e wrote:
->> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>=20
->> Commit 96927c744 replaced qdev_init_nofail() call by
->> isa_realize_and_unref() which has a different error
->> message. Update the test output accordingly.
->>=20
->> Gitlab CI error after merging b77b5b3dc7:
->> https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
->>=20
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Message-Id: <20200616154949.6586-1-philmd@redhat.com>
->> ---
->>  tests/qemu-iotests/051.pc.out | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.o=
-ut
->> index 0ea80d35f0e..da8ad871876 100644
->> --- a/tests/qemu-iotests/051.pc.out
->> +++ b/tests/qemu-iotests/051.pc.out
->> @@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
->>=20=20
->>  Testing: -drive if=3Dide
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs =
-media, but drive is empty
->> +(qemu) QEMU_PROG: Device needs media, but drive is empty
->>=20=20
->>  Testing: -drive if=3Dvirtio
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> @@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
->>=20=20
->>  Testing: -drive file=3DTEST_DIR/t.qcow2,if=3Dide,readonly=3Don
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> -(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is=
- read-only
->> +(qemu) QEMU_PROG: Block node is read-only
->>=20=20
->>  Testing: -drive file=3DTEST_DIR/t.qcow2,if=3Dvirtio,readonly=3Don
->>  QEMU X.Y.Z monitor - type 'help' for more information
->>=20
->
-> Just ran into this and wrote an identical fix. The error is not in
-> 051.out so the pc-only fix appears to be fine.
->
-> Reviewed-by: John Snow <jsnow@redhat.com>
->
-> (There seem to be other problems with the CI at the moment, but the
-> failures I am seeing are not related to this, so I think it's probably fi=
-ne)
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 1aee042d4c..9f11f3e9da 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1582,6 +1582,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     NVME_CAP_SET_TO(n->bar.cap, 0xf);
+     NVME_CAP_SET_CSS(n->bar.cap, 1);
+     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
++    NVME_CAP_SET_CMBS(n->bar.cap, n->params.cmb_size_mb ? 1 : 0);
+ 
+     n->bar.vs = 0x00010200;
+     n->bar.intmc = n->bar.intms = 0;
+@@ -1591,7 +1592,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     NvmeCtrl *n = NVME(pci_dev);
+     Error *local_err = NULL;
+-
+     int i;
+ 
+     nvme_check_constraints(n, &local_err);
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 1720ee1d51..14cf398dfa 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -35,6 +35,7 @@ enum NvmeCapShift {
+     CAP_MPSMIN_SHIFT   = 48,
+     CAP_MPSMAX_SHIFT   = 52,
+     CAP_PMR_SHIFT      = 56,
++    CAP_CMB_SHIFT      = 57,
+ };
+ 
+ enum NvmeCapMask {
+@@ -48,6 +49,7 @@ enum NvmeCapMask {
+     CAP_MPSMIN_MASK    = 0xf,
+     CAP_MPSMAX_MASK    = 0xf,
+     CAP_PMR_MASK       = 0x1,
++    CAP_CMB_MASK       = 0x1,
+ };
+ 
+ #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
+@@ -78,8 +80,10 @@ enum NvmeCapMask {
+                                                            << CAP_MPSMIN_SHIFT)
+ #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
+                                                             << CAP_MPSMAX_SHIFT)
+-#define NVME_CAP_SET_PMRS(cap, val) (cap |= (uint64_t)(val & CAP_PMR_MASK)\
++#define NVME_CAP_SET_PMRS(cap, val)   (cap |= (uint64_t)(val & CAP_PMR_MASK)   \
+                                                             << CAP_PMR_SHIFT)
++#define NVME_CAP_SET_CMBS(cap, val)   (cap |= (uint64_t)(val & CAP_CMB_MASK)   \
++                                                           << CAP_CMB_SHIFT)
+ 
+ enum NvmeCcShift {
+     CC_EN_SHIFT     = 0,
+-- 
+2.21.1
 
-It's queued via Max's tree - it's just easier to keep them in
-testing/next while I'm testing. I assume his PR will beat the eventual
-PR from this.
-
---=20
-Alex Benn=C3=A9e
 
