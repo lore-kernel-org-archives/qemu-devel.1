@@ -2,86 +2,92 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E847C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFDBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5F6220716
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B51C420716
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 21:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSzseocd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F6220716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="q945bKmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51C420716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnU4e-00052L-U0
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:33:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38930)
+	id 1jnU5D-0005z7-QN
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 17:34:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jnU2f-0003Wk-Q5; Mon, 22 Jun 2020 17:31:49 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36003)
+ (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
+ id 1jnU3b-0004CF-E0
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:32:47 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39640)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jnU2d-0005fN-Da; Mon, 22 Jun 2020 17:31:49 -0400
-Received: by mail-il1-x144.google.com with SMTP id x9so3580734ila.3;
- Mon, 22 Jun 2020 14:31:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zPzwGUMTr/d9Wz3NvTxGlPUOOwMtZQu1Qk9M7VwGTb8=;
- b=CSzseocdI6OD/k0DHOJBGNCNQ3kxpZoZ5BMjcIxfdmfDu5S1eIPONtKv0EI/qEaxoL
- PEXsmzFh7ms5M/ZfCmBjWX4vqyO11loJNiLkRQHVFXbXKHM6xxbNA8Iw5vXLMMTQhg1P
- rSw3EeP5dKuA7Hx5WYT9fDq7xg7KvhSDKtValc2/FHzJgEGWqr7XJF9G0Zgj+DWTGIPW
- kuTyNrOyhGStqnf19IU1ub1Z9pdW8WDVUgp/EMEkLLHST+0iJXC4UqHzcY0fcBzvwhZI
- LpQYHZ3voUeZ6KeZ6RKRIUtBL7ATQrg4mkI6paXytPVg1pSOR6GeGj+MsWOKPzowSeuA
- 362g==
+ (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
+ id 1jnU3W-000640-Me
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 17:32:46 -0400
+Received: by mail-oi1-x243.google.com with SMTP id d67so16978889oig.6
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 14:32:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=a1lkXyQ9aSVkgk0mGXS9UNgX64K5VdRMoBWw1iXHdaw=;
+ b=q945bKmjtdBzXdK9vxfQYEoBcHZaZHBHuQrhXNMOsd7lZ3WMJSn5KirlPoZMCBdJKP
+ Rxrsm0pvZuwPtf+TJ4C94Nd+smFkLhtl+UbrR8d1oZgs9rzqsWmLAPU0nDcNL/xkJ4TI
+ +LdU2Xi5yZ17BcheEdgAa/stkH/DsDb59R7ZqZudL+hEC9jCD/cShlyWQFqYTptGMQZ4
+ Rzd8ZzOGBGl20RwrV0N5itGtU9pwIxfyiUC12goYo0u6D4ncas+sH8NtN04DFL899NtK
+ 3PRzEZfzoWMpPdXyFSRVbY6z8nqUGhVS6bKvtjSxsdq30mPL++Th4co/tkZpzLj1xwe+
+ s1wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zPzwGUMTr/d9Wz3NvTxGlPUOOwMtZQu1Qk9M7VwGTb8=;
- b=OgvngpjTJihbz48Me1UPcTQ+hHajRRgcLycD259LwdyTjHKkd6PxA3502Q8wvAwKnG
- oMhcFl8xEshC7FJTeTLL7SiiBugydrvx7IVGtEBdnOMLiiEXKmmhTl0Vt9HGwOItqvqq
- RTLWC1C0vte79oKpNJ0bo9mqUF9WJcn/V0aJPVYg/RHC3eZRynEjZKU5WoXQZ0gMzq5Q
- K1OYvxsUEwv1jZGog6jCcg73cvoBq5H0lD07xPlhtBW+VJMrtbu68JDiBHfmVAwKYvrt
- +V9xKi5Ulb8JBaS4LCvh+WVUjVGPkXbl2LJcfutUtOVB6muXMvhpcE0mPf1zEWkwWJ/p
- L+hg==
-X-Gm-Message-State: AOAM530W41+6tNpuRoxfrT8PTPuKtdBFwYiWUW8VAwC2UxINyE6quz6c
- jeFJTA+072DMDZ0/mUOytzs0gSWmX4o1dMnziKc=
-X-Google-Smtp-Source: ABdhPJwQzhg42FvPzSPghc3ewY5gUJW/6b4oskuRLhqqKTLHBKmUzwxyzOtY298DgrexHYGLKGaFxLZNknW+FmekCoE=
-X-Received: by 2002:a92:1b4c:: with SMTP id b73mr17641592ilb.131.1592861505915; 
- Mon, 22 Jun 2020 14:31:45 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=a1lkXyQ9aSVkgk0mGXS9UNgX64K5VdRMoBWw1iXHdaw=;
+ b=oQocCez5MpOwPpoyBqlygc1A6mXGTnz9917Gbyog4+ldhAKJmrTyBltFr3N/5/deXV
+ gXS7oxKaCEN9JTTjoS4F+9DVDBnO9WVXiP2rI+BnHJ/kcZUm2d+tPZZF+RYHh20A1acD
+ npE2BPcauQnCDMSqfFCHSkcyDVAGjQF6/KH+hwgYe53ZoP7Jj+47zGVrdAz5/Y/QZuvW
+ DB51fHgvE6PR/rD9Uv6shWKloNxuSQ1awX+QOWHBmgBoD3m1Mr8Mlsyc384C0Wo/oNuG
+ YOF42AmjK7IMdflTMxpnNYkLvJBTEkwNQrwBL8Q6svopP+dB3pviGy/JKVXProtjE01Z
+ wixg==
+X-Gm-Message-State: AOAM531Q7O2vvO1uKyXm0joh/wpTP0PnYiZrmmbyYGkmUOIMUrVWszsx
+ TQQN9ORBre3wG/1hDtkb0e3kaA==
+X-Google-Smtp-Source: ABdhPJyZGqPr6GJa21asZITlwkTlYoMY9xfBPvqK/QY86/A9rFYDCPFGmXurjL7CwSIJhOTZ9KOg5A==
+X-Received: by 2002:aca:554c:: with SMTP id j73mr14628599oib.172.1592861560253; 
+ Mon, 22 Jun 2020 14:32:40 -0700 (PDT)
+Received: from minyard.net ([2001:470:b8f6:1b:acca:171:3424:849f])
+ by smtp.gmail.com with ESMTPSA id z5sm3568876otp.28.2020.06.22.14.32.39
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 22 Jun 2020 14:32:39 -0700 (PDT)
+Date: Mon, 22 Jun 2020 16:32:37 -0500
+From: Corey Minyard <cminyard@mvista.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH] i2c: Match parameters of i2c_start_transfer and
+ i2c_send_recv
+Message-ID: <20200622213237.GB3258@minyard.net>
+References: <20200621145235.9E241745712@zero.eik.bme.hu>
 MIME-Version: 1.0
-References: <20200622104250.1404835-1-armbru@redhat.com>
- <20200622104250.1404835-17-armbru@redhat.com>
-In-Reply-To: <20200622104250.1404835-17-armbru@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 22 Jun 2020 14:22:13 -0700
-Message-ID: <CAKmqyKM2bUbgZD7gEFJ9A99dQ2zzCoSydOrp51pEeWmWCpE+bA@mail.gmail.com>
-Subject: Re: [PATCH 16/22] hw: Fix error API violation around
- object_property_set_link()
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200621145235.9E241745712@zero.eik.bme.hu>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: permerror client-ip=2607:f8b0:4864:20::243;
+ envelope-from=cminyard@mvista.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,243 +101,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: cminyard@mvista.com
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 22, 2020 at 3:53 AM Markus Armbruster <armbru@redhat.com> wrote:
->
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->
-> virtio_gpu_pci_base_realize(), virtio_vga_base_realize(),
-> sparc32_ledma_device_realize(), sparc32_dma_realize(),
-> sparc32_dma_realize() xilinx_axidma_realize(), mips_cps_realize(),
-> macio_realize_ide(), xilinx_enet_realize(), and
-> virtio_iommu_pci_realize() are wrong that way: they reuse the argument
-> they pass to object_property_set_link() for another call.
->
-> Harmless, because object_property_set_link() can't actually fail for
-> them: it fails when the property doesn't exist, is not settable, or
-> its .check() method fails.  Fix by passing &error_abort instead.
->
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Sun, Jun 21, 2020 at 04:43:38PM +0200, BALATON Zoltan wrote:
+> These functions have a parameter that decides the direction of
+> transfer but totally confusingly they don't match but inverted sense.
+> To avoid frequent mistakes when using these functions change
+> i2c_send_recv to match i2c_start_transfer. Also use bool in
+> i2c_start_transfer instead of int to match i2c_send_recv.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Hmm, I have to admit that this is a little better.  Indeed the
+hw/misc/auxbus.c looks suspicious.  I can't imagine that code has ever
+been tested.
 
-Alistair
+I don't know the policy on changing an API like this with silent
+semantic changes.  You've gotten all the internal ones; I'm wondering if
+we worry about silently breaking out of tree things.
 
+I'll pull this into my tree, but hopefully others will comment on this.
+
+-corey
+
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/display/virtio-gpu-pci.c  |  2 +-
->  hw/display/virtio-vga.c      |  2 +-
->  hw/dma/sparc32_dma.c         |  6 +++---
->  hw/dma/xilinx_axidma.c       | 12 ++----------
->  hw/mips/cps.c                |  6 ++++--
->  hw/misc/macio/macio.c        |  3 ++-
->  hw/net/xilinx_axienet.c      | 12 ++----------
->  hw/virtio/virtio-iommu-pci.c |  2 +-
->  8 files changed, 16 insertions(+), 29 deletions(-)
->
-> diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
-> index b532fe8b5f..41b88b878d 100644
-> --- a/hw/display/virtio-gpu-pci.c
-> +++ b/hw/display/virtio-gpu-pci.c
-> @@ -44,7 +44,7 @@ static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->      for (i = 0; i < g->conf.max_outputs; i++) {
->          object_property_set_link(OBJECT(g->scanout[i].con),
->                                   OBJECT(vpci_dev),
-> -                                 "device", errp);
-> +                                 "device", &error_abort);
+> Looks like hw/misc/auxbus.c already got this wrong and calls both
+> i2c_start_transfer and i2c_send_recv with same is_write parameter.
+> Although the name of the is_write variable suggest this may need to be
+> inverted I'm not sure what that value actially means and which usage
+> was correct so I did not touch it. Someone knowing this device might
+> want to review and fix it.
+> 
+>  hw/display/sm501.c   |  2 +-
+>  hw/i2c/core.c        | 34 +++++++++++++++++-----------------
+>  hw/i2c/ppc4xx_i2c.c  |  2 +-
+>  include/hw/i2c/i2c.h |  4 ++--
+>  4 files changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> index 2db347dcbc..ccd0a6e376 100644
+> --- a/hw/display/sm501.c
+> +++ b/hw/display/sm501.c
+> @@ -1034,7 +1034,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
+>                      int i;
+>                      for (i = 0; i <= s->i2c_byte_count; i++) {
+>                          res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
+> -                                            !(s->i2c_addr & 1));
+> +                                            s->i2c_addr & 1);
+>                          if (res) {
+>                              s->i2c_status |= SM501_I2C_STATUS_ERROR;
+>                              return;
+> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+> index 1aac457a2a..c9d01df427 100644
+> --- a/hw/i2c/core.c
+> +++ b/hw/i2c/core.c
+> @@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
+>   * without releasing the bus.  If that fails, the bus is still
+>   * in a transaction.
+>   */
+> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
+> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
+>  {
+>      BusChild *kid;
+>      I2CSlaveClass *sc;
+> @@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
+>      bus->broadcast = false;
+>  }
+>  
+> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
+>  {
+>      I2CSlaveClass *sc;
+>      I2CSlave *s;
+>      I2CNode *node;
+>      int ret = 0;
+>  
+> -    if (send) {
+> -        QLIST_FOREACH(node, &bus->current_devs, next) {
+> -            s = node->elt;
+> -            sc = I2C_SLAVE_GET_CLASS(s);
+> -            if (sc->send) {
+> -                trace_i2c_send(s->address, *data);
+> -                ret = ret || sc->send(s, *data);
+> -            } else {
+> -                ret = -1;
+> -            }
+> -        }
+> -        return ret ? -1 : 0;
+> -    } else {
+> +    if (recv) {
+>          ret = 0xff;
+>          if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
+>              sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+> @@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+>          }
+>          *data = ret;
+>          return 0;
+> +    } else {
+> +        QLIST_FOREACH(node, &bus->current_devs, next) {
+> +            s = node->elt;
+> +            sc = I2C_SLAVE_GET_CLASS(s);
+> +            if (sc->send) {
+> +                trace_i2c_send(s->address, *data);
+> +                ret = ret || sc->send(s, *data);
+> +            } else {
+> +                ret = -1;
+> +            }
+> +        }
+> +        return ret ? -1 : 0;
 >      }
 >  }
->
-> diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-> index 68a062ece6..67f409e106 100644
-> --- a/hw/display/virtio-vga.c
-> +++ b/hw/display/virtio-vga.c
-> @@ -154,7 +154,7 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->      for (i = 0; i < g->conf.max_outputs; i++) {
->          object_property_set_link(OBJECT(g->scanout[i].con),
->                                   OBJECT(vpci_dev),
-> -                                 "device", errp);
-> +                                 "device", &error_abort);
->      }
+>  
+>  int i2c_send(I2CBus *bus, uint8_t data)
+>  {
+> -    return i2c_send_recv(bus, &data, true);
+> +    return i2c_send_recv(bus, &data, false);
 >  }
->
-> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-> index f02aca6f40..2d7dbbb92d 100644
-> --- a/hw/dma/sparc32_dma.c
-> +++ b/hw/dma/sparc32_dma.c
-> @@ -346,7 +346,7 @@ static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
->      d = qdev_new(TYPE_LANCE);
->      object_property_add_child(OBJECT(dev), "lance", OBJECT(d));
->      qdev_set_nic_properties(d, nd);
-> -    object_property_set_link(OBJECT(d), OBJECT(dev), "dma", errp);
-> +    object_property_set_link(OBJECT(d), OBJECT(dev), "dma", &error_abort);
->      sysbus_realize_and_unref(SYS_BUS_DEVICE(d), &error_fatal);
+>  
+>  uint8_t i2c_recv(I2CBus *bus)
+>  {
+>      uint8_t data = 0xff;
+>  
+> -    i2c_send_recv(bus, &data, false);
+> +    i2c_send_recv(bus, &data, true);
+>      return data;
 >  }
->
-> @@ -379,7 +379,7 @@ static void sparc32_dma_realize(DeviceState *dev, Error **errp)
->      }
->
->      espdma = qdev_new(TYPE_SPARC32_ESPDMA_DEVICE);
-> -    object_property_set_link(OBJECT(espdma), iommu, "iommu", errp);
-> +    object_property_set_link(OBJECT(espdma), iommu, "iommu", &error_abort);
->      object_property_add_child(OBJECT(s), "espdma", OBJECT(espdma));
->      sysbus_realize_and_unref(SYS_BUS_DEVICE(espdma), &error_fatal);
->
-> @@ -394,7 +394,7 @@ static void sparc32_dma_realize(DeviceState *dev, Error **errp)
->                                  sysbus_mmio_get_region(sbd, 0));
->
->      ledma = qdev_new(TYPE_SPARC32_LEDMA_DEVICE);
-> -    object_property_set_link(OBJECT(ledma), iommu, "iommu", errp);
-> +    object_property_set_link(OBJECT(ledma), iommu, "iommu", &error_abort);
->      object_property_add_child(OBJECT(s), "ledma", OBJECT(ledma));
->      sysbus_realize_and_unref(SYS_BUS_DEVICE(ledma), &error_fatal);
->
-> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-> index 6a9df2c4db..a069637bf2 100644
-> --- a/hw/dma/xilinx_axidma.c
-> +++ b/hw/dma/xilinx_axidma.c
-> @@ -537,7 +537,6 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
->      XilinxAXIDMAStreamSlave *ds = XILINX_AXI_DMA_DATA_STREAM(&s->rx_data_dev);
->      XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(
->                                                              &s->rx_control_dev);
-> -    Error *local_err = NULL;
->      int i;
->
->      object_property_add_link(OBJECT(ds), "dma", TYPE_XILINX_AXI_DMA,
-> @@ -548,11 +547,8 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
->                               (Object **)&cs->dma,
->                               object_property_allow_set_link,
->                               OBJ_PROP_LINK_STRONG);
-> -    object_property_set_link(OBJECT(ds), OBJECT(s), "dma", &local_err);
-> -    object_property_set_link(OBJECT(cs), OBJECT(s), "dma", &local_err);
-> -    if (local_err) {
-> -        goto xilinx_axidma_realize_fail;
-> -    }
-> +    object_property_set_link(OBJECT(ds), OBJECT(s), "dma", &error_abort);
-> +    object_property_set_link(OBJECT(cs), OBJECT(s), "dma", &error_abort);
->
->      for (i = 0; i < 2; i++) {
->          struct Stream *st = &s->streams[i];
-> @@ -567,10 +563,6 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
->
->      address_space_init(&s->as,
->                         s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
-> -    return;
-> -
-> -xilinx_axidma_realize_fail:
-> -    error_propagate(errp, local_err);
->  }
->
->  static void xilinx_axidma_init(Object *obj)
-> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-> index cdfab19826..5382bc86f7 100644
-> --- a/hw/mips/cps.c
-> +++ b/hw/mips/cps.c
-> @@ -150,8 +150,10 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
->      object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
->      object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
->      object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err);
-> -    object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->gic.mr), "gic", &err);
-> -    object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->cpc.mr), "cpc", &err);
-> +    object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->gic.mr), "gic",
-> +                             &error_abort);
-> +    object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->cpc.mr), "cpc",
-> +                             &error_abort);
->      sysbus_realize(SYS_BUS_DEVICE(&s->gcr), &err);
->      if (err != NULL) {
->          error_propagate(errp, err);
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index 8ba7af073c..3251c79f46 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -136,7 +136,8 @@ static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
->      sysbus_connect_irq(sysbus_dev, 0, irq0);
->      sysbus_connect_irq(sysbus_dev, 1, irq1);
->      qdev_prop_set_uint32(DEVICE(ide), "channel", dmaid);
-> -    object_property_set_link(OBJECT(ide), OBJECT(&s->dbdma), "dbdma", errp);
-> +    object_property_set_link(OBJECT(ide), OBJECT(&s->dbdma), "dbdma",
-> +                             &error_abort);
->      macio_ide_register_dma(ide);
->
->      qdev_realize(DEVICE(ide), BUS(&s->macio_bus), errp);
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index c2f40b8ea9..679a359f9a 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -980,7 +980,6 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
->      XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(&s->rx_data_dev);
->      XilinxAXIEnetStreamSlave *cs = XILINX_AXI_ENET_CONTROL_STREAM(
->                                                              &s->rx_control_dev);
-> -    Error *local_err = NULL;
->
->      object_property_add_link(OBJECT(ds), "enet", "xlnx.axi-ethernet",
->                               (Object **) &ds->enet,
-> @@ -990,11 +989,8 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
->                               (Object **) &cs->enet,
->                               object_property_allow_set_link,
->                               OBJ_PROP_LINK_STRONG);
-> -    object_property_set_link(OBJECT(ds), OBJECT(s), "enet", &local_err);
-> -    object_property_set_link(OBJECT(cs), OBJECT(s), "enet", &local_err);
-> -    if (local_err) {
-> -        goto xilinx_enet_realize_fail;
-> -    }
-> +    object_property_set_link(OBJECT(ds), OBJECT(s), "enet", &error_abort);
-> +    object_property_set_link(OBJECT(cs), OBJECT(s), "enet", &error_abort);
->
->      qemu_macaddr_default_if_unset(&s->conf.macaddr);
->      s->nic = qemu_new_nic(&net_xilinx_enet_info, &s->conf,
-> @@ -1008,10 +1004,6 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
->
->      s->rxmem = g_malloc(s->c_rxmem);
->      s->txmem = g_malloc(s->c_txmem);
-> -    return;
-> -
-> -xilinx_enet_realize_fail:
-> -    error_propagate(errp, local_err);
->  }
->
->  static void xilinx_enet_init(Object *obj)
-> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-> index 632533abaf..bd61d6e2f8 100644
-> --- a/hw/virtio/virtio-iommu-pci.c
-> +++ b/hw/virtio/virtio-iommu-pci.c
-> @@ -56,7 +56,7 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->      }
->      object_property_set_link(OBJECT(dev),
->                               OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
-> -                             "primary-bus", errp);
-> +                             "primary-bus", &error_abort);
->      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
->  }
->
-> --
-> 2.26.2
->
->
+>  
+> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> index c0a8e04567..d3899203a4 100644
+> --- a/hw/i2c/ppc4xx_i2c.c
+> +++ b/hw/i2c/ppc4xx_i2c.c
+> @@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+>                      }
+>                  }
+>                  if (!(i2c->sts & IIC_STS_ERR) &&
+> -                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
+> +                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
+>                      i2c->sts |= IIC_STS_ERR;
+>                      i2c->extsts |= IIC_EXTSTS_XFRA;
+>                      break;
+> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+> index 4117211565..a09ab9230b 100644
+> --- a/include/hw/i2c/i2c.h
+> +++ b/include/hw/i2c/i2c.h
+> @@ -72,10 +72,10 @@ struct I2CBus {
+>  I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
+>  void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
+>  int i2c_bus_busy(I2CBus *bus);
+> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
+> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
+>  void i2c_end_transfer(I2CBus *bus);
+>  void i2c_nack(I2CBus *bus);
+> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
+> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
+>  int i2c_send(I2CBus *bus, uint8_t data);
+>  uint8_t i2c_recv(I2CBus *bus);
+>  
+> -- 
+> 2.21.3
+> 
 
