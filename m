@@ -2,79 +2,79 @@ Return-Path: <SRS0=TEh4=AD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1741C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABA4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D31220706
-	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 072A320720
+	for <qemu-devel@archiver.kernel.org>; Mon, 22 Jun 2020 10:56:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IaOG/UcK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D31220706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhUIwiSw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 072A320720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnK7X-00030r-Nn
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:56:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40158)
+	id 1jnK7u-0003wH-6y
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 06:56:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJus-0007VQ-QM
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23213
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJxX-0003LT-2q
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:45:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23420
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnJuo-0005Nq-21
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:43:06 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnJxV-0005u7-Ai
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 06:45:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592822581;
+ s=mimecast20190719; t=1592822748;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IYwLcf+pVYTALN5ScB1Ik10sfW/uN0EbKCOlzTQRBqM=;
- b=IaOG/UcKJIWBPNQvUqPp9rpzFQWermLboIG225X1iyfp47+O0JPx/H7eIuf7nb1LkvRksI
- qMQLK/A/BHL+b18J7bAUFkj5rP1NeVfMzbTuQPf9XBnzYmTfU0ZhgnjGKb3cbhy8Bsb1Cd
- XH2I5IMk7ZN93GFAEgShEa/nXajyvng=
+ bh=SQ8HakB7ZbOWyB4Yh3QhjSoK4c42rgj7fcN30BSDmzc=;
+ b=YhUIwiSw1DdVDRa97pVC9L+RUW6vbneiDYp+lkNoS734HWQPCm8pTwSKqsKp/lqp/zUupR
+ 968oBlGD9zWzNQ+PN/h6qb1ILEfDHIfBLihFdnVkmmrozGuAUa/I2aac5YzRPprocBDSV4
+ lJ/IKwSY5zFqLOTcFCf+IfjgngsVmi8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-Ie1VV9K7OUCSL1un44RDqQ-1; Mon, 22 Jun 2020 06:42:59 -0400
-X-MC-Unique: Ie1VV9K7OUCSL1un44RDqQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-21-HvYVR4JnNR6BvDfJ0DuGLA-1; Mon, 22 Jun 2020 06:45:47 -0400
+X-MC-Unique: HvYVR4JnNR6BvDfJ0DuGLA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6DD210059A1
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 10:42:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF2AE1CA;
- Mon, 22 Jun 2020 10:42:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 286A81138479; Mon, 22 Jun 2020 12:42:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 11/22] vnc: Plug minor memory leak in vnc_display_open()
-Date: Mon, 22 Jun 2020 12:42:39 +0200
-Message-Id: <20200622104250.1404835-12-armbru@redhat.com>
-In-Reply-To: <20200622104250.1404835-1-armbru@redhat.com>
-References: <20200622104250.1404835-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B76A464;
+ Mon, 22 Jun 2020 10:45:45 +0000 (UTC)
+Received: from gondolin (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC0C060BEC;
+ Mon, 22 Jun 2020 10:45:34 +0000 (UTC)
+Date: Mon, 22 Jun 2020 12:45:32 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Subject: Re: [PATCH v3 4/8] s390/sclp: read sccb from mem based on sccb length
+Message-ID: <20200622124532.23dd722a.cohuck@redhat.com>
+In-Reply-To: <20200618222258.23287-5-walling@linux.ibm.com>
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-5-walling@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 01:27:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 02:57:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,44 +95,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
+ mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vnc_display_print_local_addr() leaks the Error object when
-qio_channel_socket_get_local_address() fails.  Seems unlikely.  Called
-when we create a VNC display with vnc_display_open().  Plug the leak
-by passing NULL to ignore the error.
+On Thu, 18 Jun 2020 18:22:54 -0400
+Collin Walling <walling@linux.ibm.com> wrote:
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- ui/vnc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> The header of the SCCB contains the actual length of the SCCB. Instead
+> of using a static 4K size, let's allow for a variable size determined
+> by the value set in the header. The proper checks are already in place
+> to ensure the SCCB length is sufficent to store a full response, and
+> that the length does not cross any explicitly-set boundaries.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/sclp.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 0702a76cce..527ad25124 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3274,13 +3274,12 @@ int vnc_display_pw_expire(const char *id, time_t expires)
- static void vnc_display_print_local_addr(VncDisplay *vd)
- {
-     SocketAddress *addr;
--    Error *err = NULL;
- 
-     if (!vd->listener || !vd->listener->nsioc) {
-         return;
-     }
- 
--    addr = qio_channel_socket_get_local_address(vd->listener->sioc[0], &err);
-+    addr = qio_channel_socket_get_local_address(vd->listener->sioc[0], NULL);
-     if (!addr) {
-         return;
-     }
--- 
-2.26.2
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
