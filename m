@@ -2,93 +2,96 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5692C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21657C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:56:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A09AE2064B
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:55:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TwBVHhUN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A09AE2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E564D20738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E564D20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhWb-0005Ou-R6
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44110)
+	id 1jnhXM-0007Lw-6g
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:56:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhH1-0002vT-GQ
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:31 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44681)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhGy-0003Ep-QC
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:30 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id b6so20155035wrs.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=7ABA729UVkpFOfH4LLy6vk4NgixPmbR3i5MHSNOuZUk=;
- b=TwBVHhUNeNHeBVExzduvB76aSjvylzK0ZQfhj6uwN+/oBK0Ih0uyoDSDZ6aBD0/Qer
- T0ybRjB5xn2fHpxkXigNuf/Ew4aX8iquATdaCx335rvSJ19oq7d4Q+LOZjIA/PNxiOVG
- FBNL5NkhlEHcCdjyjiCXkHNbZNj101F7iMTQgLLuphST674EDu7cFKF9meqDVYnFWBTv
- OyuBW7SrLCCA4pGiwKcmyEJ+8g6OmeKlMFssiYyujwDvoOWokJfxPikLLopwZhZOZQjH
- cfYUZok01chLGksB1GbicX1k1US8AZXXyTfeHqd+4S8+OsP578nmuPPeiuCtdNZXyrzx
- xvWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7ABA729UVkpFOfH4LLy6vk4NgixPmbR3i5MHSNOuZUk=;
- b=SqIZR3CG6hyKr27Qbgv+1wHz6VWoR5MRjSTiYmr2/Fe+aydQ2tqBEw8FYV98LyIl/S
- EHltijNx9T5tFOCQeQCAlnBF78BcffqqmZTgRWzY+MN4UEbh8BI3aJhTzqPgbnSpKqG5
- tAM449UbQJvQ2VoyBwVGiSlNQvDWE1u8npIvNY8E8cT+OYT5WO5lSEZoobuJTTPHk2Vl
- Sj2eNfz9sRf7R2n08bdP90qYNurQA39Dsj82QMZ5B4UeWXA2IjPnU6Gm21cjtNn9HPjP
- jGBOjxHiXpI/3u/2Pi8Ncdhpm3vhKjWGDNz8FDqf6kna+MUVu6l4GCRQTwffaYmDKq3g
- KAYw==
-X-Gm-Message-State: AOAM530OGVaw9yLzQMTb/LnpomoBVCOohVZynQMQVikfOMqPNJsC0j2+
- ZenbXUF6UeqhWMU0/80yLm/UzoeEOOoYqw==
-X-Google-Smtp-Source: ABdhPJzLCLU6/Aumf9YwWZOCb6Wsmjr2k626/PSkCgLXb5xFXhaPsQ6IEkr5tGZqannf7wp6ecJxng==
-X-Received: by 2002:adf:e2ce:: with SMTP id d14mr25090255wrj.415.1592912367049; 
- Tue, 23 Jun 2020 04:39:27 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.26
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 04:39:26 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jnhIr-0006Dv-62
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34566)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jnhIp-0004i6-99
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:24 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05NBWpqP183461; Tue, 23 Jun 2020 07:41:20 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2s8b9e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 07:41:20 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBPuuf032315;
+ Tue, 23 Jun 2020 11:41:18 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma04wdc.us.ibm.com with ESMTP id 31u20cw6hk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 11:41:18 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05NBfHde49152332
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jun 2020 11:41:17 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A871DC6057;
+ Tue, 23 Jun 2020 11:41:17 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4DB87C6055;
+ Tue, 23 Jun 2020 11:41:17 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 23 Jun 2020 11:41:17 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/42] target/arm: Convert Neon 2-reg-misc fp-compare-with-zero
- insns to decodetree
-Date: Tue, 23 Jun 2020 12:38:40 +0100
-Message-Id: <20200623113904.28805-19-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200623113904.28805-1-peter.maydell@linaro.org>
-References: <20200623113904.28805-1-peter.maydell@linaro.org>
+Subject: [PULL v1 00/12] Merge tpm 2020/06/23 v1
+Date: Tue, 23 Jun 2020 07:41:02 -0400
+Message-Id: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-23_06:2020-06-23,
+ 2020-06-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=834
+ suspectscore=1 clxscore=1015 lowpriorityscore=0 bulkscore=0
+ cotscore=-2147483648 mlxscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 spamscore=0 phishscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006230092
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,144 +104,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the fp-compare-with-zero insns in the Neon 2-reg-misc group to
-decodetree.
+This PR cleans up header includes in TPM code and moves some backend components
+into backends/tpm.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200616170844.13318-17-peter.maydell@linaro.org
----
- target/arm/neon-dp.decode       |  6 ++++
- target/arm/translate-neon.inc.c | 28 ++++++++++++++++++
- target/arm/translate.c          | 50 ++++-----------------------------
- 3 files changed, 39 insertions(+), 45 deletions(-)
+The following changes since commit 292ef18a38270e1cb8e9a3dc06bca589068f293d:
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index ea8d5fd99c3..c9acd00f1e8 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -479,6 +479,12 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
-     VABS         1111 001 11 . 11 .. 01 .... 0 0110 . . 0 .... @2misc
-     VNEG         1111 001 11 . 11 .. 01 .... 0 0111 . . 0 .... @2misc
- 
-+    VCGT0_F      1111 001 11 . 11 .. 01 .... 0 1000 . . 0 .... @2misc
-+    VCGE0_F      1111 001 11 . 11 .. 01 .... 0 1001 . . 0 .... @2misc
-+    VCEQ0_F      1111 001 11 . 11 .. 01 .... 0 1010 . . 0 .... @2misc
-+    VCLE0_F      1111 001 11 . 11 .. 01 .... 0 1011 . . 0 .... @2misc
-+    VCLT0_F      1111 001 11 . 11 .. 01 .... 0 1100 . . 0 .... @2misc
-+
-     VABS_F       1111 001 11 . 11 .. 01 .... 0 1110 . . 0 .... @2misc
-     VNEG_F       1111 001 11 . 11 .. 01 .... 0 1111 . . 0 .... @2misc
- 
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index ab183e47d7d..a62da21b152 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -3768,3 +3768,31 @@ static bool trans_VRINTX(DisasContext *s, arg_2misc *a)
-     }
-     return do_2misc_fp(s, a, gen_helper_rints_exact);
- }
-+
-+#define WRAP_FP_CMP0_FWD(WRAPNAME, FUNC)                        \
-+    static void WRAPNAME(TCGv_i32 d, TCGv_i32 m, TCGv_ptr fpst) \
-+    {                                                           \
-+        TCGv_i32 zero = tcg_const_i32(0);                       \
-+        FUNC(d, m, zero, fpst);                                 \
-+        tcg_temp_free_i32(zero);                                \
-+    }
-+#define WRAP_FP_CMP0_REV(WRAPNAME, FUNC)                        \
-+    static void WRAPNAME(TCGv_i32 d, TCGv_i32 m, TCGv_ptr fpst) \
-+    {                                                           \
-+        TCGv_i32 zero = tcg_const_i32(0);                       \
-+        FUNC(d, zero, m, fpst);                                 \
-+        tcg_temp_free_i32(zero);                                \
-+    }
-+
-+#define DO_FP_CMP0(INSN, FUNC, REV)                             \
-+    WRAP_FP_CMP0_##REV(gen_##INSN, FUNC)                        \
-+    static bool trans_##INSN(DisasContext *s, arg_2misc *a)     \
-+    {                                                           \
-+        return do_2misc_fp(s, a, gen_##INSN);                   \
-+    }
-+
-+DO_FP_CMP0(VCGT0_F, gen_helper_neon_cgt_f32, FWD)
-+DO_FP_CMP0(VCGE0_F, gen_helper_neon_cge_f32, FWD)
-+DO_FP_CMP0(VCEQ0_F, gen_helper_neon_ceq_f32, FWD)
-+DO_FP_CMP0(VCLE0_F, gen_helper_neon_cge_f32, REV)
-+DO_FP_CMP0(VCLT0_F, gen_helper_neon_cgt_f32, REV)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 48377860c75..dc98928856d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4954,6 +4954,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 case NEON_2RM_VCVT_SF:
-                 case NEON_2RM_VCVT_UF:
-                 case NEON_2RM_VRINTX:
-+                case NEON_2RM_VCGT0_F:
-+                case NEON_2RM_VCGE0_F:
-+                case NEON_2RM_VCEQ0_F:
-+                case NEON_2RM_VCLE0_F:
-+                case NEON_2RM_VCLT0_F:
-                     /* handled by decodetree */
-                     return 1;
-                 case NEON_2RM_VTRN:
-@@ -4975,51 +4980,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     for (pass = 0; pass < (q ? 4 : 2); pass++) {
-                         tmp = neon_load_reg(rm, pass);
-                         switch (op) {
--                        case NEON_2RM_VCGT0_F:
--                        {
--                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                            tmp2 = tcg_const_i32(0);
--                            gen_helper_neon_cgt_f32(tmp, tmp, tmp2, fpstatus);
--                            tcg_temp_free_i32(tmp2);
--                            tcg_temp_free_ptr(fpstatus);
--                            break;
--                        }
--                        case NEON_2RM_VCGE0_F:
--                        {
--                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                            tmp2 = tcg_const_i32(0);
--                            gen_helper_neon_cge_f32(tmp, tmp, tmp2, fpstatus);
--                            tcg_temp_free_i32(tmp2);
--                            tcg_temp_free_ptr(fpstatus);
--                            break;
--                        }
--                        case NEON_2RM_VCEQ0_F:
--                        {
--                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                            tmp2 = tcg_const_i32(0);
--                            gen_helper_neon_ceq_f32(tmp, tmp, tmp2, fpstatus);
--                            tcg_temp_free_i32(tmp2);
--                            tcg_temp_free_ptr(fpstatus);
--                            break;
--                        }
--                        case NEON_2RM_VCLE0_F:
--                        {
--                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                            tmp2 = tcg_const_i32(0);
--                            gen_helper_neon_cge_f32(tmp, tmp2, tmp, fpstatus);
--                            tcg_temp_free_i32(tmp2);
--                            tcg_temp_free_ptr(fpstatus);
--                            break;
--                        }
--                        case NEON_2RM_VCLT0_F:
--                        {
--                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                            tmp2 = tcg_const_i32(0);
--                            gen_helper_neon_cgt_f32(tmp, tmp2, tmp, fpstatus);
--                            tcg_temp_free_i32(tmp2);
--                            tcg_temp_free_ptr(fpstatus);
--                            break;
--                        }
-                         case NEON_2RM_VSWP:
-                             tmp2 = neon_load_reg(rd, pass);
-                             neon_store_reg(rm, pass, tmp2);
+  Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2020-06-18 16:52:10 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2020-06-23-1
+
+for you to fetch changes up to ca64b08638e259c313a3e7c3da106116b59be8e9:
+
+  tpm: Move backend code under the 'backends/' directory (2020-06-19 07:25:55 -0400)
+
+----------------------------------------------------------------
+Merge tpm 2020/06/23 v1
+
+----------------------------------------------------------------
+Philippe Mathieu-Daudé (12):
+      docs/specs/tpm: Correct header path name
+      backends: Add TPM files into their own directory
+      hw/tpm: Rename TPMDEV as TPM_BACKEND in Kconfig
+      hw/tpm: Do not include 'qemu/osdep.h' in header
+      hw/tpm: Include missing 'qemu/option.h' header
+      hw/tpm: Move 'hw/acpi/tpm.h' inclusion from header to sources
+      hw/tpm: Remove unnecessary 'tpm_int.h' header inclusion
+      hw/tpm: Make TRACE_TPM_UTIL_SHOW_BUFFER check local to tpm_util.c
+      hw/tpm: Move few declarations from 'tpm_util.h' to 'tpm_int.h'
+      hw/tpm: Move DEFINE_PROP_TPMBE() macro to 'tmp_prop.h' local header
+      hw/tpm: Make 'tpm_util.h' publicly accessible as "sysemu/tpm_util.h"
+      tpm: Move backend code under the 'backends/' directory
+
+ MAINTAINERS                            |  2 +-
+ Makefile                               |  2 +-
+ Makefile.objs                          |  1 +
+ backends/Kconfig                       |  1 +
+ backends/Makefile.objs                 |  2 +-
+ backends/tpm/Kconfig                   | 14 ++++++++++++++
+ backends/tpm/Makefile.objs             |  4 ++++
+ backends/{tpm.c => tpm/tpm_backend.c}  |  0
+ {hw => backends}/tpm/tpm_emulator.c    |  2 +-
+ {hw => backends}/tpm/tpm_int.h         | 19 ++++++++++++++++---
+ {hw => backends}/tpm/tpm_ioctl.h       |  0
+ {hw => backends}/tpm/tpm_passthrough.c |  2 +-
+ {hw => backends}/tpm/tpm_util.c        |  5 ++++-
+ backends/tpm/trace-events              | 33 +++++++++++++++++++++++++++++++++
+ docs/specs/tpm.rst                     | 14 +++++++-------
+ hw/tpm/Kconfig                         | 21 +++------------------
+ hw/tpm/Makefile.objs                   |  3 ---
+ hw/tpm/tpm_crb.c                       |  4 ++--
+ hw/tpm/tpm_ppi.c                       |  1 +
+ hw/tpm/tpm_ppi.h                       |  1 -
+ hw/tpm/tpm_prop.h                      | 31 +++++++++++++++++++++++++++++++
+ hw/tpm/tpm_spapr.c                     |  4 ++--
+ hw/tpm/tpm_tis.h                       |  1 -
+ hw/tpm/tpm_tis_common.c                | 11 +++--------
+ hw/tpm/tpm_tis_isa.c                   |  3 ++-
+ hw/tpm/tpm_tis_sysbus.c                |  3 ++-
+ hw/tpm/trace-events                    | 34 +---------------------------------
+ {hw/tpm => include/sysemu}/tpm_util.h  | 19 +++----------------
+ tests/qtest/tpm-emu.c                  |  2 +-
+ 29 files changed, 136 insertions(+), 103 deletions(-)
+ create mode 100644 backends/Kconfig
+ create mode 100644 backends/tpm/Kconfig
+ create mode 100644 backends/tpm/Makefile.objs
+ rename backends/{tpm.c => tpm/tpm_backend.c} (100%)
+ rename {hw => backends}/tpm/tpm_emulator.c (99%)
+ rename {hw => backends}/tpm/tpm_int.h (81%)
+ rename {hw => backends}/tpm/tpm_ioctl.h (100%)
+ rename {hw => backends}/tpm/tpm_passthrough.c (99%)
+ rename {hw => backends}/tpm/tpm_util.c (98%)
+ create mode 100644 backends/tpm/trace-events
+ create mode 100644 hw/tpm/tpm_prop.h
+ rename {hw/tpm => include/sysemu}/tpm_util.h (80%)
+
 -- 
-2.20.1
+2.24.1
 
 
