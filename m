@@ -2,97 +2,85 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8D0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444C1C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:56:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 661392073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:47:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B31920716
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:56:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+p3+zqT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 661392073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTkwnBwJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B31920716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jndeS-0001RX-LO
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:47:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42202)
+	id 1jndmr-0005hh-6t
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:56:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jndd3-0008W1-S0; Tue, 23 Jun 2020 03:46:01 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34737)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jndd2-0008IA-6k; Tue, 23 Jun 2020 03:46:01 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u26so1606021wmn.1;
- Tue, 23 Jun 2020 00:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZvcA7g2Qkj1AOQ15Z8eg4byP0PCtRVIbTzCf5HrSQrI=;
- b=h+p3+zqTF/Z3YnFztdYCqZFnqe6qx9wzVvSwKFgT9wFpZHxHagHuJpjqafe37rw3i/
- oZYDc/jzETWUKzR47ulVyI/C//j862XpPXW72vVlkkQm0GIp5eJtXGpVMijJ6/AbvQkR
- Kr55o2Bnjh9CqZ2NKLJBqZWMqGpYlfN5+2PRYKfRLixdxO7tKa/Ru+r2YmY4pwiW6avI
- FI/aUDnBHJVUa0FIBsue3OC6fJTpDwmB3FPoiMcNICrkG8uXVRPRvq2t2UhSQCDMJF02
- hv0qKmQ7A0vfcYpYBdwpzQ3eFg022HM7PRdKOnCaY/Hj7JEflgjzrwHg7dR8Kz476Pxs
- yhCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZvcA7g2Qkj1AOQ15Z8eg4byP0PCtRVIbTzCf5HrSQrI=;
- b=OYK/82U3Je11NlpUXaaipkw+9MzjXJNB/o9KKKxXHASmgeJxo+3FuEGrcYC6gTi2Ie
- 1Nibm7MIPPcy5izyhUfgriyTNp51kqdvBg8qpdUw3Rb2QF0EuDNJjpcUTFpA+ejKrp6G
- 2HHImU7epqqLzBE8yHXawqGu4gw9nKLNl1n8YJd8HmapklnVwQc6YIXUTOqTtXBvJh9N
- P/uo9v+vLXpgWPUR+3RlhwJoxO4jIt3d78eA5X+4zSsRPkFTAPvF967jp+7x7UA20ZCd
- 8+uLNQgoaKJjQKvb+bKR4hLDi5kkUl7agnVpfHAmLDOiQcf9NOIL5/KupcUvxuoDy03B
- HUPg==
-X-Gm-Message-State: AOAM532+cLQ31drqOSRU87w7LrsVU0dqyqD3pAg+9I6HlpgUpTYW97kf
- wNBq+ESJu58h7RzDWNhx54w=
-X-Google-Smtp-Source: ABdhPJzHN1IxbLyr/YgjCVR3wyr6NGoSotHL0FHAdklNeZhAA4IyPJo3QSg4RIbEUR5qhVYgE3bBMg==
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr11598858wmh.165.1592898357801; 
- Tue, 23 Jun 2020 00:45:57 -0700 (PDT)
-Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x5sm2634104wmg.2.2020.06.23.00.45.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 00:45:57 -0700 (PDT)
-Subject: Re: [PATCH v3 3/7] hw/misc/led: Emit a trace event when LED intensity
- has changed
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200620230719.32139-1-f4bug@amsat.org>
- <20200620230719.32139-4-f4bug@amsat.org>
- <ae4a7411-7042-3530-3faf-e25368080820@linaro.org>
- <c9e3897b-c711-f59b-d400-0bd01fd320b5@amsat.org>
- <191eaa28-7ff4-38f6-9489-612ac984f20f@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e1cec572-5645-65fb-95d0-a3ed8a094181@amsat.org>
-Date: Tue, 23 Jun 2020 09:45:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jndmA-00055j-P7
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:55:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44043
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jndm8-0003A9-7p
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:55:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592898922;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cx7SEMt+NrtXD1GH9SKknbdAgUCMl5n5xMeIVJC11Dg=;
+ b=LTkwnBwJS9ko2/NZA6J086ETYat+3ArkyHmtENgXjB9cddssLcKNfHb2XDsc/RkWrh45CT
+ 6MCGY2jenMVFX5wUZ3T8wIFFOptBFCmH4BxGrfcQt/GVXxhRxobmflY0rtLKAT3IjJLhsY
+ j/iD962sJhCpbiA7oXlRY4Qxu7twf80=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-YAmU_3MSOmuM5enWs7yOBQ-1; Tue, 23 Jun 2020 03:55:19 -0400
+X-MC-Unique: YAmU_3MSOmuM5enWs7yOBQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAEACA2F90;
+ Tue, 23 Jun 2020 07:54:45 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69ECD19930;
+ Tue, 23 Jun 2020 07:54:34 +0000 (UTC)
+Date: Tue, 23 Jun 2020 09:54:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v25 04/17] vfio: Add migration region
+ initialization and finalize function
+Message-ID: <20200623095431.30bdf9e3.cohuck@redhat.com>
+In-Reply-To: <1592684486-18511-5-git-send-email-kwankhede@nvidia.com>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-5-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <191eaa28-7ff4-38f6-9489-612ac984f20f@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,21 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 6:48 PM, Richard Henderson wrote:
-> On 6/21/20 3:25 PM, Philippe Mathieu-Daudé wrote:
->> Anyway I switched to a percent value. What is better to hold
->> it, an 'unsigned' or 'uint8_t' type?
-> 
-> Might as well use unsigned; you'll not be saving space with uint8_t.
+On Sun, 21 Jun 2020 01:51:13 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Bah if we want to migrate the intensity, we can't use 'unsigned',
-so I'll keep uint8_t / VMSTATE_UINT8.
+> Whether the VFIO device supports migration or not is decided based of
+> migration region query. If migration region query is successful and migration
+> region initialization is successful then migration is supported else
+> migration is blocked.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/vfio/Makefile.objs         |   2 +-
+>  hw/vfio/migration.c           | 142 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |   3 +
+>  include/hw/vfio/vfio-common.h |   9 +++
+>  4 files changed, 155 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/vfio/migration.c
+
+(...)
+
+> +static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    Object *obj = NULL;
+> +    int ret = -EINVAL;
+> +
+> +    if (!vbasedev->ops->vfio_get_object) {
+> +        return ret;
+> +    }
+> +
+> +    obj = vbasedev->ops->vfio_get_object(vbasedev);
+> +    if (!obj) {
+> +        return ret;
+> +    }
+> +
+> +    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
+> +                            "migration");
+> +    if (ret) {
+> +        error_report("%s: Failed to setup VFIO migration region %d: %s",
+> +                     vbasedev->name, index, strerror(-ret));
+> +        goto err;
+> +    }
+> +
+> +    if (!migration->region.size) {
+> +        ret = -EINVAL;
+> +        error_report("%s: Invalid region size of VFIO migration region %d: %s",
+> +                     vbasedev->name, index, strerror(-ret));
+
+Instead of only checking for size != 0, should we also check that the
+region has a certain expected size or minimum size?
+
+> +        goto err;
+> +    }
+> +
+> +    return 0;
+> +
+> +err:
+> +    vfio_migration_region_exit(vbasedev);
+> +    return ret;
+> +}
+> +
+
+(...)
+
+Else looks good to me.
+
 
