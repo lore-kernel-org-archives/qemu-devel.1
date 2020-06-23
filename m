@@ -2,63 +2,96 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6C4C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA0AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:38:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DB3A208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:36:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB3A208A9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id E11152078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:38:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vb8yV8b5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E11152078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnrXD-00060h-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 18:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42168)
+	id 1jnrZ0-0007qX-3d
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 18:38:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnrWW-0005X2-Qw; Tue, 23 Jun 2020 18:36:12 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42335)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnrWU-0008MA-Kj; Tue, 23 Jun 2020 18:36:12 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436413|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.335301-0.0134057-0.651294;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HrS7.rV_1592951764; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HrS7.rV_1592951764)
- by smtp.aliyun-inc.com(10.147.42.198);
- Wed, 24 Jun 2020 06:36:05 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v11 18/61] target/riscv: vector single-width integer multiply
- instructions
-Date: Wed, 24 Jun 2020 05:58:37 +0800
-Message-Id: <20200623215920.2594-19-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
-References: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnrYG-0006nx-2J
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 18:38:00 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44061)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnrYC-0000el-G3
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 18:37:59 -0400
+Received: by mail-pl1-x642.google.com with SMTP id bh7so67611plb.11
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 15:37:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wT6E8j6m4VapGwgCmLEFjV+Geu7JMe2PEbBC/bafX7c=;
+ b=Vb8yV8b5wmqFDfNKR8qRmpr5WdpxM4h8ain93+pbhg2FOm1aheAw1U2E3jzrEQnXfS
+ cAHuT2rjv6/sQkTsR+cv2kPXRXPP27MJMV+jP4jEYNlrxpCjrc4fChKr8sOUXwE8nD7t
+ /xX6hN8tOI9IvU56WQr9uCQgl9r0BOz3r0XI9HwUSC6eKUnYwnHPeK8rwSf/nzHpg1H6
+ Bc36S4DWsCzqAcZJtsF+5SQqE6MUewbt0pzo6Cxmv1/UUl/9nCBtz8VKTBHK7GjLKTF+
+ A4UQJhO5yFaZcAqJ80asnaVdJPvXsYe/Ne8JkUQzvZWI2ckUHtUirT/A0ATIRsLRZ3M8
+ RMsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wT6E8j6m4VapGwgCmLEFjV+Geu7JMe2PEbBC/bafX7c=;
+ b=q4kcmikqLG93Gs2zR/lCVLBhCCrYz8m3jB/7/LvtkkKXMUabhrwgFwRli4CBR0X/LB
+ h5ixkOKE/YVCPtzbxmL4rxgzAZhUh7D5KV/9h4bTjxCOIVY3IdMfHLaAafzglzL3kryH
+ qhb9SvvsythylvgYkYUbCBZUt3TXxr/vlfBhH+kggstf6iF4c/WfokFqTAnIVOt5o7B9
+ y9GUrTMPHKeVk1nhCmZYpHqQYF1BXc0/Lsh4BB7w/asQta2qVfkMQDsVRfWzl/sfi5yv
+ UKT4s4wwlDcZBbdW2uMw9BemMEGz0D48eRfLka4H5xKNb5Jk2wVNR58fik/z92Qfm57t
+ TOiw==
+X-Gm-Message-State: AOAM530bk9FQFf/DqZYY/SEsjqtEKchY7g9nOmXwUpK7veLo5dUy6dob
+ lI+qO3E1VkVSkw05/DZ5ousmoA==
+X-Google-Smtp-Source: ABdhPJzqgFEJqVIdqVO1mMlgUr5w+OG3qgRQelLMg2DovreFm7fO65w6wByZiwbaCz7rCBnzXfai0A==
+X-Received: by 2002:a17:90a:e283:: with SMTP id
+ d3mr4594815pjz.170.1592951873731; 
+ Tue, 23 Jun 2020 15:37:53 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id 9sm2553288pfh.160.2020.06.23.15.37.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 23 Jun 2020 15:37:52 -0700 (PDT)
+Subject: Re: [PATCH] tests/qht-bench: Adjust rate computation and comparisons
+To: "Emilio G. Cota" <cota@braap.org>
+References: <20200620214551.447392-1-richard.henderson@linaro.org>
+ <20200621212825.GB168836@sff>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d8e64843-832c-5939-0c85-27b2ad0fe13c@linaro.org>
+Date: Tue, 23 Jun 2020 15:37:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 17:32:41
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200621212825.GB168836@sff>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,280 +104,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  33 +++++
- target/riscv/insn32.decode              |   8 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
- target/riscv/vector_helper.c            | 163 ++++++++++++++++++++++++
- 4 files changed, 214 insertions(+)
+On 6/21/20 2:28 PM, Emilio G. Cota wrote:
+>> -    if (info->r < resize_threshold) {
+>> +    if (info->r <= resize_threshold) {
+>>          size_t size = info->resize_down ? resize_min : resize_max;
+>>          bool resized;
+> 
+> This works, but only because info->r cannot be 0 since xorshift never
+> returns it. (xorshift returns a random number in the range [1, u64max],
+> a fact that I missed when I wrote this code.)
+> If r were 0, then we would resize even if resize_threshold == 0.0.
+> 
+> I think it will be easier to reason about this if we rename info->r
+> to info->seed, and then have a local r = info->seed - 1. Then we can keep
+> the "if random < threshold" form (and its negated "if random >= threshold"
+> as below), which (at least to me) is intuitive provided that random's range
+> is [0, threshold), e.g. [0.0, 1.0) with drand48(3).
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 9c576e1220..c2de0d29ba 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -535,3 +535,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 3d8986c74d..6b29aad4d2 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -365,6 +365,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
- vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
- vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
- vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
-+vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
-+vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 861fd3bf1a..b5ea1c59a1 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1571,3 +1571,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
- GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
-+GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
-+GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
-+GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index cb41daa3ac..ce4aae8753 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -859,6 +859,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
- #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
- #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-+#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
-+#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
-+#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
-+#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
- 
- /* operation of two vector elements */
- typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-@@ -1603,3 +1607,162 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+#define DO_MUL(N, M) (N * M)
-+RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
-+GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
-+
-+static int8_t do_mulh_b(int8_t s2, int8_t s1)
-+{
-+    return (int16_t)s2 * (int16_t)s1 >> 8;
-+}
-+
-+static int16_t do_mulh_h(int16_t s2, int16_t s1)
-+{
-+    return (int32_t)s2 * (int32_t)s1 >> 16;
-+}
-+
-+static int32_t do_mulh_w(int32_t s2, int32_t s1)
-+{
-+    return (int64_t)s2 * (int64_t)s1 >> 32;
-+}
-+
-+static int64_t do_mulh_d(int64_t s2, int64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    muls64(&lo_64, &hi_64, s1, s2);
-+    return hi_64;
-+}
-+
-+static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
-+{
-+    return (uint16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+
-+static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
-+{
-+    return (uint32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+
-+static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
-+{
-+    return (uint64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+
-+static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    mulu64(&lo_64, &hi_64, s2, s1);
-+    return hi_64;
-+}
-+
-+static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
-+{
-+    return (int16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+
-+static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
-+{
-+    return (int32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+
-+static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
-+{
-+    return (int64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+
-+/*
-+ * Let  A = signed operand,
-+ *      B = unsigned operand
-+ *      P = mulu64(A, B), unsigned product
-+ *
-+ * LET  X = 2 ** 64  - A, 2's complement of A
-+ *      SP = signed product
-+ * THEN
-+ *      IF A < 0
-+ *          SP = -X * B
-+ *             = -(2 ** 64 - A) * B
-+ *             = A * B - 2 ** 64 * B
-+ *             = P - 2 ** 64 * B
-+ *      ELSE
-+ *          SP = P
-+ * THEN
-+ *      HI_P -= (A < 0 ? B : 0)
-+ */
-+
-+static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    mulu64(&lo_64, &hi_64, s2, s1);
-+
-+    hi_64 -= s2 < 0 ? s1 : 0;
-+    return hi_64;
-+}
-+
-+RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
-+RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
-+RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
-+RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
-+RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
-+RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
-+RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
-+RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
-+RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
-+RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
--- 
-2.23.0
+Fair enough.
 
+>>  static void do_threshold(double rate, uint64_t *threshold)
+>>  {
+>> +    /*
+>> +     * For 0 <= rate <= 1, scale to fit in a uint64_t.
+>> +     *
+>> +     * For rate == 1, returning UINT64_MAX means 100% certainty: all
+>> +     * uint64_t will match using <=.  The largest representable value
+>> +     * for rate less than 1 is 0.999999999999999889; scaling that
+>> +     * by 2**64 results in 0xfffffffffffff800.
+>> +     */
+>>      if (rate == 1.0) {
+>>          *threshold = UINT64_MAX;
+>>      } else {
+>> -        *threshold = (rate * 0xffff000000000000ull)
+>> -                   + (rate * 0x0000ffffffffffffull);
+>> +        *threshold = rate * 0x1p64;
+> 
+> I'm sorry this caused a breakage for some integration tests; I thought
+> this was fixed in May with:
+>   https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg01477.html
+> 
+> Just for my own education, why isn't nextafter needed here?
+
+I hoped I was being clear in the comment, but re-reading, it doesn't finish the
+thought.
+
+We have removed 1.0, so the rate values are between 0 and nextafter(1, 0) =
+0x1.fffffffffffff00000p-1 = 0.999999999999999889.
+
+Scaling by 2**64 results in an exact extract of the 53-bit mantessa, evenly
+spread across 0 to 0xfffffffffffff800.  Plus 1.0 -> UINT64_MAX, which we could
+consider off-by-one its "proper" value.
+
+If we scale by nextafter(0x1p64, 0), then the values are spread across 0 to
+0xfffffffffffff000.  The gap is twice as large between 1.0 and nextafter(1, 0).
+
+
+r~
 
