@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E334C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4315BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E292206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:37:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09657206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:37:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNyBmtsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E292206EB
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HCGdvqp5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09657206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnk2w-0004Uk-2k
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54008)
+	id 1jnk3H-00054M-7M
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:37:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jnjvb-0002qF-5S
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:29:35 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45652)
+ id 1jnjzr-0000C3-Sr
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:33:59 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53842)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jnjvZ-0003mC-Bv
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:29:34 -0400
-Received: by mail-wr1-x430.google.com with SMTP id s10so800246wrw.12
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:29:32 -0700 (PDT)
+ id 1jnjzp-0006zN-R4
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:33:59 -0400
+Received: by mail-wm1-x333.google.com with SMTP id j18so3190375wmi.3
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:33:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=Nfq4b7XRtmRJ0N2iBCFewwmIeXH6karw7NeyaEHuiTc=;
- b=TNyBmtsEs3Y+gyv2c/F8va50J61zC7VigTX9/DP4PNQjEx6ovPuTmrcEzbGiMmyZBo
- 0RnLrlQ76peowezKem8STxEcqn6Xbd3AAevHNAXqw854cR67EfrSo2bv0umQFY3lpvRk
- Zwtl/PRGW6AexGguO18WM0FX6X+f3BXIV4ZNngfjrROMWLMgXjMhGm9wIX/96vxFUX2b
- dOHdP7FJOSp7sQaEyvx1e5VD24yUGAjKniLyrgJVT6VPYdatITswrKW4AlxLMsBMPx1Q
- HeY0MJdlpwMji5458/XItPdYnuQPlraiGmGcNDmacXSfjqfB2458jORJ4ZXtaRzelDp+
- XAgA==
+ bh=GmJJzNcIvIb2p/+MkDt2IkLQS7EdJcXX08SQq+h1p/o=;
+ b=HCGdvqp5sKloBCJt2sWaqc3IxVf+OYAUXBBByf4IUTXgk0EZgmVnE4MLzc4SxrUNV6
+ ff5uL9g+fDBGulQeBZy43edSaq6c+mpJTF2z/j2J4xn88ohiUyAmeGEJ63RvO9SUhx3Q
+ cO9VPHOhjZJGrXycxut9Xl859QMxyKsg3edxg+enS2lW+/g9otpD2JhkDCmOamNh2ShK
+ 3KBHayWibx72xI/jJZ80r3YzTKThk1prGTqgisQBECHW4uWcGzCriQdsrEUfwCx6kh0J
+ CltQQPueGLXdFbTFheqHLhfFOfw2NMaGzMOMSVQ56KEQ1GZZb8T4a7OKugo7UXhu2eao
+ juKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=Nfq4b7XRtmRJ0N2iBCFewwmIeXH6karw7NeyaEHuiTc=;
- b=uMbYjQPT90sQhxlvTzNkxfXx6hsmf6oMu6nTMv6gILjh6CpyJjUyCu5ddZMcXSrWGw
- uEU1rbDVLBvdIyHm58P0pU5awE07oPmgNAaPKfTNw9bQEYJhBnRcfcLb3rgHrabxsSvM
- tBeaU2aUEk4SXNe1Q1bnpqLAM/APTv8sYkIef5mzyQgrazTwKcNUeZvOTJ9IP0izkkyV
- BuEQEbd+a/2wuiD6Xm4ZUJizHpX3xS9OrgaFlEYTqu3/xR4pEPw1EZ0pB5X+949VlHbP
- cSG/Pd513n6rMKZT0i5BVA0ErDq22lLECBTfWvB8D2Zr1hlmjIEgptrp/Kc1dDLAsA13
- Gs8A==
-X-Gm-Message-State: AOAM5317xAfWtUpYMgi4y1qgNTnb9atEwpQ6bUOTyx6z5XK1Q0hip9Jn
- mFC/5VVfq6iaquGjr0FqE3BYptTsDNM=
-X-Google-Smtp-Source: ABdhPJxW4TPZymFI1waDsZS1N4zb5h8d14nh0Xa4Y51dQM6jIS9+rOxci1/5w9fgk31rlHP0+DKgrA==
-X-Received: by 2002:adf:f311:: with SMTP id i17mr10931512wro.237.1592922571838; 
- Tue, 23 Jun 2020 07:29:31 -0700 (PDT)
+ bh=GmJJzNcIvIb2p/+MkDt2IkLQS7EdJcXX08SQq+h1p/o=;
+ b=KMerGuCCDV3kr8Ysx9+Hoi3IVNiDKXXZ1lLko2/Gf2ws7zyDahU1okRulGxrLTqt5+
+ 1qFuTx91t5je/3bSHgFwwGcq804lDuYXemBBMuDTUtoZfzHlLVGi7ZeVgADKp9HsOysD
+ EAw83u3mcZISF2Gp3+AHGMFrFHdPbE7uAjwNwq/9mQnHVmUMe6ZCy83g80NkkctQxWnX
+ HQaP2oHwohy3uWaz9vab7fznDsQyp73kMSceao8TW7g2Oan8b71x7Yl70lEOR089hiDU
+ kdyKmjorwpP+ISsvn0RS0uV7NgPMJQYi4Gxpf08CKNKyNSoYEGcyf/SeIToyolXzP2Wz
+ 7cXA==
+X-Gm-Message-State: AOAM532Z/1uhZeq+c+z0r90FB78NdlcZWoCBi52zZHseL9GQHFJKVyxc
+ DjyK7fmn8APiM//2nFrbBS4=
+X-Google-Smtp-Source: ABdhPJzQJQJU1ZPfjoHsOBaXsmBKphdr1xAZjQy2exsIyBDGzrSpJ/X/jjCDs7g+cKgehvlHqZ7/Lg==
+X-Received: by 2002:a1c:2b86:: with SMTP id r128mr25790192wmr.13.1592922836154; 
+ Tue, 23 Jun 2020 07:33:56 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id i17sm16748788wrc.34.2020.06.23.07.29.30
+ by smtp.gmail.com with ESMTPSA id j24sm20909380wrd.43.2020.06.23.07.33.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 07:29:30 -0700 (PDT)
-Date: Tue, 23 Jun 2020 15:29:29 +0100
+ Tue, 23 Jun 2020 07:33:54 -0700 (PDT)
+Date: Tue, 23 Jun 2020 15:33:53 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Bug 1883400 <1883400@bugs.launchpad.net>
-Subject: Re: [Bug 1883400] [NEW] Windows 10 extremely slow and unresponsive
-Message-ID: <20200623142929.GN36568@stefanha-x1.localdomain>
-References: <159209820759.11242.7518482343283209679.malonedeb@soybean.canonical.com>
+To: Dario Ciriminna <dario@ciriminna.com>
+Subject: Re: qemu win10 host winxp quest very slow
+Message-ID: <20200623143353.GO36568@stefanha-x1.localdomain>
+References: <127ef1aa-bcb3-835d-21ba-0918bb62b0f8@ciriminna.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="3hAdtgBjtgL7p0NQ"
+ protocol="application/pgp-signature"; boundary="/UvyDgxjlFfP/4zZ"
 Content-Disposition: inline
-In-Reply-To: <159209820759.11242.7518482343283209679.malonedeb@soybean.canonical.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x430.google.com
+In-Reply-To: <127ef1aa-bcb3-835d-21ba-0918bb62b0f8@ciriminna.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x333.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,48 +106,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---3hAdtgBjtgL7p0NQ
-Content-Type: text/plain; charset=us-ascii
+--/UvyDgxjlFfP/4zZ
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 14, 2020 at 01:30:07AM -0000, Toddandmargo-n wrote:
-> Public bug reported:
+On Mon, Jun 15, 2020 at 11:03:40AM +0200, Dario Ciriminna wrote:
+> Hello folks,
 >=20
-> Hi,
+> i need to compile and run qemu under Windows 10 host (Pentium G860, very
+> bad)=A0 with a Windows XP guest.
+> Precompiled downloaded binary run smoothly, but my compiled version is ve=
+ry
+> very slow (I NEED to compile it).
 >=20
-> Fedora 32, x64
-> qemu-5.0.0-2.fc32.x86_64
+> I start it with :
 >=20
-> https://www.microsoft.com/en-us/software-download/windows10ISO
-> Win10_2004_English_x64.iso
+> "C:\Program Files\qemu\qemu-system-x86_64w.exe" .\WindowsXP.img -m 1024M
+> -usb -vga std -netdev user,id=3Dn0 -device rtl8139,netdev=3Dn0 -fda
+> .\ZSK_DSK.img -D .\qemu.log
 >=20
-> Windows 10 is excruciatingly slow since upgrading to 5.0.0-2.fc32.
-> Disabling your repo and downgrading to 2:4.2.0-7.fc32 and corrects the
-> issue (the package in the Fedora repo).
+> ah and -D .\qemu.log doesn't log nothing. 0k log file.
 >=20
-> You can duplicate this off of the Windows 10 ISO (see above) and do not
-> even have to install Windows 10 itself.
+> What can i try ? 3 min to start Windows XP is unacceptable and after start
+> system run slow!
 
-Could this be a duplicate of
-https://bugs.launchpad.net/qemu/+bug/1877716?
+According to this page the G860 has virtualization support:
+https://ark.intel.com/content/www/us/en/ark/products/53492/intel-pentium-pr=
+ocessor-g860-3m-cache-3-00-ghz.html
+
+Did you build with ./configure --enable-whpx for hardware assisted
+virtualization support?
+
+If you cannot use WHPX then you may be stuck with the current speed.
 
 Stefan
 
---3hAdtgBjtgL7p0NQ
+--/UvyDgxjlFfP/4zZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7yEckACgkQnKSrs4Gr
-c8jwNQgAoQfcerC6vnd1B++7Wlgw8BXim547qWbIWl5uZUxF9fdOP3GsmBEwm3N7
-xe3wGTGYUPHRfL0nbUYEI1GoBvpsh7ynEPQr70aFnhEID9S6rlso0rB3JPBbOO6k
-kJpZd3U0JrrhLJwOLdlyFKEyHHtuWZ+hP1qfrDyTZJjx3XuWg/6vJbbO5B0pYHg6
-gNZisa3y9XmAIEpGqDBsAxI+MtfzVHmlDB2NYcxVFn/beIGTb2FWvN2xn0QYLJOY
-1ZAbp8rsEp693DXgwY1sD1H4AT2RuLOKkO4SccKKbu3k22/bG/NTNf22xX7CAwhr
-SIjaiUXprFhQDP97/c89PdAoz3iE5A==
-=tcCE
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7yEtEACgkQnKSrs4Gr
+c8gDSwgAnbuM4w+INhJmO6Hf0pi0yqa/ck8Sc+nmMbH+kbIrYayJL3HRcUWjSlF+
+FvI1pWbucnOzeFKclJitMSFnSbWgbLi5GB7/KFJ9FayepmU8HH1jjzxwLiypN+TY
+9IICnIDvBrHAGmfIS7Hj+qblNIQAzGyIIj3iRnxhkzMY/KGZGUWRUMT+ykrOAyTT
+3bLlckQseYE1/xEbv6bYr91i3tTPDH/iWuIZEHEej0TOMun8qy7giJ272qF3OFrH
+Mg3iaMmrRc2TeC+jyF1HkegsDPtdzGe1gM1AudKmskrsJtej/0tjBZuPEC+8azc/
+RRCPvjq8d1F4Xokg5m+1muWm+yCBiQ==
+=dp0e
 -----END PGP SIGNATURE-----
 
---3hAdtgBjtgL7p0NQ--
+--/UvyDgxjlFfP/4zZ--
 
