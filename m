@@ -2,89 +2,134 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F363C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 06:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88705C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 06:55:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B2772072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 06:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53A2720724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 06:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLGbPuLV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B2772072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4D3fzvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53A2720724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jncXn-0003Nu-KK
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 02:36:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45184)
+	id 1jncq0-0001mx-I2
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 02:55:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jncXC-0002ri-TF; Tue, 23 Jun 2020 02:35:54 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:45045)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jncXB-0001RZ-2z; Tue, 23 Jun 2020 02:35:54 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id n123so10328170ybf.11;
- Mon, 22 Jun 2020 23:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=N1qEleLQKGSNa8UdSAfSfiKKgieKHNfKzwMoxFRxyF8=;
- b=XLGbPuLVrV9jAvsnZKHNkLhVwBjhEsWq23ZzPyBBiPHxa0jejhrsIToZbabUzT1lCF
- 2tcEnHr9MxrgUGRDhFNcWb4bKM4dmwbzRkP7PYP195shmhegqxLmYhrQhSNyEo2+M1QG
- QAVdYwjKOSrDOxX7zmya1ZTPua0fYT9pJ4BWiRmAnlxXV0Q370Qw9GOBRkTdSmjzxMrG
- Gs7RscSzgi1CV31ODSoqs++ObqG5jOZ3HjNqrfh9VepbHVttvhBq66Fx1NPS/eMThTIi
- kVx0smWZjbYuL9ZHacL6uH+OfLIwWdHBXMU8xuizxcZ6n188iegVxb9PesW0U1lKC96+
- qEdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=N1qEleLQKGSNa8UdSAfSfiKKgieKHNfKzwMoxFRxyF8=;
- b=M8F36MWs7VoRShBQSXUyWkYQ5MT2J2KnWiB44mpnCscqV6Ksjw/sb/5v4p/2//YHW5
- lyxdHyMz4Hgcfp9ktM7xdTR78soDfTxdj8V5PXRbodURDCb7lt6HX+cMXnE9CRtpoZvP
- fJYjBy3WXCjb0jtHbgFKbiebBwoiNkiNJdvV6/y9oMVMBRDpc7wyDsl7QKfyKCsuwIih
- kuZQ07EFhOLAQDaBUKar995FTnrse+KI/K3qGl/mwiP6xAYDlnB0onulent4OAzJFoZH
- /6hZ9x3CfKDyPaDuXJYiKjyi+Oz+RuaE/933oAOeDrJrmUAstPFSb1wY8zjjeY2K6sp4
- xwEw==
-X-Gm-Message-State: AOAM5331TZT02EdWzbuxF+9YOUhviApTkUVS7875Wb4YcEQQGny8cBAG
- bBORt3e4vbLI/eevWWY3lpNWEcT524gkPiZOof8=
-X-Google-Smtp-Source: ABdhPJx08B6j4i1zQhqjbZ4mWEi+cvaJlUzyLp2u79CVw7hBwPSwpu2VphBatfHxULj+RtsP276TOy8GmYeSTpKyz9A=
-X-Received: by 2002:a25:38c5:: with SMTP id
- f188mr34233228yba.332.1592894151376; 
- Mon, 22 Jun 2020 23:35:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jncpQ-0001Nk-FY
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 02:54:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54392
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jncpN-0007eF-T8
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 02:54:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592895279;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Ca1UeBVFQleCNWJrdKdTbryetRB4WYiyEUETFWm7RdE=;
+ b=A4D3fzvIsiU9z9jmHlch5imLU+fdYwxJ1K9d9CkRdxrghPkZ1pKQALn+PgFrgJ2LJ2w5tv
+ UQMYPEoAWDgGxE6HyzE+xGfbpza01VE+DVr+1zyUgp5ns4s/AofwsEX3rXZeRC6WecsXsH
+ haI0bpYiCgl03YlpvC5QMG58j6VSb6g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-y1JLjU2ENrWGul_4G7-ikg-1; Tue, 23 Jun 2020 02:54:37 -0400
+X-MC-Unique: y1JLjU2ENrWGul_4G7-ikg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB3D01883604;
+ Tue, 23 Jun 2020 06:54:36 +0000 (UTC)
+Received: from [10.36.113.187] (ovpn-113-187.ams2.redhat.com [10.36.113.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE5387CADB;
+ Tue, 23 Jun 2020 06:54:32 +0000 (UTC)
+Subject: Re: [PATCH 1/2] virtio-balloon: Prevent guest from starting a report
+ when we didn't request one
+To: Alexander Duyck <alexander.duyck@gmail.com>
+References: <20200619214912.25598.8400.stgit@localhost.localdomain>
+ <20200619215309.25598.7553.stgit@localhost.localdomain>
+ <acac152a-8be5-aa5c-ca52-e5ffc90b6ed4@redhat.com>
+ <CAKgT0UcP6gGK_X80pepwpsC=JFmL9+n61ow-HEJMKbFVZ4Jh8g@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <4ea55633-51df-1ca7-72bc-4c9c7d429575@redhat.com>
+Date: Tue, 23 Jun 2020 08:54:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <CAEUhbmXh_tYqubC4nF6PymQW795ExfPUN9Ap1u7PNPN2hws=CA@mail.gmail.com>
- <mhng-fd27972e-5f98-4fdb-b4dc-bd020f4fe8e2@palmer-si-x1e>
-In-Reply-To: <mhng-fd27972e-5f98-4fdb-b4dc-bd020f4fe8e2@palmer-si-x1e>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Tue, 23 Jun 2020 14:35:40 +0800
-Message-ID: <CAEUhbmUgE7v0-E4q128Tw-94938w4ibsxcPHQgHAk=5qhTViPA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] riscv: sifive_e: Correct
- various SoC IP block sizes
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAKgT0UcP6gGK_X80pepwpsC=JFmL9+n61ow-HEJMKbFVZ4Jh8g@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,150 +142,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Chih-Min Chao <chihmin.chao@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+>>> +++ b/hw/virtio/virtio-balloon.c
+>>> @@ -527,7 +527,8 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
+>>>              ret = false;
+>>>              goto out;
+>>>          }
+>>> -        if (id == dev->free_page_report_cmd_id) {
+>>> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED &&
+>>> +            id == dev->free_page_report_cmd_id) {
+>>>              dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>>>          } else {
+>>>              /*
+>>
+>> But doesn't that mean that, after the first hint, all further ones will
+>> be discarded and we'll enter the STOP state in the else case? Or am I
+>> missing something?
+>>
+>> Shouldn't this be something like
+>>
+>> if (id == dev->free_page_report_cmd_id) {
+>>     if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+>>         dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+>>     }
+>>     /* Stay in FREE_PAGE_REPORT_S_START as long as the cmd_id match .*/
+>> } else { ...
+> 
+> There should only be one element containing an outbuf at the start of
+> the report. Once that is processed we should not see the driver
+> sending additional outbufs unless it is sending the STOP command ID.
 
-On Thu, Sep 5, 2019 at 2:34 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Tue, 03 Sep 2019 20:41:52 PDT (-0700), bmeng.cn@gmail.com wrote:
-> > Palmer,
-> >
-> > On Wed, Aug 14, 2019 at 5:34 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >>
-> >> Hi Palmer,
-> >>
-> >> On Wed, Aug 7, 2019 at 10:53 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >> >
-> >> > On Wed, Aug 7, 2019 at 5:06 AM Philippe Mathieu-Daud=C3=A9 <philmd@r=
-edhat.com> wrote:
-> >> > >
-> >> > > On 8/5/19 8:43 AM, Bin Meng wrote:
-> >> > > > On Mon, Aug 5, 2019 at 2:14 PM Chih-Min Chao <chihmin.chao@sifiv=
-e.com> wrote:
-> >> > > >> On Sat, Aug 3, 2019 at 8:27 AM Bin Meng <bmeng.cn@gmail.com> wr=
-ote:
-> >> > > >>>
-> >> > > >>> Some of the SoC IP block sizes are wrong. Correct them accordi=
-ng
-> >> > > >>> to the FE310 manual.
-> >> > > >>>
-> >> > > >>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> >> > > >>> ---
-> >> > > >>>
-> >> > > >>>  hw/riscv/sifive_e.c | 6 +++---
-> >> > > >>>  1 file changed, 3 insertions(+), 3 deletions(-)
-> >> > > >>>
-> >> > > >>> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> >> > > >>> index 2a499d8..9655847 100644
-> >> > > >>> --- a/hw/riscv/sifive_e.c
-> >> > > >>> +++ b/hw/riscv/sifive_e.c
-> >> > > >>> @@ -53,13 +53,13 @@ static const struct MemmapEntry {
-> >> > > >>>      hwaddr base;
-> >> > > >>>      hwaddr size;
-> >> > > >>>  } sifive_e_memmap[] =3D {
-> >> > > >>> -    [SIFIVE_E_DEBUG] =3D    {        0x0,      0x100 },
-> >> > > >>> +    [SIFIVE_E_DEBUG] =3D    {        0x0,     0x1000 },
-> >> > > >>>      [SIFIVE_E_MROM] =3D     {     0x1000,     0x2000 },
-> >> > > >>>      [SIFIVE_E_OTP] =3D      {    0x20000,     0x2000 },
-> >> > > >>>      [SIFIVE_E_CLINT] =3D    {  0x2000000,    0x10000 },
-> >> > > >>>      [SIFIVE_E_PLIC] =3D     {  0xc000000,  0x4000000 },
-> >> > > >>> -    [SIFIVE_E_AON] =3D      { 0x10000000,     0x8000 },
-> >> > > >>> -    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x8000 },
-> >> > > >>> +    [SIFIVE_E_AON] =3D      { 0x10000000,     0x1000 },
-> >> > > >>> +    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x1000 },
-> >> > > >>>      [SIFIVE_E_OTP_CTRL] =3D { 0x10010000,     0x1000 },
-> >> > > >>>      [SIFIVE_E_GPIO0] =3D    { 0x10012000,     0x1000 },
-> >> > > >>>      [SIFIVE_E_UART0] =3D    { 0x10013000,     0x1000 },
-> >> > > >>> --
-> >> > > >>> 2.7.4
-> >> > > >>>
-> >> > > >>
-> >> > > >> It seems the modification follows  E310-G002(Hifive1 Rev B) spe=
-c and the origin is for E310-G000(Hifive1) spec.
-> >> > > >> There should be some way to specify different board version wit=
-h different memory map or we have policy, always support the latest spec.
-> >> > >
-> >> > > I agree with Chao, it would be cleaner to have two different board=
-s
-> >> > > (machines).
-> >> > > Since the SoCs are very similar, you could add a 'revision' proper=
-ty and
-> >> > > use it to select the correct map.
-> >> > >
-> >> >
-> >> > I am not sure if adding two different machines will bring us a lot o=
-f
-> >> > benefits, since the only difference is the SoC revision with differe=
-nt
-> >> > block sizes.
-> >> >
-> >> > > >>
-> >> > > >
-> >> > > > Yes, I checked both specs. The older spec says these bigger size=
-s,
-> >> > > > however their register sizes fit well in the smaller range as we=
-ll. So
-> >> > > > I think the modification works well for both.
-> >> > >
-> >> > > This is OK for the PRCI, since sifive_prci_create() does not use
-> >> > > memmap[SIFIVE_E_PRCI].size.
-> >> > >
-> >> > > However the AON case is borderline, since you shrink it from 32KiB=
- to 4KiB.
-> >> > >
-> >> >
-> >> > AON is not implemented anyway currently. And I checked the FE310 old
-> >> > spec, its register block size is still within the 4KiB range, so
-> >> > shrinking the size should be fine for both old and new SoC.
-> >> >
-> >> > > BTW (not related to this patch) it is odd a function named
-> >> > > sifive_mmio_emulate() creates a RAM region with memory_region_init=
-_ram()
-> >> > > and does not use the UnimplementedDevice (see make_unimp_dev() in
-> >> > > hw/arm/musca.c).
-> >> > >
-> >>
-> >> What's your suggestion regarding this patch?
-> >
-> > Ping?
->
-> Sorry, I missed this the first time around.  In retrospect, it looks like=
- we
-> ended up with the wrong naming scheme for boards: sifive_e is very ambigu=
-ous,
-> as there are many boards that look like this.  We'd originally chosen a m=
-ore
-> explicit scheme (something like "sifive-fe310-g000"), but that was NAK'd =
-as
-> resulting in too many machine types.
->
-> Peter: would you be OK deprecating "sifive_e" and adding "sifive-fe310-g0=
-00"
-> and "sifive-fe310-g002" targets?  We'll end up with a lot of machines thi=
-s way,
-> but I don't see another way to closely match what's out there.  In embedd=
-ed
-> land there isn't really any runtime portability, so if the memory maps do=
-n't
-> match exactly then it's not a useful target for users.
+Ok, I assume what Linux guests do is considered the correct protocol.
 
-Just want to restart the discussion for this patch. Now that we have
-"revB" support for sifive_e machine, I guess we can do something?
+[...]
 
-But renaming the sifive_e machine to something like sifive-fe31-g000
-is another topic .. Thoughts?
+> 
+>>> @@ -592,14 +593,16 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+>>>          return;
+>>>      }
+>>>
+>>> -    if (s->free_page_report_cmd_id == UINT_MAX) {
+>>> +    qemu_mutex_lock(&s->free_page_lock);
+>>> +
+>>> +    if (s->free_page_report_cmd_id++ == UINT_MAX) {
+>>>          s->free_page_report_cmd_id =
+>>>                         VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+>>> -    } else {
+>>> -        s->free_page_report_cmd_id++;
+>>>      }
+>>
+>> Somewhat unrelated cleanup.
+> 
+> Agreed. I can drop it if preferred. I just took care of it because I
+> was adding the lock above and below to prevent us from getting into
+> any wierd states where the command ID might be updated but the report
+> status was not.
 
-Regards,
-Bin
+No hard feelings, it just makes reviewing harder, because one has to
+investigate how the changes relate to the locking changes - to find out
+they don't. :)
+
+Acked-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
