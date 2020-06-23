@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE6EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E46C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:31:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55562208A9
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:29:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55562208A9
+	by mail.kernel.org (Postfix) with ESMTPS id DB34C2078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:31:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB34C2078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnsLw-0005Hb-K5
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 19:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54510)
+	id 1jnsNp-0007VQ-7L
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 19:31:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnsLB-0004TR-E8; Tue, 23 Jun 2020 19:28:33 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37472)
+ id 1jnsN7-0006yu-U2; Tue, 23 Jun 2020 19:30:33 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:48224)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnsL8-0006KM-SF; Tue, 23 Jun 2020 19:28:33 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08098282|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_regular_dialog|0.146209-0.000366199-0.853425;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03301; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HrSnF0w_1592954904; 
+ id 1jnsN5-0006hX-Hs; Tue, 23 Jun 2020 19:30:33 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07548427|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.136839-8.07347e-05-0.86308;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HrSyapx_1592955025; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HrSnF0w_1592954904) by smtp.aliyun-inc.com(10.147.40.2);
- Wed, 24 Jun 2020 07:28:24 +0800
+ fp:SMTPD_---.HrSyapx_1592955025)
+ by smtp.aliyun-inc.com(10.147.40.26); Wed, 24 Jun 2020 07:30:25 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v11 44/61] target/riscv: narrowing floating-point/integer
- type-convert instructions
-Date: Wed, 24 Jun 2020 05:59:03 +0800
-Message-Id: <20200623215920.2594-45-zhiwei_liu@c-sky.com>
+Subject: [PATCH v11 45/61] target/riscv: vector single-width integer reduction
+ instructions
+Date: Wed, 24 Jun 2020 05:59:04 +0800
+Message-Id: <20200623215920.2594-46-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
 References: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
@@ -81,150 +81,180 @@ Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   | 11 ++++++
- target/riscv/insn32.decode              |  5 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 48 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 39 ++++++++++++++++++++
- 4 files changed, 103 insertions(+)
+ target/riscv/helper.h                   | 33 +++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 18 ++++++
+ target/riscv/vector_helper.c            | 74 +++++++++++++++++++++++++
+ 4 files changed, 133 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c5f1f298f2..5870c4041e 100644
+index 5870c4041e..a7fe4443e4 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1028,3 +1028,14 @@ DEF_HELPER_5(vfwcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfwcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfwcvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfwcvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+@@ -1039,3 +1039,36 @@ DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
 +
-+DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredsum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmaxu_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmaxu_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmaxu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmaxu_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmax_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmax_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmax_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredminu_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredminu_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredminu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredminu_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmin_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredand_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredand_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredand_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredand_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredor_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredor_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredor_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredor_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredxor_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredxor_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredxor_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vredxor_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index eda09f0c15..55fbe166d8 100644
+index 55fbe166d8..878eeecb7e 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -526,6 +526,11 @@ vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
- vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
- vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
- vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
-+vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
-+vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
-+vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
-+vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
-+vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
+@@ -531,6 +531,14 @@ vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
+ vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
+ vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
+ vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
++vredsum_vs      000000 . ..... ..... 010 ..... 1010111 @r_vm
++vredand_vs      000001 . ..... ..... 010 ..... 1010111 @r_vm
++vredor_vs       000010 . ..... ..... 010 ..... 1010111 @r_vm
++vredxor_vs      000011 . ..... ..... 010 ..... 1010111 @r_vm
++vredminu_vs     000100 . ..... ..... 010 ..... 1010111 @r_vm
++vredmin_vs      000101 . ..... ..... 010 ..... 1010111 @r_vm
++vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
++vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 0fc8947389..6c46d893b0 100644
+index 6c46d893b0..b4e3f904d3 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2276,3 +2276,51 @@ GEN_OPFV_WIDEN_TRANS(vfwcvt_x_f_v)
- GEN_OPFV_WIDEN_TRANS(vfwcvt_f_xu_v)
- GEN_OPFV_WIDEN_TRANS(vfwcvt_f_x_v)
- GEN_OPFV_WIDEN_TRANS(vfwcvt_f_f_v)
-+
-+/* Narrowing Floating-Point/Integer Type-Convert Instructions */
+@@ -2324,3 +2324,21 @@ GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
+ GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
+ GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
+ GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
 +
 +/*
-+ * If the current SEW does not correspond to a supported IEEE floating-point
-+ * type, an illegal instruction exception is raised
++ *** Vector Reduction Operations
 + */
-+static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
++/* Vector Single-Width Integer Reduction Instructions */
++static bool reduction_check(DisasContext *s, arg_rmrr *a)
 +{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
-+                                     2 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++    return vext_check_isa_ill(s) && vext_check_reg(s, a->rs2, false);
 +}
 +
-+#define GEN_OPFV_NARROW_TRANS(NAME)                                \
-+static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
-+{                                                                  \
-+    if (opfv_narrow_check(s, a)) {                                 \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_3_ptr * const fns[2] = {            \
-+            gen_helper_##NAME##_h,                                 \
-+            gen_helper_##NAME##_w,                                 \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        gen_set_rm(s, 7);                                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew - 1]);    \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
-+GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
++GEN_OPIVV_TRANS(vredsum_vs, reduction_check)
++GEN_OPIVV_TRANS(vredmaxu_vs, reduction_check)
++GEN_OPIVV_TRANS(vredmax_vs, reduction_check)
++GEN_OPIVV_TRANS(vredminu_vs, reduction_check)
++GEN_OPIVV_TRANS(vredmin_vs, reduction_check)
++GEN_OPIVV_TRANS(vredand_vs, reduction_check)
++GEN_OPIVV_TRANS(vredor_vs, reduction_check)
++GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 6ccc4ab7de..32cd298f43 100644
+index 32cd298f43..1bf3c870d3 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -4293,3 +4293,42 @@ RVVCALL(OPFVV1, vfwcvt_f_f_v_h, WOP_UU_H, H4, H2, vfwcvtffv16)
- RVVCALL(OPFVV1, vfwcvt_f_f_v_w, WOP_UU_W, H8, H4, float32_to_float64)
- GEN_VEXT_V_ENV(vfwcvt_f_f_v_h, 2, 4, clearl)
- GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
+@@ -4332,3 +4332,77 @@ RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
+ RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
+ GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
+ GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
 +
-+/* Narrowing Floating-Point/Integer Type-Convert Instructions */
-+/* (TD, T2, TX2) */
-+#define NOP_UU_H uint16_t, uint32_t, uint32_t
-+#define NOP_UU_W uint32_t, uint64_t, uint64_t
-+/* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
-+RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
-+RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
-+GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4, clearl)
-+
-+/* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
-+RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
-+RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
-+GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4, clearl)
-+
-+/* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
-+RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
-+RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4, clearl)
-+
-+/* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
-+RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
-+RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4, clearl)
-+
-+/* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
-+static uint16_t vfncvtffv16(uint32_t a, float_status *s)
-+{
-+    return float32_to_float16(a, true, s);
++/*
++ *** Vector Reduction Operations
++ */
++/* Vector Single-Width Integer Reduction Instructions */
++#define GEN_VEXT_RED(NAME, TD, TS2, HD, HS2, OP, CLEAR_FN)\
++void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
++        void *vs2, CPURISCVState *env, uint32_t desc)     \
++{                                                         \
++    uint32_t mlen = vext_mlen(desc);                      \
++    uint32_t vm = vext_vm(desc);                          \
++    uint32_t vl = env->vl;                                \
++    uint32_t i;                                           \
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;        \
++    TD s1 =  *((TD *)vs1 + HD(0));                        \
++                                                          \
++    for (i = 0; i < vl; i++) {                            \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                  \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {        \
++            continue;                                     \
++        }                                                 \
++        s1 = OP(s1, (TD)s2);                              \
++    }                                                     \
++    *((TD *)vd + HD(0)) = s1;                             \
++    CLEAR_FN(vd, 1, sizeof(TD), tot);                     \
 +}
 +
-+RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
-+RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
++/* vd[0] = sum(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredsum_vs_b, int8_t, int8_t, H1, H1, DO_ADD, clearb)
++GEN_VEXT_RED(vredsum_vs_h, int16_t, int16_t, H2, H2, DO_ADD, clearh)
++GEN_VEXT_RED(vredsum_vs_w, int32_t, int32_t, H4, H4, DO_ADD, clearl)
++GEN_VEXT_RED(vredsum_vs_d, int64_t, int64_t, H8, H8, DO_ADD, clearq)
++
++/* vd[0] = maxu(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredmaxu_vs_b, uint8_t, uint8_t, H1, H1, DO_MAX, clearb)
++GEN_VEXT_RED(vredmaxu_vs_h, uint16_t, uint16_t, H2, H2, DO_MAX, clearh)
++GEN_VEXT_RED(vredmaxu_vs_w, uint32_t, uint32_t, H4, H4, DO_MAX, clearl)
++GEN_VEXT_RED(vredmaxu_vs_d, uint64_t, uint64_t, H8, H8, DO_MAX, clearq)
++
++/* vd[0] = max(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredmax_vs_b, int8_t, int8_t, H1, H1, DO_MAX, clearb)
++GEN_VEXT_RED(vredmax_vs_h, int16_t, int16_t, H2, H2, DO_MAX, clearh)
++GEN_VEXT_RED(vredmax_vs_w, int32_t, int32_t, H4, H4, DO_MAX, clearl)
++GEN_VEXT_RED(vredmax_vs_d, int64_t, int64_t, H8, H8, DO_MAX, clearq)
++
++/* vd[0] = minu(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredminu_vs_b, uint8_t, uint8_t, H1, H1, DO_MIN, clearb)
++GEN_VEXT_RED(vredminu_vs_h, uint16_t, uint16_t, H2, H2, DO_MIN, clearh)
++GEN_VEXT_RED(vredminu_vs_w, uint32_t, uint32_t, H4, H4, DO_MIN, clearl)
++GEN_VEXT_RED(vredminu_vs_d, uint64_t, uint64_t, H8, H8, DO_MIN, clearq)
++
++/* vd[0] = min(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredmin_vs_b, int8_t, int8_t, H1, H1, DO_MIN, clearb)
++GEN_VEXT_RED(vredmin_vs_h, int16_t, int16_t, H2, H2, DO_MIN, clearh)
++GEN_VEXT_RED(vredmin_vs_w, int32_t, int32_t, H4, H4, DO_MIN, clearl)
++GEN_VEXT_RED(vredmin_vs_d, int64_t, int64_t, H8, H8, DO_MIN, clearq)
++
++/* vd[0] = and(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredand_vs_b, int8_t, int8_t, H1, H1, DO_AND, clearb)
++GEN_VEXT_RED(vredand_vs_h, int16_t, int16_t, H2, H2, DO_AND, clearh)
++GEN_VEXT_RED(vredand_vs_w, int32_t, int32_t, H4, H4, DO_AND, clearl)
++GEN_VEXT_RED(vredand_vs_d, int64_t, int64_t, H8, H8, DO_AND, clearq)
++
++/* vd[0] = or(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredor_vs_b, int8_t, int8_t, H1, H1, DO_OR, clearb)
++GEN_VEXT_RED(vredor_vs_h, int16_t, int16_t, H2, H2, DO_OR, clearh)
++GEN_VEXT_RED(vredor_vs_w, int32_t, int32_t, H4, H4, DO_OR, clearl)
++GEN_VEXT_RED(vredor_vs_d, int64_t, int64_t, H8, H8, DO_OR, clearq)
++
++/* vd[0] = xor(vs1[0], vs2[*]) */
++GEN_VEXT_RED(vredxor_vs_b, int8_t, int8_t, H1, H1, DO_XOR, clearb)
++GEN_VEXT_RED(vredxor_vs_h, int16_t, int16_t, H2, H2, DO_XOR, clearh)
++GEN_VEXT_RED(vredxor_vs_w, int32_t, int32_t, H4, H4, DO_XOR, clearl)
++GEN_VEXT_RED(vredxor_vs_d, int64_t, int64_t, H8, H8, DO_XOR, clearq)
 -- 
 2.23.0
 
