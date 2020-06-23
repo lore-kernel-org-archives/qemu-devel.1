@@ -2,123 +2,81 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C725C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9683C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A84720724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A41AB20724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:47:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpNPxlKd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A84720724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mrx85yyB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41AB20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jneZm-0006DT-Fz
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:46:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35832)
+	id 1jneaM-00074J-Iz
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:47:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jneZ4-0005mj-He
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:45:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59437
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jneZZ-0006CZ-WB
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:46:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59931
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jneZ2-0006BE-Hd
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:45:58 -0400
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jneZX-0006QX-1A
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:46:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592901955;
+ s=mimecast20190719; t=1592901986;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=d624vJOmd/Bk93i3VzMLbynATlZuSzc4NH7/hVDViNI=;
- b=fpNPxlKdt0ofm4xHGvtP9RH3/Nqjpjes1EMA4tyPdAGKtrq+u29KLMzNr8ecM8Buv05aos
- rSCk9bC35JPMvLmY+OdADYuUG/WLjWzTCANzbxh1MxfLX0YQ2ugl3am53Fqg6cjPnKEbuA
- N61GdLzomAhdA0/2DSwhUlo5Fws8YaM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-kkSGP5w9PpC67Xyl_kLwGg-1; Tue, 23 Jun 2020 04:45:51 -0400
-X-MC-Unique: kkSGP5w9PpC67Xyl_kLwGg-1
-Received: by mail-wr1-f72.google.com with SMTP id a18so2922981wrm.14
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 01:45:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=d624vJOmd/Bk93i3VzMLbynATlZuSzc4NH7/hVDViNI=;
- b=HiGZs1z/F+CAp2xeEGsYiDDyISDZlOxbKO/9t7Yo9C03uYR6sAvgxEXhoFpi/4xsOG
- ZpbejQYWoJugUKGy/GN8z+iYGElc2fb7im31NIQ/zdeAU6OPrh+KdgTcTCPBIF0jajo3
- U0BMZAygEv3ichGDbhQGLotGCjYyBVwhApwjH8aUVstTMgJ/mdTwUQAo4HYyk6/NWpX9
- Xi1fGQ1TwohhOxawMx2+tuWp3nYeWFcAJOG+VsbWbx3QS/zlSLqHh+AdzhsfR5GVq/Hj
- HUdnmPjyhp0vhXNwUibspyn+45NwMYfz5kThXYMYY0EO4vXR4plaHAR9UHamizPX+5s6
- SL/A==
-X-Gm-Message-State: AOAM531SPN3kuA2vVwrvYF+U0rPCEm+sX2jTrN7u3zblCU5jvpPtE+oy
- NcBE+7HhTV1ACsYOWU19teY4aakl5E8RsdEKpsi9Rq4UkwXLbw4VSXUikRZsKnrKLp/5HGO7KbF
- 9TW3SrO2xB4hlva4=
-X-Received: by 2002:adf:e50a:: with SMTP id j10mr25410100wrm.71.1592901949810; 
- Tue, 23 Jun 2020 01:45:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx22JANvHQJAkiDWNW5+/73Em4ExQ5uLfrHAaLr9ZPptSYUVn8sjYQAmvhZO1KSCo5vtn4EmA==
-X-Received: by 2002:adf:e50a:: with SMTP id j10mr25410081wrm.71.1592901949567; 
- Tue, 23 Jun 2020 01:45:49 -0700 (PDT)
-Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id w12sm11144331wrm.79.2020.06.23.01.45.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 01:45:49 -0700 (PDT)
-Subject: Re: [PATCH v9 04/10] configure: Generate rule to calculate the base
- architecture of a target
-To: Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200618123342.10693-1-philmd@redhat.com>
- <20200618123342.10693-5-philmd@redhat.com>
- <08f176aa-56a1-3bd0-5889-806f383bca8b@suse.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <eed19fd0-8817-7b63-0f81-5c4df35f3174@redhat.com>
-Date: Tue, 23 Jun 2020 10:45:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references;
+ bh=r7tVgCxLEVKIKPPk/JELCpOA5FPdEYgvnSl+jolOanA=;
+ b=Mrx85yyBqvpPPPatGNE6wQDT48K6A8COFdtCgnJ/NdynmdSv+heDOjjRBYUrpwjgd5AQYT
+ +Uei/YArLHWmyaFhhotvX3iU5wbZXI0KeRg0Sx+C41dtL6FPwiqJIE2RkAbUjdZ645qg4s
+ e8LvtKkC4y0wSl5zacqDZr7ukjxy+AE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-mVTjF9WZPz-C8pwhTkP4ow-1; Tue, 23 Jun 2020 04:46:24 -0400
+X-MC-Unique: mVTjF9WZPz-C8pwhTkP4ow-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 975F318A0739;
+ Tue, 23 Jun 2020 08:46:21 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD48119D61;
+ Tue, 23 Jun 2020 08:46:06 +0000 (UTC)
+Date: Tue, 23 Jun 2020 10:46:03 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH RFC 01/22] arm/cpuhp: Add QMP vcpu params validation
+ support
+Message-ID: <20200623084603.i4kv3udz3dlcxlak@kamzik.brq.redhat.com>
+References: <20200613213629.21984-1-salil.mehta@huawei.com>
+ <20200613213629.21984-2-salil.mehta@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <08f176aa-56a1-3bd0-5889-806f383bca8b@suse.de>
-Content-Language: en-US
+In-Reply-To: <20200613213629.21984-2-salil.mehta@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=drjones@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -126,7 +84,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,107 +97,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, mehta.salil.lnk@gmail.com, gshan@redhat.com,
+ pbonzini@redhat.com, mst@redhat.com, jiakernel2@gmail.com, maz@kernel.org,
+ david@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ linuxarm@huawei.com, eric.auger@redhat.com, will@kernel.org,
+ qemu-arm@nongnu.org, james.morse@arm.com, catalin.marinas@arm.com,
+ sudeep.holla@arm.com, imammedo@redhat.com, maran.wilson@oracle.com,
+ zhukeqian1@huawei.com, wangxiongfeng2@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 10:01 AM, Claudio Fontana wrote:
-> Hi Philippe, Alex,
+On Sat, Jun 13, 2020 at 10:36:08PM +0100, Salil Mehta wrote:
+> For now, vcpu hotplug is only supported with single socket single thread,
+> single die. NUMA is not supported either and everthing falls into single
+> node. Work to properly support these could be taken later once community
+> agrees with the base framework changes being presented to support ARM vcpu
+> hotplug in QEMU. Hence, these checks.
 > 
-> On 6/18/20 2:33 PM, Philippe Mathieu-Daudé wrote:
->> From: Alex Bennée <alex.bennee@linaro.org>
->>
->> As we encode the base architecture in configure.sh, we can emit
->> the base-arch() function into config-host.mak.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Salil Mehta <salil.mehta@huawei.com>
+> ---
+>  hw/arm/virt.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
 > 
-> I found this change a bit strange, but maybe I am missing some context.
-
-This is used in patch 9:
-"Makefile: Allow target-specific optional Kconfig"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg713823.html
-
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 37462a6f78..5d1afdd031 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2201,6 +2201,46 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+>      return NULL;
+>  }
+>  
+> +static void virt_smp_parse(MachineState *ms, QemuOpts *opts)
+> +{
+> +    if (opts) {
+> +        unsigned cpus    = qemu_opt_get_number(opts, "cpus", 1);
+> +        unsigned sockets = qemu_opt_get_number(opts, "sockets", 1);
+> +        unsigned cores   = qemu_opt_get_number(opts, "cores", cpus);
+> +        unsigned threads = qemu_opt_get_number(opts, "threads", 1);
+> +        unsigned int max_cpus;
+> +
+> +        if (sockets > 1 || threads > 1) {
+> +            error_report("does not support more than one socket or thread");
+> +            exit(1);
+> +        }
+> +
+> +        if (cores != cpus) {
+> +            error_report("cpu topology: "
+> +                         "sockets (%u) * cores (%u) * threads (%u) < "
+> +                         "smp_cpus (%u)",
+> +                         sockets, cores, threads, cpus);
+> +            exit(1);
+> +        }
+> +
+> +        max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+> +        if (sockets * cores * threads > max_cpus) {
+> +            error_report("cpu topology: "
+> +                         "sockets (%u) * cores (%u) * threads (%u) > "
+> +                         "maxcpus (%u)",
+> +                         sockets, cores, threads,
+> +                         max_cpus);
+> +            exit(1);
+> +        }
+> +
+> +        ms->smp.max_cpus = max_cpus;
+> +        ms->smp.sockets = sockets;
+> +        ms->smp.cpus = cpus;
+> +        ms->smp.cores = cores;
+> +        ms->smp.threads = threads;
+> +    }
+> +}
+> +
+>  /*
+>   * for arm64 kvm_type [7-0] encodes the requested number of bits
+>   * in the IPA address space
+> @@ -2266,6 +2306,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->nvdimm_supported = true;
+>      mc->auto_enable_numa_with_memhp = true;
+>      mc->default_ram_id = "mach-virt.ram";
+> +    mc->smp_parse = virt_smp_parse;
+>  
+>      object_class_property_add(oc, "acpi", "OnOffAuto",
+>          virt_get_acpi, virt_set_acpi,
+> -- 
+> 2.17.1
 > 
-> Would it not be easier to read the information from the
-> config-target.mak files as it is already emitted there?
-
-So you are suggesting moving the SUBDIR_DEVICES_MAK creation code
-to Makefile.target, before until now it is target-agnostic but we
-are making it target-specific. Yes, it could work...
-
-I keep respining this series since the semihosting rework. Frankly
-I don't remember why it became so complicated, I need to jump into
-the code again.
-
-I guess when Paolo introduced Kconfig, the accelerator configs were
-almost static, so SUBDIR_DEVICES_MAK was only dependent of host
-config.
-
-The semihosting "device" depends of accelerator and target configs.
-
-Maybe the problem is to see minikconf generating device selectors,
-as kconfig is also used for generic features (such accelerator,
-not really "device").
-
 > 
-> Ciao,
-> 
-> Claudio
-> 
-> 
->> ---
->>  configure | 19 +++++++++++++++++++
->>  1 file changed, 19 insertions(+)
->>
->> diff --git a/configure b/configure
->> index ba88fd1824..c0d7fbc30e 100755
->> --- a/configure
->> +++ b/configure
->> @@ -7927,6 +7927,8 @@ if test "$linux" = "yes" ; then
->>      fi
->>  fi
->>  
->> +target_to_base_map=""
->> +
->>  for target in $target_list; do
->>  target_dir="$target"
->>  config_target_mak=$target_dir/config-target.mak
->> @@ -8155,6 +8157,7 @@ target_arch_name="$(upper $TARGET_ARCH)"
->>  echo "TARGET_$target_arch_name=y" >> $config_target_mak
->>  echo "TARGET_NAME=$target_name" >> $config_target_mak
->>  echo "TARGET_BASE_ARCH=$TARGET_BASE_ARCH" >> $config_target_mak
->> +target_to_base_map="$target_dir,$TARGET_BASE_ARCH $target_to_base_map"
->>  if [ "$TARGET_ABI_DIR" = "" ]; then
->>    TARGET_ABI_DIR=$TARGET_ARCH
->>  fi
->> @@ -8370,6 +8373,22 @@ if test "$ccache_cpp2" = "yes"; then
->>    echo "export CCACHE_CPP2=y" >> $config_host_mak
->>  fi
->>  
->> +# Export a rule for calculating base arch from target_dir for use by
->> +# the Kconfig generator
->> +echo "# Usage: \$(call base-arch, target-dir)" >> $config_host_mak
->> +echo "# Return the base architecture for a target." >> $config_host_mak
->> +echo "# e.g \$(call base-arch, aarch64-linux-user) returns 'arm'" >> $config_host_mak
->> +echo "base-arch = \$(strip \\" >> $config_host_mak
->> +close_braces=""
->> +for pairs in $target_to_base_map
->> +do
->> +    dir="${pairs%%,*}"
->> +    base="${pairs#*,}"
->> +    echo "\$(if \$(findstring $dir,\$1),$base, \\" >> $config_host_mak
->> +    close_braces="$close_braces )"
->> +done
->> +echo "$close_braces )" >> $config_host_mak
->> +
->>  # If we're using a separate build tree, set it up now.
->>  # DIRS are directories which we simply mkdir in the build tree;
->>  # LINKS are things to symlink back into the source tree
->>
-> 
+>
+
+Hi Salil,
+
+This patch and the whole series has inspired me to pick up the vcpu
+topology work again. In fact, I think it may be necessary in order
+to properly describe a cpu when hot[un]plugging. I'll try to pull
+together an RFC soon, at least for TCG. For KVM, we may need to
+change KVM in order to allow user-controlled MPIDR. Although I'm
+not sure about that anymore, because, as you stated somewhere else,
+we already have user-controlled MPIDR to some degree, since KVM simply
+transforms the cpu index.
+
+Regarding this patch specifically, I would change this to allow
+sockets, but prefer cores (i.e. when only '-smp N' is given, then
+N is the number of cores, not sockets). Also I would allow threads,
+but only for !kvm_enabled(). Then the function would be similar to
+something I think I once posted long ago, or at least wrote and maybe
+never posted...
+
+Thanks,
+drew
 
 
