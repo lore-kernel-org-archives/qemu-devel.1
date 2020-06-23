@@ -2,96 +2,92 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57273C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 090CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:08:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 208C920774
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C66F220706
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:08:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gkxFKjhK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 208C920774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BqlyQESR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66F220706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnmLk-0002Sn-AT
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:04:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54648)
+	id 1jnmPH-00054H-W6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:08:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnmKP-0001KO-J8
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:03:21 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50632)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnmKN-0002iW-Rq
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:03:21 -0400
-Received: by mail-wm1-x344.google.com with SMTP id l17so3661014wmj.0
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 10:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=tfYzqeONeL95lTYuJtTxc0aKu62ZhtgB0l2M/6sJwb4=;
- b=gkxFKjhKJ4y6+KBs0cMBET5SZMC7og0l5A5SaeVrgj3FzOjnPvAFq/QUKLoEuD5We6
- hUu7NP+wcBouYiyZGBc5Fuflw6urEuKNt5vFvOzviPBmbfchQISgC2sGaPukeIdr4S8C
- J8u4fhyTok87n7nnPHa6xA41XWMY8mlWo7HV+VGoa0SBlNcXRdFF0QfRqz0w3I6ZF/CF
- wwydqz2DGlDDcrX+AWcTofyJz65ypFGSbnpVWCOxUdAGaFBvPht+VEdu+CWCWcuBjxG+
- 1XQkv/CkCxq+ElwcbzHcLifm1SlwL0dlFhYJPkq3yXhgheiY+4/06vYcGs+V3Pl8Zk36
- SXtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=tfYzqeONeL95lTYuJtTxc0aKu62ZhtgB0l2M/6sJwb4=;
- b=Ld2/5BqIk7vhJJuWNfyB7YMzmKHYJNFUsYRP6LmKrkuwiZmHlJ432rNU9aIL8ky+K2
- kaJxRJc5j+OVP5H67ve8MouwU9aWp5TlYbDz+4hVYnclUWMNfUhG7dORe+2y/53ql/SQ
- Kjw24H0I/eHKmMf8XEqe/ib+zbluPMXHrqTa0xEEm4bRARuBIMYqyq7qRUPylgtr0ikS
- V4cpdbyGdQY+mkSbx5/MEVb2q/8wFrG1kEdWdH842pKFPxq849CaVUzyZrvQho153GYW
- ylEGMPHkjnDe7ag7n8kZ4QyPqxXcW76jL2zPLYwoP5fT/Vr3EM5V1zRy1064LHP8n+XF
- kn+A==
-X-Gm-Message-State: AOAM532LKjfJxoGlf03Zgrk5kC6l6UEtyW46LjnbWdmIMSWvORt1KSsR
- tUhuwzhfGSwPAGA1sLFrpfyURw==
-X-Google-Smtp-Source: ABdhPJyvmB78FuCEH0lEEsg7k7dVTYifqlfTwZEkhYlWIzPrvCc5JNEaVQUUeKpIU71XlbhegR+pwg==
-X-Received: by 2002:a1c:3286:: with SMTP id y128mr23923488wmy.29.1592931798034; 
- Tue, 23 Jun 2020 10:03:18 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p4sm13026268wrx.63.2020.06.23.10.03.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 10:03:16 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D79F01FF7E;
- Tue, 23 Jun 2020 18:03:15 +0100 (BST)
-References: <20200522023440.26261-1-richard.henderson@linaro.org>
- <20200522023440.26261-23-richard.henderson@linaro.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3 22/25] Standardize reginfo_dump_mismatch printing
-In-reply-to: <20200522023440.26261-23-richard.henderson@linaro.org>
-Date: Tue, 23 Jun 2020 18:03:15 +0100
-Message-ID: <87y2od7m0c.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnmOf-0004fH-9R
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:07:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28592
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jnmOb-0004JC-W8
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:07:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592932060;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=RDTSq0k8O9nLzFHtMDnrEPQkr5s+IiZtw9n3KqPBnRg=;
+ b=BqlyQESRpogUm15Alc24w/fmAPnVls7MNSFIVIwq9K2Ncb4wmDD7ZDqjXMcpoxCVc5mWX6
+ MS5TwWtIhc+rPqI6NlqFcZTJfVcMCCZ+eEvzRacCIRf/9ALD8K272+AFou0gLw06GyrkAh
+ HhhcY4qEsQ5qJf+C1wcCVfVvTjiap4U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-Y0twkY04MgKf5y-Tw_nlQQ-1; Tue, 23 Jun 2020 13:07:36 -0400
+X-MC-Unique: Y0twkY04MgKf5y-Tw_nlQQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E021805EE4;
+ Tue, 23 Jun 2020 17:07:35 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-149.ams2.redhat.com [10.36.112.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DF04B10027B5;
+ Tue, 23 Jun 2020 17:07:24 +0000 (UTC)
+Subject: Re: [PATCH] Revert "tests/migration: Reduce autoconverge initial
+ bandwidth"
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200623145506.439100-1-mst@redhat.com>
+ <3554a068-ba6f-0aa0-38b4-b6dca3069630@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5d3c4773-5aa2-e80d-68c7-a94eac8a7422@redhat.com>
+Date: Tue, 23 Jun 2020 19:07:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <3554a068-ba6f-0aa0-38b4-b6dca3069630@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,22 +100,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 23/06/2020 17.39, Philippe Mathieu-Daudé wrote:
+> On 6/23/20 4:56 PM, Michael S. Tsirkin wrote:
+>> This reverts commit 6d1da867e65f ("tests/migration: Reduce autoconverge initial bandwidth")
+>> since that change makes unit tests much slower for all developers, while it's not
+>> a robust way to fix migration tests. Migration tests need to find
+>> a more robust way to discover a reasonable bandwidth without slowing
+>> things down for everyone.
+> 
+> Please also mention we can do this since 1de8e4c4dcf which allow
+> marked the s390x job as "unstable" and allow it to fail.
+> 
+> But if nobody is going to look at it, instead lets disable
+> it until someone figure out the issue:
+> 
+> -- >8 --
+> diff --git a/.travis.yml b/.travis.yml
+> index 74158f741b..364e67b14b 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -507,6 +507,7 @@ jobs:
+> 
+>      - name: "[s390x] Clang (disable-tcg)"
+>        arch: s390x
+> +      if: false # Temporarily disabled due to issue testing migration
+> (see commit 6d1da867e65).
+>        dist: bionic
+>        compiler: clang
+>        addons:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Sorry, but that looks wrong. First, the disable-tcg test does not run
+the qtests at all. So this is certainly the wrong location here. Second,
+if just one of the qtests is failing, please only disable that single
+failing qtest and not the whole test pipeline.
 
-> Hoist the "master vs apprentice" label to apprentice(), since
-> we will want different labels for dumping.  Remove all of the
-> "mismatch" text from reginfo_dump_mismatch -- just print "vs".
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+ Thanks,
+  Thomas
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
 
