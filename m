@@ -2,101 +2,92 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B66C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE7BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6035A20774
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0587720774
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:06:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AVTBsUjS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6035A20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mngUCcGx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0587720774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnkVP-0003BX-LW
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:06:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35276)
+	id 1jnkVb-0003c0-58
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnkMH-0007rT-LN
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:57:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35757
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnkMF-0003mi-4y
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:57:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592924225;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=kIDvPuB8KHqCOD97URxiiLd4BWyBBgGXBC7RqCRKmCw=;
- b=AVTBsUjSEzka8Wv9GpoT1z6BPNRuDUg7jgxvCoUKWkRx/tXkUu1hjNy0BpsMfHt2sd002e
- y9EHIPJntOF7jb4B/LKiSv85YnsrqU6vAzHwvqclmLtOaV+12973P/u1h3ipTe2rSrZEmb
- 1Bo68WEkvn/pkfIhmNogUs0Mslqp4mo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-7OIPjzOXM7meTpjf_AI4ag-1; Tue, 23 Jun 2020 10:57:03 -0400
-X-MC-Unique: 7OIPjzOXM7meTpjf_AI4ag-1
-Received: by mail-wr1-f71.google.com with SMTP id y16so12233421wrr.20
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:57:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jnkTw-0001i0-20
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:05:04 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36980)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jnkTu-0000av-8q
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:05:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a6so18935237wrm.4
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 08:05:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=lU27h3focvbgoLfr0h4prGMxg1a7SxSdgbHNcPtkQBE=;
+ b=mngUCcGx/Kfwc6M9dRYN3b3MFgPNgIDBGPOZU9WFrxt0GaxI8I6zinmXYt8j8qcMya
+ htOjg07dB16E7xefQmcE+q+/wwFfHQhfHC8A2FWHwez3jAcxUEsgMdSLgcc6SfhFgcfq
+ cCAFvvjURhH4pISTOmQ5F5JgiWEdz0BE693XGHt/iuWNLLSq4jjAr2XXJJueoFXHSlUB
+ 9lsQxzB/xyRvkzrIiz9ONX6Q9TlJKRbUkME2jcrXFROEvqyBEtidQmEQ5fptrHEu4knj
+ MEgpr/QpriCQ24P5a5JsdeOpi+EwtxcI02Z8Gsuk2hyYNfA+5XwOeGWohPfp+44G+x8W
+ MVdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=kIDvPuB8KHqCOD97URxiiLd4BWyBBgGXBC7RqCRKmCw=;
- b=eiB6a73jZ9so90oGxsyPBWuLiGSn92PVFDjDIHQega8lzpXBxInxb8oyglucJv4MA0
- NvveEEe8tyKCSOhAbqU4Q4I/ybEkne003SAAqJPJ3mhyne/TGa39qjTRaIgK88PP/PZm
- wxq1a8w1Eq7NFKEFgfQ9kupCzoEXjstCpwMi4yPcQhu2Jl/3gQtrPaA5JUc7jDD1t2Zi
- vDlBcmcdpmYhLYT1t/oMkG2Ait+ddwfm18+JRUFyQIwOOQ7odlYL9HJzRUtQnQZze32F
- kkLvdba71bHS/09r+nU28YMEWDBuTUTiMELwqYUucsDAdQ89MHsL0VUqMe3QosIouBWS
- 6N5g==
-X-Gm-Message-State: AOAM532wm4UeWwMcqO6PsQjE1dmll4B0jywRLlo7IPByjjxYoor+zMLP
- 9fGobpTt3kbNGYe2cjBK3rJmHsavQVxdHsFN2Qece67iZsF3xFC+r6FfzS4RMRNW3tIn58tNHtX
- BZq4QT9EgTb/h4mI=
-X-Received: by 2002:a7b:cc08:: with SMTP id f8mr26089337wmh.106.1592924222208; 
- Tue, 23 Jun 2020 07:57:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxC/JDUCeWsSN7TILJPGuAsQQn4ik7dj6gztwccS6Pz5E2hG1G/cRA+pzF+O4T2vObZXoBvQg==
-X-Received: by 2002:a7b:cc08:: with SMTP id f8mr26089321wmh.106.1592924222035; 
- Tue, 23 Jun 2020 07:57:02 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- f2sm3924171wmj.39.2020.06.23.07.57.00
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lU27h3focvbgoLfr0h4prGMxg1a7SxSdgbHNcPtkQBE=;
+ b=ClismB+pUjfotO6P/hhFLXYsfdwGWCpZ+gQMa0RXebeFC3EZRuQFcZGDsmRbw6/0Hp
+ Asn0qm6SaE7UzE7Rlob6kit2buDc/Mn2O2nSGU7I7lVTi3IarbSn5eTWWAepfejRHBTS
+ VxDhptlLoWent3fo5wcFp6MFvUu82/scpFNT0I8RoMQ/+ijqQaoCpZ+fEfEwwnSf72If
+ M/Utn+nQPfno1Zch2fHiNPcqDxZuMyvZReHvuTn3NMAxOhW7EVztKgSA10GCtXbI6QfD
+ CDuEz9Ow1WBNhkJAbGrZIcMWoED+2aPh5zwxTdsdzwZa96DaDFb2azkM8yJ8pjHPFDR+
+ QG4A==
+X-Gm-Message-State: AOAM533I2IYavyMiC5eLse7ZnWYJyPcu/4xQDM/NPUbx6xmBq5yWkcB4
+ HKqgkJwu4e2FUeabuoTx8sU=
+X-Google-Smtp-Source: ABdhPJx76PMh9Zh6fLZBGbQsVekKRNp6M/+xuOugKdJmpMLxu/qHCl/Riv2cL8gjpOJ9O8ZtbfgZXA==
+X-Received: by 2002:a5d:4c86:: with SMTP id z6mr14250913wrs.345.1592924700510; 
+ Tue, 23 Jun 2020 08:05:00 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u20sm3970662wmc.44.2020.06.23.08.04.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 07:57:01 -0700 (PDT)
-Date: Tue, 23 Jun 2020 10:56:59 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Revert "tests/migration: Reduce autoconverge initial
- bandwidth"
-Message-ID: <20200623145506.439100-1-mst@redhat.com>
+ Tue, 23 Jun 2020 08:04:59 -0700 (PDT)
+Date: Tue, 23 Jun 2020 16:04:58 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v4 0/7] build some devices as modules.
+Message-ID: <20200623150458.GU36568@stefanha-x1.localdomain>
+References: <20200622135601.12433-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="H5pgEA8DvTwLpheO"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200622135601.12433-1-kraxel@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,39 +100,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: dinechin@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 6d1da867e65f ("tests/migration: Reduce autoconverge initial bandwidth")
-since that change makes unit tests much slower for all developers, while it's not
-a robust way to fix migration tests. Migration tests need to find
-a more robust way to discover a reasonable bandwidth without slowing
-things down for everyone.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+--H5pgEA8DvTwLpheO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
----
- tests/qtest/migration-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jun 22, 2020 at 03:55:54PM +0200, Gerd Hoffmann wrote:
+> Specifically devices which depend on shared libraries,
+> to reduce the runtime dependencies of core qemu.
 
-diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-index dc3490c9fa..21ea5ba1d2 100644
---- a/tests/qtest/migration-test.c
-+++ b/tests/qtest/migration-test.c
-@@ -1211,7 +1211,7 @@ static void test_migrate_auto_converge(void)
-      * without throttling.
-      */
-     migrate_set_parameter_int(from, "downtime-limit", 1);
--    migrate_set_parameter_int(from, "max-bandwidth", 1000000); /* ~1Mb/s */
-+    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100Mb/s */
- 
-     /* To check remaining size after precopy */
-     migrate_set_capability(from, "pause-before-switchover", true);
--- 
-MST
+Just wanted to say great that you are doing this! Nice that progress is
+being made on QEMU modularization.
 
+Stefan
+
+--H5pgEA8DvTwLpheO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7yGhoACgkQnKSrs4Gr
+c8j8/AgAmZNGqiKYOpbeugii6kxPyE2c2nABwyspCVIdczaMyiqjoyr4JmaTEGmn
+ETD9kNT9TJSNYalFnTsno+7NIBar+S/M5FkSNbqRRgItPahiYOmWqPlletLNe30O
+KWzcjSanZpiISSPKXhv3mBgGAY421kBX1cWlQaLMx8wrNu4dS+tCaokuCA6Q4JIK
+PWlksPIppZ/yJxU0qJW3PyT/Selko4pg+r3YZVlTwU+IDr7G1KkOsHM+/lNPROPk
+IRUUr/sXVZwpFxxGbX4tALrFOSnlmzDj0ymASe9A2cDyl7R5OgUX7Ci1K+kn/zgC
+DKf2Fg7t9MdvnH9wmX/4mr08RfJHRg==
+=ffIu
+-----END PGP SIGNATURE-----
+
+--H5pgEA8DvTwLpheO--
 
