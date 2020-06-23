@@ -2,97 +2,89 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E729C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E4B2073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:16:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D4072073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KDvRn03a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E4B2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3thIC+y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D4072073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnkfI-00084G-9G
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33758)
+	id 1jnkfi-0008TV-Mh
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:17:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnkHz-0005fe-Sx
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:52:44 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41947)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnkHy-00014w-0d
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:52:43 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h15so889935wrq.8
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:52:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=n3MRUD+QRMjfDSjSikC2bHhO8rpeXdlIDDxtDUZz3Iw=;
- b=KDvRn03at0cn4SR3hDvUoJYQYEkz6Kc1wX3BosewmCrLHZnok9ujLCdqYadKflUFKD
- ofAxHsCuRRElXsKnw7sKWi33BN6TTf7KrvDcl/PCFkN8DU2RBwAqHW8M9tB/tXMyduIg
- mF+m/1wjCh6d4GrdsqzKlEmKYCjdifb+XwLGPYPfYmW8D3dUzjQgRxEff3+ZkXwu95PI
- God4XhTQfgJ6meNH3yLxeIsD7ffz3lPdQ8meABgnKAvZfgy5iZQna4GB8Ux12bxoIuoX
- YpXfQR3JZ2FySh1qfHW1stWHaaw2ozDL41FgsJfeHnh3PrrG0g3K4IGKN6KLI6lbVRtQ
- JTPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=n3MRUD+QRMjfDSjSikC2bHhO8rpeXdlIDDxtDUZz3Iw=;
- b=Iw6bJifRMV12QcwTiiu4CaqxqZEf75IaY21etnvRqzrcpYUSfJIG+A7VoJi9FxXqC2
- +D05mwOiQykujvKlibxqUyZNZuxFm7QMTgLNkISDrZAIUCEXCAB5RnRbuJvyqp3AxI2s
- lwWfkmqKFAiZy73VSmWmTxuEyhOQIW2dbVaTXT8tT3I44Kho/cbcHR4AsbbCoK037Fga
- LfEZtUiT7loNkKKMprxBC37e7/wGBqehZQ3ov72kzcExNcZK3ZcGBZuItJuR4ZFx0tEp
- phi+3PowW1UgU0gwQLTj7i/RSrPVdW8KUo1B7H7pPEYK5q2IKsABTB4QIOSCUWsR7yug
- ogJA==
-X-Gm-Message-State: AOAM533xUkuFE6c+bKznBadBr2NSdnmZz5WZu28kn0W+VZBbIYcgol33
- /fAfb9Mw4ZT2n/oJHpYU0jwgVw==
-X-Google-Smtp-Source: ABdhPJxux8B3O8ZTp8BNGG90uhTWYb7FX6k8f59lK+qT7m/MdHZuzOfmVp1Upq+/7T2w3ajZNIQhDw==
-X-Received: by 2002:a05:6000:1283:: with SMTP id
- f3mr7856198wrx.106.1592923960329; 
- Tue, 23 Jun 2020 07:52:40 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p9sm3922833wma.48.2020.06.23.07.52.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 07:52:39 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5D3771FF7E;
- Tue, 23 Jun 2020 15:52:38 +0100 (BST)
-References: <20200522023440.26261-1-richard.henderson@linaro.org>
- <20200522023440.26261-18-richard.henderson@linaro.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3 17/25] Add magic and size to the trace header
-In-reply-to: <20200522023440.26261-18-richard.henderson@linaro.org>
-Date: Tue, 23 Jun 2020 15:52:38 +0100
-Message-ID: <87k0zx96mh.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnkeN-0007H4-H6
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:15:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55021
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnkeJ-0000Rv-LQ
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:15:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592925346;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=nNji3fnmV0Yr7TVzEVLMLP+ZFv2zrXLWKeKJ2u2GAAg=;
+ b=I3thIC+yVMp8QNu/nEysmymMYOQyCXBwdKLbGBq4YATLMdi2Z7bYWc9EpooTY4Ny5O3E0t
+ L7o1gE+/vgS90EcCD3x5jVuZcp2dhWYtm9BKQpM+RqGgnj7OvYj45ttI7NLpOgcq5g7lrb
+ EOfnfKk1fkzLmGZzYLhXn93BJuGMzCM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-NUv1OQRDObyPD8f760ifzA-1; Tue, 23 Jun 2020 11:15:44 -0400
+X-MC-Unique: NUv1OQRDObyPD8f760ifzA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F204107ACCA;
+ Tue, 23 Jun 2020 15:15:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 76E075D9E7;
+ Tue, 23 Jun 2020 15:15:34 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id F07E4113846D; Tue, 23 Jun 2020 17:15:32 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+References: <20200611151209.22547-1-eric.auger@redhat.com>
+ <20200611151209.22547-2-eric.auger@redhat.com>
+ <87k0zzz6nt.fsf@dusky.pond.sub.org>
+ <f0ec7470-d683-1bfd-103d-54c57ebd3863@redhat.com>
+Date: Tue, 23 Jun 2020 17:15:32 +0200
+In-Reply-To: <f0ec7470-d683-1bfd-103d-54c57ebd3863@redhat.com> (Auger Eric's
+ message of "Tue, 23 Jun 2020 10:22:47 +0200")
+Message-ID: <87imfhhkyz.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,60 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jean-philippe@linaro.org, mst@redhat.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, qemu-arm@nongnu.org,
+ pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Auger Eric <eric.auger@redhat.com> writes:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Sanity check that we're not getting out of sync with
-> the trace stream.  This will be especially bad with
-> the change in size of the sve save data.
+> Hi Markus,
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  risu.h |  10 +++-
->  risu.c | 162 ++++++++++++++++++++++++++++++++++++++++++++-------------
->  2 files changed, 136 insertions(+), 36 deletions(-)
->
-> diff --git a/risu.h b/risu.h
-> index dd9fda5..bfcf0af 100644
-> --- a/risu.h
-> +++ b/risu.h
-> @@ -55,7 +55,11 @@ typedef enum {
->      RES_END,
->      RES_MISMATCH_REG,
->      RES_MISMATCH_MEM,
-> +    RES_MISMATCH_OP,
->      RES_BAD_IO,
-> +    RES_BAD_MAGIC,
-> +    RES_BAD_SIZE,
-> +    RES_BAD_OP,
->  } RisuResult;
->=20=20
->  /* The memory block should be this long */
-> @@ -69,10 +73,14 @@ typedef enum {
->  struct reginfo;
->=20=20
->  typedef struct {
-> -   uintptr_t pc;
-> +   uint32_t magic;
-> +   uint32_t size;
->     uint32_t risu_op;
-> +   uintptr_t pc;
->  } trace_header_t;
->=20=20
-> +#define RISU_MAGIC  (('R' << 24) | ('I' << 16) | ('S' << 8) | 'U')
-> +
+> On 6/22/20 1:22 PM, Markus Armbruster wrote:
+>> Eric Auger <eric.auger@redhat.com> writes:
+>> 
+>>> Introduce a new property defining a reserved region:
+>>> <low address>, <high address>, <type>.
+[...]
+>> I dimly remember discussing the wisdom of numeric type here, dig, dig,
+>> ..., aha:
+>> 
+>>     Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
+>>     Date: Fri, 13 Dec 2019 11:03:02 +0100
+>>     Message-ID: <87y2vg4k6h.fsf@dusky.pond.sub.org>
+>> 
+>>     >> So the "label" part of "<low address>,<high address>,label" is a number?
+>>     > yes it is.
+>>     >> 
+>>     >> Is a number appropriate for your use case, or would an enum be better?
+>>     > I think a number is OK. There might be other types of reserved regions
+>>     > in the future. Also if we want to allow somebody else to reuse that
+>>     > property in another context, I would rather leave it open?
+>> 
+>>     I'd prioritize the user interface over possible reuse (which might never
+>>     happen).  Mind, I'm not telling you using numbers is a bad user
+>>     interface.  In general, enums are nicer, but I don't know enough about
+>>     this particular case.
+> Yep I remember too ;-) I left as it was because I think this property
+> could be used for other use cases.
 
-I guess a fixed constant magic value should compress well.
+YAGNI :)
 
-Anyway:
+A string would work, too, wouldn't it?
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+[...]
 
---=20
-Alex Benn=C3=A9e
 
