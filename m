@@ -2,92 +2,98 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE7EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 04:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 05:16:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E57920706
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 04:26:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E57920706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0656520738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 05:16:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u2h6cv+H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0656520738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnaVd-0001Ye-BR
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 00:26:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33520)
+	id 1jnbIP-0006hS-Nb
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 01:16:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jnaUm-0000c2-CW; Tue, 23 Jun 2020 00:25:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9912)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jnaUk-0004ZH-Cd; Tue, 23 Jun 2020 00:25:16 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05N435ua033601; Tue, 23 Jun 2020 00:25:04 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31u60ceepr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 00:25:03 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05N4G0sh030220;
- Tue, 23 Jun 2020 04:25:02 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 31u20ctxp9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 04:25:02 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05N4P2cO21365098
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 04:25:02 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 230CA12405A;
- Tue, 23 Jun 2020 04:25:02 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 88D54124054;
- Tue, 23 Jun 2020 04:25:01 +0000 (GMT)
-Received: from pompom.ibm.com (unknown [9.65.252.240])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 04:25:01 +0000 (GMT)
-From: Lijun Pan <ljp@linux.ibm.com>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v3] target/ppc: add vmsumudm vmsumcud instructions
-Date: Mon, 22 Jun 2020 23:25:01 -0500
-Message-Id: <20200623042501.47065-1-ljp@linux.ibm.com>
-X-Mailer: git-send-email 2.22.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jnbHL-0006CC-Og
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 01:15:27 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52422)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jnbHJ-0004Sv-Qi
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 01:15:27 -0400
+Received: by mail-wm1-x341.google.com with SMTP id q15so63649wmj.2
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 22:15:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=PeVnS/+owI/Zq2X3mwCNvwTM7g1vcGGNRzgVUWkxW7k=;
+ b=u2h6cv+HwmrHf6dnSmznjStQTS221EO6cp32AeFDwieG6RQ32e3BsnJmG28HoMOGcY
+ wx/T91wWu3EotOVOakgGfCAjw2PBqpVUc3fzhZw9+XtRyxHdHo7+Vpfm5F/bHd0B1DaN
+ f0+Qzo7rNESw4EpFjucsH3lLGPemC8d8fNrGYqvhgQEVxG3htIztLuBTxTdQVcV01Wi0
+ kl4F3GD5C1GHSecMmArjTMG+iXjx+0CMls4noUbwQoOlANSYP2vXLEACDjmCPYJjVHFH
+ iTmQDpd3vmSg5NB+002VwGpqf7YTZkb/zEHxs/EejLYNVOFFvNBjJp1zMNd7m3t/2Zpa
+ kc3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=PeVnS/+owI/Zq2X3mwCNvwTM7g1vcGGNRzgVUWkxW7k=;
+ b=YxGUiHqC0bFnKGCuPChR+4cc3G1hbsWt97tegkzcbaDL1vmXRdFCaMFraP5kVWn0xo
+ 7krz08C6Va2NCe92qVr4zdanSolHziJxhwjMnUCWOjvkKQ4kyK/Iu8UsaKdew5cEJDBz
+ AFyjgXcc+urCR5Y5/VxmnFmJuybU4lBjUU69qlUX2MTgQppHDqqFug3PMZ4K3jj55Z4g
+ /7pMw6jBLotyH+fvApA2wmV7rP9kLXuvqSMDeRQBMh3FCoE4X01spqrh4bPTwpITYPHs
+ GVOqfYAhJmEssqC16RnJVg7XrZW1HlpRgUvF5eu5/XW2nBk6bd3qyXk/rgYmg3kvhemb
+ 41Xw==
+X-Gm-Message-State: AOAM533FQbjq7+DByPqhl0uEJ/oXpc8v6Ngr6dmildNmF/VlpfT4w5Ln
+ 2CinfoPiWXouFfQWl5ygdlA=
+X-Google-Smtp-Source: ABdhPJyKCK2crWAQYLD0SVSXuU2qvoiGU+TLKUe4xyGfGENSGZBUZBEOO5VSoGSitQIub52+PhQxag==
+X-Received: by 2002:a1c:9943:: with SMTP id b64mr22269035wme.102.1592889323850; 
+ Mon, 22 Jun 2020 22:15:23 -0700 (PDT)
+Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id c206sm2173213wmf.36.2020.06.22.22.15.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 22 Jun 2020 22:15:23 -0700 (PDT)
+Subject: Re: [PATCH] i2c: Match parameters of i2c_start_transfer and
+ i2c_send_recv
+To: cminyard@mvista.com, BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200621145235.9E241745712@zero.eik.bme.hu>
+ <20200622213237.GB3258@minyard.net> <20200623020601.GD3258@minyard.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <da9237e0-0dd3-9da2-1707-20f5343bbf98@amsat.org>
+Date: Tue, 23 Jun 2020 07:15:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-22_16:2020-06-22,
- 2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- cotscore=-2147483648
- bulkscore=0 adultscore=0 spamscore=0 suspectscore=2 priorityscore=1501
- mlxscore=0 phishscore=0 clxscore=1011 lowpriorityscore=0 mlxlogscore=707
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006230029
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 00:25:11
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200623020601.GD3258@minyard.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,212 +106,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lijun Pan <ljp@linux.ibm.com>, richard.henderson@linaro.org,
- david@gibson.dropbear.id.au
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
-VA-form.
-vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
-Doubleword VA-form.
+On 6/23/20 4:06 AM, Corey Minyard wrote:
+> On Mon, Jun 22, 2020 at 04:32:37PM -0500, Corey Minyard wrote:
+>> On Sun, Jun 21, 2020 at 04:43:38PM +0200, BALATON Zoltan wrote:
+>>> These functions have a parameter that decides the direction of
+>>> transfer but totally confusingly they don't match but inverted sense.
+>>> To avoid frequent mistakes when using these functions change
+>>> i2c_send_recv to match i2c_start_transfer. Also use bool in
+>>> i2c_start_transfer instead of int to match i2c_send_recv.
+>>
+>> Hmm, I have to admit that this is a little better.  Indeed the
+>> hw/misc/auxbus.c looks suspicious.  I can't imagine that code has ever
+>> been tested.
+>>
+>> I don't know the policy on changing an API like this with silent
+>> semantic changes.  You've gotten all the internal ones; I'm wondering if
+>> we worry about silently breaking out of tree things.
+>>
+>> I'll pull this into my tree, but hopefully others will comment on this.
+> 
+> The more I think about it, the more I think it's a better idea to rename
+> the function.  Like i2c_send_or_recv(), which is a little more clear
+> about what it does.  Does that sound good?
 
-Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
----
-v3: implement vmsumudm/vmsumcud through int128 functions,
-    suggested by Richard Henderson.
+Or to match the common pattern used in QEMU:
 
- disas/ppc.c                         |  2 ++
- target/ppc/helper.h                 |  4 ++-
- target/ppc/int_helper.c             | 49 ++++++++++++++++++++++++++++-
- target/ppc/translate.c              |  1 -
- target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
- target/ppc/translate/vmx-ops.inc.c  |  2 ++
- 6 files changed, 76 insertions(+), 21 deletions(-)
+  int i2c_rw(I2CBus *bus, uint8_t *data, bool is_write);
 
-diff --git a/disas/ppc.c b/disas/ppc.c
-index 63e97cfe1d..bd76fae4c4 100644
---- a/disas/ppc.c
-+++ b/disas/ppc.c
-@@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] = {
- { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
- { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
- { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-+{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
- { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-+{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
- { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
- { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
- { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 2dfa1c6942..d540e8f30b 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -263,10 +263,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
- DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
-+DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
--DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
-+DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
-+DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
- DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
- DEF_HELPER_3(lvebx, void, env, avr, tl)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index be53cd6f68..37ea343cb3 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -926,7 +926,8 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-     }
- }
- 
--void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-+                      ppc_avr_t *b, ppc_avr_t *c)
- {
-     int i;
- 
-@@ -1064,6 +1065,52 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-     }
- }
- 
-+void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
-+                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+{
-+    Int128 sum;
-+    uint64_t lo, hi;
-+
-+    sum = int128_make128(c->VsrD(1), c->VsrD(0));
-+
-+    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
-+    sum = int128_add(sum, int128_make128(lo, hi));
-+
-+    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
-+    sum = int128_add(sum, int128_make128(lo, hi));
-+
-+    r->VsrD(0) = int128_gethi(sum);
-+    r->VsrD(1) = int128_getlo(sum);
-+}
-+
-+void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
-+                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+{
-+    Int128 sum;
-+    uint64_t p1lo, p1hi, p2lo, p2hi;
-+
-+    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
-+    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
-+
-+    /* Sum lowest 64-bit elements.  */
-+    sum = int128_make128(c->VsrD(1), 0);
-+    sum = int128_add(sum, int128_make128(p1lo, 0));
-+    sum = int128_add(sum, int128_make128(p2lo, 0));
-+
-+    /*
-+     * Discard low 64-bits, leaving the carry into bit 64.
-+     * Then sum the higher 64-bit elements.
-+     */
-+    sum = int128_rshift(sum, 64);
-+    sum = int128_add(sum, int128_make128(c->VsrD(0), 0));
-+    sum = int128_add(sum, int128_make128(p1hi, 0));
-+    sum = int128_add(sum, int128_make128(p2hi, 0));
-+
-+    /* The result is only the carry into bits 64 & 65. */
-+    r->VsrD(1) = int128_gethi(sum);
-+    r->VsrD(0) = 0;
-+}
-+
- #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
-     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-     {                                                                   \
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 4ce3d664b5..35ff1aa77e 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7281,7 +7281,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
- GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
--GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
- #if defined(TARGET_PPC64)
- GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
-               PPC2_ISA300),
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 403ed3a01c..520b49a773 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -1248,6 +1248,25 @@ static void gen_vsldoi(DisasContext *ctx)
-     tcg_temp_free_i32(sh);
- }
- 
-+#define GEN_VAFORM(name, opc2)                                          \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
-+{                                                                       \
-+    TCGv_ptr ra, rb, rc, rd;                                            \
-+    if (unlikely(!ctx->altivec_enabled)) {                              \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-+        return;                                                         \
-+    }                                                                   \
-+    ra = gen_avr_ptr(rA(ctx->opcode));                                  \
-+    rb = gen_avr_ptr(rB(ctx->opcode));                                  \
-+    rc = gen_avr_ptr(rC(ctx->opcode));                                  \
-+    rd = gen_avr_ptr(rD(ctx->opcode));                                  \
-+    gen_helper_##name(cpu_env, rd, ra, rb, rc);                         \
-+    tcg_temp_free_ptr(ra);                                              \
-+    tcg_temp_free_ptr(rb);                                              \
-+    tcg_temp_free_ptr(rc);                                              \
-+    tcg_temp_free_ptr(rd);                                              \
-+}
-+
- #define GEN_VAFORM_PAIRED(name0, name1, opc2)                           \
- static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
-     {                                                                   \
-@@ -1272,24 +1291,8 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
-     }
- 
- GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
--
--static void gen_vmladduhm(DisasContext *ctx)
--{
--    TCGv_ptr ra, rb, rc, rd;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    ra = gen_avr_ptr(rA(ctx->opcode));
--    rb = gen_avr_ptr(rB(ctx->opcode));
--    rc = gen_avr_ptr(rC(ctx->opcode));
--    rd = gen_avr_ptr(rD(ctx->opcode));
--    gen_helper_vmladduhm(rd, ra, rb, rc);
--    tcg_temp_free_ptr(ra);
--    tcg_temp_free_ptr(rb);
--    tcg_temp_free_ptr(rc);
--    tcg_temp_free_ptr(rd);
--}
-+GEN_VAFORM(vmsumcud, 11)
-+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
- 
- static void gen_vpermr(DisasContext *ctx)
- {
-diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index 84e05fb827..aee23e31c6 100644
---- a/target/ppc/translate/vmx-ops.inc.c
-+++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -276,6 +276,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
- GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
- GEN_VAFORM_PAIRED(vsel, vperm, 21),
- GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
-+GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC_ALTIVEC),
-+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
- 
- GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
- GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
--- 
-2.23.0
+Or
+
+  int i2c_bus_rw(I2CBus *bus, uint8_t *data, bool is_write);
+
+See:
+
+$ git grep -A1 -F _rw\( include
+include/exec/cpu-common.h:69:void cpu_physical_memory_rw(hwaddr addr,
+void *buf,
+include/exec/cpu-common.h-70-                            hwaddr len,
+bool is_write);
+--
+include/exec/cpu-common.h:74:    cpu_physical_memory_rw(addr, buf, len,
+false);
+include/exec/cpu-common.h-75-}
+--
+include/exec/cpu-common.h:79:    cpu_physical_memory_rw(addr, (void
+*)buf, len, true);
+include/exec/cpu-common.h-80-}
+--
+include/exec/memory.h:2059:MemTxResult address_space_rw(AddressSpace
+*as, hwaddr addr,
+include/exec/memory.h-2060-                             MemTxAttrs
+attrs, void *buf,
+--
+include/hw/pci/pci.h:786:static inline int pci_dma_rw(PCIDevice *dev,
+dma_addr_t addr,
+include/hw/pci/pci.h-787-                             void *buf,
+dma_addr_t len, DMADirection dir)
+--
+include/hw/pci/pci.h:789:    dma_memory_rw(pci_get_address_space(dev),
+addr, buf, len, dir);
+include/hw/pci/pci.h-790-    return 0;
+--
+include/hw/pci/pci.h:796:    return pci_dma_rw(dev, addr, buf, len,
+DMA_DIRECTION_TO_DEVICE);
+include/hw/pci/pci.h-797-}
+--
+include/hw/pci/pci.h:802:    return pci_dma_rw(dev, addr, (void *) buf,
+len, DMA_DIRECTION_FROM_DEVICE);
+include/hw/pci/pci.h-803-}
+--
+include/hw/ppc/spapr_xive.h:86:uint64_t kvmppc_xive_esb_rw(XiveSource
+*xsrc, int srcno, uint32_t offset,
+include/hw/ppc/spapr_xive.h-87-                            uint64_t
+data, bool write);
+--
+include/sysemu/dma.h:87:    return (bool)address_space_rw(as, addr,
+MEMTXATTRS_UNSPECIFIED,
+include/sysemu/dma.h-88-                                  buf, len, dir
+== DMA_DIRECTION_FROM_DEVICE);
+--
+include/sysemu/dma.h:104:static inline int dma_memory_rw(AddressSpace
+*as, dma_addr_t addr,
+include/sysemu/dma.h-105-                                void *buf,
+dma_addr_t len,
+--
+include/sysemu/dma.h:116:    return dma_memory_rw(as, addr, buf, len,
+DMA_DIRECTION_TO_DEVICE);
+include/sysemu/dma.h-117-}
+--
+include/sysemu/dma.h:122:    return dma_memory_rw(as, addr, (void *)buf,
+len,
+include/sysemu/dma.h-123-
+DMA_DIRECTION_FROM_DEVICE);
+
+> 
+> -corey
+> 
+>>
+>> -corey
+>>
+>>>
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> ---
+>>> Looks like hw/misc/auxbus.c already got this wrong and calls both
+>>> i2c_start_transfer and i2c_send_recv with same is_write parameter.
+>>> Although the name of the is_write variable suggest this may need to be
+>>> inverted I'm not sure what that value actially means and which usage
+>>> was correct so I did not touch it. Someone knowing this device might
+>>> want to review and fix it.
+>>>
+>>>  hw/display/sm501.c   |  2 +-
+>>>  hw/i2c/core.c        | 34 +++++++++++++++++-----------------
+>>>  hw/i2c/ppc4xx_i2c.c  |  2 +-
+>>>  include/hw/i2c/i2c.h |  4 ++--
+>>>  4 files changed, 21 insertions(+), 21 deletions(-)
+>>>
+>>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>>> index 2db347dcbc..ccd0a6e376 100644
+>>> --- a/hw/display/sm501.c
+>>> +++ b/hw/display/sm501.c
+>>> @@ -1034,7 +1034,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
+>>>                      int i;
+>>>                      for (i = 0; i <= s->i2c_byte_count; i++) {
+>>>                          res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
+>>> -                                            !(s->i2c_addr & 1));
+>>> +                                            s->i2c_addr & 1);
+>>>                          if (res) {
+>>>                              s->i2c_status |= SM501_I2C_STATUS_ERROR;
+>>>                              return;
+>>> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+>>> index 1aac457a2a..c9d01df427 100644
+>>> --- a/hw/i2c/core.c
+>>> +++ b/hw/i2c/core.c
+>>> @@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
+>>>   * without releasing the bus.  If that fails, the bus is still
+>>>   * in a transaction.
+>>>   */
+>>> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
+>>> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
+>>>  {
+>>>      BusChild *kid;
+>>>      I2CSlaveClass *sc;
+>>> @@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
+>>>      bus->broadcast = false;
+>>>  }
+>>>  
+>>> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+>>> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
+>>>  {
+>>>      I2CSlaveClass *sc;
+>>>      I2CSlave *s;
+>>>      I2CNode *node;
+>>>      int ret = 0;
+>>>  
+>>> -    if (send) {
+>>> -        QLIST_FOREACH(node, &bus->current_devs, next) {
+>>> -            s = node->elt;
+>>> -            sc = I2C_SLAVE_GET_CLASS(s);
+>>> -            if (sc->send) {
+>>> -                trace_i2c_send(s->address, *data);
+>>> -                ret = ret || sc->send(s, *data);
+>>> -            } else {
+>>> -                ret = -1;
+>>> -            }
+>>> -        }
+>>> -        return ret ? -1 : 0;
+>>> -    } else {
+>>> +    if (recv) {
+>>>          ret = 0xff;
+>>>          if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
+>>>              sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+>>> @@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+>>>          }
+>>>          *data = ret;
+>>>          return 0;
+>>> +    } else {
+>>> +        QLIST_FOREACH(node, &bus->current_devs, next) {
+>>> +            s = node->elt;
+>>> +            sc = I2C_SLAVE_GET_CLASS(s);
+>>> +            if (sc->send) {
+>>> +                trace_i2c_send(s->address, *data);
+>>> +                ret = ret || sc->send(s, *data);
+>>> +            } else {
+>>> +                ret = -1;
+>>> +            }
+>>> +        }
+>>> +        return ret ? -1 : 0;
+>>>      }
+>>>  }
+>>>  
+>>>  int i2c_send(I2CBus *bus, uint8_t data)
+>>>  {
+>>> -    return i2c_send_recv(bus, &data, true);
+>>> +    return i2c_send_recv(bus, &data, false);
+>>>  }
+>>>  
+>>>  uint8_t i2c_recv(I2CBus *bus)
+>>>  {
+>>>      uint8_t data = 0xff;
+>>>  
+>>> -    i2c_send_recv(bus, &data, false);
+>>> +    i2c_send_recv(bus, &data, true);
+>>>      return data;
+>>>  }
+>>>  
+>>> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+>>> index c0a8e04567..d3899203a4 100644
+>>> --- a/hw/i2c/ppc4xx_i2c.c
+>>> +++ b/hw/i2c/ppc4xx_i2c.c
+>>> @@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+>>>                      }
+>>>                  }
+>>>                  if (!(i2c->sts & IIC_STS_ERR) &&
+>>> -                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
+>>> +                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
+>>>                      i2c->sts |= IIC_STS_ERR;
+>>>                      i2c->extsts |= IIC_EXTSTS_XFRA;
+>>>                      break;
+>>> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+>>> index 4117211565..a09ab9230b 100644
+>>> --- a/include/hw/i2c/i2c.h
+>>> +++ b/include/hw/i2c/i2c.h
+>>> @@ -72,10 +72,10 @@ struct I2CBus {
+>>>  I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
+>>>  void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
+>>>  int i2c_bus_busy(I2CBus *bus);
+>>> -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
+>>> +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
+>>>  void i2c_end_transfer(I2CBus *bus);
+>>>  void i2c_nack(I2CBus *bus);
+>>> -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
+>>> +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
+>>>  int i2c_send(I2CBus *bus, uint8_t data);
+>>>  uint8_t i2c_recv(I2CBus *bus);
+>>>  
+>>> -- 
+>>> 2.21.3
+>>>
+> 
 
 
