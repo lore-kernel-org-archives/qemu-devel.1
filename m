@@ -2,90 +2,98 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE997C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7702AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:42:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF1B420679
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:41:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4031D20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:42:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kfony/zP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF1B420679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7/UTLPq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4031D20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnfQZ-0007gm-RP
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:41:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60546)
+	id 1jnfRZ-0001oi-H4
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:42:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnfJx-0004ne-J9
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:34:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23607
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jnfPG-00067y-V7
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:39:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43001
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnfJv-0001q3-QD
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:34:25 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jnfPF-0004d8-1w
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:39:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592904863;
+ s=mimecast20190719; t=1592905192;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HUuHwU6vGTCW+Kc1yUrUqQEjtwBovtWJJJPsDWGQUeY=;
- b=Kfony/zPHReEOC3HKHuybaU7Z0azGtq2KAXd5Kc3SV88OEaGdEWCjsRA/sph3IY4AYBXUz
- paXb7wq1VrOhrBx8IwUhsTZpJmlenu2Ng9P1TUEXJxAukHMFUTPZjnMSCreCbUfepArigt
- F2YVOPc1xoy0tgg8LSp7LlZ707iSpIM=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-AqbNGe4LOqCfkJAoBq80mg-1; Tue, 23 Jun 2020 05:34:21 -0400
-X-MC-Unique: AqbNGe4LOqCfkJAoBq80mg-1
-Received: by mail-pj1-f72.google.com with SMTP id cq18so1804222pjb.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:34:21 -0700 (PDT)
+ bh=devLSGWOsZYzYWfZieWlop+g3AQTWag//5NZrI0WjsI=;
+ b=f7/UTLPqlUeAnBCyPvo6A/2DdDPHvICcElQZjL0E/nIBkQddO2pCfaHv4JR6tk5SrSWjRD
+ v9SjO4RRQQBbMMWtStLebU3MWVc4cyku19LXvIrrIeumM4qtbwaJgXr7C8AjRyJgx67/zB
+ owumWLOYPO+YLGYU1+ahEeLgfhiD4Vk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-vSMY9sFONfCeFAyMEM6axg-1; Tue, 23 Jun 2020 05:39:50 -0400
+X-MC-Unique: vSMY9sFONfCeFAyMEM6axg-1
+Received: by mail-wm1-f71.google.com with SMTP id v24so3379873wmh.3
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:39:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HUuHwU6vGTCW+Kc1yUrUqQEjtwBovtWJJJPsDWGQUeY=;
- b=VBS6cd+Pl6RbbbSF03J11tSG7G3RkqzE/3X1rJGuXGebmhFyXEg60QQImek5QYzvtY
- ociy2irrm8cf4Jyw7QbBChRHzu7f7HD99w3m+W5Hr+4Cn3MN47LqOscFaGMnukrir+NM
- ODLhEp9dcFz5B4YxyXXzgS2HJRB54w+IPfjV0AnajzPHt5cDQ75LX9EgRGNpw4Mgr+N7
- iyDG4xR8EqHpbAQDDa8qJ7ZyYw4Jw9UjkjIlnbouvB0SkNi3r6j43mKH3EoA4dHwIfyU
- njrA78PcIzsrADbp/LQw1Yjz4lCMd6lUZB1/S/kl9xrfdylh7Qrc46yfpSMz9YeerPWm
- x8tA==
-X-Gm-Message-State: AOAM532sWUxl6j7GrAW3ih4JdACbs8wCz5ZvAXKfT/hxTsEaoNG2WQOd
- 4MOZGVJg31JPZ+PBRXM96g+uOGYc6yjcyvWc9eB2GXW4NyNwx1bmkMlHY0241Mmx6+3HNocjRcD
- fuFw9Y1UzStpgxjFCHOuUHo6ZcY2klRU=
-X-Received: by 2002:a63:1617:: with SMTP id w23mr16796212pgl.248.1592904860514; 
- Tue, 23 Jun 2020 02:34:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7mcyZrmIq9tPAx13S1lwU7XCKlvhpcZpEcoXGEzlctgHXyGngKHRs447r3jnAfgrQckCw6Lpxf0BhCTSvU6c=
-X-Received: by 2002:a63:1617:: with SMTP id w23mr16796185pgl.248.1592904860217; 
- Tue, 23 Jun 2020 02:34:20 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=devLSGWOsZYzYWfZieWlop+g3AQTWag//5NZrI0WjsI=;
+ b=nXYB36Hri0TRYl2aQu62lzbv5cu14HPWIn9sImpt9l3c2YBKnQ0oLcVsKn4DGrZqmc
+ l6TscU0QxBxQimOf0KMnnKI+1vYo9Yo8xn9+02FOSTUho0MLEKKxUGS3yNtrVxYgz+5s
+ 6nF56auQ/eFo9FLtQURoYVftWd9u3t1igsu3o+9Xb/9LlHMCzhMtUto4pozzAC5KwmUD
+ tXIe5N8QeG7GoZ/zFB52Vtob/CGbP+kFgGV9U8LKyKVfjobmMR6OeGGYWqrGWoo25mRj
+ AJKqYT8pWS+Y2A5RszppPqYm2souBu/afCNFiAUupw0AV9MqT39v9QH5E/VpkdJJYnbd
+ 3/BA==
+X-Gm-Message-State: AOAM53220vmk26WlleOWbtBENBL3Iqmifnhmq3v99xIkm39KBZ2ixqys
+ GiDAWbWwxfnPm58QYtY64REhOeEJEM/XFpeGbvdmVl1ulbHKvWP27mmJYqjYqO+KTHUVu/lztJR
+ uJoYzkEJ+i2q6iTk=
+X-Received: by 2002:a1c:4c0d:: with SMTP id z13mr21975597wmf.97.1592905189182; 
+ Tue, 23 Jun 2020 02:39:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwcz8IPvvE0DqJQZ4OE0m1m8U6YasMoSoOm1DLWdWRUDI1C47D866oDSaqIgIyg5+cz7tXymQ==
+X-Received: by 2002:a1c:4c0d:: with SMTP id z13mr21975584wmf.97.1592905188956; 
+ Tue, 23 Jun 2020 02:39:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1?
+ ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
+ by smtp.gmail.com with ESMTPSA id c65sm2910949wme.8.2020.06.23.02.39.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 23 Jun 2020 02:39:48 -0700 (PDT)
+Subject: Re: [PATCH v3 00/12] tpm: Split hw/ vs backends/
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200612085444.8362-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <03924193-9774-9f85-2008-05c047fe91cf@redhat.com>
+Date: Tue, 23 Jun 2020 11:39:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200622153756.19189-1-lulu@redhat.com>
- <20200622153756.19189-9-lulu@redhat.com>
- <3fab12a1-1c44-b18d-cfb8-f069190e0b2c@redhat.com>
-In-Reply-To: <3fab12a1-1c44-b18d-cfb8-f069190e0b2c@redhat.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 23 Jun 2020 17:34:09 +0800
-Message-ID: <CACLfguWkntyF0Syrcy=90X8jweCJFASgz7=tN4yS1CpZ+Bo7=g@mail.gmail.com>
-Subject: Re: [PATCH v1 08/10] vhost: implement vhost_dev_start method
-To: Jason Wang <jasowang@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
+In-Reply-To: <20200612085444.8362-1-philmd@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -106,125 +114,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Michael Tsirkin <mst@redhat.com>,
- mhabets@solarflare.com, qemu-devel@nongnu.org, hanand@xilinx.com,
- Rob Miller <rob.miller@broadcom.com>, saugatm@xilinx.com,
- Markus Armbruster <armbru@redhat.com>, hch@infradead.org,
- Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
- Shahaf Shuler <shahafs@mellanox.com>, kevin.tian@intel.com, parav@mellanox.com,
- Vitaly Mireyno <vmireyno@marvell.com>, "Liang,
- Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
- Zhihong" <zhihong.wang@intel.com>, Ariel Adam <aadam@redhat.com>,
- rdunlap@infradead.org, Maxime Coquelin <maxime.coquelin@redhat.com>, "Zhu,
- Lingshan" <lingshan.zhu@intel.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 23, 2020 at 3:21 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/6/22 =E4=B8=8B=E5=8D=8811:37, Cindy Lu wrote:
-> > use the vhost_dev_start callback to send the status to backend
->
->
-> I suggest to squash this into previous patch.
->
-Sure will do
->
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >   hw/virtio/vhost.c         | 17 +++++++++++++++++
-> >   include/hw/virtio/vhost.h |  2 ++
-> >   2 files changed, 19 insertions(+)
-> >
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index 01ebe12f28..bfd7f9ce1f 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -744,6 +744,7 @@ static void vhost_iommu_region_del(MemoryListener *=
-listener,
-> >       }
-> >   }
-> >
-> > +
-> >   static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
-> >                                       struct vhost_virtqueue *vq,
-> >                                       unsigned idx, bool enable_log)
-> > @@ -1661,6 +1662,11 @@ int vhost_dev_start(struct vhost_dev *hdev, Virt=
-IODevice *vdev)
-> >           }
-> >       }
-> >
-> > +    r =3D vhost_set_start(hdev, true);
->
->
-> I think we need a better name for this function.
->
-Shall we change it to vhost_set_device_start ? Since the
-vhost_dev_start was occupied by other function
->
-> > +    if (r) {
-> > +        goto fail_log;
-> > +    }
-> > +
-> >       if (vhost_dev_has_iommu(hdev)) {
-> >           hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
-> >
-> > @@ -1697,6 +1703,8 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtI=
-ODevice *vdev)
-> >       /* should only be called after backend is connected */
-> >       assert(hdev->vhost_ops);
-> >
-> > +    vhost_set_start(hdev, false);
-> > +
-> >       for (i =3D 0; i < hdev->nvqs; ++i) {
-> >           vhost_virtqueue_stop(hdev,
-> >                                vdev,
-> > @@ -1722,3 +1730,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev=
-,
-> >
-> >       return -1;
-> >   }
-> > +
-> > +int vhost_set_start(struct vhost_dev *hdev, bool started)
-> > +{
-> > +
-> > +    if (hdev->vhost_ops->vhost_dev_start) {
-> > +        hdev->vhost_ops->vhost_dev_start(hdev, started);
-> > +    }
-> > +    return 0;
-> > +}
-> > diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> > index 085450c6f8..59ea53f8c2 100644
-> > --- a/include/hw/virtio/vhost.h
-> > +++ b/include/hw/virtio/vhost.h
-> > @@ -92,6 +92,7 @@ struct vhost_dev {
-> >       const VhostDevConfigOps *config_ops;
-> >   };
-> >
-> > +
-> >   int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> >                      VhostBackendType backend_type,
-> >                      uint32_t busyloop_timeout);
-> > @@ -137,4 +138,5 @@ int vhost_dev_set_inflight(struct vhost_dev *dev,
-> >                              struct vhost_inflight *inflight);
-> >   int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size=
-,
-> >                              struct vhost_inflight *inflight);
-> > +int vhost_set_start(struct vhost_dev *dev, bool started);
->
->
-> Any reason for exporting this? It looks to me there's no real user out
-> this file.
->
-> Thanks
->
-Sure will fix this
->
-> >   #endif
->
+On 12/06/20 10:54, Philippe Mathieu-Daudé wrote:
+> Missing review: last patch
+> - #12 "tpm: Move backend code under the 'backends/' directory"
+> 
+> Hi,
+> 
+> Yesterday I started to review some vTPM patches and got very
+> confused by the files under hw/tpm/. In particular after
+> running:
+> 
+>   $ git grep TYPE_TPM_BACKEND
+>   backends/tpm.c:188:    .name = TYPE_TPM_BACKEND,
+>   hw/tpm/tpm_emulator.c:985:    .parent = TYPE_TPM_BACKEND,
+>   hw/tpm/tpm_passthrough.c:393:    .parent = TYPE_TPM_BACKEND,
+>   include/sysemu/tpm_backend.h:21:#define TYPE_TPM_BACKEND "tpm-backend"
+> 
+> As there is no particular reason to keep this mixed, clean it up.
+> 
+> Since v2:
+> - Resolved the FIXME in tpm_tis_common.c by making the
+>   TRACE_TPM_UTIL_SHOW_BUFFER check locally to tpm_util.c
+> 
+> Since v1:
+> - Amended docs/ changes
+> - Renamed Kconfig TPM_BACKEND variable
+> - Move backend files under backends/tpm/ (Marc-André & Stefan)
+> - Fix x86-64 build error (patchew)
+> 
+> Philippe Mathieu-Daudé (12):
+>   docs/specs/tpm: Correct header path name
+>   backends: Add TPM files into their own directory
+>   hw/tpm: Rename TPMDEV as TPM_BACKEND in Kconfig
+>   hw/tpm: Do not include 'qemu/osdep.h' in header
+>   hw/tpm: Include missing 'qemu/option.h' header
+>   hw/tpm: Move 'hw/acpi/tpm.h' inclusion from header to sources
+>   hw/tpm: Remove unnecessary 'tpm_int.h' header inclusion
+>   hw/tpm: Make TRACE_TPM_UTIL_SHOW_BUFFER check local to tpm_util.c
+>   hw/tpm: Move few declarations from 'tpm_util.h' to 'tpm_int.h'
+>   hw/tpm: Move DEFINE_PROP_TPMBE() macro to 'tmp_prop.h' local header
+>   hw/tpm: Make 'tpm_util.h' publicly accessible as "sysemu/tpm_util.h"
+>   tpm: Move backend code under the 'backends/' directory
+> 
+>  docs/specs/tpm.rst                     | 14 +++++------
+>  Makefile                               |  2 +-
+>  Makefile.objs                          |  1 +
+>  {hw => backends}/tpm/tpm_int.h         | 19 +++++++++++---
+>  {hw => backends}/tpm/tpm_ioctl.h       |  0
+>  hw/tpm/tpm_ppi.h                       |  1 -
+>  hw/tpm/tpm_prop.h                      | 31 +++++++++++++++++++++++
+>  hw/tpm/tpm_tis.h                       |  1 -
+>  {hw/tpm => include/sysemu}/tpm_util.h  | 19 +++-----------
+>  backends/{tpm.c => tpm/tpm_backend.c}  |  0
+>  {hw => backends}/tpm/tpm_emulator.c    |  2 +-
+>  {hw => backends}/tpm/tpm_passthrough.c |  2 +-
+>  {hw => backends}/tpm/tpm_util.c        |  5 +++-
+>  hw/tpm/tpm_crb.c                       |  4 +--
+>  hw/tpm/tpm_ppi.c                       |  1 +
+>  hw/tpm/tpm_spapr.c                     |  4 +--
+>  hw/tpm/tpm_tis_common.c                | 11 +++------
+>  hw/tpm/tpm_tis_isa.c                   |  3 ++-
+>  hw/tpm/tpm_tis_sysbus.c                |  3 ++-
+>  tests/qtest/tpm-emu.c                  |  2 +-
+>  MAINTAINERS                            |  2 +-
+>  backends/Kconfig                       |  1 +
+>  backends/Makefile.objs                 |  2 +-
+>  backends/tpm/Kconfig                   | 14 +++++++++++
+>  backends/tpm/Makefile.objs             |  4 +++
+>  backends/tpm/trace-events              | 33 +++++++++++++++++++++++++
+>  hw/tpm/Kconfig                         | 21 +++-------------
+>  hw/tpm/Makefile.objs                   |  3 ---
+>  hw/tpm/trace-events                    | 34 +-------------------------
+>  29 files changed, 136 insertions(+), 103 deletions(-)
+>  rename {hw => backends}/tpm/tpm_int.h (81%)
+>  rename {hw => backends}/tpm/tpm_ioctl.h (100%)
+>  create mode 100644 hw/tpm/tpm_prop.h
+>  rename {hw/tpm => include/sysemu}/tpm_util.h (80%)
+>  rename backends/{tpm.c => tpm/tpm_backend.c} (100%)
+>  rename {hw => backends}/tpm/tpm_emulator.c (99%)
+>  rename {hw => backends}/tpm/tpm_passthrough.c (99%)
+>  rename {hw => backends}/tpm/tpm_util.c (98%)
+>  create mode 100644 backends/Kconfig
+>  create mode 100644 backends/tpm/Kconfig
+>  create mode 100644 backends/tpm/Makefile.objs
+>  create mode 100644 backends/tpm/trace-events
+> 
+
+Queued this one, actually.
+
+Paolo
 
 
