@@ -2,79 +2,92 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17727C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AACC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D410D20780
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:13:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3647D206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZ1c5txx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D410D20780
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxLKUJwG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3647D206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnmUd-0007km-40
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:13:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59132)
+	id 1jnmiq-0006UD-D6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnmU3-0007Iv-0G
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:13:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45842
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmhx-0005TX-NY
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58744
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jnmU0-0006MA-P9
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:13:18 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmhv-0003dr-H6
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592932394;
+ s=mimecast20190719; t=1592933258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=nFyo9d5brvOdgGyhrupvlcJyRq0Zpqbo+/sNVXNWy9M=;
- b=gZ1c5txxGcK7n7zztAUoE+OVEXwzbj5BNIp6YD8Wdtvd03gQVr3dLJlEb2joy0VAfkQqep
- bF+bOZERr08EgebAtckVrWSfcWsRs/EbbxcU9MJoJt9+gie924aGtuAFCQAOXttqedqs3l
- iYmV0ylyJOASuqLcaJP7BBCxP6KkUUE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-vGiGfvw-MWmSnjw8JF7nhQ-1; Tue, 23 Jun 2020 13:13:13 -0400
-X-MC-Unique: vGiGfvw-MWmSnjw8JF7nhQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 155F185B690
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 17:13:08 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
- [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 33C0F7FEBD;
- Tue, 23 Jun 2020 17:12:54 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 197D045BD; Tue, 23 Jun 2020 19:12:48 +0200 (CEST)
-Date: Tue, 23 Jun 2020 19:12:48 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v4 3/7] ccid: build smartcard as module
-Message-ID: <20200623171248.pnq6otnwyvl3apky@sirius.home.kraxel.org>
-References: <20200622135601.12433-1-kraxel@redhat.com>
- <20200622135601.12433-4-kraxel@redhat.com>
- <434be3b8-8ed0-d27b-99c7-e682b0dc4c02@redhat.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=t2F+AcWEb4clUdxV3QmHayEZG+Q2SVmpDbgPn5tA3NU=;
+ b=BxLKUJwGMZkkSMA11ja/fky6Oyp9/3djMjAWRjGmHYTlBdpQ0Zf1ybHU/hRmJTd17XCY22
+ U4yELHDRK480nz6Z9XDkcsX6m5o0nlmG2EBNxyX7HQKwq/5K0amnEXAiwuwXxS43QSAsMh
+ UOej6qjK6bv7WOA2nj0N78ALaOcYZzQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285-GxA6a_4EP_iUY3-2gvn3Lw-1; Tue, 23 Jun 2020 13:27:29 -0400
+X-MC-Unique: GxA6a_4EP_iUY3-2gvn3Lw-1
+Received: by mail-wr1-f72.google.com with SMTP id r5so16379914wrt.9
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 10:27:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=t2F+AcWEb4clUdxV3QmHayEZG+Q2SVmpDbgPn5tA3NU=;
+ b=kVuNgJ2MGB0F5QgaGvNZq9XEA9Fz9xkWmuctftYWeoAPoRShWRNtQTrvM1WRpW9BKr
+ W3hzHTpyXxaUAXyzWsJJb0a8bMI22jAtLtGy+8ldBcVeYj0+Oa9G1tPXprziQQCnX6ci
+ /djdbap/Va0Wk3h8hHSMYd/jFyD9Tr2mz17Wbpv55U7OdxBzdw/MdcOGShvXLA6YoKIl
+ 18+lOXlHW1WecsWnO3+oaE9ibHDH1bMaJK7s9TVPE8Ns+fNnbKdM/2Ekf4elTGhuSZGI
+ 4V4M97IJIia5U22Rn/FcNyGp6JlIAneCKkXpyN+nhq9rWvIECGxztKpxaJzd9unau9sN
+ zZZQ==
+X-Gm-Message-State: AOAM5332e9wXRJ032fR+ti9vlLKEr+jHXXGNl5/28WaC0usdve0icXDR
+ Zuu2wn9iAAbu3pW0isNRFnoJRKmABSgzybNfInDeUbQA0gWwhnVtEo3WSs/f52HV5q0zowZ6U7b
+ XeKxIfVdZMJ+25EE=
+X-Received: by 2002:adf:de0a:: with SMTP id b10mr23863955wrm.72.1592933248378; 
+ Tue, 23 Jun 2020 10:27:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzT4bljQk/haHjbpzNdi/UfAt+A+ITJICLP6Ox90UYpRt4nJGRpD2+nDuuVl0fDIUTqiTZ79Q==
+X-Received: by 2002:adf:de0a:: with SMTP id b10mr23863931wrm.72.1592933248065; 
+ Tue, 23 Jun 2020 10:27:28 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id u20sm3457005wmm.15.2020.06.23.10.27.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 10:27:27 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 0/5] fw_cfg: Add FW_CFG_DATA_GENERATOR;
+ crypto: Add tls-cipher-suites
+Date: Tue, 23 Jun 2020 19:27:21 +0200
+Message-Id: <20200623172726.21040-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <434be3b8-8ed0-d27b-99c7-e682b0dc4c02@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,66 +108,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dinechin@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+Hi,
 
-> > +    { .type = "ccid-card-passthru",    .mod = "usb-smartcard"         },
-> > +    { .type = "ccid-card-emulated",    .mod = "usb-smartcard"         },
-> 
-> We want to use type definitions here (such TYPE_CCID_PASSTHRU),
-> as we don't guaranty them stable.
+This series has 3 parts:
 
-Hmm?  I'm pretty sure '-device ccid-card-passthru' *is* stable ABI.
+- First we add the tls-cipher-suites object
 
-> Since there is a relation between QOM type and the module,
-> can we store/use the module name in the TypeInfo declaration?
-> 
->   static const TypeInfo passthru_card_info = {
->       .name          = TYPE_CCID_PASSTHRU,
->       .parent        = TYPE_CCID_CARD,
->       .instance_size = sizeof(PassthruState),
->       .class_init    = passthru_class_initfn,
->       .module_name   = "usb-smartcard",        <=====
->   };
+- We add the ability to QOM objects to produce data
+  consumable by the fw_cfg device,
 
-That doesn't buy us much, the TypeInfo ends up in the module not qemu.
-So qemu can't access it without loading the module.
+- Then we let the tls-cipher-suites object implement
+  the FW_CFG_DATA_GENERATOR interface.
 
-We do *not* want load all modules on startup though.  Which means we
-need a such list in qemu.  The struct above is just that.  There
-certainly is room for improvement, building that list automatically
-somehow for example.
+This is required by EDK2 'HTTPS Boot' feature [*] to tell
+the guest which TLS ciphers it can use.
 
-Given that most devices don't depend on external shared libraries I
-expect the list of device modules will stay relatively short.  So I've
-decided to start with something simple and see how it goes (see also
-patch 1/7).
+Since v9:
+- intent to address Daniel suggestions, rewrite of crypto/* code
+Since v8:
+- addressed Laszlo review comments (reword/typos)
+Since v7:
+- addressed Laszlo review comments
+Since v6:
+- addressed Laszlo & Daniel review comments
+Since v5:
+- Complete rewrite after chatting with Daniel Berrangé
+Since v4:
+- Addressed Laszlo comments (see patch#1 description)
+Since v3:
+- Addressed Markus' comments (do not care about heap)
+Since v2:
+- Split of
+Since v1:
+- Addressed Michael and Laszlo comments.
 
-> Actually this modularization is not specific to QDEV
-> and can be used to all QOM right? I.e:
-> 
->   static const TypeInfo qcrypto_tls_creds_x509_info = {
->       .parent = TYPE_QCRYPTO_TLS_CREDS,
->       .name = TYPE_QCRYPTO_TLS_CREDS_X509,
->       .module_name = "gnu-tls",
->       ...
->   }
+Phil.
 
-Not as-is.  You'll need module load hooks in more places then and some
-code tweaks to move it from qdev level (loading hw-* module only) to qom
-level.
+$ git backport-diff -u v9
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-But, yes, moving the infrastructure to some qom-module.c file might be
-useful when modularizing non-device objects.  Do you have any candidates
-in mind?
+001/5:[0139] [FC] 'crypto: Add tls-cipher-suites object'
+002/5:[0052] [FC] 'hw/nvram/fw_cfg: Add the FW_CFG_DATA_GENERATOR interface'
+003/5:[0010] [FC] 'softmmu/vl: Let -fw_cfg option take a 'gen_id' argument'
+004/5:[----] [--] 'softmmu/vl: Allow -fw_cfg 'gen_id' option to use the 'etc/' namespace'
+005/5:[0018] [FC] 'crypto/tls-cipher-suites: Produce fw_cfg consumable blob'
 
-take care,
-  Gerd
+[*]: https://github.com/tianocore/edk2/blob/master/OvmfPkg/README
+v9: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg04046.html
+v8: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg02428.html
+v7: https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08050.html
+v6: https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05448.html
+v5: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04525.html
+v4: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04300.html
+v3: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02965.html
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02522.html
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01598.html
+
+Philippe Mathieu-Daudé (5):
+  crypto: Add tls-cipher-suites object
+  hw/nvram/fw_cfg: Add the FW_CFG_DATA_GENERATOR interface
+  softmmu/vl: Let -fw_cfg option take a 'gen_id' argument
+  softmmu/vl: Allow -fw_cfg 'gen_id' option to use the 'etc/' namespace
+  crypto/tls-cipher-suites: Produce fw_cfg consumable blob
+
+ docs/specs/fw_cfg.txt              |  13 ++-
+ include/crypto/tls-cipher-suites.h |  39 +++++++++
+ include/hw/nvram/fw_cfg.h          |  43 ++++++++++
+ crypto/tls-cipher-suites.c         | 126 +++++++++++++++++++++++++++++
+ hw/nvram/fw_cfg.c                  |  35 ++++++++
+ softmmu/vl.c                       |  37 ++++++---
+ crypto/Makefile.objs               |   1 +
+ crypto/trace-events                |   5 ++
+ qemu-options.hx                    |  37 +++++++++
+ 9 files changed, 326 insertions(+), 10 deletions(-)
+ create mode 100644 include/crypto/tls-cipher-suites.h
+ create mode 100644 crypto/tls-cipher-suites.c
+
+-- 
+2.21.3
 
 
