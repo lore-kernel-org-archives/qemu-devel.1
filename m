@@ -3,77 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54332C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B619C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2152C20723
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:03:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B76420702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:07:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TB9FNvCN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2152C20723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbWhakwH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B76420702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnepX-0004kb-Cq
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42502)
+	id 1jneu2-0007Nj-Kl
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:07:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jnenv-0003V3-3N
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:01:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42395
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnesy-0006KZ-J9
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33024
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jnens-0008BR-Hu
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:01:18 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnesx-00032B-3n
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592902875;
+ s=mimecast20190719; t=1592903189;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=DWqDZq0v4LXkIn+biD2SU+252DF5UrweAVupAlT/kV4=;
- b=TB9FNvCN2yjVx4v+Fpkc5LsVkjKtTObq/dl1YaXAN9wA3Hce68iVrOnB4kmVQuy/4ivk3B
- a355R+cOEu+h9ddB8RXjHQgxee0eHVh1MFkLcvuQLnH/2F9xNkhNV3FUaBTOfeMDlt/iDq
- DqY445wTWYB1WgTufTdKlU4xAAMxVY8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-bg8d4tNyNRqauV5cnE7Veg-1; Tue, 23 Jun 2020 05:01:02 -0400
-X-MC-Unique: bg8d4tNyNRqauV5cnE7Veg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC5AF804001;
- Tue, 23 Jun 2020 09:00:59 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D5B019D7F;
- Tue, 23 Jun 2020 09:00:45 +0000 (UTC)
-Date: Tue, 23 Jun 2020 11:00:43 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH RFC 07/22] arm/cpuhp: Init PMU at host for all possible
- vcpus
-Message-ID: <20200623090043.fwf7h6zmprc3oug4@kamzik.brq.redhat.com>
-References: <20200613213629.21984-1-salil.mehta@huawei.com>
- <20200613213629.21984-8-salil.mehta@huawei.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=2m2t021fPmocAk1w7rK7jsWgzV0rCiGfOdB2/ye3op0=;
+ b=dbWhakwHD8H5oV049Nm+m2ldEXE7NSVAF2idN+WMAyTsxvJ4cCiTBvAkg7NO+PUxB+Y+nC
+ NMn6fD9q8iKuQg0lSkbeEkp1VHImEECRghDDP565wtvntpFsBw9y+Cef+WJUuoN+bxbR3L
+ RWcQaCp9ZpsWNrL824US93HByBDN1GE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-7NYUiXCoNfyG_wSJMzs19w-1; Tue, 23 Jun 2020 05:06:26 -0400
+X-MC-Unique: 7NYUiXCoNfyG_wSJMzs19w-1
+Received: by mail-wr1-f70.google.com with SMTP id g14so7769816wrp.8
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:06:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2m2t021fPmocAk1w7rK7jsWgzV0rCiGfOdB2/ye3op0=;
+ b=OHKIIv3uDe1wF5vFqTqGI7xBwAB6FiGix2F7Lvy3A33JcFDeK/DG/HzgDYRSZxKKgj
+ v7WfK9A8KEkA4e2IheVYTeW1j7/JtVCZv+cCLHlvv25iANe6xH+vedPIQ4izV0oqooTo
+ eKWcp3Re60Z4prI/9vBMAb8npexx2xtk0ZwYAjHaalVXGbsQf2HNF/nzGabPp9w2iXw4
+ 1PbE0DYr/uZsHbulDzTzn3KYgE/hz1I32oIImwgBDx7CFTY6mSTqVDoneiyQw8aq5XAi
+ l8wQS6l1lx7tty4fcBEBOhCETANXeON3uJ8E07GGLAbLegdGAkpHHZ8p8dVPTsd3Yr1a
+ XRBQ==
+X-Gm-Message-State: AOAM533/vxbJJLrwhcWzPMHgJCP+bu1WIDbEehWe84Oj2xFK0/6sfSta
+ l11kJQ43H565cYodPB62658ZBkV3Rh4WlNVCVnG7CJ5yss6VnAn5Y9/ORJFNGe3rfGvEXpgxJh6
+ lG3PWWtSj2Sw4BgQ=
+X-Received: by 2002:a05:6000:100c:: with SMTP id
+ a12mr11437365wrx.81.1592903185314; 
+ Tue, 23 Jun 2020 02:06:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyZP10WQPOHMp4i3NHPCCa9B8KmGvXoITH2SZ5LSo0WtmaCkCiIGpy/qn/H3k+WRHf/tocWQg==
+X-Received: by 2002:a05:6000:100c:: with SMTP id
+ a12mr11437320wrx.81.1592903184970; 
+ Tue, 23 Jun 2020 02:06:24 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id b19sm2951554wmj.0.2020.06.23.02.06.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 02:06:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/2] target/arm: Fix using pmu=on on KVM
+Date: Tue, 23 Jun 2020 11:06:20 +0200
+Message-Id: <20200623090622.30365-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200613213629.21984-8-salil.mehta@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,43 +108,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mehta.salil.lnk@gmail.com, gshan@redhat.com,
- pbonzini@redhat.com, mst@redhat.com, jiakernel2@gmail.com, maz@kernel.org,
- david@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- linuxarm@huawei.com, eric.auger@redhat.com, will@kernel.org,
- qemu-arm@nongnu.org, james.morse@arm.com, catalin.marinas@arm.com,
- sudeep.holla@arm.com, imammedo@redhat.com, maran.wilson@oracle.com,
- zhukeqian1@huawei.com, wangxiongfeng2@huawei.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 13, 2020 at 10:36:14PM +0100, Salil Mehta wrote:
-> PMU for all possible vcpus must be initialized at the virt machine
-> initialization time. This patch refactors existing code to accomodate possible
-> vcpus. This also assumes that all processor being used are identical at least
-> for now but does not affect the normal scanarios where they might not be in
-> future. This assumption only affects the future hotplug scenarios if ever there
-> exists any hetergenous processors. In such a case PMU might not be enabled on
-> some vcpus. Is it acceptable and doable tradeoff for now?
-> 
-> This perhaps needs more discussion. please check below link,
-> Link: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg00131.html
-> 
-> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
-> Signed-off-by: Salil Mehta <salil.mehta@huawei.com>
-> ---
->  hw/arm/virt.c         | 51 ++++++++++++++++++++++++++++++-------------
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 37 insertions(+), 15 deletions(-)
->
+Since v2:
+- include Drew test fix (addressed Peter review comments)
+- addressed Drew review comments
+- collected R-b/A-b
 
-I have a similar patch to this one in my steal-time dev branch that I just
-started last week. I'm creating a new function that must be called after
-cpu realization and gic creation that completes cpu setup. There's a few
-things that will end up there (including steal-time stuff).
+Andrew Jones (1):
+  tests/qtest/arm-cpu-features: Add feature setting tests
 
-Thanks,
-drew
+Philippe Mathieu-Daudé (1):
+  target/arm: Check supported KVM features globally (not per vCPU)
+
+ target/arm/kvm_arm.h           | 21 ++++++++-----------
+ target/arm/cpu.c               |  2 +-
+ target/arm/cpu64.c             | 10 ++++-----
+ target/arm/kvm.c               |  4 ++--
+ target/arm/kvm64.c             | 14 +++++--------
+ tests/qtest/arm-cpu-features.c | 38 ++++++++++++++++++++++++++++++----
+ 6 files changed, 56 insertions(+), 33 deletions(-)
+
+-- 
+2.21.3
 
 
