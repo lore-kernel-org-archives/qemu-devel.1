@@ -2,87 +2,128 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FCEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F780C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A3420724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25DB520702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:21:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYruvkr9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A3420724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ANSLwaDW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DB520702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jng1J-0002L7-W8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 06:19:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57554)
+	id 1jng3N-0004Ts-DM
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 06:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jng0Y-0001Rz-Bp
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 06:18:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58290
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jng0V-0004Lh-IU
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 06:18:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592907501;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vwo+r+KZ620W7QY928LUe9//H+IYKpfvsdEQpzrmShw=;
- b=TYruvkr9vYc4jN+ghJUVnjuz+pEeN0qKfzCDk0f/BhVOTxl3vorBOoyd1AP+GvmfnfJjUa
- dSUW8SAr1pKR3MdjsZgX45vAoAmPWltPwiMlpfEh3ZD/W0EWE+5rhPj8fg1+aEA87NJSmi
- pOgw9yVIfiJj5T3DnGettH0oD0jcsBs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-OhDHD3evPty_guJeikdEqw-1; Tue, 23 Jun 2020 06:18:17 -0400
-X-MC-Unique: OhDHD3evPty_guJeikdEqw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D66CB464;
- Tue, 23 Jun 2020 10:18:16 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-115-78.ams2.redhat.com [10.36.115.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2A4F5C1D4;
- Tue, 23 Jun 2020 10:18:15 +0000 (UTC)
-Date: Tue, 23 Jun 2020 12:18:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Subject: Re: [PATCH 0/2] qcow2: Force preallocation with data-file-raw
-Message-ID: <20200623101814.GD5853@linux.fritz.box>
-References: <20200619104012.235977-1-mreitz@redhat.com>
- <CAMRbyyu1ZC2qMKSHJXNy7-98-nXHh00dL-v_D0BKcEL6Rmmj+g@mail.gmail.com>
- <72eb5700-faf6-22ee-69be-1e7653cf06c6@redhat.com>
- <CAMRbyyu+tkhZLJXKiuDRxRixZqsXgzQ3GzgcnP0pXN2-r6Xagw@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAMRbyyu+tkhZLJXKiuDRxRixZqsXgzQ3GzgcnP0pXN2-r6Xagw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jng2Y-0003mI-Ff; Tue, 23 Jun 2020 06:20:30 -0400
+Received: from mail-eopbgr00109.outbound.protection.outlook.com
+ ([40.107.0.109]:21314 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jng2V-0006tQ-JK; Tue, 23 Jun 2020 06:20:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eV72uWF41wAAeVHTcRkSVlxJehv1JEnhY2ua5iV1J/qEAIrUnZ5iSPKQXgGgRUHwealQwKz81JN0ch09NkdEvYI99PJxjH8GcEB0Rt6lgyQ8QTB2at9GhkkMG1OmeY8uEz8uLxixSD1jmJMKJTMolf/x4M+6pugRj1LlcHcU2mRustYJiFNNxKhQXO0mE31L1i3ORjSH/wagC9P0F0RITksQ04V/X67ezA5Q3oHwx5kaXytIQxTFccjTUJySPcdUpUyRISJWRvmRksnx4h7hnHv7kCLbYPiFf7GsbUi55qZSxyPYY6JERsiM0rXhkgevWxElaqYvIy2gs5FTshHjbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CsrZCY7vuMUQlZqLMcFSbpxphQ7mFMqKq2cSpcBXfL0=;
+ b=juhVSWUjcLqKUlyOsE0a4lArJ2DnsurNqoeRF34FvWWDv8t0ZYgCwZaCW5IGz757GmJs2NlO3F6KEJdGsC/Vj7UkG1I6i63nLfJxLXDBrjHHJANufFiXlBRvX3tH5Rm+ev6Jp9XNKRDlhYP6Vufje6LTHET+sdmzEh5+/QiHLuLwt57BAtXpUGKYKmZRX+nNQhIyrh529YW3x0HsYy7UucOktL6TghaCVgBd2l15XOXa1AxDjZ7NN4BS31zYus7aBAjox8shQ1RZhpBvTwIa/y8ds0IYKGcpVrLTEDwCGGbV42gvDKXD2MolW3cFcgXPEuBuiVvsWS3A8xTYd42N8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CsrZCY7vuMUQlZqLMcFSbpxphQ7mFMqKq2cSpcBXfL0=;
+ b=ANSLwaDWOl5D5w0oBRk7UoCMqhEHQfeWe1ANo0rauZX6xmAiPpKN4WQ/U2DTzd/knka/DISyPfkbMyD9CQv2MMXuxwuswkKbOTe1DYhQ11NxtMioyDLMOr0iE77BNqdYHE66McIduTPvbL4I9tSDQH7tImpxz+yy+L+Cx+Dks3Q=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3158.eurprd08.prod.outlook.com (2603:10a6:209:44::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.21; Tue, 23 Jun
+ 2020 10:20:14 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.020; Tue, 23 Jun 2020
+ 10:20:14 +0000
+Subject: Re: [PATCH v3 05/17] block/io: support int64_t bytes in
+ bdrv_co_do_pwrite_zeroes()
+To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org
+References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
+ <20200430111033.29980-6-vsementsov@virtuozzo.com>
+ <w513686o0gq.fsf@maestria.local.igalia.com>
+ <7b5f7192-9a03-da06-1583-039b671c1e81@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <58dd9502-9356-3fa1-e37d-b9ce8b646b3b@virtuozzo.com>
+Date: Tue, 23 Jun 2020 13:20:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+In-Reply-To: <7b5f7192-9a03-da06-1583-039b671c1e81@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-ClientProxiedBy: AM0PR02CA0091.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.117) by
+ AM0PR02CA0091.eurprd02.prod.outlook.com (2603:10a6:208:154::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22 via Frontend
+ Transport; Tue, 23 Jun 2020 10:20:12 +0000
+X-Originating-IP: [185.215.60.117]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ea23b13e-d07d-442a-ecb2-08d8175f047f
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3158:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3158C3AC0F86D4FB6C5C2499C1940@AM6PR08MB3158.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 04433051BF
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sESOeuEVea9YKsS8+RHiqSlLDSy7CFojvCzowESQ+wDwW7g8Pv1lROOkrh2bVdRBJaDuZm3sIBKSsEselsF/6ovmEHBJQDFN7ORNKzEcvxWZh6wHaJyuRiAEVK+fbEslf72y36SWFVIBei8/ENknvd7IPiF+X0Kq5EE7vhCIxjLTVadV9Ev7L6BYzRZ6DtDncDDa+mX6EnooNoD1I0ZabBsdjuNGHf5iuk8zAoOoJZNsihhS++f5JFfNqNmljwA2u1LK/cN1thgaa4QKosIv5RFNP0+JiU0BxHSdCZadsBXwIXeFC6pnPSMkNpQnfq8F8f67ajniRWXWUHDamLYzGgyiqLY28hn6r/Pru7QL+EG0ULMpHArmhR05aqFFfxeK
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(136003)(396003)(39840400004)(346002)(376002)(316002)(107886003)(16576012)(53546011)(2616005)(956004)(4326008)(16526019)(186003)(110136005)(66476007)(36756003)(6486002)(66946007)(31696002)(66556008)(7416002)(8676002)(8936002)(52116002)(86362001)(83380400001)(26005)(31686004)(2906002)(5660300002)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ahnH1KvBiRdrOeJN4GvMoc7wroRQUdX/5s1cNd1wHBGzF0lWkTWONUlZD8aSFzJD9ZFsJOb4/F84L9eWyZ5KWa20VsfsJpZ2wlD3ueKLSWNT8NEUzsWo7L4HZUhnAi8e8wak6PBFGtLcF//pHsvn3/4S/wBt6RyywqlQpuKtCYSb0YAMHnN4L6Js4NV262KiMga2YmcqmUjwt0IrgNg485yufSPnZ3d9Wg7UJGWwFDsD8AG7iUt/X9/TZYF3TcGKMygUAekn4u/QdfO4z6Ri3TehaGWj38QxUYER64Pu4MEPZpL/u3ByMrr2vsZQxlHBfHILCVSKZfL45zVieWZAxlWyBn9M6nmZk9UnMw9Dq5gmFOrrycCY/rVbDaA5xyaTvxyCFx3BHqynYIjtsciEYGZR5TdW1Q8gE44xCny18p4vImkmWdjNYvoaLdA5yVRTU0MccrFasw0xsIq2AS3HCY8RXc4DlwaAI6H8epy1UFZbIpIaN3ZN+K5Atv1OzJw/
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea23b13e-d07d-442a-ecb2-08d8175f047f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2020 10:20:13.9123 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uWmDvGwnaBljt+oQkwHifyk/K0VQFXQ4wjvp1lPk3gD3VlT5ibhF60yLX3K8dFKMh1tx2vdcnq3MQn4M7yXJJFsUNgy6cNvKSNcsFXct0uA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3158
+Received-SPF: pass client-ip=40.107.0.109;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 06:20:25
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,139 +136,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org,
+ sheepdog@lists.wpkg.org, pavel.dovgaluk@ispras.ru, dillaman@redhat.com,
+ qemu-devel@nongnu.org, sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com,
+ mreitz@redhat.com, den@openvz.org, stefanha@redhat.com, namei.unix@gmail.com,
+ pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.06.2020 um 17:50 hat Nir Soffer geschrieben:
-> On Mon, Jun 22, 2020 at 12:47 PM Max Reitz <mreitz@redhat.com> wrote:
-> >
-> > On 22.06.20 00:25, Nir Soffer wrote:
-> > > On Fri, Jun 19, 2020 at 1:40 PM Max Reitz <mreitz@redhat.com> wrote:
-> > >>
-> > >> Hi,
-> > >>
-> > >> As discussed here:
-> > >>
-> > >> https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
-> > >> https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
-> > >> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00240.html
-> > >>
-> > >> I think that qcow2 images with data-file-raw should always have
-> > >> preallocated 1:1 L1/L2 tables, so that the image always looks the same
-> > >> whether you respect or ignore the qcow2 metadata.
-> > >
-> > > I don't know the internals of qcow2 data_file, but are we really using
-> > > qcow2 metadata when accessing the data file?
-> >
-> > Yes.
-> >
-> > > This may have unwanted performance consequences.
-> >
-> > I don’t think so, because in practice normal lookups of L1/L2 mappings
-> > generally don’t cost that much performance.
-> >
-> > > If I understand correctly, qcow2 metadata is needed only for keeping
-> > > bitmaps (or maybe
-> > > future extensions) for raw data file, and reading from the qcow2 image
-> > > should be read
-> > > directly from the raw file without any extra work.
-> > >
-> > > Writing to the data file should also bypass the qcow2 metadata, since the bitmap
-> > > is updated in memory.
-> >
-> > Well, with this series, writing would no longer update the metadata at
-> > least, because it would always be preallocated already.
-> >
-> > >>  The easiest way to
-> > >> achieve that is to enforce at least metadata preallocation whenever
-> > >> data-file-raw is given.
-> > >
-> > > But preallocation is not free, even on file systems, it can be even
-> > > slow (NFS < 4.2).
-> >
-> > Metadata preallocation with an external data file should be the same
-> > speed on every file system.  We only need to create the metadata
-> > structures, which, with the default cluster size (64k) take up a bit
-> > more than 1/8192 of the full image size.
-> >
-> > Sure, it’s not free.  But if we decide we should indeed fully ignore the
-> > L1/L2 tables for data-file-raw images, the qcow2 spec must be amended.
-> > As I can read it, it currently doesn’t say so.
-> >
-> > (By the way, this is not a trivial change.  Right now, data-file-raw is
-> > an autoclear flag: If a version of qemu that doesn’t support it accesses
-> > the image, it will automatically clear the flag, but the image stays
-> > valid.  If we decide to completely ignore the L1/L2 tables (i.e. not
-> > even create them), then this can no longer be an autoclear flag.  We’d
-> > need a new incompatible flag.  (Because without L1/L2 tables, the image
-> > becomes useless to older qemu versions.))
-> >
-> > > With block storage this means you need to allocate the entire image size on
-> > > storage for writing the metadata.
-> > >
-> > > While oVirt does not use qcow2 with data_file, having preallocated qcow2
-> > > will make this very hard to use, for example for 500 GiB disk we will have to
-> > > allocate 500 GiB disk for the raw data file and 500 GiB disk for the qcow2
-> > > metadata disk which will be 99% unused.
-> >
-> > I don’t understand this.  When you use an external data file, the qcow2
-> > file will only contain the metadata:
-> >
-> > $ qemu-img create -f qcow2 \
-> >     -o data_file=foo.data,data_file_raw=on,preallocation=metadata \
-> >     foo.qcow2 8G
-> > Formatting 'foo.qcow2', fmt=qcow2 size=8589934592 data_file=foo.data
-> > data_file_raw=on cluster_size=65536 preallocation=metadata
-> > lazy_refcounts=off refcount_bits=16
-> > $ ls -l foo.qcow2
-> > ... 1310720 ... foo.qcow2
-> > $ ls -l foo.data
-> > ... 8589934592 ... foo.data
+11.05.2020 21:34, Eric Blake wrote:
+> On 5/11/20 12:17 PM, Alberto Garcia wrote:
+>> On Thu 30 Apr 2020 01:10:21 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>>>      compute 'int tail' via % 'int alignment' - safe
+>>
+>>      tail = (offset + bytes) % alignment;
+>>
+>> both are int64_t, no chance of overflow here?
 > 
-> When allocating metadata in regular qcow2, need the to allocate the
-> entire device
-> (+ extra space for metadata overhead):
+> Good question - I know several places check that offset+bytes does not overflow, but did not specifically audit if this one does.  Adding an assert() in this function may be easier than trying to prove all callers pass in safe values.
 > 
-> # qemu-img create -f qcow2 -o preallocation=metadata foo.qcow2 500g
-> Formatting 'foo.qcow2', fmt=qcow2 size=536870912000 cluster_size=65536
-> preallocation=metadata lazy_refcounts=off refcount_bits=16
-> 
-> # qemu-img check foo.qcow2
-> No errors were found on the image.
-> 8192000/8192000 = 100.00% allocated, 0.00% fragmented, 0.00% compressed clusters
-> Image end offset: 536953094144
 
-I think we shouldn't really call this "allocating" because we don't
-actually reserve space for it yet. On a filesystem, you get a large file
-size, but it's almost completely sparse. On block devices, it depends on
-whether the storage has thin provisioning.
+Hm, it's preexisting, as int64_t + int may overflow as well. Strange, but I don't see overflow check neither in blk_check_byte_request nor in bdrv_check_byte_request. Only discard, which recently dropped call of bdrv_check_byte_request() has this check.
 
-> But I see that with metadata file we allocate much less:
-> 
-> # qemu-img create -f qcow2 -o
-> data_file=foo.data,data_file_raw=on,preallocation=metadata foo.qcow2
-> 500g
-> Formatting 'foo.qcow2', fmt=qcow2 size=536870912000 data_file=foo.data
-> data_file_raw=on cluster_size=65536 preallocation=metadata
-> lazy_refcounts=off refcount_bits=16
-> 
-> # qemu-img check foo.qcow2
-> No errors were found on the image.
-> 8192000/8192000 = 100.00% allocated, 0.00% fragmented, 0.00% compressed clusters
-> Image end offset: 65798144
+I can add a patch for overflow check in blk_check_byte_request and bdrv_check_byte_request.. But what about alignment? There may be requests, for which bytes + offset doesn't overflow, but do overflow after aligning up. Refactor bdrv_pad_request() to return an error if we can't pad request due to overflow?
 
-Actually, this is not much less, but just split in two places. You still
-have the 500 GB data file. The metadata is small, but it was already
-small before:
-
-536953094144 - 536870912000 = ~78 MB.
-
-Not exactly sure why it's more than the 64 MB you get for an external
-data file, maybe some alignment thing, but not significant anyway.
-
-Kevin
-
+-- 
+Best regards,
+Vladimir
 
