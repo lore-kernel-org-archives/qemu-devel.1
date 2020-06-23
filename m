@@ -2,95 +2,90 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4C0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B7EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A47B20738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:04:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3036D2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:07:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMEvhro3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A47B20738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjyRJXcS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3036D2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jngjZ-000496-B9
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:04:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52912)
+	id 1jnglj-0005G1-AK
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jngir-0003bC-60; Tue, 23 Jun 2020 07:04:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36727)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jngip-000683-Dq; Tue, 23 Jun 2020 07:04:12 -0400
-Received: by mail-wr1-x444.google.com with SMTP id k6so7591329wrn.3;
- Tue, 23 Jun 2020 04:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ie7ZjNr3QlOFBcrFKMUjZuJLoJQ64iApva3SwELQhc8=;
- b=CMEvhro3DkSqeKade+nFhO1/2J769Qka70VlIA3ut1gRgDOvJc2RVxOdzUXpqbknLH
- qfjsl/dDrvoMxq+GMuTCvN5FgqY0NR0NYrv+9UejwolfOrWvb36zhGoPBr1cRlGhIQvy
- 8+bmsB59dCScGEqBwwT7YEMUIerH+6oxTPxvC3aUldXpfguGt0O1VYrk1HFKgNQzEd5P
- lgV5BP6Z1UbSaTZSxhTlryFPXDpmGtpEFWsZH9qj7o9zwZUFbV0RY8pt9ab10MaH2KZI
- anrG3fM9MhBSTQuwmzwCmpdw+OEbDJAEibfJhiLTs7JhOpLAwZZgoMtDcArWfPmhcZNh
- CpHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ie7ZjNr3QlOFBcrFKMUjZuJLoJQ64iApva3SwELQhc8=;
- b=TNECVTPpT0MjLaCc8AgtUJv3YftdQuaOJMjWAqj94BqPeRxbhWFT6p1IDuo/H+GIji
- 60ITQPPwNLZ5jb2+BOIH020krSHAHpElWfIKxy/noh4aqHsas4Vtp3KkqhgbQ69AyQ7D
- QWIw9wnwAHRAa89l6YPPYrMS3WRRGotUHtkmpB95DHPnkF2wwrsUG+WHBpXR/KAYFgXZ
- ceWYDjuFbrWne/xfDLCj9HvXXIDpHQRLQepIgvlycEYgMjwA+vGRZgiIJZJvBqoCzIVl
- 6m2jHoTaebKl4eDm7Vd69TEs/LCZQtYGl1v6VWdil6AutQUBaavHGCmIdx8j5NYElqLh
- WosA==
-X-Gm-Message-State: AOAM531GW+8aj9yzqEmp4VGCMOrrGferQEng/o5j4/tOl6eWpE6H6qzS
- z6CHkDk1RNg3Qvi6cYv1JdI=
-X-Google-Smtp-Source: ABdhPJxl+e/9sOe+YnoTQCYtcG/bj8eA5eGP5scCUjHeThCNxSsBPdkEcvUGddZdpdXZjagVGtouhQ==
-X-Received: by 2002:adf:ce90:: with SMTP id r16mr24171693wrn.408.1592910249347; 
- Tue, 23 Jun 2020 04:04:09 -0700 (PDT)
-Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id z1sm13624133wru.30.2020.06.23.04.04.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 04:04:08 -0700 (PDT)
-Subject: Re: [PATCH v5 1/9] hw/i2c/core: Add i2c_try_create_slave() and
- i2c_realize_and_unref()
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200622183428.12255-1-f4bug@amsat.org>
- <20200622183428.12255-2-f4bug@amsat.org> <875zbimcs6.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fbecc71b-3f1d-0c6f-83eb-e10b408c85e2@amsat.org>
-Date: Tue, 23 Jun 2020 13:04:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jngl8-0004qA-Ch
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:06:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60539
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jngl6-0007eZ-GE
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:06:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592910391;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZZndPcptz55FjJA9JmenfKTWyiKAibv2FipgTjIQXrs=;
+ b=ZjyRJXcSjrofSqVZmOt2onuKGBlaU710LWoHFupr7IUSGxe//gxyeYrH3ycpr6Ji3AEfpU
+ AT0ovKwiiUXpey5BK+iWEFBV0kmHCVwkIuTRggiz0VSWnFY7UxDD8S55qON/CvELQvQkEb
+ tbUcz25BnkOFCjgvio9IRRSUJFiiLAI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27--vL5aZmSOoqX2Y51hBqBrw-1; Tue, 23 Jun 2020 07:06:27 -0400
+X-MC-Unique: -vL5aZmSOoqX2Y51hBqBrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E97C88005AD;
+ Tue, 23 Jun 2020 11:06:24 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A84455DAA0;
+ Tue, 23 Jun 2020 11:06:14 +0000 (UTC)
+Date: Tue, 23 Jun 2020 13:06:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH QEMU v25 12/17] vfio: Add function to start and stop
+ dirty pages tracking
+Message-ID: <20200623130612.16eefe35.cohuck@redhat.com>
+In-Reply-To: <20200623110125.GD3328@work-vm>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-13-git-send-email-kwankhede@nvidia.com>
+ <20200623123216.17eefe2e.cohuck@redhat.com>
+ <20200623110125.GD3328@work-vm>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <875zbimcs6.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,103 +99,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 10:01 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> Extract i2c_try_create_slave() and i2c_realize_and_unref()
->> from i2c_create_slave().
->> We can now set properties on a I2CSlave before it is realized.
->>
->> This is in line with the recent qdev/QOM changes merged
->> in commit 6675a653d2e.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> Cc: Markus Armbruster <armbru@redhat.com>
->> ---
->>  include/hw/i2c/i2c.h |  2 ++
->>  hw/i2c/core.c        | 18 ++++++++++++++++--
->>  2 files changed, 18 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
->> index 4117211565..d6e3d85faf 100644
->> --- a/include/hw/i2c/i2c.h
->> +++ b/include/hw/i2c/i2c.h
->> @@ -80,6 +80,8 @@ int i2c_send(I2CBus *bus, uint8_t data);
->>  uint8_t i2c_recv(I2CBus *bus);
->>  
->>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
->> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
->> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
->>  
->>  /* lm832x.c */
->>  void lm832x_key_event(DeviceState *dev, int key, int state);
->> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
->> index 1aac457a2a..acf34a12d6 100644
->> --- a/hw/i2c/core.c
->> +++ b/hw/i2c/core.c
->> @@ -267,13 +267,27 @@ const VMStateDescription vmstate_i2c_slave = {
->>      }
->>  };
->>  
->> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
->>  {
->>      DeviceState *dev;
->>  
->>      dev = qdev_new(name);
->>      qdev_prop_set_uint8(dev, "address", addr);
->> -    qdev_realize_and_unref(dev, &bus->qbus, &error_fatal);
->> +    return dev;
->> +}
->> +
->> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
->> +{
->> +    return qdev_realize_and_unref(dev, &bus->qbus, errp);
->> +}
->> +
->> +DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->> +{
->> +    DeviceState *dev;
->> +
->> +    dev = i2c_try_create_slave(name, addr);
->> +    i2c_realize_and_unref(dev, bus, &error_fatal);
->> +
->>      return dev;
->>  }
-> 
-> We use "create_simple" names for functions that allocate, initialize,
-> configure and realize device objects: pci_create_simple(),
-> isa_create_simple(), usb_create_simple().  Calling this one
-> i2c_create_slave() is okay with me.  I'd prefer
-> i2c_slave_create_simple(), though.
-> 
-> We use "new" names for functions that allocate and initialize device
-> objects: pci_new(), isa_new(), usb_new().  Let's call this one
-> i2c_slave_new().
-> 
-> Your use of "realize_and_unref" matches existing names elsewhere:
-> pci_realize_and_unref(), isa_realize_and_unref(),
-> usb_realize_and_unref().  However, the other two i2c functions are
-> called i2c_slave_FOO(), not i2c_FOO().  You could name this one
-> i2c_slave_realize_and_unref().  Another path to consistency: drop the
-> slave_ from all three names.
-> 
-> Ideally with my naming suggestions considered:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+On Tue, 23 Jun 2020 12:01:25 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-If you don't mind, as this series is already fully reviewed,
-I'll correct/improve on top of it.
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Sun, 21 Jun 2020 01:51:21 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> > > Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
+> > > for VFIO devices.
+> > > 
+> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  hw/vfio/migration.c | 36 ++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 36 insertions(+)
+> > > 
+> > > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> > > index faacea5327cb..e0fbb3a01855 100644
+> > > --- a/hw/vfio/migration.c
+> > > +++ b/hw/vfio/migration.c
+> > > @@ -11,6 +11,7 @@
+> > >  #include "qemu/main-loop.h"
+> > >  #include "qemu/cutils.h"
+> > >  #include <linux/vfio.h>
+> > > +#include <sys/ioctl.h>
+> > >  
+> > >  #include "sysemu/runstate.h"
+> > >  #include "hw/vfio/vfio-common.h"
+> > > @@ -329,6 +330,32 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+> > >      return qemu_file_get_error(f);
+> > >  }
+> > >  
+> > > +static int vfio_start_dirty_page_tracking(VFIODevice *vbasedev, bool start)  
+> > 
+> > I find 'start' functions that may also stop something a bit confusing.
+> > Maybe vfio_toggle_dirty_page_tracking()?  
+> 
+> I don't think toggle is any better; I always think of toggle as flipping
+> the state to the other state.
+> vfio_set_dirty_page_tracking maybe?
 
-Thanks!
+Sounds good to me.
 
-Phil.
 
