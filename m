@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2480C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76536C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:49:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2AB6207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 447C52098B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:49:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XvLSyXtd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2AB6207E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tsjgXD6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447C52098B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnoum-0000vg-UC
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 15:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42122)
+	id 1jnovO-00022o-FF
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 15:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojW-0003pk-Ky
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:26 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35236)
+ id 1jnojT-0003jS-O3
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:23 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41528)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojU-0005fz-1N
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:26 -0400
-Received: by mail-pf1-x444.google.com with SMTP id h185so10566499pfg.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:23 -0700 (PDT)
+ id 1jnojR-0005eL-9b
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:23 -0400
+Received: by mail-pg1-x542.google.com with SMTP id b5so13021pgm.8
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JUH08mqCPsYXydFaT0uxZthQYxuk222Kz13pCnZjYg4=;
- b=XvLSyXtdGkC1xpSYLxLVdbXPE8v4DXJCWjNUSW6xLrwq39ch9syxT8dpnWIasBoBwJ
- /1kTuKphOm+XCQtRN/cVmst4yadttWXCwnGl0P85FWbh6nbRwpaCXkKl15A0t+meb9u+
- MHEcSZBa+VS8GBu6NaBUqmdn1mVRmdaw+uGHqlVyr2IEV61hG7FVy0W5zwDJT+VqmTVo
- WjXdqgfIV0//PbeAk13JeYEkiXsB4xm2RE1lWWuCYEc7AeyVUMBexeHbnoVzofbUfvBJ
- WmhvYhxkiJMyafXXw13u4vZdZzqt3as57k+ZB2sOqY6CQxWQhjc2Zk1Q0JwfWWlqgp10
- 5xAw==
+ bh=drS4gTiWZxC3Kosp8AvXNBkFhO1l78w6MG//p420qaQ=;
+ b=tsjgXD6fZTateWW5KZKXQRLhJ/Gs65xk/vXMZ4Qs+qqFj0C5SnrNjoRRbMSZUmDNCV
+ jbFLS1wSE93UWfv2XcCrwO/jekmD8RBDPtw7d5aFsknC3ABqqAxSih7iDN0QHOGOJVXg
+ K/jH3PD2MrDbWthdeqeTx5GlNVZhe4fNasidrTEg6DsQuozVxkY/dySzWj+yCAVWKgL9
+ 8F6F1ND2IFCAmAanrnJN1pYFWcUHXoP4Ehl+k38gWa5bWc7dfJlt0eU9STtk452STKkl
+ O/E2DGA09Y00XaF3OPNXxGP+AljE86Y3/BzP8U1QoUY0RPLidFolRD38owxXvgbJ3gFZ
+ 4dFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JUH08mqCPsYXydFaT0uxZthQYxuk222Kz13pCnZjYg4=;
- b=aGPvnUugqJ2EE41v5Y7P+4yq0B5RuxduwhbX4F5YPB1LtI1Fnx9LXYQinzVnQ/XI9n
- /P467N2SOK1qpMG/fKtLdCdoBu9/Uk0d0Lgpy8gfM5z1XBssSRD2c8VKVT8/uw1FAbst
- TGlY3cbQHAf5biRT6wwKxGr5cvKDT0Uwl6IvA28RGUhl+jcmSR5gZwXRBemoejdDmmMG
- 77HCZvDvsvvoav/5qeUfA6mbc8dTnsAuB6XKTCZJUxgCzB89KS3wb8BYHEKaLepblulp
- NaK0IcJ2VuMvkLj8x2hSyBtgjJlnEmXRJau15eYSkvntqzE8QSnKnO/s9VopPwKvXRGl
- H1cA==
-X-Gm-Message-State: AOAM533y52SfcQgNfmVbUZUmshUXILhzE0pAwj7fVnMVH50HWhk3e9iG
- VMur+94oQztUKzp1dJ/sIpA+hABYUaI=
-X-Google-Smtp-Source: ABdhPJz6b7w5PCsMNKu2myiMd3x4vc17XVKfCdehAamK5TbAqx/LJMrx1mmHXqDPDqOtWUXTjo/4SA==
-X-Received: by 2002:aa7:9092:: with SMTP id i18mr5863630pfa.18.1592941042320; 
- Tue, 23 Jun 2020 12:37:22 -0700 (PDT)
+ bh=drS4gTiWZxC3Kosp8AvXNBkFhO1l78w6MG//p420qaQ=;
+ b=YWvwhISEklRl/TgfF08pcy6tWthtLXEpN5bMin34P1liXB99aW6b5thWTB4B2GSvmO
+ PUotTsaxjy1Are7E1OlL44p7drqaeQa+dqMMaBTQ1uB/Dv00p9sobc8yqanEImlg0xXD
+ 57NfpGyZYf/Q54zW5vlV0kUz4P6XZZYxzn0vygjwuUCKjfzVSQBDxleMOG8mA9JHXyZ8
+ cT+yfDZYDjIXCofzUKdEiyWPZUA4GEIFqePaFpZhtwDyUNS4qL9kFvsYp0QQJLq9Q3TJ
+ Kz640MrJkk3OBaYvekMxACPWlVSMV5S2EpyxQe6WfC2ueELu+gfiwfFXUeAv937RVon8
+ vz+g==
+X-Gm-Message-State: AOAM530UQN2Ms36HaRCVKDwHjjCCtvd6RxM+KJUlusUZ5yaagTViUqAR
+ 3efkTmx128Y2hRunDdLyadWgmyO5LXQ=
+X-Google-Smtp-Source: ABdhPJzZ/SK3w235FH2HfMUaNK5fudUkt9q3N6hdVRKxG8rI/wyUxrKp5jLfJ3G9fzCJ0Kh6zJewHQ==
+X-Received: by 2002:a62:cf01:: with SMTP id b1mr25307278pfg.84.1592941039233; 
+ Tue, 23 Jun 2020 12:37:19 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.21
+ by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 12:37:21 -0700 (PDT)
+ Tue, 23 Jun 2020 12:37:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 16/45] target/arm: Implement the STGP instruction
-Date: Tue, 23 Jun 2020 12:36:29 -0700
-Message-Id: <20200623193658.623279-17-richard.henderson@linaro.org>
+Subject: [PATCH v8 14/45] target/arm: Define arm_cpu_do_unaligned_access for
+ user-only
+Date: Tue, 23 Jun 2020 12:36:27 -0700
+Message-Id: <20200623193658.623279-15-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200623193658.623279-1-richard.henderson@linaro.org>
 References: <20200623193658.623279-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,84 +107,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Use the same code as system mode, so that we generate the same
+exception + syndrome for the unaligned access.
+
+For the moment, if MTE is enabled so that this path is reachable,
+this would generate a SIGSEGV in the user-only cpu_loop.  Decoding
+the syndrome to produce the proper SIGBUS will be done later.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Handle atomicity, require pre-cleaned address.
-v6: Fix constant offset shift, non-checked address, use pre-computed ata.
+v8: Raise the normal data exception + syndrome.
 ---
- target/arm/translate-a64.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+ target/arm/cpu.c        | 2 +-
+ target/arm/tlb_helper.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c6152b3cc0..5d8c9483bc 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2690,7 +2690,7 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
-  * +-----+-------+---+---+-------+---+-------+-------+------+------+
-  *
-  * opc: LDP/STP/LDNP/STNP        00 -> 32 bit, 10 -> 64 bit
-- *      LDPSW                    01
-+ *      LDPSW/STGP               01
-  *      LDP/STP/LDNP/STNP (SIMD) 00 -> 32 bit, 01 -> 64 bit, 10 -> 128 bit
-  *   V: 0 -> GPR, 1 -> Vector
-  * idx: 00 -> signed offset with non-temporal hint, 01 -> post-index,
-@@ -2715,6 +2715,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
-     bool is_signed = false;
-     bool postindex = false;
-     bool wback = false;
-+    bool set_tag = false;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 5b7a36b5d7..10677c0c23 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2169,8 +2169,8 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+     cc->tlb_fill = arm_cpu_tlb_fill;
+     cc->debug_excp_handler = arm_debug_excp_handler;
+     cc->debug_check_watchpoint = arm_debug_check_watchpoint;
+-#if !defined(CONFIG_USER_ONLY)
+     cc->do_unaligned_access = arm_cpu_do_unaligned_access;
++#if !defined(CONFIG_USER_ONLY)
+     cc->do_transaction_failed = arm_cpu_do_transaction_failed;
+     cc->adjust_watchpoint_address = arm_adjust_watchpoint_address;
+ #endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+index 7388494a55..522a6442a4 100644
+--- a/target/arm/tlb_helper.c
++++ b/target/arm/tlb_helper.c
+@@ -10,8 +10,6 @@
+ #include "internals.h"
+ #include "exec/exec-all.h"
  
-     TCGv_i64 clean_addr, dirty_addr;
+-#if !defined(CONFIG_USER_ONLY)
+-
+ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+                                             unsigned int target_el,
+                                             bool same_el, bool ea,
+@@ -122,6 +120,8 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+     arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
+ }
  
-@@ -2727,6 +2728,14 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
- 
-     if (is_vector) {
-         size = 2 + opc;
-+    } else if (opc == 1 && !is_load) {
-+        /* STGP */
-+        if (!dc_isar_feature(aa64_mte_insn_reg, s) || index == 0) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        size = 3;
-+        set_tag = true;
-     } else {
-         size = 2 + extract32(opc, 1, 1);
-         is_signed = extract32(opc, 0, 1);
-@@ -2767,7 +2776,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
--    offset <<= size;
-+    offset <<= (set_tag ? LOG2_TAG_GRANULE : size);
- 
-     if (rn == 31) {
-         gen_check_sp_alignment(s);
-@@ -2777,8 +2786,22 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
-     if (!postindex) {
-         tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
-     }
--    clean_addr = clean_data_tbi(s, dirty_addr);
- 
-+    if (set_tag) {
-+        if (!s->ata) {
-+            /*
-+             * TODO: We could rely on the stores below, at least for
-+             * system mode, if we arrange to add MO_ALIGN_16.
-+             */
-+            gen_helper_stg_stub(cpu_env, dirty_addr);
-+        } else if (tb_cflags(s->base.tb) & CF_PARALLEL) {
-+            gen_helper_stg_parallel(cpu_env, dirty_addr, dirty_addr);
-+        } else {
-+            gen_helper_stg(cpu_env, dirty_addr, dirty_addr);
-+        }
-+    }
++#if !defined(CONFIG_USER_ONLY)
 +
-+    clean_addr = clean_data_tbi(s, dirty_addr);
-     if (is_vector) {
-         if (is_load) {
-             do_fp_ld(s, rt, clean_addr, size);
+ /*
+  * arm_cpu_do_transaction_failed: handle a memory system error response
+  * (eg "no device/memory present at address") by raising an external abort
 -- 
 2.25.1
 
