@@ -2,106 +2,82 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C8FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AFEC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:11:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FD92206FA
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:10:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhfqnVXl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FD92206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E204120723
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:11:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E204120723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnihB-0007Ce-6B
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:10:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51906)
+	id 1jniiO-0008FJ-3b
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:11:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnigO-0006kz-IY
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:09:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59398
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnigM-0005Z2-Kv
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:09:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592917785;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ftNVvr7o2kixxqU+15fnHbqtnCG16g4/IFaY19W+FWE=;
- b=LhfqnVXljjSu9kC7FRmIENfYfKSytIxmcbWn1lphUb6iFJTtZLp6U3z5dQvIzuX+Fj9PhP
- SuOTipAvBbynpETgYW9DiJ4F27WMPpDXW0WsXeOMw3lxHPeL7ijdRG2V73597A6xc9cwAt
- bRDNCUQ0hfbQ7EMz5DB4lmm+V5qnC1I=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-xKryCeo0P9eMWDauJbDSgQ-1; Tue, 23 Jun 2020 09:09:43 -0400
-X-MC-Unique: xKryCeo0P9eMWDauJbDSgQ-1
-Received: by mail-wr1-f69.google.com with SMTP id l3so6401636wrw.4
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 06:09:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ftNVvr7o2kixxqU+15fnHbqtnCG16g4/IFaY19W+FWE=;
- b=GvChLlNBriBMU4ZUvWeiOU4giXpyTnqAwrBOkcDDQd07n0rIatsU4txtG2gb/Gu/EI
- JYvYbkJmZsj43ryh8PkWGHwxhBHF9oQGaEJ71g/rRBjFhbRBfirv/1FnRGUCbFHp0e0A
- YAH1bRYiETPGB70Uo6fBCWWcWwMf9IMp1p7B/5t1eCvGKXRpkSUiFGz4TTB8eMw58OpS
- Fi5M9KxlP3JN9wwUQej9ToNrNJTdjRfDkvl5qUeda1Y184X8aIeElfZgVpNmn7T/kFGy
- 8M968bUiUl3sbWWX5Zt1LFYJ4P9EENIm0RhAHbqM6yY6Sc5m508h6RaZbiqgamVMw1DD
- Imsg==
-X-Gm-Message-State: AOAM532uTvnWCeHLkCyDbex5uyzCgvvlShN6wwuvzT3fOImTrcHh05kq
- uwOjZKIvtBuFN9XQygndEM09IAP0CF2dcB05dhPdKvSIiE/2tDNjV7imJ7L3Kpmq9qEa/ltWBbK
- 7ttRyEAj4Kszj004=
-X-Received: by 2002:a1c:2485:: with SMTP id
- k127mr21271487wmk.138.1592917782656; 
- Tue, 23 Jun 2020 06:09:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwr2lfEZMrKpghBUsZMxoAuiUEeun6vKBbv4vHzz6YzdIWLARx76XKq7+7dNj8zfHUd8/o0vA==
-X-Received: by 2002:a1c:2485:: with SMTP id
- k127mr21271465wmk.138.1592917782440; 
- Tue, 23 Jun 2020 06:09:42 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- d28sm24360942wrc.50.2020.06.23.06.09.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 06:09:41 -0700 (PDT)
-Date: Tue, 23 Jun 2020 09:09:38 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Subject: Re: [PATCH v4 0/8] tpm: Enable usage of TPM TIS with interrupts
-Message-ID: <20200623090840-mutt-send-email-mst@kernel.org>
-References: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jnihn-0007o8-8s
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:11:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46108)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jnihk-0006Tf-Ue
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:11:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jnihh-0003e2-FN
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 13:11:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6D0612E8050
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 13:11:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 23 Jun 2020 12:56:53 -0000
+From: Stefan Hajnoczi <1882241@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: i82551
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: stefanha tim-tree-of-life
+X-Launchpad-Bug-Reporter: timsoft (tim-tree-of-life)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <159136023930.32294.17616621945608188739.malonedeb@gac.canonical.com>
+ <159240575569.16985.2747320831416406615.malone@chaenomeles.canonical.com>
+Message-ID: <20200623125653.GI36568@stefanha-x1.localdomain>
+Subject: Re: [Bug 1882241] Re: file transfer over cifs to 64bit guest corrupts
+ large files
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 593f3bf3ba3ebb105d925f0e2b45a8a4dadfeab3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 09:11:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -110,56 +86,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, eric.auger@redhat.com, pbonzini@redhat.com,
- marcandre.lureau@redhat.com, philmd@redhat.com, mkedzier@redhat.com
+Reply-To: Bug 1882241 <1882241@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200623125653.EkyiE8Fmu-l49_ljaBxq68ABNIn5emHKMKwOZwGk6sk@z>
 
-On Wed, Jun 17, 2020 at 10:22:57AM -0400, Stefan Berger wrote:
-> This series of patches enables the usage of the TPM TIS with interrupts.
-> We use the unused IRQ 13, which is the only one accepted by Windows.
-> 
->     Stefan
+On Wed, Jun 17, 2020 at 02:55:55PM -0000, timsoft wrote:
+> thanks for the suggestion. I tried using netcat (nc) to transfer a large =
+file from host to guest, and also from fileserver to guest with the problem=
+atic i82551 emulated network adapter on the host and the files transfered r=
+eliably. (correct md5sum 3 out of 3 attempts)
+> I also tried md5sum of the same file mounted on the guest fs as before an=
+d it still corrupts the data.
+> this seems to imply there is something in the cifs implementation which r=
+eacts adversly with this particular combination of virtual network hardware=
+, the fact it works with the vmxnet3 emulated card, would support that conc=
+lusion.
 
+I'm not sure if someone will look into it because the eepro100
+(i82551) NIC device is old an not used much nowadays.
 
-ACPI parts:
+However, if someone does decide to investigate and wants to brainstorm
+debugging ideas or needs help, feel free to contact me.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+-- =
 
-How do we want this merged? TPM tree or mine?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882241
 
-> v3->v4:
->  - Changed TPM_IRQ_DISABLED from -1 to ~0
-> 
-> v2->v3:
->  - Extended series to disable IRQ for TIS on sysbus
-> 
-> v1->v2:
->  - Added updated DSDT
-> 
-> Stefan Berger (8):
->   tpm_tis: Allow lowering of IRQ also when locality is not active
->   tpm: Extend TPMIfClass with get_irqnum() function
->   tests: Temporarily ignore DSDT table differences
->   tpm: Split TPM_TIS_IRQ into TPM_TIS_ISA_IRQ and TPM_TIS_SYSBUS_IRQ
->   acpi: Enable TPM IRQ
->   tests: Add updated DSDT
->   tpm: Guard irq related ops in case interrupts are disabled
->   tpm: Disable interrupt support for TIS on sysbus
-> 
->  hw/i386/acpi-build.c         |  11 +++++------
->  hw/tpm/tpm_tis_common.c      |  12 +++++++++---
->  hw/tpm/tpm_tis_isa.c         |  17 ++++++++++++++---
->  hw/tpm/tpm_tis_sysbus.c      |  12 +++++++++++-
->  include/hw/acpi/tpm.h        |   3 ++-
->  include/sysemu/tpm.h         |  12 ++++++++++++
->  tests/data/acpi/q35/DSDT.tis | Bin 8357 -> 8360 bytes
->  7 files changed, 53 insertions(+), 14 deletions(-)
-> 
-> -- 
-> 2.24.1
-> 
-> 
+Title:
+  file transfer over cifs to 64bit guest corrupts large files
 
+Status in QEMU:
+  New
+
+Bug description:
+  qemu 4.0 compiled fom source.
+  vm called by
+  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
+ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
+kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
+odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
+monitor telnet:localhost:7103,server,nowait,nodelay
+
+  copying large files eg 2.4gb or reading them on a cifs mount in the guest=
+ causes corruption every time. For smaller files 40-60mb corruption is more=
+ than 50% of the time. tested by md5sum on cifs server, or on host machine =
+vs. on guest vm.
+  corruption is seen only with 64bit guest using cifs with i82551 emulated =
+network device
+  ie. 32bit guest using cifs with i82551 emulated network device gives no c=
+orruption.
+
+  changing the emulated device to vmxnet3 removes the data corruption
+  (see below)
+
+  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
+  file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
+  /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
+  nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0
+  -enable-kvm -k en-gb -display vnc=3D:3 -monitor
+  telnet:localhost:7103,server,nowait,nodelay
+
+  this corruption is repeatable. ie. I created new vm, call using top examp=
+le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
+ then run md5sum "filecopied"
+  the md5sum is different every time. copy same file to the host, or to a 3=
+2bit guest with the same virtual network device and bridge and md5sums are =
+correct. The host pysical network adapter is
+  lspci|grep Ether
+  1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
+/8411 PCI Express Gigabit Ethernet Controller (rev 11)
+
+  physically connected via gigabit ethernet to cifs server (via gigabit
+  switch)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882241/+subscriptions
 
