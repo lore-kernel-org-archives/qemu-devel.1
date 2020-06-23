@@ -2,88 +2,86 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE2AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D5AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:09:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A0032072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A9D22072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:09:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfS36JJT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0032072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kBclIOdp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A9D22072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jngml-0006rN-In
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:08:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55046)
+	id 1jngnp-00089z-J8
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:09:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jngll-0005Yn-TZ; Tue, 23 Jun 2020 07:07:13 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39113)
+ id 1jngn9-0007bj-LD; Tue, 23 Jun 2020 07:08:39 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43197)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jnglk-00087j-2G; Tue, 23 Jun 2020 07:07:13 -0400
-Received: by mail-wr1-x443.google.com with SMTP id q5so7674676wru.6;
- Tue, 23 Jun 2020 04:07:11 -0700 (PDT)
+ id 1jngn7-0000nx-GM; Tue, 23 Jun 2020 07:08:39 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l10so20073668wrr.10;
+ Tue, 23 Jun 2020 04:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MIB4wGWnrxzNvDMpgsQ3/CQS8HsCRBZ2iK7yUj4UOr8=;
- b=kfS36JJTCnFpF9e71LLgv1K90BcJeBdKLxhgPXPYDxhqHV1Ycou7PK0SNpRL9kfL3I
- bTg7rH5MkvnQCVoHHA4QP8ryxrQXhcQSFOaFc+EnAMWlJT3ftX50lDdQ1jVZ2YQ3vbbj
- MjkWlnVduB95IyeGbM8HR8MuVRDSUsgVGCks68/KcKHmZUsIRjVi/I6DwksI9V5AM4rW
- /vZvb36PdI1GCrah2rAEOstc+9DK3Rpz+R67s6osrhaIBSIuEty+Um6GEoYgwUY8LuuC
- 6Hg2cxrSmzN914W8LdXhUCoOQuwQG/sopZjtx1JR5nn9MCYz+wZ19t9vM1QfcU582GVM
- IBNA==
+ bh=eFNg4l8BDcidOcqkqEkPfeilv/c4Xk+sftvu9BcvccI=;
+ b=kBclIOdpxNKOWd/EFm8EVNmK7rCGTjP8QRt1JWlWiUg6ZCwzpvlA1ylXFfUB5LKDtQ
+ xKGER9BCOLFGDIoW9cdzBtIHF/c7nfbUhhUyRzhj3CqdYZqb3URVJYE5IvJV2sHfuJBx
+ /ihMJwUr31CGiTc4/FTWnyJwKoHEYGvQKLAndzfS82ufZYUlXdf0o+RxuGvdioJL7wdx
+ anZBWX+Ntc1zn0/xqqx1KK8FCWz/PJlPkTvPwVYZT25/kr4lLNQsGHjNhfVmbOcI2A+K
+ CCkMxKJnM3ZiHxZndxjrFr9q9xvm4VZvBYpCSSXdczpzLHFMPrUH4w9B+EhAERnEkrHe
+ 1kug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=MIB4wGWnrxzNvDMpgsQ3/CQS8HsCRBZ2iK7yUj4UOr8=;
- b=meJhGSN04/3p05eW78N5bg0qbZan7EOtUhsyRei6YekPmb3XNDAZKyQpYK1UnQk3qm
- 4OEL5YCsEl4HaVHFc7OK9EDWW7Wij1wbouZTW/BnKZ3WSANrimwH2aMykyGqJ/fLYrMZ
- BUlaB686q1yttg8hwyK866a8HDQXNpxiZfuPSAnR4TwUYq09U8HpjDUgz+yugmNTNgIt
- HcuCS15FLI7KReALXlqOKX8Tcj+kODGHlfClf2OgaUqcG8gApghzLd4H0KfiYlcytNaE
- +Z6ctSi+sDKSMyawZcx5PpeDcKqEgoHMZzGoMMgCPaj4Bzc+FV3RD5Rhd+B/ir7n4D8H
- xfMw==
-X-Gm-Message-State: AOAM531KWv4oECK71kQK+TKo5sut2AeH/qfW7AKMylxjs6ArmkAUanSa
- DOdL15DjjLGT77roD/oMYZcxnqno
-X-Google-Smtp-Source: ABdhPJxQ8WeoqEMLLN6egpomSyqvvV9BqzD0kZV8rzAoMBraOc6P+zU1VBrzqB6QGd8I2hLEpxa11Q==
-X-Received: by 2002:a05:6000:4e:: with SMTP id
- k14mr11732785wrx.157.1592910430300; 
- Tue, 23 Jun 2020 04:07:10 -0700 (PDT)
+ bh=eFNg4l8BDcidOcqkqEkPfeilv/c4Xk+sftvu9BcvccI=;
+ b=GHgnH9NTcgbq5D75Dz4buqr8plNosYz39YnaOzeMQy8bYC3fNXZDavUidztIpXW9Rz
+ 1jVzH7ZKfmUDw2/VEa1w8htWAKoiQ9rhhMh1ByDF+BfvtTE/cJJqKLUB0uLvrXruQ7PD
+ vraPA/dYAB9UrBVwI+dhkiQttuXUHYqs1JUg8fl+hNBA3l+LT/MdwsX8FMi6FJ9ih2gd
+ shMb8nvcu75JVRPv4oHvsJDYazuqJJbpziFfhuDBxewfokHiksC8hazXNJKas25fM6i3
+ v61hFGGbSK8JcImUPXm8tGEhShFEhZwTItBn2z40eu+4TtW7nGmbhVUKfHeYh811Ojtk
+ AqbQ==
+X-Gm-Message-State: AOAM532vI/DdwthfTG8KqXE0+t0JXvba5JlP35AYvdVuVpxpN2VUODU5
+ qsj6A/iMUu9pEz/HEQ9sJp4=
+X-Google-Smtp-Source: ABdhPJyjTD9fGgQAS1awL5rOLy0PKu19iYRdmAh9cNhg0fTK5kgc5snvE1tn0w33GaOxGKv1fbQfbw==
+X-Received: by 2002:a5d:5441:: with SMTP id w1mr23365697wrv.381.1592910515300; 
+ Tue, 23 Jun 2020 04:08:35 -0700 (PDT)
 Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id i19sm15975270wrb.56.2020.06.23.04.07.09
+ by smtp.gmail.com with ESMTPSA id 63sm23803379wra.86.2020.06.23.04.08.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 04:07:09 -0700 (PDT)
-Subject: Re: [PATCH v6 1/9] hw/i2c/core: Add i2c_try_create_slave() and
- i2c_realize_and_unref()
+ Tue, 23 Jun 2020 04:08:34 -0700 (PDT)
+Subject: Re: [PATCH v6 7/9] hw/arm/aspeed: Describe each PCA9552 device
 To: qemu-devel@nongnu.org
 References: <20200623072723.6324-1-f4bug@amsat.org>
- <20200623072723.6324-2-f4bug@amsat.org>
+ <20200623072723.6324-8-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ab054e7d-a78f-8b38-f4d6-93cda08e1a62@amsat.org>
-Date: Tue, 23 Jun 2020 13:07:08 +0200
+Message-ID: <fd0407f1-e6d5-596a-2a16-7056801ad761@amsat.org>
+Date: Tue, 23 Jun 2020 13:08:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200623072723.6324-2-f4bug@amsat.org>
+In-Reply-To: <20200623072723.6324-8-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -115,74 +113,60 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/23/20 9:27 AM, Philippe Mathieu-Daudé wrote:
-> Extract i2c_try_create_slave() and i2c_realize_and_unref()
-> from i2c_create_slave().
-> We can now set properties on a I2CSlave before it is realized.
+> We have 2 distinct PCA9552 devices. Set their description
+> to distinguish them when looking at the trace events.
 > 
-> This is in line with the recent qdev/QOM changes merged
-> in commit 6675a653d2e.
+> Description name taken from:
+> https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
 > 
-> Reviewed-by: Corey Minyard <cminyard@mvista.com>
 > Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Collecting Markus review on v5:
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg07060.html
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg07078.html
 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
 > Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Corey Minyard <cminyard@mvista.com>
 > ---
->  include/hw/i2c/i2c.h |  2 ++
->  hw/i2c/core.c        | 18 ++++++++++++++++--
->  2 files changed, 18 insertions(+), 2 deletions(-)
+>  hw/arm/aspeed.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> index 4117211565..d6e3d85faf 100644
-> --- a/include/hw/i2c/i2c.h
-> +++ b/include/hw/i2c/i2c.h
-> @@ -80,6 +80,8 @@ int i2c_send(I2CBus *bus, uint8_t data);
->  uint8_t i2c_recv(I2CBus *bus);
->  
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
-> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
-> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
->  
->  /* lm832x.c */
->  void lm832x_key_event(DeviceState *dev, int key, int state);
-> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-> index 1aac457a2a..acf34a12d6 100644
-> --- a/hw/i2c/core.c
-> +++ b/hw/i2c/core.c
-> @@ -267,13 +267,27 @@ const VMStateDescription vmstate_i2c_slave = {
->      }
->  };
->  
-> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
-> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index ccf127b328..307dba5065 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -508,12 +508,15 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
 >  {
->      DeviceState *dev;
->  
->      dev = qdev_new(name);
->      qdev_prop_set_uint8(dev, "address", addr);
-> -    qdev_realize_and_unref(dev, &bus->qbus, &error_fatal);
-> +    return dev;
-> +}
-> +
-> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
-> +{
-> +    return qdev_realize_and_unref(dev, &bus->qbus, errp);
-> +}
-> +
-> +DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
-> +{
+>      AspeedSoCState *soc = &bmc->soc;
+>      uint8_t *eeprom_buf = g_malloc0(8 * 1024);
 > +    DeviceState *dev;
-> +
-> +    dev = i2c_try_create_slave(name, addr);
-> +    i2c_realize_and_unref(dev, bus, &error_fatal);
-> +
->      return dev;
+>  
+>      /* Bus 3: TODO bmp280@77 */
+>      /* Bus 3: TODO max31785@52 */
+>      /* Bus 3: TODO dps310@76 */
+> -    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), TYPE_PCA9552,
+> -                     0x60);
+> +    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
+> +    qdev_prop_set_string(dev, "description", "pca1");
+> +    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3),
+> +                          &error_fatal);
+>  
+>      i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423", 0x4c);
+>      i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423", 0x4c);
+> @@ -528,8 +531,10 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>  
+>      smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), 0x51,
+>                            eeprom_buf);
+> -    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), TYPE_PCA9552,
+> -                     0x60);
+> +    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
+> +    qdev_prop_set_string(dev, "description", "pca0");
+> +    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11),
+> +                          &error_fatal);
+>      /* Bus 11: TODO ucd90160@64 */
 >  }
 >  
 > 
