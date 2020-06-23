@@ -2,89 +2,107 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 989B8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C88C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 646F620768
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EB7620738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:03:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JiWms+b4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 646F620768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gK1J4QlI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB7620738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnghH-00021L-Gd
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:02:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51452)
+	id 1jnghu-0002u9-IM
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:03:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jnggV-0001bl-Gk
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:01:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59412
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jnggS-000584-Lr
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:01:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592910102;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=o2ucEhjbnW7/mjPRQZF/oV3WPodjkmV8zQLFM2Ll2wQ=;
- b=JiWms+b4l/zsPUTvAbpQAqCpHYb3rjIQEKFieKOIiQho6aWw4uO+Irn/hLj3yTOnNMfat7
- N0eiT58NDpy/MKsKXvB//23bc5/b571OKg4D3c1XIMco9cjBUMPk/X8TVuJr3fbDOE6r1F
- swNA6M4Tkm4u9o8nmTPKw1zob0d5UZg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-yfilmfI2MmeEHIkaSkWBQw-1; Tue, 23 Jun 2020 07:01:41 -0400
-X-MC-Unique: yfilmfI2MmeEHIkaSkWBQw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDA048005AD;
- Tue, 23 Jun 2020 11:01:38 +0000 (UTC)
-Received: from work-vm (ovpn-115-91.ams2.redhat.com [10.36.115.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 69A305BACB;
- Tue, 23 Jun 2020 11:01:28 +0000 (UTC)
-Date: Tue, 23 Jun 2020 12:01:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH QEMU v25 12/17] vfio: Add function to start and stop
- dirty pages tracking
-Message-ID: <20200623110125.GD3328@work-vm>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-13-git-send-email-kwankhede@nvidia.com>
- <20200623123216.17eefe2e.cohuck@redhat.com>
+ (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
+ id 1jnghC-00028W-Hq
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:02:31 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:36004)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
+ id 1jngh8-0005bg-N8
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:02:30 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05NB1lKr108127;
+ Tue, 23 Jun 2020 11:02:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=O1PQZtYeDKDpJvlFr4mN82x+eoq4SFMub3fgkluk08U=;
+ b=gK1J4QlIvsfSzlUQvPi0d612se4o25xNppYCRjMaf9tGdgXWZxicpFHLEZe7sidkk42N
+ MdXhja0642Yg7cRiD1JbeHmCYsz05z+dWrHu7qGGCEorGE/9hZQBah1Rqre+C90QFej3
+ DSq3YZcRlLWOGKkomvY6gJLUUB2i5mI60PM9EDkXtrlHoPFeo11FzNWs6RXrpi0ODYod
+ kdqzT5cvxVPfTcj8zfANJJDyHprLdm3YjXSvrFlxyC6VQXd0xt3rRaXGxljtMAO01NGO
+ 9iYZCs0slWHqokacnnSdu4Kbqbi2OmMJIuTjysM6/sOuxilWrMD/6bPEalZKlqEIzntD 7w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 31sebbckn6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Tue, 23 Jun 2020 11:02:24 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05NAx9RV130067;
+ Tue, 23 Jun 2020 11:02:24 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 31svcwjxrr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jun 2020 11:02:23 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05NB2MXA008968;
+ Tue, 23 Jun 2020 11:02:22 GMT
+Received: from [192.168.14.112] (/79.176.227.138)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 23 Jun 2020 11:02:22 +0000
+Subject: Re: [PATCH] vmport: move compat properties to hw_compat_5_0
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200623102834.4816-1-pbonzini@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <41297039-e7af-a9cd-b1e4-3db2c8fe4f94@oracle.com>
+Date: Tue, 23 Jun 2020 14:02:20 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200623123216.17eefe2e.cohuck@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+In-Reply-To: <20200623102834.4816-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ bulkscore=0 adultscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006230087
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ cotscore=-2147483648
+ lowpriorityscore=0 phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 priorityscore=1501 spamscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006230088
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=liran.alon@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:02:25
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,123 +115,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Sun, 21 Jun 2020 01:51:21 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
-> > for VFIO devices.
-> > 
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/vfio/migration.c | 36 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 36 insertions(+)
-> > 
-> > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> > index faacea5327cb..e0fbb3a01855 100644
-> > --- a/hw/vfio/migration.c
-> > +++ b/hw/vfio/migration.c
-> > @@ -11,6 +11,7 @@
-> >  #include "qemu/main-loop.h"
-> >  #include "qemu/cutils.h"
-> >  #include <linux/vfio.h>
-> > +#include <sys/ioctl.h>
-> >  
-> >  #include "sysemu/runstate.h"
-> >  #include "hw/vfio/vfio-common.h"
-> > @@ -329,6 +330,32 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> >      return qemu_file_get_error(f);
-> >  }
-> >  
-> > +static int vfio_start_dirty_page_tracking(VFIODevice *vbasedev, bool start)
-> 
-> I find 'start' functions that may also stop something a bit confusing.
-> Maybe vfio_toggle_dirty_page_tracking()?
 
-I don't think toggle is any better; I always think of toggle as flipping
-the state to the other state.
-vfio_set_dirty_page_tracking maybe?
-
-Dave
-
-
-> > +{
-> > +    int ret;
-> > +    VFIOContainer *container = vbasedev->group->container;
-> > +    struct vfio_iommu_type1_dirty_bitmap dirty = {
-> > +        .argsz = sizeof(dirty),
-> > +    };
-> > +
-> > +    if (start) {
-> > +        if (vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) {
-> > +            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_START;
-> > +        } else {
-> > +            return -EINVAL;
-> > +        }
-> > +    } else {
-> > +            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP;
-> > +    }
-> > +
-> > +    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, &dirty);
-> > +    if (ret) {
-> > +        error_report("Failed to set dirty tracking flag 0x%x errno: %d",
-> > +                     dirty.flags, errno);
-> > +    }
-> > +    return ret;
-> > +}
-> > +
-> >  /* ---------------------------------------------------------------------- */
-> >  
-> >  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> > @@ -360,6 +387,11 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >          return ret;
-> >      }
-> >  
-> > +    ret = vfio_start_dirty_page_tracking(vbasedev, true);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> >      qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> >  
-> >      ret = qemu_file_get_error(f);
-> > @@ -375,6 +407,8 @@ static void vfio_save_cleanup(void *opaque)
-> >      VFIODevice *vbasedev = opaque;
-> >      VFIOMigration *migration = vbasedev->migration;
-> >  
-> > +    vfio_start_dirty_page_tracking(vbasedev, false);
-> 
-> I suppose we can't do anything useful if stopping dirty page tracking
-> fails?
-> 
-> > +
-> >      if (migration->region.mmaps) {
-> >          vfio_region_unmap(&migration->region);
-> >      }
-> > @@ -706,6 +740,8 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-> >          if (ret) {
-> >              error_report("%s: Failed to set state RUNNING", vbasedev->name);
-> >          }
-> > +
-> > +        vfio_start_dirty_page_tracking(vbasedev, false);
-> >      }
-> >  }
-> >  
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+On 23/06/2020 13:28, Paolo Bonzini wrote:
+> The patches that introduced the properties were submitted when QEMU 5.0
+> had not been released yet, so they got merged under the wrong heading.
+> Move them to hw_compat_5_0 so that 5.0 machine types get the pre-patch
+> behavior.
+>
+> Reported-by: Laurent Vivier <lvivier@redhat.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>   hw/core/machine.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 1d80ab0e1d..211b4e077a 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -30,6 +30,10 @@
+>   
+>   GlobalProperty hw_compat_5_0[] = {
+>       { "virtio-balloon-device", "page-poison", "false" },
+> +    { "vmport", "x-read-set-eax", "off" },
+> +    { "vmport", "x-signal-unsupported-cmd", "off" },
+> +    { "vmport", "x-report-vmx-type", "off" },
+> +    { "vmport", "x-cmds-v2", "off" },
+>   };
+>   const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+>   
+> @@ -45,10 +49,6 @@ GlobalProperty hw_compat_4_2[] = {
+>       { "qxl", "revision", "4" },
+>       { "qxl-vga", "revision", "4" },
+>       { "fw_cfg", "acpi-mr-restore", "false" },
+> -    { "vmport", "x-read-set-eax", "off" },
+> -    { "vmport", "x-signal-unsupported-cmd", "off" },
+> -    { "vmport", "x-report-vmx-type", "off" },
+> -    { "vmport", "x-cmds-v2", "off" },
+>   };
+>   const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
+>   
 
