@@ -2,101 +2,109 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E29DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58B16206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:23:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjDAtRte"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B16206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB8A320724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:25:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB8A320724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnitu-0007ww-IQ
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:23:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
+	id 1jnivT-0001Qu-8X
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:25:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jnitA-0007D4-Sd
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:23:00 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:51948)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jnit8-0003Gc-81
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:23:00 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id 22so2113093wmg.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 06:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=vIGEeWZ/DVd9Ibs07TWhRGb9A0+4o4egEkTtwP8/mEg=;
- b=LjDAtRteY8fo/Dm7K4nv316lDLC6HqeijvUUDZeSU+csoYPmhYG113Cwj6B4traz+x
- IgY6JZBXWzgbmfwhkEHp6NzHcAB8MjwWwQ28+sv6c37WEzSilfTVwmPUFw120k8wsuTg
- ok5GyvksuFQHSi2t61o58WQU3lUPDbf9B/mpn89NRVSfh04HDLNOBaihnS32aDn3uJd4
- aQ47iqrhqdV7uDafZOEbFWi1xhxaOOJASLOFIXjHz+mCHLcjI9yQoZRbF5htTH6naw3W
- 26qFyiyapxARuPQ++t/BzUcv1B8Exhrcp0YB0EX59TiafQFsNyONTLaY6XzCxe2YJP5v
- 0KEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=vIGEeWZ/DVd9Ibs07TWhRGb9A0+4o4egEkTtwP8/mEg=;
- b=MrKYwkkWdEP8AUP24WKS4UEXNoQJOUUe825cTnGvthHLHZlAmIO1zv/cRn2EXbRjf3
- 9UD2Nsrgxr006z/KxKn6/uiP2j2SdSAq+7PWqbZSRUKE3mKpoades+A/qki2blJNp0/M
- WwZ5C6naWbbhc7/4JNiKdzz/1aQCjg3r4ZsY3nl17uKcF7/qBZYrVzL4aaMc0dE9Wfwd
- t+Y5rsibT1o1qRKHAC4XT8wSsTzTvyTQ+aIfGRlnpTdlKApIECxkFu3DSC++ouW7oFTK
- pobEWHyhgvMGundUKYmWmiRQCDufagJWoPfLaU7uT10y75zWzTrOPZbw4t8kbtfOza8F
- dWfw==
-X-Gm-Message-State: AOAM5326vIfBP9EFku54G/bz2/nHjvRGmKoZ/OlBKEV2EbU9eonoyh7E
- W/GDvq5Ki/MjM3IJsT5Lrog=
-X-Google-Smtp-Source: ABdhPJyrIF8yCBU+BQCn+xuPW6esvDwE9e7lES4JkEqmtABqvocaYgJ3qEe2pLJTMlMjP+pdmf2FZA==
-X-Received: by 2002:a7b:cb11:: with SMTP id u17mr24112181wmj.84.1592918576756; 
- Tue, 23 Jun 2020 06:22:56 -0700 (PDT)
-Received: from CBGR90WXYV0 (54-240-197-224.amazon.com. [54.240.197.224])
- by smtp.gmail.com with ESMTPSA id u10sm3710648wml.29.2020.06.23.06.22.55
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 23 Jun 2020 06:22:56 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: "'Jason Andryuk'" <jandryuk@gmail.com>,
- "'Markus Armbruster'" <armbru@redhat.com>
-References: <CAKf6xpuSD3NC2bLPQN75e2pR8asu9Ey1xTGxTNeCR_1MGsnPOg@mail.gmail.com>
- <ac4dfe3b-7981-49bb-25a2-08578da150d5@ilande.co.uk>
- <CAKf6xpvs6mNowsiAzbfQGLGp0aY0zKgUD=DVpSorWHycm--J8g@mail.gmail.com>
- <87k0zykwdl.fsf@dusky.pond.sub.org>
- <CAKf6xpuWfw7HEyfaH4jk02LUkt5b6eqdOdXhddqEX=iuPTbCTA@mail.gmail.com>
-In-Reply-To: <CAKf6xpuWfw7HEyfaH4jk02LUkt5b6eqdOdXhddqEX=iuPTbCTA@mail.gmail.com>
-Subject: RE: sysbus failed assert for xen_sysdev
-Date: Tue, 23 Jun 2020 14:22:54 +0100
-Message-ID: <000101d64961$681c0350$385409f0$@xen.org>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jnitx-00088M-6O
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:23:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63826)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jnitv-0003Yg-71
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:23:48 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05NCa7Uc044333
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 09:23:45 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31udkcj93d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 09:23:45 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NDJAMx057320
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 09:23:45 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31udkcj92w-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 09:23:44 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NDK5Vm016062;
+ Tue, 23 Jun 2020 13:23:43 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma05wdc.us.ibm.com with ESMTP id 31sa38qeb2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 13:23:43 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05NDNewO28442928
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jun 2020 13:23:40 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D1C226A054;
+ Tue, 23 Jun 2020 13:23:42 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2DABC6A047;
+ Tue, 23 Jun 2020 13:23:42 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 23 Jun 2020 13:23:41 +0000 (GMT)
+Subject: Re: [PATCH v4 0/8] tpm: Enable usage of TPM TIS with interrupts
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
+References: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
+ <20200623090840-mutt-send-email-mst@kernel.org>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <5262d4c8-84df-e5a9-a383-c3f8f5cdbc81@linux.ibm.com>
+Date: Tue, 23 Jun 2020 09:23:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQIJfv1jP4fCJU6d0eNUL65zTb1lhAKJjZPCAZLY/IEByWeHdwGvNa5pqEMcPwA=
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=xadimgnik@gmail.com; helo=mail-wm1-x32d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200623090840-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-23_06:2020-06-23,
+ 2020-06-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=642
+ cotscore=-2147483648 lowpriorityscore=0 bulkscore=0 phishscore=0
+ clxscore=1015 adultscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 spamscore=0 mlxscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006230097
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,267 +118,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Anthony PERARD' <anthony.perard@citrix.com>,
- 'xen-devel' <xen-devel@lists.xenproject.org>,
- 'Mark Cave-Ayland' <mark.cave-ayland@ilande.co.uk>,
- 'QEMU' <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, eric.auger@redhat.com, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, philmd@redhat.com, mkedzier@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Jason Andryuk <jandryuk@gmail.com>
-> Sent: 23 June 2020 13:57
-> To: Markus Armbruster <armbru@redhat.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>; Anthony PERARD <anthony.perard@citrix.com>; xen-
-> devel <xen-devel@lists.xenproject.org>; Paul Durrant <paul@xen.org>; QEMU <qemu-devel@nongnu.org>
-> Subject: Re: sysbus failed assert for xen_sysdev
-> 
-> On Tue, Jun 23, 2020 at 4:41 AM Markus Armbruster <armbru@redhat.com> wrote:
-> >
-> > Jason Andryuk <jandryuk@gmail.com> writes:
-> >
-> > > On Mon, Jun 22, 2020 at 5:17 PM Mark Cave-Ayland
-> > > <mark.cave-ayland@ilande.co.uk> wrote:
-> > >>
-> > >> On 22/06/2020 21:33, Jason Andryuk wrote:
-> > >>
-> > >> > Hi,
-> > >> >
-> > >> > Running qemu devel for a Xen VM is failing an assert after the recent
-> > >> > "qdev: Rework how we plug into the parent bus" sysbus changes.
-> > >> >
-> > >> > qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
-> > >> > `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
-> > >> > failed.
-> > >> >
-> > >> > dc->bus_type is "xen-sysbus" and it's the
-> > >> > `object_dynamic_cast(OBJECT(bus), dc->bus_type)` portion that fails
-> > >> > the assert.  bus seems to be "main-system-bus", I think:
-> > >> > (gdb) p *bus
-> > >> > $3 = {obj = {class = 0x55555636d780, free = 0x7ffff7c40db0 <g_free>,
-> > >> > properties = 0x5555563f7180, ref = 3, parent = 0x5555563fe980}, parent
-> > >> > = 0x0, name = 0x5555563fec60 "main-system-bus", ...
-> > >> >
-> > >> > The call comes from hw/xen/xen-legacy-backend.c:706
-> > >> > sysbus_realize_and_unref(SYS_BUS_DEVICE(xen_sysdev), &error_fatal);
-> > >> >
-> > >> > Any pointers on what needs to be fixed?
-> > >>
-> > >> Hi Jason,
-> > >>
-> > >> My understanding is that the assert() is telling you that you're plugging a
-> > >> TYPE_SYS_BUS_DEVICE into a bus that isn't derived from TYPE_SYSTEM_BUS.
-> > >> TYPE_SYS_BUS_DEVICE into a bus that isn't derived from TYPE_SYSTEM_BUS. A quick look
-> >
-> > Correct.  Let's review the assertion:
-> >
-> >     assert(dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type));
-> >
-> > Context: we're supposted to plug @dev into @bus, and @dc is @dev's
-> > DeviceClass.
-> >
-> > The assertion checks that
-> >
-> > 1. @dev plugs into a bus: dc->bus_type
-> >
-> > 2. @bus is an instance of the type of bus @dev plugs into:
-> >    object_dynamic_cast(OBJECT(bus), dc->bus_type)
-> >
-> > >> at the file in question suggests that you could try changing the parent class of
-> > >> TYPE_XENSYSBUS from TYPE_BUS to TYPE_SYSTEM_BUS to see if that helps?
-> > >
-> > > Hi, Mark.
-> > >
-> > > Thanks, but unfortunately changing xensysbus_info .parent does not
-> > > stop the assert.  But it kinda pointed me in the right direction.
-> > >
-> > > xen-sysdev overrode the bus_type which was breaking sysbus_realize.
-> > > So drop that:
-> > >
-> > > --- a/hw/xen/xen-legacy-backend.c
-> > > +++ b/hw/xen/xen-legacy-backend.c
-> > > @@ -824,7 +825,7 @@ static void xen_sysdev_class_init(ObjectClass
-> > > *klass, void *data)
-> > >      DeviceClass *dc = DEVICE_CLASS(klass);
-> > >
-> > >      device_class_set_props(dc, xen_sysdev_properties);
-> > > -    dc->bus_type = TYPE_XENSYSBUS;
-> > > +    //dc->bus_type = TYPE_XENSYSBUS;
-> > >  }
-> >
-> > Uff!
-> >
-> > Let me explain how things are supposed to work.
-> >
-> > Say we have FOO bus (QOM type TYPE_FOO_BUS), with FOO devices plugging
-> > into it (abstract QOM type TYPE_FOO_DEVICE).  One of them is SOME_FOO
-> > (concrete QOM type TYPE_SOME_FOO).  Code ties them together like this:
-> >
-> >     static const TypeInfo pci_bus_info = {
-> >         .name = TYPE_PCI_BUS,
-> >         .parent = TYPE_BUS,
-> >         ...
-> >     };
-> >
-> >     static const TypeInfo foo_device_info = {
-> >         .name = TYPE_FOO_DEVICE,
-> >         .parent = TYPE_DEVICE,
-> >         .abstract = true,
-> >         .class_init = foo_device_class_init,
-> >         ...
-> >     };
-> >
-> >     static void foo_device_class_init(ObjectClass *oc, void *data)
-> >     {
-> >         DeviceClass *dc = DEVICE_CLASS(oc);
-> >
-> >         dc->bus_type = TYPE_FOO_BUS;
-> >         ...
-> >     }
-> >
-> >     static const TypeInfo some_foo_info = {
-> >         .name = TYPE_SOME_FOO,
-> >         .parent = TYPE_FOO_DEVICE,
-> >         ...
-> >     };
-> >
-> > When you plug an instance of TYPE_SOME_FOO into a bus, the assertion
-> > checks that the bus is an instance of TYPE_FOO_BUS.
-> >
-> > Note that subtypes of TYPE_FOO_DEVICE do not mess with dc->bus_type!
-> >
-> > TYPE_XENSYSDEV does mess with it:
-> >
-> >     static void xen_sysdev_class_init(ObjectClass *klass, void *data)
-> >     {
-> >         DeviceClass *dc = DEVICE_CLASS(klass);
-> >
-> >         device_class_set_props(dc, xen_sysdev_properties);
-> >         dc->bus_type = TYPE_XENSYSBUS;
-> >     }
-> >
-> >     static const TypeInfo xensysdev_info = {
-> >         .name          = TYPE_XENSYSDEV,
-> >         .parent        = TYPE_SYS_BUS_DEVICE,
-> >         .instance_size = sizeof(SysBusDevice),
-> >         .class_init    = xen_sysdev_class_init,
-> >     };
-> >
-> > On the one hand, xensysdev_info.parent claims TYPE_XENSYSDEV is a
-> > TYPE_SYS_BUS_DEVICE (and therefore should plug into a TYPE_SYSTEM_BUS).
-> > On the other hand, its dc->bus_type is a TYPE_XENSYSBUS, which is *not*
-> > a subtype of TYPE_SYSTEM_BUS:
-> >
-> >     static const TypeInfo xensysbus_info = {
-> >         .name       = TYPE_XENSYSBUS,
-> > --->    .parent     = TYPE_BUS,
-> >         .class_init = xen_sysbus_class_init,
-> >         .interfaces = (InterfaceInfo[]) {
-> >             { TYPE_HOTPLUG_HANDLER },
-> >             { }
-> >         }
-> >     };
-> >
-> > This is an inconsistent mess.
-> >
-> > Are TYPE_XENSYSDEV and TYPE_XENSYSBUS related to TYPE_SYS_BUS_DEVICE and
-> > TYPE_SYSTEM_BUS?
-> >
-> > If no, then xensysbus_info.parent should not be TYPE_SYS_BUS_DEVICE, and
-> > you must not pass instances of one kind to functions expecting the other
-> > kind.
-> >
-> > If yes, how?  If the former are specializations of the latter, consider
-> > making the former subtypes of the latter.  Both of them.  Then a
-> > TYPE_XENSYSDEV device can plug into a TYPE_XENSYSBUS bus, but not into a
-> > TYPE_SYSTEM_BUS bus.
-> >
-> > A TYPE_SYS_BUS_DEVICE could still plug into TYPE_XENSYSBUS, because the
-> > latter is also an instance of TYPE_SYSTEM_BUS.
-> 
-> Thanks for your response, Markus.
-> 
-> I didn't write it, but my understanding is as follows.  TYPE_XENSYSDEV
-> is a device on the system bus that provides the TYPE_XENSYSBUS bus.
-> TYPE_XENBACKEND devices can then attach to TYPE_XENSYSBUS.
-> 
-> That would make the qom-tree something like:
->   /TYPE_XENSYSDEV
->     /TYPE_XENSYSBUX
->       /TYPE_XENBACKEND
-> 
-> (I think today the TYPE_XENBACKEND devices ends up attached to the System bus.)
-> 
-> I think TYPE_XENSYSDEV is correct - it is a device on the system bus.
-> static const TypeInfo xensysdev_info = {
-> .name = TYPE_XENSYSDEV,
-> .parent = TYPE_SYS_BUS_DEVICE,
-> ...
-> }
-> 
-> TYPE_XENSYSBUS is the xen-specific bus - provided by TYPE_XENSYSDEV -
-> for attaching xendev.
-> static const TypeInfo xensysbus_info = {
-> .name = TYPE_XENSYSBUS,
-> .parent = TYPE_BUS,
-> ...
-> }
-> 
-> TYPE_XENBACKEND is a generic Xen device and it plugs into
-> TYPE_XENSYSBUS.  Maybe the .parent here is wrong and it should just be
-> TYPE_DEVICE?
+On 6/23/20 9:09 AM, Michael S. Tsirkin wrote:
+> On Wed, Jun 17, 2020 at 10:22:57AM -0400, Stefan Berger wrote:
+>> This series of patches enables the usage of the TPM TIS with interrupts.
+>> We use the unused IRQ 13, which is the only one accepted by Windows.
+>>
+>>      Stefan
+>
+> ACPI parts:
+>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> How do we want this merged? TPM tree or mine?
 
-Yes, I think that is the problem leading to the assert. See the equivalent (non-legacy) code in xen-bus.c. 
+Queued it here: https://github.com/stefanberger/qemu-tpm/commits/tpm-next
 
-  Paul
+Was going to send a PR later this week with this part. Will add your Rb-s.
 
-> static const TypeInfo xendev_type_info = {
-> .name = TYPE_XENBACKEND,
-> .parent = TYPE_XENSYSDEV,
-> ...
-> }
-> 
-> So removing `bus_type = TYPE_XENSYSBUS` from TYPE_XENSYSDEV class_init
-> and adding it to TYPE_XENBACKEND seems correct to me.
-> 
-> Regards,
-> Jason
-> 
-> > Questions?
-> >
-> > >
-> > >  static const TypeInfo xensysdev_info = {
-> > >
-> > > Then I had a different instance of the failed assert trying to attach
-> > > xen-console-0 to xen-sysbus.  So I made this change:
-> > > --- a/hw/xen/xen-legacy-backend.c
-> > > +++ b/hw/xen/xen-legacy-backend.c
-> > > @@ -789,6 +789,7 @@ static void xendev_class_init(ObjectClass *klass,
-> > > void *data)
-> > >      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> > >      /* xen-backend devices can be plugged/unplugged dynamically */
-> > >      dc->user_creatable = true;
-> > > +    dc->bus_type = TYPE_XENSYSBUS;
-> > >  }
-> > >
-> > >  static const TypeInfo xendev_type_info = {
-> > >
-> > > Then it gets farther... until
-> > > qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
-> > > Assertion `dev->realized' failed.
-> > >
-> > > dev->id is NULL. The failing device is:
-> > > (gdb) p *dev.parent_obj.class.type
-> > > $12 = {name = 0x555556207770 "cfi.pflash01",
-> > >
-> > > Is that right?
-> > >
-> > > I'm going to have to take a break from this now.
-> > >
-> > > Regards,
-> > > Jason
-> >
+
+    Stefan
+
+
+>
+>> v3->v4:
+>>   - Changed TPM_IRQ_DISABLED from -1 to ~0
+>>
+>> v2->v3:
+>>   - Extended series to disable IRQ for TIS on sysbus
+>>
+>> v1->v2:
+>>   - Added updated DSDT
+>>
+>> Stefan Berger (8):
+>>    tpm_tis: Allow lowering of IRQ also when locality is not active
+>>    tpm: Extend TPMIfClass with get_irqnum() function
+>>    tests: Temporarily ignore DSDT table differences
+>>    tpm: Split TPM_TIS_IRQ into TPM_TIS_ISA_IRQ and TPM_TIS_SYSBUS_IRQ
+>>    acpi: Enable TPM IRQ
+>>    tests: Add updated DSDT
+>>    tpm: Guard irq related ops in case interrupts are disabled
+>>    tpm: Disable interrupt support for TIS on sysbus
+>>
+>>   hw/i386/acpi-build.c         |  11 +++++------
+>>   hw/tpm/tpm_tis_common.c      |  12 +++++++++---
+>>   hw/tpm/tpm_tis_isa.c         |  17 ++++++++++++++---
+>>   hw/tpm/tpm_tis_sysbus.c      |  12 +++++++++++-
+>>   include/hw/acpi/tpm.h        |   3 ++-
+>>   include/sysemu/tpm.h         |  12 ++++++++++++
+>>   tests/data/acpi/q35/DSDT.tis | Bin 8357 -> 8360 bytes
+>>   7 files changed, 53 insertions(+), 14 deletions(-)
+>>
+>> -- 
+>> 2.24.1
+>>
+>>
 
 
