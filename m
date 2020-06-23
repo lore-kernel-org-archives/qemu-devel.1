@@ -2,66 +2,63 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D08BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F33C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEB3920774
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9358E20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:57:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKGT/Jye"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB3920774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5CtX1mK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9358E20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnnAl-0001GL-6P
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:57:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50746)
+	id 1jnnAq-0001TQ-OW
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnn9T-00082d-9p
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:56:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55653
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnn9X-00084e-SG
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:56:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44782
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnn9Q-0007cI-Ut
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:56:06 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnn9V-0007e5-T4
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:56:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592934963;
+ s=mimecast20190719; t=1592934968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Is2tIf/0DtLHm8mVWWn82hWvvU03LrDXNghp6ja0Zdw=;
- b=eKGT/JyePkgOWR7pTGpOQIBrnu4/CJkFq62JpsSVVJvSpBvwr+QLs8w2R7IPTE/GohP2MF
- 9E+UhdvcIgYeveqQWg2lUsfAAYTs4AgwBnkNkKw8b/pA2VpZ7s8rQLBbt8/3kGb7rW60Ee
- 6BGEWjKMKal8ZqA6OJHkjYWjSRhlzVw=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ACeJ7euy7BFFPpxLQo0yFxVBVyvJxjkq3cB/Q/echJM=;
+ b=c5CtX1mK0NTChjz5aTuv+s4gy296a89s/127vwxCrxumK8T2hnruW4PIq6rWa0sVeYuV3/
+ wqerFbPlnJWt5FQNexi8Im0mnfiDWzvBwl6WyTrweMcADgtIMnP9cUvd2awMpGm7tBmCII
+ o0Y8W77duhPrAt7Bhs5I811kdDJ9Vgk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-wODfEqFEMdiC6HtJeFfl9g-1; Tue, 23 Jun 2020 13:55:59 -0400
-X-MC-Unique: wODfEqFEMdiC6HtJeFfl9g-1
+ us-mta-303-kVSS2slHM1CzZ9WD5Hb6_w-1; Tue, 23 Jun 2020 13:55:57 -0400
+X-MC-Unique: kVSS2slHM1CzZ9WD5Hb6_w-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47222100A61E;
- Tue, 23 Jun 2020 17:55:57 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-115-78.ams2.redhat.com [10.36.115.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2161C71688;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C66F71005513;
  Tue, 23 Jun 2020 17:55:55 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-115-78.ams2.redhat.com [10.36.115.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7DAD7169A;
+ Tue, 23 Jun 2020 17:55:54 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 1/2] vvfat: Check that updated filenames are valid
-Date: Tue, 23 Jun 2020 19:55:33 +0200
-Message-Id: <20200623175534.38286-2-kwolf@redhat.com>
-In-Reply-To: <20200623175534.38286-1-kwolf@redhat.com>
-References: <20200623175534.38286-1-kwolf@redhat.com>
+Subject: [PATCH 0/2] vvfat: Two small patches
+Date: Tue, 23 Jun 2020 19:55:32 +0200
+Message-Id: <20200623175534.38286-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
@@ -97,62 +94,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FAT allows only a restricted set of characters in file names, and for
-some of the illegal characters, it's actually important that we catch
-them: If filenames can contain '/', the guest can construct filenames
-containing "../" and escape from the assigned vvfat directory. The same
-problem could arise if ".." was ever accepted as a literal filename.
+This fixes two of the four cases (1. and 4.) reported in:
 
-Fix this by adding a check that all filenames are valid in
-check_directory_consistency().
+    https://bugs.launchpad.net/qemu/+bug/1883083
 
-Reported-by: Nathan Huckleberry <nhuck15@gmail.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/vvfat.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+The third case I attempted to fix looks a bit more complicated and I
+don't have the time right now to learn how vvfat really works, so let's
+merge these two patches at least.
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index c65a98e3ee..2fab371258 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -520,6 +520,25 @@ static void set_begin_of_direntry(direntry_t* direntry, uint32_t begin)
-     direntry->begin_hi = cpu_to_le16((begin >> 16) & 0xffff);
- }
- 
-+static bool valid_filename(const unsigned char *name)
-+{
-+    unsigned char c;
-+    if (!strcmp((const char*)name, ".") || !strcmp((const char*)name, "..")) {
-+        return false;
-+    }
-+    for (; (c = *name); name++) {
-+        if (!((c >= '0' && c <= '9') ||
-+              (c >= 'A' && c <= 'Z') ||
-+              (c >= 'a' && c <= 'z') ||
-+              c > 127 ||
-+              strchr("$%'-_@~`!(){}^#&.+,;=[]", c) != 0))
-+        {
-+            return false;
-+        }
-+    }
-+    return true;
-+}
-+
- static uint8_t to_valid_short_char(gunichar c)
- {
-     c = g_unichar_toupper(c);
-@@ -2098,6 +2117,10 @@ DLOG(fprintf(stderr, "check direntry %d:\n", i); print_direntry(direntries + i))
-             }
-             lfn.checksum = 0x100; /* cannot use long name twice */
- 
-+            if (!valid_filename(lfn.name)) {
-+                fprintf(stderr, "Invalid file name\n");
-+                goto fail;
-+            }
-             if (path_len + 1 + lfn.len >= PATH_MAX) {
-                 fprintf(stderr, "Name too long: %s/%s\n", path, lfn.name);
-                 goto fail;
+Kevin Wolf (2):
+  vvfat: Check that updated filenames are valid
+  vvfat: Fix array_remove_slice()
+
+ block/vvfat.c | 65 ++++++++++++++++++++++-----------------------------
+ 1 file changed, 28 insertions(+), 37 deletions(-)
+
 -- 
 2.25.4
 
