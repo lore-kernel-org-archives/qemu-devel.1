@@ -2,80 +2,87 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF99FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F09C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B41BB2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:41:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41BB2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A5AA32072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:44:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCZLuPfL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AA32072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnl3S-0004IE-R5
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51774)
+	id 1jnl6Q-00067a-KO
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:44:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnl2g-0003sh-R1
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:40:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57646)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnl2e-0000MV-Fx
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:40:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnl2c-00024f-0n
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 15:40:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 04F672E80E7
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 15:40:54 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnl5f-0005Fo-FX
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:44:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29746
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jnl5d-0001ib-Qt
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:44:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592927041;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HKWiIbEnoBKdrEpt4leFANplYkn60/HbZQG9iAnotP8=;
+ b=LCZLuPfLimMnYMqvfXh7yG3M0Or/CDSR2+cAzVBR0/JIycF7uWwiWDHew4Ldzf32qRyqut
+ a7F35/5XnrjOsrEiZx8WJDpP+gu3pVp1heUU9iXrsipZz3SxoPC4guMKNuKjsLzFUi7eWj
+ k/CPJfHU2qVcXKyYwpQwH9jgdLGf4pM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-GE8oYt_2NMWGgR_EhjhW6Q-1; Tue, 23 Jun 2020 11:43:57 -0400
+X-MC-Unique: GE8oYt_2NMWGgR_EhjhW6Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F1958031E1;
+ Tue, 23 Jun 2020 15:43:55 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9EC8C5C240;
+ Tue, 23 Jun 2020 15:43:42 +0000 (UTC)
+Date: Tue, 23 Jun 2020 17:43:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 2/7] accel/kvm: Simplify kvm_check_extension()
+Message-ID: <20200623174340.0dbc1989.cohuck@redhat.com>
+In-Reply-To: <20200623105052.1700-3-philmd@redhat.com>
+References: <20200623105052.1700-1-philmd@redhat.com>
+ <20200623105052.1700-3-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2020 15:33:42 -0000
-From: Alexander Bulekov <1878067@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-References: <158922026261.5250.13637087242622903872.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159292642308.25602.11049384012779707493.malone@gac.canonical.com>
-Subject: [Bug 1878067] Re: Assertion failure in eth_get_gso_type through the
- e1000e
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0d3663248f8fa36d0001384ebe5acdbc18ad1aa5
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 09:11:11
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,149 +91,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878067 <1878067@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ qemu-s390x@nongnu.org, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here is a shorter reporoducer:
-cat << EOF | ./i386-softmmu/qemu-system-i386 -qtest stdio -monitor none -se=
-rial none -M pc-q35-5.0 -nographic
-outl 0xcf8 0x80001010
-outl 0xcfc 0xe1020000
-outl 0xcf8 0x80001014
-outl 0xcf8 0x80001004
-outw 0xcfc 0x7
-outl 0xcf8 0x800010a2
-write 0xe1020420 0x4 0xffffffff
-write 0xe1020424 0x4 0xffffffff
-write 0xe1025008 0x4 0x05d88600
-write 0xe1020103 0x26 0xffffff00ffffffffffffef56fffffffffffffffffffffffffff=
-fffffffffff00ffffffffffff
-write 0xe1020403 0x1 0xff
-write 0xe102042a 0xf 0xffffffffffffffff00ffffffffffffe
-EOF
+On Tue, 23 Jun 2020 12:50:47 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
--- =
+> In previous commit we let kvm_check_extension() use the
+> global kvm_state. Since the KVMState* argument is now
+> unused, drop it.
+>=20
+> Convert callers with this Coccinelle script:
+>=20
+>   @@
+>   expression kvm_state, extension;
+>   @@
+>   -   kvm_check_extension(kvm_state, extension)
+>   +   kvm_check_extension(extension)
+>=20
+> Unused variables manually removed:
+> - CPUState* in hyperv_enabled()
+> - KVMState* in kvm_arm_get_max_vm_ipa_size()
+>=20
+> Inspired-by: Paolo Bonzini <pbonzini@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878067
+=F0=9F=8C=9F=F0=9F=92=A1=F0=9F=8C=9F
 
-Title:
-  Assertion failure in eth_get_gso_type through the e1000e
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  include/sysemu/kvm.h         |  2 +-
+>  accel/kvm/kvm-all.c          | 64 ++++++++++++++++++------------------
+>  hw/hyperv/hyperv.c           |  2 +-
+>  hw/i386/kvm/clock.c          |  2 +-
+>  hw/i386/kvm/i8254.c          |  4 +--
+>  hw/i386/kvm/ioapic.c         |  2 +-
+>  hw/intc/arm_gic_kvm.c        |  2 +-
+>  hw/intc/openpic_kvm.c        |  2 +-
+>  hw/intc/xics_kvm.c           |  2 +-
+>  hw/s390x/s390-stattrib-kvm.c |  2 +-
+>  target/arm/kvm.c             | 13 ++++----
+>  target/arm/kvm32.c           |  2 +-
+>  target/arm/kvm64.c           | 15 ++++-----
+>  target/i386/kvm.c            | 61 ++++++++++++++++------------------
+>  target/mips/kvm.c            |  4 +--
+>  target/ppc/kvm.c             | 34 +++++++++----------
+>  target/s390x/cpu_models.c    |  3 +-
+>  target/s390x/kvm.c           | 30 ++++++++---------
+>  18 files changed, 119 insertions(+), 127 deletions(-)
 
-Status in QEMU:
-  New
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an assertion failure in
-  eth_get_gso_type through the e1000e:
-
-  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
-  #2  0x00007ffff7c75dc3 in  () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so=
-.0
-  #3  0x00007ffff7cd0b0a in g_assertion_message_expr () at /usr/lib/x86_64-=
-linux-gnu/libglib-2.0.so.0
-  #4  0x0000555556875f33 in eth_get_gso_type (l3_proto=3D<optimized out>, l=
-3_hdr=3D<optimized out>, l4proto=3D<optimized out>) at /home/alxndr/Develop=
-ment/qemu/net/eth.c:76
-  #5  0x00005555565e09ac in net_tx_pkt_get_gso_type (pkt=3D0x631000014800, =
-tso_enable=3D0x1) at /home/alxndr/Development/qemu/hw/net/net_tx_pkt.c:300
-  #6  0x00005555565e09ac in net_tx_pkt_build_vheader (pkt=3D0x631000014800,=
- tso_enable=3D<optimized out>, csum_enable=3D<optimized out>, gso_size=3D<o=
-ptimized out>) at /home/alxndr/Development/qemu/hw/net/net_tx_pkt.c:316
-  #7  0x000055555660bdb1 in e1000e_setup_tx_offloads (core=3D0x7fffeeb754e0=
-, tx=3D0x7fffeeb95748) at /home/alxndr/Development/qemu/hw/net/e1000e_core.=
-c:637
-  #8  0x000055555660bdb1 in e1000e_tx_pkt_send (core=3D0x7fffeeb754e0, tx=
-=3D0x7fffeeb95748, queue_index=3D<optimized out>) at /home/alxndr/Developme=
-nt/qemu/hw/net/e1000e_core.c:658
-  #9  0x000055555660bdb1 in e1000e_process_tx_desc (core=3D0x7fffeeb754e0, =
-tx=3D0x7fffeeb95748, dp=3D<optimized out>, queue_index=3D<optimized out>) a=
-t /home/alxndr/Development/qemu/hw/net/e1000e_core.c:743
-  #10 0x000055555660bdb1 in e1000e_start_xmit (core=3Dcore@entry=3D0x7fffee=
-b754e0, txr=3D<optimized out>, txr@entry=3D0x7fffffffbe60) at /home/alxndr/=
-Development/qemu/hw/net/e1000e_core.c:934
-  #11 0x0000555556607e2e in e1000e_set_tctl (core=3D0x7fffeeb754e0, index=
-=3D<optimized out>, val=3D<optimized out>) at /home/alxndr/Development/qemu=
-/hw/net/e1000e_core.c:2431
-  #12 0x00005555565f90fd in e1000e_core_write (core=3D<optimized out>, addr=
-=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /home=
-/alxndr/Development/qemu/hw/net/e1000e_core.c:3261
-  #13 0x0000555555ff4337 in memory_region_write_accessor (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
->, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:483
-  #14 0x0000555555ff3ce0 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x7fffeeb75110, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #15 0x0000555555ff3ce0 in memory_region_dispatch_write (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, data=3D0x2b, op=3D<optimized out>, attrs=3D...=
-) at /home/alxndr/Development/qemu/memory.c:1476
-
-  I can reproduce it in qemu 5.0 built with using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -netdev user,id=3Dqtest-bn0 -device e1000e,netdev=3Dqtest-bn0 -dis=
-play none -nodefaults -nographic -qtest stdio -monitor none -serial none
-  outl 0xcf8 0x80000810
-  outl 0xcfc 0xe0000000
-  outl 0xcf8 0x80000814
-  outl 0xcf8 0x80000804
-  outw 0xcfc 0x7
-  outl 0xcf8 0x800008a2
-  write 0xe0000420 0x1fc 0x3ff9ffdf00000000002467ff272d2f3ff9ffdf0000000000=
-246fff272d2f3ff9ffdf00000000002477ff272d2f3ff9ffdf0000000000247fff272d2f3ff=
-9ffdf00000000002487ff272d2f3ff9ffdf0000000000248fff272d2f3ff9ffdf0000000000=
-2497ff272d2f3ff9ffdf0000000000249fff272d2f3ff9ffdf000000000024a7ff272d2f3ff=
-9ffdf000000000024afff272d2f3ff9ffdf000000000024b7ff272d2f3ff9ffdf0000000000=
-24bfff272d2f3ff9ffdf000000000024c7ff272d2f3ff9ffdf000000000024cfff272d2f3ff=
-9ffdf000000000024d7ff272d2f3ff9ffdf000000000024dfff272d2f3ff9ffdf0000000000=
-24e7ff272d2f3ff9ffdf000000000024efff272d2f3ff9ffdf000000000024f7ff272d2f3ff=
-9ffdf000000000024ffff272d2f3ff9ffdf00000000002407ff272d2f3ff9ffdf0000000000=
-240fff272d2f3ff9ffdf00000000002417ff272d2f3ff9ffdf0000000000241fff272d2f3ff=
-9ffdf00000000002427ff272d2f3ff9ffdf0000000000242fff272d2f3ff9ffdf0000000000=
-2437ff272d2f3ff9ffdf0000000000243fff272d2f3ff9ffdf00000000002447ff272d2f3ff=
-9ffdf0000000000244fff272d2f3ff9ffdf00000000002457ff272d2f3ff9ffdf0000000000=
-245fff272d2f3ff9ffdf00000000002467ff272d2f3ff9ffdf0000000000246fff27
-  write 0xe00000b8 0x349 0xa300f52bff003100ffa300f52bff003100ffa300f52bff00=
-3100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00310=
-0ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ff=
-a300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa30=
-0f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f5=
-2bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bf=
-f003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00=
-3100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00310=
-0ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ff=
-a300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa30=
-0f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f5=
-2bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bf=
-f003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00=
-3100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00310=
-0ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ff=
-a300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa30=
-0f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f5=
-2bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bf=
-f003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00=
-3100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff00310=
-0ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ff=
-a300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52bff003100ffa30=
-0f52bff003100ffa300f52bff003100ffa300f52bff003100ffa300f52b
-  EOF
-
-  I also attached the trace to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -netdev user,id=3Dqtest-bn0 -device
-  e1000e,netdev=3Dqtest-bn0 -display none -nodefaults -nographic -qtest
-  stdio -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878067/+subscriptions
 
