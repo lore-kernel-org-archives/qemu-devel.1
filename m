@@ -6,76 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956E1C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:07:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E91320776
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6022920716
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:07:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OllQbGUN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E91320776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HsusJR9r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6022920716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jniaw-000252-M4
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:04:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50082)
+	id 1jnidt-0004Eg-MT
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:07:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jniaA-0001Em-Tc
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:03:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32088
+ id 1jnidG-0003oy-TB
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:06:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45479
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jnia8-0003Pe-79
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:03:22 -0400
+ id 1jnidE-0004g0-VM
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:06:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592917398;
+ s=mimecast20190719; t=1592917591;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nhooRDZRoeoCB8hD8sojsZV4rMxRQ+mOUNx4EzvRRjg=;
- b=OllQbGUNzjlGRh57Fky2M53/0iozxCMcvgVVsm7f3mnQ6RaDmMwqO+GO/rASlhJQ5yKarf
- lRkilsyHhsJW5tSV/QoxS24x7RydpbEoyFMYU+/ip3pKoZzjDK+dZxCpL0svosqA/UUPtp
- qY5umZd0/wAkH2jFOCl0hDIpmEv5/hs=
+ bh=9AyIZYxqVh6ZGmmxCcEC0ZfEXaJoEdOKhh+Zece7bsY=;
+ b=HsusJR9rb1oiwj/10LLAPM4gKRO9l3x9QYxVav5dWg1QKoaMJ12q4F5Vms3i4EDg2SU7ee
+ j7IsLSYmdulxZCKOnYmcdEc0hhZUObOJMXanxrYNCfkO3GO7Z5szRod1u6J52d2RQFMt/p
+ ZD5hXtbqlE2/Iw+/hIfweyIfebBajwc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-FhgTfHbjOQ-i6PwdoNntRQ-1; Tue, 23 Jun 2020 09:02:12 -0400
-X-MC-Unique: FhgTfHbjOQ-i6PwdoNntRQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-138--9DzI9mqPJunI3wrZYRTOQ-1; Tue, 23 Jun 2020 09:06:29 -0400
+X-MC-Unique: -9DzI9mqPJunI3wrZYRTOQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EFC08031C2;
- Tue, 23 Jun 2020 13:02:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F0A9107ACF5;
+ Tue, 23 Jun 2020 13:06:28 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.11])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 161215C1D4;
- Tue, 23 Jun 2020 13:01:57 +0000 (UTC)
-Date: Tue, 23 Jun 2020 15:01:56 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F245C60CD3;
+ Tue, 23 Jun 2020 13:06:13 +0000 (UTC)
+Date: Tue, 23 Jun 2020 15:06:12 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Subject: Re: [PATCH v4 5/8] acpi: Enable TPM IRQ
-Message-ID: <20200623150156.2e350e18@redhat.com>
-In-Reply-To: <20200617142305.1198672-6-stefanb@linux.vnet.ibm.com>
+Subject: Re: [PATCH v4 6/8] tests: Add updated DSDT
+Message-ID: <20200623150612.49a6c097@redhat.com>
+In-Reply-To: <20200617142305.1198672-7-stefanb@linux.vnet.ibm.com>
 References: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
- <20200617142305.1198672-6-stefanb@linux.vnet.ibm.com>
+ <20200617142305.1198672-7-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,70 +101,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 17 Jun 2020 10:23:02 -0400
+On Wed, 17 Jun 2020 10:23:03 -0400
 Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 
-> From: Stefan Berger <stefanb@linux.ibm.com>
+> Add the updated DSDT following the interrupt enablement.
 >=20
-> Move the TPM TIS IRQ to unused IRQ 13, which is the only one accepted by
-> Windows. Query for the TPM's irq number and enable the TPM IRQ unless
-> TPM_IRQ_DISABLED is returned.
+> @@ -5,13 +5,13 @@
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/q35/DSDT.tis, Mon Jun 15 09:57:05 2020
+> + * Disassembly of /tmp/aml-Y77YL0, Mon Jun 15 09:57:05 2020
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000020A5 (8357)
+> + *     Length           0x000020A8 (8360)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math supp=
+ort
+> - *     Checksum         0xAD
+> + *     Checksum         0x77
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPCDSDT"
+>   *     OEM Revision     0x00000001 (1)
+> @@ -3162,6 +3162,8 @@
+>                          0xFED40000,         // Address Base
+>                          0x00005000,         // Address Length
+>                          )
+> +                    IRQNoFlags ()
+> +                        {13}
+>                  })
+>                  OperationRegion (TPP2, SystemMemory, 0xFED45100, 0x5A)
+>                  Field (TPP2, AnyAcc, NoLock, Preserve)
+> **
 >=20
 > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Message-id: 20200616205721.1191408-6-stefanb@linux.vnet.ibm.com
+> Message-id: 20200616205721.1191408-7-stefanb@linux.vnet.ibm.com
 > CC: Michael S. Tsirkin <mst@redhat.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->  hw/i386/acpi-build.c  | 11 +++++------
->  include/hw/acpi/tpm.h |  2 +-
->  2 files changed, 6 insertions(+), 7 deletions(-)
+>  tests/data/acpi/q35/DSDT.tis                | Bin 8357 -> 8360 bytes
+>  tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+>  2 files changed, 1 deletion(-)
 >=20
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 900f786d08..bb9a7f8497 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2021,6 +2021,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en=
-);
-> =20
->              if (TPM_IS_TIS_ISA(tpm)) {
-> +                int8_t irq =3D tpm_get_irqnum(tpm);
->                  if (misc->tpm_version =3D=3D TPM_VERSION_2_0) {
->                      dev =3D aml_device("TPM");
->                      aml_append(dev, aml_name_decl("_HID",
-> @@ -2035,12 +2036,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
-,
->                  crs =3D aml_resource_template();
->                  aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
->                             TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-> -                /*
-> -                    FIXME: TPM_TIS_IRQ=3D5 conflicts with PNP0C0F irqs,
-> -                    Rewrite to take IRQ from TPM device model and
-> -                    fix default IRQ value there to use some unused IRQ
-> -                 */
-> -                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
-> +
-> +                if (irq !=3D TPM_IRQ_DISABLED) {
-> +                    aml_append(crs, aml_irq_no_flags(irq));
-> +                }
->                  aml_append(dev, aml_name_decl("_CRS", crs));
-> =20
->                  tpm_build_ppi_acpi(tpm, dev);
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index d5caee9771..d356f2e06e 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -24,7 +24,7 @@
->  #define TPM_TIS_ADDR_BASE           0xFED40000
->  #define TPM_TIS_ADDR_SIZE           0x5000
-> =20
-> -#define TPM_TIS_ISA_IRQ             5
-> +#define TPM_TIS_ISA_IRQ             13    /* only one possible */
->  #define TPM_TIS_SYSBUS_IRQ          5
-> =20
->  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+> diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+> index 56b6fb0c3298517d080e38fea05a748b9f1dba54..3f9db960aa05d399fa7f8449e=
+6db688788211832 100644
+> GIT binary patch
+> delta 64
+> zcmZ4LxWbXkCD<iog#rTuWBEp|KeC)oS~2m#PVoX>llkS`nVeK7N60A%iEs(FaWXJ6
+> UFkJb^5Wv8o#GtUbT~3Y(068!Z;Q#;t
+>=20
+> delta 61
+> zcmZ4CxYUu$CD<iosR9E7<Jyf}e`GoRHDls~o#F-DC-cj>Gx@7bj*wH}7v$n=3D<78lD
+> RV7T&+A%KBlbC;YP695=3D#58(g+
+>=20
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
+os-tables-test-allowed-diff.h
+> index bb4ce8967b..dfb8523c8b 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,2 +1 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/q35/DSDT.tis",
 
 
