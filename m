@@ -2,111 +2,89 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1639C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC538C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B023820768
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:38:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8DFA20723
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IqH450CZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B023820768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbI+4RZ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DFA20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnfNV-0002WX-Uz
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:38:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60986)
+	id 1jnfOF-0004K4-Te
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:38:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
- id 1jnfKg-0006FO-W3
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:35:11 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:38686)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
- id 1jnfKe-0002PL-SU
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:35:10 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05N9GRAs018714;
- Tue, 23 Jun 2020 09:35:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=vmTtrMHoiA3S4bpytCmU19WHDVMsvnzESuYGioZFyjk=;
- b=IqH450CZ9MUCIoZCPJqByhiEOCb+NTzASjArjSboBN8MNSAsoHzRlZAeVeTkK8T00aF5
- B1GNzI5bzCiv2+seCnb6iP90dIWj94A4ABLsu32zG9KOErZ0IJa8BpJx62GJLPmJ+X6H
- yKZxlYCOKt2aDnUnRUXJoLBEdB2DHOzz/C4uwj/q5EQgG9ibUJoHiZ6A0/aBrPqkVzR1
- qDAtIh7CjPiHsThbtd2Zbck6MWoXYyDB7sQEnIhWJCciUplPWw3G7Q37WJu+xRXJBp3L
- ZsWtCG8i4jim/4pKcf9E1gijfKiaF8Kby9Xxvn6Fj32CUxB5FtlSosC8VybytROEMMrl JA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 31sebbm73y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Tue, 23 Jun 2020 09:35:05 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05N9I0BV034912;
- Tue, 23 Jun 2020 09:35:04 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 31svc3nrmv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 09:35:04 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05N9Z2Fg007217;
- Tue, 23 Jun 2020 09:35:02 GMT
-Received: from [192.168.14.112] (/79.176.227.138)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 23 Jun 2020 09:35:02 +0000
-Subject: Re: [PULL 027/115] hw/i386/vmport: Propagate IOPort read to vCPU EAX
- register
-To: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- qemu-devel@nongnu.org
-References: <20200611194449.31468-1-pbonzini@redhat.com>
- <20200611194449.31468-28-pbonzini@redhat.com>
- <f6f506ab-99a9-0f64-3bc0-2090f58f80f0@redhat.com>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <db41f0d2-386c-44c9-9b44-2e1e72648e2a@oracle.com>
-Date: Tue, 23 Jun 2020 12:34:59 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jnfJC-0003UN-UX
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:33:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21691
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jnfJ9-0001c2-Qx
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:33:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592904815;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ntfAOaCI8FsWFg2XJLaPdm8Y+EgB6Ug4QecggYSwpuM=;
+ b=GbI+4RZ3xlTJbGkNsgZgTVVAGzvqErMRQk6mR2ZvoqwA2Jw58Ptfn89YiWrsPoPCbIzFMW
+ T+Y+TtlHxlvT+R/53QyJ0QpqqMv0J3cZ+vX0/7Q0kuLn3hRNDs10cXZXKOKBGEzHgyrHUH
+ BfR+kNbkyNtVRWkYzflW+ZYv+JXF5NQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-midXjykaO7WwtYoj8N6MgA-1; Tue, 23 Jun 2020 05:33:31 -0400
+X-MC-Unique: midXjykaO7WwtYoj8N6MgA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FFDF1005513;
+ Tue, 23 Jun 2020 09:33:30 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAA1B19D7F;
+ Tue, 23 Jun 2020 09:33:27 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
+ armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
+ bbhushan2@marvell.com, peterx@redhat.com
+Subject: [PATCH v4 5/5] hw/arm/virt: Let the virtio-iommu bypass MSIs
+Date: Tue, 23 Jun 2020 11:32:44 +0200
+Message-Id: <20200623093244.24931-6-eric.auger@redhat.com>
+In-Reply-To: <20200623093244.24931-1-eric.auger@redhat.com>
+References: <20200623093244.24931-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f6f506ab-99a9-0f64-3bc0-2090f58f80f0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- phishscore=0 bulkscore=0
- spamscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006230074
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- lowpriorityscore=0
- mlxlogscore=999 cotscore=-2147483648 mlxscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 suspectscore=0 clxscore=1011
- impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006230074
-Received-SPF: pass client-ip=156.151.31.86; envelope-from=liran.alon@oracle.com;
- helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 05:35:05
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,82 +97,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nikita Leshenko <nikita.leshchenko@oracle.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+At the moment the virtio-iommu translates MSI transactions.
+This behavior is inherited from ARM SMMU. The virt machine
+code knows where the guest MSI doorbells are so we can easily
+declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
+setting the guest will not map MSIs through the IOMMU and those
+transactions will be simply bypassed.
 
-On 23/06/2020 11:46, Laurent Vivier wrote:
-> On 11/06/2020 21:43, Paolo Bonzini wrote:
->> From: Liran Alon <liran.alon@oracle.com>
->>
->> vmport_ioport_read() returns the value that should propagate to vCPU EAX
->> register when guest reads VMPort IOPort (i.e. By x86 IN instruction).
->>
->> However, because vmport_ioport_read() calls cpu_synchronize_state(), the
->> returned value gets overridden by the value in QEMU vCPU EAX register.
->> i.e. cpu->env.regs[R_EAX].
->>
->> To fix this issue, change vmport_ioport_read() to explicitly override
->> cpu->env.regs[R_EAX] with the value it wish to propagate to vCPU EAX
->> register.
->>
->> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->> Message-Id: <20200312165431.82118-4-liran.alon@oracle.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   hw/core/machine.c |  1 +
->>   hw/i386/vmport.c  | 32 +++++++++++++++++++++++++++++---
->>   2 files changed, 30 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index bb3a7b18b1..83f0fe5c91 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -43,6 +43,7 @@ GlobalProperty hw_compat_4_2[] = {
->>       { "qxl", "revision", "4" },
->>       { "qxl-vga", "revision", "4" },
->>       { "fw_cfg", "acpi-mr-restore", "false" },
->> +    { "vmport", "x-read-set-eax", "off" },
-> This is modifying the hw_compat_4_2 properties while qemu-5.0 has been
-> already released. I think all the vmport property updates [1] should go
-> to hw_compat_5_0.
->
-> Liran? Paolo?
+Depending on which MSI controller is in use (ITS or GICV2M),
+we declare either:
+- the ITS interrupt translation space (ITS_base + 0x10000),
+  containing the GITS_TRANSLATOR or
+- The GICV2M single frame, containing the MSI_SETSP_NS register.
 
-When I submitted these patches, QEMU 5.0 wasn't released yet. That's why 
-I updated hw_compat_4_2[].
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-Having said that, I believe the compatibility risk here is very small 
-and therefore because QEMU 5.0 was
-released for a very short time-span before these patches were merged, 
-I'm not sure it's really preferable
-to move these flags to hw_compat_5_0[]. But I will leave this for Paolo 
-to decide.
-(Note that moving these flags will also risk in comparability people 
-running with current patches and
-specifying explicitly machine-type 5.0...)
+---
+v3 -> v4:
+- use ':' as separators
 
--Liran
+v2 -> v3:
+- Add a new value to VirtMSIControllerType
 
->
-> Thanks,
-> Laurent
->
-> [1]
->
-> b889212973da hw/i386/vmport: Propagate IOPort read to vCPU EAX register
-> 0342ee761ef2 hw/i386/vmport: Set EAX to -1 on failed and unsupported
-> commands
-> f8bdc550370f hw/i386/vmport: Report vmware-vmx-type in CMD_GETVERSION
-> aaacf1c15a22 hw/i386/vmport: Add support for CMD_GETBIOSUUID
->
->      { "vmport", "x-read-set-eax", "off" },
->      { "vmport", "x-signal-unsupported-cmd", "off" },
->      { "vmport", "x-report-vmx-type", "off" },
->      { "vmport", "x-cmds-v2", "off" },
->
+v1 -> v2:
+- Test which MSI controller is instantiated
+- If GICV2M is in use, declare its doorbell as an MSI doorbell too
+---
+ include/hw/arm/virt.h |  7 +++++++
+ hw/arm/virt.c         | 18 ++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 31878ddc72..a18b6b397b 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -96,6 +96,12 @@ typedef enum VirtIOMMUType {
+     VIRT_IOMMU_VIRTIO,
+ } VirtIOMMUType;
+ 
++typedef enum VirtMSIControllerType {
++    VIRT_MSI_CTRL_NONE,
++    VIRT_MSI_CTRL_GICV2M,
++    VIRT_MSI_CTRL_ITS,
++} VirtMSIControllerType;
++
+ typedef enum VirtGICType {
+     VIRT_GIC_VERSION_MAX,
+     VIRT_GIC_VERSION_HOST,
+@@ -136,6 +142,7 @@ typedef struct {
+     OnOffAuto acpi;
+     VirtGICType gic_version;
+     VirtIOMMUType iommu;
++    VirtMSIControllerType msi_controller;
+     uint16_t virtio_iommu_bdf;
+     struct arm_boot_info bootinfo;
+     MemMapEntry *memmap;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index caceb1e4a0..75cf31fcba 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -602,6 +602,7 @@ static void create_its(VirtMachineState *vms)
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vms->memmap[VIRT_GIC_ITS].base);
+ 
+     fdt_add_its_gic_node(vms);
++    vms->msi_controller = VIRT_MSI_CTRL_ITS;
+ }
+ 
+ static void create_v2m(VirtMachineState *vms)
+@@ -622,6 +623,7 @@ static void create_v2m(VirtMachineState *vms)
+     }
+ 
+     fdt_add_v2m_gic_node(vms);
++    vms->msi_controller = VIRT_MSI_CTRL_GICV2M;
+ }
+ 
+ static void create_gic(VirtMachineState *vms)
+@@ -2149,8 +2151,24 @@ out:
+ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+                                             DeviceState *dev, Error **errp)
+ {
++    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
++
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         virt_memory_pre_plug(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
++        /* we declare a VIRTIO_IOMMU_RESV_MEM_T_MSI region */
++
++        if (vms->msi_controller == VIRT_MSI_CTRL_ITS) {
++            /* GITS_TRANSLATER page */
++            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
++            qdev_prop_set_string(dev, "reserved-regions[0]",
++                                 "0x8090000:0x809FFFF:1");
++        } else if (vms->msi_controller == VIRT_MSI_CTRL_GICV2M) {
++            /* MSI_SETSPI_NS page */
++            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
++            qdev_prop_set_string(dev, "reserved-regions[0]",
++                                 "0x8020000:0x8020FFF:1");
++        }
+     }
+ }
+ 
+-- 
+2.20.1
+
 
