@@ -2,78 +2,86 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444C1C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42396C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:02:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B31920716
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 122812078B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:02:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTkwnBwJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B31920716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhAsivyA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 122812078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jndmr-0005hh-6t
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:56:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
+	id 1jndsy-0000hb-9H
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:02:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jndmA-00055j-P7
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:55:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44043
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jndrv-0007qq-DJ
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:01:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25175
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jndm8-0003A9-7p
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:55:26 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jndrt-0007h8-7b
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:01:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592898922;
+ s=mimecast20190719; t=1592899279;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cx7SEMt+NrtXD1GH9SKknbdAgUCMl5n5xMeIVJC11Dg=;
- b=LTkwnBwJS9ko2/NZA6J086ETYat+3ArkyHmtENgXjB9cddssLcKNfHb2XDsc/RkWrh45CT
- 6MCGY2jenMVFX5wUZ3T8wIFFOptBFCmH4BxGrfcQt/GVXxhRxobmflY0rtLKAT3IjJLhsY
- j/iD962sJhCpbiA7oXlRY4Qxu7twf80=
+ bh=g9A41gXSHBekuAZBKlyRF1tjqiShsTmNHyInAZGqj70=;
+ b=dhAsivyAdG16Eh9cKTj2YYbA4sztLwbztSMDHFA75yv/jcz2s7eXWbxBzv+AxLyJjFoUAY
+ gTMac19UAnSumK1cOAN02UFG4o44HCtzdC+KPPmF5NLEo7VcpsKs7ik17/2mk5QT4JsDqb
+ QI/Z01fwqLBfmaPItN8+VscrfIZ01ho=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-YAmU_3MSOmuM5enWs7yOBQ-1; Tue, 23 Jun 2020 03:55:19 -0400
-X-MC-Unique: YAmU_3MSOmuM5enWs7yOBQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-13-VWgkAppnNQib4u2upeGNOA-1; Tue, 23 Jun 2020 04:01:17 -0400
+X-MC-Unique: VWgkAppnNQib4u2upeGNOA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAEACA2F90;
- Tue, 23 Jun 2020 07:54:45 +0000 (UTC)
-Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 69ECD19930;
- Tue, 23 Jun 2020 07:54:34 +0000 (UTC)
-Date: Tue, 23 Jun 2020 09:54:31 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH QEMU v25 04/17] vfio: Add migration region
- initialization and finalize function
-Message-ID: <20200623095431.30bdf9e3.cohuck@redhat.com>
-In-Reply-To: <1592684486-18511-5-git-send-email-kwankhede@nvidia.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-5-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5B7A8031CB;
+ Tue, 23 Jun 2020 08:01:15 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61CD67CAA3;
+ Tue, 23 Jun 2020 08:01:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D1A00113846D; Tue, 23 Jun 2020 10:01:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 1/9] hw/i2c/core: Add i2c_try_create_slave() and
+ i2c_realize_and_unref()
+References: <20200622183428.12255-1-f4bug@amsat.org>
+ <20200622183428.12255-2-f4bug@amsat.org>
+Date: Tue, 23 Jun 2020 10:01:13 +0200
+In-Reply-To: <20200622183428.12255-2-f4bug@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 22 Jun 2020 20:34:20
+ +0200")
+Message-ID: <875zbimcs6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,83 +102,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
- ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?utf-8?Q?C=C3=A9d?= =?utf-8?Q?ric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 21 Jun 2020 01:51:13 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> Whether the VFIO device supports migration or not is decided based of
-> migration region query. If migration region query is successful and migration
-> region initialization is successful then migration is supported else
-> migration is blocked.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Extract i2c_try_create_slave() and i2c_realize_and_unref()
+> from i2c_create_slave().
+> We can now set properties on a I2CSlave before it is realized.
+>
+> This is in line with the recent qdev/QOM changes merged
+> in commit 6675a653d2e.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/vfio/Makefile.objs         |   2 +-
->  hw/vfio/migration.c           | 142 ++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events          |   3 +
->  include/hw/vfio/vfio-common.h |   9 +++
->  4 files changed, 155 insertions(+), 1 deletion(-)
->  create mode 100644 hw/vfio/migration.c
-
-(...)
-
-> +static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
-> +{
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    Object *obj = NULL;
-> +    int ret = -EINVAL;
-> +
-> +    if (!vbasedev->ops->vfio_get_object) {
-> +        return ret;
-> +    }
-> +
-> +    obj = vbasedev->ops->vfio_get_object(vbasedev);
-> +    if (!obj) {
-> +        return ret;
-> +    }
-> +
-> +    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
-> +                            "migration");
-> +    if (ret) {
-> +        error_report("%s: Failed to setup VFIO migration region %d: %s",
-> +                     vbasedev->name, index, strerror(-ret));
-> +        goto err;
-> +    }
-> +
-> +    if (!migration->region.size) {
-> +        ret = -EINVAL;
-> +        error_report("%s: Invalid region size of VFIO migration region %d: %s",
-> +                     vbasedev->name, index, strerror(-ret));
-
-Instead of only checking for size != 0, should we also check that the
-region has a certain expected size or minimum size?
-
-> +        goto err;
-> +    }
-> +
-> +    return 0;
-> +
-> +err:
-> +    vfio_migration_region_exit(vbasedev);
-> +    return ret;
+> Cc: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/hw/i2c/i2c.h |  2 ++
+>  hw/i2c/core.c        | 18 ++++++++++++++++--
+>  2 files changed, 18 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+> index 4117211565..d6e3d85faf 100644
+> --- a/include/hw/i2c/i2c.h
+> +++ b/include/hw/i2c/i2c.h
+> @@ -80,6 +80,8 @@ int i2c_send(I2CBus *bus, uint8_t data);
+>  uint8_t i2c_recv(I2CBus *bus);
+> =20
+>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
+r);
+> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
+> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
+> =20
+>  /* lm832x.c */
+>  void lm832x_key_event(DeviceState *dev, int key, int state);
+> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+> index 1aac457a2a..acf34a12d6 100644
+> --- a/hw/i2c/core.c
+> +++ b/hw/i2c/core.c
+> @@ -267,13 +267,27 @@ const VMStateDescription vmstate_i2c_slave =3D {
+>      }
+>  };
+> =20
+> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
+r)
+> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
+>  {
+>      DeviceState *dev;
+> =20
+>      dev =3D qdev_new(name);
+>      qdev_prop_set_uint8(dev, "address", addr);
+> -    qdev_realize_and_unref(dev, &bus->qbus, &error_fatal);
+> +    return dev;
 > +}
 > +
+> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
+> +{
+> +    return qdev_realize_and_unref(dev, &bus->qbus, errp);
+> +}
+> +
+> +DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
+r)
+> +{
+> +    DeviceState *dev;
+> +
+> +    dev =3D i2c_try_create_slave(name, addr);
+> +    i2c_realize_and_unref(dev, bus, &error_fatal);
+> +
+>      return dev;
+>  }
 
-(...)
+We use "create_simple" names for functions that allocate, initialize,
+configure and realize device objects: pci_create_simple(),
+isa_create_simple(), usb_create_simple().  Calling this one
+i2c_create_slave() is okay with me.  I'd prefer
+i2c_slave_create_simple(), though.
 
-Else looks good to me.
+We use "new" names for functions that allocate and initialize device
+objects: pci_new(), isa_new(), usb_new().  Let's call this one
+i2c_slave_new().
+
+Your use of "realize_and_unref" matches existing names elsewhere:
+pci_realize_and_unref(), isa_realize_and_unref(),
+usb_realize_and_unref().  However, the other two i2c functions are
+called i2c_slave_FOO(), not i2c_FOO().  You could name this one
+i2c_slave_realize_and_unref().  Another path to consistency: drop the
+slave_ from all three names.
+
+Ideally with my naming suggestions considered:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
