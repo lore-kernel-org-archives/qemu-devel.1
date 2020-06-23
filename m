@@ -2,98 +2,89 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D386C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7053AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D78C2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:07:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B87B207E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:22:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mqb+aQX8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D78C2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLcP6ukw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B87B207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnnK3-0008KF-Dr
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 14:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56140)
+	id 1jnnZ1-0008H0-FT
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 14:22:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnnJK-0007hr-FO
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:06:18 -0400
-Received: from mail-pj1-x102f.google.com ([2607:f8b0:4864:20::102f]:39591)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnnJI-0005y0-Gn
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:06:18 -0400
-Received: by mail-pj1-x102f.google.com with SMTP id b92so209037pjc.4
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 11:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sqH3myKxhwObTCSAf3M49mrxAdHCZocAEtDKioaAzH8=;
- b=Mqb+aQX8+FwMdtN+whrVdpi0VyHLUP5/6/c0pC5qyGH9fp4X30+vLVpZ0QEQPWglF4
- SO4GYoxudjxtIXDHxl3PF8lNPTHKViwP4MeC7tmzg3gIwJdQaNOrA31sZ5u3AkULl01i
- wJaxE6f1npqV94XT0tTMz+pjCkgjheTAkQ3SpcKwXFFH1J9bvAfdBiVzxIMuLOfc/vPI
- mYnGv8oxXfOWk+p12WRy95+OBGjW0+wQg75Qxb9tcOCXNoClV0Gji63LAT7P4N/UfPhA
- JnW5dcJNAJGAgAj5LFoIDYgXgi6wao1EsBFtdqB6aOIIYef7OLMXuxm1AdccI59SJMjm
- fNdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sqH3myKxhwObTCSAf3M49mrxAdHCZocAEtDKioaAzH8=;
- b=jUT2tXrxOIjcPdT7g5kN5N0GJjq2/sJoiTjV4qDs/I8p1j0EXwbYbR9Vsy9LZqHB1t
- ck+sQvLKPMprIWrWqImCdiNNqjsjiXBqVAaiS9DGXPJifBGPsEI7bA0LmB7+WUWsCUdI
- bJlrYnFu4vYtur4C+r3Jog3S3wTqGKCIIswXZU5b6WgAcBAJvClCySMhWvQ4XPcircs+
- r4scCWHt/s+KAZaTRS26fFMnYTOxlv1zcp2ePGl4v7+WJrepNnYwoDjwJiacbuyMb2a9
- zrW7ja0UV/cEedIsI22bowM/OY7lZDeE8CRAvfVYzGcUKfMpnx2/dpzAH63sT7GhKRJz
- 33IA==
-X-Gm-Message-State: AOAM530RplBb3uhplozO7cjQlG4LnLg/gIxOdXChpT3sTWDjJ0X26/RQ
- Gmd07cMeiwERI20bIUJZA2UdmBxTCTc=
-X-Google-Smtp-Source: ABdhPJy6/k1407Pee3u5W04DUs7mxkWyhM65112tDKxfNOg/7iVwyuMDWi8XCKXK+bsc0OV6eRK2WA==
-X-Received: by 2002:a17:902:7c87:: with SMTP id
- y7mr5260707pll.240.1592935574065; 
- Tue, 23 Jun 2020 11:06:14 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h13sm17610374pfk.25.2020.06.23.11.06.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 11:06:13 -0700 (PDT)
-Subject: Re: [PATCH v3 25/25] ppc64: Clean up reginfo handling
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200522023440.26261-1-richard.henderson@linaro.org>
- <20200522023440.26261-26-richard.henderson@linaro.org>
- <87sgel7k2f.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e9296458-a20f-6174-8a91-9bedbd662f99@linaro.org>
-Date: Tue, 23 Jun 2020 11:06:11 -0700
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnnYG-00070Y-HJ
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:21:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21120
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnnYE-0001nb-CU
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:21:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592936498;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cfgnWErQiBEj++RtmHqXcckhk4i5tvf7X2LMrPEWeE0=;
+ b=bLcP6ukwF73padj73AJCH9EQf/FfY7uyhQnbxUUpOguVpdLOMyfLqLeMaFaCD96dQolnp9
+ QwJ6oHjfE3Gffyni9F6y/ijXVLa3Bi7a5IX5t8L0zp76ROCXjvsqQvbC/8u0j/HHg0YB5f
+ DSMGlzfgnjMlBIgJsXtqNwin7qf8Ogo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-YyAWeFcENliNDTnTrkDP9w-1; Tue, 23 Jun 2020 14:21:23 -0400
+X-MC-Unique: YyAWeFcENliNDTnTrkDP9w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D4DD18A0761;
+ Tue, 23 Jun 2020 18:21:22 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A97853C6B;
+ Tue, 23 Jun 2020 18:21:21 +0000 (UTC)
+Subject: Re: [PATCH 1/2] vvfat: Check that updated filenames are valid
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200623175534.38286-1-kwolf@redhat.com>
+ <20200623175534.38286-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <33941063-cfcc-002b-5fe8-d37050d8e532@redhat.com>
+Date: Tue, 23 Jun 2020 13:21:21 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <87sgel7k2f.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200623175534.38286-2-kwolf@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102f;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,30 +97,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: nhuck15@gmail.com, qemu-devel@nongnu.org, ppandit@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 10:45 AM, Alex Bennée wrote:
+On 6/23/20 12:55 PM, Kevin Wolf wrote:
+> FAT allows only a restricted set of characters in file names, and for
+> some of the illegal characters, it's actually important that we catch
+> them: If filenames can contain '/', the guest can construct filenames
+> containing "../" and escape from the assigned vvfat directory. The same
+> problem could arise if ".." was ever accepted as a literal filename.
 > 
-> Richard Henderson <richard.henderson@linaro.org> writes:
+> Fix this by adding a check that all filenames are valid in
+> check_directory_consistency().
 > 
->> Several of the gp_reg[] elements are not relevant -- e.g. orig r3,
->> which is related to system calls.  Omit those from the original
->> reginfo_init(), so that any differences are automatically hidden.
->>
->> Do not only compare bit 4 of CCR -- this register is 32 bits wide
->> with 8 cr subfields.  We should compare all of them.
->>
->> Tidy reginfo_dump() output.  Especially, do not dump the non-
->> relevant fields.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Reported-by: Nathan Huckleberry <nhuck15@gmail.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/vvfat.c | 23 +++++++++++++++++++++++
+>   1 file changed, 23 insertions(+)
 > 
-> I guess this means any traces that exist will need to be redone?
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index c65a98e3ee..2fab371258 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -520,6 +520,25 @@ static void set_begin_of_direntry(direntry_t* direntry, uint32_t begin)
+>       direntry->begin_hi = cpu_to_le16((begin >> 16) & 0xffff);
+>   }
+>   
+> +static bool valid_filename(const unsigned char *name)
+> +{
+> +    unsigned char c;
+> +    if (!strcmp((const char*)name, ".") || !strcmp((const char*)name, "..")) {
+> +        return false;
+> +    }
+> +    for (; (c = *name); name++) {
+> +        if (!((c >= '0' && c <= '9') ||
+> +              (c >= 'A' && c <= 'Z') ||
+> +              (c >= 'a' && c <= 'z') ||
+> +              c > 127 ||
+> +              strchr("$%'-_@~`!(){}^#&.+,;=[]", c) != 0))
 
-Well, that's true anyway because of the format change.
+s/0/NULL/
 
-r~
+Hmm - would it be any more efficient to use a single comparison of 
+strcspn() vs. strlen(), where you merely spell out the bytes that are 
+rejected?  Out of 256 byte values, NUL is implicitly rejected (since 
+these are C strings), the 128 high-bit bytes are all valid, and you have 
+permitted 62 alnum and 23 other characters; that leaves merely 42 byte 
+values to explicitly list in a reject string.  Of course, writing the 
+string literal containing those 42 invalid bytes is itself a bit of an 
+exercise in reading the ASCII table:
+
+"\x01\x02\x03\x04\x05\x06\x07"
+"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+"\x10\x11\x12\x13\x14\x15\x16\x17"
+"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+" \"*/:<>?\\|\x7f"
+
+> +        {
+> +            return false;
+> +        }
+> +    }
+> +    return true;
+> +}
+> +
+>   static uint8_t to_valid_short_char(gunichar c)
+>   {
+>       c = g_unichar_toupper(c);
+> @@ -2098,6 +2117,10 @@ DLOG(fprintf(stderr, "check direntry %d:\n", i); print_direntry(direntries + i))
+>               }
+>               lfn.checksum = 0x100; /* cannot use long name twice */
+>   
+> +            if (!valid_filename(lfn.name)) {
+> +                fprintf(stderr, "Invalid file name\n");
+
+Wow, the fact that we are still using fprintf is annoying, but pre-existing.
+
+> +                goto fail;
+> +            }
+>               if (path_len + 1 + lfn.len >= PATH_MAX) {
+>                   fprintf(stderr, "Name too long: %s/%s\n", path, lfn.name);
+>                   goto fail;
+> 
+
+At any rate, the idea makes sense. If you don't like my strcspn() idea, 
+then:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
