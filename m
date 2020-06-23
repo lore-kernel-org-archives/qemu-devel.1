@@ -2,105 +2,84 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B966FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 883952072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:06:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 883952072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5435F2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:07:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDemA28F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5435F2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhgn-0005oC-OA
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:06:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45256)
+	id 1jnhhg-0006e1-Cn
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:07:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIv-0006Nl-C7
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42240)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIt-0004kB-AZ
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:29 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05NBWlLf036523; Tue, 23 Jun 2020 07:41:25 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udff7f0x-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:25 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBX0ZY038010;
- Tue, 23 Jun 2020 07:41:25 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udff7f0d-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:25 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBQDW3028316;
- Tue, 23 Jun 2020 11:41:23 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma02wdc.us.ibm.com with ESMTP id 31sa38xts5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 11:41:23 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05NBfMk427656636
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:41:23 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D9495C6057;
- Tue, 23 Jun 2020 11:41:22 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5FA89C6055;
- Tue, 23 Jun 2020 11:41:22 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 11:41:22 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 08/12] hw/tpm: Make TRACE_TPM_UTIL_SHOW_BUFFER check local
- to tpm_util.c
-Date: Tue, 23 Jun 2020 07:41:10 -0400
-Message-Id: <20200623114114.1375104-9-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
-References: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnhOe-00017D-ML
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:47:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48678
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jnhOd-0007ZY-4z
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:47:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592912842;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=HvGP4aYF9pmcQ/UjWh6TZo+I3Cs+gW4pxBqKOmj+cfM=;
+ b=CDemA28FRxbUtPDojOseQ7XViOamx1EsYRHkLYUTuuVfM7l6tWh/BhrHxA7EJachs7DaLC
+ FjtGMLl39DjllUglOrzArTyXZ/x7+6Ka6M6nqW4UMCGe1G6jldg0Qbi0k8RoPUG4p90yUW
+ 7D5UStAhTNFdKFqfWmxQI1B2VzpBNr4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-7xMz8Q93P4CBRY9xCOnjIg-1; Tue, 23 Jun 2020 07:47:18 -0400
+X-MC-Unique: 7xMz8Q93P4CBRY9xCOnjIg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2906464;
+ Tue, 23 Jun 2020 11:47:17 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-115-78.ams2.redhat.com [10.36.115.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 318DF7CCC0;
+ Tue, 23 Jun 2020 11:47:16 +0000 (UTC)
+Date: Tue, 23 Jun 2020 13:47:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v3 0/6] block: add block-dirty-bitmap-populate job
+Message-ID: <20200623114714.GH5853@linux.fritz.box>
+References: <20200619195621.58740-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-23_06:2020-06-23,
- 2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 phishscore=0
- spamscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- suspectscore=1 impostorscore=0 clxscore=1015 adultscore=0 mlxscore=0
- bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006230092
-Received-SPF: none client-ip=148.163.156.1;
- envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+In-Reply-To: <20200619195621.58740-1-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,72 +92,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Am 19.06.2020 um 21:56 hat Eric Blake geschrieben:
+> [From John's original cover letter:]
+> This is a new (very small) block job that writes a pattern into a
+> bitmap. The only pattern implemented is the top allocation information.
+> 
+> This can be used to "recover" an incremental bitmap chain if an external
+> snapshot was taken without creating a new bitmap first: any writes made
+> to the image will be reflected by the allocation status and can be
+> written back into a bitmap.
+> 
+> This is useful for e.g. libvirt managing backup chains if a user creates
+> an external snapshot outside of libvirt.
+> 
+> v3:
+>  - Addressed a bit more feedback
+>  - Make it easier to decide if we want an x- prefix if we think there
+>  are more tweaks to be made to the interface
+>  - Drop dependency on John's JobRunner iotest series
+>  - Renumber the new iotest
+> 
+> I know there was a lot of discussion about whether there are
+> optimizations to be made with populating directly into the target
+> bitmap rather than into a temporary that then gets merged in at the
+> completion of the job, but the QMP aspect seems fairly stable.  Even
+> so, we may still want to consider using an x- prefix until we know for
+> sure whether libvirt can make decent use of the interface.
 
-The trace_event_get_state_backends() call is useful to avoid
-making extensive calls (usually preparing arguments passed to
-the tracing framework. In this case, the extensive work is
-done in tpm_util_show_buffer(), and the arguments used to
-call it don't involve extra processing. Simplify by moving
-the TRACE_TPM_UTIL_SHOW_BUFFER check to tpm_util_show_buffer.
+Fair enough, as long as everyone agrees that the QMP aspect includes
+that merging the bits only at the end of the job is an implementation
+detail and not something that client may rely on.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Message-id: 20200612085444.8362-9-philmd@redhat.com
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- hw/tpm/tpm_tis_common.c | 8 ++------
- hw/tpm/tpm_util.c       | 3 +++
- 2 files changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
-index 94704870f6..1779b4fc1e 100644
---- a/hw/tpm/tpm_tis_common.c
-+++ b/hw/tpm/tpm_tis_common.c
-@@ -78,9 +78,7 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_t flags)
-  */
- static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
- {
--    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
--        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
--    }
-+    tpm_util_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
- 
-     /*
-      * rw_offset serves as length indicator for length of data;
-@@ -246,9 +244,7 @@ void tpm_tis_request_completed(TPMState *s, int ret)
-     s->loc[locty].state = TPM_TIS_STATE_COMPLETION;
-     s->rw_offset = 0;
- 
--    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
--        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
--    }
-+    tpm_util_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
- 
-     if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
-         tpm_tis_abort(s);
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index c0a0f3d71f..12f19465c5 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -357,6 +357,9 @@ void tpm_util_show_buffer(const unsigned char *buffer,
-     size_t len, i;
-     char *line_buffer, *p;
- 
-+    if (!trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
-+        return;
-+    }
-     len = MIN(tpm_cmd_get_size(buffer), buffer_size);
- 
-     /*
--- 
-2.24.1
+Kevin
 
 
