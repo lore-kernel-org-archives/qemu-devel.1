@@ -2,97 +2,91 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C47C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E85C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E0420738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72AE62072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C/P1kWBs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E0420738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELUN8ij9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72AE62072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jneCJ-0004cW-8m
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54178)
+	id 1jneDd-00063H-NJ
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:23:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jneBi-00043P-HC
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:21:50 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55914)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jneBg-00013V-Ha
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:21:50 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g75so2093342wme.5
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 01:21:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Zj0UT/e6KB63EvemT3G99hMk9FSebnqp177CT4m+/qA=;
- b=C/P1kWBsiQ3rOABGyOqu5uXt/h074gEqTLiAwLcQe7pIL99l6DQJs3r90AaZcR1R3+
- Vt/+uMEOjkGsKQ50ozRV3rgsDu1CiYMIBTPV+GMZW1Pd7JsnO7DbIaws5QOHSaUY3/wn
- EqFjOmtXnEac3e3E1bkPL3bTB4hkJQuW7FuLC3p3YxkZelmIK/zp29PIS8AAyq7+OGJx
- Nzcd8QEhAHtq+rAhHpYGAAlgxqpIbEGvNAxGP9Pq4Xm2MEEULangQVi0vgdAyLYNl4jB
- mP2P8UTQTHgbLp9TVDNQ3dpKw+VCjl+tnnLF/wub2jC0KHyUOOHSkgnh0LJGJ612yxze
- /Nog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Zj0UT/e6KB63EvemT3G99hMk9FSebnqp177CT4m+/qA=;
- b=SmiNu/AT3db+RTZOmuLsp8axNLJWCTQMq1oSPfe31KJroWnNiFbuFNXhDcOKKraVAC
- 76qW3rWDlABZoL3RXtz0n07oNmAyyLdJF+eOuK5zv74Mn4Tm7SaWpSyoxRaetcjE5Y+h
- wZxVZjL2Oj5ts+12TutaVy6g/Y5FjbkCm5GN7ycDdOwOA919ByW4uanoKU7ABY0iCKt7
- eUlXi5xat/s0jlc2sdZLOraCXa0glpXLcdSyn88qjV54+Zq2s6ws9xXn0z4Tc0rVpCgt
- 25aKbGaEHKjLmr8LbH80vib9jDZOXnrzTGyEF+1tMvkoc4WLAP3cQtq72thA2U+Nkkd/
- VLbw==
-X-Gm-Message-State: AOAM533dMRU70Flepbv7cqpoYX1qCivHU819hf8P+CyIH+os06z2KSBP
- Ug2D6lCP64qkkROlkrnlayOLPA==
-X-Google-Smtp-Source: ABdhPJyATGvAskKaQyHf2c7KZTbM14mV3bzJgrlawGca7ONt0b6eoe6Getj/aBc/94E33YFp6L5XBA==
-X-Received: by 2002:a1c:2b01:: with SMTP id r1mr23794359wmr.26.1592900506614; 
- Tue, 23 Jun 2020 01:21:46 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p4sm10975699wrx.63.2020.06.23.01.21.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 01:21:45 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5EAA71FF7E;
- Tue, 23 Jun 2020 09:21:44 +0100 (BST)
-References: <20200612014606.147691-1-jkz@google.com>
- <20200612014606.147691-5-jkz@google.com> <87h7vbyowf.fsf@linaro.org>
- <CADgy-2uOn835LrnOBDacbqznW8MR7ZQy55kBmpjDbK2Uy1xPEg@mail.gmail.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Josh Kunz <jkz@google.com>
-Subject: Re: [PATCH 4/5] linux-user: Support CLONE_VM and extended clone
- options
-In-reply-to: <CADgy-2uOn835LrnOBDacbqznW8MR7ZQy55kBmpjDbK2Uy1xPEg@mail.gmail.com>
-Date: Tue, 23 Jun 2020 09:21:44 +0100
-Message-ID: <877dvy9opz.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jneCw-0005Gn-66
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:23:06 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29852
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jneCt-0002P3-6d
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:23:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592900581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/WBocIYEs3qc/YC/LoNZO5dWSeB0pAgII+eW6V4vfEc=;
+ b=ELUN8ij9scNHlnR/JQj8Dt27pOrZmkqBXQ0jxVqVbhNb1B+TcXAOmIdpFugnoFRIrCWBNH
+ DSFsQp03H1k6Vol3ageJjDB2O0qORq91Q9fu7vMdOAPgg2lP82djhPU9S4+Anm3nJAZhZJ
+ R61ox8ImrYTwWRjrwx91NkDH+PNNTyU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-OEZaExvkMdSwplWLZ8zDzA-1; Tue, 23 Jun 2020 04:22:59 -0400
+X-MC-Unique: OEZaExvkMdSwplWLZ8zDzA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0518C100CCC4;
+ Tue, 23 Jun 2020 08:22:58 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F92C5D9DA;
+ Tue, 23 Jun 2020 08:22:49 +0000 (UTC)
+Subject: Re: [PATCH v3 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200611151209.22547-1-eric.auger@redhat.com>
+ <20200611151209.22547-2-eric.auger@redhat.com>
+ <87k0zzz6nt.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f0ec7470-d683-1bfd-103d-54c57ebd3863@redhat.com>
+Date: Tue, 23 Jun 2020 10:22:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <87k0zzz6nt.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,90 +99,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
+ peterx@redhat.com, jean-philippe@linaro.org, qemu-arm@nongnu.org,
+ pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Markus,
 
-Josh Kunz <jkz@google.com> writes:
-
-> Thanks for the responses Alex. I'm working on your comments, but
-> wanted to clarify some of the points you brought up before mailing a
-> second version. Responses inline.
->
-> On Tue, Jun 16, 2020 at 9:08 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->> Which by the way fail on some targets:
+On 6/22/20 1:22 PM, Markus Armbruster wrote:
+> Eric Auger <eric.auger@redhat.com> writes:
+> 
+>> Introduce a new property defining a reserved region:
+>> <low address>, <high address>, <type>.
 >>
->>     TEST    linux-test on alpha
->>   /home/alex/lsrc/qemu.git/tests/tcg/multiarch/linux-test.c:709: child d=
-id not receive PDEATHSIG on parent death
->>   make[2]: *** [../Makefile.target:153: run-linux-test] Error 1
->>   make[1]: *** [/home/alex/lsrc/qemu.git/tests/tcg/Makefile.qemu:76: run=
--guest-tests] Error 2
->>   make: *** [/home/alex/lsrc/qemu.git/tests/Makefile.include:851: run-tc=
-g-tests-alpha-linux-user] Error 2
+>> This will be used to encode reserved IOVA regions.
 >>
->> Have you managed a clean check-tcg with docker enabled so all the guest
->> architectures get tested?
->
-> I've gotten this Alpha failure to reproduce on my local build and I'm
-> working on a fix. Thanks for pointing this out. I'll make sure I get a
-> clean `make check-tcg` for `linux-test` on all guest architectures.
->
->> > In this patch, I've employed an alternative approach: spawning a thread
->> > an "stealing" its TLS image for use in the child process. This approach
->> > leaves a dangling thread while the TLS image is in use, but by design
->> > that thread will not become schedulable until after the TLS data is no
->> > longer in-use by the child (as described in a moment). Therefore, it
->> > should cause relatively minimal overhead. When considered in the larger
->> > context, this seems like a reasonable tradeoff.
+>> For instance, in virtio-iommu use case, reserved IOVA regions
+>> will be passed by the machine code to the virtio-iommu-pci
+>> device (an array of those). The type of the reserved region
+>> will match the virtio_iommu_probe_resv_mem subtype value:
+>> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+>> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
 >>
->> *sharp intake of breath*
+>> on PC/Q35 machine, this will be used to inform the
+>> virtio-iommu-pci device it should bypass the MSI region.
+>> The reserved region will be: 0xfee00000, 0xfeefffff, 1.
 >>
->> OK so the solution to the complexity of handling threads is to add more
->> threads? cool cool cool....
->
-> The solution to the complexity of shared memory, but yeah, not my
-> favorite either. I was kinda hoping that someone on the list would
-> explain why this approach is clearly wrong.
->
->> > * Non-standard libc extension to allow creating TLS images independent
->> >   of threads. This would allow us to just `clone` the child directly
->> >   instead of this complicated maneuver. Though we probably would still
->> >   need the cleanup logic. For libcs, TLS image allocation is tightly
->> >   connected to thread stack allocation, which is also arch-specific. I
->> >   do not have enough experience with libc development to know if
->> >   maintainers of any popular libcs would be open to supporting such an
->> >   API. Additionally, since it will probably take years before a libc
->> >   fix would be widely deployed, we need an interim solution anyways.
+>> On ARM, we can declare the ITS MSI doorbell as an MSI
+>> region to prevent MSIs from being mapped on guest side.
 >>
->> We could consider a custom lib stub that intercepts calls to the guests
->> original libc and replaces it with a QEMU aware one?
->
-> Unfortunately the problem here is host libc, rather than guest libc.
-> We need to make TLS variables in QEMU itself work, so intercepting
-> guest libc calls won't help much. Or am I misunderstanding the point?
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v11 -> v12:
+>> - rename into DEFINE_PROP_RESERVED_REGION
+>> - do not use g_strsplit anymore, use endptr instead
+>> - remove 0x references
+>> ---
+>>  include/exec/memory.h        |  6 +++
+>>  include/hw/qdev-properties.h |  3 ++
+>>  include/qemu/typedefs.h      |  1 +
+>>  hw/core/qdev-properties.c    | 89 ++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 99 insertions(+)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 3e00cdbbfa..3ee8224fa7 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -57,6 +57,12 @@ struct MemoryRegionMmio {
+>>      CPUWriteMemoryFunc *write[3];
+>>  };
+>>  
+>> +struct ReservedRegion {
+>> +    hwaddr low;
+>> +    hwaddr high;
+>> +    unsigned int type;
+>> +};
+>> +
+>>  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+>>  
+>>  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>> index f161604fb6..03bf850a7e 100644
+>> --- a/include/hw/qdev-properties.h
+>> +++ b/include/hw/qdev-properties.h
+>> @@ -19,6 +19,7 @@ extern const PropertyInfo qdev_prop_string;
+>>  extern const PropertyInfo qdev_prop_chr;
+>>  extern const PropertyInfo qdev_prop_tpm;
+>>  extern const PropertyInfo qdev_prop_macaddr;
+>> +extern const PropertyInfo qdev_prop_reserved_region;
+>>  extern const PropertyInfo qdev_prop_on_off_auto;
+>>  extern const PropertyInfo qdev_prop_multifd_compression;
+>>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>> @@ -183,6 +184,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>>      DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
+>>  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+>>      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
+>> +#define DEFINE_PROP_RESERVED_REGION(_n, _s, _f)         \
+>> +    DEFINE_PROP(_n, _s, _f, qdev_prop_reserved_region, ReservedRegion)
+>>  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+>>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+>>  #define DEFINE_PROP_MULTIFD_COMPRESSION(_n, _s, _f, _d) \
+>> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+>> index ecf3cde26c..85c4f891f4 100644
+>> --- a/include/qemu/typedefs.h
+>> +++ b/include/qemu/typedefs.h
+>> @@ -59,6 +59,7 @@ typedef struct ISABus ISABus;
+>>  typedef struct ISADevice ISADevice;
+>>  typedef struct IsaDma IsaDma;
+>>  typedef struct MACAddr MACAddr;
+>> +typedef struct ReservedRegion ReservedRegion;
+>>  typedef struct MachineClass MachineClass;
+>>  typedef struct MachineState MachineState;
+>>  typedef struct MemoryListener MemoryListener;
+>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>> index cc924815da..15b84adbee 100644
+>> --- a/hw/core/qdev-properties.c
+>> +++ b/hw/core/qdev-properties.c
+>> @@ -14,6 +14,7 @@
+>>  #include "qapi/visitor.h"
+>>  #include "chardev/char.h"
+>>  #include "qemu/uuid.h"
+>> +#include "qemu/cutils.h"
+>>  
+>>  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>>                                    Error **errp)
+>> @@ -577,6 +578,94 @@ const PropertyInfo qdev_prop_macaddr = {
+>>      .set   = set_mac,
+>>  };
+>>  
+>> +/* --- Reserved Region --- */
+>> +
+>> +/*
+>> + * accepted syntax version:
+>> + *   <low address>,<high address>,<type>
+>> + *   where low/high addresses are uint64_t in hexadecimal
+>> + *   and type is an unsigned integer in decimal
+>> + */
+>> +static void get_reserved_region(Object *obj, Visitor *v, const char *name,
+>> +                                void *opaque, Error **errp)
+>> +{
+>> +    DeviceState *dev = DEVICE(obj);
+>> +    Property *prop = opaque;
+>> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
+>> +    char buffer[64];
+>> +    char *p = buffer;
+>> +
+>> +    snprintf(buffer, sizeof(buffer), "0x%"PRIx64",0x%"PRIx64",%u",
+>> +             rr->low, rr->high, rr->type);
+> 
+> Matches existing practice in other getters.  Nevertheless, I'd suggest
+> something like
+> 
+>        n = snprintf(buffer, sizeof(buffer), ...);
+>        assert(n < sizeof(buffer);
+OK
+> 
+>> +
+>> +    visit_type_str(v, name, &p, errp);
+>> +}
+>> +
+>> +static void set_reserved_region(Object *obj, Visitor *v, const char *name,
+>> +                                void *opaque, Error **errp)
+>> +{
+>> +    DeviceState *dev = DEVICE(obj);
+>> +    Property *prop = opaque;
+>> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
+>> +    Error *local_err = NULL;
+>> +    const char *endptr;
+>> +    char *str;
+>> +    int ret;
+>> +
+>> +    if (dev->realized) {
+>> +        qdev_prop_set_after_realize(dev, name, errp);
+>> +        return;
+>> +    }
+>> +
+>> +    visit_type_str(v, name, &str, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>> +    ret = qemu_strtou64(str, &endptr, 16, &rr->low);
+>> +    if (ret) {
+>> +        error_setg(errp, "Failed to decode reserved region low addr");
+>> +        error_append_hint(errp,
+>> +                          "should be an address in hexadecimal\n");
+> 
+> Comes out like this:
+> 
+>     qemu-system-x86_64: -device ...: Failed to decode reserved region low addr
+>     should be an address in hexadecimal
+> 
+> I'd capitalize the other way, to get
+> 
+>     qemu-system-x86_64: -device ...: failed to decode reserved region low addr
+>     Should be an address in hexadecimal
+> 
+> Note: output is made up; I failed at figuring out how to use the new
+> property.  An example in PATCH 4's commit message might help.
+OK I will add one example. In practice in the virtio-iommu case the
+property is not really meant to be passed by the end-user but should be
+set by the machine code. However I have just tested from the cmd line
+and it looks using commas as separators is a bad idea because it
+collides with ',' separating properties. So if you're OK I will change
+the comma into ':'.
 
-Hold up - I'm a little confused now. Why does the host TLS affect the
-guest TLS? We have complete control over the guests view of the world so
-we should be able to control it's TLS storage.
+> 
+> Since the error message fails to mention @name, the user is left
+> guessing unless "-device ..." contains just one reserved region
+> parameter.
+> 
+> What about something like this:
+> 
+>            error_setg(errp, "start address of reserved region '%s'"
+>                       " must be a hexadecimal integer",
+>                       name);
+Sure. Given the fact the property is named reserved-region[n], this may
+be simplified into
+            error_setg(errp, "start address of '%s'"
+                       " must be a hexadecimal integer",
+>                      name);
+> 
+> No need to mess around with error_append_hint() then.
+OK
+> 
+> Same for the other error messages.
+> 
+>> +        goto out;
+>> +    }
+>> +    if (*endptr != ',') {
+>> +        goto separator_error;
+>> +    }
+>> +
+>> +    ret = qemu_strtou64(endptr + 1, &endptr, 16, &rr->high);
+>> +    if (ret) {
+>> +        error_setg(errp, "Failed to decode reserved region high addr");
+>> +        error_append_hint(errp,
+>> +                          "should be an address in hexadecimal\n");
+>> +        goto out;
+>> +    }
+>> +    if (*endptr != ',') {
+>> +        goto separator_error;
+>> +    }
+>> +
+>> +    ret = qemu_strtoui(endptr + 1, &endptr, 10, &rr->type);
+>> +    if (ret) {
+>> +        error_setg(errp, "Failed to decode reserved region type");
+>> +        error_append_hint(errp, "should be an unsigned integer in decimal\n");
+>> +    }
+> 
+> I dimly remember discussing the wisdom of numeric type here, dig, dig,
+> ..., aha:
+> 
+>     Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
+>     Date: Fri, 13 Dec 2019 11:03:02 +0100
+>     Message-ID: <87y2vg4k6h.fsf@dusky.pond.sub.org>
+> 
+>     >> So the "label" part of "<low address>,<high address>,label" is a number?
+>     > yes it is.
+>     >> 
+>     >> Is a number appropriate for your use case, or would an enum be better?
+>     > I think a number is OK. There might be other types of reserved regions
+>     > in the future. Also if we want to allow somebody else to reuse that
+>     > property in another context, I would rather leave it open?
+> 
+>     I'd prioritize the user interface over possible reuse (which might never
+>     happen).  Mind, I'm not telling you using numbers is a bad user
+>     interface.  In general, enums are nicer, but I don't know enough about
+>     this particular case.
+Yep I remember too ;-) I left as it was because I think this property
+could be used for other use cases.
+> 
+>> +    goto out;
+>> +
+>> +separator_error:
+>> +    error_setg(errp, "reserved region fields must be separated with commas");
+> 
+> I'm not sure de-duplicating this error message is worth the extra goto.
+> 
+>> +out:
+>> +    g_free(str);
+>> +    return;
+>> +}
+>> +
+>> +const PropertyInfo qdev_prop_reserved_region = {
+>> +    .name  = "reserved_region",
+>> +    .description = "Reserved Region, example: 0xFEE00000,0xFEEFFFFF,0",
+>> +    .get   = get_reserved_region,
+>> +    .set   = set_reserved_region,
+>> +};
+>> +
+>>  /* --- on/off/auto --- */
+>>  
+>>  const PropertyInfo qdev_prop_on_off_auto = {
+> 
+> Can't find anything that's actually wrong, so
+> 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Thanks
 
->> Have you considered a daemon which could co-ordinate between the
->> multiple processes that are sharing some state?
->
-> Not really for the `CLONE_VM` support added in this patch series. I
-> have considered trying to pull tcg out of the guest process, but not
-> very seriously, since it seems like a pretty heavyweight approach.
-> Especially compared to the solution included in this series. Do you
-> think there's a simpler approach that involves using a daemon to do
-> coordination?
+Eric
+> 
 
-I'm getting a little lost now. Exactly what state are we trying to share
-between two QEMU guests which are now in separate execution contexts?
-
---=20
-Alex Benn=C3=A9e
 
