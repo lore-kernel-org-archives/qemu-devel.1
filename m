@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 316A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB101C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 076E920702
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:57:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 076E920702
+	by mail.kernel.org (Postfix) with ESMTPS id 83A7A20702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:57:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83A7A20702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnpyn-0007f3-8n
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:57:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
+	id 1jnpyw-00082M-Nn
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:57:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnps1-0003nX-51; Tue, 23 Jun 2020 16:50:17 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56370
+ id 1jnpt3-0005Vt-Km; Tue, 23 Jun 2020 16:51:23 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56478
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnprz-0001PK-Fj; Tue, 23 Jun 2020 16:50:16 -0400
+ id 1jnpt0-00029N-RV; Tue, 23 Jun 2020 16:51:21 -0400
 Received: from host86-158-109-79.range86-158.btcentralplus.com
  ([86.158.109.79] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnprt-0007T1-M6; Tue, 23 Jun 2020 21:50:16 +0100
+ id 1jnpsu-0007T1-SG; Tue, 23 Jun 2020 21:51:20 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Tue, 23 Jun 2020 21:49:19 +0100
-Message-Id: <20200623204936.24064-6-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 23 Jun 2020 21:49:32 +0100
+Message-Id: <20200623204936.24064-19-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
 References: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
@@ -50,8 +50,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.158.109.79
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 05/22] pmu: honour autopoll_rate_ms when rearming the ADB
- autopoll timer
+Subject: [PATCH v2 18/22] mac_via: move VIA1 portB write logic into
+ mos6522_q800_via1_write()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -80,38 +80,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Don't use a fixed value but instead use the default value from the ADB bus
-state.
+Currently the logic is split between the mos6522 portB_write() callback and
+the memory region used to capture the VIA1 MMIO accesses. Move everything
+into the latter mos6522_q800_via1_write() function to keep all the logic in
+one place to make it easier to follow.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Finn Thain <fthain@telegraphics.com.au>
 ---
- hw/misc/macio/pmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/misc/mac_via.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index cae2845936..bae0b440d0 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -106,7 +106,7 @@ static void pmu_adb_poll(void *opaque)
-     }
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+index 7a28bb37ac..a1dc00d9f6 100644
+--- a/hw/misc/mac_via.c
++++ b/hw/misc/mac_via.c
+@@ -801,11 +801,21 @@ static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
+                                     unsigned size)
+ {
+     MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(opaque);
++    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+     MOS6522State *ms = MOS6522(v1s);
  
-     timer_mod(s->adb_poll_timer,
--              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 30);
-+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->autopoll_rate_ms);
+     addr = (addr >> 9) & 0xf;
+     mos6522_write(ms, addr, val, size);
+ 
++    switch (addr) {
++    case VIA_REG_B:
++        via1_rtc_update(m);
++        via1_adb_update(m);
++
++        v1s->last_b = ms->b;
++        break;
++    }
++
+     via1_one_second_update(v1s);
+     via1_VBL_update(v1s);
+ }
+@@ -1037,18 +1047,6 @@ static TypeInfo mac_via_info = {
+ };
+ 
+ /* VIA 1 */
+-static void mos6522_q800_via1_portB_write(MOS6522State *s)
+-{
+-    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
+-                                             parent_obj);
+-    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+-
+-    via1_rtc_update(m);
+-    via1_adb_update(m);
+-
+-    v1s->last_b = s->b;
+-}
+-
+ static void mos6522_q800_via1_reset(DeviceState *dev)
+ {
+     MOS6522State *ms = MOS6522(dev);
+@@ -1071,10 +1069,8 @@ static void mos6522_q800_via1_init(Object *obj)
+ static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+-    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
+ 
+     dc->reset = mos6522_q800_via1_reset;
+-    mdc->portB_write = mos6522_q800_via1_portB_write;
  }
  
- static void pmu_one_sec_timer(void *opaque)
-@@ -182,7 +182,7 @@ static void pmu_cmd_set_adb_autopoll(PMUState *s, uint16_t mask)
-     s->adb_poll_mask = mask;
-     if (mask) {
-         timer_mod(s->adb_poll_timer,
--                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 30);
-+                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->autopoll_rate_ms);
-     } else {
-         timer_del(s->adb_poll_timer);
-     }
+ static const TypeInfo mos6522_q800_via1_type_info = {
 -- 
 2.20.1
 
