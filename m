@@ -2,46 +2,46 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B88D2C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89F1C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FECE20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FECE20675
+	by mail.kernel.org (Postfix) with ESMTPS id ABC8F20702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABC8F20702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnptM-0005KU-PJ
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44932)
+	id 1jnptY-0005jh-U6
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnprf-0002vb-Cn; Tue, 23 Jun 2020 16:49:55 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56332
+ id 1jnprn-0003Jm-Ne; Tue, 23 Jun 2020 16:50:03 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56348
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnprd-0001IV-Rq; Tue, 23 Jun 2020 16:49:55 -0400
+ id 1jnprm-0001Ja-16; Tue, 23 Jun 2020 16:50:03 -0400
 Received: from host86-158-109-79.range86-158.btcentralplus.com
  ([86.158.109.79] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jnpra-0007T1-Dn; Tue, 23 Jun 2020 21:49:55 +0100
+ id 1jnprk-0007T1-8A; Tue, 23 Jun 2020 21:50:03 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Tue, 23 Jun 2020 21:49:15 +0100
-Message-Id: <20200623204936.24064-2-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 23 Jun 2020 21:49:17 +0100
+Message-Id: <20200623204936.24064-4-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
 References: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
@@ -50,7 +50,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.158.109.79
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 01/22] adb: coding style update to fix checkpatch errors
+Subject: [PATCH v2 03/22] cuda: convert ADB autopoll timer from ns to ms
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,50 +79,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will help ensure that style guidelines are being maintained during
-subsequent changes.
+This is in preparation for consolidating all of the ADB autopoll management
+in one place.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Finn Thain <fthain@telegraphics.com.au>
 ---
- hw/input/adb.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/misc/macio/cuda.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index b1ac4a3852..bf1bc30d19 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -44,14 +44,14 @@ int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
- 
-     cmd = buf[0] & 0xf;
-     if (cmd == ADB_BUSRESET) {
--        for(i = 0; i < s->nb_devices; i++) {
-+        for (i = 0; i < s->nb_devices; i++) {
-             d = s->devices[i];
-             adb_device_reset(d);
-         }
-         return 0;
+diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+index 47aa3b0552..01bf47327c 100644
+--- a/hw/misc/macio/cuda.c
++++ b/hw/misc/macio/cuda.c
+@@ -210,8 +210,9 @@ static void cuda_adb_poll(void *opaque)
+         obuf[1] = 0x40; /* polled data */
+         cuda_send_packet_to_host(s, obuf, olen + 2);
      }
-     devaddr = buf[0] >> 4;
--    for(i = 0; i < s->nb_devices; i++) {
-+    for (i = 0; i < s->nb_devices; i++) {
-         d = s->devices[i];
-         if (d->devaddr == devaddr) {
-             ADBDeviceClass *adc = ADB_DEVICE_GET_CLASS(d);
-@@ -69,9 +69,10 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
-     uint8_t buf[1];
+-    timer_mod(s->adb_poll_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-              (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
++
++    timer_mod(s->adb_poll_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++              s->autopoll_rate_ms);
+ }
  
-     olen = 0;
--    for(i = 0; i < s->nb_devices; i++) {
--        if (s->poll_index >= s->nb_devices)
-+    for (i = 0; i < s->nb_devices; i++) {
-+        if (s->poll_index >= s->nb_devices) {
-             s->poll_index = 0;
-+        }
-         d = s->devices[s->poll_index];
-         if ((1 << d->devaddr) & poll_mask) {
-             buf[0] = ADB_READREG | (d->devaddr << 4);
+ /* description of commands */
+@@ -238,8 +239,8 @@ static bool cuda_cmd_autopoll(CUDAState *s,
+         s->autopoll = autopoll;
+         if (autopoll) {
+             timer_mod(s->adb_poll_timer,
+-                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-                      (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
++                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                      s->autopoll_rate_ms);
+         } else {
+             timer_del(s->adb_poll_timer);
+         }
+@@ -264,8 +265,8 @@ static bool cuda_cmd_set_autorate(CUDAState *s,
+     s->autopoll_rate_ms = in_data[0];
+     if (s->autopoll) {
+         timer_mod(s->adb_poll_timer,
+-                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-                  (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
++                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                  s->autopoll_rate_ms);
+     }
+     return true;
+ }
+@@ -544,7 +545,7 @@ static void cuda_realize(DeviceState *dev, Error **errp)
+     s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
+     s->sr_delay_ns = 20 * SCALE_US;
+ 
+-    s->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
++    s->adb_poll_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
+     s->adb_poll_mask = 0xffff;
+     s->autopoll_rate_ms = 20;
+ }
 -- 
 2.20.1
 
