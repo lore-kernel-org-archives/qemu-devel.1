@@ -2,106 +2,93 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE15AC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F23BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 974A7206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 974A7206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68CEE206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:01:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L4n6WaKj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68CEE206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhbF-00069F-LG
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:00:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
+	id 1jnhcg-00081Y-ID
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIt-0006K6-UL
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14508)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIs-0004jP-0b
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:27 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05NBWRcV111247; Tue, 23 Jun 2020 07:41:24 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udkceyhw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:24 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBX2Ux113376;
- Tue, 23 Jun 2020 07:41:23 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udkceyhe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:23 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBPsx7004551;
- Tue, 23 Jun 2020 11:41:22 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03dal.us.ibm.com with ESMTP id 31sa394hue-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 11:41:22 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05NBfK3V10158462
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:41:20 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 98A3EC6059;
- Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1E392C6055;
- Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhHG-0003VJ-Qf
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:46 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42643)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhHF-0003Or-5X
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:46 -0400
+Received: by mail-wr1-x442.google.com with SMTP id o11so12449557wrv.9
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=SI0UuaYn0LhrgnH6JJza5nCoeq6PoqqyPFPSDuwFopc=;
+ b=L4n6WaKjnTeSm0Jxq6WbowY1X3LmIW5sUu3GadFqIli6aDuffMh4u7jJpFaMsaoutN
+ bZjNx1DiVKiVr+B9nEl7OKMGz4g5RZxEhd8bvQ8llVLvhVWyIFCDRgmWR8BR3WCw696p
+ W0u29LQ56sKu0aF9WHBQjLdzmI4/wc+nC2fgYK7z0UGxOdMz81DDkb6tlbK9pkqf8Nm0
+ bqYCJ5xa79BUDClvWuBcQ8mZuGlHeBJ3wrJQiUHSl1nS3xy8gD5Lmq4Wb6r9cR6IIYBj
+ Lvyt+31RslVDuzrb6HKDLz9pnf3zNcqwDyYzJAcjNAhKkhKQmJy4SoiZVdR4sIZrFD0Z
+ wTxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=SI0UuaYn0LhrgnH6JJza5nCoeq6PoqqyPFPSDuwFopc=;
+ b=d8LcqpDNv0FrnxiX5MTdi97jdlolJvTgT0redciLcxg/8XYhuKBX5NzZno7p2JIbvq
+ b9cNqIiUSwqMnuHO6smrDNwm+pYv2kxWEikYbxLt90593CLnk1u5u8g4YidAIxHebGuI
+ 3oKU4w9U8jsKqoh8yXVtel0+TlpF0G+RwJB4MT7Zrnl9Fsc0qfDvbLABZbGYDif0PeSW
+ Wvqkmmhcu+N/hTT9OLL921DcVBkZO4He/bx3UrZQdyNZGxpjiyIkJ4hGSvRCkvJSitkH
+ +U3AL1bCL2liPs/TBdKNwgjYx+5zc2fsyUpG/QvcTPldFnaui8Fu/+5S8tlzeXTjbVm7
+ bm4g==
+X-Gm-Message-State: AOAM532GYuKjrvNqFzQ6qhwSGWaCb4r7kKQBN0w0xoGJpKLz1RfXCOxD
+ f3l0HkHAO54oai32JcGJd0yWsG/3MhjGTg==
+X-Google-Smtp-Source: ABdhPJw+K8zcNWdkInPj0drZXSSwDG4JPuvYaOweHgzPiQTWKabs9nbsx76d+yO1TKWCiEOYwHseAw==
+X-Received: by 2002:a5d:5642:: with SMTP id j2mr17589023wrw.19.1592912383658; 
+ Tue, 23 Jun 2020 04:39:43 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.42
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 04:39:43 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 06/12] hw/tpm: Move 'hw/acpi/tpm.h' inclusion from header to
- sources
-Date: Tue, 23 Jun 2020 07:41:08 -0400
-Message-Id: <20200623114114.1375104-7-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
-References: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
+Subject: [PULL 32/42] hw/arm/mps2: Rename CMSDK AHB peripheral region
+Date: Tue, 23 Jun 2020 12:38:54 +0100
+Message-Id: <20200623113904.28805-33-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200623113904.28805-1-peter.maydell@linaro.org>
+References: <20200623113904.28805-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-23_06:2020-06-23,
- 2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999
- cotscore=-2147483648 lowpriorityscore=0 bulkscore=0 phishscore=0
- clxscore=1015 adultscore=0 suspectscore=1 priorityscore=1501
- malwarescore=0 spamscore=0 mlxscore=0 impostorscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006230088
-Received-SPF: none client-ip=148.163.156.1;
- envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,78 +101,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Nothing in "tpm_ppi.h" require declarations from "hw/acpi/tpm.h".
-Reduce dependencies and include it only in the files requiring it.
+To differenciate with the CMSDK APB peripheral region,
+rename this region 'CMSDK AHB peripheral region'.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Message-id: 20200612085444.8362-7-philmd@redhat.com
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200617072539.32686-8-f4bug@amsat.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/tpm/tpm_ppi.c        | 1 +
- hw/tpm/tpm_ppi.h        | 1 -
- hw/tpm/tpm_tis_isa.c    | 1 +
- hw/tpm/tpm_tis_sysbus.c | 1 +
- 4 files changed, 3 insertions(+), 1 deletion(-)
+ hw/arm/mps2.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index 6d9c1a3e40..72d7a3d926 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -17,6 +17,7 @@
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
- #include "migration/vmstate.h"
-+#include "hw/acpi/tpm.h"
- #include "tpm_ppi.h"
- #include "trace.h"
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index ee555f919de..4fe5cc8622f 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -212,10 +212,11 @@ static void mps2_common_init(MachineState *machine)
+      */
+     create_unimplemented_device("CMSDK APB peripheral region @0x40000000",
+                                 0x40000000, 0x00010000);
+-    create_unimplemented_device("CMSDK peripheral region @0x40010000",
++    create_unimplemented_device("CMSDK AHB peripheral region @0x40010000",
+                                 0x40010000, 0x00010000);
+     create_unimplemented_device("Extra peripheral region @0x40020000",
+                                 0x40020000, 0x00010000);
++
+     create_unimplemented_device("RESERVED 4", 0x40030000, 0x001D0000);
+     create_unimplemented_device("VGA", 0x41000000, 0x0200000);
  
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-index d33ef27de6..6f773c25a0 100644
---- a/hw/tpm/tpm_ppi.h
-+++ b/hw/tpm/tpm_ppi.h
-@@ -12,7 +12,6 @@
- #ifndef TPM_TPM_PPI_H
- #define TPM_TPM_PPI_H
- 
--#include "hw/acpi/tpm.h"
- #include "exec/address-spaces.h"
- 
- typedef struct TPMPPI {
-diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
-index 30ba37079d..42f909ff1e 100644
---- a/hw/tpm/tpm_tis_isa.c
-+++ b/hw/tpm/tpm_tis_isa.c
-@@ -26,6 +26,7 @@
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "hw/acpi/tpm.h"
- #include "tpm_util.h"
- #include "tpm_tis.h"
- 
-diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
-index eced1fc843..edca1dae0d 100644
---- a/hw/tpm/tpm_tis_sysbus.c
-+++ b/hw/tpm/tpm_tis_sysbus.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "hw/acpi/tpm.h"
- #include "tpm_util.h"
- #include "hw/sysbus.h"
- #include "tpm_tis.h"
 -- 
-2.24.1
+2.20.1
 
 
