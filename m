@@ -2,95 +2,87 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2C5C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E342CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DCA820724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8EF320724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgdFiUa6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DCA820724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i+THWZ5U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EF320724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnf6r-00045C-I8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:20:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53092)
+	id 1jnf7I-0004iN-VK
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnf5h-0002tP-Va
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:19:41 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60666
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnf5g-0001IF-8I
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:19:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592903979;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Bl7lOpgMnvotqjPLbSfMN9zL6BPdSRJ7iWJANapg8XE=;
- b=hgdFiUa6THyInFBEqlo2WhR40mnOlTVv3VqZ+cqhslw31o1EubODOF60jLpGZ29EoH2QCM
- N+crX+YCZPtsIRijRqyHHafhqBEk1SXRK3dawm+jA+UzKoM6IyMNDBOX2AUMq+fw4bn4kt
- m4BYHGhQkZ2i+hXZItBtCaMv5BFKUrs=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-cbDfmqXvPQqWSxJrxbIYSg-1; Tue, 23 Jun 2020 05:19:35 -0400
-X-MC-Unique: cbDfmqXvPQqWSxJrxbIYSg-1
-Received: by mail-pf1-f200.google.com with SMTP id b6so15365556pfr.20
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:19:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnf5y-0003HG-P7
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:19:58 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41896)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnf5v-0001NC-NV
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:19:58 -0400
+Received: by mail-ot1-x344.google.com with SMTP id k15so15881194otp.8
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:19:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=AEb5s+GUhyRzuTnhQbtbo27oAkxKXoB/Zj5TeJetDe0=;
+ b=i+THWZ5UaDbQXuNVseEZyK5cFQklmhA3f50o/rX6QUzrezkeoyn2jyNux1l/zteJWE
+ SHRJo5X/tx/gsNra/S7gQJzjsgHir326zb1wyNUuZe5TpVrE8JZf9/RjHhf+LZOa/lCv
+ mqtf1qz7p9NEsmB/CNmgQbyYrV+XhL6QWrC0U3RMOkwE/J8MWo5fThOvRlgkm7EdVbqd
+ 7dDWyT5oNLW+viGp11OzRc/TUOkaT3JvcE4hiN1OiePb/U0XdndnhzedxTdZRKCmVLKM
+ ldZZoY9BWee1N11+kLbx2PwcY40G93A5lSBEuP7QYPhLYO90OW6WrjyEG0wJZEErfZj9
+ gjjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Bl7lOpgMnvotqjPLbSfMN9zL6BPdSRJ7iWJANapg8XE=;
- b=gPRGgzMpFNX8X/2u0CSMBvsS7qtZkOLRtQTAeWQk8V18XpeYxXoJIgw3BTmxrNK2m2
- deXANW6med1kQ62P4k0AUXMxqO/JG/4so9CpV1NKHRQBBjqKS7GqYMJNF8OLTCtzNUJN
- b7MmxDtJVR/raEjnLrOID/1yMBjycHgLTPyu0zNOs83NdImq0P9i5Ay54NuPH5SaIONE
- swVSol0MyPXBjU/z8VI+dw4k7hp/zKgYZ3S08Nwkc+hUMi8vB53aXsg5yLrua1uxaWJK
- +e7tDEX+2TthZWteiE5OPvEIsYaRk1fNKCEYcjONm+S+8ZQFevfJszL9f/Dcx2RZ1ljS
- WmNg==
-X-Gm-Message-State: AOAM530KcWXxgYY4tRLYuYsj+iPQRMXCNtr5uF+VGPMsXvrWmJikva7l
- PhjmAsLikNnftlQs7DSK5Y2mxah64+4Z0T1PXg5x9cbOtHKcUVshk4fqYZQ86LX7G/flIocc6Wl
- mvxUZfIcOW6bsH+lIyqF+ngFh0Rz9t/4=
-X-Received: by 2002:a63:1617:: with SMTP id w23mr16751394pgl.248.1592903974197; 
- Tue, 23 Jun 2020 02:19:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/6j++m60K2Mb7qqTgUzC3iqArXSQprwM2RfHxMWJ4Xfvg6YKvogEubGNvPAKJDk/BqrWww4lDJXnUYBCSf7E=
-X-Received: by 2002:a63:1617:: with SMTP id w23mr16751381pgl.248.1592903973966; 
- Tue, 23 Jun 2020 02:19:33 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=AEb5s+GUhyRzuTnhQbtbo27oAkxKXoB/Zj5TeJetDe0=;
+ b=jCu3ISfH7Er9Y5WCPpayp6V/ZvmpLugWNkaE5QgAyBbH8ssz17JU+Q56FCKB1IrKhc
+ +J3rsQvgddZaUX/02vRf4bPeskZAt2+BezHK0pZDZjcNtwbHCwOzwSf3ehOvRyh/CtqE
+ 9ko78ZTrtq9dZ8w1uRk4HhbIR+8xf0UNtOqGuIvdrPq7N3sOj3ZXeMoRcx67tHfT6VFT
+ ou48H+5G74N5eRDryDbFpgCbdiYWzgy8eS6m/OqzOGrhkA30z/uEHATWE4u3J7IM9jvk
+ o9r68GAsgNV8ZqWqu/+GSb2xSFKdk5xMLOtdQTeJIJTrhdhTIziXB3wkfAIw+W6cOg/I
+ iZJQ==
+X-Gm-Message-State: AOAM532swrBe034yoe5GYCPR2OIEyf5uwTrntJmVYxZFrPDeHzmGt46l
+ P9oxdsPJWNJoY6nhy72lhFVt0pM6v9HunPRF1jziug==
+X-Google-Smtp-Source: ABdhPJw3QSud07RewYsEGl8YDK+8cD3uzas0MwvOEfk2fxtu2UeDM2rcV88JRv8fjUbcja10MxHa/29qrpOmBAB/jfw=
+X-Received: by 2002:a9d:5786:: with SMTP id q6mr3344560oth.135.1592903994331; 
+ Tue, 23 Jun 2020 02:19:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200622153756.19189-1-lulu@redhat.com>
- <20200622153756.19189-11-lulu@redhat.com>
- <875zbi45n2.fsf@dusky.pond.sub.org>
-In-Reply-To: <875zbi45n2.fsf@dusky.pond.sub.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 23 Jun 2020 17:19:23 +0800
-Message-ID: <CACLfguUyyuwTAa8P5dnKM+Zu5TboG8gAoLWAWLwvAoipiipWEQ@mail.gmail.com>
-Subject: Re: [PATCH v1 10/10] vhost-vdpa: introduce vhost-vdpa net client
-To: Markus Armbruster <armbru@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20200623090622.30365-1-philmd@redhat.com>
+ <20200623091807.vlqy53ckagcrhoah@kamzik.brq.redhat.com>
+In-Reply-To: <20200623091807.vlqy53ckagcrhoah@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 23 Jun 2020 10:19:43 +0100
+Message-ID: <CAFEAcA-2-g=ZMMRkxoT-ncxqbdjc5vV1WbFzGXw7R8o7QOb6hQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/2] target/arm: Fix using pmu=on on KVM
+To: Andrew Jones <drjones@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,99 +95,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, Michael Tsirkin <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Rob Miller <rob.miller@broadcom.com>, saugatm@xilinx.com,
- Maxime Coquelin <maxime.coquelin@redhat.com>, hch@infradead.org,
- Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
- mhabets@solarflare.com, Shahaf Shuler <shahafs@mellanox.com>,
- kevin.tian@intel.com, parav@mellanox.com,
- Vitaly Mireyno <vmireyno@marvell.com>, "Liang,
- Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
- Zhihong" <zhihong.wang@intel.com>, Tiwei Bie <tiwei.bie@intel.com>,
- Ariel Adam <aadam@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- hanand@xilinx.com, "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 23, 2020 at 3:13 PM Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, 23 Jun 2020 at 10:18, Andrew Jones <drjones@redhat.com> wrote:
 >
-> QAPI schema review only.
->
-> Cindy Lu <lulu@redhat.com> writes:
->
-> > This patch set introduces a new net client type: vhost-vdpa.
-> > vhost-vdpa net client will set up a vDPA device which is specified
-> > by a "vhostdev" parameter.
+> On Tue, Jun 23, 2020 at 11:06:20AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > Since v2:
+> > - include Drew test fix (addressed Peter review comments)
+> > - addressed Drew review comments
+> > - collected R-b/A-b
 > >
-> > Signed-off-by: Lingshan Zhu <lingshan.zhu@intel.com>
-> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> [...]
-> > diff --git a/qapi/net.json b/qapi/net.json
-> > index cebb1b52e3..03aad67693 100644
-> > --- a/qapi/net.json
-> > +++ b/qapi/net.json
-> > @@ -428,6 +428,24 @@
-> >      '*vhostforce':    'bool',
-> >      '*queues':        'int' } }
+> > Andrew Jones (1):
+> >   tests/qtest/arm-cpu-features: Add feature setting tests
 > >
-> > +##
-> > +# @NetdevVhostVDPAOptions:
-> > +#
-> > +# Vhost-vdpa network backend
->
-> Considering this ends up in QMP reference documentation, could you add a
-> hint on what "Vhost-vdpa" is?
->
-> > +#
-> > +# @vhostdev: name of a vdpa dev path in sysfs
->
-> How is this thing to be spelled in text, vdpa, VDPA or vDPA?
->
-> Avoid unnecessary abbreviations in doc text, please: write "device
-> path", not "dev path".
->
-> > +#            (default path:/dev/vhost-vdpa-$ID)
->
-> What's $ID?
->
-Thanks, I will rewrite this part and make it clear
-> > +#
-> > +# @queues: number of queues to be created for multiqueue vhost-vdpa
-> > +#          (default: 1)
-> > +#
-> > +# Since: 5.1
-> > +##
-> > +{ 'struct': 'NetdevVhostVDPAOptions',
-> > +  'data': {
-> > +    '*vhostdev':     'str',
-> > +    '*queues':       'int' } }
-> > +
-> >  ##
-> >  # @NetClientDriver:
-> >  #
-> > @@ -437,7 +455,7 @@
-> >  ##
-> >  { 'enum': 'NetClientDriver',
-> >    'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-> > -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
-> > +            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
+> > Philippe Mathieu-Daud=C3=A9 (1):
+> >   target/arm: Check supported KVM features globally (not per vCPU)
 > >
-> >  ##
-> >  # @Netdev:
-> > @@ -465,7 +483,8 @@
-> >      'bridge':   'NetdevBridgeOptions',
-> >      'hubport':  'NetdevHubPortOptions',
-> >      'netmap':   'NetdevNetmapOptions',
-> > -    'vhost-user': 'NetdevVhostUserOptions' } }
-> > +    'vhost-user': 'NetdevVhostUserOptions',
-> > +    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
+> >  target/arm/kvm_arm.h           | 21 ++++++++-----------
+> >  target/arm/cpu.c               |  2 +-
+> >  target/arm/cpu64.c             | 10 ++++-----
+> >  target/arm/kvm.c               |  4 ++--
+> >  target/arm/kvm64.c             | 14 +++++--------
+> >  tests/qtest/arm-cpu-features.c | 38 ++++++++++++++++++++++++++++++----
+> >  6 files changed, 56 insertions(+), 33 deletions(-)
 > >
-> >  ##
-> >  # @NetLegacy:
+> > --
+> > 2.21.3
+> >
+> >
 >
+> Hi Phil,
+>
+> Thanks for including the test patch. To avoid breaking bisection, if one
+> were to use qtest to bisect something, then the order of patches should
+> be reversed. I guess Peter can apply them that way without a repost
+> though.
 
+Yeah, I can just flip the order.
+
+thanks
+-- PMM
 
