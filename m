@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B25C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 16:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00878C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 16:59:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 971972076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 16:55:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B73A92076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 16:59:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAoNddkB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 971972076E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b7zcgn8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73A92076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnmCe-0002pJ-Qq
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 12:55:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50744)
+	id 1jnmGY-0005yx-1i
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 12:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnmC2-0002Pj-Ms
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 12:54:42 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:32919)
+ id 1jnmFx-0005Th-C6
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 12:58:45 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44638)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jnmC0-0006xN-Pm
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 12:54:42 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l11so21312552wru.0
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 09:54:40 -0700 (PDT)
+ id 1jnmFv-0000Ks-DI
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 12:58:45 -0400
+Received: by mail-wr1-x442.google.com with SMTP id b6so21299325wrs.11
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 09:58:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=Ch4LbcUZyo/u10MPvsGlPUCFmPf2YewDsgxiuyT7lp8=;
- b=qAoNddkBfur8DS1VqZu5jR4gRMA0JEsD4WEz+HBvK2pe/XR3nWZ0QCLbhmSQl48bKW
- L+KLLfKbN7HY9FctzD/WBdAfPrw/PETlVJy06DDuh8gWgu+V/TBLN1FMW/HblU18fvOS
- mJnrf2MRdRQAOSxLtc1mtFtwznaj+1g8binlnCzq2b237hHjkMw4Lc6LrVSVnMbp1z+D
- n1PcnDy1wwZnhmu8+Pj5BB59wwStCcYI1o5GXt+7XcJKR5q4+1uWqWIv1PnUyKbbZRbG
- iR9uGkoN97a+Ue6uU4pMrSv8Qnb+mvamPFDU89wrYmZLtGzl0dvt4zDF1LALz4UT+9D/
- bSuA==
+ bh=jLujH8z7TJU9u/evnTRL+oyitCVDncHuIz7gwPOSjAo=;
+ b=b7zcgn8r0BunniVCaIBNZfjQtrGTE1FZcPTmmH4gYDJtTINu1dmk/oMSjFk/sO6DY/
+ LcamIw3u4Os3QIKzEUaoF6LVr1GoYHkY61rFhNgxwEDV4djDJqOA+HSJq30VOnnGC1wH
+ EFN3IOuzM+eJ2tR7m3zaVNo6tTjw641B/v+W2XxpIGOeeWeg7RscOpPVOPbpOBFn79Eh
+ K8+7cU3p+2B/nIbItr6ekP7JEQtiji+L4uUrhsPuZUo0xIEpwcz6U6Sh3+i+oyvXaY/f
+ P/7MYCwG7jpsWl4zvIolagT/t0C57JEivOA6fuF2tvmD2ZS0T3fGFu90+WNaD9RSTcZ0
+ ElSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Ch4LbcUZyo/u10MPvsGlPUCFmPf2YewDsgxiuyT7lp8=;
- b=DrAvPwUgS8jGWBgLyBrUymssQmcRyUk1OibEhicZ370InDfFL/UyKKd2Uiq0S8fdOj
- RJD471vQMjsLxwBQKSXDoExBC4TBJrtVI4ORUZ4EpLiIae6XZ9B10QcJR/LyZjZsXdPK
- G+Yk/wa+lBd4g6Ta5KbmSKP3BhaOU5E6ZvI5fQVIY01x3/F/XgE+BrwhhsQNjQR9H5ME
- JBzowvKsz5wcUgmhXIsxUCvFutPZz8Q+39HWXo9AhxL74kk7sJYkVa6Qg4HGY6kh08d4
- lPpe83Yv4MdYfOoDvZ9iPs1dg1I2IfGEE7jEEwndUBCZxPJPGlwiBU1bW6oW137Tt/eQ
- ynZw==
-X-Gm-Message-State: AOAM533Yi2aEhcn/DAPE3bXhEAyS8HoGTtYHkED4pj3ACChHyq4GF9hv
- WpLI5r6UhRzfuTO7iwWhR3PiUg==
-X-Google-Smtp-Source: ABdhPJzPTMzhUsq0mBf92JCDgaSTj6UvNHwvvfwYWOATZFSCbGzJKA0nLfnrJKXG/ms6OhjE1WiR1g==
-X-Received: by 2002:adf:f452:: with SMTP id f18mr2448200wrp.78.1592931279085; 
- Tue, 23 Jun 2020 09:54:39 -0700 (PDT)
+ bh=jLujH8z7TJU9u/evnTRL+oyitCVDncHuIz7gwPOSjAo=;
+ b=ib/jp/uJrxbjxff5D72YEfiy/04JnRCC3i+IOEPZfI53TV8a3eJ5H5nwKu+G6wkdAf
+ iyYnXW7nqNCD+fPdiQvSYQXm0az0P009kyVFVJZE2mFntXlZIePf12RNex+IUZ9O5BsX
+ bvyseDCnuFWhvEk3FPLIIhOclAn0cW7JClZaxlACR9yJ3vC33LMw5hk7rHFz5v6Cfw8f
+ /baSb6iWCyA7GWRvHoWr4/IWHzWw8hbNrg1VlM71YBXFgfET561y0v6xnAbELDfjg19m
+ OfuTORMz+48zMMcS8epMPv5cna6TZmKR5krPlALzdw2DD61UxRzTCVcqNpMM/WoySKZS
+ AmBw==
+X-Gm-Message-State: AOAM530BZ6AqcajB46Z9PtFYfjVTXZ38oqGvD7NH3rf/F/lX8mHACC9S
+ WgALs7hAFSY6QxoOF3FObtMxCg==
+X-Google-Smtp-Source: ABdhPJzqPObGaUWn82A/HdxbDfgc2GNufaWoowJenQutjg5OcevNvt+lBC8K0rR0BeqnkrHHcJFpmw==
+X-Received: by 2002:adf:c3c7:: with SMTP id d7mr25697947wrg.51.1592931521506; 
+ Tue, 23 Jun 2020 09:58:41 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a81sm4903308wmd.25.2020.06.23.09.54.37
+ by smtp.gmail.com with ESMTPSA id v7sm3113615wmj.11.2020.06.23.09.58.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 09:54:37 -0700 (PDT)
+ Tue, 23 Jun 2020 09:58:40 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D66421FF7E;
- Tue, 23 Jun 2020 17:54:36 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 736AC1FF7E;
+ Tue, 23 Jun 2020 17:58:39 +0100 (BST)
 References: <20200522023440.26261-1-richard.henderson@linaro.org>
- <20200522023440.26261-21-richard.henderson@linaro.org>
+ <20200522023440.26261-22-richard.henderson@linaro.org>
 User-agent: mu4e 1.5.3; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3 20/25] aarch64: Use arch_init to configure sve
-In-reply-to: <20200522023440.26261-21-richard.henderson@linaro.org>
-Date: Tue, 23 Jun 2020 17:54:36 +0100
-Message-ID: <874kr190z7.fsf@linaro.org>
+Subject: Re: [PATCH v3 21/25] ppc64: Use uint64_t to represent double
+In-reply-to: <20200522023440.26261-22-richard.henderson@linaro.org>
+Date: Tue, 23 Jun 2020 17:58:39 +0100
+Message-ID: <871rm590sg.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,9 +112,8 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Adjust some of the aarch64 code to look at the reginfo struct
-> instead of looking at test_sve, so that we do not need to pass
-> the --test-sve option in order to dump sve trace files.
+> We want to do exact bitwise comparisons of the data,
+> not be held hostage to IEEE comparisons and NaNs.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
