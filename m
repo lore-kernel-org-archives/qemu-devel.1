@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4FDC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B155C433E0
 	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CA6220724
+	by mail.kernel.org (Postfix) with ESMTPS id 49B9D20768
 	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J4xoYTT8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA6220724
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VWuJXmrq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B9D20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhI4-00045F-C7
+	id 1jnhI4-00045j-FH
 	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:40:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43750)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhGh-0002Gh-Tq
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:33273)
+ id 1jnhGi-0002H1-Op
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:12 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37985)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhGg-00034F-D2
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
-Received: by mail-wm1-x335.google.com with SMTP id a6so2054015wmm.0
+ id 1jnhGg-00032s-Cq
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:12 -0400
+Received: by mail-wm1-x335.google.com with SMTP id f18so2852072wml.3
  for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=e266PxlxI12WIYe2b81DHcJwXbjmet15CRZzovOJKkQ=;
- b=J4xoYTT80RBlY5T0MCRlP3aAe884iA1hWTOX8NckEEk5skPw5XVJ2yH/A8o9cuzCrN
- BsOfxxoVTDwQ7jLQeGRaRJWVtB9/IhyINRDxldb1Tzzb5azk+nrd71d+KkpnIEXvnfMG
- D2G466I3n2TpVHYtOEb3iJ0P9K4on4egQK1jNZhDR4i/WQPVV2y2L07CyykQvB637X8j
- nIrgoKtpUYIM+RdSYPLJe6FhF5DRqVzAzlXeaeVRRROb3/uoopJ50qCbOr64g4eDxOLm
- U4vXg8LKqAWHw70OMJAazkrUNzkw5CNnuffBmP3OwqtZ9UTeAatRI573em3nO+PdeLfk
- o7nA==
+ bh=e3yZlBX9xNiG28mBJ+uBjbIqL32jKJprQAQLqWGSi0A=;
+ b=VWuJXmrqw5jLLWYk1lXl9ByPaFD/NRv9X7Xadp3Hzi8ZQBz3mPe4r+JFKlsDYpgCsz
+ 1HP1bKaxXNVTCJn1fyw5ru0AxaeZASByNijBWrHhe4fnHVHZwAYbXgGE22COfgL/BPvD
+ KvU9w2F5DhWO7qVMrqWbscf8uJ7Dg3oRousyncgy7TGV6AGCJ5LaBWIDcnObV1ZESb3h
+ 2yt/CKzYV3Vnfp5KGCQ81eILjhswDLbRzoZF1VCCiqOntMzIfxg4zfQ9qcNwCOQgeog7
+ qxTwFa15UyijDPzxkEU5wzJopwq4pkP4h2UHnOMK/uZkuTaEZtXG+q8auDNjpn1LfrP7
+ QpnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=e266PxlxI12WIYe2b81DHcJwXbjmet15CRZzovOJKkQ=;
- b=BLcHSMV6K+T0ejT3kKbh2JGOUkA9EWZrTX/hE447gZzdf4Wl9oVXJYQ0SNyBLIuUO8
- 3yMimxBz06XA14sctCY/WUEyPzpNIHAXgw9kxsLVNxGCc1k22TC8jQAbHCBDJKfMQVWx
- 5xgE4opXYqy8VS9QJuvnnoakQb1iiyobv3eyfvrKgqh7RhpLYISILh6UMsR1g5tSiVzy
- 5wAnGbKGZnj5UwLPIwwwEOlBvqAevHZzmOgvdFfHC1M91Z7vWQgO8wVEtESXS7c/htOc
- dvI01tpEi0oUsPfgmpf0CEtI8dxyQfzlxqSOmJvo5g4MiDJdNAdb7QIBhNXS9PqLa52h
- iJYw==
-X-Gm-Message-State: AOAM531VMSYYWsgXlME9FC5A8gDm/ntMZ3KEzr73fqAyInrzmNy32xSq
- Hxxf0dAAJL3870qB3ZoIOGw/wxYLgst5Qw==
-X-Google-Smtp-Source: ABdhPJyI0c+Rhc2M5a2pdRs+oP/rdDLkVkaPCX4Zl/0SQQCDZcCe9fN5/Y+7ItNGGfCG6+A+P68TCQ==
-X-Received: by 2002:a7b:cd90:: with SMTP id y16mr16341769wmj.20.1592912348879; 
- Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
+ bh=e3yZlBX9xNiG28mBJ+uBjbIqL32jKJprQAQLqWGSi0A=;
+ b=rBDauGkPqpojmwDcIrinHuivdn0Kc+Y4rwhLpMGbF+CKUPUWgyJYIfk1H4iEdnb+lw
+ rcpTHOk6k8CEt8VSUOl5rjmYgusH0VshOwbxpIJy/hsBqA5g9STjLzqDPKB7q9GxsXTX
+ qK9WUmg4UCfq+uUViDKoTZtvUsnDUOfxOz2MyTJ82qWM3TvSXZUD//ImRDukwI0AUMkx
+ WXF+5gpAEOa9R547YeAMOYExSE8Qo2Wj0WHB20pUJ+JmS9elsmgIbdPkDzj6Am9x8EDb
+ LyhpVUk1HUQUicRKYTXoj809CHbBtB1PujUkkgFXscazK6pbSvwfQ/K9EPQX7jcAXHYg
+ pETw==
+X-Gm-Message-State: AOAM531f44W1Msoas31p2LOXzLG2xBMEXfg1c6UnxdAsQDjl9b/hgaht
+ 6lYCrStOATC3jy/4h+N6pfcSo045Wg2hWw==
+X-Google-Smtp-Source: ABdhPJxIaUycr491S7rgBlTgZKK1cO6pzvKeF0E4BO5MooNaF1yLcojznUKRJ/UdIX2QOCFgVLs4XQ==
+X-Received: by 2002:a05:600c:c1:: with SMTP id u1mr9086839wmm.48.1592912347866; 
+ Tue, 23 Jun 2020 04:39:07 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.08
+ by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.06
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
+ Tue, 23 Jun 2020 04:39:07 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/42] util/oslib-posix : qemu_init_exec_dir implementation for
- Mac
-Date: Tue, 23 Jun 2020 12:38:24 +0100
-Message-Id: <20200623113904.28805-3-peter.maydell@linaro.org>
+Subject: [PULL 01/42] hw/arm/virt: Add 5.0 HW compat props
+Date: Tue, 23 Jun 2020 12:38:23 +0100
+Message-Id: <20200623113904.28805-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200623113904.28805-1-peter.maydell@linaro.org>
 References: <20200623113904.28805-1-peter.maydell@linaro.org>
@@ -105,56 +104,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David CARLIER <devnexen@gmail.com>
+From: Andrew Jones <drjones@redhat.com>
 
-From 3025a0ce3fdf7d3559fc35a52c659f635f5c750c Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Tue, 26 May 2020 21:35:27 +0100
-Subject: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for Mac
-
-Using dyld API to get the full path of the current process.
-
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Message-id: CA+XhMqxwC10XHVs4Z-JfE0-WLAU3ztDuU9QKVi31mjr59HWCxg@mail.gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-id: 20200616140803.25515-1-drjones@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- util/oslib-posix.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hw/arm/virt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 916f1be2243..39ddc77c85b 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -57,6 +57,10 @@
- #include <lwp.h>
- #endif
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index caceb1e4a05..8b6e6aa7b13 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2375,6 +2375,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+     virt_machine_5_1_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+ }
+ DEFINE_VIRT_MACHINE(5, 0)
  
-+#ifdef __APPLE__
-+#include <mach-o/dyld.h>
-+#endif
-+
- #include "qemu/mmap-alloc.h"
- 
- #ifdef CONFIG_DEBUG_STACK_USAGE
-@@ -375,6 +379,17 @@ void qemu_init_exec_dir(const char *argv0)
-             p = buf;
-         }
-     }
-+#elif defined(__APPLE__)
-+    {
-+        char fpath[PATH_MAX];
-+        uint32_t len = sizeof(fpath);
-+        if (_NSGetExecutablePath(fpath, &len) == 0) {
-+            p = realpath(fpath, buf);
-+            if (!p) {
-+                return;
-+            }
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
 -- 
 2.20.1
 
