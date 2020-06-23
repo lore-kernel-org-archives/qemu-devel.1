@@ -2,91 +2,94 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B07C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 01:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBE0C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 02:06:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FDB22075A
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 01:58:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17CAB20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 02:06:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="eumRV4dv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDB22075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="y9DdWDY/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CAB20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnYCs-0005Wp-SF
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 21:58:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42834)
+	id 1jnYKr-0001BY-9s
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 22:06:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jnYCC-0004kE-VD
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 21:57:56 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:41144)
+ (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
+ id 1jnYKB-0000jf-0V
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 22:06:11 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38402)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jnYCB-0007KO-3H
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 21:57:56 -0400
-Received: by mail-qk1-x743.google.com with SMTP id z63so5425658qkb.8
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 18:57:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
+ id 1jnYK5-0005wj-Qb
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 22:06:10 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 64so4077382oti.5
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 19:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=J0rOJOfjboePb7+z/BDV9QAtcExXi9JhBM8abs2lC8s=;
- b=eumRV4dvM/I9RcVJx8K6IImMseTsSAHdrSljjwpV+xAyl4fSV5hxk3j3uK0gV3j1dX
- XneRP3ydKs9MON6FVcqAOsP337Knw82uZKhlAQJp27hvqLMt26qUFawGL1lunxrBrTZX
- 6No/GxcDH/q+NLRsVjR6OnAc+/jfNQOVu5CFPGfQyg7lKSQ3UscAZSLEw3Q18hU1KrMH
- JR0LuR4CKK5WmaAUyrwer6lVJhTKbxFJBcQ4ysOSzW4VVPdOvQrO6Kjv6+UwUhthftdP
- yz+dZ60nx971bkovLZMqjrs232C0l+QLUnH6IjaQPE2EThLyoifGGEmRCiWd0qV2GUAF
- DF+w==
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=vovEO5kooT0fn2inRmrZ6u/7T/x7nRNCPqhucbweRgQ=;
+ b=y9DdWDY/0c8y1uuJggDWc87V1AW03rZtAL+v2u9HQJIPlmC6NhlqVMUk42YUQ6JF0M
+ +w8PuRUAIwoVe7Lg6Dy0r1TFH+wWfQDFqUhk6L2QX7SB1ETQHEnvfzrLWzdjicpwT72T
+ e2ZWceWtWPqZUpWAAscAMyzK2IO4DQdKlKOoZi6P46SxdzbZMHYvPRsmp0NESbwquenz
+ f9VzPtP1qOO5mrMRw48+Q6CCRUB73xcI6PJJYPr8PdG1V4iMTz4gpfBcvgglIbKFIpX4
+ avcMynQ44eKRNiNeHI3vwv59OOyvA1jBXcOyPl5S1joQU2uqjACtbwDEWcdEHoVa6siQ
+ OyLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=J0rOJOfjboePb7+z/BDV9QAtcExXi9JhBM8abs2lC8s=;
- b=VsyVIaV6xygzfoNikglBX5A2zmaYNzO/LATPwNULWSDsd1hmVaWPYCwqm1aQ9uIgfE
- Pu6WMO/8U76CcckpXGwQgsvr3Yr1poOwMOMM2YhHm82uFRmKcL8felMP/tAcSKdeEoi6
- onTXHQZu3JWnuQ9dis2vylB9d70CSWVnFwyrX8BNxm2AIvGC2inNqSPfZ0F4/huZtQfw
- vqwNv+C/ESj7IlY2zqIpWvQki0QQ9wohgq1P58a/yLdlRsud1HvGPrjwQ+s1Sc622zU0
- 4PV0z3j5Lrx1k0Ut1pOfStINTwJTaiYN2vap9xX+TKqHX46GNInNtxJnMxdpgeLzkZvi
- oo3g==
-X-Gm-Message-State: AOAM531f+hR367In6gWa6qVlN4Jae3uHChK5w5rqyEhckTQ9TzHuKebx
- SdLgGQUKwjjltyx5JwJ1OsOEQA==
-X-Google-Smtp-Source: ABdhPJyW5VQU//EUmrgt1h1o/rwN2BXsOXTd4y2xSsauKrWm6u9mMIUe9rAy1bKWf1XmUWJfQsMtig==
-X-Received: by 2002:a37:488c:: with SMTP id
- v134mr18522350qka.318.1592877473885; 
- Mon, 22 Jun 2020 18:57:53 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id r2sm9641828qtn.27.2020.06.22.18.57.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 22 Jun 2020 18:57:53 -0700 (PDT)
-Date: Mon, 22 Jun 2020 21:57:52 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] tests/qht-bench: Adjust rate computation and comparisons
-Message-ID: <20200623015752.GB280811@sff>
-References: <20200620214551.447392-1-richard.henderson@linaro.org>
- <20200621212825.GB168836@sff>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=vovEO5kooT0fn2inRmrZ6u/7T/x7nRNCPqhucbweRgQ=;
+ b=q1IyWCVGRsihMRA3swYHCW9+GayWQlscktlPTY35xS+Mr7qUZyrg35DQ1kE0IZUoss
+ j7cimwlQ6lcG0EwYau567jFyxXfaREtRso5hhO8TIvhKLkZaKqM9ynY3720HEoJw3r6g
+ 6byVJ3ZOd81HJQ5DhCBSJ0YaIDGOZvKOKPazwT26BD7TD3+Mqh8U6Xqh6DXOZCrnHApG
+ ImtAREdkG6iCKOmcT+FUAlTWaNf5gGxYK4y0J64agOWMZTjrWPptzs/EshtIQjF9IsWb
+ QdZtYwNF/uusR8Ew9r2l8lPvTVo17zviz3GaWonzTGA+PpimTYIzpzn7Wb4Rn1RhLFTD
+ 18aA==
+X-Gm-Message-State: AOAM531XJhbi5SqiTHLualiprigWj0ka7iCMqRCuQLCEAUlv3O4ZnRcd
+ 4XdqfQrmiKKUulbd8o62XfMWIg==
+X-Google-Smtp-Source: ABdhPJz0PEAInB/GyrALU51vjYMV6semejdJl0V2J9ggrwKPWV83EDNksS+Gqlw8Qv2wsYzrw1oXIg==
+X-Received: by 2002:a4a:87c9:: with SMTP id c9mr16638942ooi.72.1592877963776; 
+ Mon, 22 Jun 2020 19:06:03 -0700 (PDT)
+Received: from minyard.net ([2001:470:b8f6:1b:acca:171:3424:849f])
+ by smtp.gmail.com with ESMTPSA id o2sm3704787ota.14.2020.06.22.19.06.02
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 22 Jun 2020 19:06:03 -0700 (PDT)
+Date: Mon, 22 Jun 2020 21:06:01 -0500
+From: Corey Minyard <cminyard@mvista.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH] i2c: Match parameters of i2c_start_transfer and
+ i2c_send_recv
+Message-ID: <20200623020601.GD3258@minyard.net>
+References: <20200621145235.9E241745712@zero.eik.bme.hu>
+ <20200622213237.GB3258@minyard.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200621212825.GB168836@sff>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::743;
- envelope-from=cota@braap.org; helo=mail-qk1-x743.google.com
+In-Reply-To: <20200622213237.GB3258@minyard.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: permerror client-ip=2607:f8b0:4864:20::344;
+ envelope-from=cminyard@mvista.com; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,86 +102,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Reply-To: cminyard@mvista.com
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Philippe, who authored the fix for this in May as I mention below.
+On Mon, Jun 22, 2020 at 04:32:37PM -0500, Corey Minyard wrote:
+> On Sun, Jun 21, 2020 at 04:43:38PM +0200, BALATON Zoltan wrote:
+> > These functions have a parameter that decides the direction of
+> > transfer but totally confusingly they don't match but inverted sense.
+> > To avoid frequent mistakes when using these functions change
+> > i2c_send_recv to match i2c_start_transfer. Also use bool in
+> > i2c_start_transfer instead of int to match i2c_send_recv.
+> 
+> Hmm, I have to admit that this is a little better.  Indeed the
+> hw/misc/auxbus.c looks suspicious.  I can't imagine that code has ever
+> been tested.
+> 
+> I don't know the policy on changing an API like this with silent
+> semantic changes.  You've gotten all the internal ones; I'm wondering if
+> we worry about silently breaking out of tree things.
+> 
+> I'll pull this into my tree, but hopefully others will comment on this.
 
-		Emilio
+The more I think about it, the more I think it's a better idea to rename
+the function.  Like i2c_send_or_recv(), which is a little more clear
+about what it does.  Does that sound good?
 
-On Sun, Jun 21, 2020 at 17:28:25 -0400, Emilio G. Cota wrote:
-> On Sat, Jun 20, 2020 at 14:45:51 -0700, Richard Henderson wrote:
-> > Use <= comparisons vs the threshold, so that threshold UINT64_MAX
-> > is always true, corresponding to rate 1.0 being unity.  Simplify
-> > do_threshold scaling to 2**64, with a special case for 1.0.
+-corey
+
+> 
+> -corey
+> 
 > > 
-> > Cc: Emilio G. Cota <cota@braap.org>
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > > ---
-> >  tests/qht-bench.c | 15 +++++++++++----
-> >  1 file changed, 11 insertions(+), 4 deletions(-)
+> > Looks like hw/misc/auxbus.c already got this wrong and calls both
+> > i2c_start_transfer and i2c_send_recv with same is_write parameter.
+> > Although the name of the is_write variable suggest this may need to be
+> > inverted I'm not sure what that value actially means and which usage
+> > was correct so I did not touch it. Someone knowing this device might
+> > want to review and fix it.
 > > 
-> > diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-> > index eb88a90137..21b1b7de82 100644
-> > --- a/tests/qht-bench.c
-> > +++ b/tests/qht-bench.c
-> > @@ -132,7 +132,7 @@ static void do_rz(struct thread_info *info)
+> >  hw/display/sm501.c   |  2 +-
+> >  hw/i2c/core.c        | 34 +++++++++++++++++-----------------
+> >  hw/i2c/ppc4xx_i2c.c  |  2 +-
+> >  include/hw/i2c/i2c.h |  4 ++--
+> >  4 files changed, 21 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> > index 2db347dcbc..ccd0a6e376 100644
+> > --- a/hw/display/sm501.c
+> > +++ b/hw/display/sm501.c
+> > @@ -1034,7 +1034,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
+> >                      int i;
+> >                      for (i = 0; i <= s->i2c_byte_count; i++) {
+> >                          res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
+> > -                                            !(s->i2c_addr & 1));
+> > +                                            s->i2c_addr & 1);
+> >                          if (res) {
+> >                              s->i2c_status |= SM501_I2C_STATUS_ERROR;
+> >                              return;
+> > diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+> > index 1aac457a2a..c9d01df427 100644
+> > --- a/hw/i2c/core.c
+> > +++ b/hw/i2c/core.c
+> > @@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
+> >   * without releasing the bus.  If that fails, the bus is still
+> >   * in a transaction.
+> >   */
+> > -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
+> > +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
 > >  {
-> >      struct thread_stats *stats = &info->stats;
+> >      BusChild *kid;
+> >      I2CSlaveClass *sc;
+> > @@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
+> >      bus->broadcast = false;
+> >  }
 > >  
-> > -    if (info->r < resize_threshold) {
-> > +    if (info->r <= resize_threshold) {
-> >          size_t size = info->resize_down ? resize_min : resize_max;
-> >          bool resized;
-> 
-> This works, but only because info->r cannot be 0 since xorshift never
-> returns it. (xorshift returns a random number in the range [1, u64max],
-> a fact that I missed when I wrote this code.)
-> If r were 0, then we would resize even if resize_threshold == 0.0.
-> 
-> I think it will be easier to reason about this if we rename info->r
-> to info->seed, and then have a local r = info->seed - 1. Then we can keep
-> the "if random < threshold" form (and its negated "if random >= threshold"
-> as below), which (at least to me) is intuitive provided that random's range
-> is [0, threshold), e.g. [0.0, 1.0) with drand48(3).
-> 
-> > @@ -154,7 +154,7 @@ static void do_rw(struct thread_info *info)
-> >      uint32_t hash;
-> >      long *p;
-> >  
-> > -    if (info->r >= update_threshold) {
-> > +    if (info->r > update_threshold) {
-> >          bool read;
-> >  
-> >          p = &keys[info->r & (lookup_range - 1)];
-> > @@ -281,11 +281,18 @@ static void pr_params(void)
-> >  
-> >  static void do_threshold(double rate, uint64_t *threshold)
+> > -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+> > +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
 > >  {
-> > +    /*
-> > +     * For 0 <= rate <= 1, scale to fit in a uint64_t.
-> > +     *
-> > +     * For rate == 1, returning UINT64_MAX means 100% certainty: all
-> > +     * uint64_t will match using <=.  The largest representable value
-> > +     * for rate less than 1 is 0.999999999999999889; scaling that
-> > +     * by 2**64 results in 0xfffffffffffff800.
-> > +     */
-> >      if (rate == 1.0) {
-> >          *threshold = UINT64_MAX;
-> >      } else {
-> > -        *threshold = (rate * 0xffff000000000000ull)
-> > -                   + (rate * 0x0000ffffffffffffull);
-> > +        *threshold = rate * 0x1p64;
-> 
-> I'm sorry this caused a breakage for some integration tests; I thought
-> this was fixed in May with:
->   https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg01477.html
-> 
-> Just for my own education, why isn't nextafter needed here?
-> 
-> Thanks,
-> 		Emilio
+> >      I2CSlaveClass *sc;
+> >      I2CSlave *s;
+> >      I2CNode *node;
+> >      int ret = 0;
+> >  
+> > -    if (send) {
+> > -        QLIST_FOREACH(node, &bus->current_devs, next) {
+> > -            s = node->elt;
+> > -            sc = I2C_SLAVE_GET_CLASS(s);
+> > -            if (sc->send) {
+> > -                trace_i2c_send(s->address, *data);
+> > -                ret = ret || sc->send(s, *data);
+> > -            } else {
+> > -                ret = -1;
+> > -            }
+> > -        }
+> > -        return ret ? -1 : 0;
+> > -    } else {
+> > +    if (recv) {
+> >          ret = 0xff;
+> >          if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
+> >              sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+> > @@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+> >          }
+> >          *data = ret;
+> >          return 0;
+> > +    } else {
+> > +        QLIST_FOREACH(node, &bus->current_devs, next) {
+> > +            s = node->elt;
+> > +            sc = I2C_SLAVE_GET_CLASS(s);
+> > +            if (sc->send) {
+> > +                trace_i2c_send(s->address, *data);
+> > +                ret = ret || sc->send(s, *data);
+> > +            } else {
+> > +                ret = -1;
+> > +            }
+> > +        }
+> > +        return ret ? -1 : 0;
+> >      }
+> >  }
+> >  
+> >  int i2c_send(I2CBus *bus, uint8_t data)
+> >  {
+> > -    return i2c_send_recv(bus, &data, true);
+> > +    return i2c_send_recv(bus, &data, false);
+> >  }
+> >  
+> >  uint8_t i2c_recv(I2CBus *bus)
+> >  {
+> >      uint8_t data = 0xff;
+> >  
+> > -    i2c_send_recv(bus, &data, false);
+> > +    i2c_send_recv(bus, &data, true);
+> >      return data;
+> >  }
+> >  
+> > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > index c0a8e04567..d3899203a4 100644
+> > --- a/hw/i2c/ppc4xx_i2c.c
+> > +++ b/hw/i2c/ppc4xx_i2c.c
+> > @@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+> >                      }
+> >                  }
+> >                  if (!(i2c->sts & IIC_STS_ERR) &&
+> > -                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
+> > +                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
+> >                      i2c->sts |= IIC_STS_ERR;
+> >                      i2c->extsts |= IIC_EXTSTS_XFRA;
+> >                      break;
+> > diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+> > index 4117211565..a09ab9230b 100644
+> > --- a/include/hw/i2c/i2c.h
+> > +++ b/include/hw/i2c/i2c.h
+> > @@ -72,10 +72,10 @@ struct I2CBus {
+> >  I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
+> >  void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
+> >  int i2c_bus_busy(I2CBus *bus);
+> > -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
+> > +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
+> >  void i2c_end_transfer(I2CBus *bus);
+> >  void i2c_nack(I2CBus *bus);
+> > -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
+> > +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
+> >  int i2c_send(I2CBus *bus, uint8_t data);
+> >  uint8_t i2c_recv(I2CBus *bus);
+> >  
+> > -- 
+> > 2.21.3
+> > 
 
