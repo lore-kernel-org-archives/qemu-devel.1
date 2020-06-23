@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EB3C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B18C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 266A720776
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:22:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266A720776
+	by mail.kernel.org (Postfix) with ESMTPS id E443320776
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:23:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E443320776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhwj-0003KT-FG
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:22:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45128)
+	id 1jnhxf-0004jQ-8g
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:23:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIq-0006Cy-Ly
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29490
+ id 1jnhIs-0006GQ-Cs
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50712
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIo-0004hQ-N8
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:24 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ id 1jnhIq-0004iS-KO
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:26 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05NBW69C005183; Tue, 23 Jun 2020 07:41:20 -0400
+ 05NBUxck085413; Tue, 23 Jun 2020 07:41:23 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31uej7n0d9-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31ufmyta02-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:20 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBX4N5008354;
- Tue, 23 Jun 2020 07:41:19 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31uej7n0d1-1
+ Tue, 23 Jun 2020 07:41:23 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBVH5P086531;
+ Tue, 23 Jun 2020 07:41:23 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31ufmyt9yh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:19 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBQDt7027079;
- Tue, 23 Jun 2020 11:41:19 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma03wdc.us.ibm.com with ESMTP id 31sa38eujg-1
+ Tue, 23 Jun 2020 07:41:23 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBPfkl023800;
+ Tue, 23 Jun 2020 11:41:22 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma01dal.us.ibm.com with ESMTP id 31sa38vjwn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 11:41:19 +0000
+ Tue, 23 Jun 2020 11:41:22 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05NBfIj256099138
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05NBfJs514418362
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:41:18 GMT
+ Tue, 23 Jun 2020 11:41:19 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5766DC6055;
- Tue, 23 Jun 2020 11:41:18 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id F255DC6057;
+ Tue, 23 Jun 2020 11:41:20 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C8145C6059;
- Tue, 23 Jun 2020 11:41:17 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6F5E2C6055;
+ Tue, 23 Jun 2020 11:41:20 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 11:41:17 +0000 (GMT)
+ Tue, 23 Jun 2020 11:41:20 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 01/12] docs/specs/tpm: Correct header path name
-Date: Tue, 23 Jun 2020 07:41:03 -0400
-Message-Id: <20200623114114.1375104-2-stefanb@linux.vnet.ibm.com>
+Subject: [PULL v1 05/12] hw/tpm: Include missing 'qemu/option.h' header
+Date: Tue, 23 Jun 2020 07:41:07 -0400
+Message-Id: <20200623114114.1375104-6-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
 References: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
@@ -87,12 +87,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-23_06:2020-06-23,
  2020-06-23 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 adultscore=0
- spamscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 mlxlogscore=999 impostorscore=0 cotscore=-2147483648
- suspectscore=1 bulkscore=0 clxscore=1015 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006230088
+ mlxscore=0 malwarescore=0
+ suspectscore=1 priorityscore=1501 phishscore=0 spamscore=0 clxscore=1015
+ cotscore=-2147483648 mlxlogscore=999 adultscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006230088
 Received-SPF: none client-ip=148.163.158.5;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:41:20
@@ -123,31 +122,31 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Commit 8dc6701722 introduce the documentation but an
-incorrect path name was used. Fix that.
+Files using the TPM_STANDARD_CMDLINE_OPTS macro declared in
+"tpm_int.h" will use QEMU_OPT_STRING definition declared in
+"qemu/option.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Message-id: 20200612085444.8362-2-philmd@redhat.com
+Message-id: 20200612085444.8362-6-philmd@redhat.com
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- docs/specs/tpm.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/tpm/tpm_int.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
-index 5e61238bc5..9e48e3b981 100644
---- a/docs/specs/tpm.rst
-+++ b/docs/specs/tpm.rst
-@@ -199,8 +199,8 @@ to be used with the passthrough backend or the swtpm backend.
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index 3fb28a9d6c..fd5ebc6489 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -12,6 +12,8 @@
+ #ifndef TPM_TPM_INT_H
+ #define TPM_TPM_INT_H
  
- QEMU files related to TPM backends:
-  - ``backends/tpm.c``
-+ - ``include/sysemu/tpm.h``
-  - ``include/sysemu/tpm_backend.h``
-- - ``include/sysemu/tpm_backend_int.h``
- 
- The QEMU TPM passthrough device
- -------------------------------
++#include "qemu/option.h"
++
+ #define TPM_STANDARD_CMDLINE_OPTS \
+     { \
+         .name = "type", \
 -- 
 2.24.1
 
