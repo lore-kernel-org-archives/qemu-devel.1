@@ -2,88 +2,62 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF7CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B1E6C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46C7C20780
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:37:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGUWXkAy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C7C20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D78720780
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 23:38:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D78720780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnsTV-0003iF-GK
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 19:37:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56278)
+	id 1jnsUa-0004vv-Vj
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 19:38:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jnsSt-0002pj-K1
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 19:36:31 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:33936)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jnsSr-0000bl-TM
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 19:36:31 -0400
-Received: by mail-io1-xd44.google.com with SMTP id m81so195698ioa.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 16:36:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Nl9jXdNtjAnTCrHlyLE4JKGJ5lvNmMPxJLiGu3DMeiA=;
- b=bGUWXkAy3TXr3oqC4qPelN2zc8gnMZEdpLP3VY7K5r7JmUbDA8HAemH5enETUY40Ef
- klZqEdT/SgPvSvXiGUWF9u9yei1XgAxtRCDI2xY7OA9DFFuFAZy/d+8kLePVF+u7+vvZ
- RsIVhKxrpvMGzfGrGpsX72gKEtAG4qDD4irnwoZl1kDxgDN6B4jqfX6tfOdc8ZFpIs97
- qnT3Up1OC/neH3j4Ar6MC0k92cL9C/A8K3hmHqXYMdvFb5hY+mf1W3fShSUnEMkN4LRi
- y9TG85ymRuLH8RcbfuV9w1lgtg8rqeBQG9HAE95zop8gE+Tb+ajzdtwRRjC/qQ8RAswf
- Wq6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Nl9jXdNtjAnTCrHlyLE4JKGJ5lvNmMPxJLiGu3DMeiA=;
- b=E0hy4c25UPtcIz+Mh8NRBpJb0FhXFtstHYXFLDBUtqb320C0bot0tIr8Ga7ZYPLF6O
- vRyQUnBLWXbM0rzvV9EQlyUGXM0FyiO1wDVUFxQYKC5RNye8V20iBEBpBkacTt0OJ1hq
- 4CNm7CJ+AOGc+TOHpgm+9TscQDR0dLu2jq6mFCrjGnVWI9vkz7PGrQkbHgJn8HPtRe5e
- +z3bonTwWHK4Hr77kvr7EcpoQTF0i9G0lc5jw+faBi2geCS2EthPgYjbQZoFU6gQeE+e
- /1UCwyX/oMp7K9OMVzS8FB7HM3s8u+wKFneUZ7RsQIubFNphfpbjQln5O0+gmveJnGNE
- wrGw==
-X-Gm-Message-State: AOAM5325cQybRQQ2Q35KIEXVktCaDeNJLgrElcNDRU/7theOut3bTf9O
- u1AOV6d87Q0HEg6pdCuHsKpjpCLYdHKjGwzVGaBKBkL3
-X-Google-Smtp-Source: ABdhPJyoWCpXE02O8apDVS06t7kC4vVJSaHSXlmwx830+TITN6vpvY+apUvd8LkTDwagCLEc4pw4kPB+6YELt59QxWI=
-X-Received: by 2002:a05:6638:dd3:: with SMTP id
- m19mr27460860jaj.106.1592955387989; 
- Tue, 23 Jun 2020 16:36:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jnsSw-0002tb-K9; Tue, 23 Jun 2020 19:36:34 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60316)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jnsSu-0000bs-ME; Tue, 23 Jun 2020 19:36:34 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07456405|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.00455244-2.154e-05-0.995426;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HrTLCaQ_1592955387; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HrTLCaQ_1592955387) by smtp.aliyun-inc.com(10.147.40.2);
+ Wed, 24 Jun 2020 07:36:28 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v11 48/61] target/riscv: vector widening floating-point
+ reduction instructions
+Date: Wed, 24 Jun 2020 05:59:07 +0800
+Message-Id: <20200623215920.2594-49-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
+References: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-References: <20200623195441.14646-1-pbonzini@redhat.com>
-In-Reply-To: <20200623195441.14646-1-pbonzini@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 23 Jun 2020 16:26:55 -0700
-Message-ID: <CAKmqyKP4c1qBcWYP3R1bXB8xCR-6GBqwRe6qEYHkMNBjH3LVnA@mail.gmail.com>
-Subject: Re: [PATCH] ibex_uart: fix XOR-as-pow
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 17:32:41
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,43 +70,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 23, 2020 at 1:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The xor-as-pow warning in clang actually detected a genuine bug.
-> Fix it.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/char/ibex_uart.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/char/ibex_uart.c b/hw/char/ibex_uart.c
-> index 3e0dd9968e..45cd724998 100644
-> --- a/hw/char/ibex_uart.c
-> +++ b/hw/char/ibex_uart.c
-> @@ -331,7 +331,7 @@ static void ibex_uart_write(void *opaque, hwaddr addr,
->          if (value & UART_CTRL_NCO) {
->              uint64_t baud = ((value & UART_CTRL_NCO) >> 16);
->              baud *= 1000;
-> -            baud /= 2 ^ 20;
-> +            baud >>= 20;
-
-Whoops, that is clearly wrong. Thanks for catching this.
-
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   |  3 ++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  3 ++
+ target/riscv/vector_helper.c            | 46 +++++++++++++++++++++++++
+ 4 files changed, 54 insertions(+)
 
-Alistair
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 8e8b8d0407..217f09a55c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1089,3 +1089,6 @@ DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 986308e99a..2668d483a7 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -545,6 +545,8 @@ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+ vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
++# Vector widening ordered and unordered float reduction sum
++vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 3dd4171898..b78829be36 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2351,3 +2351,6 @@ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
++
++/* Vector Widening Floating-Point Reduction Instructions */
++GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 0b395ad8d1..61d169398a 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4456,3 +4456,49 @@ GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
+ GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
+ GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
+ GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
++
++/* Vector Widening Floating-Point Reduction Instructions */
++/* Unordered reduce 2*SEW = 2*SEW + sum(promote(SEW)) */
++void HELPER(vfwredsum_vs_h)(void *vd, void *v0, void *vs1,
++                            void *vs2, CPURISCVState *env, uint32_t desc)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    uint32_t i;
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;
++    uint32_t s1 =  *((uint32_t *)vs1 + H4(0));
++
++    for (i = 0; i < vl; i++) {
++        uint16_t s2 = *((uint16_t *)vs2 + H2(i));
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        s1 = float32_add(s1, float16_to_float32(s2, true, &env->fp_status),
++                         &env->fp_status);
++    }
++    *((uint32_t *)vd + H4(0)) = s1;
++    clearl(vd, 1, sizeof(uint32_t), tot);
++}
++
++void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
++                            void *vs2, CPURISCVState *env, uint32_t desc)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    uint32_t i;
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;
++    uint64_t s1 =  *((uint64_t *)vs1);
++
++    for (i = 0; i < vl; i++) {
++        uint32_t s2 = *((uint32_t *)vs2 + H4(i));
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        s1 = float64_add(s1, float32_to_float64(s2, &env->fp_status),
++                         &env->fp_status);
++    }
++    *((uint64_t *)vd) = s1;
++    clearq(vd, 1, sizeof(uint64_t), tot);
++}
+-- 
+2.23.0
 
->
->              s->char_tx_time = (NANOSECONDS_PER_SECOND / baud) * 10;
->          }
-> --
-> 2.26.2
->
->
 
