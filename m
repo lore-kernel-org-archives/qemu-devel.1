@@ -2,78 +2,102 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5983AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:47:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 321942073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:46:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 321942073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 661392073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:47:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+p3+zqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 661392073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnddu-0001C2-Gl
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:46:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42072)
+	id 1jndeS-0001RX-LO
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:47:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jndcq-0008J8-NB
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:45:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39500)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jndd3-0008W1-S0; Tue, 23 Jun 2020 03:46:01 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34737)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jndcn-0007tv-Bd
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:45:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jndcl-0006Ha-Ca
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:45:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5B2502E8109
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:45:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jndd2-0008IA-6k; Tue, 23 Jun 2020 03:46:01 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u26so1606021wmn.1;
+ Tue, 23 Jun 2020 00:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ZvcA7g2Qkj1AOQ15Z8eg4byP0PCtRVIbTzCf5HrSQrI=;
+ b=h+p3+zqTF/Z3YnFztdYCqZFnqe6qx9wzVvSwKFgT9wFpZHxHagHuJpjqafe37rw3i/
+ oZYDc/jzETWUKzR47ulVyI/C//j862XpPXW72vVlkkQm0GIp5eJtXGpVMijJ6/AbvQkR
+ Kr55o2Bnjh9CqZ2NKLJBqZWMqGpYlfN5+2PRYKfRLixdxO7tKa/Ru+r2YmY4pwiW6avI
+ FI/aUDnBHJVUa0FIBsue3OC6fJTpDwmB3FPoiMcNICrkG8uXVRPRvq2t2UhSQCDMJF02
+ hv0qKmQ7A0vfcYpYBdwpzQ3eFg022HM7PRdKOnCaY/Hj7JEflgjzrwHg7dR8Kz476Pxs
+ yhCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZvcA7g2Qkj1AOQ15Z8eg4byP0PCtRVIbTzCf5HrSQrI=;
+ b=OYK/82U3Je11NlpUXaaipkw+9MzjXJNB/o9KKKxXHASmgeJxo+3FuEGrcYC6gTi2Ie
+ 1Nibm7MIPPcy5izyhUfgriyTNp51kqdvBg8qpdUw3Rb2QF0EuDNJjpcUTFpA+ejKrp6G
+ 2HHImU7epqqLzBE8yHXawqGu4gw9nKLNl1n8YJd8HmapklnVwQc6YIXUTOqTtXBvJh9N
+ P/uo9v+vLXpgWPUR+3RlhwJoxO4jIt3d78eA5X+4zSsRPkFTAPvF967jp+7x7UA20ZCd
+ 8+uLNQgoaKJjQKvb+bKR4hLDi5kkUl7agnVpfHAmLDOiQcf9NOIL5/KupcUvxuoDy03B
+ HUPg==
+X-Gm-Message-State: AOAM532+cLQ31drqOSRU87w7LrsVU0dqyqD3pAg+9I6HlpgUpTYW97kf
+ wNBq+ESJu58h7RzDWNhx54w=
+X-Google-Smtp-Source: ABdhPJzHN1IxbLyr/YgjCVR3wyr6NGoSotHL0FHAdklNeZhAA4IyPJo3QSg4RIbEUR5qhVYgE3bBMg==
+X-Received: by 2002:a1c:e355:: with SMTP id a82mr11598858wmh.165.1592898357801; 
+ Tue, 23 Jun 2020 00:45:57 -0700 (PDT)
+Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id x5sm2634104wmg.2.2020.06.23.00.45.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 23 Jun 2020 00:45:57 -0700 (PDT)
+Subject: Re: [PATCH v3 3/7] hw/misc/led: Emit a trace event when LED intensity
+ has changed
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200620230719.32139-1-f4bug@amsat.org>
+ <20200620230719.32139-4-f4bug@amsat.org>
+ <ae4a7411-7042-3530-3faf-e25368080820@linaro.org>
+ <c9e3897b-c711-f59b-d400-0bd01fd320b5@amsat.org>
+ <191eaa28-7ff4-38f6-9489-612ac984f20f@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e1cec572-5645-65fb-95d0-a3ed8a094181@amsat.org>
+Date: Tue, 23 Jun 2020 09:45:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2020 07:39:58 -0000
-From: Martin Grigorov <1884719@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: martingrigorov
-X-Launchpad-Bug-Reporter: Martin Grigorov (martingrigorov)
-X-Launchpad-Bug-Modifier: Martin Grigorov (martingrigorov)
-Message-Id: <159289799812.6175.17000319886186623286.malonedeb@soybean.canonical.com>
-Subject: [Bug 1884719] [NEW] Function not implemented when using libaio
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fdaf0d3fab1d7c8e342bd8e69b6774be8c38540d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 03:45:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <191eaa28-7ff4-38f6-9489-612ac984f20f@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,333 +106,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884719 <1884719@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Hello
-
-I experience "Function not implemented" errors when trying to use Linux
-libaio library in foreign architecture, e.g. aarch64.
-
-I've faced this problem while using https://github.com/multiarch/qemu-user-=
-static, i.e. Docker+QEMU. =
-
-I understand that I do not use plain QEMU and you may count this report as =
-a "distribution of QEMU"! Just let me know what are the steps to test it wi=
-th plain QEMU and I will test and update this ticket!
-
-
-Here are the steps to reproduce the issue:
-
-1) On x86_64 machine register QEMU:
-
-    `docker run -it --rm --privileged multiarch/qemu-user-static --reset
---credential yes --persistent yes`
-
-2) Start a Docker image with foreign CPU architecture, e.g. aarch64
-
-    `docker run -it arm64v8/centos:8 bash`
-
-3) Inside the Docker container install GCC and libaio
-
-    `yum install gcc libaio libaio-devel`
-
-4) Compile the following C program
-
-```
-#include <stdio.h>
-#include <errno.h>
-#include <libaio.h>
-#include <stdlib.h>
-
-struct io_control {
-    io_context_t ioContext;
-};
-
-int main() {
-    int queueSize =3D 10;
-
-    struct io_control * theControl =3D (struct io_control *) malloc(sizeof(=
-struct io_control));
-    if (theControl =3D=3D NULL) {
-        printf("theControl is NULL");
-        return 123;
-    }
-
-    int res =3D io_queue_init(queueSize, &theControl->ioContext);
-    io_queue_release(theControl->ioContext);
-    free(theControl);
-    printf("res is: %d", res);
-}
-```
-
-    ```
-    cat > test.c
-        [PASTE THE CODE ABOVE HERE]
-    ^D
-    ```
-
-    `gcc test.c -o out -laio && ./out`
-
-
-When executed directly on aarch64 machine (i.e. without emulation) or on x8=
-6_64 Docker image (e.g. centos:8) it prints `res is: 0`, i.e. it successful=
-ly initialized a LibAIO queue.
-
-But when executed on Docker image with foreign/emulated CPU architecture
-it prints `res is: -38` (ENOSYS). `man io_queue_init` says that error
-ENOSYS is returned when "Not implemented."
-
-Environment:
-
-QEMU version: 5.0.0.2  (https://github.com/multiarch/qemu-user-static/blob/=
-master/.travis.yml#L24-L28)
-Container application: Docker
-Output of `docker --version`:
-
-```
-Client:
- Version:           19.03.8
- API version:       1.40
- Go version:        go1.13.8
- Git commit:        afacb8b7f0
- Built:             Wed Mar 11 23:42:35 2020
- OS/Arch:           linux/amd64
- Experimental:      false
-
-Server:
- Engine:
-  Version:          19.03.8
-  API version:      1.40 (minimum version 1.12)
-  Go version:       go1.13.8
-  Git commit:       afacb8b7f0
-  Built:            Wed Mar 11 22:48:33 2020
-  OS/Arch:          linux/amd64
-  Experimental:     false
- containerd:
-  Version:          1.3.3-0ubuntu2
-  GitCommit:        =
-
- runc:
-  Version:          spec: 1.0.1-dev
-  GitCommit:        =
-
- docker-init:
-  Version:          0.18.0
-  GitCommit:        =
-
-```
-
-Same happens with Ubuntu (arm64v8/ubuntu:focal).
-
-I've tried to `strace` it but :
-
-```
-/usr/bin/strace: ptrace(PTRACE_TRACEME, ...): Function not implemented
-/usr/bin/strace: PTRACE_SETOPTIONS: Function not implemented
-/usr/bin/strace: detach: waitpid(112): No child processes
-/usr/bin/strace: Process 112 detached
-```
-
-Here are the steps to reproduce the problem with strace:
-
-     ```
-     docker run --rm -it --security-opt seccomp:unconfined --security-opt a=
-pparmor:unconfined --privileged --cap-add ALL arm64v8/centos:8 bash
-
-     yum install -y strace`
-
-     strace echo Test
-     ```
-
-Note: I used --privileged, disabled seccomp and apparmor, and added all
-capabilities
-
-Disabling security solves the "Permission denied" problem but then comes
-the "Not implemented" one.
-
-
-Any idea what could be the problem and how to work it around ?
-I've googled a lot but I wasn't able to find any problems related to libaio=
- on QEMU.
-
-Thank you!
-Martin
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884719
-
-Title:
-  Function not implemented when using libaio
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello
-
-  I experience "Function not implemented" errors when trying to use
-  Linux libaio library in foreign architecture, e.g. aarch64.
-
-  I've faced this problem while using https://github.com/multiarch/qemu-use=
-r-static, i.e. Docker+QEMU. =
-
-  I understand that I do not use plain QEMU and you may count this report a=
-s a "distribution of QEMU"! Just let me know what are the steps to test it =
-with plain QEMU and I will test and update this ticket!
-
-  =
-
-  Here are the steps to reproduce the issue:
-
-  1) On x86_64 machine register QEMU:
-
-      `docker run -it --rm --privileged multiarch/qemu-user-static
-  --reset --credential yes --persistent yes`
-
-  2) Start a Docker image with foreign CPU architecture, e.g. aarch64
-
-      `docker run -it arm64v8/centos:8 bash`
-
-  3) Inside the Docker container install GCC and libaio
-
-      `yum install gcc libaio libaio-devel`
-
-  4) Compile the following C program
-
-  ```
-  #include <stdio.h>
-  #include <errno.h>
-  #include <libaio.h>
-  #include <stdlib.h>
-
-  struct io_control {
-      io_context_t ioContext;
-  };
-
-  int main() {
-      int queueSize =3D 10;
-
-      struct io_control * theControl =3D (struct io_control *) malloc(sizeo=
-f(struct io_control));
-      if (theControl =3D=3D NULL) {
-          printf("theControl is NULL");
-          return 123;
-      }
-
-      int res =3D io_queue_init(queueSize, &theControl->ioContext);
-      io_queue_release(theControl->ioContext);
-      free(theControl);
-      printf("res is: %d", res);
-  }
-  ```
-
-      ```
-      cat > test.c
-          [PASTE THE CODE ABOVE HERE]
-      ^D
-      ```
-
-      `gcc test.c -o out -laio && ./out`
-
-  =
-
-  When executed directly on aarch64 machine (i.e. without emulation) or on =
-x86_64 Docker image (e.g. centos:8) it prints `res is: 0`, i.e. it successf=
-ully initialized a LibAIO queue.
-
-  But when executed on Docker image with foreign/emulated CPU
-  architecture it prints `res is: -38` (ENOSYS). `man io_queue_init`
-  says that error ENOSYS is returned when "Not implemented."
-
-  Environment:
-
-  QEMU version: 5.0.0.2  (https://github.com/multiarch/qemu-user-static/blo=
-b/master/.travis.yml#L24-L28)
-  Container application: Docker
-  Output of `docker --version`:
-
-  ```
-  Client:
-   Version:           19.03.8
-   API version:       1.40
-   Go version:        go1.13.8
-   Git commit:        afacb8b7f0
-   Built:             Wed Mar 11 23:42:35 2020
-   OS/Arch:           linux/amd64
-   Experimental:      false
-
-  Server:
-   Engine:
-    Version:          19.03.8
-    API version:      1.40 (minimum version 1.12)
-    Go version:       go1.13.8
-    Git commit:       afacb8b7f0
-    Built:            Wed Mar 11 22:48:33 2020
-    OS/Arch:          linux/amd64
-    Experimental:     false
-   containerd:
-    Version:          1.3.3-0ubuntu2
-    GitCommit:        =
-
-   runc:
-    Version:          spec: 1.0.1-dev
-    GitCommit:        =
-
-   docker-init:
-    Version:          0.18.0
-    GitCommit:        =
-
-  ```
-
-  Same happens with Ubuntu (arm64v8/ubuntu:focal).
-
-  I've tried to `strace` it but :
-
-  ```
-  /usr/bin/strace: ptrace(PTRACE_TRACEME, ...): Function not implemented
-  /usr/bin/strace: PTRACE_SETOPTIONS: Function not implemented
-  /usr/bin/strace: detach: waitpid(112): No child processes
-  /usr/bin/strace: Process 112 detached
-  ```
-
-  Here are the steps to reproduce the problem with strace:
-
-       ```
-       docker run --rm -it --security-opt seccomp:unconfined --security-opt=
- apparmor:unconfined --privileged --cap-add ALL arm64v8/centos:8 bash
-
-       yum install -y strace`
-
-       strace echo Test
-       ```
-
-  Note: I used --privileged, disabled seccomp and apparmor, and added
-  all capabilities
-
-  Disabling security solves the "Permission denied" problem but then
-  comes the "Not implemented" one.
-
-  =
-
-  Any idea what could be the problem and how to work it around ?
-  I've googled a lot but I wasn't able to find any problems related to liba=
-io on QEMU.
-
-  Thank you!
-  Martin
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884719/+subscriptions
+On 6/22/20 6:48 PM, Richard Henderson wrote:
+> On 6/21/20 3:25 PM, Philippe Mathieu-Daudé wrote:
+>> Anyway I switched to a percent value. What is better to hold
+>> it, an 'unsigned' or 'uint8_t' type?
+> 
+> Might as well use unsigned; you'll not be saving space with uint8_t.
+
+Bah if we want to migrate the intensity, we can't use 'unsigned',
+so I'll keep uint8_t / VMSTATE_UINT8.
 
