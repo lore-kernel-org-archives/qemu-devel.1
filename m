@@ -2,82 +2,84 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7848DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4FDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43B8420724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CA6220724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CFIWqAt6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B8420724
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J4xoYTT8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA6220724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhI2-0003yU-Ei
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:40:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43736)
+	id 1jnhI4-00045F-C7
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:40:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhGh-0002Gb-Iy
+ id 1jnhGh-0002Gh-Tq
  for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35510)
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:33273)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jnhGf-00032T-BP
+ id 1jnhGg-00034F-D2
  for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
-Received: by mail-wr1-x430.google.com with SMTP id g18so11113327wrm.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id a6so2054015wmm.0
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=bp9P8X9qhNhqR1DZYLJlLTpeaJnCEFmUa9xUdHNBspo=;
- b=CFIWqAt6BJIu6p3pGeLuVxsqcMSDBnvswEXAYEqtw2/1eRMGBFgYXKcNGfAWi8Wfw+
- JWgpaRYhvAfFrtuVfL20Jls0fPzJNKaDeg/iAUhybGEzY7+11wJ+Jp+bCV8oPI7GuETo
- JPXeYO9aRCWnVgs8F43dWyuXpS42CwA3sYDjnTnn/jUXgLHEaE9YeyfDYfpoePl72DiM
- 4mLdx64j5C5BLxOgoWEYyiCTPdQrGQTxjHHsAwTQ4+Y+oH9DFiRU97Ye3RAkHCVGFYjl
- +Xo9yZmaMm9hRCoevW3INGf8A5lnrqzxD9aVxuu7xTt+vG8BlCV4tjYNtpgHm7wjcHyZ
- 0V9Q==
+ bh=e266PxlxI12WIYe2b81DHcJwXbjmet15CRZzovOJKkQ=;
+ b=J4xoYTT80RBlY5T0MCRlP3aAe884iA1hWTOX8NckEEk5skPw5XVJ2yH/A8o9cuzCrN
+ BsOfxxoVTDwQ7jLQeGRaRJWVtB9/IhyINRDxldb1Tzzb5azk+nrd71d+KkpnIEXvnfMG
+ D2G466I3n2TpVHYtOEb3iJ0P9K4on4egQK1jNZhDR4i/WQPVV2y2L07CyykQvB637X8j
+ nIrgoKtpUYIM+RdSYPLJe6FhF5DRqVzAzlXeaeVRRROb3/uoopJ50qCbOr64g4eDxOLm
+ U4vXg8LKqAWHw70OMJAazkrUNzkw5CNnuffBmP3OwqtZ9UTeAatRI573em3nO+PdeLfk
+ o7nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bp9P8X9qhNhqR1DZYLJlLTpeaJnCEFmUa9xUdHNBspo=;
- b=FSKQf75FCCviaR4O2P8BKJzazmE8nxlAL+1FEa0xsZj4LOLX3zL6rsVIwXSuQLZLiL
- 9iZlrAyw9qZn3K7ERNI6bu6/scCi/qHaHiU+yA0Oqpk4bKFdsIVgENv4C6HGQQVGf4Al
- a8yeNL3YuSI9GUV3w71tAWSlTbmTB76WSRWjt0tJuZbmW/IfEkpM/xThsmnDWBc7MxZL
- a/wd968qFNPvd3dl/ppqFgLM9xwsm5wUEt9qG1CMNdIVWHJf7M8UwxY5SPlCsm2OUPkn
- hNCywXlbWzDr1cWfhDtq+3EwFAtduR3YUiLVWjCOSRXtIeSy/LD2aTKguXsD1PAnEUaX
- mrTg==
-X-Gm-Message-State: AOAM531bEa8wicU/Rxvbj3+BiXJ6l1ZuO/4ZVV3MMZNhF99Zqm858b4Z
- Z49YsdYbYQfNl2VWAuj/1N023uKYrDpXLg==
-X-Google-Smtp-Source: ABdhPJzFkYtH8IfKh176XA19jei9oXGIUeakl/mhzl9LGB3ZSwBYuPeuvsiVODL6ef2RXsrLLt+g6w==
-X-Received: by 2002:adf:f711:: with SMTP id r17mr25222856wrp.409.1592912346833; 
- Tue, 23 Jun 2020 04:39:06 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=e266PxlxI12WIYe2b81DHcJwXbjmet15CRZzovOJKkQ=;
+ b=BLcHSMV6K+T0ejT3kKbh2JGOUkA9EWZrTX/hE447gZzdf4Wl9oVXJYQ0SNyBLIuUO8
+ 3yMimxBz06XA14sctCY/WUEyPzpNIHAXgw9kxsLVNxGCc1k22TC8jQAbHCBDJKfMQVWx
+ 5xgE4opXYqy8VS9QJuvnnoakQb1iiyobv3eyfvrKgqh7RhpLYISILh6UMsR1g5tSiVzy
+ 5wAnGbKGZnj5UwLPIwwwEOlBvqAevHZzmOgvdFfHC1M91Z7vWQgO8wVEtESXS7c/htOc
+ dvI01tpEi0oUsPfgmpf0CEtI8dxyQfzlxqSOmJvo5g4MiDJdNAdb7QIBhNXS9PqLa52h
+ iJYw==
+X-Gm-Message-State: AOAM531VMSYYWsgXlME9FC5A8gDm/ntMZ3KEzr73fqAyInrzmNy32xSq
+ Hxxf0dAAJL3870qB3ZoIOGw/wxYLgst5Qw==
+X-Google-Smtp-Source: ABdhPJyI0c+Rhc2M5a2pdRs+oP/rdDLkVkaPCX4Zl/0SQQCDZcCe9fN5/Y+7ItNGGfCG6+A+P68TCQ==
+X-Received: by 2002:a7b:cd90:: with SMTP id y16mr16341769wmj.20.1592912348879; 
+ Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.05
+ by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 04:39:06 -0700 (PDT)
+ Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/42] target-arm queue
-Date: Tue, 23 Jun 2020 12:38:22 +0100
-Message-Id: <20200623113904.28805-1-peter.maydell@linaro.org>
+Subject: [PULL 02/42] util/oslib-posix : qemu_init_exec_dir implementation for
+ Mac
+Date: Tue, 23 Jun 2020 12:38:24 +0100
+Message-Id: <20200623113904.28805-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200623113904.28805-1-peter.maydell@linaro.org>
+References: <20200623113904.28805-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,111 +105,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 61fee7f45955cd0bf9b79be9fa9c7ebabb5e6a85:
+From: David CARLIER <devnexen@gmail.com>
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/acceptance-testing-20200622' into staging (2020-06-22 20:50:10 +0100)
+From 3025a0ce3fdf7d3559fc35a52c659f635f5c750c Mon Sep 17 00:00:00 2001
+From: David Carlier <devnexen@gmail.com>
+Date: Tue, 26 May 2020 21:35:27 +0100
+Subject: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for Mac
 
-are available in the Git repository at:
+Using dyld API to get the full path of the current process.
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200623
+Signed-off-by: David Carlier <devnexen@gmail.com>
+Message-id: CA+XhMqxwC10XHVs4Z-JfE0-WLAU3ztDuU9QKVi31mjr59HWCxg@mail.gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ util/oslib-posix.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-for you to fetch changes up to 539533b85fbd269f777bed931de8ccae1dd837e9:
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 916f1be2243..39ddc77c85b 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -57,6 +57,10 @@
+ #include <lwp.h>
+ #endif
+ 
++#ifdef __APPLE__
++#include <mach-o/dyld.h>
++#endif
++
+ #include "qemu/mmap-alloc.h"
+ 
+ #ifdef CONFIG_DEBUG_STACK_USAGE
+@@ -375,6 +379,17 @@ void qemu_init_exec_dir(const char *argv0)
+             p = buf;
+         }
+     }
++#elif defined(__APPLE__)
++    {
++        char fpath[PATH_MAX];
++        uint32_t len = sizeof(fpath);
++        if (_NSGetExecutablePath(fpath, &len) == 0) {
++            p = realpath(fpath, buf);
++            if (!p) {
++                return;
++            }
++        }
++    }
+ #endif
+     /* If we don't have any way of figuring out the actual executable
+        location then try argv[0].  */
+-- 
+2.20.1
 
-  arm/virt: Add memory hot remove support (2020-06-23 11:39:48 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * util/oslib-posix : qemu_init_exec_dir implementation for Mac
- * target/arm: Last parts of neon decodetree conversion
- * hw/arm/virt: Add 5.0 HW compat props
- * hw/watchdog/cmsdk-apb-watchdog: Add trace event for lock status
- * mps2: Add CMSDK APB watchdog, FPGAIO block, S2I devices and I2C devices
- * mps2: Add some unimplemented-device stubs for audio and GPIO
- * mps2-tz: Use the ARM SBCon two-wire serial bus interface
- * target/arm: Check supported KVM features globally (not per vCPU)
- * tests/qtest/arm-cpu-features: Add feature setting tests
- * arm/virt: Add memory hot remove support
-
-----------------------------------------------------------------
-Andrew Jones (2):
-      hw/arm/virt: Add 5.0 HW compat props
-      tests/qtest/arm-cpu-features: Add feature setting tests
-
-David CARLIER (1):
-      util/oslib-posix : qemu_init_exec_dir implementation for Mac
-
-Peter Maydell (23):
-      target/arm: Convert Neon 2-reg-misc VREV64 to decodetree
-      target/arm: Convert Neon 2-reg-misc pairwise ops to decodetree
-      target/arm: Convert VZIP, VUZP to decodetree
-      target/arm: Convert Neon narrowing moves to decodetree
-      target/arm: Convert Neon 2-reg-misc VSHLL to decodetree
-      target/arm: Convert Neon VCVT f16/f32 insns to decodetree
-      target/arm: Convert vectorised 2-reg-misc Neon ops to decodetree
-      target/arm: Convert Neon 2-reg-misc crypto operations to decodetree
-      target/arm: Rename NeonGenOneOpFn to NeonGenOne64OpFn
-      target/arm: Fix capitalization in NeonGenTwo{Single, Double}OPFn typedefs
-      target/arm: Make gen_swap_half() take separate src and dest
-      target/arm: Convert Neon 2-reg-misc VREV32 and VREV16 to decodetree
-      target/arm: Convert remaining simple 2-reg-misc Neon ops
-      target/arm: Convert Neon VQABS, VQNEG to decodetree
-      target/arm: Convert simple fp Neon 2-reg-misc insns
-      target/arm: Convert Neon 2-reg-misc fp-compare-with-zero insns to decodetree
-      target/arm: Convert Neon 2-reg-misc VRINT insns to decodetree
-      target/arm: Convert Neon 2-reg-misc VCVT insns to decodetree
-      target/arm: Convert Neon VSWP to decodetree
-      target/arm: Convert Neon VTRN to decodetree
-      target/arm: Move some functions used only in translate-neon.inc.c to that file
-      target/arm: Remove unnecessary gen_io_end() calls
-      target/arm: Remove dead code relating to SABA and UABA
-
-Philippe Mathieu-Daudé (15):
-      hw/watchdog/cmsdk-apb-watchdog: Add trace event for lock status
-      hw/i2c/versatile_i2c: Add definitions for register addresses
-      hw/i2c/versatile_i2c: Add SCL/SDA definitions
-      hw/i2c: Add header for ARM SBCon two-wire serial bus interface
-      hw/arm: Use TYPE_VERSATILE_I2C instead of hardcoded string
-      hw/arm/mps2: Document CMSDK/FPGA APB subsystem sections
-      hw/arm/mps2: Rename CMSDK AHB peripheral region
-      hw/arm/mps2: Add CMSDK APB watchdog device
-      hw/arm/mps2: Add CMSDK AHB GPIO peripherals as unimplemented devices
-      hw/arm/mps2: Map the FPGA I/O block
-      hw/arm/mps2: Add SPI devices
-      hw/arm/mps2: Add I2C devices
-      hw/arm/mps2: Add audio I2S interface as unimplemented device
-      hw/arm/mps2-tz: Use the ARM SBCon two-wire serial bus interface
-      target/arm: Check supported KVM features globally (not per vCPU)
-
-Shameer Kolothum (1):
-      arm/virt: Add memory hot remove support
-
- include/hw/i2c/arm_sbcon_i2c.h   |   35 ++
- target/arm/cpu.h                 |    2 +-
- target/arm/kvm_arm.h             |   21 +-
- target/arm/translate.h           |    8 +-
- target/arm/neon-dp.decode        |  106 ++++
- hw/acpi/generic_event_device.c   |   29 +
- hw/arm/mps2-tz.c                 |   23 +-
- hw/arm/mps2.c                    |   65 ++-
- hw/arm/realview.c                |    3 +-
- hw/arm/versatilepb.c             |    3 +-
- hw/arm/vexpress.c                |    3 +-
- hw/arm/virt.c                    |   63 +-
- hw/i2c/versatile_i2c.c           |   38 +-
- hw/watchdog/cmsdk-apb-watchdog.c |    1 +
- target/arm/cpu.c                 |    2 +-
- target/arm/cpu64.c               |   10 +-
- target/arm/kvm.c                 |    4 +-
- target/arm/kvm64.c               |   14 +-
- target/arm/translate-a64.c       |   20 +-
- target/arm/translate-neon.inc.c  | 1191 +++++++++++++++++++++++++++++++++++++-
- target/arm/translate-vfp.inc.c   |    7 +-
- target/arm/translate.c           | 1064 +---------------------------------
- tests/qtest/arm-cpu-features.c   |   38 +-
- util/oslib-posix.c               |   15 +
- MAINTAINERS                      |    1 +
- hw/arm/Kconfig                   |    8 +-
- hw/watchdog/trace-events         |    1 +
- 27 files changed, 1624 insertions(+), 1151 deletions(-)
- create mode 100644 include/hw/i2c/arm_sbcon_i2c.h
 
