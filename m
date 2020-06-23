@@ -2,72 +2,97 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B7AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F514C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:00:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE7D420724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE7D420724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EF1920724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 10:00:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+TwjjCF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF1920724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnfgO-00048c-5r
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:57:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44970)
+	id 1jnfin-0005cr-6k
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 06:00:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jnffo-0003dR-98; Tue, 23 Jun 2020 05:57:00 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2117 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
- id 1jnffl-0005VA-N4; Tue, 23 Jun 2020 05:57:00 -0400
-Received: from lhreml708-chm.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id D015DC1205F14913C897;
- Tue, 23 Jun 2020 10:56:54 +0100 (IST)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml708-chm.china.huawei.com (10.201.108.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Tue, 23 Jun 2020 10:56:54 +0100
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
- Tue, 23 Jun 2020 10:56:54 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: RE: [PATCH RFC 00/22] Support of Virtual CPU Hotplug for ARMv8 Arch
-Thread-Topic: [PATCH RFC 00/22] Support of Virtual CPU Hotplug for ARMv8 Arch
-Thread-Index: AQHWQcvNstQMr4/nnU2Xs7zxVVwVQKjl6FsAgAAbB4A=
-Date: Tue, 23 Jun 2020 09:56:54 +0000
-Message-ID: <ae90783d37454d8b9f5a189098e6bbb7@huawei.com>
-References: <20200613213629.21984-1-salil.mehta@huawei.com>
- <20200623091202.pbcbvwnk3pdvwyyy@kamzik.brq.redhat.com>
-In-Reply-To: <20200623091202.pbcbvwnk3pdvwyyy@kamzik.brq.redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.79.3]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnfgd-0004Yb-Uh
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:57:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35761
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jnfga-0005qH-BG
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:57:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592906266;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X8WVqHOI1CJUGmSzFJzc4zFIYQ5gsA98LGlpolY2Uso=;
+ b=E+TwjjCFGE2KBcC3r23/6TiXJqsV0YadrTtgxsl0yw5EPuT5A5mUZ1bZR/unGkFPyhHKl5
+ 3Pgod/7zaGP/Djbkl8L0nJNIbGsmHhYGW5ryEPo30DeYDlohEOe48YOd28LfIxGSG1TDZJ
+ /5AquHR1H504ERPf8/bKyrirMzxKVwU=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-vxh0BMdxN7OmXvs4UcYfxw-1; Tue, 23 Jun 2020 05:57:45 -0400
+X-MC-Unique: vxh0BMdxN7OmXvs4UcYfxw-1
+Received: by mail-pf1-f199.google.com with SMTP id 137so15444642pfw.5
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:57:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=X8WVqHOI1CJUGmSzFJzc4zFIYQ5gsA98LGlpolY2Uso=;
+ b=Kj4iCOxbq4CNrtyjnp1N/DP7WaEgXYs88LqjQsq0WwcK8RoHjDjG7lVNQBJzxicSDx
+ NXIqhGC+NPzC1iy+3DZzmNuQ+FLcipy6SXjOaE18+SKYqiKOqEfYUbplVC55QudKNvTS
+ NnCUgBUoTTHUd/TStLgnA7y03f3p4Scg+fSG1OzjLGCsN+kmTkx8V0LAHnO7MxtAY2q6
+ eWVc1irBS3JJgZTR9tl41pZ8skgsQd9fRSvuBbDFnugS95/dR4SBk4/u8A1qyLeZ84Sy
+ MPRroPMZWu/GkE58vh3w1YEp+DgbsUGkzVz+Mgjk+CkVqH7QFHBb2vkpimUY42P3l97l
+ NROA==
+X-Gm-Message-State: AOAM532nRPUlPS6BUYGxtPUa6ZJV30lYcgVqkhwC4l03jkEe80ojetL2
+ 5wS04csj8JBrt7z+KCF2jVEes85VUrmUobenkQNoiwjuK5Chfq9K5Zb/rx4NjHMdIsAO0Qp0Oqm
+ caJbZ4vRO1EJjHqt3tr5PNLLvTuK1Q8E=
+X-Received: by 2002:a62:dd97:: with SMTP id w145mr23226782pff.23.1592906263904; 
+ Tue, 23 Jun 2020 02:57:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1sRNu+U7a9UkpjzQDfjuAncdJe1xG+CWwh2RsQKtEkor7/FJErMEQKEaHRm2UEFfHf5+KYUooWTbjKO/Z9Z8=
+X-Received: by 2002:a62:dd97:: with SMTP id w145mr23226740pff.23.1592906263421; 
+ Tue, 23 Jun 2020 02:57:43 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=185.176.76.210;
- envelope-from=salil.mehta@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 05:40:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -51
-X-Spam_score: -5.2
-X-Spam_bar: -----
-X-Spam_report: (-5.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200622153756.19189-1-lulu@redhat.com>
+ <20200622153756.19189-11-lulu@redhat.com>
+ <36d932d1-18ad-8152-dc6e-5cf9df2b8a43@redhat.com>
+In-Reply-To: <36d932d1-18ad-8152-dc6e-5cf9df2b8a43@redhat.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 23 Jun 2020 17:57:31 +0800
+Message-ID: <CACLfguW0nFqJ+n2ps38Xwdux5UZhMRokzaf7g+7S71QcJSNTEg@mail.gmail.com>
+Subject: Re: [PATCH v1 10/10] vhost-vdpa: introduce vhost-vdpa net client
+To: Jason Wang <jasowang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lulu@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,353 +105,463 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mehta.salil.lnk@gmail.com" <mehta.salil.lnk@gmail.com>,
- "gshan@redhat.com" <gshan@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "jiakernel2@gmail.com" <jiakernel2@gmail.com>,
- "maz@kernel.org" <maz@kernel.org>, "david@redhat.com" <david@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "will@kernel.org" <will@kernel.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "sudeep.holla@arm.com" <sudeep.holla@arm.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "maran.wilson@oracle.com" <maran.wilson@oracle.com>,
- zhukeqian <zhukeqian1@huawei.com>,
- "wangxiongfeng \(C\)" <wangxiongfeng2@huawei.com>
+Cc: rdunlap@infradead.org, Michael Tsirkin <mst@redhat.com>,
+ mhabets@solarflare.com, qemu-devel@nongnu.org,
+ Rob Miller <rob.miller@broadcom.com>, saugatm@xilinx.com,
+ Markus Armbruster <armbru@redhat.com>, hch@infradead.org,
+ Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
+ Shahaf Shuler <shahafs@mellanox.com>, kevin.tian@intel.com, parav@mellanox.com,
+ Vitaly Mireyno <vmireyno@marvell.com>, "Liang,
+ Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
+ Zhihong" <zhihong.wang@intel.com>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>,
+ Ariel Adam <aadam@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ hanand@xilinx.com, "Zhu, Lingshan" <lingshan.zhu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Andrew Jones [mailto:drjones@redhat.com]
-> Sent: Tuesday, June 23, 2020 10:12 AM
-> To: Salil Mehta <salil.mehta@huawei.com>
-> Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
-> sudeep.holla@arm.com; gshan@redhat.com; mst@redhat.com; jiakernel2@gmail.=
-com;
-> maz@kernel.org; zhukeqian <zhukeqian1@huawei.com>; david@redhat.com;
-> richard.henderson@linaro.org; Linuxarm <linuxarm@huawei.com>;
-> eric.auger@redhat.com; james.morse@arm.com; catalin.marinas@arm.com;
-> imammedo@redhat.com; pbonzini@redhat.com; mehta.salil.lnk@gmail.com;
-> maran.wilson@oracle.com; will@kernel.org; wangxiongfeng (C)
-> <wangxiongfeng2@huawei.com>
-> Subject: Re: [PATCH RFC 00/22] Support of Virtual CPU Hotplug for ARMv8 A=
-rch
->=20
-> On Sat, Jun 13, 2020 at 10:36:07PM +0100, Salil Mehta wrote:
-> > This patch-set introduces the virtual cpu hotplug support for ARMv8
-> > architecture in QEMU. Idea is to be able to hotplug and hot-unplug the =
-vcpus
-> > while guest VM is running and no reboot is required. This does *not* ma=
-kes
-> any
-> > assumption of the physical cpu hotplug availability within the host sys=
-tem
-> but
-> > rather tries to solve the problem at virtualizer/QEMU layer and by intr=
-oducing
-> > cpu hotplug hooks and event handling within the guest kernel. No change=
-s are
-> > required within the host kernel/KVM.
+On Tue, Jun 23, 2020 at 4:57 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/6/22 =E4=B8=8B=E5=8D=8811:37, Cindy Lu wrote:
+> > This patch set introduces a new net client type: vhost-vdpa.
+> > vhost-vdpa net client will set up a vDPA device which is specified
+> > by a "vhostdev" parameter.
 > >
-> > Motivation:
-> > This allows scaling the guest VM compute capacity on-demand which would=
- be
-> > useful for the following example scenarios,
-> > 1. Vertical Pod Autoscaling[3][4] in the cloud: Part of the orchestrati=
-on
-> >    framework which could adjust resource requests (CPU and Mem requests=
-) for
-> >    the containers in a pod, based on usage.
-> > 2. Pay-as-you-grow Business Model: Infrastructure provider could alloca=
-te and
-> >    restrict the total number of compute resources available to the gues=
-t VM
-> >    according to the SLA(Service Level Agreement). VM owner could reques=
-t for
-> >    more compute to be hot-plugged for some cost.
+> > Signed-off-by: Lingshan Zhu <lingshan.zhu@intel.com>
+> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >   include/net/vhost-vdpa.h |  21 ++++
+> >   include/net/vhost_net.h  |   1 -
+> >   net/Makefile.objs        |   2 +-
+> >   net/clients.h            |   2 +
+> >   net/net.c                |   3 +
+> >   net/vhost-vdpa.c         | 230 ++++++++++++++++++++++++++++++++++++++=
++
+> >   qapi/net.json            |  23 +++-
+> >   7 files changed, 278 insertions(+), 4 deletions(-)
+> >   create mode 100644 include/net/vhost-vdpa.h
+> >   create mode 100644 net/vhost-vdpa.c
 > >
-> > Terminology:
+> > diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
+> > new file mode 100644
+> > index 0000000000..725c8b1c81
+> > --- /dev/null
+> > +++ b/include/net/vhost-vdpa.h
+> > @@ -0,0 +1,21 @@
+> > +/*
+> > + * vhost-vdpa.h
+> > + *
+> > + * Copyright(c) 2017-2018 Intel Corporation.
+> > + * Copyright(c) 2020 Red Hat, Inc.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#ifndef VHOST_VDPA_H
+> > +#define VHOST_VDPA_H
+> > +
+> > +struct vhost_net;
+> > +struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
+> > +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
+> > +
+> > +extern const int vdpa_feature_bits[];
+> > +
+> > +#endif /* VHOST_VDPA_H */
+> > diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> > index abfb0e8e68..4843cdb36f 100644
+> > --- a/include/net/vhost_net.h
+> > +++ b/include/net/vhost_net.h
+> > @@ -44,5 +44,4 @@ int vhost_set_vring_enable(NetClientState * nc, int e=
+nable);
+> >   uint64_t vhost_net_get_acked_features(VHostNetState *net);
 > >
-> > (*) Present cpus: Total cpus with which guest has/will boot and are ava=
-ilable
-> >                   to guest for use and can be onlined. Qemu parameter(-=
-smp)
-> > (*) Disabled cpus: Possible cpus which will not be available for the gu=
-est
-> to
-> >                    use. These can be hotplugged and made present. These=
- can be
-> > 		   thought of as un-plugged vcpus. These will be included as
-> > 		   part of sizing.
-> > (*) Posssible cpus: Total vcpus which could ever exist in VM. This incl=
-udes
-> >                     booted cpus plus any cpus which could be later plug=
-ged.
-> > 		    - Qemu parameter(-maxcpus)
-> > 	            - Possible vcpus =3D Present vcpus (+) Disabled vcpus
-> >
-> >
-> > Limitations of ARMv8 Architecture:
-> >
-> > A. Physical Limitation to CPU Hotplug:
-> > 1. ARMv8 architecture does not support the concept of the physical cpu =
-hotplug.
-> >    The closest thing which is recomended to achieve the cpu hotplug on =
-ARM
-> is
-> >    to bring down power state of the cpu using PSCI.
-> > 2. Other ARM components like GIC etc. have not been designed to realize
-> >    physical cpu hotplug capability as of now.
-> >
-> > B. Limitations of GIC to Support Virtual CPU Hotplug:
-> > 1. GIC requires various resources(related to GICR/redistributor, GICC/c=
-pu
-> >    interface etc) like memory regions to be fixed at the VM init time a=
-nd these
-> >    could not be changed later on after VM has inited.
-> > 2. Associations between GICC(GIC cpu interface) and vcpu get fixed at t=
-he VM
-> >    init time and GIC does not allows to change this association once GI=
-C has
-> >    initialized.
-> >
-> > C. Known Limitation of the KVM:
-> > 1. As of now KVM allows to create VCPUs but does not allows to delete t=
-he
-> >    already created vcpus. QEMU already provides an interface to manage =
-created
-> >    vcpus at KVM level and then to re-use them.
-> > 2. Inconsistency in interpretation of the MPIDR generated by KVM for vc=
-pus
-> >    vis-a-vis SMT/threads. This does not looks to be compliant to the MP=
-IDR
-> >    format(SMT is present) as mentioned in the ARMv8 spec. (Please corre=
-ct my
-> >    understanding if I am wrong here?)
-> >
-> >
-> > Workaround to the problems mentioned in Section B & C1:
-> > 1. We pre-size the GIC with possible vcpus at VM init time
-> > 2. Pre-create all possible vcpus at KVM and associate them with GICC
-> > 3. Park the unplugged vcpus (similar to x86)
-> >
-> >
-> > (*) For all of above please refer to Marc's suggestion here[1]
-> >
-> >
-> > Overview of the Approach:
-> > At the time of machvirt_init() we pre-create all of the possible ARMCPU
-> > objects along with the corresponding KVM vcpus at the host. Disabled KV=
-M vcpu
-> > (which are *not* "present" vcpus but are part of "possible" vcpu list) =
-are
-> > parked at per VM list "kvm_parked_vcpus" after their initialization.
-> >
-> > We create the ARMCPU objects(but these are not *realized* in QOM sense)=
- even
-> > for the disabled vcpus to facilitate the GIC initialization (pre-sized =
-with
-> > possible vcpus). After Initialization of the machine is complete we rel=
-ease
-> > the ARMCPU Objects for the disabled vcpus. These ARMCPU object shall be
-> > re-created at the time when vcpu is hot plugged. This new object is the=
-n
-> > re-attached with the earlier parked KVM vcpu which also gets unparked. =
-The
-> > ARMCPU object gets now "realized" in QEMU, which means creation of the
-> > corresponding threads, pre_plug/plug phases, and event notification to =
-the
-> > guest using ACPI GED etc. Similarly, hot-unplug leg will lead to the
-> > "unrealization" of the vcpus and will lead to similar ACPI GED events t=
-o the
-> > guest for unplug and cleanup and eventually ARMCPU object shall be rele=
-ased
-> and
-> > KVM vcpus shall be parked again.
-> >
-> > During machine init, ACPI MADT Table is sized with *possible* vcpus GIC=
-C
-> > entries. The unplugged/disabled vcpus are presented as MADT GICC DISABL=
-ED
-> > entries to the guest. This means the guest will have its resources pre-=
-sized
-> > with possible vcpus(=3Dpresent+disabled)
-> >
-> > Other approaches to deal with ARMCPU object release(after machine init)=
-:
-> > 1. The ARMCPU objects for the disabled vcpus are released in context to=
- the
-> >    virt_machine_done() notifier(approach adopted in this patch-set).
-> > 2. Defer the release of current ARMCPU object till the new vcpu object =
-is
-> >    hot plugged.
-> > 3. Never release and keep on reusing them and release once at VM exit. =
-This
-> >    solves many problems with above 2 approaches but requires change in =
-the
-> way
-> >    qdev_device_add() fetches/creates the ARMCPU object for the new vcpu=
-s being
-> >    hotplugged. For the arm cpu hotplug case we need to figure out way h=
-ow to
-> >    get access to old object and use it to "re-realize" instead of the n=
-ew
-> >    ARMCPU object.
-> >
-> > Concerns/Questions:
-> > 1. In ARM arch a cpu is uniquely represented in hierarchy using various
-> >    affinity levels which could represent thread, core, cluster, package=
-. This
-> >    is generally represented by a value in MPIDR register as per the for=
-mat
-> >    mentioned in specification. Now, the way MPIDR value is derived for =
-vcpus
-> is
-> >    done using vcpu-index. The concept of thread is not quite as same an=
-d rather
-> >    gets lost in the derivation of MPIDR for vcpus.
-> > 2. The topology info used to specify the vcpu while hot-plugging might =
-not
-> >    match with the MPIDR value given back by the KVM for the vcpu at the=
- time
-> of
-> >    init. Concept of SMT bit in MPIDR gets lost as per the derivation be=
-ing
-> done
-> >    in the KVM. Hence, concept of thread-id, core-id, socket-id if used =
-as a
-> >    topology info to derive MPIDR value as per ARM specification will no=
-t match
-> >    with MPIDR actually assigned by the KVM?
-> >    Perhaps need to carry forward work of Andrew? please check here[2]
-> > 3. Further if this info is supplied to the guest using PPTT(once introd=
-uced
-> in
-> >    QEMU) or even derived using MPIDR shall be inconsistent with the hos=
-t vcpu.
-> > 4. Any possibilities of interrupts(SGI/PPI/LPI/SPI) always remaining in
-> >    *pending* state for the cpus which have been hot-unplugged? IMHO it =
-looks
-> >    okay but will need Marc's confirmation on this.
-> > 5. If the ARMCPU object is released after the machine init, UEFI could =
-call
-> >    back virt_update_table() to re-build the ACPI tables which might nee=
-d an
-> >    ARMCPU object. Please check the discussion here[5]
-> >
-> >
-> > Commands Used:
-> >
-> > A. Qemu launch commands to init the machine
-> >
-> > $ qemu-system-aarch64 --enable-kvm -machine virt,gic-version=3D3 \
-> > -cpu host -smp cpus=3D4,maxcpus=3D6 \
-> > -m 300M \
-> > -kernel Image \
-> > -initrd rootfs.cpio.gz \
-> > -append "console=3DttyAMA0 root=3D/dev/ram rdinit=3D/init maxcpus=3D2 a=
-cpi=3Dforce" \
-> > -nographic \
-> > -bios  QEMU_EFI.fd \
-> >
-> > B. Hot-(un)plug related commands
-> >
-> > # Hotplug a host vcpu(accel=3Dkvm)
-> > $ device_add host-arm-cpu,id=3Dcore4,core-id=3D4
-> >
-> > # Hotplug a vcpu(accel=3Dtcg)
-> > $ device_add cortex-a57-arm-cpu,id=3Dcore4,core-id=3D4
-> >
-> > # Delete the vcpu
-> > $ device_del core4
-> >
-> > NOTE: I have not tested the current solution with '-device' interface. =
-The
-> use
-> >       is suggested by Igor here[6]. I will test this in coming times bu=
-t looks
-> >       it should work with existing changes.
-> >
-> >
-> > Sample output on guest after boot:
-> >
-> > $ cat /sys/devices/system/cpu/possible
-> > 0-5
-> > $ cat /sys/devices/system/cpu/present
-> > 0-3
-> > $ cat /sys/devices/system/cpu/online
-> > 0-1
-> > $ cat /sys/devices/system/cpu/offline
-> > 2-5
-> >
-> >
-> > Sample output on guest after hotplug of vcpu=3D4:
-> >
-> > $ cat /sys/devices/system/cpu/possible
-> > 0-5
-> > $ cat /sys/devices/system/cpu/present
-> > 0-4
-> > $ cat /sys/devices/system/cpu/online
-> > 0-1,4
-> > $ cat /sys/devices/system/cpu/offline
-> > 2-3,5
-> >
-> > Note: vcpu=3D4 was explicitly 'onlined' after hot-plug
-> > $ echo 1 > /sys/devices/system/cpu/cpu4/online
-> >
-> >
-> > Repository:
-> >  (*) QEMU changes for vcpu hotplug could be cloned from below site,
-> >      https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1
-> >
-> >  (*) Guest Kernel changes required to co-work with the QEMU shall be po=
-sted
-> soon
-> >      and repo made available at above site.
-> >
-> >
-> > THINGS TO DO:
-> >  (*) Migration support
-> >  (*) TCG/Emulation support is not proper right now. Works to a certain =
-extent
-> >      but is not complete. especially the unrealize part in which there =
-is a
-> >      overflow of tcg contexts. The last is due to the fact tcg maintain=
-s a
-> >      count on number of context(per thread instance) so as we hotplug t=
-he vcpus
-> >      this counter keeps on incrementing. But during hot-unplug the coun=
-ter
-> is
-> >      not decremented.
-> >  (*) Support of hotplug with NUMA is not proper
-> >  (*) CPU Topology right now is not specified using thread/core/socket b=
-ut
-> >      rather flatly indexed using core-id. This needs consideration[2].
-> >  (*) Do we need PPTT Support for to specify right topology info to gues=
-t about
-> >      hot-plugged or unplugged vcpus?
-> >  (*) Test cases
-> >  (*) Docs need to be updated.
-> >
-> >
->=20
-> Hi Salil,
->=20
-> I realize this is just a preliminary posting and the approach hasn't been
-> finalized, but maybe in a future posting we can put a lot of this
-> information into a doc patch. I think we'll need good documentation for
-> this feature to ensure we get it right and keep in maintained correctly.
+> >   int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
+> > -
+>
+>
+> Let's keep this newline.
+>
+>
+> >   #endif
+> > diff --git a/net/Makefile.objs b/net/Makefile.objs
+> > index c5d076d19c..5ab45545db 100644
+> > --- a/net/Makefile.objs
+> > +++ b/net/Makefile.objs
+> > @@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) =3D tap-solaris.o
+> >   tap-obj-y ?=3D tap-stub.o
+> >   common-obj-$(CONFIG_POSIX) +=3D tap.o $(tap-obj-y)
+> >   common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
+> > -
+>
+>
+> And this.
+>
+>
+Sure will do, I will double check these issue next time
 
+> > +common-obj-$(CONFIG_VHOST_NET_VDPA) +=3D vhost-vdpa.o
+> >   vde.o-libs =3D $(VDE_LIBS)
+> >
+> >   common-obj-$(CONFIG_CAN_BUS) +=3D can/
+> > diff --git a/net/clients.h b/net/clients.h
+> > index a6ef267e19..92f9b59aed 100644
+> > --- a/net/clients.h
+> > +++ b/net/clients.h
+> > @@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char =
+*name,
+> >   int net_init_vhost_user(const Netdev *netdev, const char *name,
+> >                           NetClientState *peer, Error **errp);
+> >
+> > +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+> > +                        NetClientState *peer, Error **errp);
+> >   #endif /* QEMU_NET_CLIENTS_H */
+> > diff --git a/net/net.c b/net/net.c
+> > index 599fb61028..82624ea9ac 100644
+> > --- a/net/net.c
+> > +++ b/net/net.c
+> > @@ -965,6 +965,9 @@ static int (* const net_client_init_fun[NET_CLIENT_=
+DRIVER__MAX])(
+> >   #ifdef CONFIG_VHOST_NET_USER
+> >           [NET_CLIENT_DRIVER_VHOST_USER] =3D net_init_vhost_user,
+> >   #endif
+> > +#ifdef CONFIG_VHOST_NET_VDPA
+> > +        [NET_CLIENT_DRIVER_VHOST_VDPA] =3D net_init_vhost_vdpa,
+> > +#endif
+> >   #ifdef CONFIG_L2TPV3
+> >           [NET_CLIENT_DRIVER_L2TPV3]    =3D net_init_l2tpv3,
+> >   #endif
+> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > new file mode 100644
+> > index 0000000000..34858a6ea3
+> > --- /dev/null
+> > +++ b/net/vhost-vdpa.c
+> > @@ -0,0 +1,230 @@
+> > +/*
+> > + * vhost-vdpa.c
+> > + *
+> > + * Copyright(c) 2017-2018 Intel Corporation.
+> > + * Copyright(c) 2020 Red Hat, Inc.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "clients.h"
+> > +#include "net/vhost_net.h"
+> > +#include "net/vhost-vdpa.h"
+> > +#include "hw/virtio/vhost-vdpa.h"
+> > +#include "qemu/config-file.h"
+> > +#include "qemu/error-report.h"
+> > +#include "qemu/option.h"
+> > +#include "qapi/error.h"
+> > +#include <sys/ioctl.h>
+> > +#include <err.h>
+> > +#include "standard-headers/linux/virtio_net.h"
+> > +#include "monitor/monitor.h"
+> > +#include "hw/virtio/vhost.h"
+> > +
+> > +/* Todo:need to add the multiqueue support here */
+> > +typedef struct VhostVDPAState {
+> > +    NetClientState nc;
+> > +    struct vhost_vdpa vhost_vdpa;
+> > +    VHostNetState *vhost_net;
+> > +    uint64_t acked_features;
+> > +    bool started;
+> > +} VhostVDPAState;
+> > +
+> > +const int vdpa_feature_bits[] =3D {
+> > +    VIRTIO_F_NOTIFY_ON_EMPTY,
+> > +    VIRTIO_RING_F_INDIRECT_DESC,
+> > +    VIRTIO_RING_F_EVENT_IDX,
+> > +    VIRTIO_F_ANY_LAYOUT,
+> > +    VIRTIO_F_VERSION_1,
+> > +    VIRTIO_NET_F_CSUM,
+> > +    VIRTIO_NET_F_GUEST_CSUM,
+> > +    VIRTIO_NET_F_GSO,
+> > +    VIRTIO_NET_F_GUEST_TSO4,
+> > +    VIRTIO_NET_F_GUEST_TSO6,
+> > +    VIRTIO_NET_F_GUEST_ECN,
+> > +    VIRTIO_NET_F_GUEST_UFO,
+> > +    VIRTIO_NET_F_HOST_TSO4,
+> > +    VIRTIO_NET_F_HOST_TSO6,
+> > +    VIRTIO_NET_F_HOST_ECN,
+> > +    VIRTIO_NET_F_HOST_UFO,
+> > +    VIRTIO_NET_F_MRG_RXBUF,
+> > +    VIRTIO_NET_F_MTU,
+> > +    VIRTIO_F_IOMMU_PLATFORM,
+> > +    VIRTIO_F_RING_PACKED,
+> > +    VIRTIO_NET_F_GUEST_ANNOUNCE,
+> > +    VHOST_INVALID_FEATURE_BIT
+> > +};
+> > +
+> > +VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
+> > +{
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    return s->vhost_net;
+> > +}
+> > +
+> > +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc)
+> > +{
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    s->acked_features =3D vhost_net_get_acked_features(s->vhost_net);
+> > +
+> > +    return s->acked_features;
+> > +}
+> > +
+> > +static int vhost_vdpa_net_check_device_id(NetClientState *nc)
+> > +{
+> > +    uint32_t device_id;
+> > +    int ret;
+> > +    struct vhost_net *net;
+> > +    struct vhost_dev *hdev;
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+>
+>
+> Let's try to avoid those unnecessary conversion and check since the
+> caller knows e.g VhostVDPAState.
+>
+sure will change this
+>
+> > +    net =3D s->vhost_net;
+> > +    hdev =3D (struct vhost_dev *)&net->dev;
+> > +    ret =3D hdev->vhost_ops->vhost_get_device_id(hdev, &device_id);
+> > +    if (device_id !=3D VIRTIO_ID_NET) {
+> > +        return -ENOTSUP;
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> > +static void vhost_vdpa_del(NetClientState *ncs)
+> > +{
+> > +    VhostVDPAState *s;
+> > +    assert(ncs->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    s =3D DO_UPCAST(VhostVDPAState, nc, ncs);
+> > +    if (s->vhost_net) {
+> > +        vhost_net_cleanup(s->vhost_net);
+> > +    }
+> > +}
+> > +
+> > +static int vhost_vdpa_add(NetClientState *ncs, void *be)
+> > +{
+> > +    VhostNetOptions options;
+> > +    struct vhost_net *net =3D NULL;
+> > +    VhostVDPAState *s;
+> > +    int ret;
+> > +
+> > +    options.backend_type =3D VHOST_BACKEND_TYPE_VDPA;
+> > +    assert(ncs->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    s =3D DO_UPCAST(VhostVDPAState, nc, ncs);
+> > +    options.net_backend =3D ncs;
+> > +    options.opaque      =3D be;
+> > +    options.busyloop_timeout =3D 0;
+> > +    net =3D vhost_net_init(&options);
+> > +    if (!net) {
+> > +        error_report("failed to init vhost_net for queue");
+> > +        goto err;
+> > +    }
+> > +    if (s->vhost_net) {
+> > +        vhost_net_cleanup(s->vhost_net);
+> > +        g_free(s->vhost_net);
+> > +    }
+> > +    s->vhost_net =3D net;
+> > +    ret =3D vhost_vdpa_net_check_device_id(ncs);
+>
+>
+> Eli pointed out it's better to validate device Id before vhost_net_init()=
+.
+>
+> Otherwise driver may see e.g DRIVER before getting device id.
+>
+Maybe we can't move this before vhost_net_init(),
+because the callback vhost_ops->vhost_get_device_id was init during
+vhost_net_init()
 
-Sure, let us do it once we converge on the concept.
+>
+> > +    if (ret) {
+> > +        goto err;
+> > +    }
+> > +    return 0;
+> > +err:
+> > +    if (net) {
+> > +        vhost_net_cleanup(net);
+> > +    }
+> > +    vhost_vdpa_del(ncs);
+> > +    return -1;
+> > +}
+> > +
+> > +static void vhost_vdpa_cleanup(NetClientState *nc)
+> > +{
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +
+> > +    if (s->vhost_net) {
+> > +        vhost_net_cleanup(s->vhost_net);
+> > +        g_free(s->vhost_net);
+> > +        s->vhost_net =3D NULL;
+> > +    }
+> > +}
+> > +
+> > +static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
+> > +{
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +
+> > +    return true;
+> > +}
+> > +
+> > +static bool vhost_vdpa_has_ufo(NetClientState *nc)
+> > +{
+> > +    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    uint64_t  features =3D 0;
+>
+>
+> Unnecessary spaces between uint64_t and features.
+>
+will remove
+>
+> > +    features |=3D (1ULL << VIRTIO_NET_F_HOST_UFO);
+> > +    features =3D vhost_net_get_features(s->vhost_net, features);
+> > +    return !!(features & (1ULL << VIRTIO_NET_F_HOST_UFO));
+> > +
+> > +}
+> > +
+> > +static NetClientInfo net_vhost_vdpa_info =3D {
+> > +        .type =3D NET_CLIENT_DRIVER_VHOST_VDPA,
+> > +        .size =3D sizeof(VhostVDPAState),
+> > +        .cleanup =3D vhost_vdpa_cleanup,
+> > +        .has_vnet_hdr =3D vhost_vdpa_has_vnet_hdr,
+> > +        .has_ufo =3D vhost_vdpa_has_ufo,
+> > +};
+> > +
+> > +static int net_vhost_vdpa_init(NetClientState *peer, const char *devic=
+e,
+> > +                               const char *name, const char *vhostdev)
+> > +{
+> > +    NetClientState *nc =3D NULL;
+> > +    VhostVDPAState *s;
+> > +    int vdpa_device_fd =3D -1;
+> > +    int ret =3D 0;
+> > +    assert(name);
+> > +    nc =3D qemu_new_net_client(&net_vhost_vdpa_info, peer, device, nam=
+e);
+> > +    snprintf(nc->info_str, sizeof(nc->info_str), "vhost-vdpa");
+>
+>
+> Do we need an for this vhost-vdpa?
+>
+> Thanks
+>
+>
+Sure will add this
+> > +    nc->queue_index =3D 0;
+> > +    s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    vdpa_device_fd =3D qemu_open(vhostdev, O_RDWR);
+> > +    if (vdpa_device_fd =3D=3D -1) {
+> > +        return -errno;
+> > +    }
+> > +    s->vhost_vdpa.device_fd =3D vdpa_device_fd;
+> > +    ret =3D vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
+> > +    assert(s->vhost_net);
+> > +    return ret;
+> > +}
+> > +
+> > +static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **e=
+rrp)
+> > +{
+> > +    const char *name =3D opaque;
+> > +    const char *driver, *netdev;
+> > +
+> > +    driver =3D qemu_opt_get(opts, "driver");
+> > +    netdev =3D qemu_opt_get(opts, "netdev");
+> > +    if (!driver || !netdev) {
+> > +        return 0;
+> > +    }
+> > +    if (strcmp(netdev, name) =3D=3D 0 &&
+> > +        !g_str_has_prefix(driver, "virtio-net-")) {
+> > +        error_setg(errp, "vhost-vdpa requires frontend driver virtio-n=
+et-*");
+> > +        return -1;
+> > +    }
+> > +    return 0;
+> > +}
+> > +
+> > +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+> > +                        NetClientState *peer, Error **errp)
+> > +{
+> > +    const NetdevVhostVDPAOptions *opts;
+> > +
+> > +    assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> > +    opts =3D &netdev->u.vhost_vdpa;
+> > +    /* verify net frontend */
+> > +    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_ne=
+t,
+> > +                          (char *)name, errp)) {
+> > +        return -1;
+> > +    }
+> > +    return net_vhost_vdpa_init(peer, "vhost_vdpa", name, opts->vhostde=
+v);
+> > +}
+> > diff --git a/qapi/net.json b/qapi/net.json
+> > index cebb1b52e3..03aad67693 100644
+> > --- a/qapi/net.json
+> > +++ b/qapi/net.json
+> > @@ -428,6 +428,24 @@
+> >       '*vhostforce':    'bool',
+> >       '*queues':        'int' } }
+> >
+> > +##
+> > +# @NetdevVhostVDPAOptions:
+> > +#
+> > +# Vhost-vdpa network backend
+> > +#
+> > +# @vhostdev: name of a vdpa dev path in sysfs
+> > +#            (default path:/dev/vhost-vdpa-$ID)
+> > +#
+> > +# @queues: number of queues to be created for multiqueue vhost-vdpa
+> > +#          (default: 1)
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'struct': 'NetdevVhostVDPAOptions',
+> > +  'data': {
+> > +    '*vhostdev':     'str',
+> > +    '*queues':       'int' } }
+> > +
+> >   ##
+> >   # @NetClientDriver:
+> >   #
+> > @@ -437,7 +455,7 @@
+> >   ##
+> >   { 'enum': 'NetClientDriver',
+> >     'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> > -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+> > +            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' =
+] }
+> >
+> >   ##
+> >   # @Netdev:
+> > @@ -465,7 +483,8 @@
+> >       'bridge':   'NetdevBridgeOptions',
+> >       'hubport':  'NetdevHubPortOptions',
+> >       'netmap':   'NetdevNetmapOptions',
+> > -    'vhost-user': 'NetdevVhostUserOptions' } }
+> > +    'vhost-user': 'NetdevVhostUserOptions',
+> > +    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
+> >
+> >   ##
+> >   # @NetLegacy:
+>
 
-Thanks
-Salil.
 
