@@ -2,98 +2,96 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB98C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:34:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B96E2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED8802072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 08:34:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PqinJkzF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B96E2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yX8KpvCl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED8802072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jneHO-0002GM-HC
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
+	id 1jneO5-0006Xf-2Z
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 04:34:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jneGQ-0001Rd-Kw
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:26:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25497
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jneGO-0004In-O3
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:26:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592900799;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gJ/jqKSruetAbPv/0pR4k3wMshX/lxk3A5EUZsrPN/A=;
- b=PqinJkzFt52RgQ102reVBdmDv1cdLE8fKHAfDLJNJUTzmB+14323ghjLGIGlW/kjNa2BB+
- cWyKexC30GZgpfvSBnVkBtTSKoCop2cNZANSF40oMgFILoA+K+BY054cmL/TO8BdOJQdjz
- fyFOnCKtHu9EiHieZAmNT75nG6JM6kA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-0wFQGRVKMdiKuFPWz8KJkQ-1; Tue, 23 Jun 2020 04:26:37 -0400
-X-MC-Unique: 0wFQGRVKMdiKuFPWz8KJkQ-1
-Received: by mail-wm1-f71.google.com with SMTP id l2so3142488wmi.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 01:26:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jneNO-0005kp-Jo
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:33:54 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43702)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jneNM-00075i-TJ
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 04:33:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l10so19576205wrr.10
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 01:33:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Hdg6kn0fwIHVdKp93JW+WKTFwlYtz+QHOsWefKiM3ec=;
+ b=yX8KpvCl5DbuAwKs/Uy/SbjeKJZakhhv+qwaXcQpZVl9uvNPKBum7riwWNjd+bqfQE
+ 4lIhxlgK/sO6ZIdeqFnMH/aeWM6LxBdqBKnSQk3G8tuskCA2e8JsRIOkdM7jcCVnaqj5
+ DlGXRc/Bd+jCjJdAXiZUQgMYc48e39WOft9SbwrxvyzwXFOlDzUqkelofLEo62EqW6el
+ /CCtgxj/S1KdWxOQIzi2LBxlOCmo3tiyzWUd4fGLytGIaqlJtkE62hgJY8JWRKA1UIUC
+ R3dv3E3x1UzDVWkxUtGztgr174spOI2ANjBenQMymk2+PlqMz/K1qDOQpdUIUDfedlGm
+ Qt/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=gJ/jqKSruetAbPv/0pR4k3wMshX/lxk3A5EUZsrPN/A=;
- b=j1eIVlT3QBVb4qo0U0IXEV69mT/tmsKYc6afto91k8i3MpkVNChrPfU77i4GMv+23+
- w8PbweDc3PgyGB0giP0Ea6jZSCTPkgqLJB+xANgRZoDaHNidGEVbg086Hbfy/k0Ps+7X
- NCploLvKKEq4AjU5BdyAdmEZpaLix8/RclvLpuv9XoF/oCpu51EIlscYnEyOEdrTsEhQ
- /Co3hyNFfzyApH8Mjy+zaOqbQ5ewBTVXHvZcfwR3DgGI63mDzBlMPS1psPJOO7t88Fww
- mUAuc1/VT1xwbA2eVSOhXf7gFht1Kao0z6nb+GRw5LhOCUrtKpFhKEAqqx4BSiuwn3vR
- Ggsw==
-X-Gm-Message-State: AOAM533G2QqIasYOaa/UkxqaJGPRiWHXv/qCXlSmCMxf7+jNMzOReElg
- 2jGuv0qgX5fENxQT47AR3ggGn1DIUsHgON0y9bRS3YdQCUeZbyqm3+E+ig2EofidonWxu0B3Stx
- bURnO4hjocck4uvE=
-X-Received: by 2002:a1c:4d0a:: with SMTP id o10mr22978630wmh.150.1592900796518; 
- Tue, 23 Jun 2020 01:26:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwpcjKCnH84EfOPj2FlkbExr/PMOZGbnKNmRlyTbvA98cSBYNXUOtL+1V4ycBiaPNzAF9KC8w==
-X-Received: by 2002:a1c:4d0a:: with SMTP id o10mr22978617wmh.150.1592900796344; 
- Tue, 23 Jun 2020 01:26:36 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- 65sm1528437wma.48.2020.06.23.01.26.35
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Hdg6kn0fwIHVdKp93JW+WKTFwlYtz+QHOsWefKiM3ec=;
+ b=mjAR/x5NwVXc9M5AKDo5ek2f87UwvsNPTjxuCxBU3VZB16/BK3tkGhx/kkzoNGCqfy
+ xOaPVmudzNoFpcB2mNSfYbc1ic5NROMw9lM3yNngUT3Obih3Wtr+a7l6fhw4H2yKPk02
+ SSfEYfs5QaHQ376U0IxfONi+KWXdMq3OqR4alhStlSYclxCJ7abCMxpElqPK8KfepbfB
+ yX+EHSzvsyjVYuupk6aecX/lfWV+eoAlH4yn6rUFB/47HSR1HLKUxrAzjc7a2PWQFPrN
+ 5o921HJS2tVcuxFZ86In3Qkv1prDeSsefWism3jz6yjlIc5kK1+f7bjMpVU8rnIaFuQr
+ r7LQ==
+X-Gm-Message-State: AOAM530T2zHu20Xbu/MLlxdpY3+NH/xoksv9E88fbaZcVXq7bECKj8Tv
+ bxde6YnaD2+c3lTydo8ERSZ48w==
+X-Google-Smtp-Source: ABdhPJxDdTNdeYJf/7zKeKc5kF6RYPRHznh5nmb0odPD1H/+lwoqPEb6k0yHWgTNgehdnokCuc671A==
+X-Received: by 2002:a5d:6a06:: with SMTP id m6mr8062262wru.321.1592901230759; 
+ Tue, 23 Jun 2020 01:33:50 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p9sm2581668wma.48.2020.06.23.01.33.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 01:26:35 -0700 (PDT)
-Date: Tue, 23 Jun 2020 04:26:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PATCH 0/2] checkpatch: Do appropriate kernel->qemu renaming
-Message-ID: <20200623042626-mutt-send-email-mst@kernel.org>
-References: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
+ Tue, 23 Jun 2020 01:33:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0728D1FF7E;
+ Tue, 23 Jun 2020 09:33:49 +0100 (BST)
+References: <20200522023440.26261-1-richard.henderson@linaro.org>
+ <20200522023440.26261-15-richard.henderson@linaro.org>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 14/25] Merge reginfo.c into risu.c
+In-reply-to: <20200522023440.26261-15-richard.henderson@linaro.org>
+Date: Tue, 23 Jun 2020 09:33:48 +0100
+Message-ID: <871rm69o5v.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,30 +104,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 20, 2020 at 03:32:05PM +0200, Aleksandar Markovic wrote:
-> There are several places where 'kernel' is mentioned instead of
-> 'qemu' in checkpatch.pl.
-> 
-> This small series corrects this.
 
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-fine by me
+> The distinction between the two is artificial.  Following
+> patches will rearrange the functions involved to make it
+> easier for dumping of the trace file.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> Aleksandar Markovic (2):
->   checkpatch: Rename top_of_kernel_tree() to top_of_qemu_tree()
->   checkpatch: Change occurences of 'kernel' to 'qemu' in user messages
-> 
->  scripts/checkpatch.pl | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
-> 
-> -- 
-> 2.20.1
-
+--=20
+Alex Benn=C3=A9e
 
