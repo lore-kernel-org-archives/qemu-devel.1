@@ -2,90 +2,84 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7054BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51092C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:08:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FD6A206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:07:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 200572082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZUuDkTuP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD6A206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WPUH2VKL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200572082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnpCz-0007Eb-9R
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:07:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51446)
+	id 1jnpD5-0007QZ-DW
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:07:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnp0l-000544-MQ
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:55:15 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44434)
+ id 1jnoju-0004lh-MJ
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:50 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42703)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnp0j-0008Rz-QW
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:55:15 -0400
-Received: by mail-pg1-x544.google.com with SMTP id r18so32762pgk.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:55:13 -0700 (PDT)
+ id 1jnojr-0005rX-Ax
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:50 -0400
+Received: by mail-pl1-x642.google.com with SMTP id k6so9533219pll.9
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MJWqeoUbiMsWn8YWhEsrx3vSel5g8s8d58neBNcu5Pc=;
- b=ZUuDkTuP7KMnUTZ/wIh8gVu+mNAg2igA7/2YFKxrZotR4oOD4BI5y5o1J2SWKmmFri
- 5kzxZywJJ00EL1L2J5hrtpx02YHJtwQd/yCySIIp0ODbIXbJmAq+LB14juAqxvd58UnQ
- MC1sIRzgKoxJlsTl2PwGm/JVKX6f1+iIEuZwyTuUZis94b+/U9SbqvpZqaW66IskJBa+
- vxIVT0cWC2yW6VaxTuxDe/W/18MxTrRpvJa1a2Ry4+P4Ku2FYacQ20evABdbXZyFVOeR
- QizWS5DMVTZ4Z/yg3FpOAYtNB7uiQIOWoEpxPJ6LIAm/ui9gXIQD7J4xpBg8M6WdoO08
- TLsQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NYe9wQzTvXU1gjsTjXV8P2ixn5lgpDK0SgGpjLrcDR0=;
+ b=WPUH2VKLEEYBsG5KUb4kK9nNqBasrgtb3aqkNwu4mkG/WDy+P47OCm0428D3zglfVj
+ 1GxBCWKjEJTIT6GgTPIkmGzR94Wr6/1pCfneD3OgYGqIB/9TS7EecdSF5DB1dE9X7/oH
+ kQhmdJR0km2UqY5o5/9xV0X7mFvaR/NKf9sXEfXHAe/3zhWTHUJXSO4MDW/pxa7lrR4h
+ /oEjc1ElT4KYmWCuJgtftbk9B9thA7sqC9IEkn2J7jbZxvX1xNEdGY+tix4whtuPs48w
+ +xQsj10ZW+E6h8WRRsYRXWmJfcaApFJypW6MdOdHvMLqdyZqnevvNzzEr5D0o2iEXAdC
+ +H6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MJWqeoUbiMsWn8YWhEsrx3vSel5g8s8d58neBNcu5Pc=;
- b=G2c+qgBFDI7P9ald0B9SDYNVy/7ZKjWjyhhbwBKHdOJ6bpiLh0jYZHEI2F3RVUQbQ9
- 6I1wOTwfW74baG0R1X2Isw9dr49uG7oXCUwdvfY+SO9ZxHE/wG0rbjbqtY62E3dxx4Rn
- GWLsW7t1OtXl2AU78sZJoG1IXMiV4AURzmeXTov2AUzkxrnUM4wycP3jwojAuJX45dbh
- fC1mVk0Em+tOrGJC0D/ow6RxTs1Yu8ctShVvMJa+hX37U8Pkf/2CQ2d+iklfFeoGHOD7
- PZmbaVOqIdC4d/o32NHAARMHu/YybEWyhLol/lBJfykYtWJ139T8MGVQE5OmcXHnM7GW
- WXfw==
-X-Gm-Message-State: AOAM531ST4QBKviFlzwePDzWhnzHjrClG2xOdRcq1Ccfa/Ol3JRwJy6v
- 3zpFMS4+6t9P0TJct1Uj2WF/TOSSVaA=
-X-Google-Smtp-Source: ABdhPJzExCSrc3ogtr32BsMWwmTJIFczkuaq8Umz57EZfFfbRScbDdFMk7D+XYXIk0/DMzqIQNFUMA==
-X-Received: by 2002:aa7:9a9c:: with SMTP id w28mr24610594pfi.295.1592942111899; 
- Tue, 23 Jun 2020 12:55:11 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id j19sm17571513pfn.109.2020.06.23.12.55.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 12:55:11 -0700 (PDT)
-Subject: Re: [PATCH] risu: don't do a full register compare for OP_SIGILL
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200522023440.26261-1-richard.henderson@linaro.org>
- <20200623144446.4243-1-alex.bennee@linaro.org>
- <CAFEAcA8LvhhWihVHc_09ZRzZKv8tiWFfd2MfT7ZawJpU3UktyQ@mail.gmail.com>
- <87eeq592pk.fsf@linaro.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NYe9wQzTvXU1gjsTjXV8P2ixn5lgpDK0SgGpjLrcDR0=;
+ b=b6LEth1B8Zhh8uOep2/0ZbbUuaLLpx226TECqLQ6LrIifOpP2CstZMnpBb+0bN7UXa
+ 2vS9rt/dFIpZ0yy6QgIjgbgv6v20AGuFa/k6nWRhtarndF9Itj39aQTxQKptL4F5Ox30
+ hxD7Ptj+4iB1atqY3OVTY+SzRkTO9ecm2BidCotPhVsoTWtF/8f9FNK1HMbcuysNctpX
+ U7HgKVa/3tRefg0W0n4AFeA5JQ4aGPtCkmXtTLEcIhvCtB2NpppVz92iOhtBmPXVs42g
+ D4wf/aTDtFNJEAF2e6TQJU1lLQt4T/l2ri1dsvF+U/mt4qTCMI1sEOzJ5GLhVyy5//bt
+ aBzw==
+X-Gm-Message-State: AOAM5330K8yNFTc+pHpPRN3y9iPIIX79onGEq9c6u/tWuZL1SMlFCaRB
+ 3cVkCHCTOXw+iztg4ODJ/Si+S1EHHKo=
+X-Google-Smtp-Source: ABdhPJzQCDrIt4AmHE7pC6RKy87LhqtBo2hrmZ066XPUzMC8GtICCRsusIon2A6benO+BjbUjY68Dw==
+X-Received: by 2002:a17:902:7785:: with SMTP id
+ o5mr25538572pll.288.1592941064799; 
+ Tue, 23 Jun 2020 12:37:44 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 12:37:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1fc28bd0-1bee-1329-2d8e-ae9362d2c219@linaro.org>
-Date: Tue, 23 Jun 2020 12:55:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 32/45] target/arm: Add arm_tlb_bti_gp
+Date: Tue, 23 Jun 2020 12:36:45 -0700
+Message-Id: <20200623193658.623279-33-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200623193658.623279-1-richard.henderson@linaro.org>
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87eeq592pk.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,32 +101,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, david.spickett@linaro.org,
+ steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 9:17 AM, Alex Bennée wrote:
-> 
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On Tue, 23 Jun 2020 at 16:07, Alex Bennée <alex.bennee@linaro.org> wrote:
->>>
->>> OP_SIGILL means we have an unexpected invalid operation. If this is a
->>> load or store the register state may be un-rectified pointing at the
->>> memblock so would be invalid. In this case just compare the PC and
->>> make sure the other end also faulted at the same place.
->>
->> In case of mismatch of the PC do we still print the full register
->> dump?
+Introduce an lvalue macro to wrap target_tlb_bit0.
 
-No.  If we want that, we should do something else, like remember that the
-memory pointer is in use and zap it out before reporting the register set.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h           | 13 +++++++++++++
+ target/arm/helper.c        |  2 +-
+ target/arm/translate-a64.c |  2 +-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-But, generally, if we see SIGILL, then we have not actually executed anything,
-so the register state doesn't matter too much.  What probably does want
-reporting in this case is the insn opcode.
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a5d3b6c9ee..3121836bdc 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3393,6 +3393,19 @@ static inline uint64_t *aa64_vfp_qreg(CPUARMState *env, unsigned regno)
+ /* Shared between translate-sve.c and sve_helper.c.  */
+ extern const uint64_t pred_esz_masks[4];
+ 
++/* Helper for the macros below, validating the argument type. */
++static inline MemTxAttrs *typecheck_memtxattrs(MemTxAttrs *x)
++{
++    return x;
++}
++
++/*
++ * Lvalue macros for ARM TLB bits that we must cache in the TCG TLB.
++ * Using these should be a bit more self-documenting than using the
++ * generic target bits directly.
++ */
++#define arm_tlb_bti_gp(x) (typecheck_memtxattrs(x)->target_tlb_bit0)
++
+ /*
+  * Naming convention for isar_feature functions:
+  * Functions which test 32-bit ID registers should have _aa32_ in
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 33f902387b..44a3f9fb48 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11079,7 +11079,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+     }
+     /* When in aarch64 mode, and BTI is enabled, remember GP in the IOTLB.  */
+     if (aarch64 && guarded && cpu_isar_feature(aa64_bti, cpu)) {
+-        txattrs->target_tlb_bit0 = true;
++        arm_tlb_bti_gp(txattrs) = true;
+     }
+ 
+     if (cacheattrs != NULL) {
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 7e8263e86f..ec2295393d 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14446,7 +14446,7 @@ static bool is_guarded_page(CPUARMState *env, DisasContext *s)
+      * table entry even for that case.
+      */
+     return (tlb_hit(entry->addr_code, addr) &&
+-            env_tlb(env)->d[mmu_idx].iotlb[index].attrs.target_tlb_bit0);
++            arm_tlb_bti_gp(&env_tlb(env)->d[mmu_idx].iotlb[index].attrs));
+ #endif
+ }
+ 
+-- 
+2.25.1
 
-
-r~
 
