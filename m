@@ -2,93 +2,85 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBE0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 02:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B7BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 03:42:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17CAB20720
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 02:06:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0868B206C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 03:42:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="y9DdWDY/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CAB20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkO5PKTH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0868B206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnYKr-0001BY-9s
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 22:06:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52544)
+	id 1jnZov-0001Uw-Ao
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 23:42:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
- id 1jnYKB-0000jf-0V
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 22:06:11 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38402)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jnZo6-00013h-Bf
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 23:41:10 -0400
+Received: from mail-lj1-x233.google.com ([2a00:1450:4864:20::233]:39230)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cminyard@mvista.com>)
- id 1jnYK5-0005wj-Qb
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 22:06:10 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 64so4077382oti.5
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 19:06:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=vovEO5kooT0fn2inRmrZ6u/7T/x7nRNCPqhucbweRgQ=;
- b=y9DdWDY/0c8y1uuJggDWc87V1AW03rZtAL+v2u9HQJIPlmC6NhlqVMUk42YUQ6JF0M
- +w8PuRUAIwoVe7Lg6Dy0r1TFH+wWfQDFqUhk6L2QX7SB1ETQHEnvfzrLWzdjicpwT72T
- e2ZWceWtWPqZUpWAAscAMyzK2IO4DQdKlKOoZi6P46SxdzbZMHYvPRsmp0NESbwquenz
- f9VzPtP1qOO5mrMRw48+Q6CCRUB73xcI6PJJYPr8PdG1V4iMTz4gpfBcvgglIbKFIpX4
- avcMynQ44eKRNiNeHI3vwv59OOyvA1jBXcOyPl5S1joQU2uqjACtbwDEWcdEHoVa6siQ
- OyLA==
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jnZo4-0001x1-Mm
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 23:41:10 -0400
+Received: by mail-lj1-x233.google.com with SMTP id a9so21728684ljn.6
+ for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 20:41:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=g780v6WnLYQ1QZQRWq+6mQKK2XsAf/u1xfSFw0Z6JFs=;
+ b=nkO5PKTHb8KutOobp7Hgg+WgOCYi/XoTF9/3Vxe5VfF8NFti+41Pbu/33yI+D8AQsq
+ Ky9jOYjaj1wJff8Skb2LVhjnLwjyOwRsnOUvotHAXYRKjTCiHmIX9wn4jCAksbtjIdTI
+ 58vdQCHRAVYOmMvccfsH9inZ2nczLKA7q2rbGBJXGFqkrkecCToCo25wfPFefpORLBl6
+ JS3sRSuX6u/92iF1QgVsQwiWvLFpR5rX4wdzG/TcZ8fL2fKLgyEkNx5UrTPAYTC00oNx
+ Iede+FD2k91tVb53kUAVjYO9dajw6a5TtNiTIfbLa8tBAMCeQE+vMbS567v9CzUXNNtX
+ MnDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=vovEO5kooT0fn2inRmrZ6u/7T/x7nRNCPqhucbweRgQ=;
- b=q1IyWCVGRsihMRA3swYHCW9+GayWQlscktlPTY35xS+Mr7qUZyrg35DQ1kE0IZUoss
- j7cimwlQ6lcG0EwYau567jFyxXfaREtRso5hhO8TIvhKLkZaKqM9ynY3720HEoJw3r6g
- 6byVJ3ZOd81HJQ5DhCBSJ0YaIDGOZvKOKPazwT26BD7TD3+Mqh8U6Xqh6DXOZCrnHApG
- ImtAREdkG6iCKOmcT+FUAlTWaNf5gGxYK4y0J64agOWMZTjrWPptzs/EshtIQjF9IsWb
- QdZtYwNF/uusR8Ew9r2l8lPvTVo17zviz3GaWonzTGA+PpimTYIzpzn7Wb4Rn1RhLFTD
- 18aA==
-X-Gm-Message-State: AOAM531XJhbi5SqiTHLualiprigWj0ka7iCMqRCuQLCEAUlv3O4ZnRcd
- 4XdqfQrmiKKUulbd8o62XfMWIg==
-X-Google-Smtp-Source: ABdhPJz0PEAInB/GyrALU51vjYMV6semejdJl0V2J9ggrwKPWV83EDNksS+Gqlw8Qv2wsYzrw1oXIg==
-X-Received: by 2002:a4a:87c9:: with SMTP id c9mr16638942ooi.72.1592877963776; 
- Mon, 22 Jun 2020 19:06:03 -0700 (PDT)
-Received: from minyard.net ([2001:470:b8f6:1b:acca:171:3424:849f])
- by smtp.gmail.com with ESMTPSA id o2sm3704787ota.14.2020.06.22.19.06.02
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 22 Jun 2020 19:06:03 -0700 (PDT)
-Date: Mon, 22 Jun 2020 21:06:01 -0500
-From: Corey Minyard <cminyard@mvista.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] i2c: Match parameters of i2c_start_transfer and
- i2c_send_recv
-Message-ID: <20200623020601.GD3258@minyard.net>
-References: <20200621145235.9E241745712@zero.eik.bme.hu>
- <20200622213237.GB3258@minyard.net>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=g780v6WnLYQ1QZQRWq+6mQKK2XsAf/u1xfSFw0Z6JFs=;
+ b=VLRtv9D3cfgWHyf3r4stXlsgU615V3GTW5oo7DsMI4YQCb0YR3fe/U4fCplvXBeu1Z
+ MP8tymwDKsgMep+xDKXTSSWaWI7B5CPVnmCfNS43Zgssn0eFnKBSAmXYi2AjfYxteG6j
+ He+lhS8EsQyd5Vmn8nBZEDKyAiOmD8u0BE7c5vbOW9F7/ZYMMz4G9eJPQDRiA37YzlJK
+ Xq6e2tTCLpgLpE79uU+V0s43skmo6Yav9d3BXA3tFcrpab+RV3Kldfy9fzDjlLg+gmXk
+ XgzIEM85KfC/sTRL0ShU6NOKvzFPNqv7+HCmc3KL+7+96GooAco4IQWIyTRmuPZFe2jO
+ y/2A==
+X-Gm-Message-State: AOAM533A2tJ+5wWYoKElarKQQQQCCJBm+8ZUv9pxvPJUo/y+aFk0Uurh
+ NYHigV3Re8uGRvZVhjokDAMFN/zjnivJ7cCVJgg=
+X-Google-Smtp-Source: ABdhPJyBZV5fmqperXCFj6v08Ebo6e6nCRkDfnitOFhxpl87pM0Cj79N1j1ptSWGuTMvlschI12cqgk9yx9AUkKiFyY=
+X-Received: by 2002:a2e:9141:: with SMTP id q1mr9666796ljg.196.1592883666790; 
+ Mon, 22 Jun 2020 20:41:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200622213237.GB3258@minyard.net>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: permerror client-ip=2607:f8b0:4864:20::344;
- envelope-from=cminyard@mvista.com; helo=mail-ot1-x344.google.com
+References: <CAKf6xpuSD3NC2bLPQN75e2pR8asu9Ey1xTGxTNeCR_1MGsnPOg@mail.gmail.com>
+ <ac4dfe3b-7981-49bb-25a2-08578da150d5@ilande.co.uk>
+In-Reply-To: <ac4dfe3b-7981-49bb-25a2-08578da150d5@ilande.co.uk>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Mon, 22 Jun 2020 23:40:55 -0400
+Message-ID: <CAKf6xpvs6mNowsiAzbfQGLGp0aY0zKgUD=DVpSorWHycm--J8g@mail.gmail.com>
+Subject: Re: sysbus failed assert for xen_sysdev
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::233;
+ envelope-from=jandryuk@gmail.com; helo=mail-lj1-x233.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,176 +94,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: cminyard@mvista.com
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Anthony PERARD <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>, Paul Durrant <paul@xen.org>,
+ QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 22, 2020 at 04:32:37PM -0500, Corey Minyard wrote:
-> On Sun, Jun 21, 2020 at 04:43:38PM +0200, BALATON Zoltan wrote:
-> > These functions have a parameter that decides the direction of
-> > transfer but totally confusingly they don't match but inverted sense.
-> > To avoid frequent mistakes when using these functions change
-> > i2c_send_recv to match i2c_start_transfer. Also use bool in
-> > i2c_start_transfer instead of int to match i2c_send_recv.
-> 
-> Hmm, I have to admit that this is a little better.  Indeed the
-> hw/misc/auxbus.c looks suspicious.  I can't imagine that code has ever
-> been tested.
-> 
-> I don't know the policy on changing an API like this with silent
-> semantic changes.  You've gotten all the internal ones; I'm wondering if
-> we worry about silently breaking out of tree things.
-> 
-> I'll pull this into my tree, but hopefully others will comment on this.
+On Mon, Jun 22, 2020 at 5:17 PM Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> On 22/06/2020 21:33, Jason Andryuk wrote:
+>
+> > Hi,
+> >
+> > Running qemu devel for a Xen VM is failing an assert after the recent
+> > "qdev: Rework how we plug into the parent bus" sysbus changes.
+> >
+> > qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
+> > `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
+> > failed.
+> >
+> > dc->bus_type is "xen-sysbus" and it's the
+> > `object_dynamic_cast(OBJECT(bus), dc->bus_type)` portion that fails
+> > the assert.  bus seems to be "main-system-bus", I think:
+> > (gdb) p *bus
+> > $3 = {obj = {class = 0x55555636d780, free = 0x7ffff7c40db0 <g_free>,
+> > properties = 0x5555563f7180, ref = 3, parent = 0x5555563fe980}, parent
+> > = 0x0, name = 0x5555563fec60 "main-system-bus", ...
+> >
+> > The call comes from hw/xen/xen-legacy-backend.c:706
+> > sysbus_realize_and_unref(SYS_BUS_DEVICE(xen_sysdev), &error_fatal);
+> >
+> > Any pointers on what needs to be fixed?
+>
+> Hi Jason,
+>
+> My understanding is that the assert() is telling you that you're plugging a
+> TYPE_SYS_BUS_DEVICE into a bus that isn't derived from TYPE_SYSTEM_BUS. A quick look
+> at the file in question suggests that you could try changing the parent class of
+> TYPE_XENSYSBUS from TYPE_BUS to TYPE_SYSTEM_BUS to see if that helps?
 
-The more I think about it, the more I think it's a better idea to rename
-the function.  Like i2c_send_or_recv(), which is a little more clear
-about what it does.  Does that sound good?
+Hi, Mark.
 
--corey
+Thanks, but unfortunately changing xensysbus_info .parent does not
+stop the assert.  But it kinda pointed me in the right direction.
 
-> 
-> -corey
-> 
-> > 
-> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> > ---
-> > Looks like hw/misc/auxbus.c already got this wrong and calls both
-> > i2c_start_transfer and i2c_send_recv with same is_write parameter.
-> > Although the name of the is_write variable suggest this may need to be
-> > inverted I'm not sure what that value actially means and which usage
-> > was correct so I did not touch it. Someone knowing this device might
-> > want to review and fix it.
-> > 
-> >  hw/display/sm501.c   |  2 +-
-> >  hw/i2c/core.c        | 34 +++++++++++++++++-----------------
-> >  hw/i2c/ppc4xx_i2c.c  |  2 +-
-> >  include/hw/i2c/i2c.h |  4 ++--
-> >  4 files changed, 21 insertions(+), 21 deletions(-)
-> > 
-> > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> > index 2db347dcbc..ccd0a6e376 100644
-> > --- a/hw/display/sm501.c
-> > +++ b/hw/display/sm501.c
-> > @@ -1034,7 +1034,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-> >                      int i;
-> >                      for (i = 0; i <= s->i2c_byte_count; i++) {
-> >                          res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-> > -                                            !(s->i2c_addr & 1));
-> > +                                            s->i2c_addr & 1);
-> >                          if (res) {
-> >                              s->i2c_status |= SM501_I2C_STATUS_ERROR;
-> >                              return;
-> > diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-> > index 1aac457a2a..c9d01df427 100644
-> > --- a/hw/i2c/core.c
-> > +++ b/hw/i2c/core.c
-> > @@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
-> >   * without releasing the bus.  If that fails, the bus is still
-> >   * in a transaction.
-> >   */
-> > -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
-> > +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
-> >  {
-> >      BusChild *kid;
-> >      I2CSlaveClass *sc;
-> > @@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
-> >      bus->broadcast = false;
-> >  }
-> >  
-> > -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
-> > +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
-> >  {
-> >      I2CSlaveClass *sc;
-> >      I2CSlave *s;
-> >      I2CNode *node;
-> >      int ret = 0;
-> >  
-> > -    if (send) {
-> > -        QLIST_FOREACH(node, &bus->current_devs, next) {
-> > -            s = node->elt;
-> > -            sc = I2C_SLAVE_GET_CLASS(s);
-> > -            if (sc->send) {
-> > -                trace_i2c_send(s->address, *data);
-> > -                ret = ret || sc->send(s, *data);
-> > -            } else {
-> > -                ret = -1;
-> > -            }
-> > -        }
-> > -        return ret ? -1 : 0;
-> > -    } else {
-> > +    if (recv) {
-> >          ret = 0xff;
-> >          if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
-> >              sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
-> > @@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
-> >          }
-> >          *data = ret;
-> >          return 0;
-> > +    } else {
-> > +        QLIST_FOREACH(node, &bus->current_devs, next) {
-> > +            s = node->elt;
-> > +            sc = I2C_SLAVE_GET_CLASS(s);
-> > +            if (sc->send) {
-> > +                trace_i2c_send(s->address, *data);
-> > +                ret = ret || sc->send(s, *data);
-> > +            } else {
-> > +                ret = -1;
-> > +            }
-> > +        }
-> > +        return ret ? -1 : 0;
-> >      }
-> >  }
-> >  
-> >  int i2c_send(I2CBus *bus, uint8_t data)
-> >  {
-> > -    return i2c_send_recv(bus, &data, true);
-> > +    return i2c_send_recv(bus, &data, false);
-> >  }
-> >  
-> >  uint8_t i2c_recv(I2CBus *bus)
-> >  {
-> >      uint8_t data = 0xff;
-> >  
-> > -    i2c_send_recv(bus, &data, false);
-> > +    i2c_send_recv(bus, &data, true);
-> >      return data;
-> >  }
-> >  
-> > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> > index c0a8e04567..d3899203a4 100644
-> > --- a/hw/i2c/ppc4xx_i2c.c
-> > +++ b/hw/i2c/ppc4xx_i2c.c
-> > @@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-> >                      }
-> >                  }
-> >                  if (!(i2c->sts & IIC_STS_ERR) &&
-> > -                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
-> > +                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
-> >                      i2c->sts |= IIC_STS_ERR;
-> >                      i2c->extsts |= IIC_EXTSTS_XFRA;
-> >                      break;
-> > diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> > index 4117211565..a09ab9230b 100644
-> > --- a/include/hw/i2c/i2c.h
-> > +++ b/include/hw/i2c/i2c.h
-> > @@ -72,10 +72,10 @@ struct I2CBus {
-> >  I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
-> >  void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
-> >  int i2c_bus_busy(I2CBus *bus);
-> > -int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
-> > +int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
-> >  void i2c_end_transfer(I2CBus *bus);
-> >  void i2c_nack(I2CBus *bus);
-> > -int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
-> > +int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
-> >  int i2c_send(I2CBus *bus, uint8_t data);
-> >  uint8_t i2c_recv(I2CBus *bus);
-> >  
-> > -- 
-> > 2.21.3
-> > 
+xen-sysdev overrode the bus_type which was breaking sysbus_realize.
+So drop that:
+
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -824,7 +825,7 @@ static void xen_sysdev_class_init(ObjectClass
+*klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+
+     device_class_set_props(dc, xen_sysdev_properties);
+-    dc->bus_type = TYPE_XENSYSBUS;
++    //dc->bus_type = TYPE_XENSYSBUS;
+ }
+
+ static const TypeInfo xensysdev_info = {
+
+Then I had a different instance of the failed assert trying to attach
+xen-console-0 to xen-sysbus.  So I made this change:
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -789,6 +789,7 @@ static void xendev_class_init(ObjectClass *klass,
+void *data)
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     /* xen-backend devices can be plugged/unplugged dynamically */
+     dc->user_creatable = true;
++    dc->bus_type = TYPE_XENSYSBUS;
+ }
+
+ static const TypeInfo xendev_type_info = {
+
+Then it gets farther... until
+qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
+Assertion `dev->realized' failed.
+
+dev->id is NULL. The failing device is:
+(gdb) p *dev.parent_obj.class.type
+$12 = {name = 0x555556207770 "cfi.pflash01",
+
+Is that right?
+
+I'm going to have to take a break from this now.
+
+Regards,
+Jason
 
