@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EDCC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE15AC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51E8E206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E8E206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 974A7206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:00:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 974A7206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhbA-0005y0-A2
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45252)
+	id 1jnhbF-00069F-LG
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:00:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIv-0006NI-6c
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55762)
+ id 1jnhIt-0006K6-UL
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jnhIs-0004k0-GJ
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:28 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1jnhIs-0004jP-0b
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:41:27 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05NBUwPQ181284; Tue, 23 Jun 2020 07:41:25 -0400
+ 05NBWRcV111247; Tue, 23 Jun 2020 07:41:24 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udt2eq1b-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:41:25 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBVcLT183747;
- Tue, 23 Jun 2020 07:41:24 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31udt2eq12-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31udkceyhw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Tue, 23 Jun 2020 07:41:24 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBQHh5028386;
- Tue, 23 Jun 2020 11:41:24 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma02wdc.us.ibm.com with ESMTP id 31sa38xts8-1
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NBX2Ux113376;
+ Tue, 23 Jun 2020 07:41:23 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31udkceyhe-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 11:41:24 +0000
+ Tue, 23 Jun 2020 07:41:23 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBPsx7004551;
+ Tue, 23 Jun 2020 11:41:22 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03dal.us.ibm.com with ESMTP id 31sa394hue-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 11:41:22 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05NBfNGE40567094
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05NBfK3V10158462
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:41:23 GMT
+ Tue, 23 Jun 2020 11:41:20 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7EAF6C6059;
- Tue, 23 Jun 2020 11:41:23 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 98A3EC6059;
+ Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 05627C6055;
- Tue, 23 Jun 2020 11:41:23 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1E392C6055;
+ Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 11:41:22 +0000 (GMT)
+ Tue, 23 Jun 2020 11:41:21 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 09/12] hw/tpm: Move few declarations from 'tpm_util.h' to
- 'tpm_int.h'
-Date: Tue, 23 Jun 2020 07:41:11 -0400
-Message-Id: <20200623114114.1375104-10-stefanb@linux.vnet.ibm.com>
+Subject: [PULL v1 06/12] hw/tpm: Move 'hw/acpi/tpm.h' inclusion from header to
+ sources
+Date: Tue, 23 Jun 2020 07:41:08 -0400
+Message-Id: <20200623114114.1375104-7-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
 References: <20200623114114.1375104-1-stefanb@linux.vnet.ibm.com>
@@ -87,16 +87,16 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-23_06:2020-06-23,
  2020-06-23 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0
- cotscore=-2147483648 mlxscore=0 bulkscore=0 priorityscore=1501
- clxscore=1015 mlxlogscore=999 malwarescore=0 adultscore=0 spamscore=0
- impostorscore=0 suspectscore=1 lowpriorityscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
+ mlxlogscore=999
+ cotscore=-2147483648 lowpriorityscore=0 bulkscore=0 phishscore=0
+ clxscore=1015 adultscore=0 suspectscore=1 priorityscore=1501
+ malwarescore=0 spamscore=0 mlxscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2006230088
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:41:20
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -123,70 +123,68 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-We are going to make "tpm_util.h" publicly accessible by
-moving it to the include/ directory in a pair of commits.
-Keep declarations internals to hw/tpm/ in "tpm_int.h".
+Nothing in "tpm_ppi.h" require declarations from "hw/acpi/tpm.h".
+Reduce dependencies and include it only in the files requiring it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Message-id: 20200612085444.8362-10-philmd@redhat.com
+Message-id: 20200612085444.8362-7-philmd@redhat.com
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_int.h  | 11 +++++++++++
- hw/tpm/tpm_util.h | 10 ----------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ hw/tpm/tpm_ppi.c        | 1 +
+ hw/tpm/tpm_ppi.h        | 1 -
+ hw/tpm/tpm_tis_isa.c    | 1 +
+ hw/tpm/tpm_tis_sysbus.c | 1 +
+ 4 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-index fd5ebc6489..9f72879d89 100644
---- a/hw/tpm/tpm_int.h
-+++ b/hw/tpm/tpm_int.h
-@@ -13,6 +13,7 @@
- #define TPM_TPM_INT_H
+diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+index 6d9c1a3e40..72d7a3d926 100644
+--- a/hw/tpm/tpm_ppi.c
++++ b/hw/tpm/tpm_ppi.c
+@@ -17,6 +17,7 @@
+ #include "cpu.h"
+ #include "sysemu/memory_mapping.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/tpm.h"
+ #include "tpm_ppi.h"
+ #include "trace.h"
  
- #include "qemu/option.h"
-+#include "sysemu/tpm.h"
+diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+index d33ef27de6..6f773c25a0 100644
+--- a/hw/tpm/tpm_ppi.h
++++ b/hw/tpm/tpm_ppi.h
+@@ -12,7 +12,6 @@
+ #ifndef TPM_TPM_PPI_H
+ #define TPM_TPM_PPI_H
  
- #define TPM_STANDARD_CMDLINE_OPTS \
-     { \
-@@ -74,4 +75,14 @@ struct tpm_resp_hdr {
- #define TPM_RC_FAILURE            0x101
- #define TPM_RC_LOCALITY           0x907
+-#include "hw/acpi/tpm.h"
+ #include "exec/address-spaces.h"
  
-+int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
-+                             size_t *buffersize);
-+
-+typedef struct TPMSizedBuffer {
-+    uint32_t size;
-+    uint8_t  *buffer;
-+} TPMSizedBuffer;
-+
-+void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
-+
- #endif /* TPM_TPM_INT_H */
-diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-index 7889081fba..d524935576 100644
---- a/hw/tpm/tpm_util.h
-+++ b/hw/tpm/tpm_util.h
-@@ -66,19 +66,9 @@ static inline void tpm_cmd_set_error(void *b, uint32_t error)
-     stl_be_p(b + 6, error);
- }
+ typedef struct TPMPPI {
+diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
+index 30ba37079d..42f909ff1e 100644
+--- a/hw/tpm/tpm_tis_isa.c
++++ b/hw/tpm/tpm_tis_isa.c
+@@ -26,6 +26,7 @@
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/tpm.h"
+ #include "tpm_util.h"
+ #include "tpm_tis.h"
  
--int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
--                             size_t *buffersize);
--
- #define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
- 
--typedef struct TPMSizedBuffer {
--    uint32_t size;
--    uint8_t  *buffer;
--} TPMSizedBuffer;
--
--void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
--
- void tpm_util_show_buffer(const unsigned char *buffer,
-                           size_t buffer_size, const char *string);
- 
+diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
+index eced1fc843..edca1dae0d 100644
+--- a/hw/tpm/tpm_tis_sysbus.c
++++ b/hw/tpm/tpm_tis_sysbus.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/tpm.h"
+ #include "tpm_util.h"
+ #include "hw/sysbus.h"
+ #include "tpm_tis.h"
 -- 
 2.24.1
 
