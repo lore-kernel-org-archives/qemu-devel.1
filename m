@@ -2,82 +2,91 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AFEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E7CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E204120723
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E204120723
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F33F020724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:16:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="Oaa79o99"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33F020724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jniiO-0008FJ-3b
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:11:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52506)
+	id 1jninL-0001q0-8s
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnihn-0007o8-8s
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:11:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46108)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnihk-0006Tf-Ue
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:11:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnihh-0003e2-FN
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 13:11:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6D0612E8050
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 13:11:09 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jnimK-0001LB-Nx
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:15:56 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:39674 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jnimI-0000FX-VE
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:15:56 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 615F14C89B;
+ Tue, 23 Jun 2020 13:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1592918149;
+ x=1594732550; bh=M/3F70WDmO2uu/pgfl2MLCgrlWmCZfHZH2atOkb5Tw4=; b=
+ Oaa79o99UdNUCzTjMAWr51xqJ6SKApDUuBYRJGuFW42Cc1NoLJS5XKvnFbJUq8bZ
+ nCA7tKb6ZcrTPvbz1F6wTaex+FG0xsD1xX/6MHhRsbkAwDYJBWlAWoDLUfadDsec
+ i9P3smqzwpLeV+yXRJJ9+rkDERMlwvFgG0URCRfprAA=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 542jZsCQ_9yN; Tue, 23 Jun 2020 16:15:49 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 4BD154C855;
+ Tue, 23 Jun 2020 16:15:49 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 23
+ Jun 2020 16:15:49 +0300
+Date: Tue, 23 Jun 2020 16:15:48 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH] configure: Don't warn about lack of PIE on macOS
+Message-ID: <20200623131548.GB25104@SPB-NB-133.local>
+References: <20200601124257.32057-1-r.bolshakov@yadro.com>
+ <20200623124857.GH36568@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2020 12:56:53 -0000
-From: Stefan Hajnoczi <1882241@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: i82551
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: stefanha tim-tree-of-life
-X-Launchpad-Bug-Reporter: timsoft (tim-tree-of-life)
-X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
-References: <159136023930.32294.17616621945608188739.malonedeb@gac.canonical.com>
- <159240575569.16985.2747320831416406615.malone@chaenomeles.canonical.com>
-Message-ID: <20200623125653.GI36568@stefanha-x1.localdomain>
-Subject: Re: [Bug 1882241] Re: file transfer over cifs to 64bit guest corrupts
- large files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 593f3bf3ba3ebb105d925f0e2b45a8a4dadfeab3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 09:11:11
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200623124857.GH36568@stefanha-x1.localdomain>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 09:15:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,83 +95,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882241 <1882241@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200623125653.EkyiE8Fmu-l49_ljaBxq68ABNIn5emHKMKwOZwGk6sk@z>
 
-On Wed, Jun 17, 2020 at 02:55:55PM -0000, timsoft wrote:
-> thanks for the suggestion. I tried using netcat (nc) to transfer a large =
-file from host to guest, and also from fileserver to guest with the problem=
-atic i82551 emulated network adapter on the host and the files transfered r=
-eliably. (correct md5sum 3 out of 3 attempts)
-> I also tried md5sum of the same file mounted on the guest fs as before an=
-d it still corrupts the data.
-> this seems to imply there is something in the cifs implementation which r=
-eacts adversly with this particular combination of virtual network hardware=
-, the fact it works with the vmxnet3 emulated card, would support that conc=
-lusion.
+On Tue, Jun 23, 2020 at 01:48:57PM +0100, Stefan Hajnoczi wrote:
+> On Mon, Jun 01, 2020 at 03:42:57PM +0300, Roman Bolshakov wrote:
+> > ld64 is making PIE executables for 10.7 and above by default, as
+> > documented in ld(1).
+> > 
+> > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> > ---
+> >  configure | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/configure b/configure
+> > index af2ba83f0e..6dddbca4b2 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -2137,6 +2137,8 @@ elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+> >    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
+> >    QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
+> >    pie="yes"
+> > +elif test "$darwin" = "yes"; then
+> > +  pie="yes"
+> 
+> Hi Roman,
+> I'm wondering why the elif above doesn't detect the presence of PIE
+> automatically?
+> 
+>   elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+>     QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
+>     QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
+>     pie="yes"
+> 
+> Can this code be tweaked to cover macOS too?
+> 
+> Also CCing Peter Maydell in case he wants to merge this patch directly
+> into qemu.git.
+> 
+> Stefan
 
-I'm not sure if someone will look into it because the eepro100
-(i82551) NIC device is old an not used much nowadays.
+Hi Stefan,
 
-However, if someone does decide to investigate and wants to brainstorm
-debugging ideas or needs help, feel free to contact me.
+It's because clang does not accept -pie/-no-pie directly:
+  $ cc -Werror -fPIE -DPIE -pie main.c
+  clang: error: argument unused during compilation: '-pie' [-Werror,-Wunused-command-line-argument]
 
--- =
+It has to be passed as linker option, i.e. -Wl,-pie or -Wl,-no_pie. pie
+is also a default behaviour of clang/ld64.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882241
+I had a patch to enable proper support of pie/no-pie for macOS but I see
+little value in it. I don't know where no_pie would be helfpul becuase
+clang from Apple Developer Tools can't cross-compile option ROMs.
 
-Title:
-  file transfer over cifs to 64bit guest corrupts large files
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu 4.0 compiled fom source.
-  vm called by
-  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
-ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
-kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
-odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
-monitor telnet:localhost:7103,server,nowait,nodelay
-
-  copying large files eg 2.4gb or reading them on a cifs mount in the guest=
- causes corruption every time. For smaller files 40-60mb corruption is more=
- than 50% of the time. tested by md5sum on cifs server, or on host machine =
-vs. on guest vm.
-  corruption is seen only with 64bit guest using cifs with i82551 emulated =
-network device
-  ie. 32bit guest using cifs with i82551 emulated network device gives no c=
-orruption.
-
-  changing the emulated device to vmxnet3 removes the data corruption
-  (see below)
-
-  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
-  file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
-  /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
-  nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0
-  -enable-kvm -k en-gb -display vnc=3D:3 -monitor
-  telnet:localhost:7103,server,nowait,nodelay
-
-  this corruption is repeatable. ie. I created new vm, call using top examp=
-le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
- then run md5sum "filecopied"
-  the md5sum is different every time. copy same file to the host, or to a 3=
-2bit guest with the same virtual network device and bridge and md5sums are =
-correct. The host pysical network adapter is
-  lspci|grep Ether
-  1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
-/8411 PCI Express Gigabit Ethernet Controller (rev 11)
-
-  physically connected via gigabit ethernet to cifs server (via gigabit
-  switch)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882241/+subscriptions
+Thanks,
+Roman
 
