@@ -2,81 +2,81 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBD3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D39C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:00:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2525D20702
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 13:51:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4184F20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:00:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VI+hQsau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2525D20702
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UkA+GJa5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4184F20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnjKe-0006Qa-DT
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 09:51:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38862)
+	id 1jnjT7-0004ac-DP
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:00:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jnjJo-0005S0-H9
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:50:32 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33980)
+ id 1jnjRu-0003GA-Hc
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:58:54 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42634)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jnjJl-0002KK-MS
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:50:32 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u26so2304212wmn.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 06:50:29 -0700 (PDT)
+ id 1jnjRr-0008WA-SY
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 09:58:54 -0400
+Received: by mail-wr1-x431.google.com with SMTP id o11so12925414wrv.9
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 06:58:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=s14FefprESCzbbW/KKMUugzZbUvIG5eqGtUib05qksA=;
- b=VI+hQsaufhjS4I96r9R91hyMB7g/9mYMABFiOEQEKwtRmUvtnl7jK5dl1UiyOL8mCx
- xD/nFVeYt6IA7zeKU1ViI7LXtxrPyG5SmPUNcuuCdg5zZpZJ/2JjRYACDZB28R8j+DZb
- 4Q73eLfIjjrw8fC6fRrfSiJcB1zh/SUbc0ovGK+fZ2Dz6Kgf5tcZkaBOKUTolYtCVSL3
- U5OIPCfUClHrx8GVLWX6TNxtt6mC5dNefPqSobf+U6/gnjDzDdurjeCUPz3hWziQ6VQU
- BHp1aSAFX3ql7PixLPr1nzaglCiLwR/+J4dKSn6j66se4JrTi4N0Rkkvy9rqpjqRB5Gk
- p3bg==
+ :cc; bh=Ktfn6mxj7LNxV535myPEwsv0bmQxGogoqKvllCS1z7Q=;
+ b=UkA+GJa58ko40ecCVuDlThaqJsnZ7joB7FI4VJ1LJ2YDj6URWlC/3P6ErtVUuF2lbf
+ CTI58c1fFa1LK33CvgJRpoBiDtS0l7ttWSD+MVYY6aPWXPAp1bAHM1GDgNq83/rjuINc
+ 8UA3uWFi5Ny8o7JAZ5WBKWOqvt8PDWcj5+JQCVylAGUcwikRTtF4DNsE+dFa8Ru3vKZB
+ Ivgiku75xYsGdJEhckix02fVioSLPih7O3lebNdL/fNiQFWYNQuphnS6fd8iaYCl8n7f
+ A7Ge7yXO2NIqmaS3dfYgYJlxXRGlR4V8uskkBg9wtcUY2LCaouSL4ZRQyfkMpXNM5z0o
+ wcHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=s14FefprESCzbbW/KKMUugzZbUvIG5eqGtUib05qksA=;
- b=uHv6DdFKRJLxA2DCW9+IGmeUow6RZEAfTSk2ukROvT8b1jkVAbHNKRSKwV+8qTIESJ
- pQXzl+MhDhO7ORGYvBsp9JMyeCQqgYGWU3MI/5EIorukmPLa55QdUK+s14igW15w+j9b
- mQttClRUiFUodCxJbPLFnAWH79FwY8i01Yg7H38pvi5Cd8/rX/hDuQpEJir9sTuu4ugu
- UdiJZMQkPHsHyWW+k7bBmkOZxek2tOxhtzq+H7n8iuIfAQT5SIobQhQHGuz/1EqpF9nx
- NtbFySL3CQ0S/FD7bnLbL7Lum5QGXc3t8lu6SDFuY5zAXOlb6fg7ZKzfc4fpOudVuAnj
- 7HpQ==
-X-Gm-Message-State: AOAM530hsk23ICjQiVqDTvpfK/gx1bDvigpnToG8iAUB/rsaN8i0i/ab
- SGpLVaub4kzem8DXtjXrzRB3Zldeeg2mGCYZgk4=
-X-Google-Smtp-Source: ABdhPJzKv5Ejadc6pFecIhkrhFyB5pmwNbv068vXQKbp0c+FsIDAXTne19hkCGqaGNe/ArzAXubP4dfK8Yir0GM5mhw=
-X-Received: by 2002:a1c:4444:: with SMTP id r65mr5836002wma.129.1592920228124; 
- Tue, 23 Jun 2020 06:50:28 -0700 (PDT)
+ bh=Ktfn6mxj7LNxV535myPEwsv0bmQxGogoqKvllCS1z7Q=;
+ b=jSOBtx9uekVMtNm2w/snfqUQRYh8NiPcpuen24RTvAuas3ad8latqHks3oWTlkxKZ/
+ hBlPGx/lyC8I/MV1GAMw5VgPEnWYHtonWaM3Al9X2HgJ7O/rV020umMgt+50MvOGJzVd
+ j9cmwFFDwHhA5HUDursNfqFBQ52fKN1ZIXWmN+pXwDULbfC0ZL39dkIkL1gonpoKvPde
+ hlAOK+hPby0yBr8cwceJfGO9zp8MsbTpbc9yBdi5StgUcqLSAegaxZwqDda7MWfcbRZt
+ jV0KbqKd8pUtbfQGf7EF1eHllEiOxF9x/UsPY9Rky6ui7CHFWad+FXO5RyQuDDRDJ59e
+ Zo8w==
+X-Gm-Message-State: AOAM531LyTdP3MIxIKC3OJtUpaMhSAgHcJ0ae3gZVfL3RLmQD5mFnx7J
+ QvaqPLGjHKNaJJRnTeq5IK2Irs/eSFKCTXlTzciPwAOm
+X-Google-Smtp-Source: ABdhPJyjUBaUit5yRwMpcU1AfRQmIOoYhz2mnIHeZQ+nFENEEPkli9lJZq9vV+Q2tCg+x18bD3RGlazdqzKUxQ/FPIs=
+X-Received: by 2002:adf:a283:: with SMTP id s3mr23934322wra.147.1592920729875; 
+ Tue, 23 Jun 2020 06:58:49 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a7b:c0d7:0:0:0:0:0 with HTTP; Tue, 23 Jun 2020 06:50:27
+Received: by 2002:a7b:c0d7:0:0:0:0:0 with HTTP; Tue, 23 Jun 2020 06:58:49
  -0700 (PDT)
-In-Reply-To: <1592914438-30317-5-git-send-email-chenhc@lemote.com>
+In-Reply-To: <159291732571.6029.8642408239343726657@d1fd068a5071>
 References: <1592914438-30317-1-git-send-email-chenhc@lemote.com>
- <1592914438-30317-5-git-send-email-chenhc@lemote.com>
+ <159291732571.6029.8642408239343726657@d1fd068a5071>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 23 Jun 2020 15:50:27 +0200
-Message-ID: <CAHiYmc5rCjZXc4Pt4QqD8zykqBo8pxbPAxjQP7rTWi6y=3bjsg@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V5 4/4] MAINTAINERS: Add Loongson-3 maintainer and
- reviewer
-To: Huacai Chen <zltjiangshi@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000005a5cfd05a8c0a460"
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x344.google.com
+Date: Tue, 23 Jun 2020 15:58:49 +0200
+Message-ID: <CAHiYmc6rMujXmF6NuoQVwm484PXxW2876zdp6wXpiO0p+ssAqw@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V5 0/4] mips: Add Loongson-3 machine support (with
+ KVM)
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="000000000000427a7f05a8c0c2f6"
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -85,7 +85,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,108 +98,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "zltjiangshi@gmail.com" <zltjiangshi@gmail.com>,
+ "aleksandar.rikalo@syrmia.com" <aleksandar.rikalo@syrmia.com>,
+ "chenhuacai@gmail.com" <chenhuacai@gmail.com>,
+ "f4bug@amsat.org" <f4bug@amsat.org>, "chenhc@lemote.com" <chenhc@lemote.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005a5cfd05a8c0a460
+--000000000000427a7f05a8c0c2f6
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 23. =D1=98=D1=83=D0=BD 2020., Huacai =
-Chen <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
-=B0=D0=BE/=D0=BB=D0=B0:
+=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 23. =D1=98=D1=83=D0=BD 2020., <no-rep=
+ly@patchew.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=
+=BB=D0=B0:
 
-> Add myself as a maintainer of Loongson-3 virtual platform, and also add
-> Jiaxun Yang as a reviewer.
+> Patchew URL: https://patchew.org/QEMU/1592914438-30317-1-git-send-
+> email-chenhc@lemote.com/
 >
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>
+>
+> Hi,
+>
+> This series seems to have some coding style problems. See output below fo=
+r
+> more information:
+>
+>
+Hi, Huacai.
+
+Please fix all checkpatch warnings in the next version (except thise that
+complain about the need for updating MAONTAINERS)
+
+Also, you dont need " for-5.1" in subject prefixes.
+
+Please fix these and other small things that I commented about, and send v6
+soon (tomorrow, if possible?), so that we remove these small obstacles and
+focus on the core functionality of tge series.
+
+Thanks, Aleksandar
+
+
+
+
+
+> Subject: [PATCH for-5.1 V5 0/4] mips: Add Loongson-3 machine support (wit=
+h
+> KVM)
+> Type: series
+> Message-id: 1592914438-30317-1-git-send-email-chenhc@lemote.com
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>
+> From https://github.com/patchew-project/qemu
+>  * [new tag]         patchew/1592914438-30317-1-
+> git-send-email-chenhc@lemote.com -> patchew/1592914438-30317-1-
+> git-send-email-chenhc@lemote.com
+> Switched to a new branch 'test'
+> 63e13a2 MAINTAINERS: Add Loongson-3 maintainer and reviewer
+> 727fa14 hw/mips: Add Loongson-3 machine support (with KVM)
+> 5fd21a0 hw/intc: Add Loongson liointc support
+> 6996d49 hw/mips: Implement the kvm_type() hook in MachineClass
+>
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/4 Checking commit 6996d492ec71 (hw/mips: Implement the kvm_type() hook
+> in MachineClass)
+> 2/4 Checking commit 5fd21a0bcd83 (hw/intc: Add Loongson liointc support)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #36:
+> new file mode 100644
+>
+> ERROR: line over 90 characters
+> #90: FILE: hw/intc/loongson_liointc.c:50:
+> +#define LOONGSON_LIOINTC(obj) OBJECT_CHECK(struct loongson_liointc,
+> (obj), TYPE_LOONGSON_LIOINTC)
+>
+> ERROR: open brace '{' following struct go on the same line
+> #93: FILE: hw/intc/loongson_liointc.c:53:
+> +struct loongson_liointc
+> +{
+>
+> ERROR: code indent should never use tabs
+> #148: FILE: hw/intc/loongson_liointc.c:108:
+> +^I    if (p->parent_state[parent] !=3D$
+>
+> total: 3 errors, 1 warnings, 256 lines checked
+>
+> Patch 2/4 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> 3/4 Checking commit 727fa142abed (hw/mips: Add Loongson-3 machine support
+> (with KVM))
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #84:
+> new file mode 100644
+>
+> WARNING: line over 80 characters
+> #404: FILE: hw/mips/loongson3_virt.c:316:
+> +static void loongson3_pm_write(void *opaque, hwaddr addr, uint64_t val,
+> unsigned size)
+>
+> WARNING: line over 80 characters
+> #704: FILE: hw/mips/loongson3_virt.c:616:
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)current_machine->
+> smp.max_cpus);
+>
+> WARNING: line over 80 characters
+> #840: FILE: hw/mips/loongson3_virt.c:752:
+> +static inline void loongson3_virt_devices_init(MachineState *machine,
+> DeviceState *pic)
+>
+> WARNING: line over 80 characters
+> #871: FILE: hw/mips/loongson3_virt.c:783:
+> +                             get_system_io(), 0,
+> virt_memmap[VIRT_PCIE_PIO].size);
+>
+> WARNING: line over 80 characters
+> #977: FILE: hw/mips/loongson3_virt.c:889:
+> +    /* Allocate RAM/BIOS, 0x00000000~0x10000000 is alias of
+> 0x80000000~0x90000000 */
+>
+> total: 0 errors, 6 warnings, 999 lines checked
+>
+> Patch 3/4 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 4/4 Checking commit 63e13a297290 (MAINTAINERS: Add Loongson-3 maintainer
+> and reviewer)
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>
+> Test command exited with code: 1
+>
+>
+> The full log is available at
+> http://patchew.org/logs/1592914438-30317-1-git-send-
+> email-chenhc@lemote.com/testing.checkpatch/?type=3Dmessage.
 > ---
->  MAINTAINERS | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f0cb1fd..293188e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1095,6 +1095,12 @@ F: hw/isa/vt82c686.c
->  F: hw/pci-host/bonito.c
->  F: include/hw/isa/vt82c686.h
->
-> +Loongson-3 Virtual Platform
-> +M: Huacai Chen <chenhc@lemote.com>
-> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> +S: Maintained
-> +F: hw/mips/loongson3_virt.c
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
-
- hw/intc/loongson_liointc.c is missing.
-
-
-> +
->  Boston
->  M: Paul Burton <pburton@wavecomp.com>
->  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-> --
-> 2.7.0
->
->
-
---0000000000005a5cfd05a8c0a460
+--000000000000427a7f05a8c0c2f6
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 23. =D1=98=D1=83=D0=BD 2020.,=
- Huacai Chen &lt;<a href=3D"mailto:zltjiangshi@gmail.com">zltjiangshi@gmail=
-.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=
-=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">Add myself as a maintainer of Loo=
-ngson-3 virtual platform, and also add<br>
-Jiaxun Yang as a reviewer.<br>
+  &lt;<a href=3D"mailto:no-reply@patchew.org">no-reply@patchew.org</a>&gt; =
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br><b=
+lockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px =
+#ccc solid;padding-left:1ex">Patchew URL: <a href=3D"https://patchew.org/QE=
+MU/1592914438-30317-1-git-send-email-chenhc@lemote.com/" target=3D"_blank">=
+https://patchew.org/QEMU/<wbr>1592914438-30317-1-git-send-<wbr>email-chenhc=
+@lemote.com/</a><br>
 <br>
-Signed-off-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@=
-lemote.com</a>&gt;<br>
-Co-developed-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com"=
->jiaxun.yang@flygoat.com</a>&gt;<br>
+<br>
+<br>
+Hi,<br>
+<br>
+This series seems to have some coding style problems. See output below for<=
+br>
+more information:<br>
+<br></blockquote><div><br></div><div>Hi, Huacai.</div><div><br></div><div>P=
+lease fix all checkpatch warnings in the next version (except thise that co=
+mplain about the need for updating MAONTAINERS)</div><div><br></div><div>Al=
+so, you dont need &quot; for-5.1&quot; in subject prefixes.</div><div><br><=
+/div><div>Please fix these and other small things that I commented about, a=
+nd send v6 soon (tomorrow, if possible?), so that we remove these small obs=
+tacles and focus on the core functionality of tge series.</div><div><br></d=
+iv><div>Thanks, Aleksandar</div><div><br></div><div><br></div><div><br></di=
+v><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
+.8ex;border-left:1px #ccc solid;padding-left:1ex">
+Subject: [PATCH for-5.1 V5 0/4] mips: Add Loongson-3 machine support (with =
+KVM)<br>
+Type: series<br>
+Message-id: <a href=3D"mailto:1592914438-30317-1-git-send-email-chenhc@lemo=
+te.com">1592914438-30317-1-git-send-<wbr>email-chenhc@lemote.com</a><br>
+<br>
+=3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D<br>
+#!/bin/bash<br>
+git rev-parse base &gt; /dev/null || exit 0<br>
+git config --local diff.renamelimit 0<br>
+git config --local diff.renames True<br>
+git config --local diff.algorithm histogram<br>
+./scripts/<a href=3D"http://checkpatch.pl" target=3D"_blank">checkpatch.pl<=
+/a> --mailback base..<br>
+=3D=3D=3D TEST SCRIPT END =3D=3D=3D<br>
+<br>
+From <a href=3D"https://github.com/patchew-project/qemu" target=3D"_blank">=
+https://github.com/patchew-<wbr>project/qemu</a><br>
+=C2=A0* [new tag]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0patchew/<a href=3D"mailt=
+o:1592914438-30317-1-git-send-email-chenhc@lemote.com">1592914438-30317-1-<=
+wbr>git-send-email-chenhc@lemote.<wbr>com</a> -&gt; patchew/<a href=3D"mail=
+to:1592914438-30317-1-git-send-email-chenhc@lemote.com">1592914438-30317-1-=
+<wbr>git-send-email-chenhc@lemote.<wbr>com</a><br>
+Switched to a new branch &#39;test&#39;<br>
+63e13a2 MAINTAINERS: Add Loongson-3 maintainer and reviewer<br>
+727fa14 hw/mips: Add Loongson-3 machine support (with KVM)<br>
+5fd21a0 hw/intc: Add Loongson liointc support<br>
+6996d49 hw/mips: Implement the kvm_type() hook in MachineClass<br>
+<br>
+=3D=3D=3D OUTPUT BEGIN =3D=3D=3D<br>
+1/4 Checking commit 6996d492ec71 (hw/mips: Implement the kvm_type() hook in=
+ MachineClass)<br>
+2/4 Checking commit 5fd21a0bcd83 (hw/intc: Add Loongson liointc support)<br=
+>
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?<b=
+r>
+#36: <br>
+new file mode 100644<br>
+<br>
+ERROR: line over 90 characters<br>
+#90: FILE: hw/intc/loongson_liointc.c:50:<br>
++#define LOONGSON_LIOINTC(obj) OBJECT_CHECK(struct loongson_liointc, (obj),=
+ TYPE_LOONGSON_LIOINTC)<br>
+<br>
+ERROR: open brace &#39;{&#39; following struct go on the same line<br>
+#93: FILE: hw/intc/loongson_liointc.c:53:<br>
++struct loongson_liointc<br>
++{<br>
+<br>
+ERROR: code indent should never use tabs<br>
+#148: FILE: hw/intc/loongson_liointc.c:<wbr>108:<br>
++^I=C2=A0 =C2=A0 if (p-&gt;parent_state[parent] !=3D$<br>
+<br>
+total: 3 errors, 1 warnings, 256 lines checked<br>
+<br>
+Patch 2/4 has style problems, please review.=C2=A0 If any of these errors<b=
+r>
+are false positives report them to the maintainer, see<br>
+CHECKPATCH in MAINTAINERS.<br>
+<br>
+3/4 Checking commit 727fa142abed (hw/mips: Add Loongson-3 machine support (=
+with KVM))<br>
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?<b=
+r>
+#84: <br>
+new file mode 100644<br>
+<br>
+WARNING: line over 80 characters<br>
+#404: FILE: hw/mips/loongson3_virt.c:316:<br>
++static void loongson3_pm_write(void *opaque, hwaddr addr, uint64_t val, un=
+signed size)<br>
+<br>
+WARNING: line over 80 characters<br>
+#704: FILE: hw/mips/loongson3_virt.c:616:<br>
++=C2=A0 =C2=A0 fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)current_ma=
+chine-&gt;<wbr>smp.max_cpus);<br>
+<br>
+WARNING: line over 80 characters<br>
+#840: FILE: hw/mips/loongson3_virt.c:752:<br>
++static inline void loongson3_virt_devices_init(<wbr>MachineState *machine,=
+ DeviceState *pic)<br>
+<br>
+WARNING: line over 80 characters<br>
+#871: FILE: hw/mips/loongson3_virt.c:783:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0get_system_io(), 0, virt_memmap[VIRT_PCIE_PI=
+O].<wbr>size);<br>
+<br>
+WARNING: line over 80 characters<br>
+#977: FILE: hw/mips/loongson3_virt.c:889:<br>
++=C2=A0 =C2=A0 /* Allocate RAM/BIOS, 0x00000000~0x10000000 is alias of 0x80=
+000000~0x90000000 */<br>
+<br>
+total: 0 errors, 6 warnings, 999 lines checked<br>
+<br>
+Patch 3/4 has style problems, please review.=C2=A0 If any of these errors<b=
+r>
+are false positives report them to the maintainer, see<br>
+CHECKPATCH in MAINTAINERS.<br>
+4/4 Checking commit 63e13a297290 (MAINTAINERS: Add Loongson-3 maintainer an=
+d reviewer)<br>
+=3D=3D=3D OUTPUT END =3D=3D=3D<br>
+<br>
+Test command exited with code: 1<br>
+<br>
+<br>
+The full log is available at<br>
+<a href=3D"http://patchew.org/logs/1592914438-30317-1-git-send-email-chenhc=
+@lemote.com/testing.checkpatch/?type=3Dmessage" target=3D"_blank">http://pa=
+tchew.org/logs/<wbr>1592914438-30317-1-git-send-<wbr>email-chenhc@lemote.co=
+m/<wbr>testing.checkpatch/?type=3D<wbr>message</a>.<br>
 ---<br>
-=C2=A0MAINTAINERS | 6 ++++++<br>
-=C2=A01 file changed, 6 insertions(+)<br>
-<br>
-diff --git a/MAINTAINERS b/MAINTAINERS<br>
-index f0cb1fd..293188e 100644<br>
---- a/MAINTAINERS<br>
-+++ b/MAINTAINERS<br>
-@@ -1095,6 +1095,12 @@ F: hw/isa/vt82c686.c<br>
-=C2=A0F: hw/pci-host/bonito.c<br>
-=C2=A0F: include/hw/isa/vt82c686.h<br>
-<br>
-+Loongson-3 Virtual Platform<br>
-+M: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@lemote.com<=
-/a>&gt;<br>
-+R: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com">jiaxun.yang@=
-flygoat.com</a>&gt;<br>
-+S: Maintained<br>
-+F: hw/mips/loongson3_virt.c</blockquote><div><br></div><div><span style=3D=
-"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px">=C2=A0h=
-w/intc/loongson_liointc.c is missing.</span><br></div><div>=C2=A0</div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #c=
-cc solid;padding-left:1ex">
-+<br>
-=C2=A0Boston<br>
-=C2=A0M: Paul Burton &lt;<a href=3D"mailto:pburton@wavecomp.com">pburton@wa=
-vecomp.com</a>&gt;<br>
-=C2=A0R: Aleksandar Rikalo &lt;<a href=3D"mailto:aleksandar.rikalo@syrmia.c=
-om">aleksandar.rikalo@syrmia.com</a>&gt;<br>
--- <br>
-2.7.0<br>
-<br>
-</blockquote>
+Email generated automatically by Patchew [<a href=3D"https://patchew.org/" =
+target=3D"_blank">https://patchew.org/</a>].<br>
+Please send your feedback to <a href=3D"mailto:patchew-devel@redhat.com">pa=
+tchew-devel@redhat.com</a></blockquote>
 
---0000000000005a5cfd05a8c0a460--
+--000000000000427a7f05a8c0c2f6--
 
