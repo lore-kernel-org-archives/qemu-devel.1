@@ -4,84 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFF0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE075C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1989E20774
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9846820774
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:40:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOg5bwf+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1989E20774
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CdqjMf4j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9846820774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnkrn-0005Xg-DU
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:29:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48076)
+	id 1jnl1r-0003JT-Rb
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:40:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnkrD-0004ui-9H
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:29:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25532
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnl1B-0002gv-GF
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:39:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51036
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnkr9-0001gD-Lt
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:29:06 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnl18-0007B3-LS
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:39:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592926142;
+ s=mimecast20190719; t=1592926760;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zK5dBlT0LtmrrNUNzELUSHvkFOntBOdU/GwZhmtmQGk=;
- b=GOg5bwf+n3HXtODnCHNLoCkgcawx5YEApG72kiJIpTHRd55T4l9uX3dkkF+0w1dbhA4p2t
- C9Pe1D4tKSnS3i+fh02Ztw68f+QAw2f01XMB0A5lCVEkusoMZjD2D2t4hwWCRFnXn6rMEm
- /S/cev38BOWLw+Wpg1peoJ4zLjAdmnE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-kWX09vASP8WNjOZJB4UUJA-1; Tue, 23 Jun 2020 11:28:58 -0400
-X-MC-Unique: kWX09vASP8WNjOZJB4UUJA-1
-Received: by mail-wr1-f69.google.com with SMTP id i12so7848388wrx.11
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 08:28:58 -0700 (PDT)
+ bh=XY6ebUwbL66ALjwEfWPhUoEVjl2/AFfBvB/uhze7Oa4=;
+ b=CdqjMf4jXga2Nvr4MWUI/VeqLVGl+pwxa0hQpZIYXumapWkRbz5jWRfLe4wP25hEBL70iK
+ b4jVZ/b3Q0s4OsygDblzzsonCfeiiVenGVPTExf9/a+2NiD0aPkPKqubSkq57t1lBde0MR
+ oUc0uhet+GstIHcjx3fHJIzuSQID8+E=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-pchFJZRbN0qn5nd9WgQlBQ-1; Tue, 23 Jun 2020 11:39:16 -0400
+X-MC-Unique: pchFJZRbN0qn5nd9WgQlBQ-1
+Received: by mail-wr1-f71.google.com with SMTP id c14so16087386wrm.15
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 08:39:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=zK5dBlT0LtmrrNUNzELUSHvkFOntBOdU/GwZhmtmQGk=;
- b=McIWWeM497nTmR/AcQlWULWAqbNkO3GS9CbpfUsZFlqAmm7p/1h1hYHs2fOYP/tZ4/
- xqU1BM0koo+g1oaIVGjiXNSyJSYILL6nlGy8gJT2lqZyEdBGHwMPe6mYz8DpOXLoh7A5
- 5NAizsLLlBhDFiw8pXFIhYGH9wmFEOn1x+sTce6rp5HDuLuC3m7p4JbY5RWQzMub8XvW
- RqjOvialJitCCJTRSRPSXyM8zfr/DSff66PKsLIaqvokMypdsfQJn7z5WwnFpIGfagkC
- dj5l24Kt9mvjFXPGyCirmZ1JTk4PhTyKg3KcjIJh2C7t50mUbl2IyPAsU5XNGDV+dHhB
- 1wGA==
-X-Gm-Message-State: AOAM531hyUZc+06m9Qv+SXhdHTdgOx8+5G7lbmQLk89Vp/oDY+OJ8TW1
- gkYwH1IuanoGlBlPoCscAFsLOxg5euxVfeKYqm0SeMupFw7zw6pvY1NeVWuNTrcW93azRBJ6cUZ
- 0gbBneN+5AJry1Kw=
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr18310847wmm.156.1592926137101; 
- Tue, 23 Jun 2020 08:28:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIMH/y7tM2Hi0v9621MCnS5YQA/L6XU/KncJ7rlEP5IBvcSzbJVXQPL+YwxqHxsSYeuq/6vw==
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr18310823wmm.156.1592926136820; 
- Tue, 23 Jun 2020 08:28:56 -0700 (PDT)
+ bh=XY6ebUwbL66ALjwEfWPhUoEVjl2/AFfBvB/uhze7Oa4=;
+ b=nTVh2WqIATOAaCyTCqw5PBCIIDpz0TrIDQ5iojIVmDBIzpMC3pi9TLKYiedaV4SHdD
+ k++GC31Nxsc+Eo3P/n9c1QWxSFeTzbUMl0en9ZLKE9BLWoBc8WCXiDol887UFBarHqCs
+ BcBt9W8TM6hmflMCAjsX9UkFC/3B9ZOjosggeVoIFkzbsF0GTXfn8Itqj8RFMjMFT82K
+ POIVfQ1el69DV7pX49wsS/Lc4aDdnKpR2+vv/iI5UU5BnR1S9sKJ47IpWmOw5qlOIN00
+ 7rpy+8cBEh0g/1MWkkaM8YRblfU7jHz3c13MqTP8kWzQ0a6xhxbqzEgHsw5GxxIcW/kc
+ bEWA==
+X-Gm-Message-State: AOAM5326hLWt79jk+Yu91mu2F9ODSUGBNHYxLZ9DdJwPdhNTu4pFL4vQ
+ LAS89iukOA3gY5fNM9BI1zRZWGqztSbegAbJIdY/ftwcLnpV5krCiPgRqOml5kY1fFAl1v96L1k
+ lTITKIobikFZ5fIc=
+X-Received: by 2002:adf:ea84:: with SMTP id s4mr14638706wrm.222.1592926755513; 
+ Tue, 23 Jun 2020 08:39:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/xqaHbn/nlTfYy5aU5m96snoBoI33gMIzxBnaDzV8xjLYueYRaFwSySxr3SQnP7qZmjVjOw==
+X-Received: by 2002:adf:ea84:: with SMTP id s4mr14638678wrm.222.1592926755206; 
+ Tue, 23 Jun 2020 08:39:15 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id d24sm3899253wmb.45.2020.06.23.08.28.55
+ by smtp.gmail.com with ESMTPSA id c2sm23818116wrv.47.2020.06.23.08.39.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 23 Jun 2020 08:28:56 -0700 (PDT)
-Subject: Re: [PATCH v4 3/7] ccid: build smartcard as module
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <20200622135601.12433-1-kraxel@redhat.com>
- <20200622135601.12433-4-kraxel@redhat.com>
+ Tue, 23 Jun 2020 08:39:14 -0700 (PDT)
+Subject: Re: [PATCH] Revert "tests/migration: Reduce autoconverge initial
+ bandwidth"
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20200623145506.439100-1-mst@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -106,22 +104,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <434be3b8-8ed0-d27b-99c7-e682b0dc4c02@redhat.com>
-Date: Tue, 23 Jun 2020 17:28:55 +0200
+Message-ID: <3554a068-ba6f-0aa0-38b4-b6dca3069630@redhat.com>
+Date: Tue, 23 Jun 2020 17:39:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200622135601.12433-4-kraxel@redhat.com>
+In-Reply-To: <20200623145506.439100-1-mst@redhat.com>
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -129,7 +125,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,105 +138,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dinechin@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+On 6/23/20 4:56 PM, Michael S. Tsirkin wrote:
+> This reverts commit 6d1da867e65f ("tests/migration: Reduce autoconverge initial bandwidth")
+> since that change makes unit tests much slower for all developers, while it's not
+> a robust way to fix migration tests. Migration tests need to find
+> a more robust way to discover a reasonable bandwidth without slowing
+> things down for everyone.
 
-On 6/22/20 3:55 PM, Gerd Hoffmann wrote:
-> Drops libcacard.so dependency from core qemu.
+Please also mention we can do this since 1de8e4c4dcf which allow
+marked the s390x job as "unstable" and allow it to fail.
+
+But if nobody is going to look at it, instead lets disable
+it until someone figure out the issue:
+
+-- >8 --
+diff --git a/.travis.yml b/.travis.yml
+index 74158f741b..364e67b14b 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -507,6 +507,7 @@ jobs:
+
+     - name: "[s390x] Clang (disable-tcg)"
+       arch: s390x
++      if: false # Temporarily disabled due to issue testing migration
+(see commit 6d1da867e65).
+       dist: bionic
+       compiler: clang
+       addons:
+---
+
+With the hunk amended (no need to mention 1de8e4c4d actually):
+Acked-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
 > ---
->  Makefile.objs        | 1 +
->  hw/core/qdev.c       | 2 ++
->  hw/Makefile.objs     | 1 +
->  hw/usb/Makefile.objs | 4 +++-
->  4 files changed, 7 insertions(+), 1 deletion(-)
+>  tests/qtest/migration-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 7ce2588b89a3..ca555ede0710 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -59,6 +59,7 @@ common-obj-y += migration/
->  common-obj-y += audio/
->  common-obj-m += audio/
->  common-obj-y += hw/
-> +common-obj-m += hw/
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index dc3490c9fa..21ea5ba1d2 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -1211,7 +1211,7 @@ static void test_migrate_auto_converge(void)
+>       * without throttling.
+>       */
+>      migrate_set_parameter_int(from, "downtime-limit", 1);
+> -    migrate_set_parameter_int(from, "max-bandwidth", 1000000); /* ~1Mb/s */
+> +    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100Mb/s */
 >  
->  common-obj-y += replay/
->  
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6119e25e0eeb..d6459e4aa8e8 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -172,6 +172,8 @@ static struct {
->      const char *type;
->      const char *mod;
->  } const hwmodules[] = {
-> +    { .type = "ccid-card-passthru",    .mod = "usb-smartcard"         },
-> +    { .type = "ccid-card-emulated",    .mod = "usb-smartcard"         },
-
-We want to use type definitions here (such TYPE_CCID_PASSTHRU),
-as we don't guaranty them stable.
-
-We don't want to include various "hw/x/y.h" in this core file.
-
-Since there is a relation between QOM type and the module,
-can we store/use the module name in the TypeInfo declaration?
-
-  static const TypeInfo passthru_card_info = {
-      .name          = TYPE_CCID_PASSTHRU,
-      .parent        = TYPE_CCID_CARD,
-      .instance_size = sizeof(PassthruState),
-      .class_init    = passthru_class_initfn,
-      .module_name   = "usb-smartcard",        <=====
-  };
-
-Actually this modularization is not specific to QDEV
-and can be used to all QOM right? I.e:
-
-  static const TypeInfo qcrypto_tls_creds_x509_info = {
-      .parent = TYPE_QCRYPTO_TLS_CREDS,
-      .name = TYPE_QCRYPTO_TLS_CREDS_X509,
-      .module_name = "gnu-tls",
-      ...
-  }
-
->  };
->  
->  static bool qdev_module_loaded_all;
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 4cbe5e4e57d6..af8fd9a510ed 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -43,4 +43,5 @@ devices-dirs-y += smbios/
->  endif
->  
->  common-obj-y += $(devices-dirs-y)
-> +common-obj-m += usb/
->  obj-y += $(devices-dirs-y)
-> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-> index fa5c3fa1b877..3c5b3d4fadd3 100644
-> --- a/hw/usb/Makefile.objs
-> +++ b/hw/usb/Makefile.objs
-> @@ -29,11 +29,13 @@ common-obj-$(CONFIG_USB_NETWORK)      += dev-network.o
->  
->  ifeq ($(CONFIG_USB_SMARTCARD),y)
->  common-obj-y                          += dev-smartcard-reader.o
-> -common-obj-$(CONFIG_SMARTCARD)        += smartcard.mo
-> +ifeq ($(CONFIG_SMARTCARD),y)
-> +common-obj-m                          += smartcard.mo
->  smartcard.mo-objs := ccid-card-passthru.o ccid-card-emulated.o
->  smartcard.mo-cflags := $(SMARTCARD_CFLAGS)
->  smartcard.mo-libs := $(SMARTCARD_LIBS)
->  endif
-> +endif
->  
->  ifeq ($(CONFIG_POSIX),y)
->  common-obj-$(CONFIG_USB_STORAGE_MTP)  += dev-mtp.o
+>      /* To check remaining size after precopy */
+>      migrate_set_capability(from, "pause-before-switchover", true);
 > 
 
 
