@@ -2,92 +2,117 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851CCC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5884C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:32:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D61E2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ADB22072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oyo6uM2p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D61E2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aMsx5QrS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ADB22072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jndPn-0006Pt-F8
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:32:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34606)
+	id 1jndQB-0006z3-Mt
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:32:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jndLB-0007C2-P3; Tue, 23 Jun 2020 03:27:33 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39645)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jndL9-0004zl-TX; Tue, 23 Jun 2020 03:27:33 -0400
-Received: by mail-wm1-x341.google.com with SMTP id t194so2059097wmt.4;
- Tue, 23 Jun 2020 00:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NpyG7hZJw/+4UIPOBhAz0178NGmLQwbmVGrN4QqVZFU=;
- b=Oyo6uM2pc/TKyMHQ+OeOmsgQxA41aLeKDMRq2f1rCNNjzLU4CBhPlRbcXbAHZ2PAxk
- LneLB69NaArLxr7+molzKwcloPOvrNY7Vjc33KJi1CqZf1bWl+k0VVwqNc2HqKTVi8LC
- 7XZH13CR0X0iaZ331Lf/ayKiaALAOu1yiaQ7LQfBAeCeb29xFfy1PRp9F7QB3LRByE1q
- fwgvLc5mdRau6MmnMJ8Bbtckh4osm9w/y1d3klhWSHB28Oj52Y/gg3kEkTQ3XqWnMMKF
- MtZEQMvvQtq7Vy0DorJBhVk4abj2EO2luGty6PTzTDZIey3P7Dqd4DRmwsjF+o9wLw/R
- 39gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=NpyG7hZJw/+4UIPOBhAz0178NGmLQwbmVGrN4QqVZFU=;
- b=qMRTBBtI/ZNXMWE/uw3hCz++BXIKWj8HMShK3qiLpp2F1LKfsDWw/rVv+K8JZrWzW8
- eWSz9KsON+iIwXzSXp8ZoZobu2Ox8j0i2qq20DTsj3o62DNNGUYXfwxzv6vAPJA0MylV
- 4emki2zsshJqhI++ejNUNnjFizEAinvs/ioIu0A2ALQLJR9gtU2pKIC3Ky+9yfqZukxy
- aNlhn6liny4eKiTHjzLBd+W+y6vp0W+/pNmLoIjdY/VGK/zStgwFQDqlPyR4zrCECji9
- +T3NfenuqBVu/WVLdX7urj3nbq6VzfL177Nd15DnYhSRovJc/CLr9nepD/0LjQ71csup
- 8oUw==
-X-Gm-Message-State: AOAM532KgmAtGTeoQi1xNjS88aNkLN9MSDE6YyHyJxaa83i/OrJxcPFH
- SoBsVf0gOvXPpX4M+wN5Z3EEVU8d
-X-Google-Smtp-Source: ABdhPJzkbE8o7CDIO1D1HfMQrY1AZevFb7uQyrcZto6diyiZZ1NFtf4ec4LI7Kxym2kWS7m5GIT0TQ==
-X-Received: by 2002:a05:600c:22c9:: with SMTP id
- 9mr24349932wmg.68.1592897249227; 
- Tue, 23 Jun 2020 00:27:29 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l14sm4200059wrn.18.2020.06.23.00.27.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 00:27:28 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 3/9] hw/misc/pca9552: Rename generic code as pca955x
-Date: Tue, 23 Jun 2020 09:27:17 +0200
-Message-Id: <20200623072723.6324-4-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200623072723.6324-1-f4bug@amsat.org>
-References: <20200623072723.6324-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jndMO-0001Gb-Ga
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:28:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58981
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jndMN-0005LA-0Q
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:28:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592897326;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=LXnFs2qcEI40S++U8w1MW9HNBQv+Yl603ProFmaqeFY=;
+ b=aMsx5QrSHZf8A9iZWooO3SOUFL6A+EFV8II/x5jKFO7Zaaxdrck3iGE49INmWVQfAdu9Pr
+ ghnwA0j+TQw6DZXbZEZ1wf4iD0864UcB7M4gsDyOYWb5s8KfLdw7LIo44FUeATZMOJYfC3
+ L32R46+7kFUxF1zBxbDZZhD/Q5wsAT0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-OCxe3G45ONqNAas38wsHkA-1; Tue, 23 Jun 2020 03:28:44 -0400
+X-MC-Unique: OCxe3G45ONqNAas38wsHkA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19A7218A8220;
+ Tue, 23 Jun 2020 07:28:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-138.ams2.redhat.com
+ [10.36.113.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20D6E5C541;
+ Tue, 23 Jun 2020 07:28:41 +0000 (UTC)
+Subject: Re: [PATCH 1/2] qcow2: Force preallocation with data-file-raw
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+References: <20200619104012.235977-1-mreitz@redhat.com>
+ <20200619104012.235977-2-mreitz@redhat.com>
+ <w51eeqb9f43.fsf@maestria.local.igalia.com>
+ <9c14c622-eb30-4619-d33a-b59395a397be@redhat.com>
+ <w51r1u788gg.fsf@maestria.local.igalia.com>
+ <2d35fdff-6230-18b9-cf99-ca72be53267f@redhat.com>
+ <w51o8pb80k8.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <79352940-67a5-deb8-13df-ec1547efe77e@redhat.com>
+Date: Tue, 23 Jun 2020 09:28:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <w51o8pb80k8.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="EgjXaRZ1s0gXIHSWyGglqxk11syZmnRpL"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,307 +126,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Various code from the PCA9552 device model is generic to the
-PCA955X family. We'll split the generic code in a base class
-in the next commit. To ease review, first do a dumb renaming.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EgjXaRZ1s0gXIHSWyGglqxk11syZmnRpL
+Content-Type: multipart/mixed; boundary="9x57pzu0Wj9SOJpxSRCWXUcYpqrYJkrYP"
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/misc/pca9552.h | 10 ++---
- hw/misc/pca9552.c         | 80 +++++++++++++++++++--------------------
- 2 files changed, 45 insertions(+), 45 deletions(-)
+--9x57pzu0Wj9SOJpxSRCWXUcYpqrYJkrYP
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
-index bc5ed31087..db527595a3 100644
---- a/include/hw/misc/pca9552.h
-+++ b/include/hw/misc/pca9552.h
-@@ -12,11 +12,11 @@
- #include "hw/i2c/i2c.h"
- 
- #define TYPE_PCA9552 "pca9552"
--#define PCA9552(obj) OBJECT_CHECK(PCA9552State, (obj), TYPE_PCA9552)
-+#define PCA955X(obj) OBJECT_CHECK(PCA955xState, (obj), TYPE_PCA9552)
- 
--#define PCA9552_NR_REGS 10
-+#define PCA955X_NR_REGS 10
- 
--typedef struct PCA9552State {
-+typedef struct PCA955xState {
-     /*< private >*/
-     I2CSlave i2c;
-     /*< public >*/
-@@ -24,9 +24,9 @@ typedef struct PCA9552State {
-     uint8_t len;
-     uint8_t pointer;
- 
--    uint8_t regs[PCA9552_NR_REGS];
-+    uint8_t regs[PCA955X_NR_REGS];
-     uint8_t max_reg;
-     uint8_t pin_count;
--} PCA9552State;
-+} PCA955xState;
- 
- #endif
-diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-index 81da757a7e..5681ff3b22 100644
---- a/hw/misc/pca9552.c
-+++ b/hw/misc/pca9552.c
-@@ -25,7 +25,7 @@
- 
- static const char *led_state[] = {"on", "off", "pwm0", "pwm1"};
- 
--static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
-+static uint8_t pca955x_pin_get_config(PCA955xState *s, int pin)
- {
-     uint8_t reg   = PCA9552_LS0 + (pin / 4);
-     uint8_t shift = (pin % 4) << 1;
-@@ -33,14 +33,14 @@ static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
-     return extract32(s->regs[reg], shift, 2);
- }
- 
--static void pca9552_update_pin_input(PCA9552State *s)
-+static void pca955x_update_pin_input(PCA955xState *s)
- {
-     int i;
- 
-     for (i = 0; i < s->pin_count; i++) {
-         uint8_t input_reg = PCA9552_INPUT0 + (i / 8);
-         uint8_t input_shift = (i % 8);
--        uint8_t config = pca9552_pin_get_config(s, i);
-+        uint8_t config = pca955x_pin_get_config(s, i);
- 
-         switch (config) {
-         case PCA9552_LED_ON:
-@@ -58,7 +58,7 @@ static void pca9552_update_pin_input(PCA9552State *s)
-     }
- }
- 
--static uint8_t pca9552_read(PCA9552State *s, uint8_t reg)
-+static uint8_t pca955x_read(PCA955xState *s, uint8_t reg)
- {
-     switch (reg) {
-     case PCA9552_INPUT0:
-@@ -79,7 +79,7 @@ static uint8_t pca9552_read(PCA9552State *s, uint8_t reg)
-     }
- }
- 
--static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
-+static void pca955x_write(PCA955xState *s, uint8_t reg, uint8_t data)
- {
-     switch (reg) {
-     case PCA9552_PSC0:
-@@ -94,7 +94,7 @@ static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
-     case PCA9552_LS2:
-     case PCA9552_LS3:
-         s->regs[reg] = data;
--        pca9552_update_pin_input(s);
-+        pca955x_update_pin_input(s);
-         break;
- 
-     case PCA9552_INPUT0:
-@@ -110,7 +110,7 @@ static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
-  * after each byte is sent to or received by the device. The index
-  * rollovers to 0 when the maximum register address is reached.
-  */
--static void pca9552_autoinc(PCA9552State *s)
-+static void pca955x_autoinc(PCA955xState *s)
- {
-     if (s->pointer != 0xFF && s->pointer & PCA9552_AUTOINC) {
-         uint8_t reg = s->pointer & 0xf;
-@@ -120,12 +120,12 @@ static void pca9552_autoinc(PCA9552State *s)
-     }
- }
- 
--static uint8_t pca9552_recv(I2CSlave *i2c)
-+static uint8_t pca955x_recv(I2CSlave *i2c)
- {
--    PCA9552State *s = PCA9552(i2c);
-+    PCA955xState *s = PCA955X(i2c);
-     uint8_t ret;
- 
--    ret = pca9552_read(s, s->pointer & 0xf);
-+    ret = pca955x_read(s, s->pointer & 0xf);
- 
-     /*
-      * From the Specs:
-@@ -143,40 +143,40 @@ static uint8_t pca9552_recv(I2CSlave *i2c)
-                       __func__);
-     }
- 
--    pca9552_autoinc(s);
-+    pca955x_autoinc(s);
- 
-     return ret;
- }
- 
--static int pca9552_send(I2CSlave *i2c, uint8_t data)
-+static int pca955x_send(I2CSlave *i2c, uint8_t data)
- {
--    PCA9552State *s = PCA9552(i2c);
-+    PCA955xState *s = PCA955X(i2c);
- 
-     /* First byte sent by is the register address */
-     if (s->len == 0) {
-         s->pointer = data;
-         s->len++;
-     } else {
--        pca9552_write(s, s->pointer & 0xf, data);
-+        pca955x_write(s, s->pointer & 0xf, data);
- 
--        pca9552_autoinc(s);
-+        pca955x_autoinc(s);
-     }
- 
-     return 0;
- }
- 
--static int pca9552_event(I2CSlave *i2c, enum i2c_event event)
-+static int pca955x_event(I2CSlave *i2c, enum i2c_event event)
- {
--    PCA9552State *s = PCA9552(i2c);
-+    PCA955xState *s = PCA955X(i2c);
- 
-     s->len = 0;
-     return 0;
- }
- 
--static void pca9552_get_led(Object *obj, Visitor *v, const char *name,
-+static void pca955x_get_led(Object *obj, Visitor *v, const char *name,
-                             void *opaque, Error **errp)
- {
--    PCA9552State *s = PCA9552(obj);
-+    PCA955xState *s = PCA955X(obj);
-     int led, rc, reg;
-     uint8_t state;
- 
-@@ -195,7 +195,7 @@ static void pca9552_get_led(Object *obj, Visitor *v, const char *name,
-      * reading the INPUTx reg
-      */
-     reg = PCA9552_LS0 + led / 4;
--    state = (pca9552_read(s, reg) >> (led % 8)) & 0x3;
-+    state = (pca955x_read(s, reg) >> (led % 8)) & 0x3;
-     visit_type_str(v, name, (char **)&led_state[state], errp);
- }
- 
-@@ -209,10 +209,10 @@ static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, int state)
-                 ((state & 0x3) << (led_num << 1));
- }
- 
--static void pca9552_set_led(Object *obj, Visitor *v, const char *name,
-+static void pca955x_set_led(Object *obj, Visitor *v, const char *name,
-                             void *opaque, Error **errp)
- {
--    PCA9552State *s = PCA9552(obj);
-+    PCA955xState *s = PCA955X(obj);
-     Error *local_err = NULL;
-     int led, rc, reg, val;
-     uint8_t state;
-@@ -244,9 +244,9 @@ static void pca9552_set_led(Object *obj, Visitor *v, const char *name,
-     }
- 
-     reg = PCA9552_LS0 + led / 4;
--    val = pca9552_read(s, reg);
-+    val = pca955x_read(s, reg);
-     val = pca955x_ledsel(val, led % 4, state);
--    pca9552_write(s, reg, val);
-+    pca955x_write(s, reg, val);
- }
- 
- static const VMStateDescription pca9552_vmstate = {
-@@ -254,17 +254,17 @@ static const VMStateDescription pca9552_vmstate = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT8(len, PCA9552State),
--        VMSTATE_UINT8(pointer, PCA9552State),
--        VMSTATE_UINT8_ARRAY(regs, PCA9552State, PCA9552_NR_REGS),
--        VMSTATE_I2C_SLAVE(i2c, PCA9552State),
-+        VMSTATE_UINT8(len, PCA955xState),
-+        VMSTATE_UINT8(pointer, PCA955xState),
-+        VMSTATE_UINT8_ARRAY(regs, PCA955xState, PCA955X_NR_REGS),
-+        VMSTATE_I2C_SLAVE(i2c, PCA955xState),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
- static void pca9552_reset(DeviceState *dev)
- {
--    PCA9552State *s = PCA9552(dev);
-+    PCA955xState *s = PCA955X(dev);
- 
-     s->regs[PCA9552_PSC0] = 0xFF;
-     s->regs[PCA9552_PWM0] = 0x80;
-@@ -275,15 +275,15 @@ static void pca9552_reset(DeviceState *dev)
-     s->regs[PCA9552_LS2] = 0x55;
-     s->regs[PCA9552_LS3] = 0x55;
- 
--    pca9552_update_pin_input(s);
-+    pca955x_update_pin_input(s);
- 
-     s->pointer = 0xFF;
-     s->len = 0;
- }
- 
--static void pca9552_initfn(Object *obj)
-+static void pca955x_initfn(Object *obj)
- {
--    PCA9552State *s = PCA9552(obj);
-+    PCA955xState *s = PCA955X(obj);
-     int led;
- 
-     /* If support for the other PCA955X devices are implemented, these
-@@ -297,7 +297,7 @@ static void pca9552_initfn(Object *obj)
-         char *name;
- 
-         name = g_strdup_printf("led%d", led);
--        object_property_add(obj, name, "bool", pca9552_get_led, pca9552_set_led,
-+        object_property_add(obj, name, "bool", pca955x_get_led, pca955x_set_led,
-                             NULL, NULL);
-         g_free(name);
-     }
-@@ -308,9 +308,9 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
- 
--    k->event = pca9552_event;
--    k->recv = pca9552_recv;
--    k->send = pca9552_send;
-+    k->event = pca955x_event;
-+    k->recv = pca955x_recv;
-+    k->send = pca955x_send;
-     dc->reset = pca9552_reset;
-     dc->vmsd = &pca9552_vmstate;
- }
-@@ -318,14 +318,14 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pca9552_info = {
-     .name          = TYPE_PCA9552,
-     .parent        = TYPE_I2C_SLAVE,
--    .instance_init = pca9552_initfn,
--    .instance_size = sizeof(PCA9552State),
-+    .instance_init = pca955x_initfn,
-+    .instance_size = sizeof(PCA955xState),
-     .class_init    = pca9552_class_init,
- };
- 
--static void pca9552_register_types(void)
-+static void pca955x_register_types(void)
- {
-     type_register_static(&pca9552_info);
- }
- 
--type_init(pca9552_register_types)
-+type_init(pca955x_register_types)
--- 
-2.21.3
+On 22.06.20 19:36, Alberto Garcia wrote:
+
+[...]
+
+> You would still have problems with images created with raw data files
+> but without preallocation.
+
+Yeah, sure, but, well.  Bug in qemu. :/
+
+Max
+
+
+--9x57pzu0Wj9SOJpxSRCWXUcYpqrYJkrYP--
+
+--EgjXaRZ1s0gXIHSWyGglqxk11syZmnRpL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7xrygACgkQ9AfbAGHV
+z0BARQgAwkYnP0ByT6lkqTKkTtbTytU7XCaX1hlC9F4eBwSJ5eyepHS+EN3y8dc6
+3cq2tfZgP/o3Vu/PBq333Y2CB91H8sdT1pdnNqEPX0nKvYrsPfPB9vpzIQYPXM2q
+hQbz3aLeA8rjKid+02IGlTDyGxJiCLeZiqFnp/UzZe6zXqasITC+E/W5HwgO46YX
+Ps8oqY3XNDpw+w6bLOx/hvidx+TqZsw82xVEB1SFcM9GZu1l4mKW3+EpLMncF87D
+LtoDKPbbULr3qn7JA/SQNL6DTcM27K4OTipbevL1goTcxqu9ct+qptroQbQN1Xhe
+rzLKJFe4OrdlSXC2YtWdMgUYJrthnQ==
+=BEOl
+-----END PGP SIGNATURE-----
+
+--EgjXaRZ1s0gXIHSWyGglqxk11syZmnRpL--
 
 
