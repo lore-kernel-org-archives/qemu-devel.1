@@ -6,87 +6,77 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2595FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E686C20702
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 586A920702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:10:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmuwnYwE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E686C20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U5HXZZwm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586A920702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnevJ-000158-7C
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46668)
+	id 1jnewK-0002iz-LS
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:10:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnetv-0007ZA-Kd
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:07:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37867
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jneun-0000XB-5N
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:08:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38969
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jnett-0003ce-4g
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:07:31 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jneuk-000454-5V
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:08:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592903248;
+ s=mimecast20190719; t=1592903301;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ewh11NkAt1vxijOPsDw2gC659VmFWnVa0/7d4edZN4M=;
- b=AmuwnYwEGAQOYwL95VOICxV/7szlRK6y6aEpdAQy0VLGcLEzSMDdbu4PkqDMSKOMoUWSUm
- gzKeJDXI7qjwOrMX5W0JxO+7Ydw40hoic1vTxI7SfGu5mZeO0r9QG+Hb1emygAJU9DYkvq
- UM7uJvceM+7m+/YkOH5M593k5dBHwek=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-i6qRMFjuO72Q8MNnAGYFbg-1; Tue, 23 Jun 2020 05:07:26 -0400
-X-MC-Unique: i6qRMFjuO72Q8MNnAGYFbg-1
-Received: by mail-wr1-f69.google.com with SMTP id e11so5046069wrs.2
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:07:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ewh11NkAt1vxijOPsDw2gC659VmFWnVa0/7d4edZN4M=;
- b=gg1urH4t5EL7iTB19S4SHlypTOn9fyPjY0s3PqngfjmTw61Jsk43jmi4v0Wym/KXDc
- odz/LHHUOCBtgnRcAioUXtxfTG4aydxZz3K2XCNHAhoC4EKqY5vNjO2ph7DDcJHEMnBI
- 8/jsioXPFEuQ/8IJ0cpwiABYxDeTB2pdFCqjSepWYiRhUQkxaPLVJxQ9jw7yVist+w1I
- kd0VFFfXkJ8MOa4gNHR0tcMW0xaiatlRuOiDgU86BNVjiAwGNPd0yRU1ygrIXzyoZcAc
- SuIHAOOOow2E5ae+TVuD/0jqFkkYVHkBwA6vredrIiqH+oL0VdnT0iSfzTUJ256Qz8PB
- csCw==
-X-Gm-Message-State: AOAM530nWs1+YOODzVtww7NHuWJr9XkstX63dCu241etVyDsGDaN8e2c
- /mWkLj30p6PrbQ6nqg3oCvGJ8L0BslncN5F0ETyn2EUB2asHKSLqGVqop6CHuTJ1Y+zeXKAU4yj
- QvhWMdFZhAV4rltU=
-X-Received: by 2002:a1c:c357:: with SMTP id t84mr24462144wmf.155.1592903245572; 
- Tue, 23 Jun 2020 02:07:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx5efUCvXkEslaLpEKWD3clNoBIPZkH5panxpoB2OIJy8MDdNw82bKzaaJzXAD7NREsW2FNqA==
-X-Received: by 2002:a1c:c357:: with SMTP id t84mr24462127wmf.155.1592903245365; 
- Tue, 23 Jun 2020 02:07:25 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- v20sm21986273wrb.51.2020.06.23.02.07.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 02:07:24 -0700 (PDT)
-Date: Tue, 23 Jun 2020 05:07:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2] Stop vhost-user sending uninitialized mmap_offsets
-Message-ID: <20200623050715-mutt-send-email-mst@kernel.org>
-References: <1592650156-25845-1-git-send-email-raphael.norwitz@nutanix.com>
- <CAFEAcA90x+7LgSgwkSs2Ah+UwKv+Wouq71K690sh9j4AROhxdw@mail.gmail.com>
+ bh=Uhg4WOZQdNZ1CRUamur1MbLAoMb/HQRZOtcr18AlXX0=;
+ b=U5HXZZwmnb3dqxTowtW2k+xmGrTZoTz7iYzG1JOm42G0BEKIqfFDheHNbJ0X9pb9SzF7DD
+ 5Y/O5+WW1bGSWrOc0rVHi3X/ton60TGa5PQMYaAhSdMFIObk6mCEL9fG2KYsZP5KXKZJMC
+ EV6regsvmyzE/AiYgSLPJLMyCFjm7cs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-BFsh9SmuMOK_ENrLkKdrBQ-1; Tue, 23 Jun 2020 05:08:17 -0400
+X-MC-Unique: BFsh9SmuMOK_ENrLkKdrBQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE084804033;
+ Tue, 23 Jun 2020 09:08:15 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A859A512FE;
+ Tue, 23 Jun 2020 09:08:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2EAEF113846D; Tue, 23 Jun 2020 11:08:14 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+Subject: Re: [PULL v2 03/32] riscv: Generalize CPU init routine for the base
+ CPU
+References: <20200619165817.4144200-1-alistair.francis@wdc.com>
+ <20200619165817.4144200-4-alistair.francis@wdc.com>
+ <CAEUhbmUEREaNBXBP6a0UgAYK6dmVbGFtDu8wLGUjNXHL5mWtoA@mail.gmail.com>
+Date: Tue, 23 Jun 2020 11:08:14 +0200
+In-Reply-To: <CAEUhbmUEREaNBXBP6a0UgAYK6dmVbGFtDu8wLGUjNXHL5mWtoA@mail.gmail.com>
+ (Bin Meng's message of "Tue, 23 Jun 2020 14:22:46 +0800")
+Message-ID: <87lfkejgjl.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA90x+7LgSgwkSs2Ah+UwKv+Wouq71K690sh9j4AROhxdw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,42 +97,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 23, 2020 at 09:58:23AM +0100, Peter Maydell wrote:
-> On Tue, 23 Jun 2020 at 00:50, Raphael Norwitz
-> <raphael.norwitz@nutanix.com> wrote:
-> >
-> > Prior to this change, the vhost_user_fill_msg_region function filled out
-> > all elements of the VhostUserMemoryRegion struct except the mmap_offset.
-> >
-> > This function is often called on uninitialized structs, which are then
-> > copied into VHOST_USER_SET_MEM_TABLE and VHOST_USER_ADD/REM_MEM_REG
-> > messages. In some cases, where the mmap_offset was not needed, it was
-> > left uninitialized, causing QEMU to send the backend uninitialized data,
-> > which Coverity flagged as a series of issues.
-> >
-> > This change augments the vhost_user_fill_msg_region API, adding a
-> > mmap_offset paramenter, forcing the caller to initialize mmap_offset.
-> >
-> > Fixes: ece99091c2d0aeb23734289a50ef2ff4e0a08929
-> > Fixes: f1aeb14b0809e313c74244d838645ed25e85ea63
-> > Reported-by: Coverity (CIDs 1429802, 1429803 and 1429804)
-> > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-> > ---
-> 
-> 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> thanks
-> -- PMM
+Bin Meng <bmeng.cn@gmail.com> writes:
 
-Queued, thanks!
+> Hi Alistair,
+>
+> On Sat, Jun 20, 2020 at 1:09 AM Alistair Francis
+> <alistair.francis@wdc.com> wrote:
+>>
+>> From: Bin Meng <bin.meng@windriver.com>
+>>
+>> There is no need to have two functions that have exactly the same
+>> codes for 32-bit and 64-bit base CPUs.
+>>
+>> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>> Message-id: 1591837729-27486-1-git-send-email-bmeng.cn@gmail.com
+>> Message-Id: <1591837729-27486-1-git-send-email-bmeng.cn@gmail.com>
+>
+> I noticed that patches from other people than you have the
+> "Message-id" tags, but your patch [1] does not. Is this intentional?
+>
+> (not sure why we need 2 "Message-id" tags here, with one has <> ?)
+
+We don't.  Looks like an accident.
+
+> Just want to know what's the best practice here.
+
+The Message-Id tag's purpose is connecting commits back to the mailing
+list.  Useful when you want to look up their review later.
+
+To get them into git, maintainers should use git-am -m to apply
+patches.  I have
+
+    [am]
+            messageid = true
+
+in my .gitconfig.
+
+Maintainers may be tempted to use git-rebase or git-cherry-pick instead
+for patches they already have in their local git (such as their own
+patches).  No good, because we don't get the Message-Id that way.
+
+Patch submissions (as opposed to pull requests) generally do not have
+Message-Id tags in commit messages.
+
+Hope this helps!
+
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  target/riscv/cpu.c | 18 +++++-------------
+>>  1 file changed, 5 insertions(+), 13 deletions(-)
+>>
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06208.html
+>
+> Regards,
+> Bin
 
 
