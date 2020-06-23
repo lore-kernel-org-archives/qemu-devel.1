@@ -2,92 +2,94 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DDAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A69C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:23:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 725782070E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6626E2070E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 15:23:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzFcLRPM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725782070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3fUD4x9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6626E2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnkkR-0003T0-Jm
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:22:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
+	id 1jnkmB-0005RE-JW
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 11:23:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jnkVA-0003EH-74
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:06:20 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jnkV8-0001W8-Bn
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:06:19 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 22so2441751wmg.1
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 08:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=PxEXhYLbmH1o6u+grMyWsHnAH2Lm9BUoWtjkfx2PRsQ=;
- b=bzFcLRPM8dyN9xEr89boLO7PFuM5iyjGW3txKKFfgQxhDIfqZi5nNZHQvyYlaZYXcx
- 81zVul/FpqrsJVOVuCWUwa4zNwQSeuYzdXdEg4dIblNfyM4D/EgW0J2g0ozZ36iRMK8y
- /aX9bUNzJPAkXTxXJfq7z2KL78d3fN4jzkhrZEzg+9sLMozo/xGME8RMYOXZ9co/Jfpz
- n8SnlV0ISCXu0GFCvGS22seukEKAOikwv/NTaLv9ckJYxRwXxSbAi3XtTHbrm6Agj5LR
- 4LHnKSZxc8csvXm/u/m/PEddMqTCMG6/zTkOo9HWXNBvjDa1GeONVXIscchGhseIn+VN
- i/Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=PxEXhYLbmH1o6u+grMyWsHnAH2Lm9BUoWtjkfx2PRsQ=;
- b=dPeXuF51dpHSqpcSQrL1wxvypKEcLxVd/Vwo6qNvuXCX1NogL0mXRJDpWwsz8tncGL
- Stbri74zUtopNAgooktQwmfXmho40Rs6QiQ9DLRTzFOlL5TywLc/WmSqEnHr9nn5uHk8
- xXa66pwKA2UQ4b0Pcfmh0WrfYXxEXfKoZEg2ZacHKXhIkV1R9ALdjAIY8VFEJLOhGwHH
- qvj0abUoU5N1rQQz177qLa/GY8Fpt4bLQdABPxczCooB2jM70M3EIOINS3wxGXFtX2s1
- EugUOESVyWP+cWHXFSka3bbNQD0ZZMlrJHjPR9PmQot2UV8TvUV4dScOiU6hz8TsqSg4
- yYJQ==
-X-Gm-Message-State: AOAM530TlshEZ0sDCk84BwLLqYhg1YsGu6GrdEByKFNjOk3T83shstPK
- Ti1sUC7IGQ6JN4F9j9DJleo=
-X-Google-Smtp-Source: ABdhPJyTbBEPTxsNv7WhA6YDtQz5c3O0kmktdUbyvXJt36jPXn25Qb5H17B3hYEEs3Bz3pwLYUOkfQ==
-X-Received: by 2002:a1c:ba08:: with SMTP id k8mr11127633wmf.28.1592924776803; 
- Tue, 23 Jun 2020 08:06:16 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id w13sm23154330wrr.67.2020.06.23.08.06.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 08:06:15 -0700 (PDT)
-Date: Tue, 23 Jun 2020 16:06:14 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: Re: [PATCH v2] Stop vhost-user sending uninitialized mmap_offsets
-Message-ID: <20200623150614.GV36568@stefanha-x1.localdomain>
-References: <1592650156-25845-1-git-send-email-raphael.norwitz@nutanix.com>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jnkl6-0004XM-HM
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:22:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48580
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jnkl3-0007o5-RG
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 11:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592925764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yurOEOR3+8OV7Dyuj+11/b4vu7uceWZ/I62bnyA8Ua4=;
+ b=B3fUD4x9SovfERfu9uIvfGsYKaQoqXjTjXo76VCxc1dfnJmD7iTDXY80XCCgGR/NSa3Jmq
+ p9abv9oW5uQjcF+yaQOqXOXPXfopTxnemaO4akODixXt7Y0Cf0iGpM1rUJYfDfSex6T3OQ
+ hCCk4XwNiKidtPJko+JZVihLzhJMH2g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-K_kaor1YPV62cLTXSoxDUw-1; Tue, 23 Jun 2020 11:22:38 -0400
+X-MC-Unique: K_kaor1YPV62cLTXSoxDUw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5636E1005512;
+ Tue, 23 Jun 2020 15:22:37 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D685D7166A;
+ Tue, 23 Jun 2020 15:22:34 +0000 (UTC)
+Subject: Re: [PATCH v3 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200611151209.22547-1-eric.auger@redhat.com>
+ <20200611151209.22547-2-eric.auger@redhat.com>
+ <87k0zzz6nt.fsf@dusky.pond.sub.org>
+ <f0ec7470-d683-1bfd-103d-54c57ebd3863@redhat.com>
+ <87imfhhkyz.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e5964e6e-2ee2-577d-775a-b02d63bca651@redhat.com>
+Date: Tue, 23 Jun 2020 17:22:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="U8v/hV883cEE9JJG"
-Content-Disposition: inline
-In-Reply-To: <1592650156-25845-1-git-send-email-raphael.norwitz@nutanix.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87imfhhkyz.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,56 +102,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- marcandre.lureau@redhat.com, mst@redhat.com
+Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
+ peterx@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
+ jean-philippe@linaro.org, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Markus,
 
---U8v/hV883cEE9JJG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 6/23/20 5:15 PM, Markus Armbruster wrote:
+> Auger Eric <eric.auger@redhat.com> writes:
+> 
+>> Hi Markus,
+>>
+>> On 6/22/20 1:22 PM, Markus Armbruster wrote:
+>>> Eric Auger <eric.auger@redhat.com> writes:
+>>>
+>>>> Introduce a new property defining a reserved region:
+>>>> <low address>, <high address>, <type>.
+> [...]
+>>> I dimly remember discussing the wisdom of numeric type here, dig, dig,
+>>> ..., aha:
+>>>
+>>>     Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
+>>>     Date: Fri, 13 Dec 2019 11:03:02 +0100
+>>>     Message-ID: <87y2vg4k6h.fsf@dusky.pond.sub.org>
+>>>
+>>>     >> So the "label" part of "<low address>,<high address>,label" is a number?
+>>>     > yes it is.
+>>>     >> 
+>>>     >> Is a number appropriate for your use case, or would an enum be better?
+>>>     > I think a number is OK. There might be other types of reserved regions
+>>>     > in the future. Also if we want to allow somebody else to reuse that
+>>>     > property in another context, I would rather leave it open?
+>>>
+>>>     I'd prioritize the user interface over possible reuse (which might never
+>>>     happen).  Mind, I'm not telling you using numbers is a bad user
+>>>     interface.  In general, enums are nicer, but I don't know enough about
+>>>     this particular case.
+>> Yep I remember too ;-) I left as it was because I think this property
+>> could be used for other use cases.
+> 
+> YAGNI :)
+> 
+> A string would work, too, wouldn't it?
+:-)
 
-On Mon, Jun 22, 2020 at 11:50:44PM +0000, Raphael Norwitz wrote:
-> Prior to this change, the vhost_user_fill_msg_region function filled out
-> all elements of the VhostUserMemoryRegion struct except the mmap_offset.
->=20
-> This function is often called on uninitialized structs, which are then
-> copied into VHOST_USER_SET_MEM_TABLE and VHOST_USER_ADD/REM_MEM_REG
-> messages. In some cases, where the mmap_offset was not needed, it was
-> left uninitialized, causing QEMU to send the backend uninitialized data,
-> which Coverity flagged as a series of issues.
->=20
-> This change augments the vhost_user_fill_msg_region API, adding a
-> mmap_offset paramenter, forcing the caller to initialize mmap_offset.
->=20
-> Fixes: ece99091c2d0aeb23734289a50ef2ff4e0a08929
-> Fixes: f1aeb14b0809e313c74244d838645ed25e85ea63
-> Reported-by: Coverity (CIDs 1429802, 1429803 and 1429804)
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-> ---
->  hw/virtio/vhost-user.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+Eric
+> 
+> [...]
+> 
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---U8v/hV883cEE9JJG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7yGmYACgkQnKSrs4Gr
-c8jGCQgAsfDgSYJlS14g6FIBIco9/+A5fjN/eZKlpFKPeb3OCGY15I4RriyMzWAr
-ELe80wovYoKcAfyXT4EslHIt0OXxQCBi4aRtH/XbTGG+eDdTd/f30q4q/47iFcoU
-mjaZrf4mz11PEZX0tZ7H+qPLkd20RfJZTqhP8cgBJndKP2qeHMmtffgABmj0SRw/
-EsiF9GIG40NeDmK9fr8dfONaJAS+65GfvoiDpbXSz2aXLpBVxT4pWH5n1UoXVOua
-M4APv5egoYiIi32QJN+zhU5H7BYUiMa9iDCEd49c45nE5V9EOcCKWY/J0PGRqTgM
-btmxc9Kk3I8MflSOT2XPrh6n051ruQ==
-=wMjz
------END PGP SIGNATURE-----
-
---U8v/hV883cEE9JJG--
 
