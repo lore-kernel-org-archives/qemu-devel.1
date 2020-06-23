@@ -2,109 +2,90 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD85C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7848DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7DAA206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:30:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7DAA206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43B8420724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:40:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CFIWqAt6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B8420724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnh8M-0000Bm-1Y
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:30:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40154)
+	id 1jnhI2-0003yU-Ei
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:40:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jnh7e-0007qm-6L
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:29:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49808)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jnh7c-0006M4-7w
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:29:49 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05NB2c9a093311; Tue, 23 Jun 2020 07:29:27 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2s80s9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:29:27 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NB2n6k093598;
- Tue, 23 Jun 2020 07:29:26 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2s80rf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 07:29:26 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NBPUZE031545;
- Tue, 23 Jun 2020 11:29:24 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma04dal.us.ibm.com with ESMTP id 31sa38vj3j-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 23 Jun 2020 11:29:23 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05NBTLEV29753698
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:29:21 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C40B66A04F;
- Tue, 23 Jun 2020 11:29:22 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 26E106A047;
- Tue, 23 Jun 2020 11:29:22 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 23 Jun 2020 11:29:21 +0000 (GMT)
-Subject: Re: [PATCH v3 00/12] tpm: Split hw/ vs backends/
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200612085444.8362-1-philmd@redhat.com>
- <03924193-9774-9f85-2008-05c047fe91cf@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <3dff6351-e20c-e5bd-cb97-8c80793df52c@linux.ibm.com>
-Date: Tue, 23 Jun 2020 07:29:21 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhGh-0002Gb-Iy
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35510)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhGf-00032T-BP
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:39:11 -0400
+Received: by mail-wr1-x430.google.com with SMTP id g18so11113327wrm.2
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bp9P8X9qhNhqR1DZYLJlLTpeaJnCEFmUa9xUdHNBspo=;
+ b=CFIWqAt6BJIu6p3pGeLuVxsqcMSDBnvswEXAYEqtw2/1eRMGBFgYXKcNGfAWi8Wfw+
+ JWgpaRYhvAfFrtuVfL20Jls0fPzJNKaDeg/iAUhybGEzY7+11wJ+Jp+bCV8oPI7GuETo
+ JPXeYO9aRCWnVgs8F43dWyuXpS42CwA3sYDjnTnn/jUXgLHEaE9YeyfDYfpoePl72DiM
+ 4mLdx64j5C5BLxOgoWEYyiCTPdQrGQTxjHHsAwTQ4+Y+oH9DFiRU97Ye3RAkHCVGFYjl
+ +Xo9yZmaMm9hRCoevW3INGf8A5lnrqzxD9aVxuu7xTt+vG8BlCV4tjYNtpgHm7wjcHyZ
+ 0V9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bp9P8X9qhNhqR1DZYLJlLTpeaJnCEFmUa9xUdHNBspo=;
+ b=FSKQf75FCCviaR4O2P8BKJzazmE8nxlAL+1FEa0xsZj4LOLX3zL6rsVIwXSuQLZLiL
+ 9iZlrAyw9qZn3K7ERNI6bu6/scCi/qHaHiU+yA0Oqpk4bKFdsIVgENv4C6HGQQVGf4Al
+ a8yeNL3YuSI9GUV3w71tAWSlTbmTB76WSRWjt0tJuZbmW/IfEkpM/xThsmnDWBc7MxZL
+ a/wd968qFNPvd3dl/ppqFgLM9xwsm5wUEt9qG1CMNdIVWHJf7M8UwxY5SPlCsm2OUPkn
+ hNCywXlbWzDr1cWfhDtq+3EwFAtduR3YUiLVWjCOSRXtIeSy/LD2aTKguXsD1PAnEUaX
+ mrTg==
+X-Gm-Message-State: AOAM531bEa8wicU/Rxvbj3+BiXJ6l1ZuO/4ZVV3MMZNhF99Zqm858b4Z
+ Z49YsdYbYQfNl2VWAuj/1N023uKYrDpXLg==
+X-Google-Smtp-Source: ABdhPJzFkYtH8IfKh176XA19jei9oXGIUeakl/mhzl9LGB3ZSwBYuPeuvsiVODL6ef2RXsrLLt+g6w==
+X-Received: by 2002:adf:f711:: with SMTP id r17mr25222856wrp.409.1592912346833; 
+ Tue, 23 Jun 2020 04:39:06 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.05
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 04:39:06 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/42] target-arm queue
+Date: Tue, 23 Jun 2020 12:38:22 +0100
+Message-Id: <20200623113904.28805-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <03924193-9774-9f85-2008-05c047fe91cf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-23_06:2020-06-23,
- 2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999
- suspectscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
- cotscore=-2147483648 mlxscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 spamscore=0 phishscore=0 impostorscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006230088
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:29:31
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,105 +99,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 5:39 AM, Paolo Bonzini wrote:
-> On 12/06/20 10:54, Philippe Mathieu-Daudé wrote:
->> Missing review: last patch
->> - #12 "tpm: Move backend code under the 'backends/' directory"
->>
->> Hi,
->>
->> Yesterday I started to review some vTPM patches and got very
->> confused by the files under hw/tpm/. In particular after
->> running:
->>
->>    $ git grep TYPE_TPM_BACKEND
->>    backends/tpm.c:188:    .name = TYPE_TPM_BACKEND,
->>    hw/tpm/tpm_emulator.c:985:    .parent = TYPE_TPM_BACKEND,
->>    hw/tpm/tpm_passthrough.c:393:    .parent = TYPE_TPM_BACKEND,
->>    include/sysemu/tpm_backend.h:21:#define TYPE_TPM_BACKEND "tpm-backend"
->>
->> As there is no particular reason to keep this mixed, clean it up.
->>
->> Since v2:
->> - Resolved the FIXME in tpm_tis_common.c by making the
->>    TRACE_TPM_UTIL_SHOW_BUFFER check locally to tpm_util.c
->>
->> Since v1:
->> - Amended docs/ changes
->> - Renamed Kconfig TPM_BACKEND variable
->> - Move backend files under backends/tpm/ (Marc-André & Stefan)
->> - Fix x86-64 build error (patchew)
->>
->> Philippe Mathieu-Daudé (12):
->>    docs/specs/tpm: Correct header path name
->>    backends: Add TPM files into their own directory
->>    hw/tpm: Rename TPMDEV as TPM_BACKEND in Kconfig
->>    hw/tpm: Do not include 'qemu/osdep.h' in header
->>    hw/tpm: Include missing 'qemu/option.h' header
->>    hw/tpm: Move 'hw/acpi/tpm.h' inclusion from header to sources
->>    hw/tpm: Remove unnecessary 'tpm_int.h' header inclusion
->>    hw/tpm: Make TRACE_TPM_UTIL_SHOW_BUFFER check local to tpm_util.c
->>    hw/tpm: Move few declarations from 'tpm_util.h' to 'tpm_int.h'
->>    hw/tpm: Move DEFINE_PROP_TPMBE() macro to 'tmp_prop.h' local header
->>    hw/tpm: Make 'tpm_util.h' publicly accessible as "sysemu/tpm_util.h"
->>    tpm: Move backend code under the 'backends/' directory
->>
->>   docs/specs/tpm.rst                     | 14 +++++------
->>   Makefile                               |  2 +-
->>   Makefile.objs                          |  1 +
->>   {hw => backends}/tpm/tpm_int.h         | 19 +++++++++++---
->>   {hw => backends}/tpm/tpm_ioctl.h       |  0
->>   hw/tpm/tpm_ppi.h                       |  1 -
->>   hw/tpm/tpm_prop.h                      | 31 +++++++++++++++++++++++
->>   hw/tpm/tpm_tis.h                       |  1 -
->>   {hw/tpm => include/sysemu}/tpm_util.h  | 19 +++-----------
->>   backends/{tpm.c => tpm/tpm_backend.c}  |  0
->>   {hw => backends}/tpm/tpm_emulator.c    |  2 +-
->>   {hw => backends}/tpm/tpm_passthrough.c |  2 +-
->>   {hw => backends}/tpm/tpm_util.c        |  5 +++-
->>   hw/tpm/tpm_crb.c                       |  4 +--
->>   hw/tpm/tpm_ppi.c                       |  1 +
->>   hw/tpm/tpm_spapr.c                     |  4 +--
->>   hw/tpm/tpm_tis_common.c                | 11 +++------
->>   hw/tpm/tpm_tis_isa.c                   |  3 ++-
->>   hw/tpm/tpm_tis_sysbus.c                |  3 ++-
->>   tests/qtest/tpm-emu.c                  |  2 +-
->>   MAINTAINERS                            |  2 +-
->>   backends/Kconfig                       |  1 +
->>   backends/Makefile.objs                 |  2 +-
->>   backends/tpm/Kconfig                   | 14 +++++++++++
->>   backends/tpm/Makefile.objs             |  4 +++
->>   backends/tpm/trace-events              | 33 +++++++++++++++++++++++++
->>   hw/tpm/Kconfig                         | 21 +++-------------
->>   hw/tpm/Makefile.objs                   |  3 ---
->>   hw/tpm/trace-events                    | 34 +-------------------------
->>   29 files changed, 136 insertions(+), 103 deletions(-)
->>   rename {hw => backends}/tpm/tpm_int.h (81%)
->>   rename {hw => backends}/tpm/tpm_ioctl.h (100%)
->>   create mode 100644 hw/tpm/tpm_prop.h
->>   rename {hw/tpm => include/sysemu}/tpm_util.h (80%)
->>   rename backends/{tpm.c => tpm/tpm_backend.c} (100%)
->>   rename {hw => backends}/tpm/tpm_emulator.c (99%)
->>   rename {hw => backends}/tpm/tpm_passthrough.c (99%)
->>   rename {hw => backends}/tpm/tpm_util.c (98%)
->>   create mode 100644 backends/Kconfig
->>   create mode 100644 backends/tpm/Kconfig
->>   create mode 100644 backends/tpm/Makefile.objs
->>   create mode 100644 backends/tpm/trace-events
->>
-> Queued this one, actually.
+The following changes since commit 61fee7f45955cd0bf9b79be9fa9c7ebabb5e6a85:
 
-I was going to send a PR today.
+  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/acceptance-testing-20200622' into staging (2020-06-22 20:50:10 +0100)
 
->
-> Paolo
->
+are available in the Git repository at:
 
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200623
+
+for you to fetch changes up to 539533b85fbd269f777bed931de8ccae1dd837e9:
+
+  arm/virt: Add memory hot remove support (2020-06-23 11:39:48 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * util/oslib-posix : qemu_init_exec_dir implementation for Mac
+ * target/arm: Last parts of neon decodetree conversion
+ * hw/arm/virt: Add 5.0 HW compat props
+ * hw/watchdog/cmsdk-apb-watchdog: Add trace event for lock status
+ * mps2: Add CMSDK APB watchdog, FPGAIO block, S2I devices and I2C devices
+ * mps2: Add some unimplemented-device stubs for audio and GPIO
+ * mps2-tz: Use the ARM SBCon two-wire serial bus interface
+ * target/arm: Check supported KVM features globally (not per vCPU)
+ * tests/qtest/arm-cpu-features: Add feature setting tests
+ * arm/virt: Add memory hot remove support
+
+----------------------------------------------------------------
+Andrew Jones (2):
+      hw/arm/virt: Add 5.0 HW compat props
+      tests/qtest/arm-cpu-features: Add feature setting tests
+
+David CARLIER (1):
+      util/oslib-posix : qemu_init_exec_dir implementation for Mac
+
+Peter Maydell (23):
+      target/arm: Convert Neon 2-reg-misc VREV64 to decodetree
+      target/arm: Convert Neon 2-reg-misc pairwise ops to decodetree
+      target/arm: Convert VZIP, VUZP to decodetree
+      target/arm: Convert Neon narrowing moves to decodetree
+      target/arm: Convert Neon 2-reg-misc VSHLL to decodetree
+      target/arm: Convert Neon VCVT f16/f32 insns to decodetree
+      target/arm: Convert vectorised 2-reg-misc Neon ops to decodetree
+      target/arm: Convert Neon 2-reg-misc crypto operations to decodetree
+      target/arm: Rename NeonGenOneOpFn to NeonGenOne64OpFn
+      target/arm: Fix capitalization in NeonGenTwo{Single, Double}OPFn typedefs
+      target/arm: Make gen_swap_half() take separate src and dest
+      target/arm: Convert Neon 2-reg-misc VREV32 and VREV16 to decodetree
+      target/arm: Convert remaining simple 2-reg-misc Neon ops
+      target/arm: Convert Neon VQABS, VQNEG to decodetree
+      target/arm: Convert simple fp Neon 2-reg-misc insns
+      target/arm: Convert Neon 2-reg-misc fp-compare-with-zero insns to decodetree
+      target/arm: Convert Neon 2-reg-misc VRINT insns to decodetree
+      target/arm: Convert Neon 2-reg-misc VCVT insns to decodetree
+      target/arm: Convert Neon VSWP to decodetree
+      target/arm: Convert Neon VTRN to decodetree
+      target/arm: Move some functions used only in translate-neon.inc.c to that file
+      target/arm: Remove unnecessary gen_io_end() calls
+      target/arm: Remove dead code relating to SABA and UABA
+
+Philippe Mathieu-Daudé (15):
+      hw/watchdog/cmsdk-apb-watchdog: Add trace event for lock status
+      hw/i2c/versatile_i2c: Add definitions for register addresses
+      hw/i2c/versatile_i2c: Add SCL/SDA definitions
+      hw/i2c: Add header for ARM SBCon two-wire serial bus interface
+      hw/arm: Use TYPE_VERSATILE_I2C instead of hardcoded string
+      hw/arm/mps2: Document CMSDK/FPGA APB subsystem sections
+      hw/arm/mps2: Rename CMSDK AHB peripheral region
+      hw/arm/mps2: Add CMSDK APB watchdog device
+      hw/arm/mps2: Add CMSDK AHB GPIO peripherals as unimplemented devices
+      hw/arm/mps2: Map the FPGA I/O block
+      hw/arm/mps2: Add SPI devices
+      hw/arm/mps2: Add I2C devices
+      hw/arm/mps2: Add audio I2S interface as unimplemented device
+      hw/arm/mps2-tz: Use the ARM SBCon two-wire serial bus interface
+      target/arm: Check supported KVM features globally (not per vCPU)
+
+Shameer Kolothum (1):
+      arm/virt: Add memory hot remove support
+
+ include/hw/i2c/arm_sbcon_i2c.h   |   35 ++
+ target/arm/cpu.h                 |    2 +-
+ target/arm/kvm_arm.h             |   21 +-
+ target/arm/translate.h           |    8 +-
+ target/arm/neon-dp.decode        |  106 ++++
+ hw/acpi/generic_event_device.c   |   29 +
+ hw/arm/mps2-tz.c                 |   23 +-
+ hw/arm/mps2.c                    |   65 ++-
+ hw/arm/realview.c                |    3 +-
+ hw/arm/versatilepb.c             |    3 +-
+ hw/arm/vexpress.c                |    3 +-
+ hw/arm/virt.c                    |   63 +-
+ hw/i2c/versatile_i2c.c           |   38 +-
+ hw/watchdog/cmsdk-apb-watchdog.c |    1 +
+ target/arm/cpu.c                 |    2 +-
+ target/arm/cpu64.c               |   10 +-
+ target/arm/kvm.c                 |    4 +-
+ target/arm/kvm64.c               |   14 +-
+ target/arm/translate-a64.c       |   20 +-
+ target/arm/translate-neon.inc.c  | 1191 +++++++++++++++++++++++++++++++++++++-
+ target/arm/translate-vfp.inc.c   |    7 +-
+ target/arm/translate.c           | 1064 +---------------------------------
+ tests/qtest/arm-cpu-features.c   |   38 +-
+ util/oslib-posix.c               |   15 +
+ MAINTAINERS                      |    1 +
+ hw/arm/Kconfig                   |    8 +-
+ hw/watchdog/trace-events         |    1 +
+ 27 files changed, 1624 insertions(+), 1151 deletions(-)
+ create mode 100644 include/hw/i2c/arm_sbcon_i2c.h
 
