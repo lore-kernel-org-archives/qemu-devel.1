@@ -2,94 +2,83 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D95C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB1FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:06:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 235C72100A
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25D752080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:06:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VQxZg2my"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 235C72100A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vVnxD73y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25D752080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnp9V-0001jg-Co
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:04:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42568)
+	id 1jnpBC-00049m-C7
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:06:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojo-0004cj-MK
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:44 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45745)
+ (Exim 4.90_1) (envelope-from <derrick.mckee@gmail.com>)
+ id 1jnp0l-00052u-1u; Tue, 23 Jun 2020 15:55:15 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:40975)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojm-0005qA-OQ
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:44 -0400
-Received: by mail-pl1-x644.google.com with SMTP id g17so357706plq.12
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=rcFv549aa6vm0WyOmr9ZtAI+qbXjy1Qjdhyb2qG7F7k=;
- b=VQxZg2myiGdQPKAkfrBbc4JtVbOLGTm562QXxSNDlRFi2BRpN6YX20AsWEaQmDz0sQ
- W5dWfiROO3PVmYNjEDPWX1raJiQBSIMKFjNOCi2dUk0kGY2MEkg9PAKDpqVFsT1pvceJ
- aHWSu9jWEJRuNfMk8xM3rtXOX5dVFRALRoqEDj+wCNInwKiGXFncQI24XdO+bvJZ2su6
- ZPT7qQZ7S8gC/FVINNs/l43kQ6PcQWDbgTcMUTJw3dfgrUvFNdaXn9BqCs4bHeEThL8G
- FWouXncnpgdDDUDaRgaWkAK7ryHSIZ5GvIYlVkvL+voDHslj6o1fTysvzVWYqQZ7v/IC
- p1sg==
+ (Exim 4.90_1) (envelope-from <derrick.mckee@gmail.com>)
+ id 1jnp0i-0008QK-TK; Tue, 23 Jun 2020 15:55:14 -0400
+Received: by mail-qt1-x844.google.com with SMTP id g13so6018837qtv.8;
+ Tue, 23 Jun 2020 12:55:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GK3pL52JblkrMAgCVuqUxoVNn02inswLMPdRIlOeNm8=;
+ b=vVnxD73y9/TcjjagmKy04IhNkl/ixXzhPc57dH33ctTGbcb1dyoVD884IQpDCKq/Vy
+ aVVZErL+GbuZgop3ZKPABRPkxtGngJTim6Vt31syQK2q2uLaoD68XeCZYBEPOnq4jGw7
+ 8SvlYdgBBfnxDsWQKkmUDEJhKKd03rMfDzISe0cxXXG9vXzq+E6PsyXAArCYNqLWpvVW
+ iGnWg2tkXXhZPd0BLHFp7ab1/W25EBM0zrMnHeOl+eGA6BSnONgijMqVW2hK5AMYtTx7
+ 4R/GeASmrQNj3omv/qY1wOfxdjq1+bwgME3VXEZL3QcE1LUgkpJhxvZXnHcvkozybh6h
+ MLIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=rcFv549aa6vm0WyOmr9ZtAI+qbXjy1Qjdhyb2qG7F7k=;
- b=NHEbtXC5GLLYfX20XFfodjGy8ErOL1qj4/omnMDCUFLVPJkMNNjYfXjuH7YsPJVipi
- lQS1QJNqwv7YqrOyI11bkHt3aKuKtyGYECJmI9RI04PcM29qvDZD4qwhwvUetfJuTQfN
- OiYcm5hsVB0XTyEAWuPVbF/PDr4a08senGV6wREvaI+wcBuJJy9UU0jVA9RJmkT2AtE1
- FSUmTz6MDuLdjmM3umX6EkF4hPkYSiCXp5oU3jYiCWYxnvL/JHnLYOzd6Zem2jx0ca9P
- Z6SBshcMa59UlqiZzbWnTeiw9eKuMScEGlyERsu57gtrFNvY7uCnsY8LRgwUvYR3AljB
- C/AQ==
-X-Gm-Message-State: AOAM533tdNwDbOzBfUBjAe9R45RAZnNpnDJ5SHvFT/XHdoucnezGA199
- 58+Kf/nTVwUPStsg4+zKLU9URECHbFM=
-X-Google-Smtp-Source: ABdhPJzQTUE56jg9ReMY0hKodoiuEWbAY5maNnP9L1skjEe6AEB8fJOAuLLydLd+RH7R/4daC1jvzA==
-X-Received: by 2002:a17:902:7c18:: with SMTP id
- x24mr24375261pll.26.1592941061047; 
- Tue, 23 Jun 2020 12:37:41 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 12:37:40 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 29/45] target/arm: Use mte_checkN for sve unpredicated
- stores
-Date: Tue, 23 Jun 2020 12:36:42 -0700
-Message-Id: <20200623193658.623279-30-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200623193658.623279-1-richard.henderson@linaro.org>
-References: <20200623193658.623279-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GK3pL52JblkrMAgCVuqUxoVNn02inswLMPdRIlOeNm8=;
+ b=ZhcIW21GfVjChTdkORtDdL+uVDYqNl8CtzFaCQENIfrgtLLhfmcCfbYP7ckJWtjLG5
+ imKW9mvO2NeYh/M1Gn5l8IvcfwjJTFpmke9KQX7nDteoBqksybwkOSd1vMw/ZvzUi7eb
+ rEkXUnMhM+67r+cGP3rC25CjFiAkT/F2zXMHRb1zW1X7aPaR71o1FX4DXtN+hspZX7gL
+ cBgICs8jpTh50nnWA6F4rJJfg+Fiey8lFxWYPgHRtgTubQdRlodeFkSePXPdvyk7xP2J
+ oiE/061qPvWNkqnOnEa6Vgc2thnp7B5laR8aiBHvwajPcV5ZDvgOGq186R/YxXgCk5SF
+ i9GA==
+X-Gm-Message-State: AOAM533BNSasIlatZdtMJe4KppnrgWCy9iT2dkJ0MWj07+8yLHMl/uvj
+ Khu+JA4S8kmc+RFS/Brm3jmLtelXJc6iqEQ3XAg=
+X-Google-Smtp-Source: ABdhPJx5T5/2r+7rIyiImLCdfFVPEQsxc5o1SwjWYVG4IuGANnlD9WbClUDgpCLnQbzNNKm83FbubtkJZ0pSh1NRiiM=
+X-Received: by 2002:ac8:2bba:: with SMTP id m55mr22899454qtm.171.1592942110985; 
+ Tue, 23 Jun 2020 12:55:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
+In-Reply-To: <20200623193658.623279-1-richard.henderson@linaro.org>
+From: Derrick McKee <derrick.mckee@gmail.com>
+Date: Tue, 23 Jun 2020 15:55:00 -0400
+Message-ID: <CAJoBWHy9HfD_hBbJNgG5vsM5Wt_kiYYJyYAnxfTNzq2nuohk+w@mail.gmail.com>
+Subject: Re: [PATCH v8 00/45] target/arm: Implement ARMv8.5-MemTag, system mode
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
+ envelope-from=derrick.mckee@gmail.com; helo=mail-qt1-x844.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,132 +91,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, david.spickett@linaro.org,
- steplong@quicinc.com
+Cc: peter.maydell@linaro.org, steplong@quicinc.com, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, david.spickett@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v8: Drop the out-of-line helper (pmm).
----
- target/arm/translate-sve.c | 61 +++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 28 deletions(-)
+Hi Richard,
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 11e0dfc210..4a613ca689 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4432,10 +4432,12 @@ static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int imm)
-     int len_remain = len % 8;
-     int nparts = len / 8 + ctpop8(len_remain);
-     int midx = get_mem_index(s);
--    TCGv_i64 addr, t0;
-+    TCGv_i64 dirty_addr, clean_addr, t0;
- 
--    addr = tcg_temp_new_i64();
--    t0 = tcg_temp_new_i64();
-+    dirty_addr = tcg_temp_new_i64();
-+    tcg_gen_addi_i64(dirty_addr, cpu_reg_sp(s, rn), imm);
-+    clean_addr = gen_mte_checkN(s, dirty_addr, false, rn != 31, len, MO_8);
-+    tcg_temp_free_i64(dirty_addr);
- 
-     /* Note that unpredicated load/store of vector/predicate registers
-      * are defined as a stream of bytes, which equates to little-endian
-@@ -4448,33 +4450,35 @@ static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int imm)
-     if (nparts <= 4) {
-         int i;
- 
-+        t0 = tcg_temp_new_i64();
-         for (i = 0; i < len_align; i += 8) {
-             tcg_gen_ld_i64(t0, cpu_env, vofs + i);
--            tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + i);
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEQ);
-+            tcg_gen_addi_i64(clean_addr, cpu_reg_sp(s, rn), 8);
-         }
-+        tcg_temp_free_i64(t0);
-     } else {
-         TCGLabel *loop = gen_new_label();
--        TCGv_ptr t2, i = tcg_const_local_ptr(0);
-+        TCGv_ptr tp, i = tcg_const_local_ptr(0);
-+
-+        /* Copy the clean address into a local temp, live across the loop. */
-+        t0 = clean_addr;
-+        clean_addr = tcg_temp_local_new_i64();
-+        tcg_gen_mov_i64(clean_addr, t0);
-+        tcg_temp_free_i64(t0);
- 
-         gen_set_label(loop);
- 
--        t2 = tcg_temp_new_ptr();
--        tcg_gen_add_ptr(t2, cpu_env, i);
--        tcg_gen_ld_i64(t0, t2, vofs);
--
--        /* Minimize the number of local temps that must be re-read from
--         * the stack each iteration.  Instead, re-compute values other
--         * than the loop counter.
--         */
--        tcg_gen_addi_ptr(t2, i, imm);
--        tcg_gen_extu_ptr_i64(addr, t2);
--        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, rn));
--        tcg_temp_free_ptr(t2);
--
--        tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
--
-+        t0 = tcg_temp_new_i64();
-+        tp = tcg_temp_new_ptr();
-+        tcg_gen_add_ptr(tp, cpu_env, i);
-+        tcg_gen_ld_i64(t0, tp, vofs);
-         tcg_gen_addi_ptr(i, i, 8);
-+        tcg_temp_free_ptr(tp);
-+
-+        tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEQ);
-+        tcg_gen_addi_i64(clean_addr, clean_addr, 8);
-+        tcg_temp_free_i64(t0);
- 
-         tcg_gen_brcondi_ptr(TCG_COND_LTU, i, len_align, loop);
-         tcg_temp_free_ptr(i);
-@@ -4482,29 +4486,30 @@ static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int imm)
- 
-     /* Predicate register stores can be any multiple of 2.  */
-     if (len_remain) {
-+        t0 = tcg_temp_new_i64();
-         tcg_gen_ld_i64(t0, cpu_env, vofs + len_align);
--        tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + len_align);
- 
-         switch (len_remain) {
-         case 2:
-         case 4:
-         case 8:
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LE | ctz32(len_remain));
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx,
-+                                MO_LE | ctz32(len_remain));
-             break;
- 
-         case 6:
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUL);
--            tcg_gen_addi_i64(addr, addr, 4);
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUL);
-+            tcg_gen_addi_i64(clean_addr, clean_addr, 4);
-             tcg_gen_shri_i64(t0, t0, 32);
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUW);
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUW);
-             break;
- 
-         default:
-             g_assert_not_reached();
-         }
-+        tcg_temp_free_i64(t0);
-     }
--    tcg_temp_free_i64(addr);
--    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(clean_addr);
- }
- 
- static bool trans_LDR_zri(DisasContext *s, arg_rri *a)
--- 
-2.25.1
+I am currently doing research with MTE, and Arm's FVP leaves a lot to
+be desired.  Is there some way I can get access to your QEMU changes
+that enable MTE for system emulation?  Thanks.
 
+On Tue, Jun 23, 2020 at 3:37 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Version 8 incorporates quite a bit of review (thanks, PMM):
+>
+>  * Include HCR_DCT in the HCR_EL2 update.
+>  * Use a separate decode function for ADDG/SUBG.
+>  * Use the system arm_cpu_do_unaligned_access for user-only as well.
+>  * Fix alignment for LDG.
+>  * Fix no-fault for mte_probe1.
+>  * Rearrage how tagged pages are recorded.
+>
+> and perhaps most visibly, for those tracking the kernel patches:
+>
+>  * Add arm,armv8.5-memtag to the dtb.
+>
+>
+> r~
+>
+>
+> In need of review:
+> 0010-target-arm-Revise-decoding-for-disas_add_sub_imm.patch
+> 0011-target-arm-Implement-the-ADDG-SUBG-instructions.patch
+> 0014-target-arm-Define-arm_cpu_do_unaligned_access-for.patch
+> 0015-target-arm-Implement-LDG-STG-ST2G-instructions.patch
+> 0025-target-arm-Implement-helper_mte_check1.patch
+> 0028-target-arm-Use-mte_checkN-for-sve-unpredicated-lo.patch
+> 0029-target-arm-Use-mte_checkN-for-sve-unpredicated-st.patch
+> 0030-target-arm-Use-mte_check1-for-sve-LD1R.patch
+> 0031-target-arm-Tidy-trans_LD1R_zpri.patch
+> 0032-target-arm-Add-arm_tlb_bti_gp.patch
+> 0033-target-arm-Add-mte-helpers-for-sve-scalar-int-loa.patch
+> 0034-target-arm-Add-mte-helpers-for-sve-scalar-int-sto.patch
+> 0035-target-arm-Add-mte-helpers-for-sve-scalar-int-ff-.patch
+> 0036-target-arm-Handle-TBI-for-sve-scalar-int-memory-o.patch
+> 0037-target-arm-Add-mte-helpers-for-sve-scatter-gather.patch
+> 0038-target-arm-Complete-TBI-clearing-for-user-only-fo.patch
+> 0041-target-arm-Always-pass-cacheattr-to-get_phys_addr.patch
+> 0042-target-arm-Cache-the-Tagged-bit-for-a-page-in-Mem.patch
+> 0043-target-arm-Create-tagged-ram-when-MTE-is-enabled.patch
+> 0044-target-arm-Add-allocation-tag-storage-for-system-.patch
+> 0045-target-arm-Enable-MTE.patch
+>
+>
+> Richard Henderson (45):
+>   target/arm: Add isar tests for mte
+>   target/arm: Improve masking of SCR RES0 bits
+>   target/arm: Add support for MTE to SCTLR_ELx
+>   target/arm: Add support for MTE to HCR_EL2 and SCR_EL3
+>   target/arm: Rename DISAS_UPDATE to DISAS_UPDATE_EXIT
+>   target/arm: Add DISAS_UPDATE_NOCHAIN
+>   target/arm: Add MTE system registers
+>   target/arm: Add MTE bits to tb_flags
+>   target/arm: Implement the IRG instruction
+>   target/arm: Revise decoding for disas_add_sub_imm
+>   target/arm: Implement the ADDG, SUBG instructions
+>   target/arm: Implement the GMI instruction
+>   target/arm: Implement the SUBP instruction
+>   target/arm: Define arm_cpu_do_unaligned_access for user-only
+>   target/arm: Implement LDG, STG, ST2G instructions
+>   target/arm: Implement the STGP instruction
+>   target/arm: Restrict the values of DCZID.BS under TCG
+>   target/arm: Simplify DC_ZVA
+>   target/arm: Implement the LDGM, STGM, STZGM instructions
+>   target/arm: Implement the access tag cache flushes
+>   target/arm: Move regime_el to internals.h
+>   target/arm: Move regime_tcr to internals.h
+>   target/arm: Add gen_mte_check1
+>   target/arm: Add gen_mte_checkN
+>   target/arm: Implement helper_mte_check1
+>   target/arm: Implement helper_mte_checkN
+>   target/arm: Add helper_mte_check_zva
+>   target/arm: Use mte_checkN for sve unpredicated loads
+>   target/arm: Use mte_checkN for sve unpredicated stores
+>   target/arm: Use mte_check1 for sve LD1R
+>   target/arm: Tidy trans_LD1R_zpri
+>   target/arm: Add arm_tlb_bti_gp
+>   target/arm: Add mte helpers for sve scalar + int loads
+>   target/arm: Add mte helpers for sve scalar + int stores
+>   target/arm: Add mte helpers for sve scalar + int ff/nf loads
+>   target/arm: Handle TBI for sve scalar + int memory ops
+>   target/arm: Add mte helpers for sve scatter/gather memory ops
+>   target/arm: Complete TBI clearing for user-only for SVE
+>   target/arm: Implement data cache set allocation tags
+>   target/arm: Set PSTATE.TCO on exception entry
+>   target/arm: Always pass cacheattr to get_phys_addr
+>   target/arm: Cache the Tagged bit for a page in MemTxAttrs
+>   target/arm: Create tagged ram when MTE is enabled
+>   target/arm: Add allocation tag storage for system mode
+>   target/arm: Enable MTE
+>
+>  include/hw/arm/boot.h          |    3 +
+>  target/arm/cpu.h               |   50 +-
+>  target/arm/helper-a64.h        |   16 +
+>  target/arm/helper-sve.h        |  488 ++++++++++++
+>  target/arm/helper.h            |    2 +
+>  target/arm/internals.h         |  153 +++-
+>  target/arm/translate-a64.h     |    5 +
+>  target/arm/translate.h         |   23 +-
+>  hw/arm/boot.c                  |   12 +-
+>  hw/arm/virt.c                  |   57 +-
+>  target/arm/cpu.c               |   77 +-
+>  target/arm/cpu64.c             |    1 +
+>  target/arm/helper-a64.c        |   94 +--
+>  target/arm/helper.c            |  423 +++++++---
+>  target/arm/m_helper.c          |   11 +-
+>  target/arm/mte_helper.c        |  901 +++++++++++++++++++++
+>  target/arm/op_helper.c         |   16 +
+>  target/arm/sve_helper.c        |  616 +++++++++++---
+>  target/arm/tlb_helper.c        |   13 +-
+>  target/arm/translate-a64.c     |  652 +++++++++++++--
+>  target/arm/translate-sve.c     | 1366 +++++++++++++++++++++-----------
+>  target/arm/translate-vfp.inc.c |    2 +-
+>  target/arm/translate.c         |   16 +-
+>  target/arm/Makefile.objs       |    1 +
+>  24 files changed, 4164 insertions(+), 834 deletions(-)
+>  create mode 100644 target/arm/mte_helper.c
+>
+> --
+> 2.25.1
+>
+>
+
+
+--
+Derrick McKee
+Phone: (703) 957-9362
+Email: derrick.mckee@gmail.com
 
