@@ -6,75 +6,74 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0123C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 00:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9951C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 01:33:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A810020706
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 00:47:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A810020706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A11AB20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 01:33:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11AB20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnX5a-0004gn-Tf
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 20:47:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36940)
+	id 1jnXoF-0001Z1-T9
+	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 21:33:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnX4P-0003lc-D3
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 20:45:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50104)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnX4J-0007HA-Ee
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 20:45:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnX4H-0004r4-Ap
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 00:45:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 506702E8025
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 00:45:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnXne-00019L-FA
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 21:32:34 -0400
+Resent-Date: Mon, 22 Jun 2020 21:32:34 -0400
+Resent-Message-Id: <E1jnXne-00019L-FA@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21355)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnXnb-0001iK-IX
+ for qemu-devel@nongnu.org; Mon, 22 Jun 2020 21:32:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592875928; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ejABHydE4QR8fkKSKhQmFgeQPqiaTHqcCcFKnv8wbLJ64rdSW10xroduBsQIB3oOaMI/4q6aNotNiM5fSUvvd5WV3YT1jawcErii+vZdrJyFeUPAEPNQYfjYc/jun0L5tbHUCancwfTuwzu0e7Spo8xAwixJphfWJ9bdmkbKbxM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592875928;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=S2tnw/L+DJ7sPn44C4j5iJUG/huW50mKB2S/pwE6fCE=; 
+ b=I52TQiciu63CwbrTdE0Xk3u/XmTvjShYOCIyZFJufvRqef23UoQAe83Sgr+Q7UvH1jqkzLqVfNifij66whOJVnqqPUL1+NchLvTLNQBfQ0NU3F+JSlgYHMtufpqtSaMZBCzEq3zumsNtsu/mvJlsOwU3WxyvPSIH47v+vig4OUQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592875925705553.4039140973086;
+ Mon, 22 Jun 2020 18:32:05 -0700 (PDT)
+Message-ID: <159287592453.1362.10659372770105912279@d1fd068a5071>
+Subject: Re: [PATCH v2] target/i386: reimplement fpatan using floatx80
+ operations
+In-Reply-To: <alpine.DEB.2.21.2006230000340.24721@digraph.polyomino.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2020 00:37:08 -0000
-From: TheCatFelix <1884684@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: thecatfelix
-X-Launchpad-Bug-Reporter: TheCatFelix (thecatfelix)
-X-Launchpad-Bug-Modifier: TheCatFelix (thecatfelix)
-Message-Id: <159287262873.13509.14889128175029136647.malonedeb@wampee.canonical.com>
-Subject: [Bug 1884684] [NEW] QEMU 5.0: Guest VM hangs/freeze when unplugging
- USB device
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 492667f8eab5b311a81fcf1f8c28f8296d4bf5b0
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 20:45:41
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: joseph@codesourcery.com
+Date: Mon, 22 Jun 2020 18:32:05 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/22 21:32:29
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,124 +82,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884684 <1884684@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Setup:
-
-Host: Debian/SID, Kernel 5.6, QEMU 5.0
-Guest: Windows 10 VM with PCI and USB device passthrough.
-
-Problem: Guest VM suddenly hangs when pulling USB device out from the
-Host.
-
-Observations:
- - Issue appears to be related to QEMU 5.0
-   - It started after an upgrade to QEMU 5.0.
-   - Downgrading only QEMU on multiple systems fixes the issue.
-
- - Issue is very reproducible.
-   - Most of the time within a few attempts of pulling/reconnecting the dev=
-ice.
-   - Issue happens with multiple devices (I did try standard HID devices, a=
- webcam and an x-ray sensor).
-
- - Guest just hangs.
-   - Display output remains on last frame shown.
-   - Ping to Guest immediately stops working.
-   - Logs in the Guest stop logging immediately.
-
- - Host is fine and thinks the Guest is fine. =
-
-   - Guest continues to show as running in "virsh list".
-   - No suspicious entries in the QEMU logs.
-   - No suspicious entries in Host syslogs/messages.
-   - Host can can kill guest "virsh destroy" and respawn fine.
-
- - Issue seems widespread.
-   - Multiple similar reports from ProxMox users after upgrade to ProxMox 6=
-.2 for both Windows and Linux guests (First version that uses QEMU 5.0)
-
-https://forum.proxmox.com/threads/vm-freezes-when-disconnecting-usb-keyboar=
-d-and-mouse.70287/
-https://forum.proxmox.com/threads/usb-drive-crashes-vm.70214/
-https://forum.proxmox.com/threads/latest-proxmox-usb-disconnects-freeze-kvm=
-.70398/
-https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-turn=
-ing-off-monitor-after-proxmox-6-2-upgrade.69821/
-https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-turn=
-ing-off-monitor-after-proxmox-6-2-upgrade.69824/
-
-I'd be more than happy any debugs that might be helpful.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884684
-
-Title:
-  QEMU 5.0: Guest VM hangs/freeze when unplugging USB device
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-
-  Host: Debian/SID, Kernel 5.6, QEMU 5.0
-  Guest: Windows 10 VM with PCI and USB device passthrough.
-
-  Problem: Guest VM suddenly hangs when pulling USB device out from the
-  Host.
-
-  Observations:
-   - Issue appears to be related to QEMU 5.0
-     - It started after an upgrade to QEMU 5.0.
-     - Downgrading only QEMU on multiple systems fixes the issue.
-
-   - Issue is very reproducible.
-     - Most of the time within a few attempts of pulling/reconnecting the d=
-evice.
-     - Issue happens with multiple devices (I did try standard HID devices,=
- a webcam and an x-ray sensor).
-
-   - Guest just hangs.
-     - Display output remains on last frame shown.
-     - Ping to Guest immediately stops working.
-     - Logs in the Guest stop logging immediately.
-
-   - Host is fine and thinks the Guest is fine. =
-
-     - Guest continues to show as running in "virsh list".
-     - No suspicious entries in the QEMU logs.
-     - No suspicious entries in Host syslogs/messages.
-     - Host can can kill guest "virsh destroy" and respawn fine.
-
-   - Issue seems widespread.
-     - Multiple similar reports from ProxMox users after upgrade to ProxMox=
- 6.2 for both Windows and Linux guests (First version that uses QEMU 5.0)
-
-  https://forum.proxmox.com/threads/vm-freezes-when-disconnecting-usb-keybo=
-ard-and-mouse.70287/
-  https://forum.proxmox.com/threads/usb-drive-crashes-vm.70214/
-  https://forum.proxmox.com/threads/latest-proxmox-usb-disconnects-freeze-k=
-vm.70398/
-  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
-rning-off-monitor-after-proxmox-6-2-upgrade.69821/
-  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
-rning-off-monitor-after-proxmox-6-2-upgrade.69824/
-
-  I'd be more than happy any debugs that might be helpful.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884684/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9hbHBpbmUuREVCLjIuMjEuMjAw
+NjIzMDAwMDM0MC4yNDcyMUBkaWdyYXBoLnBvbHlvbWluby5vcmcudWsvCgoKCkhpLAoKVGhpcyBz
+ZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBm
+aW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBo
+YXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2Fs
+bHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14
+ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRv
+Y2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL3RyYW5zbGF0ZS1zdmUu
+bwogIExJTksgICAgYWFyY2g2NC1zb2Z0bW11L3FlbXUtc3lzdGVtLWFhcmNoNjR3LmV4ZQovdG1w
+L3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOiBJbiBmdW5jdGlvbiAnaGVs
+cGVyX2ZwYXRhbic6Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6
+MTA5ODoxNzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdzaGlmdDEy
+OFJpZ2h0JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KIDEwOTggfCAg
+ICAgICAgICAgICAgICAgc2hpZnQxMjhSaWdodChyZW1zaWcwLCByZW1zaWcxLCAxLCAmcmVtc2ln
+MCwgJnJlbXNpZzEpOwogICAgICB8ICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+Ci90bXAv
+cWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTA5ODoxNzogZXJyb3I6IG5l
+c3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ3NoaWZ0MTI4UmlnaHQnIFstV2Vycm9yPW5lc3Rl
+ZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjEx
+MDE6MjE6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnZXN0aW1hdGVE
+aXYxMjhUbzY0JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KIDExMDEg
+fCAgICAgICAgICAgICB4c2lnMCA9IGVzdGltYXRlRGl2MTI4VG82NChyZW1zaWcwLCByZW1zaWcx
+LCBkZW5fc2lnKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
+fgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjExMDE6MjE6IGVy
+cm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9mICdlc3RpbWF0ZURpdjEyOFRvNjQnIFst
+V2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1
+X2hlbHBlci5jOjExMDI6MTM6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlv
+biAnbXVsNjRUbzEyOCcgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAx
+MTAyIHwgICAgICAgICAgICAgbXVsNjRUbzEyOChkZW5fc2lnLCB4c2lnMCwgJm1zaWcwLCAmbXNp
+ZzEpOwogICAgICB8ICAgICAgICAgICAgIF5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rh
+cmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMTAyOjEzOiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNs
+YXJhdGlvbiBvZiAnbXVsNjRUbzEyOCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVt
+dS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTEwMzoxMzogZXJyb3I6IGltcGxp
+Y2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdzdWIxMjgnIFstV2Vycm9yPWltcGxpY2l0LWZ1
+bmN0aW9uLWRlY2xhcmF0aW9uXQogMTEwMyB8ICAgICAgICAgICAgIHN1YjEyOChyZW1zaWcwLCBy
+ZW1zaWcxLCBtc2lnMCwgbXNpZzEsICZyZW1zaWcwLCAmcmVtc2lnMSk7CiAgICAgIHwgICAgICAg
+ICAgICAgXn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6
+MTEwMzoxMzogZXJyb3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ3N1YjEyOCcgWy1X
+ZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVf
+aGVscGVyLmM6MTEwNjoxNzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9u
+ICdhZGQxMjgnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMTEwNiB8
+ICAgICAgICAgICAgICAgICBhZGQxMjgocmVtc2lnMCwgcmVtc2lnMSwgMCwgZGVuX3NpZywgJnJl
+bXNpZzAsICZyZW1zaWcxKTsKICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+Ci90bXAvcWVt
+dS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTEwNjoxNzogZXJyb3I6IG5lc3Rl
+ZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ2FkZDEyOCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNd
+Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTE0MzozMzogZXJy
+b3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdzaGlmdDEyOExlZnQnIFstV2Vy
+cm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMTE0MyB8ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgc2hpZnQxMjhMZWZ0KHlzaWcwLCB5c2lnMSwgc2hpZnQsCiAgICAg
+IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KL3RtcC9xZW11
+LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMTQzOjMzOiBlcnJvcjogbmVzdGVk
+IGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnc2hpZnQxMjhMZWZ0JyBbLVdlcnJvcj1uZXN0ZWQtZXh0
+ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMTcxOjIx
+OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NoaWZ0MTI4UmlnaHRK
+YW1taW5nJyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KIDExNzEgfCAg
+ICAgICAgICAgICAgICAgICAgIHNoaWZ0MTI4UmlnaHRKYW1taW5nKHhzaWcwLCB4c2lnMSwgdGV4
+cCAtIHhleHAsCiAgICAgIHwgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
+fgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjExNzE6MjE6IGVy
+cm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9mICdzaGlmdDEyOFJpZ2h0SmFtbWluZycg
+Wy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9m
+cHVfaGVscGVyLmM6MTIwMDoxNzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0
+aW9uICdtdWwxMjhCeTY0VG8xOTInIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0
+aW9uXQogMTIwMCB8ICAgICAgICAgICAgICAgICBtdWwxMjhCeTY0VG8xOTIoeHNpZzAsIHhzaWcx
+LCB0c2lnLCAmZHNpZzAsICZkc2lnMSwgJmRzaWcyKTsKICAgICAgfCAgICAgICAgICAgICAgICAg
+Xn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVy
+LmM6MTIwMDoxNzogZXJyb3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ211bDEyOEJ5
+NjRUbzE5MicgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJn
+ZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTIxODoxNzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9u
+IG9mIGZ1bmN0aW9uICdzdWIxOTInIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0
+aW9uXQogMTIxOCB8ICAgICAgICAgICAgICAgICBzdWIxOTIocmVtc2lnMCwgcmVtc2lnMSwgcmVt
+c2lnMiwgbXNpZzAsIG1zaWcxLCBtc2lnMiwKICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+
+Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTIxODoxNzogZXJy
+b3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ3N1YjE5MicgWy1XZXJyb3I9bmVzdGVk
+LWV4dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTIy
+MjoyMTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdhZGQxOTInIFst
+V2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMTIyMiB8ICAgICAgICAgICAg
+ICAgICAgICAgYWRkMTkyKHJlbXNpZzAsIHJlbXNpZzEsIHJlbXNpZzIsIDAsIGRzaWcwLCBkc2ln
+MSwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMv
+dGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjEyMjI6MjE6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRl
+Y2xhcmF0aW9uIG9mICdhZGQxOTInIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUt
+dGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjEyMzc6MTc6IGVycm9yOiBpbXBsaWNp
+dCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnbXVsMTI4VG8yNTYnIFstV2Vycm9yPWltcGxpY2l0
+LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMTIzNyB8ICAgICAgICAgICAgICAgICBtdWwxMjhUbzI1
+Nih6c2lnMCwgenNpZzEsIHpzaWcwLCB6c2lnMSwKICAgICAgfCAgICAgICAgICAgICAgICAgXn5+
+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMjM3
+OjE3OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnbXVsMTI4VG8yNTYnIFst
+V2Vycm9yPW5lc3RlZC1leHRlcm5zXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
+IGVycm9ycwptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHRh
+cmdldC9pMzg2L2ZwdV9oZWxwZXIub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjUyNzog
+eDg2XzY0LXNvZnRtbXUvYWxsXSBFcnJvciAyCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
+aGVkIGpvYnMuLi4uCiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0tYWFyY2g2
+NC5leGUKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENh
+bGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vy
+cm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywg
+J2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NjlkNzM0ZTgxZmM4NDgzODliOGIwN2U4ZTYyNWU3MjYn
+LCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAn
+LS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9
+JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1df
+RU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9w
+YXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12
+JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13cHl1X3N3bS9zcmMvZG9ja2VyLXNyYy4y
+MDIwLTA2LTIyLTIxLjI4LjQ1LjI1NDE2Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9y
+YScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJv
+IGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51
+dWlkPTY5ZDczNGU4MWZjODQ4Mzg5YjhiMDdlOGU2MjVlNzI2Cm1ha2VbMV06ICoqKiBbZG9ja2Vy
+LXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLXdweXVfc3dtL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWlu
+Z3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDNtMTkuOTE3cwp1c2VyICAgIDBtOC43MzlzCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9hbHBp
+bmUuREVCLjIuMjEuMjAwNjIzMDAwMDM0MC4yNDcyMUBkaWdyYXBoLnBvbHlvbWluby5vcmcudWsv
+dGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
