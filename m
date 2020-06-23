@@ -2,79 +2,69 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E38C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A8DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BC5621548
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:46:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC5621548
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3A86E20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A86E20675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnpoU-0000rd-Jh
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44096)
+	id 1jnptD-0004zh-0k
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnpne-0008Je-KI
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 16:45:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51958)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jnpnc-0008Rs-5r
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 16:45:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jnpna-0002Es-65
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 20:45:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 10A0A2E810A
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 20:45:42 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jnprc-0002rH-KI; Tue, 23 Jun 2020 16:49:52 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56326
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jnpra-0001IL-9H; Tue, 23 Jun 2020 16:49:52 -0400
+Received: from host86-158-109-79.range86-158.btcentralplus.com
+ ([86.158.109.79] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jnprU-0007T1-0m; Tue, 23 Jun 2020 21:49:50 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
+ fthain@telegraphics.com.au
+Date: Tue, 23 Jun 2020 21:49:14 +0100
+Message-Id: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jun 2020 20:38:49 -0000
-From: Eric Blake <1884831@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake tobias-hunger
-X-Launchpad-Bug-Reporter: TobiasHunger (tobias-hunger)
-X-Launchpad-Bug-Modifier: Eric Blake (eblake)
-References: <159294358125.13789.3860026407311199131.malonedeb@wampee.canonical.com>
-Message-ID: <18e784cc-82ec-0b03-911b-72961cb722cd@redhat.com>
-Subject: [Bug 1884831] Re: qemu-nbd fails to discard bigger chunks
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 720aabcb8b2aa4e3370e1358cbed5ce71ac577bd
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 16:25:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.158.109.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PATCH v2 00/22] ADB: fix autopoll issues and rework mac_via state
+ machine
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,125 +73,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884831 <1884831@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200623203849.RTYVdh7-pokBl6YI2df7UO1sQZLDT54YWepBwwaXoKI@z>
 
-On 6/23/20 3:19 PM, TobiasHunger wrote:
-> Public bug reported:
-> =
+This patchset is something I have been chipping away at for a while since
+spending some time over the Christmas holidays trying to boot the MacOS
+toolbox ROM on the new q800 machine.
 
-> This report is moved from systemd to here:
-> https://github.com/systemd/systemd/issues/16242
-> =
+Initially I discovered that there were some problems when the MacOS ROM was
+enumerating ADB devices due to multiple meanings of the vADBInt bit. After
+fixing this there were still issues with keys being dropped during autopoll
+which were eventually traced back to the autopoll timer re-firing before
+the host had managed to read back the previous response.
 
-> A qemu-nbd device reports that it can discard a lot of bytes:
-> =
+At this point I noticed that CUDA/PMU/mac_via all had their own implementations
+of ADB autopoll, and that it would make sense to consolidate the autopoll timer,
+mask, interval and locking into the ADB bus. This would allow the logic to be
+removed from each separate device and managed in just one place.
 
-> cat /sys/block/nbd0/queue/discard_max_bytes
-> 2199023255040
+Finally I updated the trace-events to allow separate tracing of bus requests
+and device responses which makes it easier to follow the ADB enumeration process.
 
-That smells fishy.  It is 0xffffffff * 512.  But in reality, the NBD =
+The breakdown of the patchset is as follows:
 
-protocol is (currently) capped at 32 bits, so it cannot handle any =
+- Patch 1 keeps checkpatch happy for the remainder of the patchset whilst patch
+  2 is the proper fix for a spurious ADB register 3 write during enumeration
+  caused by ignoring the request length which I had tried to work around earlier.
 
-request 4G or larger.
+- Patches 3 to 10 are part of the autopoll consolidation process which moves the
+  separate autopoll implementations into a single implementation within
+  ADBBusState.
 
-It is not qemu-nbd that populates =
+- Patches 11 to 13 update the ADB implementation to hold a status variable
+  indicating the result of the last request and allow devices to indicate
+  whether they have data to send. This extra information is required by the
+  upcoming mac_via state machine changes.
 
-/sys/block/nbd0/queue/discard_max_bytes, but the kernel.  Are you sure =
+- Patches 14 to 17 add a variable and functions to block and unblock ADB
+  autopoll at bus level, adding the functions at the correct places within
+  CUDA and PMU.
 
-this is not a bug in the kernel's nbd.ko module, where it may be the =
+- Patches 18 and 19 rework the mac_via ADB state machine so that the bus
+  can be enumerated correctly, and both explicit and autopoll requests work
+  under both MacOS and Linux.
 
-case that it is reporting -1 as a 32-bit value which then gets =
+- Patch 20 enforces the blocking and unblocking of autopoll at the ADB
+  level, including adding an assert() to prevent developers from trying to
+  make an ADB request whilst autopoll is in progress.
+  
+- Patches 21 and 22 update the trace-events to separate out ADB device and
+  ADB bus events.
 
-mistakenly turned into a faulty advertisement?  Can you tweak your =
+The patch has been tested by myself and a couple of others during the development
+process across the PPC g3beige/mac99 and 68K q800 machine so it should be quite
+solid.
 
-software to behave as if /dev/nbd0 had a discard_max_bytes of 0xfffff000 =
+One thing to indicate is that the patchset bumps the VMState versions for the
+affected devices but does not allow older versions to load. This is a conscious
+decision given that for the mac_via device used in the q800 machine it would be
+just about impossible to map this in a way that would work for all cases. Similarly
+for the Mac PPC machines migration is already hit/miss due to timebase issues so
+I don't see this as being a big loss.
 
-instead?
+To finish off I'd also like to say a big thank-you to both Laurent Vivier and
+Finn Thain who both took time to answer my questions, dump information from a
+real q800, and analyse it in very fine detail. Without them this patchset would
+still be several months away.
 
-In fact, to prove the bug is in the kernel's nbd.ko and not in qemu-nbd, =
-
-I created an NBD server using nbdkit:
-
-# modprobe nbd
-# nbdkit memory 5G
-# nbd-client -b 512 localhost /dev/nbd0
-# cat /sys/block/nbd0/queue/discard_max_bytes
-2199023255040
-
-Same answer, different nbd server.  So it's not qemu's fault.
-
-> =
-
-> And indeed, discard works with small images:
-> =
-
-> $ qemu-img create -f qcow2 /tmp/image.img 2M
-> $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
-> $ sudo blkdiscard /dev/nbd0
-> =
-
-> but not for bigger ones (still smaller than discard_max_bytes):
-> =
-
-> $ qemu-img create -f qcow2 /tmp/image.img 5G
-> $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
-> $ sudo blkdiscard /dev/nbd0
-> =
-
-> ** Affects: qemu
->       Importance: Undecided
->           Status: New
-> =
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
--- =
+v2:
+- Rebased onto master
+- Added R-B tags from Philippe
+- Fixed byte discrepency at end of bus timeout spotted by Finn
+- Added Tested-by tag from Finn
 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
+Mark Cave-Ayland (22):
+  adb: coding style update to fix checkpatch errors
+  adb: fix adb-mouse read length and revert disable-reg3-direct-writes
+    workaround
+  cuda: convert ADB autopoll timer from ns to ms
+  pmu: fix duplicate autopoll mask variable
+  pmu: honour autopoll_rate_ms when rearming the ADB autopoll timer
+  adb: introduce realize/unrealize and VMStateDescription for ADB bus
+  adb: create autopoll variables directly within ADBBusState
+  cuda: convert to use ADBBusState internal autopoll variables
+  pmu: convert to use ADBBusState internal autopoll variables
+  mac_via: convert to use ADBBusState internal autopoll variables
+  adb: introduce new ADBDeviceHasData method to ADBDeviceClass
+  adb: keep track of devices with pending data
+  adb: add status field for holding information about the last ADB
+    request
+  adb: use adb_request() only for explicit requests
+  adb: add autopoll_blocked variable to block autopoll
+  cuda: add adb_autopoll_block() and adb_autopoll_unblock() functions
+  pmu: add adb_autopoll_block() and adb_autopoll_unblock() functions
+  mac_via: move VIA1 portB write logic into mos6522_q800_via1_write()
+  mac_via: rework ADB state machine to be compatible with both MacOS and
+    Linux
+  adb: only call autopoll callbacks when autopoll is not blocked
+  adb: use adb_device prefix for ADB device trace events
+  adb: add ADB bus trace events
 
-** Bug watch added: github.com/systemd/systemd/issues #16242
-   https://github.com/systemd/systemd/issues/16242
+ hw/input/adb-kbd.c           |  42 ++--
+ hw/input/adb-mouse.c         |  65 ++++--
+ hw/input/adb.c               | 210 ++++++++++++++++--
+ hw/input/trace-events        |  27 ++-
+ hw/misc/mac_via.c            | 411 +++++++++++++++++++++++------------
+ hw/misc/macio/cuda.c         |  60 +++--
+ hw/misc/macio/pmu.c          |  47 ++--
+ hw/misc/trace-events         |   3 +
+ hw/ppc/mac_newworld.c        |   2 -
+ include/hw/input/adb.h       |  26 ++-
+ include/hw/misc/mac_via.h    |   2 +-
+ include/hw/misc/macio/cuda.h |   4 -
+ include/hw/misc/macio/pmu.h  |   4 -
+ 13 files changed, 620 insertions(+), 283 deletions(-)
 
--- =
+-- 
+2.20.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884831
-
-Title:
-  qemu-nbd fails to discard bigger chunks
-
-Status in QEMU:
-  New
-
-Bug description:
-  This report is moved from systemd to here:
-  https://github.com/systemd/systemd/issues/16242
-
-  A qemu-nbd device reports that it can discard a lot of bytes:
-
-  cat /sys/block/nbd0/queue/discard_max_bytes
-  2199023255040
-
-  And indeed, discard works with small images:
-
-  $ qemu-img create -f qcow2 /tmp/image.img 2M
-  $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
-  $ sudo blkdiscard /dev/nbd0
-
-  but not for bigger ones (still smaller than discard_max_bytes):
-
-  $ qemu-img create -f qcow2 /tmp/image.img 5G
-  $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
-  $ sudo blkdiscard /dev/nbd0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884831/+subscriptions
 
