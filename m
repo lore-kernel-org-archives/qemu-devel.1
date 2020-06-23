@@ -2,107 +2,96 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C88C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4C0C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:04:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EB7620738
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A47B20738
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 11:04:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gK1J4QlI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB7620738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMEvhro3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A47B20738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnghu-0002u9-IM
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51966)
+	id 1jngjZ-000496-B9
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 07:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
- id 1jnghC-00028W-Hq
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:02:31 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:36004)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liran.alon@oracle.com>)
- id 1jngh8-0005bg-N8
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:02:30 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05NB1lKr108127;
- Tue, 23 Jun 2020 11:02:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=O1PQZtYeDKDpJvlFr4mN82x+eoq4SFMub3fgkluk08U=;
- b=gK1J4QlIvsfSzlUQvPi0d612se4o25xNppYCRjMaf9tGdgXWZxicpFHLEZe7sidkk42N
- MdXhja0642Yg7cRiD1JbeHmCYsz05z+dWrHu7qGGCEorGE/9hZQBah1Rqre+C90QFej3
- DSq3YZcRlLWOGKkomvY6gJLUUB2i5mI60PM9EDkXtrlHoPFeo11FzNWs6RXrpi0ODYod
- kdqzT5cvxVPfTcj8zfANJJDyHprLdm3YjXSvrFlxyC6VQXd0xt3rRaXGxljtMAO01NGO
- 9iYZCs0slWHqokacnnSdu4Kbqbi2OmMJIuTjysM6/sOuxilWrMD/6bPEalZKlqEIzntD 7w== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 31sebbckn6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Tue, 23 Jun 2020 11:02:24 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05NAx9RV130067;
- Tue, 23 Jun 2020 11:02:24 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 31svcwjxrr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Jun 2020 11:02:23 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05NB2MXA008968;
- Tue, 23 Jun 2020 11:02:22 GMT
-Received: from [192.168.14.112] (/79.176.227.138)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 23 Jun 2020 11:02:22 +0000
-Subject: Re: [PATCH] vmport: move compat properties to hw_compat_5_0
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200623102834.4816-1-pbonzini@redhat.com>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <41297039-e7af-a9cd-b1e4-3db2c8fe4f94@oracle.com>
-Date: Tue, 23 Jun 2020 14:02:20 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jngir-0003bC-60; Tue, 23 Jun 2020 07:04:13 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36727)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jngip-000683-Dq; Tue, 23 Jun 2020 07:04:12 -0400
+Received: by mail-wr1-x444.google.com with SMTP id k6so7591329wrn.3;
+ Tue, 23 Jun 2020 04:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ie7ZjNr3QlOFBcrFKMUjZuJLoJQ64iApva3SwELQhc8=;
+ b=CMEvhro3DkSqeKade+nFhO1/2J769Qka70VlIA3ut1gRgDOvJc2RVxOdzUXpqbknLH
+ qfjsl/dDrvoMxq+GMuTCvN5FgqY0NR0NYrv+9UejwolfOrWvb36zhGoPBr1cRlGhIQvy
+ 8+bmsB59dCScGEqBwwT7YEMUIerH+6oxTPxvC3aUldXpfguGt0O1VYrk1HFKgNQzEd5P
+ lgV5BP6Z1UbSaTZSxhTlryFPXDpmGtpEFWsZH9qj7o9zwZUFbV0RY8pt9ab10MaH2KZI
+ anrG3fM9MhBSTQuwmzwCmpdw+OEbDJAEibfJhiLTs7JhOpLAwZZgoMtDcArWfPmhcZNh
+ CpHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ie7ZjNr3QlOFBcrFKMUjZuJLoJQ64iApva3SwELQhc8=;
+ b=TNECVTPpT0MjLaCc8AgtUJv3YftdQuaOJMjWAqj94BqPeRxbhWFT6p1IDuo/H+GIji
+ 60ITQPPwNLZ5jb2+BOIH020krSHAHpElWfIKxy/noh4aqHsas4Vtp3KkqhgbQ69AyQ7D
+ QWIw9wnwAHRAa89l6YPPYrMS3WRRGotUHtkmpB95DHPnkF2wwrsUG+WHBpXR/KAYFgXZ
+ ceWYDjuFbrWne/xfDLCj9HvXXIDpHQRLQepIgvlycEYgMjwA+vGRZgiIJZJvBqoCzIVl
+ 6m2jHoTaebKl4eDm7Vd69TEs/LCZQtYGl1v6VWdil6AutQUBaavHGCmIdx8j5NYElqLh
+ WosA==
+X-Gm-Message-State: AOAM531GW+8aj9yzqEmp4VGCMOrrGferQEng/o5j4/tOl6eWpE6H6qzS
+ z6CHkDk1RNg3Qvi6cYv1JdI=
+X-Google-Smtp-Source: ABdhPJxl+e/9sOe+YnoTQCYtcG/bj8eA5eGP5scCUjHeThCNxSsBPdkEcvUGddZdpdXZjagVGtouhQ==
+X-Received: by 2002:adf:ce90:: with SMTP id r16mr24171693wrn.408.1592910249347; 
+ Tue, 23 Jun 2020 04:04:09 -0700 (PDT)
+Received: from [192.168.1.41] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id z1sm13624133wru.30.2020.06.23.04.04.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 23 Jun 2020 04:04:08 -0700 (PDT)
+Subject: Re: [PATCH v5 1/9] hw/i2c/core: Add i2c_try_create_slave() and
+ i2c_realize_and_unref()
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200622183428.12255-1-f4bug@amsat.org>
+ <20200622183428.12255-2-f4bug@amsat.org> <875zbimcs6.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fbecc71b-3f1d-0c6f-83eb-e10b408c85e2@amsat.org>
+Date: Tue, 23 Jun 2020 13:04:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200623102834.4816-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <875zbimcs6.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- bulkscore=0 adultscore=0
- malwarescore=0 suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006230087
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9660
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- cotscore=-2147483648
- lowpriorityscore=0 phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 priorityscore=1501 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006230088
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=liran.alon@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 07:02:25
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,50 +104,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/23/20 10:01 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Extract i2c_try_create_slave() and i2c_realize_and_unref()
+>> from i2c_create_slave().
+>> We can now set properties on a I2CSlave before it is realized.
+>>
+>> This is in line with the recent qdev/QOM changes merged
+>> in commit 6675a653d2e.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  include/hw/i2c/i2c.h |  2 ++
+>>  hw/i2c/core.c        | 18 ++++++++++++++++--
+>>  2 files changed, 18 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+>> index 4117211565..d6e3d85faf 100644
+>> --- a/include/hw/i2c/i2c.h
+>> +++ b/include/hw/i2c/i2c.h
+>> @@ -80,6 +80,8 @@ int i2c_send(I2CBus *bus, uint8_t data);
+>>  uint8_t i2c_recv(I2CBus *bus);
+>>  
+>>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
+>> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
+>> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
+>>  
+>>  /* lm832x.c */
+>>  void lm832x_key_event(DeviceState *dev, int key, int state);
+>> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+>> index 1aac457a2a..acf34a12d6 100644
+>> --- a/hw/i2c/core.c
+>> +++ b/hw/i2c/core.c
+>> @@ -267,13 +267,27 @@ const VMStateDescription vmstate_i2c_slave = {
+>>      }
+>>  };
+>>  
+>> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
+>> +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
+>>  {
+>>      DeviceState *dev;
+>>  
+>>      dev = qdev_new(name);
+>>      qdev_prop_set_uint8(dev, "address", addr);
+>> -    qdev_realize_and_unref(dev, &bus->qbus, &error_fatal);
+>> +    return dev;
+>> +}
+>> +
+>> +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
+>> +{
+>> +    return qdev_realize_and_unref(dev, &bus->qbus, errp);
+>> +}
+>> +
+>> +DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
+>> +{
+>> +    DeviceState *dev;
+>> +
+>> +    dev = i2c_try_create_slave(name, addr);
+>> +    i2c_realize_and_unref(dev, bus, &error_fatal);
+>> +
+>>      return dev;
+>>  }
+> 
+> We use "create_simple" names for functions that allocate, initialize,
+> configure and realize device objects: pci_create_simple(),
+> isa_create_simple(), usb_create_simple().  Calling this one
+> i2c_create_slave() is okay with me.  I'd prefer
+> i2c_slave_create_simple(), though.
+> 
+> We use "new" names for functions that allocate and initialize device
+> objects: pci_new(), isa_new(), usb_new().  Let's call this one
+> i2c_slave_new().
+> 
+> Your use of "realize_and_unref" matches existing names elsewhere:
+> pci_realize_and_unref(), isa_realize_and_unref(),
+> usb_realize_and_unref().  However, the other two i2c functions are
+> called i2c_slave_FOO(), not i2c_FOO().  You could name this one
+> i2c_slave_realize_and_unref().  Another path to consistency: drop the
+> slave_ from all three names.
+> 
+> Ideally with my naming suggestions considered:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-On 23/06/2020 13:28, Paolo Bonzini wrote:
-> The patches that introduced the properties were submitted when QEMU 5.0
-> had not been released yet, so they got merged under the wrong heading.
-> Move them to hw_compat_5_0 so that 5.0 machine types get the pre-patch
-> behavior.
->
-> Reported-by: Laurent Vivier <lvivier@redhat.com>
-> Cc: Liran Alon <liran.alon@oracle.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> ---
->   hw/core/machine.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 1d80ab0e1d..211b4e077a 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -30,6 +30,10 @@
->   
->   GlobalProperty hw_compat_5_0[] = {
->       { "virtio-balloon-device", "page-poison", "false" },
-> +    { "vmport", "x-read-set-eax", "off" },
-> +    { "vmport", "x-signal-unsupported-cmd", "off" },
-> +    { "vmport", "x-report-vmx-type", "off" },
-> +    { "vmport", "x-cmds-v2", "off" },
->   };
->   const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
->   
-> @@ -45,10 +49,6 @@ GlobalProperty hw_compat_4_2[] = {
->       { "qxl", "revision", "4" },
->       { "qxl-vga", "revision", "4" },
->       { "fw_cfg", "acpi-mr-restore", "false" },
-> -    { "vmport", "x-read-set-eax", "off" },
-> -    { "vmport", "x-signal-unsupported-cmd", "off" },
-> -    { "vmport", "x-report-vmx-type", "off" },
-> -    { "vmport", "x-cmds-v2", "off" },
->   };
->   const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
->   
+If you don't mind, as this series is already fully reviewed,
+I'll correct/improve on top of it.
+
+Thanks!
+
+Phil.
 
