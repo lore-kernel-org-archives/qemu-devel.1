@@ -2,92 +2,91 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF07C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA62C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:19:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49B902072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:19:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EA7C2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 12:19:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="spLQRCt0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B902072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KxSkZ4Cx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EA7C2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnhtp-0007s8-Ck
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:19:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57000)
+	id 1jnhtr-0007tH-G4
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 08:19:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jnhna-0000SU-4O
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 08:13:10 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:55268)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhHV-0003dg-0k
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:40:01 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42345)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jnhnY-00043E-Be
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 08:13:09 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id u8so1396344pje.4
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 05:13:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=6zv4LKrUNZWMbaVi6BSvUFBtq8jf6g3exSrZ11NT8kw=;
- b=spLQRCt0Y4/TyOw3VLkZP9SKZhuN5SYJ13ICSq54UdiDmYlnYod1b3PpIPkxcsipMT
- Sv79N7i7/n5rrJjfRwNAPJyGpmmAmK5SMWrElsH1ak3EvrlNpvCsGH5rB3eym+ULLQKK
- x1orVh6nFzK/QOmqgYuAMFyvYCxAIXk/Iisz3q+nJtKPj39GZ9OIlRuMKAK3UFTCRxtl
- XBk5X8BB9QfTsWXPYRR/3RjuYx+VBVeb/l7Chm2wsY/EXxffoSPii18Bciv1pO6YBe1J
- kGQIP/Y3c6NPMLuyiYb1yi4iN4eegkh+GT3s6fSXvGEDC/t8V5MkBypYp+pd1vcDIQkU
- QVlA==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jnhHP-0003U9-Dm
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 07:40:00 -0400
+Received: by mail-wr1-x435.google.com with SMTP id o11so12450054wrv.9
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 04:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=n6zJE0yRFKX8qUS2j9Gbp90DG/pGEs6Utl5blOSwKkE=;
+ b=KxSkZ4CxYJYh0vSGxFXyjuv1LH+k8DwHeLKMrr4FRJN2mX2MX/pqkD0cZZCifihqtI
+ woXWscOYu7SOUUmXxILNgY5Vz+3pHpFnDy+7BcncLFg8MIEk0mdlLO7lmy5DwaicepjA
+ EqcuHxNxaj+uFb0MieYayoAM8ZtgCALXu4SeL3H1oSjbNWOGZHfAiZjZNlpOW1pWPYTS
+ GWg/NnJdwDs0oOMs8MhJ87Pzra+NDUIMjCAem9DY3zqRur3BJklNRXkSbvwcvMN2V5am
+ j5DWjJkB5K8LM6k/n17eu5hf1pNVGt/j7f7rT2BalAcnG2beJOpE/kwQ9KL5pX2mLFU5
+ jkKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=6zv4LKrUNZWMbaVi6BSvUFBtq8jf6g3exSrZ11NT8kw=;
- b=JgwuDUk/RsUveUat4nNVObAdOZWaGMnFd3/qgE3OOhfQZlnKSamiQDNJ4e34y3XzET
- p9TFoF2mYL+R+FEkfNtt+vdsqSAu7n21MkWv8PH6RR5mKDnwcsn2lTtrN03U9BOCuAHp
- ivyu6qarBZEHlMJ4A2014Dy7/j270AU9zyWPTSDYqedQWtsOQiOqcUf1Kr41N1DpCig1
- XI37dsPbKMPJRTrfnaCyadsSyhztgRArI/8N3qufh8x14GYii+srJmkmHOTjA05zZwAr
- W1EOOrxzCk7rcWXMbokmfWt1CMz5TiCSUSdTRVDgKszfwAkNHGhAGD3/2KULFGof2/En
- UvvQ==
-X-Gm-Message-State: AOAM5327nZ7omeHonmVE29ZOskLgBcIgSFQ9VyGn4Vej4b09K+uQDE3H
- rn0E2cziOebvRdvHPhlmp5M=
-X-Google-Smtp-Source: ABdhPJxbM4TQhJZKtJ+VeCOaq0doWDkvpt8fHmUNzivtfQQr6J4qZ754QjKjzGfI8O1Fbjm9Q/dxzQ==
-X-Received: by 2002:a17:90a:2843:: with SMTP id
- p3mr21629341pjf.187.1592914386911; 
- Tue, 23 Jun 2020 05:13:06 -0700 (PDT)
-Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
- [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id m18sm17022782pfo.173.2020.06.23.05.13.04
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 23 Jun 2020 05:13:06 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 V5 1/4] hw/mips: Implement the kvm_type() hook in
- MachineClass
-Date: Tue, 23 Jun 2020 20:13:55 +0800
-Message-Id: <1592914438-30317-2-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1592914438-30317-1-git-send-email-chenhc@lemote.com>
-References: <1592914438-30317-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pj1-x1043.google.com
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=n6zJE0yRFKX8qUS2j9Gbp90DG/pGEs6Utl5blOSwKkE=;
+ b=qNTJMx84CmKJia6N6EP3ipT2PUIC6LptLEScCqh81lQEfk02N2yZZVqCJHBCI8L2pA
+ 12E6oscHX/DIwsVZPsqgDLqzFdh8namicRcrzef2I9pnWbifMQEeVn7w5MBwZBeAiHWV
+ b3byTgaTz0GcY6volWRHrrsyYQqtrXOsSJysjlWlkE+l6GFIaDVCZeYaFrk3/ssRLeHx
+ wl5EG9sqALYMPj1p+MkxSD7HOqrsDTqsvZidQTdN79o4b7ERCDlAlf71FfsE0YDZFmvm
+ BbLXwyivDy/SwxD70JTKo75ScdjhuiNUA9f9PD/zC67XUd2AwsDkbTRHU0T+a90Nf1D1
+ gO0g==
+X-Gm-Message-State: AOAM5331210/DvCk088Ok5rR7rzlXpUJ+8Kz7BA6OV/dSIxnUcKORIrE
+ Ia6cPCXU1tdK2pTwpFEZADyqpA6Pk+GeVw==
+X-Google-Smtp-Source: ABdhPJxsS/kvwA25vSYO0t3MBLnO2e6iVLujEakx+4/Nt3nVSwHk5n1bAoJ3kaZjAg2WrFfMN0wUQA==
+X-Received: by 2002:a5d:458a:: with SMTP id p10mr19518630wrq.184.1592912393453; 
+ Tue, 23 Jun 2020 04:39:53 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id m10sm4022177wru.4.2020.06.23.04.39.52
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 04:39:52 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 41/42] tests/qtest/arm-cpu-features: Add feature setting tests
+Date: Tue, 23 Jun 2020 12:39:03 +0100
+Message-Id: <20200623113904.28805-42-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200623113904.28805-1-peter.maydell@linaro.org>
+References: <20200623113904.28805-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -102,93 +101,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
-can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
-MachineClass. This patch add the the kvm_type() hook to support both of
-the two types.
+From: Andrew Jones <drjones@redhat.com>
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Some cpu features may be enabled and disabled for all configurations
+that support the feature. Let's test that.
+
+A recent regression[*] inspired adding these tests.
+
+[*] '-cpu host,pmu=on' caused a segfault
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200623090622.30365-2-philmd@redhat.com
+Message-Id: <20200623082310.17577-1-drjones@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/mips/kvm.c      | 20 ++++++++++++++++++++
- target/mips/kvm_mips.h | 11 +++++++++++
- 2 files changed, 31 insertions(+)
+ tests/qtest/arm-cpu-features.c | 38 ++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 96cfa10..373f582 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -21,10 +21,12 @@
- #include "qemu/main-loop.h"
- #include "qemu/timer.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/kvm_int.h"
- #include "sysemu/runstate.h"
- #include "sysemu/cpus.h"
- #include "kvm_mips.h"
- #include "exec/memattrs.h"
-+#include "hw/boards.h"
+diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+index 46921736766..f7e062c1891 100644
+--- a/tests/qtest/arm-cpu-features.c
++++ b/tests/qtest/arm-cpu-features.c
+@@ -159,16 +159,35 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+     qobject_unref(_resp);                                              \
+ })
  
- #define DEBUG_KVM 0
+-#define assert_feature(qts, cpu_type, feature, expected_value)         \
++#define resp_assert_feature(resp, feature, expected_value)             \
+ ({                                                                     \
+-    QDict *_resp, *_props;                                             \
++    QDict *_props;                                                     \
+                                                                        \
+-    _resp = do_query_no_props(qts, cpu_type);                          \
+     g_assert(_resp);                                                   \
+     g_assert(resp_has_props(_resp));                                   \
+     _props = resp_get_props(_resp);                                    \
+     g_assert(qdict_get(_props, feature));                              \
+     g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
++})
++
++#define assert_feature(qts, cpu_type, feature, expected_value)         \
++({                                                                     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query_no_props(qts, cpu_type);                          \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, expected_value);               \
++    qobject_unref(_resp);                                              \
++})
++
++#define assert_set_feature(qts, cpu_type, feature, value)              \
++({                                                                     \
++    const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query(qts, cpu_type, _fmt, feature);                    \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, value);                        \
+     qobject_unref(_resp);                                              \
+ })
  
-@@ -1270,3 +1272,21 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
- {
-     abort();
- }
-+
-+int mips_kvm_type(MachineState *machine, const char *vm_type)
-+{
-+    int r;
-+    KVMState *s = KVM_STATE(machine->accelerator);
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_VZ);
-+    if (r > 0) {
-+        return KVM_VM_MIPS_VZ;
-+    }
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_TE);
-+    if (r > 0) {
-+        return KVM_VM_MIPS_TE;
-+    }
-+
-+    return -1;
-+}
-diff --git a/target/mips/kvm_mips.h b/target/mips/kvm_mips.h
-index 1e40147..171d53d 100644
---- a/target/mips/kvm_mips.h
-+++ b/target/mips/kvm_mips.h
-@@ -12,6 +12,8 @@
- #ifndef KVM_MIPS_H
- #define KVM_MIPS_H
+@@ -424,10 +443,14 @@ static void test_query_cpu_model_expansion(const void *data)
+     assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
  
-+#include "cpu.h"
-+
- /**
-  * kvm_mips_reset_vcpu:
-  * @cpu: MIPSCPU
-@@ -23,4 +25,13 @@ void kvm_mips_reset_vcpu(MIPSCPU *cpu);
- int kvm_mips_set_interrupt(MIPSCPU *cpu, int irq, int level);
- int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level);
+     /* Test expected feature presence/absence for some cpu types */
+-    assert_has_feature_enabled(qts, "max", "pmu");
+     assert_has_feature_enabled(qts, "cortex-a15", "pmu");
+     assert_has_not_feature(qts, "cortex-a15", "aarch64");
  
-+#ifdef CONFIG_KVM
-+int mips_kvm_type(MachineState *machine, const char *vm_type);
-+#else
-+static inline int mips_kvm_type(MachineState *machine, const char *vm_type)
-+{
-+    return 0;
-+}
-+#endif
++    /* Enabling and disabling pmu should always work. */
++    assert_has_feature_enabled(qts, "max", "pmu");
++    assert_set_feature(qts, "max", "pmu", false);
++    assert_set_feature(qts, "max", "pmu", true);
 +
- #endif /* KVM_MIPS_H */
+     assert_has_not_feature(qts, "max", "kvm-no-adjvtime");
+ 
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+@@ -464,7 +487,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         return;
+     }
+ 
++    /* Enabling and disabling kvm-no-adjvtime should always work. */
+     assert_has_feature_disabled(qts, "host", "kvm-no-adjvtime");
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", true);
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", false);
+ 
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         bool kvm_supports_sve;
+@@ -475,7 +501,11 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         char *error;
+ 
+         assert_has_feature_enabled(qts, "host", "aarch64");
++
++        /* Enabling and disabling pmu should always work. */
+         assert_has_feature_enabled(qts, "host", "pmu");
++        assert_set_feature(qts, "host", "pmu", false);
++        assert_set_feature(qts, "host", "pmu", true);
+ 
+         assert_error(qts, "cortex-a15",
+             "We cannot guarantee the CPU type 'cortex-a15' works "
 -- 
-2.7.0
+2.20.1
 
 
