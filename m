@@ -2,93 +2,88 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFB3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66034C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:28:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 236762072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:27:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2949B20772
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 07:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiZURkzv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 236762072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n4E3QgzZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2949B20772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jndKf-0006eS-Fb
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34112)
+	id 1jndM2-0000HR-Cc
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 03:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jndJs-0005hH-IL
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:26:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26549
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jndJq-0004fs-Th
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 03:26:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592897169;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zoRef+Xi6yejA1qip3hZU4Pj/YqgSSKoAIu+yvs6QVo=;
- b=NiZURkzvC/07PBe2jiqFmn3chwr8dLHHIcBkb0M8jfgbFnAjW8bSI5kBbpx7lncyEebG0z
- DFczK3V/Fj8V5TIklaN06VP/NU8Gg5hAh8gjKpLJ0mXrQp/BP1lSdcvUS4XsJty8YpHtM3
- +oSRQXoLETfANxB9EBoHPJajfZcNdA8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-OUbIblnpODCmRFF3GBGX6Q-1; Tue, 23 Jun 2020 03:26:05 -0400
-X-MC-Unique: OUbIblnpODCmRFF3GBGX6Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 567A38005AD;
- Tue, 23 Jun 2020 07:26:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B9E05C1D4;
- Tue, 23 Jun 2020 07:26:03 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C8D86113846D; Tue, 23 Jun 2020 09:26:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v4 1/8] hw/i2c/core: Add i2c_try_create_slave() and
- i2c_realize_and_unref()
-References: <20200620225854.31160-1-f4bug@amsat.org>
- <20200620225854.31160-2-f4bug@amsat.org>
- <874kr36sg7.fsf@dusky.pond.sub.org>
- <e28de977-4e29-901f-58df-74095bcd2c91@amsat.org>
-Date: Tue, 23 Jun 2020 09:26:01 +0200
-In-Reply-To: <e28de977-4e29-901f-58df-74095bcd2c91@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 22 Jun 2020 17:41:37
- +0200")
-Message-ID: <87lfkemeeu.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jndL7-00070v-3Q; Tue, 23 Jun 2020 03:27:29 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37940)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jndL5-0004y5-Bq; Tue, 23 Jun 2020 03:27:28 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f18so2064169wml.3;
+ Tue, 23 Jun 2020 00:27:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=SySumNVS446KqKTX/VdE1PboXiC+09lFD/1qHTIdXY4=;
+ b=n4E3QgzZB2U1z4gjT9RXlayWWqgPIk2FaFVfR1RqbGUq7hl6VpgIbEacIBfAPnT4eh
+ Cmc1vYpPYwrhBefUsagfHLmSa6K5+xbbbIkrsmkep90GmdQEmDGhCXAGNVQvrERzrRoG
+ fbvd89QkCKy+/MyqT8taAq7xWgheb9Vc4dEuiBeXzJ2k90ldO4W8BPWC9SIJlQzSYdbw
+ ANtVdcjwmnkjQn8IMGk+8ns1zTOuxjG7FXDScgnD0UaKpJxiv5ZRvI5qhX8fndBll9xh
+ NJQDFam7VU7cS4Tp6QwDltgdTi+jUv6W+tvV8rFgxaItMUPTOU3oDxwM7DD6NE2UHyY2
+ J/ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=SySumNVS446KqKTX/VdE1PboXiC+09lFD/1qHTIdXY4=;
+ b=Yy1bWC3yHJFf7EIlcDoAqyi7pDuz1rRQWIxSsjAkxpUVev5yCAZXToTmEKYBpL8IbV
+ 6IQlT1bOz4MG7wI9HSIpJjGJUG2hq6imj+sOrWwbKell3nDsKFPBeDlsbnIajZZrvUDb
+ eExEbnJOXbQP1rzA23cY/6p+op4HWBGOIAIEN3EgpsUadD8XrY8nFVdpgUj9luUq0WQ4
+ mGfgUJLK/TfA11GddYxPPKzRol6E2unbCMxsf6tAk6VOMrVykuoF0znFYK6/iXXjNYVt
+ Cq270QxFXmBMMW0EJzzAynyw3cOcvgbEidHqjvlj9d2x4aW0ZylIk4C4ECUm7DoojCOR
+ LL6g==
+X-Gm-Message-State: AOAM532RIZMZ6Zi3u5EcxNl9MmR95N9fuDZM3ssQGWUITK/SCEGF7uRU
+ B8i+1Cc7ayniRcqldFQvhexJsbp9
+X-Google-Smtp-Source: ABdhPJzyk7NsMZkYlkT02j5gzRby3gPnRmXszv+hpI++/pzVuAZi3JFAzRBcZHIFsnuzSIJiEUlFww==
+X-Received: by 2002:a1c:b6c3:: with SMTP id g186mr6436311wmf.135.1592897245148; 
+ Tue, 23 Jun 2020 00:27:25 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id l14sm4200059wrn.18.2020.06.23.00.27.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 00:27:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/9] hw/misc/pca9552: Trace GPIO change events
+Date: Tue, 23 Jun 2020 09:27:14 +0200
+Message-Id: <20200623072723.6324-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,26 +97,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+This series add trace events to better display GPIO changes.
+We'll continue in the following series by connecting LEDs to
+these GPIOs.
 
-> On 6/22/20 5:17 PM, Markus Armbruster wrote:
->>=20
->> No objections, except I want to see actual users.
->
-> You weren't Cc'ed on the whole series.
->
-> User is patch #6/8 "hw/arm/aspeed: Describe each PCA9552 device":
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg714658.html
+This helps me to work on a generic LED device, see:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg711917.html
 
-Fat-fingered my grep, sorry for the noise.
+Since v5, addressed Cédric review comment:
+- Move pin_count check from realize() to instance_init()
+
+Since v4: Addressed Cédric review comments
+- Extract PCA955xClass
+- Add/use pca955x_pins_get_status() method instead of keeping
+  cached value in PCA955xState
+
+Example when booting an obmc-phosphor-image, we can see the LED #14
+(front-power LED) starting to blink.
+
+- ASCII LED bar view:
+
+  $ qemu-system-arm -M witherspoon-bmc -trace pca955x_gpio_status
+  1592689902.327837:pca955x_gpio_status pca-unspecified GPIOs 0-15 [*...............]
+  1592689902.329934:pca955x_gpio_status pca-unspecified GPIOs 0-15 [**..............]
+  1592689902.330717:pca955x_gpio_status pca-unspecified GPIOs 0-15 [***.............]
+  1592689902.331431:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****............]
+  1592689902.332163:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........*..]
+  1592689902.332888:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........**.]
+  1592689902.333629:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690032.793289:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+  1592690033.303163:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690033.812962:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+  1592690034.323234:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........***]
+  1592690034.832922:pca955x_gpio_status pca-unspecified GPIOs 0-15 [****.........*.*]
+
+- Only display GPIOs which status changes:
+
+  $ qemu-system-arm -M witherspoon-bmc -trace pca955x_gpio_change
+  1592690552.687372:pca955x_gpio_change pca1 GPIO id:0 status: 0 -> 1
+  1592690552.690169:pca955x_gpio_change pca1 GPIO id:1 status: 0 -> 1
+  1592690552.691673:pca955x_gpio_change pca1 GPIO id:2 status: 0 -> 1
+  1592690552.696886:pca955x_gpio_change pca1 GPIO id:3 status: 0 -> 1
+  1592690552.698614:pca955x_gpio_change pca1 GPIO id:13 status: 0 -> 1
+  1592690552.699833:pca955x_gpio_change pca1 GPIO id:14 status: 0 -> 1
+  1592690552.700842:pca955x_gpio_change pca1 GPIO id:15 status: 0 -> 1
+  1592690683.841921:pca955x_gpio_change pca1 GPIO id:14 status: 1 -> 0
+  1592690683.861660:pca955x_gpio_change pca1 GPIO id:14 status: 0 -> 1
+  1592690684.371460:pca955x_gpio_change pca1 GPIO id:14 status: 1 -> 0
+  1592690684.882115:pca955x_gpio_change pca1 GPIO id:14 status: 0 -> 1
+  1592690685.391411:pca955x_gpio_change pca1 GPIO id:14 status: 1 -> 0
+  1592690685.901391:pca955x_gpio_change pca1 GPIO id:14 status: 0 -> 1
+
+For information about how to test the obmc-phosphor-image, see:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg712911.html
+
+$ git backport-diff -u v5
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/9:[----] [--] 'hw/i2c/core: Add i2c_try_create_slave() and i2c_realize_and_unref()'
+002/9:[----] [--] 'hw/misc/pca9552: Rename 'nr_leds' as 'pin_count''
+003/9:[----] [--] 'hw/misc/pca9552: Rename generic code as pca955x'
+004/9:[0010] [FC] 'hw/misc/pca9552: Add generic PCA955xClass, parent of TYPE_PCA9552'
+005/9:[0007] [FC] 'hw/misc/pca9552: Add a 'description' property for debugging purpose'
+006/9:[----] [--] 'hw/misc/pca9552: Trace GPIO High/Low events'
+007/9:[----] [-C] 'hw/arm/aspeed: Describe each PCA9552 device'
+008/9:[----] [--] 'hw/misc/pca9552: Trace GPIO change events'
+009/9:[0003] [FC] 'hw/misc/pca9552: Model qdev output GPIOs'
+
+Based-on: <20200623072132.2868-1-f4bug@amsat.org>
+
+Philippe Mathieu-Daudé (9):
+  hw/i2c/core: Add i2c_try_create_slave() and i2c_realize_and_unref()
+  hw/misc/pca9552: Rename 'nr_leds' as 'pin_count'
+  hw/misc/pca9552: Rename generic code as pca955x
+  hw/misc/pca9552: Add generic PCA955xClass, parent of TYPE_PCA9552
+  hw/misc/pca9552: Add a 'description' property for debugging purpose
+  hw/misc/pca9552: Trace GPIO High/Low events
+  hw/arm/aspeed: Describe each PCA9552 device
+  hw/misc/pca9552: Trace GPIO change events
+  hw/misc/pca9552: Model qdev output GPIOs
+
+ include/hw/i2c/i2c.h      |   2 +
+ include/hw/misc/pca9552.h |  16 +--
+ hw/arm/aspeed.c           |  13 ++-
+ hw/i2c/core.c             |  18 +++-
+ hw/misc/pca9552.c         | 216 ++++++++++++++++++++++++++++----------
+ hw/misc/trace-events      |   4 +
+ 6 files changed, 202 insertions(+), 67 deletions(-)
+
+-- 
+2.21.3
 
 
