@@ -4,81 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1418DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B54F20702
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8B5820702
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 09:08:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JIUdlCNk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B54F20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IF2nMmUC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B5820702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jneu7-0007Te-CR
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:07:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46216)
+	id 1jnevE-0000uq-58
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 05:08:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnet8-0006Wp-P0
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25819
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnet3-0006Qd-6e
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53414
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnet6-00036W-BW
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:42 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnet0-00033S-Ii
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 05:06:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592903199;
+ s=mimecast20190719; t=1592903193;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K5ax+CzXtEWimJ/eHNK6Lja2ocXjQdDfH9eXh4tOcM4=;
- b=JIUdlCNkJNhG7zwrD5AIs+PKIZomYM4EYwACH9p9X5M/u0dVVLempHl0nxr3Ig8B6oLEav
- BTzn6cmkRU7I8W3Z3abXrz3K8+9jdLzl/BWBDvwl2EWKfLt3iFyzop89b5bVIdDmWxY+C7
- 0ggYRvpaG42fssgIkn6G2+LqZI+MV1w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-K9LGwGatPuuV_C7yXGGfkQ-1; Tue, 23 Jun 2020 05:06:38 -0400
-X-MC-Unique: K9LGwGatPuuV_C7yXGGfkQ-1
-Received: by mail-wr1-f72.google.com with SMTP id f5so14525434wrv.22
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:06:37 -0700 (PDT)
+ bh=NFodWqskMtC/5PQ2GwuPpH+2hReee1VihIY8eKIqRQU=;
+ b=IF2nMmUCY/0Aj9Q4bBsRtp+nd/TNmZ1DsgCXMqNvRFLRoguIAUhwGe8Nmc1u6GfpWV2lPO
+ Kp6hZpqh49omBNSrhyaJGwPP7oNEoAHnP3Ai8i5bMDzm3x0tlDl7KwJeSSE+PyMDHuC8D3
+ Zz0HZcnhHs6JY78CPB0nFr7689DnH3g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-C7o0gJhNNuSd_pLb8VZ4jg-1; Tue, 23 Jun 2020 05:06:32 -0400
+X-MC-Unique: C7o0gJhNNuSd_pLb8VZ4jg-1
+Received: by mail-wm1-f69.google.com with SMTP id a7so3215945wmf.1
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 02:06:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=K5ax+CzXtEWimJ/eHNK6Lja2ocXjQdDfH9eXh4tOcM4=;
- b=mdqxzCQnagLV9xydVVpK1RmEwSe1BmvB6ayOQLc5Fo/QmhfBOFdDpfo2L1sF6+JF8i
- sjS6JfYbSHowbsaPijNVqEf3JRWilviCP/p1YBgGb1wn6FOgDPBzR6C2Jez6PayZqtFv
- xL1HWj5x9xd5DyGEcwGh7Kx0spcCkcRMeQAfJbT87PIX43jyNsswXwaJxSD8pIDGD6ke
- 6h/QYD2v0m3jm7ZW+N2xxE4KHf1H3a6V74j2Lv3GC6z5oVoy/XBsqi9c8oqfKEdKpcGn
- GJCbKVfYc+cgI/tOM7S1Xi+Qb33meq/JiM3WE+20CqPax1iGBNaL+Vmf2d4/QFqsCtSR
- O87Q==
-X-Gm-Message-State: AOAM532MuMF5DN/ITgU583A/Le5f3MlypEcQ8+F8IlfIhdDmGrmOnt9K
- Cl87Ahs4HWmvAad6m6QCksuZjl8V/qA7C8ph+GpZ1bq4RxlgI1MYCCVpMbM8QAv77x0cNvKrV3E
- oSO8RUgo6JOq8idg=
-X-Received: by 2002:a1c:1d93:: with SMTP id d141mr22276214wmd.14.1592903196471; 
- Tue, 23 Jun 2020 02:06:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxUdI8PrOCR2mn2UWe8ZJTKeVBLyE0cVduCp+6/qCI/MmiFOF1mO9YMJ/Zu/85ZJ3nrn3DG7Q==
-X-Received: by 2002:a1c:1d93:: with SMTP id d141mr22276188wmd.14.1592903196162; 
- Tue, 23 Jun 2020 02:06:36 -0700 (PDT)
+ bh=NFodWqskMtC/5PQ2GwuPpH+2hReee1VihIY8eKIqRQU=;
+ b=UbNMtTpyGG4YRotfn711PzKJkjCAM5hc58HKveBlNWU4URE7uYVVIQU+Y2b3KP0jF2
+ a94POOJDw7K3O3HPEMo9DToIDn564QCeuJJLtpH+912V9h0JUVOhpQcujI2P7DtD7sbx
+ bx8+x+4FVzKhddgGvO8ScXDuV0LgyRvDiAoph594lei1JUAiHjQ7yN8lBd9i3v2gdTEX
+ 9deJG83bU5GmWej0GMuO0itwUkjtCrMQme++LK3kdyKj5r45xt8A0Kjgmq3349PrWSYd
+ aIDNbF8RM2nv2IKkq9aQwrgGLwZewY9/tZXNxOAP3LOCz9jq4eAyX2AaFW5GWy92iV02
+ 1Tpw==
+X-Gm-Message-State: AOAM532lLmh7SbslM1XA7Rl5ZBtWjxDlx+h9njADXqNnhp5yDk+xIC7d
+ Wp8dpkqseUxTpcIwMF0fUd6Jum1KDJITnKjx3YE64IhEbvD90tAVQBdmIXdQiNN8uIwwJ43b9df
+ 4TlzmFHVoIkW4Nlk=
+X-Received: by 2002:adf:fa81:: with SMTP id h1mr13967366wrr.266.1592903190739; 
+ Tue, 23 Jun 2020 02:06:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxYp7EOW24aIihuYBSTeyCt0a8qu7PFtl2vjpx6/D5IDweqkFR4nJCyT8X1HMCfow4T+lhWtA==
+X-Received: by 2002:adf:fa81:: with SMTP id h1mr13967350wrr.266.1592903190490; 
+ Tue, 23 Jun 2020 02:06:30 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o15sm21683962wrv.48.2020.06.23.02.06.34
+ by smtp.gmail.com with ESMTPSA id g195sm2896048wme.38.2020.06.23.02.06.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 02:06:35 -0700 (PDT)
+ Tue, 23 Jun 2020 02:06:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] target/arm: Check supported KVM features globally (not
- per vCPU)
-Date: Tue, 23 Jun 2020 11:06:22 +0200
-Message-Id: <20200623090622.30365-3-philmd@redhat.com>
+Subject: [PATCH v3 1/2] tests/qtest/arm-cpu-features: Add feature setting tests
+Date: Tue, 23 Jun 2020 11:06:21 +0200
+Message-Id: <20200623090622.30365-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200623090622.30365-1-philmd@redhat.com>
 References: <20200623090622.30365-1-philmd@redhat.com>
@@ -88,9 +87,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -114,240 +113,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Laurent Vivier <lvivier@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
  kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
- Haibo Xu <haibo.xu@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit d70c996df23f, when enabling the PMU we get:
+From: Andrew Jones <drjones@redhat.com>
 
-  $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
-  Segmentation fault (core dumped)
+Some cpu features may be enabled and disabled for all configurations
+that support the feature. Let's test that.
 
-  Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  2588        ret = ioctl(s->fd, type, arg);
-  (gdb) bt
-  #0  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  #1  0x0000aaaaaae31568 in kvm_check_extension (s=0x0, extension=126) at accel/kvm/kvm-all.c:916
-  #2  0x0000aaaaaafce254 in kvm_arm_pmu_supported (cpu=0xaaaaac214ab0) at target/arm/kvm.c:213
-  #3  0x0000aaaaaafc0f94 in arm_set_pmu (obj=0xaaaaac214ab0, value=true, errp=0xffffffffe438) at target/arm/cpu.c:1111
-  #4  0x0000aaaaab5533ac in property_set_bool (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", opaque=0xaaaaac222730, errp=0xffffffffe438) at qom/object.c:2170
-  #5  0x0000aaaaab5512f0 in object_property_set (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1328
-  #6  0x0000aaaaab551e10 in object_property_parse (obj=0xaaaaac214ab0, string=0xaaaaac11b4c0 "on", name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1561
-  #7  0x0000aaaaab54ee8c in object_apply_global_props (obj=0xaaaaac214ab0, props=0xaaaaac018e20, errp=0xaaaaabd6fd88 <error_fatal>) at qom/object.c:407
-  #8  0x0000aaaaab1dd5a4 in qdev_prop_set_globals (dev=0xaaaaac214ab0) at hw/core/qdev-properties.c:1218
-  #9  0x0000aaaaab1d9fac in device_post_init (obj=0xaaaaac214ab0) at hw/core/qdev.c:1050
-  ...
-  #15 0x0000aaaaab54f310 in object_initialize_with_type (obj=0xaaaaac214ab0, size=52208, type=0xaaaaabe237f0) at qom/object.c:512
-  #16 0x0000aaaaab54fa24 in object_new_with_type (type=0xaaaaabe237f0) at qom/object.c:687
-  #17 0x0000aaaaab54fa80 in object_new (typename=0xaaaaabe23970 "host-arm-cpu") at qom/object.c:702
-  #18 0x0000aaaaaaf04a74 in machvirt_init (machine=0xaaaaac0a8550) at hw/arm/virt.c:1770
-  #19 0x0000aaaaab1e8720 in machine_run_board_init (machine=0xaaaaac0a8550) at hw/core/machine.c:1138
-  #20 0x0000aaaaaaf95394 in qemu_init (argc=5, argv=0xffffffffea58, envp=0xffffffffea88) at softmmu/vl.c:4348
-  #21 0x0000aaaaaada3f74 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at softmmu/main.c:48
+A recent regression[*] inspired adding these tests.
 
-This is because in frame #2, cpu->kvm_state is still NULL
-(the vCPU is not yet realized).
+[*] '-cpu host,pmu=on' caused a segfault
 
-KVM has a hard requirement of all cores supporting the same
-feature set. We only need to check if the accelerator supports
-a feature, not each vCPU individually.
-
-Fix by removing the 'CPUState *cpu' argument from the
-kvm_arm_<FEATURE>_supported() functions.
-
-Fixes: d70c996df23f ('Use CPUState::kvm_state in kvm_arm_pmu_supported')
-Reported-by: Haibo Xu <haibo.xu@linaro.org>
-Analyzed-by: Andrew Jones <drjones@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Message-Id: <20200623082310.17577-1-drjones@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/arm/kvm_arm.h | 21 +++++++++------------
- target/arm/cpu.c     |  2 +-
- target/arm/cpu64.c   | 10 +++++-----
- target/arm/kvm.c     |  4 ++--
- target/arm/kvm64.c   | 14 +++++---------
- 5 files changed, 22 insertions(+), 29 deletions(-)
+ tests/qtest/arm-cpu-features.c | 38 ++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 48bf5e16d5..a4ce4fd93d 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -269,29 +269,26 @@ void kvm_arm_add_vcpu_properties(Object *obj);
+diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+index 4692173676..f7e062c189 100644
+--- a/tests/qtest/arm-cpu-features.c
++++ b/tests/qtest/arm-cpu-features.c
+@@ -159,16 +159,35 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+     qobject_unref(_resp);                                              \
+ })
  
- /**
-  * kvm_arm_aarch32_supported:
-- * @cs: CPUState
-  *
-- * Returns: true if the KVM VCPU can enable AArch32 mode
-+ * Returns: true if KVM can enable AArch32 mode
-  * and false otherwise.
-  */
--bool kvm_arm_aarch32_supported(CPUState *cs);
-+bool kvm_arm_aarch32_supported(void);
+-#define assert_feature(qts, cpu_type, feature, expected_value)         \
++#define resp_assert_feature(resp, feature, expected_value)             \
+ ({                                                                     \
+-    QDict *_resp, *_props;                                             \
++    QDict *_props;                                                     \
+                                                                        \
+-    _resp = do_query_no_props(qts, cpu_type);                          \
+     g_assert(_resp);                                                   \
+     g_assert(resp_has_props(_resp));                                   \
+     _props = resp_get_props(_resp);                                    \
+     g_assert(qdict_get(_props, feature));                              \
+     g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
++})
++
++#define assert_feature(qts, cpu_type, feature, expected_value)         \
++({                                                                     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query_no_props(qts, cpu_type);                          \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, expected_value);               \
++    qobject_unref(_resp);                                              \
++})
++
++#define assert_set_feature(qts, cpu_type, feature, value)              \
++({                                                                     \
++    const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query(qts, cpu_type, _fmt, feature);                    \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, value);                        \
+     qobject_unref(_resp);                                              \
+ })
  
- /**
-  * kvm_arm_pmu_supported:
-- * @cs: CPUState
-  *
-- * Returns: true if the KVM VCPU can enable its PMU
-+ * Returns: true if KVM can enable the PMU
-  * and false otherwise.
-  */
--bool kvm_arm_pmu_supported(CPUState *cs);
-+bool kvm_arm_pmu_supported(void);
+@@ -424,10 +443,14 @@ static void test_query_cpu_model_expansion(const void *data)
+     assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
  
- /**
-  * kvm_arm_sve_supported:
-- * @cs: CPUState
-  *
-- * Returns true if the KVM VCPU can enable SVE and false otherwise.
-+ * Returns true if KVM can enable SVE and false otherwise.
-  */
--bool kvm_arm_sve_supported(CPUState *cs);
-+bool kvm_arm_sve_supported(void);
+     /* Test expected feature presence/absence for some cpu types */
+-    assert_has_feature_enabled(qts, "max", "pmu");
+     assert_has_feature_enabled(qts, "cortex-a15", "pmu");
+     assert_has_not_feature(qts, "cortex-a15", "aarch64");
  
- /**
-  * kvm_arm_get_max_vm_ipa_size:
-@@ -359,17 +356,17 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
++    /* Enabling and disabling pmu should always work. */
++    assert_has_feature_enabled(qts, "max", "pmu");
++    assert_set_feature(qts, "max", "pmu", false);
++    assert_set_feature(qts, "max", "pmu", true);
++
+     assert_has_not_feature(qts, "max", "kvm-no-adjvtime");
  
- static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
- 
--static inline bool kvm_arm_aarch32_supported(CPUState *cs)
-+static inline bool kvm_arm_aarch32_supported(void)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_pmu_supported(CPUState *cs)
-+static inline bool kvm_arm_pmu_supported(void)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_sve_supported(CPUState *cs)
-+static inline bool kvm_arm_sve_supported(void)
- {
-     return false;
- }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 5b7a36b5d7..e44e18062c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1108,7 +1108,7 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
-     ARMCPU *cpu = ARM_CPU(obj);
- 
-     if (value) {
--        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
-+        if (kvm_enabled() && !kvm_arm_pmu_supported()) {
-             error_setg(errp, "'pmu' feature not supported by KVM on this host");
-             return;
-         }
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 778cecc2e6..a0c1d8894b 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -266,7 +266,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
- 
-     /* Collect the set of vector lengths supported by KVM. */
-     bitmap_zero(kvm_supported, ARM_MAX_VQ);
--    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && kvm_arm_sve_supported()) {
-         kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
-     } else if (kvm_enabled()) {
-         assert(!cpu_isar_feature(aa64_sve, cpu));
-@@ -473,7 +473,7 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+@@ -464,7 +487,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
          return;
      }
  
--    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "cannot set sve-max-vq");
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -519,7 +519,7 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
-         return;
-     }
++    /* Enabling and disabling kvm-no-adjvtime should always work. */
+     assert_has_feature_disabled(qts, "host", "kvm-no-adjvtime");
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", true);
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", false);
  
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "cannot enable %s", name);
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -556,7 +556,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
-         return;
-     }
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         bool kvm_supports_sve;
+@@ -475,7 +501,11 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         char *error;
  
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "'sve' feature not supported by KVM on this host");
-         return;
-     }
-@@ -751,7 +751,7 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
-      * uniform execution state like do_interrupt.
-      */
-     if (value == false) {
--        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
-+        if (!kvm_enabled() || !kvm_arm_aarch32_supported()) {
-             error_setg(errp, "'aarch64' feature cannot be disabled "
-                              "unless KVM is enabled and 32-bit EL1 "
-                              "is supported");
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index eef3bbd1cc..7c672c78b8 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -208,9 +208,9 @@ void kvm_arm_add_vcpu_properties(Object *obj)
-     }
- }
+         assert_has_feature_enabled(qts, "host", "aarch64");
++
++        /* Enabling and disabling pmu should always work. */
+         assert_has_feature_enabled(qts, "host", "pmu");
++        assert_set_feature(qts, "host", "pmu", false);
++        assert_set_feature(qts, "host", "pmu", true);
  
--bool kvm_arm_pmu_supported(CPUState *cpu)
-+bool kvm_arm_pmu_supported(void)
- {
--    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_PMU_V3);
- }
- 
- int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index f09ed9f4df..3dc494aaa7 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -652,18 +652,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     return true;
- }
- 
--bool kvm_arm_aarch32_supported(CPUState *cpu)
-+bool kvm_arm_aarch32_supported(void)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL1_32BIT);
- }
- 
--bool kvm_arm_sve_supported(CPUState *cpu)
-+bool kvm_arm_sve_supported(void)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_SVE);
- }
- 
- QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
-@@ -798,7 +794,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         env->features &= ~(1ULL << ARM_FEATURE_PMU);
-     }
-     if (cpu_isar_feature(aa64_sve, cpu)) {
--        assert(kvm_arm_sve_supported(cs));
-+        assert(kvm_arm_sve_supported());
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-     }
- 
+         assert_error(qts, "cortex-a15",
+             "We cannot guarantee the CPU type 'cortex-a15' works "
 -- 
 2.21.3
 
