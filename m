@@ -2,91 +2,97 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62055C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2F4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 310C0217D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F04522064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 20:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+piTigY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310C0217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wJDs9j1/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F04522064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnpJm-0000Kt-GF
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:14:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49688)
+	id 1jnpLO-0001iQ-8o
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 16:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jnowt-0005gc-FY
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:51:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36756
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jnowp-0004r9-7L
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:51:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592941869;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JDyDBr8Eem3hMh1yI3c64yNCNLHgRiJfDmFVbjSODk4=;
- b=Q+piTigYt5HZpvAE6fz3KwpCYlLCFV3CJyaquCk2/PJit21WKItUbz69ArLUt2n7ZmnZJL
- k6O7b+vVHFgEQ67ICbpNk19TKDZvKE70xjW4XJ81XTmroVT5Hqy8mk2Ok67SQ9jfTuHnky
- xsQj5Jywo+qZBuokuqCbbeK177pVOoc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-OP-Po23fOeuJxKQQIocTCg-1; Tue, 23 Jun 2020 15:51:03 -0400
-X-MC-Unique: OP-Po23fOeuJxKQQIocTCg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E2A718FE863;
- Tue, 23 Jun 2020 19:51:01 +0000 (UTC)
-Received: from x1.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B106B19D82;
- Tue, 23 Jun 2020 19:50:56 +0000 (UTC)
-Date: Tue, 23 Jun 2020 13:50:56 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH QEMU v25 07/17] vfio: Register SaveVMHandlers for VFIO
- device
-Message-ID: <20200623135056.0c4957a3@x1.home>
-In-Reply-To: <542ced5e-0380-19b9-91d2-5f40c5857719@nvidia.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-8-git-send-email-kwankhede@nvidia.com>
- <20200622165024.5b2eb251@x1.home>
- <542ced5e-0380-19b9-91d2-5f40c5857719@nvidia.com>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnpBh-0005YP-Sm
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 16:06:33 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44721)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jnpBf-0007Sm-Cv
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 16:06:33 -0400
+Received: by mail-pl1-x644.google.com with SMTP id bh7so9568337plb.11
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 13:06:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MgiVyPKQiE159i/baoZD/+r9z0mORJeLztQ05s8WYIU=;
+ b=wJDs9j1/RP8++qikZxGbFYK6J8KsbngoIKfEXn9wCsh/U1eeQZzRBLHOHsHjDTKB5d
+ Ne6H7bcnthLAvtJyVxnDxbRzhHNOkbVOAuI4jQpPwA6JKYJwHnyqZmvypI7Wugr0dNVF
+ QLC4iz5fxpBzWcUR8t8Y6tXo95N9WV+afZnPuKJpKPcEGgyWg8HeFfMw8g7Pg5M9s+oJ
+ YuGmXi8C5PH7kj4tnVuReUsssmx5LGKD1/OGAQLJOHKrfFX/snigHYbbxWdsDfE/5wkw
+ BxW2Sq2sixYmaI0UbxrEUjIdM0w5MuhaD9FFvEL8fIYq3ggu1qjs20kmnwOIXzp6BAMd
+ nSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MgiVyPKQiE159i/baoZD/+r9z0mORJeLztQ05s8WYIU=;
+ b=KTCFOeZONP7fESKXj3hUW+5GdIa+Fa3zzs0pYUp4YQQyQW5pLn2rZf+kDKDFu8EYP0
+ VLapwHm3OinpSQZ4kCvNML6BXZxQ4sM1iPm2uV4KHzJRAP+R/D772q5I8Bbd++wijF+/
+ 4xh2Bm+aiQYNbDn8B1KCdfTYU9SmCicpLMNV5VpnDcJY0T2AzihBwxN0FH7uRmE1xnX+
+ bdNh2s3BEA7OoYzMAfRxGVmhGzxBVVfwsb/HlN7l5fKKF6g2B1C9RKIjCAEAUkD/0qwP
+ m68OIUlMqXWVhfm0MD9RxBnqbZrJ221LI64OZ/gPNSMuBBKOM3VfGqs8fHFNdnNEHg6I
+ yJ4g==
+X-Gm-Message-State: AOAM531XOybi6D9OCkbm0+zx1THgJu0ocH3ZJNwEugHke2CwkCpmixEr
+ 3GCChtb+NdRf8uhDL0hSEWrgSA==
+X-Google-Smtp-Source: ABdhPJwZxLL/9FZzJkoA9kYcFw0WYa0vQ7LwXIDF8TOjS5fNPj0yItxUceEt1fqgxXGa82AFsSh0vw==
+X-Received: by 2002:a17:902:db83:: with SMTP id
+ m3mr1666694pld.176.1592942789685; 
+ Tue, 23 Jun 2020 13:06:29 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id q13sm18418489pfk.8.2020.06.23.13.06.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 23 Jun 2020 13:06:29 -0700 (PDT)
+Subject: Re: [PATCH v8 00/45] target/arm: Implement ARMv8.5-MemTag, system mode
+To: Derrick McKee <derrick.mckee@gmail.com>
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
+ <CAJoBWHy9HfD_hBbJNgG5vsM5Wt_kiYYJyYAnxfTNzq2nuohk+w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4e54ff84-8355-00c3-bdfb-f05577432a93@linaro.org>
+Date: Tue, 23 Jun 2020 13:06:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAJoBWHy9HfD_hBbJNgG5vsM5Wt_kiYYJyYAnxfTNzq2nuohk+w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,242 +105,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, steplong@quicinc.com, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, david.spickett@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 24 Jun 2020 00:51:06 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On 6/23/20 12:55 PM, Derrick McKee wrote:
+> Hi Richard,
+> 
+> I am currently doing research with MTE, and Arm's FVP leaves a lot to
+> be desired.  Is there some way I can get access to your QEMU changes
+> that enable MTE for system emulation?  Thanks.
 
-> On 6/23/2020 4:20 AM, Alex Williamson wrote:
-> > On Sun, 21 Jun 2020 01:51:16 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> Define flags to be used as delimeter in migration file stream.
-> >> Added .save_setup and .save_cleanup functions. Mapped & unmapped migration
-> >> region from these functions at source during saving or pre-copy phase.
-> >> Set VFIO device state depending on VM's state. During live migration, VM is
-> >> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
-> >> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> ---
-> >>   hw/vfio/migration.c  | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   hw/vfio/trace-events |  2 ++
-> >>   2 files changed, 94 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index e30bd8768701..133bb5b1b3b2 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -8,12 +8,15 @@
-> >>    */
-> >>   
-> >>   #include "qemu/osdep.h"
-> >> +#include "qemu/main-loop.h"
-> >> +#include "qemu/cutils.h"
-> >>   #include <linux/vfio.h>
-> >>   
-> >>   #include "sysemu/runstate.h"
-> >>   #include "hw/vfio/vfio-common.h"
-> >>   #include "cpu.h"
-> >>   #include "migration/migration.h"
-> >> +#include "migration/vmstate.h"
-> >>   #include "migration/qemu-file.h"
-> >>   #include "migration/register.h"
-> >>   #include "migration/blocker.h"
-> >> @@ -24,6 +27,17 @@
-> >>   #include "pci.h"
-> >>   #include "trace.h"
-> >>   
-> >> +/*
-> >> + * Flags used as delimiter:
-> >> + * 0xffffffff => MSB 32-bit all 1s
-> >> + * 0xef10     => emulated (virtual) function IO
-> >> + * 0x0000     => 16-bits reserved for flags
-> >> + */
-> >> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
-> >> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
-> >> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
-> >> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
-> >> +
-> >>   static void vfio_migration_region_exit(VFIODevice *vbasedev)
-> >>   {
-> >>       VFIOMigration *migration = vbasedev->migration;
-> >> @@ -126,6 +140,65 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
-> >>       return 0;
-> >>   }
-> >>   
-> >> +/* ---------------------------------------------------------------------- */
-> >> +
-> >> +static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret;
-> >> +
-> >> +    trace_vfio_save_setup(vbasedev->name);
-> >> +
-> >> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
-> >> +
-> >> +    if (migration->region.mmaps) {
-> >> +        qemu_mutex_lock_iothread();
-> >> +        ret = vfio_region_mmap(&migration->region);
-> >> +        qemu_mutex_unlock_iothread();
-> >> +        if (ret) {
-> >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
-> >> +                         vbasedev->name, migration->region.nr,
-> >> +                         strerror(-ret));
-> >> +            return ret;  
-> > 
-> > OTOH to my previous comments, this shouldn't be fatal, right?  mmaps
-> > are optional anyway so it should be sufficient to push an error report
-> > to explain why this might be slower than normal, but we can still
-> > proceed.
-> >   
-> 
-> Right, defining region to be sparse mmap is optional.
-> migration->region.mmaps is set if vendor driver defines sparse mmapable 
-> regions and VFIO_REGION_INFO_FLAG_MMAP flag is set. If this flag is set 
-> then error on mmap() should be fatal.
-> 
-> If there is not mmapable region, then migration will proceed.
+You can apply this patch set to qemu master.  ;-)
 
-It's both optional for the vendor to define sparse mmap support (or any
-mmap support) and optional for the user to make use of it.  The user
-can recover from an mmap failure by using read/write accesses.  The
-vendor MUST support this.  It doesn't make sense to worry about
-aborting the VM in replying to comments for 05/17, where it's not clear
-how we proceed, yet intentionally cause a fatal error here when there
-is a very clear path to proceed.
+But more seriously, this patch set is in the tree at
+https://github.com/rth7680/qemu/tree/tgt-arm-mte
 
-> >> +        }
-> >> +    }
-> >> +
-> >> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_MASK,
-> >> +                                   VFIO_DEVICE_STATE_SAVING);
-> >> +    if (ret) {
-> >> +        error_report("%s: Failed to set state SAVING", vbasedev->name);
-> >> +        return ret;
-> >> +    }  
-> > 
-> > We seem to be lacking support in the callers for detecting if the
-> > device is in an error state.  I'm not sure what our options are
-> > though, maybe only a hw_error().
-> >   
-> 
-> Returning error here fails migration process. And if device is in error 
-> state, any application running inside VM using this device would fail.
-> I think, there is no need to take any special action here by detecting 
-> device error state.
 
-If QEMU knows a device has failed, it seems like it would make sense to
-stop the VM, otherwise we risk an essentially endless assortment of
-ways that the user might notice the guest isn't behaving normally, some
-maybe even causing the user to lose data.  Thanks,
+r~
 
-Alex
- 
-> >> +
-> >> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> >> +
-> >> +    ret = qemu_file_get_error(f);
-> >> +    if (ret) {
-> >> +        return ret;
-> >> +    }
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static void vfio_save_cleanup(void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +
-> >> +    if (migration->region.mmaps) {
-> >> +        vfio_region_unmap(&migration->region);
-> >> +    }
-> >> +    trace_vfio_save_cleanup(vbasedev->name);
-> >> +}
-> >> +
-> >> +static SaveVMHandlers savevm_vfio_handlers = {
-> >> +    .save_setup = vfio_save_setup,
-> >> +    .save_cleanup = vfio_save_cleanup,
-> >> +};
-> >> +
-> >> +/* ---------------------------------------------------------------------- */
-> >> +
-> >>   static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> >>   {
-> >>       VFIODevice *vbasedev = opaque;
-> >> @@ -180,6 +253,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-> >>                                  struct vfio_region_info *info)
-> >>   {
-> >>       int ret;
-> >> +    char id[256] = "";
-> >>   
-> >>       vbasedev->migration = g_new0(VFIOMigration, 1);
-> >>   
-> >> @@ -192,6 +266,24 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-> >>           return ret;
-> >>       }
-> >>   
-> >> +    if (vbasedev->ops->vfio_get_object) {  
-> > 
-> > Nit, vfio_migration_region_init() would have failed already if this were
-> > not available.  Perhaps do the test once at the start of this function
-> > instead?  Thanks,
-> >   
 > 
-> Ok, will do that.
-> 
-> Thanks,
-> Kirti
-> 
-> 
-> > Alex
-> >   
-> >> +        Object *obj = vbasedev->ops->vfio_get_object(vbasedev);
-> >> +
-> >> +        if (obj) {
-> >> +            DeviceState *dev = DEVICE(obj);
-> >> +            char *oid = vmstate_if_get_id(VMSTATE_IF(dev));
-> >> +
-> >> +            if (oid) {
-> >> +                pstrcpy(id, sizeof(id), oid);
-> >> +                pstrcat(id, sizeof(id), "/");
-> >> +                g_free(oid);
-> >> +            }
-> >> +        }
-> >> +    }
-> >> +    pstrcat(id, sizeof(id), "vfio");
-> >> +
-> >> +    register_savevm_live(id, VMSTATE_INSTANCE_ID_ANY, 1, &savevm_vfio_handlers,
-> >> +                         vbasedev);
-> >>       vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-> >>                                                             vbasedev);
-> >>       vbasedev->migration_state.notify = vfio_migration_state_notifier;
-> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> >> index bd3d47b005cb..86c18def016e 100644
-> >> --- a/hw/vfio/trace-events
-> >> +++ b/hw/vfio/trace-events
-> >> @@ -149,3 +149,5 @@ vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
-> >>   vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
-> >>   vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> >>   vfio_migration_state_notifier(const char *name, const char *state) " (%s) state %s"
-> >> +vfio_save_setup(const char *name) " (%s)"
-> >> +vfio_save_cleanup(const char *name) " (%s)"  
-> >   
-> 
-
+> On Tue, Jun 23, 2020 at 3:37 PM Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Version 8 incorporates quite a bit of review (thanks, PMM):
+>>
+>>  * Include HCR_DCT in the HCR_EL2 update.
+>>  * Use a separate decode function for ADDG/SUBG.
+>>  * Use the system arm_cpu_do_unaligned_access for user-only as well.
+>>  * Fix alignment for LDG.
+>>  * Fix no-fault for mte_probe1.
+>>  * Rearrage how tagged pages are recorded.
+>>
+>> and perhaps most visibly, for those tracking the kernel patches:
+>>
+>>  * Add arm,armv8.5-memtag to the dtb.
 
