@@ -2,89 +2,71 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EB5C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8757C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:34:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 999F12072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:31:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bjVKgEqY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 999F12072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB0452080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 18:34:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0452080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnnhJ-00038F-Rn
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 14:31:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39436)
+	id 1jnnkP-0004Oq-Vl
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 14:34:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnngX-0002ZS-NL
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:30:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40483
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnnjP-0003iZ-JX; Tue, 23 Jun 2020 14:33:15 -0400
+Resent-Date: Tue, 23 Jun 2020 14:33:15 -0400
+Resent-Message-Id: <E1jnnjP-0003iZ-JX@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21705)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jnngU-0004xP-CE
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 14:30:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592937013;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9j0wjDBbJSecBZH6f97BArBq7ORnlj3ZbRnja/csSOI=;
- b=bjVKgEqYvhOqp2/0mwtx0IRTiUa/vfQ9+uLlBzOv4P49djQIpCLXM3hOswVF44pjqwdOj8
- D28x3dYUemZf0MdC+o4hTYKxIitFN/eELaSLl/VXkjRxe5wGnOS0vpm2n2/wjpGN56GSNc
- ZgAggEsO2JIgwcuJATrYMkAJ+qEhmYY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-MC6vZkB-OgWjC3vQEMIcmg-1; Tue, 23 Jun 2020 14:30:09 -0400
-X-MC-Unique: MC6vZkB-OgWjC3vQEMIcmg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3738F107AFB2;
- Tue, 23 Jun 2020 18:30:08 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B3B227CC9;
- Tue, 23 Jun 2020 18:30:05 +0000 (UTC)
-Subject: Re: [PATCH 2/2] vvfat: Fix array_remove_slice()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200623175534.38286-1-kwolf@redhat.com>
- <20200623175534.38286-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <ca89d6ae-734f-66b0-3862-e41ab4ce6455@redhat.com>
-Date: Tue, 23 Jun 2020 13:30:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jnnjM-0006Wu-KI; Tue, 23 Jun 2020 14:33:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592937178; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=EV5Ss60ZfaPZBV2hZGPA7HvEuHK+PPiHPFpeQLtsyfsc1aLUJ9JBy1Z6OLQsdJi2LjeCizrc0BdQWMPtsvNGh/Z6ToRaXuYpc+j2VmJCveoUfMl65Vt3dSrP2jTf8iHUh4OaekhmaNEIMmFYVybKWI2q05iMbsDT4nByzLmwAy4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592937178;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=KE7CbeCUMReCDdRyOni57/UJHHRbNbk7UbojXvKIOcs=; 
+ b=FMcgLaIHcnrI3HOPHWjRWbjdQP/OaVgBCTj8mdnVjIBQqWZsT0YtSqA4o1WoYRUN9HJVouEI4aVwLUrVOMsCDPBQ8LoY2nKIcZWVcziisgDQGDFYlIVvDzibE9Nw1sJX69YcrJGS+Zr7oHqodp9B49EMc2sZMVKKngLY9dhf46A=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592937175612953.1369244496924;
+ Tue, 23 Jun 2020 11:32:55 -0700 (PDT)
+Message-ID: <159293717432.6613.1713954866193269549@d1fd068a5071>
+Subject: Re: [PATCH 0/2] vvfat: Two small patches
+In-Reply-To: <20200623175534.38286-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200623175534.38286-3-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:54:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwolf@redhat.com
+Date: Tue, 23 Jun 2020 11:32:55 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 14:33:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,78 +79,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nhuck15@gmail.com, qemu-devel@nongnu.org, ppandit@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, nhuck15@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, ppandit@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/23/20 12:55 PM, Kevin Wolf wrote:
-> array_remove_slice() calls array_roll() with array->next - 1 as the
-> destination index. This is only correct for count == 1, otherwise we're
-> writing past the end of the array. array->next - count would be correct.
-> 
-> However, this is the only place ever calling array_roll(), so this
-> rather complicated operation isn't even necessary.
-> 
-> Fix the problem and simplify the code by replacing it with a single
-> memmove() call. array_roll() can now be removed.
-> 
-> Reported-by: Nathan Huckleberry <nhuck15@gmail.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/vvfat.c | 42 +++++-------------------------------------
->   1 file changed, 5 insertions(+), 37 deletions(-)
-> 
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 2fab371258..d6e464c595 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -140,48 +140,16 @@ static inline void* array_insert(array_t* array,unsigned int index,unsigned int
->       return array->pointer+index*array->item_size;
->   }
->   
-> -/* this performs a "roll", so that the element which was at index_from becomes
-> - * index_to, but the order of all other elements is preserved. */
-> -static inline int array_roll(array_t* array,int index_to,int index_from,int count)
-
-If I understand the intent from just the comment, the old code would 
-take a directory listing of six files:
-
-ABCDEF
-
-and on the request to delete file C, would produce:
-
-ABFDE
-
-by moving just F, instead of all of DEF.  That might be what legacy FAT 
-filesystems do natively, but I don't see it as a mandatory correctness 
-issue; ABDEF is still a directory with the same contents.  And the bug 
-for reading beyond array bounds when deleting more than one file is 
-indeed nasty, so your simpler code is fine.
-
->   static inline int array_remove_slice(array_t* array,int index, int count)
->   {
->       assert(index >=0);
->       assert(count > 0);
->       assert(index + count <= array->next);
-> -    if(array_roll(array,array->next-1,index,count))
-> -        return -1;
-> +
-> +    memmove(array->pointer + index * array->item_size,
-> +            array->pointer + (index + count) * array->item_size,
-> +            (array->next - index - count) * array->item_size);
-> +
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->       array->next -= count;
->       return 0;
->   }
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyMzE3NTUzNC4zODI4
+Ni0xLWt3b2xmQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzJdIHZ2ZmF0OiBUd28gc21hbGwgcGF0Y2hlcwpU
+eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA2MjMxNzU1MzQuMzgyODYtMS1rd29sZkByZWRo
+YXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIw
+MjAwNjIzMTc1NTM0LjM4Mjg2LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNjIz
+MTc1NTM0LjM4Mjg2LTEta3dvbGZAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjVkOWY1ZjEgdnZmYXQ6IEZpeCBhcnJheV9yZW1vdmVfc2xpY2UoKQpmMWRkOGJmIHZ2
+ZmF0OiBDaGVjayB0aGF0IHVwZGF0ZWQgZmlsZW5hbWVzIGFyZSB2YWxpZAoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KMS8yIENoZWNraW5nIGNvbW1pdCBmMWRkOGJmNzMxY2UgKHZ2ZmF0OiBDaGVjayB0
+aGF0IHVwZGF0ZWQgZmlsZW5hbWVzIGFyZSB2YWxpZCkKRVJST1I6ICIoZm9vKikiIHNob3VsZCBi
+ZSAiKGZvbyAqKSIKIzMxOiBGSUxFOiBibG9jay92dmZhdC5jOjUyNjoKKyAgICBpZiAoIXN0cmNt
+cCgoY29uc3QgY2hhciopbmFtZSwgIi4iKSB8fCAhc3RyY21wKChjb25zdCBjaGFyKiluYW1lLCAi
+Li4iKSkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNSBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCAxLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvMiBDaGVja2luZyBjb21taXQg
+NWQ5ZjVmMTYzOGFmICh2dmZhdDogRml4IGFycmF5X3JlbW92ZV9zbGljZSgpKQo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYyMzE3NTUzNC4z
+ODI4Ni0xLWt3b2xmQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
 
