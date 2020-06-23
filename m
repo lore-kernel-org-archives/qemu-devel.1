@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 398DEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA732C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED1ED20724
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:17:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED1ED20724
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8D020724
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 22:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8D020724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnrE3-0007lM-7q
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 18:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36950)
+	id 1jnrFc-0000KC-LP
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 18:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnrD4-00079P-8a; Tue, 23 Jun 2020 18:16:06 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57832)
+ id 1jnrEz-0008JM-Ud; Tue, 23 Jun 2020 18:18:05 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37739)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jnrD1-00070L-Pu; Tue, 23 Jun 2020 18:16:05 -0400
+ id 1jnrEw-0007dh-AK; Tue, 23 Jun 2020 18:18:05 -0400
 X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.73175-0.000899287-0.26735;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HrRZHMi_1592950556; 
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.656872-0.000448044-0.34268;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16368; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HrRikgt_1592950677; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HrRZHMi_1592950556)
- by smtp.aliyun-inc.com(10.147.42.198);
- Wed, 24 Jun 2020 06:15:57 +0800
+ fp:SMTPD_---.HrRikgt_1592950677)
+ by smtp.aliyun-inc.com(10.147.41.231);
+ Wed, 24 Jun 2020 06:17:57 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v11 08/61] target/riscv: add fault-only-first unit stride load
-Date: Wed, 24 Jun 2020 05:58:27 +0800
-Message-Id: <20200623215920.2594-9-zhiwei_liu@c-sky.com>
+Subject: [PATCH v11 09/61] target/riscv: add vector amo operations
+Date: Wed, 24 Jun 2020 05:58:28 +0800
+Message-Id: <20200623215920.2594-10-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
 References: <20200623215920.2594-1-zhiwei_liu@c-sky.com>
@@ -77,85 +78,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The unit-stride fault-only-fault load instructions are used to
-vectorize loops with data-dependent exit conditions(while loops).
-These instructions execute as a regular load except that they
-will only take a trap on element 0.
+Vector AMOs operate as if aq and rl bits were zero on each element
+with regard to ordering relative to other instructions in the same hart.
+Vector AMOs provide no ordering guarantee between element operations
+in the same vector AMO instruction
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/helper.h                   |  22 +++++
- target/riscv/insn32.decode              |   7 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  73 ++++++++++++++++
- target/riscv/vector_helper.c            | 110 ++++++++++++++++++++++++
- 4 files changed, 212 insertions(+)
+ target/riscv/helper.h                   |  29 +++++
+ target/riscv/insn32-64.decode           |  11 ++
+ target/riscv/insn32.decode              |  13 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 138 ++++++++++++++++++++++
+ target/riscv/internals.h                |   1 +
+ target/riscv/vector_helper.c            | 147 ++++++++++++++++++++++++
+ 6 files changed, 339 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index f3650f736e..5c97bc446e 100644
+index 5c97bc446e..c5f43b5b64 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -224,3 +224,25 @@ DEF_HELPER_6(vsxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_5(vlbff_v_b, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbff_v_h, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhff_v_h, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlwff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlwff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vleff_v_b, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vleff_v_h, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vleff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vleff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbuff_v_b, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbuff_v_h, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbuff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlbuff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhuff_v_h, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
-+DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
+@@ -246,3 +246,32 @@ DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
++#ifdef TARGET_RISCV64
++DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxord_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorw_v_d,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoord_v_d,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomind_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominud_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxud_v_d, void, ptr, ptr, tl, ptr, env, i32)
++#endif
++DEF_HELPER_6(vamoswapw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorw_v_w,   void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 380bf791bc..86153d93fa 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -57,6 +57,17 @@ amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
+ amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
+ amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
+ 
++#*** Vector AMO operations (in addition to Zvamo) ***
++vamoswapd_v     00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoaddd_v      00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoxord_v      00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoandd_v      01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoord_v       01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomind_v      10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxd_v      10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamominud_v     11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++
+ # *** RV64F Standard Extension (in addition to RV32F) ***
+ fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
+ fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 287d52bcc9..7146aec22a 100644
+index 7146aec22a..625914c85f 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -226,6 +226,13 @@ vle_v      ... 000 . 00000 ..... 111 ..... 0000111 @r2_nfvm
- vlbu_v     ... 000 . 00000 ..... 000 ..... 0000111 @r2_nfvm
- vlhu_v     ... 000 . 00000 ..... 101 ..... 0000111 @r2_nfvm
- vlwu_v     ... 000 . 00000 ..... 110 ..... 0000111 @r2_nfvm
-+vlbff_v    ... 100 . 10000 ..... 000 ..... 0000111 @r2_nfvm
-+vlhff_v    ... 100 . 10000 ..... 101 ..... 0000111 @r2_nfvm
-+vlwff_v    ... 100 . 10000 ..... 110 ..... 0000111 @r2_nfvm
-+vleff_v    ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
-+vlbuff_v   ... 000 . 10000 ..... 000 ..... 0000111 @r2_nfvm
-+vlhuff_v   ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
-+vlwuff_v   ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
- vsb_v      ... 000 . 00000 ..... 000 ..... 0100111 @r2_nfvm
- vsh_v      ... 000 . 00000 ..... 101 ..... 0100111 @r2_nfvm
- vsw_v      ... 000 . 00000 ..... 110 ..... 0100111 @r2_nfvm
+@@ -44,6 +44,7 @@
+ &u    imm rd
+ &shift     shamt rs1 rd
+ &atomic    aq rl rs2 rs1 rd
++&rwdvm     vm wd rd rs1 rs2
+ &r2nfvm    vm rd rs1 nf
+ &rnfvm     vm rd rs1 rs2 nf
+ 
+@@ -67,6 +68,7 @@
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+ @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
++@r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
+ @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
+ 
+ @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+@@ -263,6 +265,17 @@ vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
+ vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
+ vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
+ 
++#*** Vector AMO operations are encoded under the standard AMO major opcode ***
++vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoxorw_v      00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoandw_v      01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoorw_v       01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominw_v      10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxw_v      10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominuw_v     11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++
+ # *** new major opcode OP-V ***
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 11a3a89d54..5e2fbb7078 100644
+index 5e2fbb7078..768e95c8c4 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -561,3 +561,76 @@ GEN_VEXT_TRANS(vsxb_v, 0, rnfvm, st_index_op, st_index_check)
- GEN_VEXT_TRANS(vsxh_v, 1, rnfvm, st_index_op, st_index_check)
- GEN_VEXT_TRANS(vsxw_v, 2, rnfvm, st_index_op, st_index_check)
- GEN_VEXT_TRANS(vsxe_v, 3, rnfvm, st_index_op, st_index_check)
+@@ -634,3 +634,141 @@ GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
 +
 +/*
-+ *** unit stride fault-only-first load
++ *** vector atomic operation
 + */
-+static bool ldff_trans(uint32_t vd, uint32_t rs1, uint32_t data,
-+                       gen_helper_ldst_us *fn, DisasContext *s)
++typedef void gen_helper_amo(TCGv_ptr, TCGv_ptr, TCGv, TCGv_ptr,
++                            TCGv_env, TCGv_i32);
++
++static bool amo_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
++                      uint32_t data, gen_helper_amo *fn, DisasContext *s)
 +{
-+    TCGv_ptr dest, mask;
++    TCGv_ptr dest, mask, index;
 +    TCGv base;
 +    TCGv_i32 desc;
 +
@@ -164,181 +219,297 @@ index 11a3a89d54..5e2fbb7078 100644
 +
 +    dest = tcg_temp_new_ptr();
 +    mask = tcg_temp_new_ptr();
++    index = tcg_temp_new_ptr();
 +    base = tcg_temp_new();
 +    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
 +
 +    gen_get_gpr(base, rs1);
 +    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
++    tcg_gen_addi_ptr(index, cpu_env, vreg_ofs(s, vs2));
 +    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
 +
-+    fn(dest, mask, base, cpu_env, desc);
++    fn(dest, mask, base, index, cpu_env, desc);
 +
 +    tcg_temp_free_ptr(dest);
 +    tcg_temp_free_ptr(mask);
++    tcg_temp_free_ptr(index);
 +    tcg_temp_free(base);
 +    tcg_temp_free_i32(desc);
 +    gen_set_label(over);
 +    return true;
 +}
 +
-+static bool ldff_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
++static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
 +{
 +    uint32_t data = 0;
-+    gen_helper_ldst_us *fn;
-+    static gen_helper_ldst_us * const fns[7][4] = {
-+        { gen_helper_vlbff_v_b,  gen_helper_vlbff_v_h,
-+          gen_helper_vlbff_v_w,  gen_helper_vlbff_v_d },
-+        { NULL,                  gen_helper_vlhff_v_h,
-+          gen_helper_vlhff_v_w,  gen_helper_vlhff_v_d },
-+        { NULL,                  NULL,
-+          gen_helper_vlwff_v_w,  gen_helper_vlwff_v_d },
-+        { gen_helper_vleff_v_b,  gen_helper_vleff_v_h,
-+          gen_helper_vleff_v_w,  gen_helper_vleff_v_d },
-+        { gen_helper_vlbuff_v_b, gen_helper_vlbuff_v_h,
-+          gen_helper_vlbuff_v_w, gen_helper_vlbuff_v_d },
-+        { NULL,                  gen_helper_vlhuff_v_h,
-+          gen_helper_vlhuff_v_w, gen_helper_vlhuff_v_d },
-+        { NULL,                  NULL,
-+          gen_helper_vlwuff_v_w, gen_helper_vlwuff_v_d }
++    gen_helper_amo *fn;
++    static gen_helper_amo *const fnsw[9] = {
++        /* no atomic operation */
++        gen_helper_vamoswapw_v_w,
++        gen_helper_vamoaddw_v_w,
++        gen_helper_vamoxorw_v_w,
++        gen_helper_vamoandw_v_w,
++        gen_helper_vamoorw_v_w,
++        gen_helper_vamominw_v_w,
++        gen_helper_vamomaxw_v_w,
++        gen_helper_vamominuw_v_w,
++        gen_helper_vamomaxuw_v_w
 +    };
++#ifdef TARGET_RISCV64
++    static gen_helper_amo *const fnsd[18] = {
++        gen_helper_vamoswapw_v_d,
++        gen_helper_vamoaddw_v_d,
++        gen_helper_vamoxorw_v_d,
++        gen_helper_vamoandw_v_d,
++        gen_helper_vamoorw_v_d,
++        gen_helper_vamominw_v_d,
++        gen_helper_vamomaxw_v_d,
++        gen_helper_vamominuw_v_d,
++        gen_helper_vamomaxuw_v_d,
++        gen_helper_vamoswapd_v_d,
++        gen_helper_vamoaddd_v_d,
++        gen_helper_vamoxord_v_d,
++        gen_helper_vamoandd_v_d,
++        gen_helper_vamoord_v_d,
++        gen_helper_vamomind_v_d,
++        gen_helper_vamomaxd_v_d,
++        gen_helper_vamominud_v_d,
++        gen_helper_vamomaxud_v_d
++    };
++#endif
 +
-+    fn =  fns[seq][s->sew];
-+    if (fn == NULL) {
-+        return false;
++    if (tb_cflags(s->base.tb) & CF_PARALLEL) {
++        gen_helper_exit_atomic(cpu_env);
++        s->base.is_jmp = DISAS_NORETURN;
++        return true;
++    } else {
++        if (s->sew == 3) {
++#ifdef TARGET_RISCV64
++            fn = fnsd[seq];
++#else
++            /* Check done in amo_check(). */
++            g_assert_not_reached();
++#endif
++        } else {
++            fn = fnsw[seq];
++        }
 +    }
 +
 +    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
 +    data = FIELD_DP32(data, VDATA, VM, a->vm);
 +    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+    data = FIELD_DP32(data, VDATA, NF, a->nf);
-+    return ldff_trans(a->rd, a->rs1, data, fn, s);
++    data = FIELD_DP32(data, VDATA, WD, a->wd);
++    return amo_trans(a->rd, a->rs1, a->rs2, data, fn, s);
++}
++/*
++ * There are two rules check here.
++ *
++ * 1. SEW must be at least as wide as the AMO memory element size.
++ *
++ * 2. If SEW is greater than XLEN, an illegal instruction exception is raised.
++ */
++static bool amo_check(DisasContext *s, arg_rwdvm* a)
++{
++    return (!s->vill && has_ext(s, RVA) &&
++            (!a->wd || vext_check_overlap_mask(s, a->rd, a->vm, false)) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            ((1 << s->sew) <= sizeof(target_ulong)) &&
++            ((1 << s->sew) >= 4));
 +}
 +
-+GEN_VEXT_TRANS(vlbff_v, 0, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vlhff_v, 1, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vlwff_v, 2, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
-+GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vamoswapw_v, 0, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddw_v, 1, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorw_v, 2, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandw_v, 3, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorw_v, 4, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominw_v, 5, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxw_v, 6, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuw_v, 7, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuw_v, 8, rwdvm, amo_op, amo_check)
++#ifdef TARGET_RISCV64
++GEN_VEXT_TRANS(vamoswapd_v, 9, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddd_v, 10, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxord_v, 11, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandd_v, 12, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoord_v, 13, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomind_v, 14, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxd_v, 15, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominud_v, 16, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxud_v, 17, rwdvm, amo_op, amo_check)
++#endif
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+index 3253e73474..e59e8b30ad 100644
+--- a/target/riscv/internals.h
++++ b/target/riscv/internals.h
+@@ -26,4 +26,5 @@ FIELD(VDATA, MLEN, 0, 8)
+ FIELD(VDATA, VM, 8, 1)
+ FIELD(VDATA, LMUL, 9, 2)
+ FIELD(VDATA, NF, 11, 4)
++FIELD(VDATA, WD, 11, 1)
+ #endif
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 9355958d3f..d4d34d2471 100644
+index d4d34d2471..b37f1f917d 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -577,3 +577,113 @@ GEN_VEXT_ST_INDEX(vsxe_v_b, int8_t,  int8_t,  idx_b, ste_b)
- GEN_VEXT_ST_INDEX(vsxe_v_h, int16_t, int16_t, idx_h, ste_h)
- GEN_VEXT_ST_INDEX(vsxe_v_w, int32_t, int32_t, idx_w, ste_w)
- GEN_VEXT_ST_INDEX(vsxe_v_d, int64_t, int64_t, idx_d, ste_d)
+@@ -95,6 +95,11 @@ static inline uint32_t vext_lmul(uint32_t desc)
+     return FIELD_EX32(simd_data(desc), VDATA, LMUL);
+ }
+ 
++static uint32_t vext_wd(uint32_t desc)
++{
++    return (simd_data(desc) >> 11) & 0x1;
++}
++
+ /*
+  * Get vector group length in bytes. Its range is [64, 2048].
+  *
+@@ -687,3 +692,145 @@ GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, ldhu_w, clearl)
+ GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, ldhu_d, clearq)
+ GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, ldwu_w, clearl)
+ GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, ldwu_d, clearq)
 +
 +/*
-+ *** unit-stride fault-only-fisrt load instructions
++ *** Vector AMO Operations (Zvamo)
 + */
-+static inline void
-+vext_ldff(void *vd, void *v0, target_ulong base,
-+          CPURISCVState *env, uint32_t desc,
-+          vext_ldst_elem_fn *ldst_elem,
-+          clear_fn *clear_elem,
-+          uint32_t esz, uint32_t msz, uintptr_t ra)
-+{
-+    void *host;
-+    uint32_t i, k, vl = 0;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t nf = vext_nf(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vlmax = vext_maxsz(desc) / esz;
-+    target_ulong addr, offset, remain;
++typedef void vext_amo_noatomic_fn(void *vs3, target_ulong addr,
++                                  uint32_t wd, uint32_t idx, CPURISCVState *env,
++                                  uintptr_t retaddr);
 +
-+    /* probe every access*/
-+    for (i = 0; i < env->vl; i++) {
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-+            continue;
-+        }
-+        addr = base + nf * i * msz;
-+        if (i == 0) {
-+            probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
-+        } else {
-+            /* if it triggers an exception, no need to check watchpoint */
-+            remain = nf * msz;
-+            while (remain > 0) {
-+                offset = -(addr | TARGET_PAGE_MASK);
-+                host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD,
-+                                         cpu_mmu_index(env, false));
-+                if (host) {
-+#ifdef CONFIG_USER_ONLY
-+                    if (page_check_range(addr, nf * msz, PAGE_READ) < 0) {
-+                        vl = i;
-+                        goto ProbeSuccess;
-+                    }
-+#else
-+                    probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
++/* no atomic opreation for vector atomic insructions */
++#define DO_SWAP(N, M) (M)
++#define DO_AND(N, M)  (N & M)
++#define DO_XOR(N, M)  (N ^ M)
++#define DO_OR(N, M)   (N | M)
++#define DO_ADD(N, M)  (N + M)
++
++#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF) \
++static void                                                     \
++vext_##NAME##_noatomic_op(void *vs3, target_ulong addr,         \
++                          uint32_t wd, uint32_t idx,            \
++                          CPURISCVState *env, uintptr_t retaddr)\
++{                                                               \
++    typedef int##ESZ##_t ETYPE;                                 \
++    typedef int##MSZ##_t MTYPE;                                 \
++    typedef uint##MSZ##_t UMTYPE __attribute__((unused));       \
++    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);                         \
++    MTYPE  a = cpu_ld##SUF##_data(env, addr), b = *pe3;         \
++                                                                \
++    cpu_st##SUF##_data(env, addr, DO_OP(a, b));                 \
++    if (wd) {                                                   \
++        *pe3 = a;                                               \
++    }                                                           \
++}
++
++/* Signed min/max */
++#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
++#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
++
++/* Unsigned min/max */
++#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
++#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
++
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_w, 32, 32, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_w,  32, 32, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_w,  32, 32, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_w,  32, 32, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_w,   32, 32, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_w,  32, 32, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_w,  32, 32, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_w, 32, 32, H4, DO_MINU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_w, 32, 32, H4, DO_MAXU, l)
++#ifdef TARGET_RISCV64
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_d, 64, 32, H8, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapd_v_d, 64, 64, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_d,  64, 32, H8, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddd_v_d,  64, 64, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_d,  64, 32, H8, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxord_v_d,  64, 64, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_d,  64, 32, H8, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandd_v_d,  64, 64, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_d,   64, 32, H8, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoord_v_d,   64, 64, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_d,  64, 32, H8, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomind_v_d,  64, 64, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_d,  64, 32, H8, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxd_v_d,  64, 64, H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_d, 64, 32, H8, DO_MINU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominud_v_d, 64, 64, H8, DO_MINU, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
 +#endif
-+                } else {
-+                    vl = i;
-+                    goto ProbeSuccess;
-+                }
-+                if (remain <=  offset) {
-+                    break;
-+                }
-+                remain -= offset;
-+                addr += offset;
-+            }
-+        }
-+    }
-+ProbeSuccess:
-+    /* load bytes from guest memory */
-+    if (vl != 0) {
-+        env->vl = vl;
-+    }
++
++static inline void
++vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
++                  void *vs2, CPURISCVState *env, uint32_t desc,
++                  vext_get_index_addr get_index_addr,
++                  vext_amo_noatomic_fn *noatomic_op,
++                  clear_fn *clear_elem,
++                  uint32_t esz, uint32_t msz, uintptr_t ra)
++{
++    uint32_t i;
++    target_long addr;
++    uint32_t wd = vext_wd(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++
 +    for (i = 0; i < env->vl; i++) {
-+        k = 0;
 +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
 +            continue;
 +        }
-+        while (k < nf) {
-+            target_ulong addr = base + (i * nf + k) * msz;
-+            ldst_elem(env, addr, i + k * vlmax, vd, ra);
-+            k++;
++        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_LOAD);
++        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_STORE);
++    }
++    for (i = 0; i < env->vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
 +        }
++        addr = get_index_addr(base, i, vs2);
++        noatomic_op(vs3, addr, wd, i, env, ra);
 +    }
-+    /* clear tail elements */
-+    if (vl != 0) {
-+        return;
-+    }
-+    for (k = 0; k < nf; k++) {
-+        clear_elem(vd, env->vl + k * vlmax, env->vl * esz, vlmax * esz);
-+    }
++    clear_elem(vs3, env->vl, env->vl * esz, vlmax * esz);
 +}
 +
-+#define GEN_VEXT_LDFF(NAME, MTYPE, ETYPE, LOAD_FN, CLEAR_FN)     \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong base,         \
-+                  CPURISCVState *env, uint32_t desc)             \
-+{                                                                \
-+    vext_ldff(vd, v0, base, env, desc, LOAD_FN, CLEAR_FN,        \
-+              sizeof(ETYPE), sizeof(MTYPE), GETPC());            \
++#define GEN_VEXT_AMO(NAME, MTYPE, ETYPE, INDEX_FN, CLEAR_FN)    \
++void HELPER(NAME)(void *vs3, void *v0, target_ulong base,       \
++                  void *vs2, CPURISCVState *env, uint32_t desc) \
++{                                                               \
++    vext_amo_noatomic(vs3, v0, base, vs2, env, desc,            \
++                      INDEX_FN, vext_##NAME##_noatomic_op,      \
++                      CLEAR_FN, sizeof(ETYPE), sizeof(MTYPE),   \
++                      GETPC());                                 \
 +}
 +
-+GEN_VEXT_LDFF(vlbff_v_b,  int8_t,   int8_t,   ldb_b,  clearb)
-+GEN_VEXT_LDFF(vlbff_v_h,  int8_t,   int16_t,  ldb_h,  clearh)
-+GEN_VEXT_LDFF(vlbff_v_w,  int8_t,   int32_t,  ldb_w,  clearl)
-+GEN_VEXT_LDFF(vlbff_v_d,  int8_t,   int64_t,  ldb_d,  clearq)
-+GEN_VEXT_LDFF(vlhff_v_h,  int16_t,  int16_t,  ldh_h,  clearh)
-+GEN_VEXT_LDFF(vlhff_v_w,  int16_t,  int32_t,  ldh_w,  clearl)
-+GEN_VEXT_LDFF(vlhff_v_d,  int16_t,  int64_t,  ldh_d,  clearq)
-+GEN_VEXT_LDFF(vlwff_v_w,  int32_t,  int32_t,  ldw_w,  clearl)
-+GEN_VEXT_LDFF(vlwff_v_d,  int32_t,  int64_t,  ldw_d,  clearq)
-+GEN_VEXT_LDFF(vleff_v_b,  int8_t,   int8_t,   lde_b,  clearb)
-+GEN_VEXT_LDFF(vleff_v_h,  int16_t,  int16_t,  lde_h,  clearh)
-+GEN_VEXT_LDFF(vleff_v_w,  int32_t,  int32_t,  lde_w,  clearl)
-+GEN_VEXT_LDFF(vleff_v_d,  int64_t,  int64_t,  lde_d,  clearq)
-+GEN_VEXT_LDFF(vlbuff_v_b, uint8_t,  uint8_t,  ldbu_b, clearb)
-+GEN_VEXT_LDFF(vlbuff_v_h, uint8_t,  uint16_t, ldbu_h, clearh)
-+GEN_VEXT_LDFF(vlbuff_v_w, uint8_t,  uint32_t, ldbu_w, clearl)
-+GEN_VEXT_LDFF(vlbuff_v_d, uint8_t,  uint64_t, ldbu_d, clearq)
-+GEN_VEXT_LDFF(vlhuff_v_h, uint16_t, uint16_t, ldhu_h, clearh)
-+GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, ldhu_w, clearl)
-+GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, ldhu_d, clearq)
-+GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, ldwu_w, clearl)
-+GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, ldwu_d, clearq)
++#ifdef TARGET_RISCV64
++GEN_VEXT_AMO(vamoswapw_v_d, int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoswapd_v_d, int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoaddw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoaddd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoxorw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoxord_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoandw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoandd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoorw_v_d,   int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamoord_v_d,   int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamominw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomind_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomaxw_v_d,  int32_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamomaxd_v_d,  int64_t,  int64_t,  idx_d, clearq)
++GEN_VEXT_AMO(vamominuw_v_d, uint32_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamominud_v_d, uint64_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamomaxuw_v_d, uint32_t, uint64_t, idx_d, clearq)
++GEN_VEXT_AMO(vamomaxud_v_d, uint64_t, uint64_t, idx_d, clearq)
++#endif
++GEN_VEXT_AMO(vamoswapw_v_w, int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoaddw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoxorw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoandw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamoorw_v_w,   int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamominw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamomaxw_v_w,  int32_t,  int32_t,  idx_w, clearl)
++GEN_VEXT_AMO(vamominuw_v_w, uint32_t, uint32_t, idx_w, clearl)
++GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
 -- 
 2.23.0
 
