@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53701C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D77C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F77E206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53DD3206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 17:28:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ymy6n6Sj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F77E206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwlntGE4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53DD3206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnmit-0006Zo-6h
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36786)
+	id 1jnmj7-00073u-Fv
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 13:28:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmi0-0005UU-2o
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29201
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmiD-0005o3-UK
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36700
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmhy-0003fS-4g
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:43 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jnmiB-0003nw-NN
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 13:27:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592933261;
+ s=mimecast20190719; t=1592933274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ta8fofB145HRjeBtGSzkFXoaX65FKHWgqbBS1sayKBY=;
- b=Ymy6n6SjKe9o39pNB8vmyKqZeS8xBeWD94lOyg9hXC9tsx5PSb8J1xa1Y5kD8rH28wv9Hh
- umfVTMxLyiVTxf6BJnfV03aMfvXQTBkWPYHJ9ZVly+EcH7Vnx/tYHcj+uP6bX4HyCXn6Xw
- njYOdpVfrk6Ilbs6R6VglnlBvvL7Wtg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-5N5sT3TMNLacBn_rSA-BeA-1; Tue, 23 Jun 2020 13:27:39 -0400
-X-MC-Unique: 5N5sT3TMNLacBn_rSA-BeA-1
-Received: by mail-wr1-f69.google.com with SMTP id b14so16082132wrp.0
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 10:27:39 -0700 (PDT)
+ bh=LRhf/BOyEtnWuCwhaLT5z/wF75mx5JS0IrqRF4jhdTg=;
+ b=UwlntGE4TdUnqJ0lKkp9wgy/6GfB46bIoVVt67ZhIijof3Of392u6txcDjzfob47nY/8aI
+ lb/ju4PJ2J+Psj7MGBl0E+iTV9t0N6cxz2qsnzI4tjZC1OXDDuOlRlta2j262B4aweN4Vv
+ XEGyB7Dfc7zvchW3SCqAA8Q3HdwdeC4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-YIPWi4X3M3ecJ5CHdcWV9Q-1; Tue, 23 Jun 2020 13:27:52 -0400
+X-MC-Unique: YIPWi4X3M3ecJ5CHdcWV9Q-1
+Received: by mail-wm1-f69.google.com with SMTP id p24so5106725wmc.1
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 10:27:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ta8fofB145HRjeBtGSzkFXoaX65FKHWgqbBS1sayKBY=;
- b=r5v883vQxLBPwoZsEtqJGyOrG7KWa9tlK9B7+ZiArBkbJBWU76rXeUUWDxYWn2us+T
- KoXhUZqRC8xhpOw846ax4c+HTkgLKiNYQVrX8yAKvfn7MfDkMxast26+t00pU4Sfu51y
- cGOzrGEKKO86uKqdzgcgALQ/dRdO5XAmODl2npm4pU30oT7noKqnFh/MqiW7W21pLKRr
- igWdshjOyiw1JVSrFG/pD3ZQtrWw+ZHtX9LQPZxQFFTsMt4dyPxPuaQ9oL/L3/iU9xoV
- TYfTnK+vCG6CdGTkXosClaiPn9JqX9p80moMUm2Wdt/jEusAm8L+gYdZZ/pmcL9njMb8
- p80A==
-X-Gm-Message-State: AOAM532pn8FLrcOguHmMFtSnCZ9A5A0lU9NM5VZ6aX9lmeOcMN3hEutW
- syT+0XV6d3THvnEQMmQp80dwOpF8U+QP2mS4HARTrjjfGLkHbzohLYLdwPba9z5KX02c936vcA/
- w7rgStK7iO20HAkM=
-X-Received: by 2002:a5d:60d1:: with SMTP id x17mr15034643wrt.293.1592933257745; 
- Tue, 23 Jun 2020 10:27:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKVtzcje9Rl+nWeaIqgypC+gP91BnSfn6lyOE8wHED7ZK5aMEBo+K9/2v65CiLwoQMupfuUw==
-X-Received: by 2002:a5d:60d1:: with SMTP id x17mr15034618wrt.293.1592933257496; 
- Tue, 23 Jun 2020 10:27:37 -0700 (PDT)
+ bh=LRhf/BOyEtnWuCwhaLT5z/wF75mx5JS0IrqRF4jhdTg=;
+ b=ityTBFujwgZSAPAEIUu8OQo2f08QNXLdqZ4OMCpEqXFaV4pvCyYaltwC3DToDdyHHw
+ n+Our5E+jEIwfAu6X8Ne8/O68HdLyCL8sv7oV6rDQTcQLllKrTWL4cd53c64Mo+RrFMM
+ p3h6TdF9uTniGL/uOPq0rc1aHHgLtlqTu5n4JLam4MzJA1OcZtHx1+LIs1O18EygwuaX
+ v+B2++gLEoH5j+3XMpFMJii3G92CZAxvvp+r8kqnbLGro46Ll/6Mr7oVLUnL7ZeVuTBj
+ 59rGqFK6yq8LB2MgwfdENjpsO7l76zog5KbXXhmp9qZ+mV8qMb2wXIFUlQN4wfZuV2mJ
+ hC/g==
+X-Gm-Message-State: AOAM530N1YcF8gyJusuzP2mPRoLbNj9f+hSB4uy9B+uRF8ja44B46wok
+ 9SCRTANjoaC79WNPZiIa+90+DPwlzo2mv7rUHPaIkrnAyCaUClzaBm/O08UM9gQXbVQmwmKuOqY
+ BlMUe5eC/wJ9+gz0=
+X-Received: by 2002:adf:ef01:: with SMTP id e1mr16362850wro.116.1592933271419; 
+ Tue, 23 Jun 2020 10:27:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVH+lAMrCKFvJtm5krPJ4aHcjOIwJIpESAFUrEE0UFl1sZWgRtYJp6WBmDO1iKzncX49nXsw==
+X-Received: by 2002:adf:ef01:: with SMTP id e1mr16362827wro.116.1592933271166; 
+ Tue, 23 Jun 2020 10:27:51 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id v66sm4819101wme.13.2020.06.23.10.27.36
+ by smtp.gmail.com with ESMTPSA id u20sm3458369wmm.15.2020.06.23.10.27.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 10:27:36 -0700 (PDT)
+ Tue, 23 Jun 2020 10:27:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 2/5] hw/nvram/fw_cfg: Add the FW_CFG_DATA_GENERATOR
- interface
-Date: Tue, 23 Jun 2020 19:27:23 +0200
-Message-Id: <20200623172726.21040-3-philmd@redhat.com>
+Subject: [PATCH v10 5/5] crypto/tls-cipher-suites: Produce fw_cfg consumable
+ blob
+Date: Tue, 23 Jun 2020 19:27:26 +0200
+Message-Id: <20200623172726.21040-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200623172726.21040-1-philmd@redhat.com>
 References: <20200623172726.21040-1-philmd@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:53:54
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 01:55:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,7 +98,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,175 +113,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Laszlo Ersek <lersek@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The FW_CFG_DATA_GENERATOR allows any object to produce
-blob of data consumable by the fw_cfg device.
+Since our format is consumable by the fw_cfg device,
+we can implement the FW_CFG_DATA_GENERATOR interface.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Example of use to dump the cipher suites (if tracing enabled):
+
+  $ qemu-system-x86_64 -S \
+    -object tls-cipher-suites,id=mysuite1,priority=@SYSTEM \
+    -fw_cfg name=etc/path/to/ciphers,gen_id=mysuite1 \
+    -trace qcrypto\*
+  1590664444.197123:qcrypto_tls_cipher_suite_priority priority: @SYSTEM
+  1590664444.197219:qcrypto_tls_cipher_suite_info data=[0x13,0x02] version=TLS1.3 name=TLS_AES_256_GCM_SHA384
+  1590664444.197228:qcrypto_tls_cipher_suite_info data=[0x13,0x03] version=TLS1.3 name=TLS_CHACHA20_POLY1305_SHA256
+  1590664444.197233:qcrypto_tls_cipher_suite_info data=[0x13,0x01] version=TLS1.3 name=TLS_AES_128_GCM_SHA256
+  1590664444.197236:qcrypto_tls_cipher_suite_info data=[0x13,0x04] version=TLS1.3 name=TLS_AES_128_CCM_SHA256
+  1590664444.197240:qcrypto_tls_cipher_suite_info data=[0xc0,0x30] version=TLS1.2 name=TLS_ECDHE_RSA_AES_256_GCM_SHA384
+  1590664444.197245:qcrypto_tls_cipher_suite_info data=[0xcc,0xa8] version=TLS1.2 name=TLS_ECDHE_RSA_CHACHA20_POLY1305
+  1590664444.197250:qcrypto_tls_cipher_suite_info data=[0xc0,0x14] version=TLS1.0 name=TLS_ECDHE_RSA_AES_256_CBC_SHA1
+  1590664444.197254:qcrypto_tls_cipher_suite_info data=[0xc0,0x2f] version=TLS1.2 name=TLS_ECDHE_RSA_AES_128_GCM_SHA256
+  1590664444.197258:qcrypto_tls_cipher_suite_info data=[0xc0,0x13] version=TLS1.0 name=TLS_ECDHE_RSA_AES_128_CBC_SHA1
+  1590664444.197261:qcrypto_tls_cipher_suite_info data=[0xc0,0x2c] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_GCM_SHA384
+  1590664444.197266:qcrypto_tls_cipher_suite_info data=[0xcc,0xa9] version=TLS1.2 name=TLS_ECDHE_ECDSA_CHACHA20_POLY1305
+  1590664444.197270:qcrypto_tls_cipher_suite_info data=[0xc0,0xad] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_CCM
+  1590664444.197274:qcrypto_tls_cipher_suite_info data=[0xc0,0x0a] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_256_CBC_SHA1
+  1590664444.197278:qcrypto_tls_cipher_suite_info data=[0xc0,0x2b] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_GCM_SHA256
+  1590664444.197283:qcrypto_tls_cipher_suite_info data=[0xc0,0xac] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_CCM
+  1590664444.197287:qcrypto_tls_cipher_suite_info data=[0xc0,0x09] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_128_CBC_SHA1
+  1590664444.197291:qcrypto_tls_cipher_suite_info data=[0x00,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_GCM_SHA384
+  1590664444.197296:qcrypto_tls_cipher_suite_info data=[0xc0,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_CCM
+  1590664444.197300:qcrypto_tls_cipher_suite_info data=[0x00,0x35] version=TLS1.0 name=TLS_RSA_AES_256_CBC_SHA1
+  1590664444.197304:qcrypto_tls_cipher_suite_info data=[0x00,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_GCM_SHA256
+  1590664444.197308:qcrypto_tls_cipher_suite_info data=[0xc0,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_CCM
+  1590664444.197312:qcrypto_tls_cipher_suite_info data=[0x00,0x2f] version=TLS1.0 name=TLS_RSA_AES_128_CBC_SHA1
+  1590664444.197316:qcrypto_tls_cipher_suite_info data=[0x00,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_GCM_SHA384
+  1590664444.197320:qcrypto_tls_cipher_suite_info data=[0xcc,0xaa] version=TLS1.2 name=TLS_DHE_RSA_CHACHA20_POLY1305
+  1590664444.197325:qcrypto_tls_cipher_suite_info data=[0xc0,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_CCM
+  1590664444.197329:qcrypto_tls_cipher_suite_info data=[0x00,0x39] version=TLS1.0 name=TLS_DHE_RSA_AES_256_CBC_SHA1
+  1590664444.197333:qcrypto_tls_cipher_suite_info data=[0x00,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_GCM_SHA256
+  1590664444.197337:qcrypto_tls_cipher_suite_info data=[0xc0,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_CCM
+  1590664444.197341:qcrypto_tls_cipher_suite_info data=[0x00,0x33] version=TLS1.0 name=TLS_DHE_RSA_AES_128_CBC_SHA1
+  1590664444.197345:qcrypto_tls_cipher_suite_count count: 29
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- docs/specs/fw_cfg.txt     |  9 +++++++-
- include/hw/nvram/fw_cfg.h | 43 +++++++++++++++++++++++++++++++++++++++
- hw/nvram/fw_cfg.c         | 35 +++++++++++++++++++++++++++++++
- 3 files changed, 86 insertions(+), 1 deletion(-)
+v10: Removed Laszlo Acked-by due to logical changes
+---
+ crypto/tls-cipher-suites.c | 11 +++++++++++
+ qemu-options.hx            | 18 ++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
-index 8f1ebc66fa..bc16daa38a 100644
---- a/docs/specs/fw_cfg.txt
-+++ b/docs/specs/fw_cfg.txt
-@@ -219,7 +219,7 @@ To check the result, read the "control" field:
+diff --git a/crypto/tls-cipher-suites.c b/crypto/tls-cipher-suites.c
+index 5b403f86c9..b3dba00010 100644
+--- a/crypto/tls-cipher-suites.c
++++ b/crypto/tls-cipher-suites.c
+@@ -13,6 +13,7 @@
+ #include "qom/object_interfaces.h"
+ #include "crypto/tlscreds.h"
+ #include "crypto/tls-cipher-suites.h"
++#include "hw/nvram/fw_cfg.h"
+ #include "trace.h"
  
- = Externally Provided Items =
- 
--As of v2.4, "file" fw_cfg items (i.e., items with selector keys above
-+Since v2.4, "file" fw_cfg items (i.e., items with selector keys above
- FW_CFG_FILE_FIRST, and with a corresponding entry in the fw_cfg file
- directory structure) may be inserted via the QEMU command line, using
- the following syntax:
-@@ -230,6 +230,13 @@ Or
- 
-     -fw_cfg [name=]<item_name>,string=<string>
- 
-+Since v5.1, QEMU allows some objects to generate fw_cfg-specific content,
-+the content is then associated with a "file" item using the 'gen_id' option
-+in the command line, using the following syntax:
-+
-+    -object <generator-type>,id=<generated_id>,[generator-specific-options] \
-+    -fw_cfg [name=]<item_name>,gen_id=<generated_id>
-+
- See QEMU man page for more documentation.
- 
- Using item_name with plain ASCII characters only is recommended.
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index 25d9307018..11feae3177 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -9,11 +9,36 @@
- #define TYPE_FW_CFG     "fw_cfg"
- #define TYPE_FW_CFG_IO  "fw_cfg_io"
- #define TYPE_FW_CFG_MEM "fw_cfg_mem"
-+#define TYPE_FW_CFG_DATA_GENERATOR_INTERFACE "fw_cfg-data-generator"
- 
- #define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
- #define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
- #define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
- 
-+#define FW_CFG_DATA_GENERATOR_CLASS(class) \
-+    OBJECT_CLASS_CHECK(FWCfgDataGeneratorClass, (class), \
-+                       TYPE_FW_CFG_DATA_GENERATOR_INTERFACE)
-+#define FW_CFG_DATA_GENERATOR_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(FWCfgDataGeneratorClass, (obj), \
-+                     TYPE_FW_CFG_DATA_GENERATOR_INTERFACE)
-+
-+typedef struct FWCfgDataGeneratorClass {
-+    /*< private >*/
-+    InterfaceClass parent_class;
-+    /*< public >*/
-+
-+    /**
-+     * get_data:
-+     * @obj: the object implementing this interface
-+     * @errp: pointer to a NULL-initialized error object
-+     *
-+     * Returns: reference to a byte array containing the data.
-+     * The caller should release the reference when no longer
-+     * required.
-+     */
-+    GByteArray *(*get_data)(Object *obj, Error **errp);
-+} FWCfgDataGeneratorClass;
-+
- typedef struct fw_cfg_file FWCfgFile;
- 
- #define FW_CFG_ORDER_OVERRIDE_VGA    70
-@@ -263,6 +288,24 @@ void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
- void *fw_cfg_modify_file(FWCfgState *s, const char *filename, void *data,
-                          size_t len);
- 
-+/**
-+ * fw_cfg_add_from_generator:
-+ * @s: fw_cfg device being modified
-+ * @filename: name of new fw_cfg file item
-+ * @gen_id: name of object implementing FW_CFG_DATA_GENERATOR interface
-+ * @errp: pointer to a NULL initialized error object
-+ *
-+ * Add a new NAMED fw_cfg item with the content generated from the
-+ * @gen_id object. The data generated by the @gen_id object is copied
-+ * into the data structure of the fw_cfg device.
-+ * The next available (unused) selector key starting at FW_CFG_FILE_FIRST
-+ * will be used; also, a new entry will be added to the file directory
-+ * structure residing at key value FW_CFG_FILE_DIR, containing the item name,
-+ * data size, and assigned selector key value.
-+ */
-+void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-+                               const char *gen_id, Error **errp);
-+
- FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
-                                 AddressSpace *dma_as);
- FWCfgState *fw_cfg_init_io(uint32_t iobase);
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 0408a31f8e..694722b212 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1032,6 +1032,35 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
-     return NULL;
+ /*
+@@ -88,11 +89,20 @@ static void qcrypto_tls_cipher_suites_complete(UserCreatable *uc,
+     }
  }
  
-+void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-+                               const char *gen_id, Error **errp)
++static GByteArray *qcrypto_tls_cipher_suites_fw_cfg_gen_data(Object *obj,
++                                                             Error **errp)
 +{
-+    FWCfgDataGeneratorClass *klass;
-+    Error *local_err = NULL;
-+    GByteArray *array;
-+    Object *obj;
-+    gsize size;
-+
-+    obj = object_resolve_path_component(object_get_objects_root(), gen_id);
-+    if (!obj) {
-+        error_setg(errp, "Cannot find object ID '%s'", gen_id);
-+        return;
-+    }
-+    if (!object_dynamic_cast(obj, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE)) {
-+        error_setg(errp, "Object ID '%s' is not a '%s' subclass",
-+                   gen_id, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE);
-+        return;
-+    }
-+    klass = FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
-+    array = klass->get_data(obj, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    size = array->len;
-+    fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size);
++    return qcrypto_tls_cipher_suites_get_data(QCRYPTO_TLS_CIPHER_SUITES(obj),
++                                              errp);
 +}
 +
- static void fw_cfg_machine_reset(void *opaque)
+ static void qcrypto_tls_cipher_suites_class_init(ObjectClass *oc, void *data)
  {
-     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-@@ -1333,12 +1362,18 @@ static const TypeInfo fw_cfg_mem_info = {
-     .class_init    = fw_cfg_mem_class_init,
- };
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    FWCfgDataGeneratorClass *fwgc = FW_CFG_DATA_GENERATOR_CLASS(oc);
  
-+static const TypeInfo fw_cfg_data_generator_interface_info = {
-+    .parent = TYPE_INTERFACE,
-+    .name = TYPE_FW_CFG_DATA_GENERATOR_INTERFACE,
-+    .class_size = sizeof(FWCfgDataGeneratorClass),
-+};
- 
- static void fw_cfg_register_types(void)
- {
-     type_register_static(&fw_cfg_info);
-     type_register_static(&fw_cfg_io_info);
-     type_register_static(&fw_cfg_mem_info);
-+    type_register_static(&fw_cfg_data_generator_interface_info);
+     ucc->complete = qcrypto_tls_cipher_suites_complete;
++    fwgc->get_data = qcrypto_tls_cipher_suites_fw_cfg_gen_data;
  }
  
- type_init(fw_cfg_register_types)
+ static const TypeInfo qcrypto_tls_cipher_suites_info = {
+@@ -103,6 +113,7 @@ static const TypeInfo qcrypto_tls_cipher_suites_info = {
+     .class_init = qcrypto_tls_cipher_suites_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
++        { TYPE_FW_CFG_DATA_GENERATOR_INTERFACE },
+         { }
+     }
+ };
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 4f519f35fd..ce54c7359c 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4585,6 +4585,24 @@ SRST
+         string as described at
+         https://gnutls.org/manual/html_node/Priority-Strings.html.
+ 
++        An example of use of this object is to control UEFI HTTPS Boot.
++        The tls-cipher-suites object exposes the ordered list of permitted
++        TLS cipher suites from the host side to the guest firmware, via
++        fw_cfg. The list is represented as an array of IANA_TLS_CIPHER
++        objects. The firmware uses the IANA_TLS_CIPHER array for configuring
++        guest-side TLS.
++
++        In the following example, the priority at which the host-side policy
++        is retrieved is given by the ``priority`` property.
++        Given that QEMU uses GNUTLS, ``priority=@SYSTEM`` may be used to
++        refer to /etc/crypto-policies/back-ends/gnutls.config.
++
++        .. parsed-literal::
++
++             # |qemu_system| \
++                 -object tls-cipher-suites,id=mysuite0,priority=@SYSTEM \
++                 -fw_cfg name=etc/edk2/https/ciphers,gen_id=mysuite0
++
+     ``-object filter-buffer,id=id,netdev=netdevid,interval=t[,queue=all|rx|tx][,status=on|off][,position=head|tail|id=<id>][,insert=behind|before]``
+         Interval t can't be 0, this filter batches the packet delivery:
+         all packets arriving in a given interval on netdev netdevid are
 -- 
 2.21.3
 
