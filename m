@@ -2,86 +2,91 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E6EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F4FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:52:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D11320723
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0CE520723
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:52:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clp5I5CR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D11320723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="s41cefNB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0CE520723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnkGy-0003yI-FA
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33176)
+	id 1jnkHw-0004go-2p
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:52:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jnkG6-0002ps-4A
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:50:46 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45464)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jnkG3-0008Ny-6g
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:50:45 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s10so882180wrw.12
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 07:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=obyBSk9S8aFRiIXSSr61RgYEc1CJX6CdMCHiatB2VME=;
- b=clp5I5CRm+t3D6yNBXSWVGj/kMjNWZCW+Ib07SF7gp32ZLoB21hrAAr+YxieY2xTbh
- 94KcsGxMD9jQDzGQGsOJMh6bnbesrtb6SHMpX1X6Jz8gXj+zJJ7vmiynPsSnzWUkP2sO
- km8D9nyjhSuki4kjRqtDUo6D1wS+JkRrZdoTUSCz182JumIOLL2L4WAMsnBW/0ST1RMo
- frjTkJM1zm6iAM6fVbcJVL26LsvNztKlaWwx7T+QxFoy3NjxTdCFBq5YrtqmGwQGbrI+
- ALweu6cgtCh9C1/X3HUj/ujV7JeooomfzbSaB7wOAsKo7GKwlMvnbFVQXlGUxcZCjTMp
- FwUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=obyBSk9S8aFRiIXSSr61RgYEc1CJX6CdMCHiatB2VME=;
- b=g3SIruDxCqsiYdGBPjlWEF+8S4bMsx7wJvQOymtJIsIHl6tY9ElpqeFimvOY/NbkYX
- oIcx/eFg4n7rqk10xnqL8n3ONrsMoyWFxWZ1CCVx/RxsNxN2+Nt8wj4utvn1767T55O9
- ieqFsox2LDr9hphk94vr7N/QbcdLCVBafNa6FYhfAf/SCGn2/vR59tHZN2uPhCZ9oJVA
- LWbgDqKiQZX2BQPkc/bVivRYsNdEKJ0X2fJb9/C0iDwQPbcsmsqIPfYPFDp/eBaOaEGI
- GD1amQHfPcttRGw2+t2rB6w+3hMJTH220yS1/D8qm0SeiHQsy+wIwN62n+IiY9q0jQuB
- ppeg==
-X-Gm-Message-State: AOAM530iZUm/xll3riqACeF64v3B8HkfCmKTebQg5fLypux0X1nszZ+A
- b4mn1XH3Vf3/qcK2ZSCdswoET1caaoMi9fNL15w=
-X-Google-Smtp-Source: ABdhPJyUZG03m8BUBeMgQldb/I6yzeSUNcHgC3xoVpN0jXeEnaIpkKB6GQ/MRWe5m6GqgIf0XVU7/vAI02QVmKf8jCE=
-X-Received: by 2002:adf:f885:: with SMTP id u5mr25292176wrp.402.1592923841506; 
- Tue, 23 Jun 2020 07:50:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jnk8X-0003xF-LU; Tue, 23 Jun 2020 10:42:57 -0400
+Received: from mout.web.de ([212.227.15.4]:52705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jnk8V-0002Up-Qm; Tue, 23 Jun 2020 10:42:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1592923370;
+ bh=966MeEmCdBmXq5ZMscyj1lFFlNZ/TNvAh5y+/Tq5lgw=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=s41cefNBPUc66kxALDo0Un4ry6SmtHq6HYikAkGo75s4WLKirege0MxzNQX19z6KF
+ vIpJ3nQyqCmNhwfaVDI/WpdJXUn0I6jbrEB+NsHIXg5fJjDRk9F4MnVbr1Qt3Zk//1
+ DFNavwI66gbiSDVv0P3fFjanw+ecsFlEg78bd9Xk=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.8]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MAMY6-1jgdeK1Rmc-00Bb35; Tue, 23
+ Jun 2020 16:42:50 +0200
+Date: Tue, 23 Jun 2020 16:42:48 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v5 3/7] chardev/char-socket.c: Add yank feature
+Message-ID: <f98dad765c275daa6b822eba1ad27f8ca74b35d3.1592923201.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1592923201.git.lukasstraub2@web.de>
+References: <cover.1592923201.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-References: <1592914438-30317-1-git-send-email-chenhc@lemote.com>
- <1592914438-30317-3-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1592914438-30317-3-git-send-email-chenhc@lemote.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 23 Jun 2020 16:50:21 +0200
-Message-ID: <CAHiYmc7kWNDpb5btfOSmOJT0yAFi31XQ515+f_1avZfwqBdA2A@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V5 2/4] hw/intc: Add Loongson liointc support
-To: Huacai Chen <zltjiangshi@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000ba316805a8c17b9d"
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/oQU4cT/ewsXvRR5ZrO+RhVB";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:JA0cV2yz/2bFiWBBpktQ57hqUazevxdqvYvJfOtkF4JGPd76AwL
+ NV1xu+hp/dVNtxaeO0IKFPj2QBzogpB4Z6OojZrLBiV8p0eO9mvYvhsJGP2gZYhQBWylcbp
+ 0g5Cg+rD4jNMgDdgDR2HsAEgWE8nM4Ggb8qrBgvkCpaShOU5uckTarZrIviu4kJ5iAzchp3
+ mEIX8pTslfEYrtRT4jpug==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UsbjXQ65B/s=:nC/6YIdDm6mDm9GTvJEH6j
+ ntNovQ91SUazUgIwmzmhrxaj0QISP1F/RowYMfyavs6hmTGSKqffh9HBSHebOBcZwxBPY51kk
+ sPGWc5PZozCb2f5OMTWQzamSDYKitJDKzZnLLxzeUTmrBhLK5EMClmJ2YoG1pipj/t3Y1YG3E
+ PAlOxzcZWaSHjFuNewZZ9GIIAqLLd4+rZ9ymw4t4OnldcuBS85uTRFsq/dYhw6H5W35cAFeVH
+ 5SExSkpQbXF7VoYJkhroolPnD5aqYkzuKBae0hIBVly2U8i3qqi9IDvG3zjBPh9pjGOWYsj4I
+ QKi8H4aef2fimqo9KjZ1p3S7D2Dy/B4fBdWSlZz85vuiaQiSAy04I4iRMu0jNAxt7l2Vsq9H+
+ ycQJ8HBvVl8h/UXWzz7/5RDQELSVxBWP0CWr4j7bRs30oWLaX1gIJvfFdo/rFwJ2cz3rt745X
+ YHHQ9HL4QOte/anXvTQEYBcCKtk0v96lLW3814QjfIljqVkn5/V8Is3JoHuNpyfM/k+I8UVGI
+ 9tX3z6G10X0i/2shW7jnQSZLY7ylq6/FXicGGssQgGR3qCC1PoOdM31MehS7qipI3/w7s4alP
+ ffvkQVQjrvYPRYqMVzHz18pJXi2cszht8YZsYlTQZpFN/dLBc17FkdrSPY/t2Iibs79enlPcI
+ +oTjH9a1WXHWc7zna+feQz8LL8xUjEJGLPArpwrPSXBA36YwEJY273bOoyTDsWtSR72W18g0Q
+ 1vu0oYOhSVcj9JQdM6AmCRjZbLpRLvTdFSgz0LApkAPHxRMTKw02MnZNE6cAw+QdN41eV49oV
+ +6dV8pyVA1eOgfgC549f8bLire5/OTQ29q6840MkwhqI7bRbtT+eoeWkvzRjlT+WvVPCWdgxl
+ qpF8L6h3eo8Gk/O4J4btOijLAZof5I5/ahn96EmeFveQECEA4uCFRtId5qmCBTn+F6nljcFKb
+ U2vd4JGvdwq17HxjzDrgvVjjuEsMIp2iMyDIHfgrsXaJ8Q2TibzfIkyCod0o1goKFMelwCcJ/
+ la7QYZ4Oq7D00GWNzmEnZgCP2aVOQZLpmBqd7Rv5g3iEdcf7L3XX13+gksn7EO1+3u3ZRinxD
+ TTfIaQSlAD+chy7sH7uRm2NZsmfOTnW7DXGpYJfHXRk4eWYUlE08R2zHVDPCCZRKFU38TZAF2
+ CwptDMhLobDPYk6CVsnUcUMuBUe5ZxmrHfjQEvM+0nXvjtyK++XLW2rkJa1qGAhlfRLTPFprZ
+ rQoxv1OKsEWAcTLAk
+Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 09:48:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,680 +100,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ba316805a8c17b9d
-Content-Type: text/plain; charset="UTF-8"
+--Sig_/oQU4cT/ewsXvRR5ZrO+RhVB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-=D1=83=D1=82=D0=BE, 23. =D1=98=D1=83=D0=BD 2020. =D1=83 14:13 Huacai Chen <=
-zltjiangshi@gmail.com> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+Register a yank function to shutdown the socket on yank.
 
-> Loongson-3 has an integrated liointc (Local I/O interrupt controller).
-> It is similar to goldfish interrupt controller, but more powerful (e.g.,
->
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+---
+ chardev/char-socket.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-Any pointers to documentation?
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index afebeec5c3..4e7a7e9ae4 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -34,6 +34,7 @@
+ #include "qapi/error.h"
+ #include "qapi/clone-visitor.h"
+ #include "qapi/qapi-visit-sockets.h"
++#include "qemu/yank.h"
 
-Thanks,
-Aleksandar
+ #include "chardev/char-io.h"
+
+@@ -69,6 +70,7 @@ typedef struct {
+     size_t read_msgfds_num;
+     int *write_msgfds;
+     size_t write_msgfds_num;
++    char *yank_name;
+
+     SocketAddress *addr;
+     bool is_listen;
+@@ -411,6 +413,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+
+     tcp_set_msgfds(chr, NULL, 0);
+     remove_fd_in_watch(chr);
++    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING
++        || s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
++        yank_unregister_function(s->yank_name, yank_generic_iochannel,
++                                 QIO_CHANNEL(s->sioc));
++    }
+     object_unref(OBJECT(s->sioc));
+     s->sioc =3D NULL;
+     object_unref(OBJECT(s->ioc));
+@@ -916,6 +923,8 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
+     }
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     ret =3D tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+     return ret;
+@@ -930,6 +939,8 @@ static void tcp_chr_accept(QIONetListener *listener,
+
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     tcp_chr_set_client_ioc_name(chr, cioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(cioc));
+     tcp_chr_new_client(chr, cioc);
+ }
+
+@@ -945,6 +956,8 @@ static int tcp_chr_connect_client_sync(Chardev *chr, Er=
+ror **errp)
+         object_unref(OBJECT(sioc));
+         return -1;
+     }
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+     return 0;
+@@ -960,6 +973,8 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     sioc =3D qio_net_listener_wait_client(s->listener);
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     tcp_chr_new_client(chr, sioc);
+     object_unref(OBJECT(sioc));
+ }
+@@ -1070,6 +1085,8 @@ static void char_socket_finalize(Object *obj)
+         object_unref(OBJECT(s->tls_creds));
+     }
+     g_free(s->tls_authz);
++    yank_unregister_instance(s->yank_name);
++    g_free(s->yank_name);
+
+     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+ }
+@@ -1085,6 +1102,8 @@ static void qemu_chr_socket_connected(QIOTask *task, =
+void *opaque)
+
+     if (qio_task_propagate_error(task, &err)) {
+         tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
++        yank_unregister_function(s->yank_name, yank_generic_iochannel,
++                                 QIO_CHANNEL(sioc));
+         check_report_connect_error(chr, err);
+         error_free(err);
+         goto cleanup;
+@@ -1119,6 +1138,8 @@ static void tcp_chr_connect_client_async(Chardev *chr)
+     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
+     sioc =3D qio_channel_socket_new();
+     tcp_chr_set_client_ioc_name(chr, sioc);
++    yank_register_function(s->yank_name, yank_generic_iochannel,
++                           QIO_CHANNEL(sioc));
+     /*
+      * Normally code would use the qio_channel_socket_connect_async
+      * method which uses a QIOTask + qio_task_set_error internally
+@@ -1360,6 +1381,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
+     }
+
++    s->yank_name =3D g_strconcat("chardev:", chr->label, NULL);
++    yank_register_instance(s->yank_name);
++
+     /* be isn't opened until we get a connection */
+     *be_opened =3D false;
+
+--
+2.20.1
 
 
+--Sig_/oQU4cT/ewsXvRR5ZrO+RhVB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> it can route external interrupt to multi-cores).
->
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  hw/intc/Kconfig            |   3 +
->  hw/intc/Makefile.objs      |   1 +
->  hw/intc/loongson_liointc.c | 246
-> +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 250 insertions(+)
->  create mode 100644 hw/intc/loongson_liointc.c
->
-> diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-> index a189d6f..264d82d 100644
-> --- a/hw/intc/Kconfig
-> +++ b/hw/intc/Kconfig
-> @@ -61,3 +61,6 @@ config S390_FLIC_KVM
->
->  config OMPIC
->      bool
-> +
-> +config LOONGSON_LIOINTC
-> +    bool
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index a61e672..9a26fbe 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -50,3 +50,4 @@ obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
->  obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
->  obj-$(CONFIG_OMPIC) +=3D ompic.o
->  obj-$(CONFIG_IBEX) +=3D ibex_plic.o
-> +obj-$(CONFIG_LOONGSON_LIOINTC) +=3D loongson_liointc.o
-> diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c
-> new file mode 100644
-> index 0000000..d4c1b48
-> --- /dev/null
-> +++ b/hw/intc/loongson_liointc.c
-> @@ -0,0 +1,246 @@
-> +/*
-> + * QEMU Loongson Local I/O interrupt controler.
-> + *
-> + * Copyright (c) 2020 Jiaxun Yang <jiaxun.yang@flygoat.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining
-> a copy
-> + * of this software and associated documentation files (the "Software"),
-> to deal
-> + * in the Software without restriction, including without limitation the
-> rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
-> sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be
-> included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-> OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-> ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S
-> IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/module.h"
-> +#include "hw/irq.h"
-> +#include "hw/qdev-properties.h"
-> +
-> +#define D(x)
-> +
-> +#define NUM_IRQS    32
-> +
-> +#define NUM_CORES   4
-> +#define NUM_IPS     4
-> +#define NUM_PARENTS (NUM_CORES * NUM_IPS)
-> +#define PARENT_COREx_IPy(x, y)    (NUM_IPS * x + y)
-> +
-> +#define R_MAPPER_START    0x0
-> +#define R_MAPPER_END      0x20
-> +#define R_ISR           R_MAPPER_END
-> +#define R_IEN           0x24
-> +#define R_IEN_SET       0x28
-> +#define R_IEN_CLR       0x2c
-> +#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)
-> +#define R_END           0x64
-> +
-> +#define TYPE_LOONGSON_LIOINTC "loongson.liointc"
-> +#define LOONGSON_LIOINTC(obj) OBJECT_CHECK(struct loongson_liointc,
-> (obj), TYPE_LOONGSON_LIOINTC)
-> +
-> +struct loongson_liointc
-> +{
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mmio;
-> +    qemu_irq parent_irq[NUM_PARENTS];
-> +
-> +    uint8_t mapper[NUM_IRQS]; /* 0:3 for core, 4:7 for IP */
-> +    uint32_t isr;
-> +    uint32_t ien;
-> +    uint32_t per_core_isr[NUM_CORES];
-> +
-> +    /* state of the interrupt input pins */
-> +    uint32_t pin_state;
-> +    bool parent_state[NUM_PARENTS];
-> +};
-> +
-> +static void update_irq(struct loongson_liointc *p)
-> +{
-> +    uint32_t irq, core, ip;
-> +    uint32_t per_ip_isr[NUM_IPS] =3D {0};
-> +
-> +    /* level triggered interrupt */
-> +    p->isr =3D p->pin_state;
-> +
-> +    /* Clear disabled IRQs */
-> +    p->isr &=3D p->ien;
-> +
-> +    /* Clear per_core_isr */
-> +    for (core =3D 0; core < NUM_CORES; core++) {
-> +        p->per_core_isr[core] =3D 0;
-> +    }
-> +
-> +    /* Update per_core_isr and per_ip_isr */
-> +    for (irq =3D 0; irq < NUM_IRQS; irq++) {
-> +        if (!(p->isr & (1 << irq))) {
-> +            continue;
-> +        }
-> +
-> +        for (core =3D 0; core < NUM_CORES; core++) {
-> +            if ((p->mapper[irq] & (1 << core))) {
-> +                p->per_core_isr[core] |=3D (1 << irq);
-> +            }
-> +        }
-> +
-> +        for (ip =3D 0; ip < NUM_IPS; ip++) {
-> +            if ((p->mapper[irq] & (1 << (ip + 4)))) {
-> +                per_ip_isr[ip] |=3D (1 << irq);
-> +            }
-> +        }
-> +    }
-> +
-> +    /* Emit IRQ to parent! */
-> +    for (core =3D 0; core < NUM_CORES; core++) {
-> +        for (ip =3D 0; ip < NUM_IPS; ip++) {
-> +            int parent =3D PARENT_COREx_IPy(core, ip);
-> +           if (p->parent_state[parent] !=3D
-> +                (!!p->per_core_isr[core] && !!per_ip_isr[ip])) {
-> +                p->parent_state[parent] =3D !p->parent_state[parent];
-> +                qemu_set_irq(p->parent_irq[parent],
-> p->parent_state[parent]);
-> +            }
-> +        }
-> +    }
-> +}
-> +
-> +static uint64_t
-> +liointc_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    struct loongson_liointc *p =3D opaque;
-> +    uint32_t r =3D 0;
-> +
-> +    /* Mapper is 1 byte */
-> +    if (size =3D=3D 1 && addr < R_MAPPER_END) {
-> +        r =3D p->mapper[addr];
-> +        goto out;
-> +    }
-> +
-> +    /* Rest is 4 byte */
-> +    if (size !=3D 4 || (addr % 4)) {
-> +        goto out;
-> +    }
-> +
-> +    if (addr >=3D R_PERCORE_ISR(0) &&
-> +        addr < R_PERCORE_ISR(NUM_CORES)) {
-> +        int core =3D (addr - R_PERCORE_ISR(0)) / 4;
-> +        r =3D p->per_core_isr[core];
-> +        goto out;
-> +    }
-> +
-> +    switch (addr) {
-> +    case R_ISR:
-> +        r =3D p->isr;
-> +        break;
-> +    case R_IEN:
-> +        r =3D p->ien;
-> +        break;
-> +    default:
-> +        break;
-> +    }
-> +
-> +out:
-> +    D(qemu_log("%s: size=3D%d addr=3D%lx val=3D%x\n", __func__, size, ad=
-dr, r));
-> +    return r;
-> +}
-> +
-> +static void
-> +liointc_write(void *opaque, hwaddr addr,
-> +          uint64_t val64, unsigned int size)
-> +{
-> +    struct loongson_liointc *p =3D opaque;
-> +    uint32_t value =3D val64;
-> +
-> +    D(qemu_log("%s: size=3D%d, addr=3D%lx val=3D%x\n", __func__, size, a=
-ddr,
-> value));
-> +
-> +    /* Mapper is 1 byte */
-> +    if (size =3D=3D 1 && addr < R_MAPPER_END) {
-> +        p->mapper[addr] =3D value;
-> +        goto out;
-> +    }
-> +
-> +    /* Rest is 4 byte */
-> +    if (size !=3D 4 || (addr % 4)) {
-> +        goto out;
-> +    }
-> +
-> +    if (addr >=3D R_PERCORE_ISR(0) &&
-> +        addr < R_PERCORE_ISR(NUM_CORES)) {
-> +        int core =3D (addr - R_PERCORE_ISR(0)) / 4;
-> +        p->per_core_isr[core] =3D value;
-> +        goto out;
-> +    }
-> +
-> +    switch (addr) {
-> +    case R_IEN_SET:
-> +        p->ien |=3D value;
-> +        break;
-> +    case R_IEN_CLR:
-> +        p->ien &=3D ~value;
-> +        break;
-> +    default:
-> +        break;
-> +    }
-> +
-> +out:
-> +    update_irq(p);
-> +}
-> +
-> +static const MemoryRegionOps pic_ops =3D {
-> +    .read =3D liointc_read,
-> +    .write =3D liointc_write,
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 4
-> +    }
-> +};
-> +
-> +static void irq_handler(void *opaque, int irq, int level)
-> +{
-> +    struct loongson_liointc *p =3D opaque;
-> +
-> +    p->pin_state &=3D ~(1 << irq);
-> +    p->pin_state |=3D level << irq;
-> +    update_irq(p);
-> +}
-> +
-> +static void loongson_liointc_init(Object *obj)
-> +{
-> +    struct loongson_liointc *p =3D LOONGSON_LIOINTC(obj);
-> +    int i;
-> +
-> +    qdev_init_gpio_in(DEVICE(obj), irq_handler, 32);
-> +
-> +    for (i =3D 0; i < NUM_PARENTS; i++) {
-> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &p->parent_irq[i]);
-> +    }
-> +
-> +    memory_region_init_io(&p->mmio, obj, &pic_ops, p,
-> +                         "loongson.liointc", R_END);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &p->mmio);
-> +}
-> +
-> +static const TypeInfo loongson_liointc_info =3D {
-> +    .name          =3D TYPE_LOONGSON_LIOINTC,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(struct loongson_liointc),
-> +    .instance_init =3D loongson_liointc_init,
-> +};
-> +
-> +static void loongson_liointc_register_types(void)
-> +{
-> +    type_register_static(&loongson_liointc_info);
-> +}
-> +
-> +type_init(loongson_liointc_register_types)
-> --
-> 2.7.0
->
->
+-----BEGIN PGP SIGNATURE-----
 
---000000000000ba316805a8c17b9d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7yFOgACgkQNasLKJxd
+slikdxAAmOWv7fdTF83N4cbP/XbjZzDvY4kov2FIxASD01Upo86p4wH2CsZKwU3X
+K6dwG8EQW8mtfzAQE1RZAneXqGSIx5r/BjULfZHA/x6x8YX9/Lu8+TncEzHRFOm3
+djB7lMyS4kfJsuzhpOKT2irJi0HAowIOEkPc4UqrkOsZOWz5JAZI8c/tmJC3I8Cg
+ozdsNujziZXAxOkdG2+JsV4ItSJliIAkCRGn3bNQLl5/5iNQmBsUcbqntVJWbiy6
+qezedvwu2IACVmMo7fWidDR6quJhuy+xJmf25P0uzE4Ocp0pPh9Ym/MlxoxL1oBk
+FUDq1OewJ2a9xiTt1LSvGpsYsQsrxmR/WU5aT6x/sNACqqgi/mdABoTXMPXA9vZc
+tlbNkDAdFsXMKVV21tztcmQDNipAbrTNIxxAcWwC4f23+r+pVeYqKYkflahiBwWr
+gSgVCFFwdUUrSctWidYTfqRkcyq1MGmAObNt8nycVNx88rLcjCXeXxUwn3DwLleT
+WIqXVxvz1JjW+kNNl5idC5VtVczvA1uxn4BgZco+Db8SPKxcn7FEztRkjB/kcxdk
++zkmebCMyoDJwE62Y70cDg8Y1mpk4EWyRYaXzBijX4CvJnwOkmtobZE2LPMnbdB+
+1BpiAe/cgXMn0dBiBQ5BjOMyhc2ue9DJRQnz5aSe/TMCdmiD2GA=
+=/Yl6
+-----END PGP SIGNATURE-----
 
-<div dir=3D"ltr"><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
-=3D"gmail_attr">=D1=83=D1=82=D0=BE, 23. =D1=98=D1=83=D0=BD 2020. =D1=83 14:=
-13 Huacai Chen &lt;<a href=3D"mailto:zltjiangshi@gmail.com">zltjiangshi@gma=
-il.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=
-=BB=D0=B0:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Loong=
-son-3 has an integrated liointc (Local I/O interrupt controller).<br>
-It is similar to goldfish interrupt controller, but more powerful (e.g.,<br=
-></blockquote><div><br></div><div>Any pointers to documentation?</div><div>=
-<br></div><div>Thanks,</div><div>Aleksandar<br></div><div><br></div><div>=
-=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-it can route external interrupt to multi-cores).<br>
-<br>
-Signed-off-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com" target=
-=3D"_blank">chenhc@lemote.com</a>&gt;<br>
-Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com" t=
-arget=3D"_blank">jiaxun.yang@flygoat.com</a>&gt;<br>
----<br>
-=C2=A0hw/intc/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
-=A03 +<br>
-=C2=A0hw/intc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-=C2=A0hw/intc/loongson_liointc.c | 246 ++++++++++++++++++++++++++++++++++++=
-+++++++++<br>
-=C2=A03 files changed, 250 insertions(+)<br>
-=C2=A0create mode 100644 hw/intc/loongson_liointc.c<br>
-<br>
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig<br>
-index a189d6f..264d82d 100644<br>
---- a/hw/intc/Kconfig<br>
-+++ b/hw/intc/Kconfig<br>
-@@ -61,3 +61,6 @@ config S390_FLIC_KVM<br>
-<br>
-=C2=A0config OMPIC<br>
-=C2=A0 =C2=A0 =C2=A0bool<br>
-+<br>
-+config LOONGSON_LIOINTC<br>
-+=C2=A0 =C2=A0 bool<br>
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs<br>
-index a61e672..9a26fbe 100644<br>
---- a/hw/intc/Makefile.objs<br>
-+++ b/hw/intc/Makefile.objs<br>
-@@ -50,3 +50,4 @@ obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o<br>
-=C2=A0obj-$(CONFIG_NIOS2) +=3D nios2_iic.o<br>
-=C2=A0obj-$(CONFIG_OMPIC) +=3D ompic.o<br>
-=C2=A0obj-$(CONFIG_IBEX) +=3D ibex_plic.o<br>
-+obj-$(CONFIG_LOONGSON_LIOINTC) +=3D loongson_liointc.o<br>
-diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c<br>
-new file mode 100644<br>
-index 0000000..d4c1b48<br>
---- /dev/null<br>
-+++ b/hw/intc/loongson_liointc.c<br>
-@@ -0,0 +1,246 @@<br>
-+/*<br>
-+ * QEMU Loongson Local I/O interrupt controler.<br>
-+ *<br>
-+ * Copyright (c) 2020 Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoa=
-t.com" target=3D"_blank">jiaxun.yang@flygoat.com</a>&gt;<br>
-+ *<br>
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy<br>
-+ * of this software and associated documentation files (the &quot;Software=
-&quot;), to deal<br>
-+ * in the Software without restriction, including without limitation the r=
-ights<br>
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll<br>
-+ * copies of the Software, and to permit persons to whom the Software is<b=
-r>
-+ * furnished to do so, subject to the following conditions:<br>
-+ *<br>
-+ * The above copyright notice and this permission notice shall be included=
- in<br>
-+ * all copies or substantial portions of the Software.<br>
-+ *<br>
-+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIN=
-D, EXPRESS OR<br>
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,<br>
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL=
-<br>
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER<br>
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,<br>
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN<br>
-+ * THE SOFTWARE.<br>
-+ */<br>
-+<br>
-+#include &quot;qemu/osdep.h&quot;<br>
-+#include &quot;hw/sysbus.h&quot;<br>
-+#include &quot;qemu/module.h&quot;<br>
-+#include &quot;hw/irq.h&quot;<br>
-+#include &quot;hw/qdev-properties.h&quot;<br>
-+<br>
-+#define D(x)<br>
-+<br>
-+#define NUM_IRQS=C2=A0 =C2=A0 32<br>
-+<br>
-+#define NUM_CORES=C2=A0 =C2=A04<br>
-+#define NUM_IPS=C2=A0 =C2=A0 =C2=A04<br>
-+#define NUM_PARENTS (NUM_CORES * NUM_IPS)<br>
-+#define PARENT_COREx_IPy(x, y)=C2=A0 =C2=A0 (NUM_IPS * x + y)<br>
-+<br>
-+#define R_MAPPER_START=C2=A0 =C2=A0 0x0<br>
-+#define R_MAPPER_END=C2=A0 =C2=A0 =C2=A0 0x20<br>
-+#define R_ISR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0R_MAPPER_END<br>
-+#define R_IEN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00x24<br>
-+#define R_IEN_SET=C2=A0 =C2=A0 =C2=A0 =C2=A00x28<br>
-+#define R_IEN_CLR=C2=A0 =C2=A0 =C2=A0 =C2=A00x2c<br>
-+#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)<br>
-+#define R_END=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00x64<br>
-+<br>
-+#define TYPE_LOONGSON_LIOINTC &quot;loongson.liointc&quot;<br>
-+#define LOONGSON_LIOINTC(obj) OBJECT_CHECK(struct loongson_liointc, (obj),=
- TYPE_LOONGSON_LIOINTC)<br>
-+<br>
-+struct loongson_liointc<br>
-+{<br>
-+=C2=A0 =C2=A0 SysBusDevice parent_obj;<br>
-+<br>
-+=C2=A0 =C2=A0 MemoryRegion mmio;<br>
-+=C2=A0 =C2=A0 qemu_irq parent_irq[NUM_PARENTS];<br>
-+<br>
-+=C2=A0 =C2=A0 uint8_t mapper[NUM_IRQS]; /* 0:3 for core, 4:7 for IP */<br>
-+=C2=A0 =C2=A0 uint32_t isr;<br>
-+=C2=A0 =C2=A0 uint32_t ien;<br>
-+=C2=A0 =C2=A0 uint32_t per_core_isr[NUM_CORES];<br>
-+<br>
-+=C2=A0 =C2=A0 /* state of the interrupt input pins */<br>
-+=C2=A0 =C2=A0 uint32_t pin_state;<br>
-+=C2=A0 =C2=A0 bool parent_state[NUM_PARENTS];<br>
-+};<br>
-+<br>
-+static void update_irq(struct loongson_liointc *p)<br>
-+{<br>
-+=C2=A0 =C2=A0 uint32_t irq, core, ip;<br>
-+=C2=A0 =C2=A0 uint32_t per_ip_isr[NUM_IPS] =3D {0};<br>
-+<br>
-+=C2=A0 =C2=A0 /* level triggered interrupt */<br>
-+=C2=A0 =C2=A0 p-&gt;isr =3D p-&gt;pin_state;<br>
-+<br>
-+=C2=A0 =C2=A0 /* Clear disabled IRQs */<br>
-+=C2=A0 =C2=A0 p-&gt;isr &amp;=3D p-&gt;ien;<br>
-+<br>
-+=C2=A0 =C2=A0 /* Clear per_core_isr */<br>
-+=C2=A0 =C2=A0 for (core =3D 0; core &lt; NUM_CORES; core++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;per_core_isr[core] =3D 0;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 /* Update per_core_isr and per_ip_isr */<br>
-+=C2=A0 =C2=A0 for (irq =3D 0; irq &lt; NUM_IRQS; irq++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!(p-&gt;isr &amp; (1 &lt;&lt; irq))) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (core =3D 0; core &lt; NUM_CORES; core++) =
-{<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((p-&gt;mapper[irq] &amp; (1 =
-&lt;&lt; core))) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;per_core_isr=
-[core] |=3D (1 &lt;&lt; irq);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (ip =3D 0; ip &lt; NUM_IPS; ip++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((p-&gt;mapper[irq] &amp; (1 =
-&lt;&lt; (ip + 4)))) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 per_ip_isr[ip] |=
-=3D (1 &lt;&lt; irq);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 /* Emit IRQ to parent! */<br>
-+=C2=A0 =C2=A0 for (core =3D 0; core &lt; NUM_CORES; core++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (ip =3D 0; ip &lt; NUM_IPS; ip++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int parent =3D PARENT_COREx_IPy(=
-core, ip);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (p-&gt;parent_state[parent] !=
-=3D<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (!!p-&gt;per_core_=
-isr[core] &amp;&amp; !!per_ip_isr[ip])) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;parent_state=
-[parent] =3D !p-&gt;parent_state[parent];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_set_irq(p-&gt=
-;parent_irq[parent], p-&gt;parent_state[parent]);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 }<br>
-+}<br>
-+<br>
-+static uint64_t<br>
-+liointc_read(void *opaque, hwaddr addr, unsigned int size)<br>
-+{<br>
-+=C2=A0 =C2=A0 struct loongson_liointc *p =3D opaque;<br>
-+=C2=A0 =C2=A0 uint32_t r =3D 0;<br>
-+<br>
-+=C2=A0 =C2=A0 /* Mapper is 1 byte */<br>
-+=C2=A0 =C2=A0 if (size =3D=3D 1 &amp;&amp; addr &lt; R_MAPPER_END) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 r =3D p-&gt;mapper[addr];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 /* Rest is 4 byte */<br>
-+=C2=A0 =C2=A0 if (size !=3D 4 || (addr % 4)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 if (addr &gt;=3D R_PERCORE_ISR(0) &amp;&amp;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 addr &lt; R_PERCORE_ISR(NUM_CORES)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int core =3D (addr - R_PERCORE_ISR(0)) / 4;<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 r =3D p-&gt;per_core_isr[core];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 switch (addr) {<br>
-+=C2=A0 =C2=A0 case R_ISR:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 r =3D p-&gt;isr;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 case R_IEN:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 r =3D p-&gt;ien;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 default:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+out:<br>
-+=C2=A0 =C2=A0 D(qemu_log(&quot;%s: size=3D%d addr=3D%lx val=3D%x\n&quot;, =
-__func__, size, addr, r));<br>
-+=C2=A0 =C2=A0 return r;<br>
-+}<br>
-+<br>
-+static void<br>
-+liointc_write(void *opaque, hwaddr addr,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t val64, unsigned int size)<br>
-+{<br>
-+=C2=A0 =C2=A0 struct loongson_liointc *p =3D opaque;<br>
-+=C2=A0 =C2=A0 uint32_t value =3D val64;<br>
-+<br>
-+=C2=A0 =C2=A0 D(qemu_log(&quot;%s: size=3D%d, addr=3D%lx val=3D%x\n&quot;,=
- __func__, size, addr, value));<br>
-+<br>
-+=C2=A0 =C2=A0 /* Mapper is 1 byte */<br>
-+=C2=A0 =C2=A0 if (size =3D=3D 1 &amp;&amp; addr &lt; R_MAPPER_END) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;mapper[addr] =3D value;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 /* Rest is 4 byte */<br>
-+=C2=A0 =C2=A0 if (size !=3D 4 || (addr % 4)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 if (addr &gt;=3D R_PERCORE_ISR(0) &amp;&amp;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 addr &lt; R_PERCORE_ISR(NUM_CORES)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int core =3D (addr - R_PERCORE_ISR(0)) / 4;<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;per_core_isr[core] =3D value;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 switch (addr) {<br>
-+=C2=A0 =C2=A0 case R_IEN_SET:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;ien |=3D value;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 case R_IEN_CLR:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 p-&gt;ien &amp;=3D ~value;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 default:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+out:<br>
-+=C2=A0 =C2=A0 update_irq(p);<br>
-+}<br>
-+<br>
-+static const MemoryRegionOps pic_ops =3D {<br>
-+=C2=A0 =C2=A0 .read =3D liointc_read,<br>
-+=C2=A0 =C2=A0 .write =3D liointc_write,<br>
-+=C2=A0 =C2=A0 .endianness =3D DEVICE_NATIVE_ENDIAN,<br>
-+=C2=A0 =C2=A0 .valid =3D {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .min_access_size =3D 1,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .max_access_size =3D 4<br>
-+=C2=A0 =C2=A0 }<br>
-+};<br>
-+<br>
-+static void irq_handler(void *opaque, int irq, int level)<br>
-+{<br>
-+=C2=A0 =C2=A0 struct loongson_liointc *p =3D opaque;<br>
-+<br>
-+=C2=A0 =C2=A0 p-&gt;pin_state &amp;=3D ~(1 &lt;&lt; irq);<br>
-+=C2=A0 =C2=A0 p-&gt;pin_state |=3D level &lt;&lt; irq;<br>
-+=C2=A0 =C2=A0 update_irq(p);<br>
-+}<br>
-+<br>
-+static void loongson_liointc_init(Object *obj)<br>
-+{<br>
-+=C2=A0 =C2=A0 struct loongson_liointc *p =3D LOONGSON_LIOINTC(obj);<br>
-+=C2=A0 =C2=A0 int i;<br>
-+<br>
-+=C2=A0 =C2=A0 qdev_init_gpio_in(DEVICE(obj), irq_handler, 32);<br>
-+<br>
-+=C2=A0 =C2=A0 for (i =3D 0; i &lt; NUM_PARENTS; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_init_irq(SYS_BUS_DEVICE(obj), &amp;p-&g=
-t;parent_irq[i]);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 memory_region_init_io(&amp;p-&gt;mmio, obj, &amp;pic_ops, p,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0&quot;loongson.liointc&quot;, R_END);<br>
-+=C2=A0 =C2=A0 sysbus_init_mmio(SYS_BUS_DEVICE(obj), &amp;p-&gt;mmio);<br>
-+}<br>
-+<br>
-+static const TypeInfo loongson_liointc_info =3D {<br>
-+=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_LOONGSON_LI=
-OINTC,<br>
-+=C2=A0 =C2=A0 .parent=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_SYS_BUS_DEVICE,<=
-br>
-+=C2=A0 =C2=A0 .instance_size =3D sizeof(struct loongson_liointc),<br>
-+=C2=A0 =C2=A0 .instance_init =3D loongson_liointc_init,<br>
-+};<br>
-+<br>
-+static void loongson_liointc_register_types(void)<br>
-+{<br>
-+=C2=A0 =C2=A0 type_register_static(&amp;loongson_liointc_info);<br>
-+}<br>
-+<br>
-+type_init(loongson_liointc_register_types)<br>
--- <br>
-2.7.0<br>
-<br>
-</blockquote></div></div>
-
---000000000000ba316805a8c17b9d--
+--Sig_/oQU4cT/ewsXvRR5ZrO+RhVB--
 
