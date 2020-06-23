@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48692C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1405C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11F8E206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D72120C09
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 19:42:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XkSnSs4Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11F8E206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dD+6/qZH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D72120C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnonY-0003C1-5h
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 15:41:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42226)
+	id 1jnooe-00052v-MK
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 15:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojb-00042B-9c
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:31 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41314)
+ id 1jnojI-0003ME-Od
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:12 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40191)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jnojZ-0005jZ-D6
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:30 -0400
-Received: by mail-pf1-x444.google.com with SMTP id q17so3363543pfu.8
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:28 -0700 (PDT)
+ id 1jnojG-0005XX-F8
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 15:37:12 -0400
+Received: by mail-pf1-x441.google.com with SMTP id s23so10556179pfh.7
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 12:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=O/UbM4azFeg3mpovNv7h2AkwaqvCKeiIsgAp+ku190g=;
- b=XkSnSs4YMsDwgrNNBCq1J0k/cIGAoWnKe1/9LfZUhrgRUFr1UvldI5grMY2taT3EdU
- ndmhDHEJ1DZTRfzywR2HJ2YBdCjNTYv5HY66WC5peiAGSkP57cuh57nOnh+8Lt+6k2Ty
- lIyDquBAOwmOuArQst1vragBfI0f+Y9tJqy+2las3cuoozEC0IEjYkUvLKb+1a1jAa7j
- RM6hdvosweWBWPyKbWyNi/Kvchw/wdOBXO5tvQYkUIezmwLU37CrFh2YP+J8LaO2HvlT
- C7VTMJwOzxIbHuApO8Jlo8/DnCeYYL92cJJGJ3soYPKC6dYzfaA1aFkO/NVBMtqi1+fY
- vREA==
+ bh=ztdDJx0ExFHe8U9Rsp15LQewSOcXI1YJBCF+u1ybiMg=;
+ b=dD+6/qZHp/Je6fa++veUSdrBukySRuCBizJAX1jUzbZ7UUw/VehNs2LIniG+Mjk1fO
+ fBZonBaCjTI0osePmb1DbhP1LFsGgestwr1uGZBwy/kB2EOh+otUsDcGqYgPQFI4/N7y
+ r6HihAUI/GHcxqHGpkw7qJcUSrTHui1jw45nZJEGrnroH4nN5Ja71ZNmQvMGhLIDCl+e
+ qmUoUCTuHMhgv6/CK38rmV3s/Vapfw8UX2LiceJgsPqzzpEwysiP8gKZYEKWVCgdzTOo
+ v9FXMavXdn7gFUL8Iwo9DA4otJx622kTCpNB4k+CaOQhjN4ySujiowILgRFC9zfGjm+E
+ xMlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=O/UbM4azFeg3mpovNv7h2AkwaqvCKeiIsgAp+ku190g=;
- b=B7V/BclLhuojrTr+fuAsFW4fXSQiSx2yV3q/AdYG1MDy9zrTh5tnVIc2iNMYpjyHo8
- YlnVNMxUaxXxC4diY1ZDx002s8VbVMib4N8dJg90+PwZiHewSOM00gZv4HW3sPYL2VGV
- nTXoE6gVKzB7ebHxfr96CR5olejU0i+yDItgm1rbvtGac5Yes4u/fyrZ6Om51gOIVehV
- xFPLaGv4JJEMWLxbXwUNtmkJcbT8ZxjjbA7Aa/p9Rw0A21ekdAqGMe4WSRoUTHp9GodW
- zvVIZwiQTvabzbbSL2ZJ3GFOoeczypgG5qQTGxO5uveMqhU3Pj/W7SfLVsNyChYIvr4a
- oGhQ==
-X-Gm-Message-State: AOAM530EU4Ie0O0WqH/PJ0yBvevkbxOJb8iCgJ0z9Vr0LWTD38rY62cE
- vgOjyIrORg49Q/nYcfRs94ZGTUXF57c=
-X-Google-Smtp-Source: ABdhPJxHkXSiaTiE85V3UThTUlSbLS10IZU4LTK+5/6W5oVgXx6DIhvFMFQO4a8g64ZEu1mHnp0+Tg==
-X-Received: by 2002:a63:924c:: with SMTP id s12mr18813463pgn.431.1592941047565; 
- Tue, 23 Jun 2020 12:37:27 -0700 (PDT)
+ bh=ztdDJx0ExFHe8U9Rsp15LQewSOcXI1YJBCF+u1ybiMg=;
+ b=qtmgcFbbtk0vVgHIlKm7wZ02ij01F+AMt7TjdsmrSC6WeisNnTV3HoY8A+a9a6py4r
+ yZWBTNC8tsBUKCFCvfr+a3xF+E9dmQa3a/9JcHYrRa1FGnbzez/SBL0L42jZpuEuJoE8
+ BJ6acKtXHTi1kpxlB7UwAXK6yqnfzS1lxxNBnYuD1QOLhNVUkBnOpsBlnnXO3iQIMcpq
+ Uaq6kdHKZeRDU+lDiJS/yOGryP9DuDJZbdzE40996x6mnaYanb2i4ueI3YO6XowM5o/l
+ yDpbYm3hriWT1jBS/IGHWAdP3P2jzvyVULvVYBpdNStMJ3kyjeJez7vWy1qFmT+zixXS
+ JXQA==
+X-Gm-Message-State: AOAM530GPoSYcaRVCV3hglEOuX9SGnhl2cquN4jysj05gLpizOatRw/h
+ 4YTd6g00QNqGlV7F+fl55I7XvIhObgk=
+X-Google-Smtp-Source: ABdhPJwIxy7cSFVY1M9w856Ky6tH7xztd58UUilROHBKr4wu9MFuQWgn0d1NUT53hvszz0s4PQlZzQ==
+X-Received: by 2002:a63:5d04:: with SMTP id r4mr18789452pgb.15.1592941028697; 
+ Tue, 23 Jun 2020 12:37:08 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.25
+ by smtp.gmail.com with ESMTPSA id p12sm17927642pfq.69.2020.06.23.12.37.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Jun 2020 12:37:26 -0700 (PDT)
+ Tue, 23 Jun 2020 12:37:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 19/45] target/arm: Implement the LDGM, STGM,
- STZGM instructions
-Date: Tue, 23 Jun 2020 12:36:32 -0700
-Message-Id: <20200623193658.623279-20-richard.henderson@linaro.org>
+Subject: [PATCH v8 06/45] target/arm: Add DISAS_UPDATE_NOCHAIN
+Date: Tue, 23 Jun 2020 12:36:19 -0700
+Message-Id: <20200623193658.623279-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200623193658.623279-1-richard.henderson@linaro.org>
 References: <20200623193658.623279-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,260 +106,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add an option that writes back the PC, like DISAS_UPDATE_EXIT,
+but does not exit back to the main loop.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Require pre-cleaned addresses.
-v6: Check full mte enabled.  Reorg the helpers.
----
- target/arm/helper-a64.h    |  3 ++
- target/arm/translate.h     |  2 +
- target/arm/mte_helper.c    | 84 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 72 ++++++++++++++++++++++++++++----
- 4 files changed, 153 insertions(+), 8 deletions(-)
+ target/arm/translate.h     | 2 ++
+ target/arm/translate-a64.c | 3 +++
+ target/arm/translate.c     | 4 ++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 2fa61b86fa..7b628d100e 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -113,3 +113,6 @@ DEF_HELPER_FLAGS_2(stg_stub, TCG_CALL_NO_WG, void, env, i64)
- DEF_HELPER_FLAGS_3(st2g, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_FLAGS_3(st2g_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_FLAGS_2(st2g_stub, TCG_CALL_NO_WG, void, env, i64)
-+DEF_HELPER_FLAGS_2(ldgm, TCG_CALL_NO_WG, i64, env, i64)
-+DEF_HELPER_FLAGS_3(stgm, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_3(stzgm_tags, TCG_CALL_NO_WG, void, env, i64, i64)
 diff --git a/target/arm/translate.h b/target/arm/translate.h
-index dbbf6145cb..82c598beff 100644
+index 6c01f47983..c6f9376000 100644
 --- a/target/arm/translate.h
 +++ b/target/arm/translate.h
-@@ -91,6 +91,8 @@ typedef struct DisasContext {
-      *  < 0, set by the current instruction.
-      */
-     int8_t btype;
-+    /* A copy of cpu->dcz_blocksize. */
-+    uint8_t dcz_blocksize;
-     /* True if this page is guarded.  */
-     bool guarded_page;
-     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 7ec7930dfc..27d4b4536c 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -274,3 +274,87 @@ void HELPER(st2g_stub)(CPUARMState *env, uint64_t ptr)
-         probe_write(env, ptr + TAG_GRANULE, TAG_GRANULE, mmu_idx, ra);
-     }
- }
-+
-+#define LDGM_STGM_SIZE  (4 << GMID_EL1_BS)
-+
-+uint64_t HELPER(ldgm)(CPUARMState *env, uint64_t ptr)
-+{
-+    int mmu_idx = cpu_mmu_index(env, false);
-+    uintptr_t ra = GETPC();
-+    void *tag_mem;
-+
-+    ptr = QEMU_ALIGN_DOWN(ptr, LDGM_STGM_SIZE);
-+
-+    /* Trap if accessing an invalid page.  */
-+    tag_mem = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_LOAD,
-+                                 LDGM_STGM_SIZE, MMU_DATA_LOAD,
-+                                 LDGM_STGM_SIZE / (2 * TAG_GRANULE), ra);
-+
-+    /* The tag is squashed to zero if the page does not support tags.  */
-+    if (!tag_mem) {
-+        return 0;
-+    }
-+
-+    QEMU_BUILD_BUG_ON(GMID_EL1_BS != 6);
-+    /*
-+     * We are loading 64-bits worth of tags.  The ordering of elements
-+     * within the word corresponds to a 64-bit little-endian operation.
-+     */
-+    return ldq_le_p(tag_mem);
-+}
-+
-+void HELPER(stgm)(CPUARMState *env, uint64_t ptr, uint64_t val)
-+{
-+    int mmu_idx = cpu_mmu_index(env, false);
-+    uintptr_t ra = GETPC();
-+    void *tag_mem;
-+
-+    ptr = QEMU_ALIGN_DOWN(ptr, LDGM_STGM_SIZE);
-+
-+    /* Trap if accessing an invalid page.  */
-+    tag_mem = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_STORE,
-+                                 LDGM_STGM_SIZE, MMU_DATA_LOAD,
-+                                 LDGM_STGM_SIZE / (2 * TAG_GRANULE), ra);
-+
-+    /*
-+     * Tag store only happens if the page support tags,
-+     * and if the OS has enabled access to the tags.
-+     */
-+    if (!tag_mem) {
-+        return;
-+    }
-+
-+    QEMU_BUILD_BUG_ON(GMID_EL1_BS != 6);
-+    /*
-+     * We are storing 64-bits worth of tags.  The ordering of elements
-+     * within the word corresponds to a 64-bit little-endian operation.
-+     */
-+    stq_le_p(tag_mem, val);
-+}
-+
-+void HELPER(stzgm_tags)(CPUARMState *env, uint64_t ptr, uint64_t val)
-+{
-+    uintptr_t ra = GETPC();
-+    int mmu_idx = cpu_mmu_index(env, false);
-+    int log2_dcz_bytes, log2_tag_bytes;
-+    intptr_t dcz_bytes, tag_bytes;
-+    uint8_t *mem;
-+
-+    /*
-+     * In arm_cpu_realizefn, we assert that dcz > LOG2_TAG_GRANULE+1,
-+     * i.e. 32 bytes, which is an unreasonably small dcz anyway,
-+     * to make sure that we can access one complete tag byte here.
-+     */
-+    log2_dcz_bytes = env_archcpu(env)->dcz_blocksize + 2;
-+    log2_tag_bytes = log2_dcz_bytes - (LOG2_TAG_GRANULE + 1);
-+    dcz_bytes = (intptr_t)1 << log2_dcz_bytes;
-+    tag_bytes = (intptr_t)1 << log2_tag_bytes;
-+    ptr &= -dcz_bytes;
-+
-+    mem = allocation_tag_mem(env, mmu_idx, ptr, MMU_DATA_STORE, dcz_bytes,
-+                             MMU_DATA_STORE, tag_bytes, ra);
-+    if (mem) {
-+        int tag_pair = (val & 0xf) * 0x11;
-+        memset(mem, tag_pair, tag_bytes);
-+    }
-+}
+@@ -173,6 +173,8 @@ static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+  * return from cpu_tb_exec.
+  */
+ #define DISAS_EXIT      DISAS_TARGET_9
++/* CPU state was modified dynamically; no need to exit, but do not chain. */
++#define DISAS_UPDATE_NOCHAIN  DISAS_TARGET_10
+ 
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5d8c9483bc..b7b2331ccc 100644
+index 63029bbc59..b4bf4cce18 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3736,7 +3736,7 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-     uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
-     int op2 = extract32(insn, 10, 2);
-     int op1 = extract32(insn, 22, 2);
--    bool is_load = false, is_pair = false, is_zero = false;
-+    bool is_load = false, is_pair = false, is_zero = false, is_mult = false;
-     int index = 0;
-     TCGv_i64 addr, clean_addr, tcg_rt;
- 
-@@ -3756,9 +3756,14 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-         if (op2 != 0) {
-             /* STG */
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* STZGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = is_zero = true;
-         }
--        goto do_unallocated;
-+        break;
-     case 1:
-         if (op2 != 0) {
-             /* STZG */
-@@ -3774,17 +3779,27 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-             /* ST2G */
-             is_pair = true;
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* STGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = true;
-         }
--        goto do_unallocated;
-+        break;
-     case 3:
-         if (op2 != 0) {
-             /* STZ2G */
-             is_pair = is_zero = true;
-             index = op2 - 2;
--            break;
-+        } else {
-+            /* LDGM */
-+            if (s->current_el == 0 || offset != 0) {
-+                goto do_unallocated;
-+            }
-+            is_mult = is_load = true;
-         }
--        goto do_unallocated;
-+        break;
- 
-     default:
-     do_unallocated:
-@@ -3792,7 +3807,9 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
--    if (!dc_isar_feature(aa64_mte_insn_reg, s)) {
-+    if (is_mult
-+        ? !dc_isar_feature(aa64_mte, s)
-+        : !dc_isar_feature(aa64_mte_insn_reg, s)) {
-         goto do_unallocated;
-     }
- 
-@@ -3806,6 +3823,44 @@ static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-         tcg_gen_addi_i64(addr, addr, offset);
-     }
- 
-+    if (is_mult) {
-+        tcg_rt = cpu_reg(s, rt);
-+
-+        if (is_zero) {
-+            int size = 4 << s->dcz_blocksize;
-+
-+            if (s->ata) {
-+                gen_helper_stzgm_tags(cpu_env, addr, tcg_rt);
-+            }
-+            /*
-+             * The non-tags portion of STZGM is mostly like DC_ZVA,
-+             * except the alignment happens before the access.
-+             */
-+            clean_addr = clean_data_tbi(s, addr);
-+            tcg_gen_andi_i64(clean_addr, clean_addr, -size);
-+            gen_helper_dc_zva(cpu_env, clean_addr);
-+        } else if (s->ata) {
-+            if (is_load) {
-+                gen_helper_ldgm(tcg_rt, cpu_env, addr);
-+            } else {
-+                gen_helper_stgm(cpu_env, addr, tcg_rt);
-+            }
-+        } else {
-+            MMUAccessType acc = is_load ? MMU_DATA_LOAD : MMU_DATA_STORE;
-+            int size = 4 << GMID_EL1_BS;
-+
-+            clean_addr = clean_data_tbi(s, addr);
-+            tcg_gen_andi_i64(clean_addr, clean_addr, -size);
-+            gen_probe_access(s, clean_addr, acc, size);
-+
-+            if (is_load) {
-+                /* The result tags are zeros.  */
-+                tcg_gen_movi_i64(tcg_rt, 0);
-+            }
-+        }
-+        return;
-+    }
-+
-     if (is_load) {
-         tcg_gen_andi_i64(addr, addr, -TAG_GRANULE);
-         tcg_rt = cpu_reg(s, rt);
-@@ -14484,6 +14539,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->vec_stride = 0;
-     dc->cp_regs = arm_cpu->cp_regs;
-     dc->features = env->features;
-+    dc->dcz_blocksize = arm_cpu->dcz_blocksize;
- 
-     /* Single step state. The code-generation logic here is:
-      *  SS_ACTIVE == 0:
+@@ -14310,6 +14310,9 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_EXIT:
+             tcg_gen_exit_tb(NULL, 0);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_a64_set_pc_im(dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             tcg_gen_lookup_and_goto_ptr();
+             break;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 45ea788370..00f94371a4 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9926,6 +9926,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_NEXT:
+         case DISAS_TOO_MANY:
+         case DISAS_UPDATE_EXIT:
++        case DISAS_UPDATE_NOCHAIN:
+             gen_set_pc_im(dc, dc->base.pc_next);
+             /* fall through */
+         default:
+@@ -9949,6 +9950,9 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 1, dc->base.pc_next);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_set_pc_im(dc, dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             gen_goto_ptr();
+             break;
 -- 
 2.25.1
 
