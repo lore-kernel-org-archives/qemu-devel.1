@@ -2,92 +2,92 @@ Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 806AEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 03:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE7EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 04:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C6EB206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 03:44:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JC4A16Ic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C6EB206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E57920706
+	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 04:26:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E57920706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnZrR-0003Pr-KA
-	for qemu-devel@archiver.kernel.org; Mon, 22 Jun 2020 23:44:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47584)
+	id 1jnaVd-0001Ye-BR
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 00:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jkz@google.com>) id 1jnZqi-0002pa-9z
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 23:43:52 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44266)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jkz@google.com>) id 1jnZqg-0004YJ-IY
- for qemu-devel@nongnu.org; Mon, 22 Jun 2020 23:43:52 -0400
-Received: by mail-pl1-x642.google.com with SMTP id bh7so8520119plb.11
- for <qemu-devel@nongnu.org>; Mon, 22 Jun 2020 20:43:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GrrlkA+gBTm/MgWgV1ewL+Kuua3oCvHevhU9zWU4FP4=;
- b=JC4A16IccNNrr9xJ5pIrVk25meU7h4mC/WIT1Kv6dYi+XiKLiSHNVZd/RmdrGwC2P2
- Qa0GBdyD0UJOJp5+V+ol04FXY/aMxVaBzaREKjcRXHbdZsJpyOt8JQUSdYFYKucnewnU
- SXFNo0/Gbns8GSrsHWPYGRWAMU75OM220ePKq8UkOwJQYrvoKjsDk8HGfi3LWPdtQWMt
- Q14p4Y11O8+TaumfEIhrbrxPJbIUzRECu8eHf9DiYOK+c9Mnsq5Se/TEqZaAypZET0pd
- Fu/YbmrbwDwchCrZqrSba/hffuMAgM07bg44vAr1XIWoOdXaP76yEtCDkg7T7E33om9Y
- gFEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GrrlkA+gBTm/MgWgV1ewL+Kuua3oCvHevhU9zWU4FP4=;
- b=nE1DTm8JogAH0PgWJKwy3PvK2jQao7XniMDxit2B4U0liydjIKpZ/CE5YAk3rCjues
- /lXA+HwxusYuiWV7eP7bH3EVF5/iVNolegAW2bidfxTmzoDmxuXRemyoIKSpTukDA/Lr
- 1bNKJ+GHKvhv0yzfW2XDUpM1KHsrQxIqGiaYswBMfYSQRh/gXbl1g08bFjON06h4OdHG
- FlSEeQMQ2SYZlwa7p/q1IYI0xrsoThEL/xXIBONhcDiklYvKF3bcnqZqCf1775rpfjU8
- u06r+w3ZF0TaV/Db2T/Rdl6xIMo7GB2AXd/SkIExWaqnK65CpIhXl+H2iCM2qtmv1EeH
- n07A==
-X-Gm-Message-State: AOAM530eJGzEvK6V/eu21s0qiy27fk3saXz3n4TEDmCwh4jx7hz5h06R
- FLmqczyMEXuG/hnNUgunI137TeViUrLn01nKQkJ43w==
-X-Google-Smtp-Source: ABdhPJwoJBcTNcQxglfJBRg4JUMEEq8DKa9laQ9vtNctT+M7tahA+gkjZJ/gFc7U79gUraE/4mdZvlAqNg1Gwn8DxPI=
-X-Received: by 2002:a17:902:6bcb:: with SMTP id
- m11mr22131664plt.126.1592883825159; 
- Mon, 22 Jun 2020 20:43:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
+ id 1jnaUm-0000c2-CW; Tue, 23 Jun 2020 00:25:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9912)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
+ id 1jnaUk-0004ZH-Cd; Tue, 23 Jun 2020 00:25:16 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05N435ua033601; Tue, 23 Jun 2020 00:25:04 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31u60ceepr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 00:25:03 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05N4G0sh030220;
+ Tue, 23 Jun 2020 04:25:02 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 31u20ctxp9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 23 Jun 2020 04:25:02 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+ [9.57.199.107])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05N4P2cO21365098
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 23 Jun 2020 04:25:02 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 230CA12405A;
+ Tue, 23 Jun 2020 04:25:02 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 88D54124054;
+ Tue, 23 Jun 2020 04:25:01 +0000 (GMT)
+Received: from pompom.ibm.com (unknown [9.65.252.240])
+ by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 23 Jun 2020 04:25:01 +0000 (GMT)
+From: Lijun Pan <ljp@linux.ibm.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Subject: [PATCH v3] target/ppc: add vmsumudm vmsumcud instructions
+Date: Mon, 22 Jun 2020 23:25:01 -0500
+Message-Id: <20200623042501.47065-1-ljp@linux.ibm.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-References: <20200612014606.147691-1-jkz@google.com>
- <20200612014606.147691-5-jkz@google.com>
- <87h7vbyowf.fsf@linaro.org>
-In-Reply-To: <87h7vbyowf.fsf@linaro.org>
-From: Josh Kunz <jkz@google.com>
-Date: Mon, 22 Jun 2020 20:43:33 -0700
-Message-ID: <CADgy-2uOn835LrnOBDacbqznW8MR7ZQy55kBmpjDbK2Uy1xPEg@mail.gmail.com>
-Subject: Re: [PATCH 4/5] linux-user: Support CLONE_VM and extended clone
- options
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, 
- Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=jkz@google.com; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-22_16:2020-06-22,
+ 2020-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ cotscore=-2147483648
+ bulkscore=0 adultscore=0 spamscore=0 suspectscore=2 priorityscore=1501
+ mlxscore=0 phishscore=0 clxscore=1011 lowpriorityscore=0 mlxlogscore=707
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006230029
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 00:25:11
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,80 +100,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Lijun Pan <ljp@linux.ibm.com>, richard.henderson@linaro.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for the responses Alex. I'm working on your comments, but
-wanted to clarify some of the points you brought up before mailing a
-second version. Responses inline.
+vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
+VA-form.
+vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
+Doubleword VA-form.
 
-On Tue, Jun 16, 2020 at 9:08 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-> Which by the way fail on some targets:
->
->     TEST    linux-test on alpha
->   /home/alex/lsrc/qemu.git/tests/tcg/multiarch/linux-test.c:709: child di=
-d not receive PDEATHSIG on parent death
->   make[2]: *** [../Makefile.target:153: run-linux-test] Error 1
->   make[1]: *** [/home/alex/lsrc/qemu.git/tests/tcg/Makefile.qemu:76: run-=
-guest-tests] Error 2
->   make: *** [/home/alex/lsrc/qemu.git/tests/Makefile.include:851: run-tcg=
--tests-alpha-linux-user] Error 2
->
-> Have you managed a clean check-tcg with docker enabled so all the guest
-> architectures get tested?
+Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+---
+v3: implement vmsumudm/vmsumcud through int128 functions,
+    suggested by Richard Henderson.
 
-I've gotten this Alpha failure to reproduce on my local build and I'm
-working on a fix. Thanks for pointing this out. I'll make sure I get a
-clean `make check-tcg` for `linux-test` on all guest architectures.
+ disas/ppc.c                         |  2 ++
+ target/ppc/helper.h                 |  4 ++-
+ target/ppc/int_helper.c             | 49 ++++++++++++++++++++++++++++-
+ target/ppc/translate.c              |  1 -
+ target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
+ target/ppc/translate/vmx-ops.inc.c  |  2 ++
+ 6 files changed, 76 insertions(+), 21 deletions(-)
 
-> > In this patch, I've employed an alternative approach: spawning a thread
-> > an "stealing" its TLS image for use in the child process. This approach
-> > leaves a dangling thread while the TLS image is in use, but by design
-> > that thread will not become schedulable until after the TLS data is no
-> > longer in-use by the child (as described in a moment). Therefore, it
-> > should cause relatively minimal overhead. When considered in the larger
-> > context, this seems like a reasonable tradeoff.
->
-> *sharp intake of breath*
->
-> OK so the solution to the complexity of handling threads is to add more
-> threads? cool cool cool....
+diff --git a/disas/ppc.c b/disas/ppc.c
+index 63e97cfe1d..bd76fae4c4 100644
+--- a/disas/ppc.c
++++ b/disas/ppc.c
+@@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] = {
+ { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
+ { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
+ { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
++{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
+ { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
++{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
+ { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+ { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+ { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 2dfa1c6942..d540e8f30b 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -263,10 +263,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+ DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
++DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+-DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
++DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
++DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+ DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
+ DEF_HELPER_3(lvebx, void, env, avr, tl)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index be53cd6f68..37ea343cb3 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -926,7 +926,8 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+     }
+ }
+ 
+-void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
++                      ppc_avr_t *b, ppc_avr_t *c)
+ {
+     int i;
+ 
+@@ -1064,6 +1065,52 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+     }
+ }
+ 
++void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
++                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++{
++    Int128 sum;
++    uint64_t lo, hi;
++
++    sum = int128_make128(c->VsrD(1), c->VsrD(0));
++
++    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
++    sum = int128_add(sum, int128_make128(lo, hi));
++
++    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
++    sum = int128_add(sum, int128_make128(lo, hi));
++
++    r->VsrD(0) = int128_gethi(sum);
++    r->VsrD(1) = int128_getlo(sum);
++}
++
++void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
++                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++{
++    Int128 sum;
++    uint64_t p1lo, p1hi, p2lo, p2hi;
++
++    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
++    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
++
++    /* Sum lowest 64-bit elements.  */
++    sum = int128_make128(c->VsrD(1), 0);
++    sum = int128_add(sum, int128_make128(p1lo, 0));
++    sum = int128_add(sum, int128_make128(p2lo, 0));
++
++    /*
++     * Discard low 64-bits, leaving the carry into bit 64.
++     * Then sum the higher 64-bit elements.
++     */
++    sum = int128_rshift(sum, 64);
++    sum = int128_add(sum, int128_make128(c->VsrD(0), 0));
++    sum = int128_add(sum, int128_make128(p1hi, 0));
++    sum = int128_add(sum, int128_make128(p2hi, 0));
++
++    /* The result is only the carry into bits 64 & 65. */
++    r->VsrD(1) = int128_gethi(sum);
++    r->VsrD(0) = 0;
++}
++
+ #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
+     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+     {                                                                   \
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4ce3d664b5..35ff1aa77e 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7281,7 +7281,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+ GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
+-GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
+               PPC2_ISA300),
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index 403ed3a01c..520b49a773 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -1248,6 +1248,25 @@ static void gen_vsldoi(DisasContext *ctx)
+     tcg_temp_free_i32(sh);
+ }
+ 
++#define GEN_VAFORM(name, opc2)                                          \
++static void glue(gen_, name)(DisasContext *ctx)                         \
++{                                                                       \
++    TCGv_ptr ra, rb, rc, rd;                                            \
++    if (unlikely(!ctx->altivec_enabled)) {                              \
++        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
++        return;                                                         \
++    }                                                                   \
++    ra = gen_avr_ptr(rA(ctx->opcode));                                  \
++    rb = gen_avr_ptr(rB(ctx->opcode));                                  \
++    rc = gen_avr_ptr(rC(ctx->opcode));                                  \
++    rd = gen_avr_ptr(rD(ctx->opcode));                                  \
++    gen_helper_##name(cpu_env, rd, ra, rb, rc);                         \
++    tcg_temp_free_ptr(ra);                                              \
++    tcg_temp_free_ptr(rb);                                              \
++    tcg_temp_free_ptr(rc);                                              \
++    tcg_temp_free_ptr(rd);                                              \
++}
++
+ #define GEN_VAFORM_PAIRED(name0, name1, opc2)                           \
+ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
+     {                                                                   \
+@@ -1272,24 +1291,8 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
+     }
+ 
+ GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
+-
+-static void gen_vmladduhm(DisasContext *ctx)
+-{
+-    TCGv_ptr ra, rb, rc, rd;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    ra = gen_avr_ptr(rA(ctx->opcode));
+-    rb = gen_avr_ptr(rB(ctx->opcode));
+-    rc = gen_avr_ptr(rC(ctx->opcode));
+-    rd = gen_avr_ptr(rD(ctx->opcode));
+-    gen_helper_vmladduhm(rd, ra, rb, rc);
+-    tcg_temp_free_ptr(ra);
+-    tcg_temp_free_ptr(rb);
+-    tcg_temp_free_ptr(rc);
+-    tcg_temp_free_ptr(rd);
+-}
++GEN_VAFORM(vmsumcud, 11)
++GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
+ 
+ static void gen_vpermr(DisasContext *ctx)
+ {
+diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
+index 84e05fb827..aee23e31c6 100644
+--- a/target/ppc/translate/vmx-ops.inc.c
++++ b/target/ppc/translate/vmx-ops.inc.c
+@@ -276,6 +276,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
+ GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
+ GEN_VAFORM_PAIRED(vsel, vperm, 21),
+ GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
++GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC_ALTIVEC),
++GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
+ 
+ GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
+ GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
+-- 
+2.23.0
 
-The solution to the complexity of shared memory, but yeah, not my
-favorite either. I was kinda hoping that someone on the list would
-explain why this approach is clearly wrong.
-
-> > * Non-standard libc extension to allow creating TLS images independent
-> >   of threads. This would allow us to just `clone` the child directly
-> >   instead of this complicated maneuver. Though we probably would still
-> >   need the cleanup logic. For libcs, TLS image allocation is tightly
-> >   connected to thread stack allocation, which is also arch-specific. I
-> >   do not have enough experience with libc development to know if
-> >   maintainers of any popular libcs would be open to supporting such an
-> >   API. Additionally, since it will probably take years before a libc
-> >   fix would be widely deployed, we need an interim solution anyways.
->
-> We could consider a custom lib stub that intercepts calls to the guests
-> original libc and replaces it with a QEMU aware one?
-
-Unfortunately the problem here is host libc, rather than guest libc.
-We need to make TLS variables in QEMU itself work, so intercepting
-guest libc calls won't help much. Or am I misunderstanding the point?
-
-> Have you considered a daemon which could co-ordinate between the
-> multiple processes that are sharing some state?
-
-Not really for the `CLONE_VM` support added in this patch series. I
-have considered trying to pull tcg out of the guest process, but not
-very seriously, since it seems like a pretty heavyweight approach.
-Especially compared to the solution included in this series. Do you
-think there's a simpler approach that involves using a daemon to do
-coordination?
-
-Thanks again for your reviews.
-
---
-Josh Kunz
 
