@@ -4,72 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A01C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 511D820B80
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:49:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DB462053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:50:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eu5qGQ5B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 511D820B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VcRckLnJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB462053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo163-0005fy-JS
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48526)
+	id 1jo16l-0006cC-Be
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:50:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0us-00015W-KY
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39345
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ut-000197-Mj
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44191
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ui-00027e-Pp
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uj-00027g-21
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1592987868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nb7MgsXtYZ2X5YyIuOdODBAV8JiQjFyYIVMeqm+HCbQ=;
- b=Eu5qGQ5BBTSDlYvFuD2sUQDNJOmZp4ixAh8EaGlnpltGbjo+RimuK/Yzey6D++U5U4lqLy
- CTz554kq8m6gWmZh+Yqoho0FV8BlwQJ+fffuhTQpNw9x5BJdJiul324CcUm8365A1n3t4P
- +kt1sLtEi1Yt1bKeclZ7zJkXSPuPbcI=
+ bh=53fidIty5gELKAcDAWZemEXmoEjTJUOu2oihlQHa+rM=;
+ b=VcRckLnJSl6uSE/BoZ0RlOFR/+/QnwhYsxFs/Hn/RjscX5Xd1KZYiAy3E6mh2fVXc0AUne
+ v5MlxM2HC+IrSWY8EbD04Jst21jPTaN8igAPtAL07NgPy5jaDhgZn9XB5gOdldrK4c4MNU
+ sS61fVR++/QpcsrHsd8U/FjHlEJltVs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-3BHTXHOmPzOuL-6xkfAg0g-1; Wed, 24 Jun 2020 04:37:44 -0400
-X-MC-Unique: 3BHTXHOmPzOuL-6xkfAg0g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-269-blj20x7AN6OXhCTffKt73g-1; Wed, 24 Jun 2020 04:37:45 -0400
+X-MC-Unique: blj20x7AN6OXhCTffKt73g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BF81805EE4;
- Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4620F800597;
+ Wed, 24 Jun 2020 08:37:44 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0351B1001B2B;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EC5E5BACC;
  Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BFAA21138481; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
+ id CE3CC1138485; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 19/25] mips/cps: Fix mips_cps_realize() error API violations
-Date: Wed, 24 Jun 2020 10:37:31 +0200
-Message-Id: <20200624083737.3086768-20-armbru@redhat.com>
+Subject: [PATCH v2 23/25] aspeed: Fix realize error API violation
+Date: Wed, 24 Jun 2020 10:37:35 +0200
+Message-Id: <20200624083737.3086768-24-armbru@redhat.com>
 In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
 References: <20200624083737.3086768-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -94,9 +95,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -107,83 +108,71 @@ latter kind twice without clearing it in between is wrong: if the
 first call sets an error, it no longer points to NULL for the second
 call.
 
-mips_cps_realize() is wrong that way: it passes &err to multiple
-object_property_set_FOO() without checking for failure, and then to
-sysbus_realize().  Harmless, because the object_property_set_FOO()
-can't actually fail here.
+aspeed_soc_ast2600_realize() and aspeed_soc_realize() are wrong that
+way: they pass &err to object_property_set_int() and
+object_property_set_bool() without checking it, and then to
+sysbus_realize().  Harmless, because the former can't actually fail
+here.
 
 Fix by passing &error_abort instead.
 
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Cc: "Cédric Le Goater" <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>
+Cc: Joel Stanley <joel@jms.id.au>
+Cc: qemu-arm@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/mips/cps.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ hw/arm/aspeed_ast2600.c | 5 +++--
+ hw/arm/aspeed_soc.c     | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 5382bc86f7..0d7f3cf673 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -100,10 +100,12 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     /* Inter-Thread Communication Unit */
-     if (itu_present) {
-         object_initialize_child(OBJECT(dev), "itu", &s->itu, TYPE_MIPS_ITU);
--        object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
--        object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &err);
-+        object_property_set_int(OBJECT(&s->itu), 16, "num-fifo",
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 4efac02e2b..59a7a1370b 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -383,7 +383,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < sc->spis_num; i++) {
+         object_property_set_link(OBJECT(&s->spi[i]), OBJECT(s->dram_mr),
+                                  "dram", &error_abort);
+-        object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
++        object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs",
 +                                &error_abort);
-+        object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores",
-+                                &error_abort);
-         object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
+         sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+@@ -434,7 +435,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     /* Net */
+     for (i = 0; i < sc->macs_num; i++) {
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
 -                                 &err);
 +                                 &error_abort);
-         if (saar_present) {
-             s->itu.saar = &env->CP0_SAAR;
-         }
-@@ -119,8 +121,10 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+         sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 03b91bade6..311458aa76 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -333,7 +333,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
  
-     /* Cluster Power Controller */
-     object_initialize_child(OBJECT(dev), "cpc", &s->cpc, TYPE_MIPS_CPC);
--    object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp", &err);
--    object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running", &err);
-+    object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp",
-+                            &error_abort);
-+    object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running",
-+                            &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->cpc), &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-@@ -132,8 +136,10 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
- 
-     /* Global Interrupt Controller */
-     object_initialize_child(OBJECT(dev), "gic", &s->gic, TYPE_MIPS_GIC);
--    object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp", &err);
--    object_property_set_int(OBJECT(&s->gic), 128, "num-irq", &err);
-+    object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp",
-+                            &error_abort);
-+    object_property_set_int(OBJECT(&s->gic), 128, "num-irq",
-+                            &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->gic), &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-@@ -147,9 +153,12 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     gcr_base = env->CP0_CMGCRBase << 4;
- 
-     object_initialize_child(OBJECT(dev), "gcr", &s->gcr, TYPE_MIPS_GCR);
--    object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
--    object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
--    object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err);
-+    object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp",
-+                            &error_abort);
-+    object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev",
-+                            &error_abort);
-+    object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base",
-+                            &error_abort);
-     object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->gic.mr), "gic",
-                              &error_abort);
-     object_property_set_link(OBJECT(&s->gcr), OBJECT(&s->cpc.mr), "cpc",
+     /* SPI */
+     for (i = 0; i < sc->spis_num; i++) {
+-        object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
++        object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs",
++                                &error_abort);
+         sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+@@ -384,7 +385,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     /* Net */
+     for (i = 0; i < sc->macs_num; i++) {
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+-                                 &err);
++                                 &error_abort);
+         sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
 -- 
 2.26.2
 
