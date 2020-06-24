@@ -1,103 +1,89 @@
 Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FED1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 02:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE62FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:01:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFA5A20874
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 02:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99FCC206B7
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:01:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="mIzwAj85"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA5A20874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="ZlX+VurW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FCC206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnvaj-0001rU-98
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 22:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39644)
+	id 1jnvf9-0003tI-QJ
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 23:01:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jnvZp-0001GT-6s
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 22:55:53 -0400
-Received: from smtpbg704.qq.com ([203.205.195.105]:59352
- helo=smtpproxy21.qq.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jnvZX-0004w5-1P
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 22:55:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1592967316; bh=9sTtyl6QwDskZxBqWeSWA/s2le49v3/jWY15OEsptuk=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=mIzwAj85Y48iPjR2fi8p4DYy/0VI6snjd03scOqkSBPj1esmK913tg5obQtmuabSs
- z7ahmWn28WFQLLtLHBM31qfc0smbivm8cNjDMZShZb1woa79PiHMtAnso83aBrMhoo
- CZjUS9y3yQx+Sfx/H0wu+0fa/CxdKZmIQRLA/D5Q=
-X-QQ-FEAT: bbg7GyNzecXVTMlOOYqYRukPgKoPqw/wZHMIHt0SdTl9+rFO/Uf2wHVR2VOJv
- cGmKh6qKOL5/pu6MVBc9bzZaIK828R6HKmHx8WTQe87h/No7P8tSeozaOe3gT9eNunPUkHU
- cHzdvOriAidmapLdnT/nmQPl2V35RrdEpthdgDnhZrVFH6GxqKaa9OHvBKX1qKUhiXlJUGX
- Nk4XC15sB0oGZucFReRDOJ/cYVgWIrgCQBIFeVCSzs0TEH3F3hNy88O8elGsV3bdFzNvOoc
- ORvfBpVKqVTIfu41q2klszJoo=
-X-QQ-SSF: 00010000000000F000000000000000D
-X-QQ-XMAILINFO: Mhi/VOzNUsFXlNmcqWe4QWl6H/k0wgfZ+GlVAUSY5/QIlnWI7rdGkgGzi0ogFd
- 7kw5fSXQQgNSU0dMdf8UF+eimpcVvqr6N0dHyJEBJXiwLyF1YmTNOvfk+wCwyRanLWPuDEyPdb79J
- EvtuCE9WxhU1yqDD0CiKYI3zPAo1VUC5s5orWuF6/oifMyehPI6gv33AdY2m8A2TflffwhT+DfK8G
- ESD1LRhOE4HlbEQ4AKG3M5tkPwZqdlauQy6XkQdkJeptiYvfMufCbp00nhyQMBq7OXwWOAr4TQom/
- 2a3YkQxLwftEPQhyQYjb4nbDXp0EjTYqemH9eHXLdE0vUXEHiuMmuVQ+9Al/Q8TpPJXqSBbVbf6ep
- MtHOh7S9UWjTl1PHm0odtphUwCelN/Tu5ocwCZwnetqc5I+Y1e/kYLUUlixpQqNuXR8gfYo+dK+BQ
- lRC/s568LWeED+1TZnpefmTXr88J49dlXl+UhCndMVYxjpTwAWnS3thhYGxzXytF6fPPVKHXqD9xv
- kj7gubrWCCf/oljHKuU9Pe/oj6RBWzHxPC8jHaMBjxteHistVX83ZwABs8ZeEJdIgI3NsWlV2y8rw
- 0/CHqLXQXwlnCcw7KhW8/2HTW6FEvTPfHfleWTFrvCie5KTUCPPySKdiun2HcmT0LaeFKMsC7DDz8
- nNHjYO3jbbwSFnP+/6kSjwapEKDLCiOrs9aAdBnIZ4pb6br/tT6YWmP2z4bPMbjZtQOCtxUkO9mjG
- WMdk=
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 111.199.102.238
-In-Reply-To: <00d27d39-e82d-103c-eac8-01313e3b365f@redhat.com>
-References: <tencent_2BB56CF9C4F3AA4DBB9D8A50C3BFBDCA720A@qq.com>
- <00d27d39-e82d-103c-eac8-01313e3b365f@redhat.com>
-X-QQ-STYLE: 
-X-QQ-mid: webmail725t1592967315t4811712
-From: "=?utf-8?B?Y2FzbWFj?=" <climber.cui@qq.com>
-To: "=?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?=" <philmd@redhat.com>,
- "=?utf-8?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: Re: how to build QEMU with the peripheral device modules
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="----=_NextPart_5EF2C093_0F83DC08_7FD18D54"
-Content-Transfer-Encoding: 8Bit
-Date: Wed, 24 Jun 2020 10:55:15 +0800
-X-Priority: 3
-Message-ID: <tencent_2861C996B4A0F960F3824E139C4A536FBD0A@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-ReplyHash: 1389601310
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Wed, 24 Jun 2020 10:55:16 +0800 (CST)
-Feedback-ID: webmail:qq.com:bgforeign:bgforeign12
-X-QQ-Bgrelay: 1
-Received-SPF: pass client-ip=203.205.195.105; envelope-from=climber.cui@qq.com;
- helo=smtpproxy21.qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 22:55:19
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+ (Exim 4.90_1) (envelope-from <kevin@koconnor.net>)
+ id 1jnveJ-0003AY-1B
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:00:31 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:38203)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <kevin@koconnor.net>)
+ id 1jnveG-0006nJ-RK
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:00:30 -0400
+Received: by mail-qk1-x741.google.com with SMTP id e13so586066qkg.5
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 20:00:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=LyFIwB0mWcDq6u0IhVq3NzrlZxo44JvPUF3iw2kZdP0=;
+ b=ZlX+VurW2vQVYJS15Uab1/0Fz6tWG7KfhcbC+gyMCjn/PPPCvp5LJOdQxFWWFqD+i5
+ +LUI7HZSWirX+tqwrAfT1DraumWKedR2V8BZwBXSqhCU+pxvr4ArFtTq6JOz/TIdlYz5
+ 2yQbEMFdr0NYKQRFIoIVmbV9Gog6uCY0SJrVI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=LyFIwB0mWcDq6u0IhVq3NzrlZxo44JvPUF3iw2kZdP0=;
+ b=RG7IoriSP0fJpiFt828/4U8dnN9I23/0IBsMS0LNrIVEXkp0EDiznhM+B49F8g4Eoa
+ ww3sUm/6zZSOr73w0qsRB4mPRVGFJ05q6zjnsDF5p0lUG3J9qf/yQpY4LIYcRASJAsa5
+ ABmqJ3Qk3kREZJx6+DpO4mNp3mJLfQJjtPQnRkVClXCLCQEaN6eCOPbMH2CaZhdCLkdo
+ HvdV9slDjFefZCH5NKXZwp7TRcIuhCzPgAhdRQdDo5Zv6cXN0m62JNHu9ZosFfBG9e0t
+ G4h56WXNdNMuJP4Vur49B4ILcrkvpiEcbwDeLCCpXhRyvDZzx/LU6e9NTPG2SOOLiInx
+ rgJQ==
+X-Gm-Message-State: AOAM533OLq7RtWj5uclNj2pH2D4/NM1rK0v6RDtYKZoodzczwWLzAbop
+ 3qPbrgsV1ZXX8qft3t0wctfrQQ==
+X-Google-Smtp-Source: ABdhPJwJ7SKmWGzFhItijCexjX1GB0OcpZJisqjVRLzkQqKng66Ua6d4iLjlKAx9O+/gjTN7HFpOmg==
+X-Received: by 2002:a37:6190:: with SMTP id
+ v138mr20982269qkb.121.1592967626647; 
+ Tue, 23 Jun 2020 20:00:26 -0700 (PDT)
+Received: from localhost ([64.9.245.160])
+ by smtp.gmail.com with ESMTPSA id k26sm2190309qki.98.2020.06.23.20.00.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 23 Jun 2020 20:00:25 -0700 (PDT)
+Date: Tue, 23 Jun 2020 23:00:24 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Subject: Re: [PATCH] timer: Handle decrements of PIT counter
+Message-ID: <20200624030024.GA885327@morn.lan>
+References: <20200613111911.65497-1-r.bolshakov@yadro.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200613111911.65497-1-r.bolshakov@yadro.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
+ envelope-from=kevin@koconnor.net; helo=mail-qk1-x741.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_EXCESS_BASE64=0.001, HTML_MESSAGE=0.001, MSGID_FROM_MTA_HEADER=0.001,
- SPF_PASS=-0.001, T_SPF_HELO_TEMPERROR=0.01 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,142 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: seabios@seabios.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
+On Sat, Jun 13, 2020 at 02:19:12PM +0300, Roman Bolshakov wrote:
+> There's a fallback to PIT if TSC is not present but it doesn't work
+> properly. It prevents boot from floppy on isapc and 486 cpu [1][2].
+> 
+> SeaBIOS configures PIT in Mode 2. PIT counter is decremented in the mode
+> but timer_adjust_bits() thinks that the counter overflows and increases
+> 32-bit tick counter on each detected "overflow". Invalid overflow
+> detection results in 55ms time advance (1 / 18.2Hz) on each read from
+> PIT counter. So all timers expire much faster and 5-second floppy
+> timeout expires in 83 real microseconds (or just a bit longer).
+> 
+> Provide counter direction to timer_adjust_bits() and normalize the
+> counter to advance ticks in monotonically increasing TimerLast.
 
-------=_NextPart_5EF2C093_0F83DC08_7FD18D54
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
+Good catch.  Could we fix it using the patch below instead though?
 
-SGkgLA0KJm5ic3A7IFRoYW5rcyBmb3IgdGhlIGhpbnRzLiBJIGdldCBiZXR0ZXIgdW5kZXJz
-dGFuZGluZyB0byB0aGUga2NvbmZpZyB0b29sIG5vdy4NCiZuYnNwOyBJIGFkZGVkICJzZWxl
-Y3QmbmJzcDsgVElfRE1BIiBpbiBteSBEU1Aga2NvbmZpZyBmaWxlLiBJdCBpcyBkb25lLg0K
-DQoNCmJlc3QgcmVnYXJkcywNCnhpYW9sZWkNCg0KDQoNCg0KLS0tLS0tLS0tLS0tLS0tLS0t
-Jm5ic3A7T3JpZ2luYWwmbmJzcDstLS0tLS0tLS0tLS0tLS0tLS0NCkZyb206Jm5ic3A7IlBo
-aWxpcHBlIE1hdGhpZXUtRGF1ZMOpIjxwaGlsbWRAcmVkaGF0LmNvbSZndDs7DQpEYXRlOiZu
-YnNwO0ZyaSwgSnVuIDE5LCAyMDIwIDEwOjU5IFBNDQpUbzombmJzcDsiY2FzbWFjIjxjbGlt
-YmVyLmN1aUBxcS5jb20mZ3Q7OyJxZW11LWRldmVsIjxxZW11LWRldmVsQG5vbmdudS5vcmcm
-Z3Q7Ow0KDQpTdWJqZWN0OiZuYnNwO1JlOiBob3cgdG8gYnVpbGQgUUVNVSB3aXRoIHRoZSBw
-ZXJpcGhlcmFsIGRldmljZSBtb2R1bGVzDQoNCg0KDQpIaSwNCg0KT24gNi8xOS8yMCAzOjI0
-IFBNLCBjYXNtYWMgd3JvdGU6DQomZ3Q7IEhpIEFsbCwNCiZndDsgw4ImbmJzcDsgw4ImbmJz
-cDtJIGFtIHRyeWluZyB0byBhZGQgYSBETUEgcGVyaXBoZXJhbCBtb2R1bGUuIEluIGh3L2Rt
-YSBkaXJlY3RvcnksIGENCiZndDsgZmlsZcOCJm5ic3A7IHRpX2RtYS5jIGlzIGFkZGVkLg0K
-Jmd0OyDDgiZuYnNwOyDDgiZuYnNwO0Fsc28sIGluIGh3L2RtYS9rY29uZmlnLCBJIGFkZGVk
-IHRoZSBmb2xsb3dpbmcgbGluZXM6DQomZ3Q7IGNvbmZpZyBUSV9ETUENCiZndDsgYm9vbA0K
-DQpZb3UgbmVlZCBzb21lIGRldmljZSB0aGF0ICdzZWxlY3RzJyB5b3VyIGRldmljZS4NCg0K
-WW91IGNhbiBzZWxlY3QgaXQgYnkgZGVmYXVsdDoNCg0KJm5ic3A7IGNvbmZpZyBUSV9ETUEN
-CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBib29sDQombmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgZGVmYXVsdCB5DQoNCllvdSBjYW4gZW5mb3JjZSB0aGUgc2VsZWN0
-aW9uIG9uIGEgdGFyZ2V0LiBGb3IgZXhhbXBsZSB0byBhZGQgaXQNCnRvIGFsbCB0aGUgQVJN
-IG1hY2hpbmVzLCBpbiBkZWZhdWx0LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrIGFkZDoNCg0K
-Q09ORklHX1RJX0RNQT15DQoNClRoZSBiZXN0IGlzIHRvIG9ubHkgc2VsZWN0IGl0IHdoZW4g
-cmVxdWlyZWQuIEZvciBleGFtcGxlIGlmIHlvdQ0KbmVlZCBpdCBvbiBhbGwgbWFjaGluZXMg
-dXNpbmcgYSBUSSBPTUFQIFNvQywgdGhlbiB5b3UnZCBzZWxlY3QgaXQNCmluIHRoZSBPTUFQ
-IHNlY3Rpb24gb2YgaHcvYXJtL0tjb25maWc6DQoNCiZuYnNwOyBjb25maWcgT01BUA0KJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IGJvb2wNCiZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyBzZWxlY3QgRlJBTUVCVUZGRVINCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyBzZWxlY3QgSTJDDQombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc2Vs
-ZWN0IEVDQw0KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNlbGVjdCBOQU5EDQom
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc2VsZWN0IFBGTEFTSF9DRkkwMQ0KJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHNlbGVjdCBTRA0KJm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7IHNlbGVjdCBTRVJJQUwNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyBzZWxlY3QgVElfRE1BDQoNCllvdSBzaG91bGQgaGF2ZSBlbm91Z2ggdG8gYWRh
-cHQgdG8geW91ciBuZWVkcy4NCg0KUmVnYXJkcywNCg0KUGhpbC4NCg0KJmd0OyDDgiZuYnNw
-OyDDgiZuYnNwO0luIGh3L2RtYS9tYWtlZmlsZS5vamIsIGFkZGVkIG9uZSBsaW5lOg0KJmd0
-OyBjb21tb24tb2JqLSQoQ09ORklHX1RJX0RNQSkgKz0gdGlfZG1hLm8NCiZndDsgw4ImbmJz
-cDsgw4ImbmJzcDtIb3dldmVyLCB0aV9kbWEuYyBpcyBub3QgY29tcGlsZWQgYXMgdGhlIFFF
-TVUgcHJvamVjdCBpcyBidWlsdC4gU29tZQ0KJmd0OyBkaXJlY3RvcmllcyhlZy4gYmxvY2ss
-IGNwdS4uLikgdW5kZXIgaHcgd2lsbCBiZSBjb21waWxlZCB0aG91Z2guw4ImbmJzcDsNCiZn
-dDsgw4ImbmJzcDsgw4ImbmJzcDtUaGUgbWFrZWZpbGUub2JqIHNlZW1zIHRvIHNob3cgdGhh
-dCB0aGUgRE1BIG1vZHVsZSB3b3VsZCBiZSBidWlsdA0KJmd0OyBhbG9uZyB3aXRow4ImbmJz
-cDsgb3RoZXJzOg0KJmd0OyBkZXZpY2VzLWRpcnMteSA9IGNvcmUvDQomZ3Q7IGlmZXEgKCQo
-Q09ORklHX1NPRlRNTVUpLCB5KQ0KJmd0OyBkZXZpY2VzLWRpcnMtJChjYWxsIGxvciwkKENP
-TkZJR19WSVJUSU9fOVApLCQoY2FsbA0KJmd0OyBsYW5kLCQoQ09ORklHX1ZJUlRGUyksJChD
-T05GSUdfWEVOKSkpICs9IDlwZnMvDQomZ3Q7IGRldmljZXMtZGlycy15ICs9IGFjcGkvDQom
-Z3Q7IGRldmljZXMtZGlycy15ICs9IGFkYy8NCiZndDsgZGV2aWNlcy1kaXJzLXkgKz0gYXVk
-aW8vDQomZ3Q7IGRldmljZXMtZGlycy15ICs9IGJsb2NrLw0KJmd0OyBkZXZpY2VzLWRpcnMt
-eSArPSBidC8NCiZndDsgZGV2aWNlcy1kaXJzLXkgKz0gY2hhci8NCiZndDsgZGV2aWNlcy1k
-aXJzLXkgKz0gY3B1Lw0KJmd0OyBkZXZpY2VzLWRpcnMteSArPSBkaXNwbGF5Lw0KJmd0OyBk
-ZXZpY2VzLWRpcnMteSArPSBkbWEvDQomZ3Q7IGRldmljZXMtZGlycy15ICs9IGdwaW8vDQom
-Z3Q7IC4uLi4uLg0KJmd0OyDDgiZuYnNwOyDDgiZuYnNwOyBJIGFtIG5vdCBzdXJlIHdoYXQg
-aXMgbWlzc2luZyBoZXJlLiBBbnkgYWR2aXNlIHdvdWxkIGJlIGFwcHJlY2lhdGVkLg0KJmd0
-OyBUaGFua3MuDQomZ3Q7IA0KJmd0OyB4aWFvbGVp
-
-------=_NextPart_5EF2C093_0F83DC08_7FD18D54
-Content-Type: text/html;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-
-PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
-YXJzZXQ9VVRGLTgiPjxkaXY+SGkgLDwvZGl2PjxkaXY+Jm5ic3A7IFRoYW5rcyBmb3IgdGhl
-IGhpbnRzLiBJIGdldCBiZXR0ZXIgdW5kZXJzdGFuZGluZyB0byB0aGUga2NvbmZpZyB0b29s
-IG5vdy48L2Rpdj48ZGl2PiZuYnNwOyBJIGFkZGVkICJzZWxlY3QmbmJzcDsgVElfRE1BIiBp
-biBteSBEU1Aga2NvbmZpZyBmaWxlLiBJdCBpcyBkb25lLjwvZGl2PjxkaXY+PGJyPjwvZGl2
-PjxkaXY+YmVzdCByZWdhcmRzLDwvZGl2PjxkaXY+eGlhb2xlaTwvZGl2PjxkaXY+PGRpdj48
-YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1zaXplOiAxMnB4O2Zv
-bnQtZmFtaWx5OiBBcmlhbCBOYXJyb3c7cGFkZGluZzoycHggMCAycHggMDsiPi0tLS0tLS0t
-LS0tLS0tLS0tLSZuYnNwO09yaWdpbmFsJm5ic3A7LS0tLS0tLS0tLS0tLS0tLS0tPC9kaXY+
-PGRpdiBzdHlsZT0iZm9udC1zaXplOiAxMnB4O2JhY2tncm91bmQ6I2VmZWZlZjtwYWRkaW5n
-OjhweDsiPjxkaXY+PGI+RnJvbTo8L2I+Jm5ic3A7IlBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOp
-IiZsdDtwaGlsbWRAcmVkaGF0LmNvbSZndDs7PC9kaXY+PGRpdj48Yj5EYXRlOjwvYj4mbmJz
-cDtGcmksIEp1biAxOSwgMjAyMCAxMDo1OSBQTTwvZGl2PjxkaXY+PGI+VG86PC9iPiZuYnNw
-OyJjYXNtYWMiJmx0O2NsaW1iZXIuY3VpQHFxLmNvbSZndDs7InFlbXUtZGV2ZWwiJmx0O3Fl
-bXUtZGV2ZWxAbm9uZ251Lm9yZyZndDs7PHdicj48L2Rpdj48ZGl2PjwvZGl2PjxkaXY+PGI+
-U3ViamVjdDo8L2I+Jm5ic3A7UmU6IGhvdyB0byBidWlsZCBRRU1VIHdpdGggdGhlIHBlcmlw
-aGVyYWwgZGV2aWNlIG1vZHVsZXM8L2Rpdj48L2Rpdj48ZGl2Pjxicj48L2Rpdj5IaSw8YnI+
-PGJyPk9uIDYvMTkvMjAgMzoyNCBQTSwgY2FzbWFjIHdyb3RlOjxicj4mZ3Q7IEhpIEFsbCw8
-YnI+Jmd0OyDDgiZuYnNwOyDDgiZuYnNwO0kgYW0gdHJ5aW5nIHRvIGFkZCBhIERNQSBwZXJp
-cGhlcmFsIG1vZHVsZS4gSW4gaHcvZG1hIGRpcmVjdG9yeSwgYTxicj4mZ3Q7IGZpbGXDgiZu
-YnNwOyB0aV9kbWEuYyBpcyBhZGRlZC48YnI+Jmd0OyDDgiZuYnNwOyDDgiZuYnNwO0Fsc28s
-IGluIGh3L2RtYS9rY29uZmlnLCBJIGFkZGVkIHRoZSBmb2xsb3dpbmcgbGluZXM6PGJyPiZn
-dDsgY29uZmlnIFRJX0RNQTxicj4mZ3Q7IGJvb2w8YnI+PGJyPllvdSBuZWVkIHNvbWUgZGV2
-aWNlIHRoYXQgJ3NlbGVjdHMnIHlvdXIgZGV2aWNlLjxicj48YnI+WW91IGNhbiBzZWxlY3Qg
-aXQgYnkgZGVmYXVsdDo8YnI+PGJyPiZuYnNwOyBjb25maWcgVElfRE1BPGJyPiZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBib29sPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyBkZWZhdWx0IHk8YnI+PGJyPllvdSBjYW4gZW5mb3JjZSB0aGUgc2VsZWN0aW9u
-IG9uIGEgdGFyZ2V0LiBGb3IgZXhhbXBsZSB0byBhZGQgaXQ8YnI+dG8gYWxsIHRoZSBBUk0g
-bWFjaGluZXMsIGluIGRlZmF1bHQtY29uZmlncy9hcm0tc29mdG1tdS5tYWsgYWRkOjxicj48
-YnI+Q09ORklHX1RJX0RNQT15PGJyPjxicj5UaGUgYmVzdCBpcyB0byBvbmx5IHNlbGVjdCBp
-dCB3aGVuIHJlcXVpcmVkLiBGb3IgZXhhbXBsZSBpZiB5b3U8YnI+bmVlZCBpdCBvbiBhbGwg
-bWFjaGluZXMgdXNpbmcgYSBUSSBPTUFQIFNvQywgdGhlbiB5b3UnZCBzZWxlY3QgaXQ8YnI+
-aW4gdGhlIE9NQVAgc2VjdGlvbiBvZiBody9hcm0vS2NvbmZpZzo8YnI+PGJyPiZuYnNwOyBj
-b25maWcgT01BUDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgYm9vbDxicj4m
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgc2VsZWN0IEZSQU1FQlVGRkVSPGJyPiZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzZWxlY3QgSTJDPGJyPiZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyBzZWxlY3QgRUNDPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyBzZWxlY3QgTkFORDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgc2VsZWN0IFBGTEFTSF9DRkkwMTxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgc2VsZWN0IFNEPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzZWxlY3Qg
-U0VSSUFMPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzZWxlY3QgVElfRE1B
-PGJyPjxicj5Zb3Ugc2hvdWxkIGhhdmUgZW5vdWdoIHRvIGFkYXB0IHRvIHlvdXIgbmVlZHMu
-PGJyPjxicj5SZWdhcmRzLDxicj48YnI+UGhpbC48YnI+PGJyPiZndDsgw4ImbmJzcDsgw4Im
-bmJzcDtJbiBody9kbWEvbWFrZWZpbGUub2piLCBhZGRlZCBvbmUgbGluZTo8YnI+Jmd0OyBj
-b21tb24tb2JqLSQoQ09ORklHX1RJX0RNQSkgKz0gdGlfZG1hLm88YnI+Jmd0OyDDgiZuYnNw
-OyDDgiZuYnNwO0hvd2V2ZXIsIHRpX2RtYS5jIGlzIG5vdCBjb21waWxlZCBhcyB0aGUgUUVN
-VSBwcm9qZWN0IGlzIGJ1aWx0LiBTb21lPGJyPiZndDsgZGlyZWN0b3JpZXMoZWcuIGJsb2Nr
-LCBjcHUuLi4pIHVuZGVyIGh3IHdpbGwgYmUgY29tcGlsZWQgdGhvdWdoLsOCJm5ic3A7PGJy
-PiZndDsgw4ImbmJzcDsgw4ImbmJzcDtUaGUgbWFrZWZpbGUub2JqIHNlZW1zIHRvIHNob3cg
-dGhhdCB0aGUgRE1BIG1vZHVsZSB3b3VsZCBiZSBidWlsdDxicj4mZ3Q7IGFsb25nIHdpdGjD
-giZuYnNwOyBvdGhlcnM6PGJyPiZndDsgZGV2aWNlcy1kaXJzLXkgPSBjb3JlLzxicj4mZ3Q7
-IGlmZXEgKCQoQ09ORklHX1NPRlRNTVUpLCB5KTxicj4mZ3Q7IGRldmljZXMtZGlycy0kKGNh
-bGwgbG9yLCQoQ09ORklHX1ZJUlRJT185UCksJChjYWxsPGJyPiZndDsgbGFuZCwkKENPTkZJ
-R19WSVJURlMpLCQoQ09ORklHX1hFTikpKSArPSA5cGZzLzxicj4mZ3Q7IGRldmljZXMtZGly
-cy15ICs9IGFjcGkvPGJyPiZndDsgZGV2aWNlcy1kaXJzLXkgKz0gYWRjLzxicj4mZ3Q7IGRl
-dmljZXMtZGlycy15ICs9IGF1ZGlvLzxicj4mZ3Q7IGRldmljZXMtZGlycy15ICs9IGJsb2Nr
-Lzxicj4mZ3Q7IGRldmljZXMtZGlycy15ICs9IGJ0Lzxicj4mZ3Q7IGRldmljZXMtZGlycy15
-ICs9IGNoYXIvPGJyPiZndDsgZGV2aWNlcy1kaXJzLXkgKz0gY3B1Lzxicj4mZ3Q7IGRldmlj
-ZXMtZGlycy15ICs9IGRpc3BsYXkvPGJyPiZndDsgZGV2aWNlcy1kaXJzLXkgKz0gZG1hLzxi
-cj4mZ3Q7IGRldmljZXMtZGlycy15ICs9IGdwaW8vPGJyPiZndDsgLi4uLi4uPGJyPiZndDsg
-w4ImbmJzcDsgw4ImbmJzcDsgSSBhbSBub3Qgc3VyZSB3aGF0IGlzIG1pc3NpbmcgaGVyZS4g
-QW55IGFkdmlzZSB3b3VsZCBiZSBhcHByZWNpYXRlZC48YnI+Jmd0OyBUaGFua3MuPGJyPiZn
-dDsgPGJyPiZndDsgeGlhb2xlaTxicj48YnI+PC9kaXY+
-
-------=_NextPart_5EF2C093_0F83DC08_7FD18D54--
+-Kevin
 
 
-
+--- a/src/hw/timer.c
++++ b/src/hw/timer.c
+@@ -180,7 +180,7 @@ timer_read(void)
+     // Read from PIT.
+     outb(PM_SEL_READBACK | PM_READ_VALUE | PM_READ_COUNTER0, PORT_PIT_MODE);
+     u16 v = inb(PORT_PIT_COUNTER0) | (inb(PORT_PIT_COUNTER0) << 8);
+-    return timer_adjust_bits(v, 0xffff);
++    return timer_adjust_bits(-v, 0xffff);
+ }
+ 
+ // Return the TSC value that is 'msecs' time in the future.
 
