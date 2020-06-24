@@ -2,87 +2,87 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7937C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C383C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8545C20781
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C29920781
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VwcLfqPb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8545C20781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D9gmfRWU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C29920781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo62K-0006V2-Mq
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59038)
+	id 1jo62L-0006Wv-52
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:06:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jo61F-0004m3-OP
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:04:53 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37772)
+ id 1jo61H-0004mk-SF
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:04:55 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:52330)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jo61C-0003Tx-Hc
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:04:53 -0400
-Received: by mail-wr1-x434.google.com with SMTP id a6so2429179wrm.4
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:04:50 -0700 (PDT)
+ id 1jo61D-0003U8-JL
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:04:55 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id q15so2441994wmj.2
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:04:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KLxxBVgESg8+q++r/+fvnKLfCmcpFTynVpvVjZzQTYc=;
- b=VwcLfqPbp+T4CAYLNWhwImrkNQUg/MCxrqpgGmWz5g/2C21hymKonLfsM6GwlacWol
- Q6vbsoWH5gYC+W1TWoRXxM3uM5kJjYeNn79or5nGcho35BNWgsTfmeoE2X7P8F6nR8Ty
- ts6EncUOKpud+pHpKq7ukXC+zeNjk5fZ2EL/9THYsilF+51TF6krgr7lS7pDTn7HE/mX
- aiAbFnWBcofwmlVz2vLYZ/+LCpGqy53SQkADa7q07rTQN4j+jn/qE2zIQ/e7kW2kyaXv
- wfbgf2HqRITx9sYY+aXART2mToePlOOx3Een48LcQh0lS2H9RxTA9VNyzER3pqCMCI62
- Egng==
+ bh=Pp31LDbBMynakzVJX+RF0ypg4zh/bBa29zUb++Htq94=;
+ b=D9gmfRWUKxwHohfHoYJsgG+1X0WI91GTOdJ1S8ZlUNDyhayRgm0+kCdETfntKMjro3
+ 4GrakiJ9zoOwBVudoThcL3hGhWWdKP4yS/PpaiIc2fWn9+HWTRD4I5Z01dsMKeUW/knq
+ dyHf1OODjwyNpoCYM6cYobUdIpKR5ARMLo6U6000U+wfbsUqVHaVNvyhSmdbBQUOnnqa
+ caitrgDsHV0+jTl0C4N1mWPggRsKZRfNxg5/NJ5d/Rjf0LFPI1QjsgZcPFAgdlso9tQd
+ RxAihyAghIPfq+72oygX1VmhbRx1nr1Wmz261lzZYs1QFMRkNVVQhwfes5bLyQNqY8zO
+ L28g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KLxxBVgESg8+q++r/+fvnKLfCmcpFTynVpvVjZzQTYc=;
- b=R0Q3Z76fzD+xW2/j9IwReh7NgDokcF3HjiNHCuA3KjtOCDKy1oKc7NkchPqj/MfU7P
- m9hxc81tvggHyDwME4XL+a00irVP+NrINjBPTeqQ+py6IwWTt8FNomCyB92gJS2mQLKj
- Ukw1oupafCLylz63XC6H4PsxJHAlcC0jApDASgen7YFRzXhABpVMTR4g2jFJAFfd/GNj
- gn+ETC+qe3WqLKYH9v2SlrLywgzI6dX2zLTK1/e+d69aN3sq3jXRzJCV2ihwIB35/By5
- V8ImTIlCV/NgY7EEahN3IER0WrWKhtzfE9f6neBEBn/ZT612j43dunZJjzairAq0vj3r
- hzeA==
-X-Gm-Message-State: AOAM530GvUn0jhXs3gva5ZrQJ6uf+xWDgLUb46fIFBGCH+ycmBj8774Z
- GklXK7mZVbjsk5ZQVyqzSuIP/Q==
-X-Google-Smtp-Source: ABdhPJx6Nn/euRo80F1/ttjqnACDmvz5KtiuijW7KTI5LR2E9CROt4Xt1mpEHUCwC5Rsee7FlmPv6w==
-X-Received: by 2002:adf:f3cd:: with SMTP id g13mr16503875wrp.45.1593007489056; 
- Wed, 24 Jun 2020 07:04:49 -0700 (PDT)
+ bh=Pp31LDbBMynakzVJX+RF0ypg4zh/bBa29zUb++Htq94=;
+ b=R5Xjp2HY2VX10wkEnYW0t9tThwhWtIvcBbzigmwUzvT8Mavp+zPMzjytyt5GzQuPO9
+ lTWJVAdF83jwj8gjBPbP4uorMMVjFEH54K0iqShJzDTTZvlancWJ2WpH484kdYlhhRWi
+ WtCbfPwJ23Iret4jdfUVbFcwcsCLz7fXW3W1lx6BNawImUsqIWi49e9LAzcbd2tewrnX
+ Qp+fiMfHQ0TI2+/1OsZOrzMleblmKXW+eBdLZ7bYyGqAsTXdTPSsuSRz1eHIyzJUBMnD
+ ODAaVnwUp2vC3Sva64xCCGI97xfDAwx+EjpfnnRo4jkCeY6sgXoXOWImlmwkutnokHCz
+ bN5w==
+X-Gm-Message-State: AOAM531/W9gINAOyevjwV+URmQRZCIY+PXnpWhefzqHUWmirEUGl/pbI
+ OaQTMJmqXVq6j49S6mhMXMgomvU/bmk=
+X-Google-Smtp-Source: ABdhPJxst9JPfoAEuEt+13DSWD7rj+UJY/SRqwv0cNqBJh8a+lH+KlOUHyzcut07JVTh4VrPz5OTRw==
+X-Received: by 2002:a1c:de07:: with SMTP id v7mr6471931wmg.56.1593007490169;
+ Wed, 24 Jun 2020 07:04:50 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 185sm8237788wmz.22.2020.06.24.07.04.46
+ by smtp.gmail.com with ESMTPSA id v5sm7368959wre.87.2020.06.24.07.04.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 07:04:46 -0700 (PDT)
+ Wed, 24 Jun 2020 07:04:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4C6F91FF87;
+ by zen.linaroharston (Postfix) with ESMTP id 610051FF8C;
  Wed, 24 Jun 2020 15:04:46 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/25] iotests: Fix 051 output after qdev_init_nofail()
- removal
-Date: Wed, 24 Jun 2020 15:04:22 +0100
-Message-Id: <20200624140446.15380-2-alex.bennee@linaro.org>
+Subject: [PATCH v2 02/25] crypto/linux_keyring: fix 'secret_keyring' configure
+ test
+Date: Wed, 24 Jun 2020 15:04:23 +0100
+Message-Id: <20200624140446.15380-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200624140446.15380-1-alex.bennee@linaro.org>
 References: <20200624140446.15380-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,58 +104,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, f4bug@amsat.org, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
- John Snow <jsnow@redhat.com>, aurelien@aurel32.net
+Cc: fam@euphon.net, berrange@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ David Edmondson <david.edmondson@oracle.com>, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: David Edmondson <david.edmondson@oracle.com>
 
-Commit 96927c744 replaced qdev_init_nofail() call by
-isa_realize_and_unref() which has a different error
-message. Update the test output accordingly.
+The configure test for 'secret_keyring' incorrectly checked the
+'have_keyring' variable.
 
-Gitlab CI error after merging b77b5b3dc7:
-https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Fixes: 54e7aac0562452e4fcab65ca5001d030eef2de15
+Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200616154949.6586-1-philmd@redhat.com>
+Message-Id: <20200618092636.71832-1-david.edmondson@oracle.com>
 ---
- tests/qemu-iotests/051.pc.out | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 0ea80d35f0e..da8ad871876 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive if=ide
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
-+(qemu) QEMU_PROG: Device needs media, but drive is empty
- 
- Testing: -drive if=virtio
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
-+(qemu) QEMU_PROG: Block node is read-only
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
+diff --git a/configure b/configure
+index ba88fd18244..69ffd750dbc 100755
+--- a/configure
++++ b/configure
+@@ -6369,7 +6369,7 @@ EOF
+ fi
+ if test "$secret_keyring" != "no"
+ then
+-    if test "$have_keyring" == "yes"
++    if test "$have_keyring" = "yes"
+     then
+ 	secret_keyring=yes
+     else
 -- 
 2.20.1
 
