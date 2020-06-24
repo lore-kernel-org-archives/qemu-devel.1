@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D071FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F66C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:53:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FE7D20738
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21E7D20738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:53:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXMZFg1U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE7D20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqDHb82i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21E7D20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8eV-0002wR-QI
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:53:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51732)
+	id 1jo8eq-0003eT-4n
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:53:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VQ-0003gL-Ta
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41282
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VO-0003YE-Bq
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57064
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VB-00056S-Ew
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:12 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VA-000562-Vd
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017035;
+ s=mimecast20190719; t=1593017034;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DVAoinH9aVdau80DWAEd45l50J258khhha2Mjv4pgKo=;
- b=GXMZFg1UEiwADgKwJLrrL3+yOdv5xVzz5EABVAuRnpJpgSopMyEHOYrmkfypvt6JIini1J
- 8eGsOLg+GjbjG29dL2REzQc2puW+AH2oyvqjV5YGceC8EhUn+DgN85+V5PPNF9BloBECbo
- aRf//9ajfvJIbgMBBmaQ99KyYH16G4o=
+ bh=FWGZ7kXUUhrqJTeHggGvaYfc4FZ+Nxsy6kQIxEv/BWI=;
+ b=QqDHb82iHvK/UDBdQDPB6Bi4Hs/IWEvQJQ82emWT3cdoXVe/1FyCPtPvWaizwIGeqOv41g
+ s2IfhaiPkNWNpRDKetQFvIfx8O803w/SOjeF8fTaYIO7IkeITjYap8otaIIu/UZ1KLX7Iw
+ 0U0Ai/gYCPe6fWxSzsVYV46lxF/Azvw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-2ODe8-WJMLS7PkHvgQ1M6g-1; Wed, 24 Jun 2020 12:43:51 -0400
-X-MC-Unique: 2ODe8-WJMLS7PkHvgQ1M6g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-271-gnOXQXVdP1qpHBvUZvo6Jw-1; Wed, 24 Jun 2020 12:43:52 -0400
+X-MC-Unique: gnOXQXVdP1qpHBvUZvo6Jw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C240B2DA2;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDBDC8015F0;
  Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 62A6B5C663;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 628F82B476;
  Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3BD9C1138485; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id 3F90B1138486; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 24/46] qapi: Smooth error checking manually
-Date: Wed, 24 Jun 2020 18:43:22 +0200
-Message-Id: <20200624164344.3778251-25-armbru@redhat.com>
+Subject: [PATCH 25/46] qapi: Smooth visitor error checking in generated code
+Date: Wed, 24 Jun 2020 18:43:23 +0200
+Message-Id: <20200624164344.3778251-26-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -81,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,324 +101,442 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When foo(..., &err) is followed by error_propagate(errp, err), we can
-often just as well do foo(..., errp).  The previous commit did that
-for simple cases with Coccinelle.  Do it for a few more manually.
+Use visitor functions' return values to check for failure.  Eliminate
+error_propagate() that are now unnecessary.  Delete @err that are now
+unused.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- accel/kvm/kvm-all.c       | 50 ++++++++++++++++++---------------------
- block/throttle-groups.c   |  5 ++--
- bootdevice.c              |  4 ++--
- hw/core/qdev-properties.c | 12 +++++-----
- hw/ide/qdev.c             |  4 ++--
- hw/mem/nvdimm.c           |  9 +++----
- hw/net/ne2000-isa.c       |  4 ++--
- hw/usb/dev-storage.c      |  4 ++--
- net/net.c                 |  8 ++-----
- qom/object.c              | 30 +++++++++++------------
- 10 files changed, 59 insertions(+), 71 deletions(-)
+ docs/devel/qapi-code-gen.txt | 60 ++++++++++++++----------------------
+ scripts/qapi/commands.py     | 22 ++++++-------
+ scripts/qapi/visit.py        | 57 ++++++++++++++--------------------
+ 3 files changed, 55 insertions(+), 84 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index be02b8e07a..0b921cd24c 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3119,37 +3119,33 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-                                    const char *name, void *opaque,
-                                    Error **errp)
- {
--    Error *err = NULL;
-     KVMState *s = KVM_STATE(obj);
-     OnOffSplit mode;
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 9bfc57063c..69eede6c28 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1420,8 +1420,6 @@ Example:
  
--    visit_type_OnOffSplit(v, name, &mode, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    if (!visit_type_OnOffSplit(v, name, &mode, errp)) {
-         return;
--    } else {
--        switch (mode) {
--        case ON_OFF_SPLIT_ON:
--            s->kernel_irqchip_allowed = true;
--            s->kernel_irqchip_required = true;
--            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
--            break;
--        case ON_OFF_SPLIT_OFF:
--            s->kernel_irqchip_allowed = false;
--            s->kernel_irqchip_required = false;
--            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
--            break;
--        case ON_OFF_SPLIT_SPLIT:
--            s->kernel_irqchip_allowed = true;
--            s->kernel_irqchip_required = true;
--            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
--            break;
--        default:
--            /* The value was checked in visit_type_OnOffSplit() above. If
--             * we get here, then something is wrong in QEMU.
--             */
--            abort();
--        }
-+    }
-+    switch (mode) {
-+    case ON_OFF_SPLIT_ON:
-+        s->kernel_irqchip_allowed = true;
-+        s->kernel_irqchip_required = true;
-+        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
-+        break;
-+    case ON_OFF_SPLIT_OFF:
-+        s->kernel_irqchip_allowed = false;
-+        s->kernel_irqchip_required = false;
-+        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
-+        break;
-+    case ON_OFF_SPLIT_SPLIT:
-+        s->kernel_irqchip_allowed = true;
-+        s->kernel_irqchip_required = true;
-+        s->kernel_irqchip_split = ON_OFF_AUTO_ON;
-+        break;
-+    default:
-+        /* The value was checked in visit_type_OnOffSplit() above. If
-+         * we get here, then something is wrong in QEMU.
-+         */
-+        abort();
-     }
- }
- 
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index dba2bb6451..03a53c89ea 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -889,8 +889,8 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
-     ThrottleLimits *argp;
-     Error *local_err = NULL;
- 
--    if (!visit_type_ThrottleLimits(v, name, &argp, &local_err)) {
--        goto ret;
-+    if (!visit_type_ThrottleLimits(v, name, &argp, errp)) {
-+        return;
-     }
-     qemu_mutex_lock(&tg->lock);
-     throttle_get_config(&tg->ts, &cfg);
-@@ -902,7 +902,6 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
- 
- unlock:
-     qemu_mutex_unlock(&tg->lock);
--ret:
-     qapi_free_ThrottleLimits(argp);
-     error_propagate(errp, local_err);
-     return;
-diff --git a/bootdevice.c b/bootdevice.c
-index fb09d3c668..769f40c77d 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -297,8 +297,8 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
-     int32_t boot_index;
-     Error *local_err = NULL;
- 
--    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
--        goto out;
-+    if (!visit_type_int32(v, name, &boot_index, errp)) {
-+        return;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
-     check_boot_index(boot_index, &local_err);
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index fa88a8885c..11e7d27ccc 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -664,15 +664,15 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
-     if (!visit_type_str(v, name, &str, &local_err)) {
-         error_free(local_err);
-         local_err = NULL;
--        visit_type_int32(v, name, &value, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--        } else if (value < -1 || value > 255) {
-+        if (!visit_type_int32(v, name, &value, errp)) {
-+            return;
-+        }
-+        if (value < -1 || value > 255) {
-             error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                        name ? name : "null", "pci_devfn");
--        } else {
--            *ptr = value;
-+            return;
-         }
-+        *ptr = value;
-         return;
-     }
- 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 358f10a92e..ba8b0d7f02 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -245,8 +245,8 @@ static void ide_dev_set_bootindex(Object *obj, Visitor *v, const char *name,
-     int32_t boot_index;
-     Error *local_err = NULL;
- 
--    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
--        goto out;
-+    if (!visit_type_int32(v, name, &boot_index, errp)) {
-+        return;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
-     check_boot_index(boot_index, &local_err);
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index e6fdf6ccc3..d0d6e553cf 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -82,21 +82,18 @@ static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
- {
-     NVDIMMDevice *nvdimm = NVDIMM(obj);
--    Error *local_err = NULL;
-     char *value;
- 
--    if (!visit_type_str(v, name, &value, &local_err)) {
--        goto out;
-+    if (!visit_type_str(v, name, &value, errp)) {
-+        return;
-     }
- 
-     if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
-         error_setg(errp, "Property '%s.%s' has invalid value",
-                    object_get_typename(obj), name);
-     }
--    g_free(value);
- 
--out:
--    error_propagate(errp, local_err);
-+    g_free(value);
- }
- 
- 
-diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
-index 765bcd1f0b..0594abd93a 100644
---- a/hw/net/ne2000-isa.c
-+++ b/hw/net/ne2000-isa.c
-@@ -113,8 +113,8 @@ static void isa_ne2000_set_bootindex(Object *obj, Visitor *v,
-     int32_t boot_index;
-     Error *local_err = NULL;
- 
--    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
--        goto out;
-+    if (!visit_type_int32(v, name, &boot_index, errp)) {
-+        return;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
-     check_boot_index(boot_index, &local_err);
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 1c3bd2578c..721665191e 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -736,8 +736,8 @@ static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
-     int32_t boot_index;
-     Error *local_err = NULL;
- 
--    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
--        goto out;
-+    if (!visit_type_int32(v, name, &boot_index, errp)) {
-+        return;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
-     check_boot_index(boot_index, &local_err);
-diff --git a/net/net.c b/net/net.c
-index d1130296e1..e1f45d3b36 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1052,7 +1052,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
- {
-     gchar **substrings = NULL;
-     Netdev *object = NULL;
--    Error *err = NULL;
-     int ret = -1;
-     Visitor *v = opts_visitor_new(opts);
- 
-@@ -1100,16 +1099,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-         qemu_opts_set_id(opts, g_strdup_printf("__org.qemu.net%i", idx++));
-     }
- 
--    visit_type_Netdev(v, NULL, &object, &err);
+     bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
+     {
+-        Error *err = NULL;
 -
--    if (!err) {
--        ret = net_client_init1(object, is_netdev, &err);
-+    if (visit_type_Netdev(v, NULL, &object, errp)) {
-+        ret = net_client_init1(object, is_netdev, errp);
+         if (!visit_type_int(v, "integer", &obj->integer, errp)) {
+             return false;
+         }
+@@ -1430,13 +1428,12 @@ Example:
+                 return false;
+             }
+         }
+-        error_propagate(errp, err);
+-        return !err;
++        return true;
      }
  
-     qapi_free_Netdev(object);
+     bool visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp)
+     {
+-        Error *err = NULL;
++        bool ok = false;
+ 
+         if (!visit_start_struct(v, name, (void **)obj, sizeof(UserDefOne), errp)) {
+             return false;
+@@ -1446,24 +1443,22 @@ Example:
+             assert(visit_is_dealloc(v));
+             goto out_obj;
+         }
+-        visit_type_UserDefOne_members(v, *obj, &err);
+-        if (err) {
++        if (!visit_type_UserDefOne_members(v, *obj, errp)) {
+             goto out_obj;
+         }
+-        visit_check_struct(v, &err);
++        ok = visit_check_struct(v, errp);
+     out_obj:
+         visit_end_struct(v, (void **)obj);
+-        if (err && visit_is_input(v)) {
++        if (!ok && visit_is_input(v)) {
+             qapi_free_UserDefOne(*obj);
+             *obj = NULL;
+         }
+-        error_propagate(errp, err);
+-        return !err;
++        return ok;
+     }
+ 
+     bool visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp)
+     {
+-        Error *err = NULL;
++        bool ok = false;
+         UserDefOneList *tail;
+         size_t size = sizeof(**obj);
+ 
+@@ -1473,33 +1468,27 @@ Example:
+ 
+         for (tail = *obj; tail;
+              tail = (UserDefOneList *)visit_next_list(v, (GenericList *)tail, size)) {
+-            visit_type_UserDefOne(v, NULL, &tail->value, &err);
+-            if (err) {
+-                break;
++            if (!visit_type_UserDefOne(v, NULL, &tail->value, errp)) {
++                goto out_obj;
+             }
+         }
+ 
+-        if (!err) {
+-            visit_check_list(v, &err);
+-        }
++        ok = visit_check_list(v, errp);
++    out_obj:
+         visit_end_list(v, (void **)obj);
+-        if (err && visit_is_input(v)) {
++        if (!ok && visit_is_input(v)) {
+             qapi_free_UserDefOneList(*obj);
+             *obj = NULL;
+         }
+-        error_propagate(errp, err);
+-        return !err;
++        return ok;
+     }
+ 
+     bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
+     {
+-        Error *err = NULL;
+-
+         if (!visit_type_UserDefOneList(v, "arg1", &obj->arg1, errp)) {
+             return false;
+         }
+-        error_propagate(errp, err);
+-        return !err;
++        return true;
+     }
+ 
+ [Uninteresting stuff omitted...]
+@@ -1554,15 +1543,12 @@ Example:
+ 
+     static void qmp_marshal_output_UserDefOne(UserDefOne *ret_in, QObject **ret_out, Error **errp)
+     {
+-        Error *err = NULL;
+         Visitor *v;
+ 
+         v = qobject_output_visitor_new(ret_out);
+-        visit_type_UserDefOne(v, "unused", &ret_in, &err);
+-        if (!err) {
++        if (visit_type_UserDefOne(v, "unused", &ret_in, errp)) {
+             visit_complete(v, ret_out);
+         }
+-        error_propagate(errp, err);
+         visit_free(v);
+         v = qapi_dealloc_visitor_new();
+         visit_type_UserDefOne(v, "unused", &ret_in, NULL);
+@@ -1572,33 +1558,32 @@ Example:
+     void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp)
+     {
+         Error *err = NULL;
++        bool ok = false;
+         Visitor *v;
+         UserDefOne *retval;
+         q_obj_my_command_arg arg = {0};
+ 
+         v = qobject_input_visitor_new(QOBJECT(args));
+-        visit_start_struct(v, NULL, NULL, 0, &err);
+-        if (err) {
++        if (!visit_start_struct(v, NULL, NULL, 0, errp)) {
+             goto out;
+         }
+-        visit_type_q_obj_my_command_arg_members(v, &arg, &err);
+-        if (!err) {
+-            visit_check_struct(v, &err);
++        if (visit_type_q_obj_my_command_arg_members(v, &arg, errp)) {
++            ok = visit_check_struct(v, errp);
+         }
+         visit_end_struct(v, NULL);
+-        if (err) {
++        if (!ok) {
+             goto out;
+         }
+ 
+         retval = qmp_my_command(arg.arg1, &err);
++        error_propagate(errp, err);
+         if (err) {
+             goto out;
+         }
+ 
+-        qmp_marshal_output_UserDefOne(retval, ret, &err);
++        qmp_marshal_output_UserDefOne(retval, ret, errp);
+ 
+     out:
+-        error_propagate(errp, err);
+         visit_free(v);
+         v = qapi_dealloc_visitor_new();
+         visit_start_struct(v, NULL, NULL, 0, NULL);
+@@ -1606,6 +1591,7 @@ Example:
+         visit_end_struct(v, NULL);
+         visit_free(v);
+     }
++
+ [Uninteresting stuff omitted...]
+     $ cat qapi-generated/example-qapi-init-commands.h
+ [Uninteresting stuff omitted...]
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 6809b0fb6e..3cf9e1110b 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -47,6 +47,7 @@ def gen_call(name, arg_type, boxed, ret_type):
+     ret = mcgen('''
+ 
+     %(lhs)sqmp_%(c_name)s(%(args)s&err);
++    error_propagate(errp, err);
+ ''',
+                 c_name=c_name(name), args=argstr, lhs=lhs)
+     if ret_type:
+@@ -55,7 +56,7 @@ def gen_call(name, arg_type, boxed, ret_type):
+         goto out;
+     }
+ 
+-    qmp_marshal_output_%(c_name)s(retval, ret, &err);
++    qmp_marshal_output_%(c_name)s(retval, ret, errp);
+ ''',
+                      c_name=ret_type.c_name())
+     return ret
+@@ -66,15 +67,12 @@ def gen_marshal_output(ret_type):
+ 
+ static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out, Error **errp)
+ {
+-    Error *err = NULL;
+     Visitor *v;
+ 
+     v = qobject_output_visitor_new(ret_out);
+-    visit_type_%(c_name)s(v, "unused", &ret_in, &err);
+-    if (!err) {
++    if (visit_type_%(c_name)s(v, "unused", &ret_in, errp)) {
+         visit_complete(v, ret_out);
+     }
+-    error_propagate(errp, err);
+     visit_free(v);
+     v = qapi_dealloc_visitor_new();
+     visit_type_%(c_name)s(v, "unused", &ret_in, NULL);
+@@ -104,6 +102,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+ %(proto)s
+ {
+     Error *err = NULL;
++    bool ok = false;
+     Visitor *v;
+ ''',
+                 proto=build_marshal_proto(name))
+@@ -123,28 +122,26 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+     ret += mcgen('''
+ 
+     v = qobject_input_visitor_new(QOBJECT(args));
+-    visit_start_struct(v, NULL, NULL, 0, &err);
+-    if (err) {
++    if (!visit_start_struct(v, NULL, NULL, 0, errp)) {
+         goto out;
+     }
+ ''')
+ 
+     if have_args:
+         ret += mcgen('''
+-    visit_type_%(c_arg_type)s_members(v, &arg, &err);
+-    if (!err) {
+-        visit_check_struct(v, &err);
++    if (visit_type_%(c_arg_type)s_members(v, &arg, errp)) {
++        ok = visit_check_struct(v, errp);
+     }
+ ''',
+                      c_arg_type=arg_type.c_name())
+     else:
+         ret += mcgen('''
+-    visit_check_struct(v, &err);
++    ok = visit_check_struct(v, errp);
+ ''')
+ 
+     ret += mcgen('''
+     visit_end_struct(v, NULL);
+-    if (err) {
++    if (!ok) {
+         goto out;
+     }
+ ''')
+@@ -154,7 +151,6 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+     ret += mcgen('''
  
  out:
 -    error_propagate(errp, err);
-     g_strfreev(substrings);
      visit_free(v);
-     return ret;
-diff --git a/qom/object.c b/qom/object.c
-index 780a700542..b8aac074c2 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1766,9 +1766,11 @@ static void object_set_link_property(Object *obj, Visitor *v,
-     Object *new_target = NULL;
-     char *path = NULL;
+ ''')
  
--    visit_type_str(v, name, &path, &local_err);
-+    if (!visit_type_str(v, name, &path, errp)) {
-+        return;
-+    }
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index ba0cf0b074..3fb2f30510 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -41,8 +41,6 @@ def gen_visit_object_members(name, base, members, variants):
  
--    if (!local_err && strcmp(path, "") != 0) {
-+    if (strcmp(path, "") != 0) {
-         new_target = object_resolve_link(obj, name, path, &local_err);
+ bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+ {
+-    Error *err = NULL;
+-
+ ''',
+                 c_name=c_name(name))
+ 
+@@ -97,8 +95,7 @@ bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+             else:
+                 ret += mcgen('''
+     case %(case)s:
+-        visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, &err);
+-        break;
++        return visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, errp);
+ ''',
+                              case=case_str,
+                              c_type=var.type.c_name(), c_name=c_name(var.name))
+@@ -111,8 +108,7 @@ bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+ ''')
+ 
+     ret += mcgen('''
+-    error_propagate(errp, err);
+-    return !err;
++    return true;
+ }
+ ''')
+     return ret
+@@ -123,7 +119,7 @@ def gen_visit_list(name, element_type):
+ 
+ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok = false;
+     %(c_name)s *tail;
+     size_t size = sizeof(**obj);
+ 
+@@ -133,22 +129,19 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+ 
+     for (tail = *obj; tail;
+          tail = (%(c_name)s *)visit_next_list(v, (GenericList *)tail, size)) {
+-        visit_type_%(c_elt_type)s(v, NULL, &tail->value, &err);
+-        if (err) {
+-            break;
++        if (!visit_type_%(c_elt_type)s(v, NULL, &tail->value, errp)) {
++            goto out_obj;
+         }
      }
  
-@@ -2293,36 +2295,34 @@ static void property_get_tm(Object *obj, Visitor *v, const char *name,
+-    if (!err) {
+-        visit_check_list(v, &err);
+-    }
++    ok = visit_check_list(v, errp);
++out_obj:
+     visit_end_list(v, (void **)obj);
+-    if (err && visit_is_input(v)) {
++    if (!ok && visit_is_input(v)) {
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
+     }
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ ''',
+                  c_name=c_name(name), c_elt_type=element_type.c_name())
+@@ -173,7 +166,7 @@ def gen_visit_alternate(name, variants):
  
-     prop->get(obj, &value, &err);
-     if (err) {
--        goto out;
-+        error_propagate(errp, err);
-+        return;
-     }
+ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok = false;
  
--    if (!visit_start_struct(v, name, NULL, 0, &err)) {
--        goto out;
-+    if (!visit_start_struct(v, name, NULL, 0, errp)) {
-+        return;
+     if (!visit_start_alternate(v, name, (GenericAlternate **)obj,
+                                sizeof(**obj), errp)) {
+@@ -182,6 +175,7 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+     if (!*obj) {
+         /* incomplete */
+         assert(visit_is_dealloc(v));
++        ok = true;
+         goto out_obj;
      }
--    if (!visit_type_int32(v, "tm_year", &value.tm_year, &err)) {
-+    if (!visit_type_int32(v, "tm_year", &value.tm_year, errp)) {
-         goto out_end;
+     switch ((*obj)->type) {
+@@ -196,13 +190,11 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+                      case=var.type.alternate_qtype())
+         if isinstance(var.type, QAPISchemaObjectType):
+             ret += mcgen('''
+-        visit_start_struct(v, name, NULL, 0, &err);
+-        if (err) {
++        if (!visit_start_struct(v, name, NULL, 0, errp)) {
+             break;
+         }
+-        visit_type_%(c_type)s_members(v, &(*obj)->u.%(c_name)s, &err);
+-        if (!err) {
+-            visit_check_struct(v, &err);
++        if (visit_type_%(c_type)s_members(v, &(*obj)->u.%(c_name)s, errp)) {
++            ok = visit_check_struct(v, errp);
+         }
+         visit_end_struct(v, NULL);
+ ''',
+@@ -210,7 +202,7 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+                          c_name=c_name(var.name))
+         else:
+             ret += mcgen('''
+-        visit_type_%(c_type)s(v, name, &(*obj)->u.%(c_name)s, &err);
++        ok = visit_type_%(c_type)s(v, name, &(*obj)->u.%(c_name)s, errp);
+ ''',
+                          c_type=var.type.c_name(),
+                          c_name=c_name(var.name))
+@@ -224,7 +216,7 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+         abort();
+     default:
+         assert(visit_is_input(v));
+-        error_setg(&err, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "%(name)s");
+         /* Avoid passing invalid *obj to qapi_free_%(c_name)s() */
+         g_free(*obj);
+@@ -232,12 +224,11 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
      }
--    if (!visit_type_int32(v, "tm_mon", &value.tm_mon, &err)) {
-+    if (!visit_type_int32(v, "tm_mon", &value.tm_mon, errp)) {
-         goto out_end;
+ out_obj:
+     visit_end_alternate(v, (void **)obj);
+-    if (err && visit_is_input(v)) {
++    if (!ok && visit_is_input(v)) {
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
      }
--    if (!visit_type_int32(v, "tm_mday", &value.tm_mday, &err)) {
-+    if (!visit_type_int32(v, "tm_mday", &value.tm_mday, errp)) {
-         goto out_end;
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ ''',
+                  name=name, c_name=c_name(name))
+@@ -250,7 +241,7 @@ def gen_visit_object(name, base, members, variants):
+ 
+ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok = false;
+ 
+     if (!visit_start_struct(v, name, (void **)obj, sizeof(%(c_name)s), errp)) {
+         return false;
+@@ -260,19 +251,17 @@ bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+         assert(visit_is_dealloc(v));
+         goto out_obj;
      }
--    if (!visit_type_int32(v, "tm_hour", &value.tm_hour, &err)) {
-+    if (!visit_type_int32(v, "tm_hour", &value.tm_hour, errp)) {
-         goto out_end;
-     }
--    if (!visit_type_int32(v, "tm_min", &value.tm_min, &err)) {
-+    if (!visit_type_int32(v, "tm_min", &value.tm_min, errp)) {
-         goto out_end;
-     }
--    if (!visit_type_int32(v, "tm_sec", &value.tm_sec, &err)) {
-+    if (!visit_type_int32(v, "tm_sec", &value.tm_sec, errp)) {
-         goto out_end;
+-    visit_type_%(c_name)s_members(v, *obj, &err);
+-    if (err) {
++    if (!visit_type_%(c_name)s_members(v, *obj, errp)) {
+         goto out_obj;
      }
 -    visit_check_struct(v, &err);
-+    visit_check_struct(v, errp);
- out_end:
-     visit_end_struct(v, NULL);
--out:
++    ok = visit_check_struct(v, errp);
+ out_obj:
+     visit_end_struct(v, (void **)obj);
+-    if (err && visit_is_input(v)) {
++    if (!ok && visit_is_input(v)) {
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
+     }
 -    error_propagate(errp, err);
--
+-    return !err;
++    return ok;
  }
- 
- static void property_release_tm(Object *obj, const char *name,
+ ''',
+                  c_name=c_name(name))
 -- 
 2.26.2
 
