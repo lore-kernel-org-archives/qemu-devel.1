@@ -2,69 +2,69 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41EF2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D36B4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11B3820CC7
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DBD52084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:54:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P4kEQ2GV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B3820CC7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhGfB2IF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DBD52084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo331-0007qb-80
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:54:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56458)
+	id 1jo33R-0000HV-Qn
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:54:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2zf-0000ul-PL
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39306
+ id 1jo2zm-0001AB-Th
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40599
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2zd-0001Eq-Ow
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:03 -0400
+ id 1jo2zl-0001Jl-0x
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592995861;
+ s=mimecast20190719; t=1592995868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q9Je4/GAg4SH4ewN1aBvGsdOoDw32X/9E7go6c+n/Uk=;
- b=P4kEQ2GVdxnpqEc7t4t7oFQEvCTa624bS6vQu0NJHsHMG/xjg/6Sz739SRd+RT+fvzrXFh
- j6/+wBGIkh9y6Hro4RrSaqvmrQDwfYsdxeHfPLd94TrjolNNt8CNTdcsJZumhES7Jm8Ygg
- +hShBOZgW31fkqyjmEiveEmZsAC3Y44=
+ bh=Ecq6ZUkpsnc040JueViIsqBMjrtp9srwbm9A9vdokPs=;
+ b=bhGfB2IFQTFI5VjH2PN5Nl+uUtlZXYtyul6YjEVT71aSK0v5OjOM4idxp5BXT0c96uMwS2
+ 8o5IjxOTuq0DVmsHe8q/q1StJLKiTN0Mg+24VZRi9cjLC5F/+MkEBPaFpJR8LYIbptkYes
+ YdAxsBNx34fRyW5RuDvJnLNkela7YPc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-lDTrkSTPPcC5AwSzj00fzA-1; Wed, 24 Jun 2020 06:50:58 -0400
-X-MC-Unique: lDTrkSTPPcC5AwSzj00fzA-1
+ us-mta-379-9TZ4YbDgMi-QZGCg9v8bpg-1; Wed, 24 Jun 2020 06:51:03 -0400
+X-MC-Unique: 9TZ4YbDgMi-QZGCg9v8bpg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D325A87950F;
- Wed, 24 Jun 2020 10:50:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EE5B879512;
+ Wed, 24 Jun 2020 10:51:02 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com
  (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 883681DC;
- Wed, 24 Jun 2020 10:50:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C59271695;
+ Wed, 24 Jun 2020 10:51:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/31] memory: Revert "memory: accept mismatching sizes in
- memory_region_access_valid"
-Date: Wed, 24 Jun 2020 06:50:22 -0400
-Message-Id: <20200624105048.375353-5-pbonzini@redhat.com>
+Subject: [PULL 10/31] docs/nvdimm: add description of alignment requirement of
+ device dax
+Date: Wed, 24 Jun 2020 06:50:27 -0400
+Message-Id: <20200624105048.375353-10-pbonzini@redhat.com>
 In-Reply-To: <20200624104917.375143-1-pbonzini@redhat.com>
 References: <20200624104917.375143-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -96,91 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-stable@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Joao Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+From: Jingqi Liu <jingqi.liu@intel.com>
 
-Memory API documentation documents valid .min_access_size and .max_access_size
-fields and explains that any access outside these boundaries is blocked.
+For device dax (e.g., /dev/dax0.0), the NUM of 'align=NUM' option
+needs to match the alignment requirement of the device dax.
+It must be larger than or equal to the 'align' of device dax.
 
-This is what devices seem to assume.
-
-However this is not what the implementation does: it simply
-ignores the boundaries unless there's an "accepts" callback.
-
-Naturally, this breaks a bunch of devices.
-
-Revert to the documented behaviour.
-
-Devices that want to allow any access can just drop the valid field,
-or add the impl field to have accesses converted to appropriate
-length.
-
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Fixes: CVE-2020-13754
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842363
-Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region_access_valid")
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20200610134731.1514409-1-mst@redhat.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Message-Id: <20200429085011.63752-3-jingqi.liu@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- memory.c | 29 +++++++++--------------------
- 1 file changed, 9 insertions(+), 20 deletions(-)
+ docs/nvdimm.txt | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/memory.c b/memory.c
-index 2f15a4b250..9200b20130 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1352,35 +1352,24 @@ bool memory_region_access_valid(MemoryRegion *mr,
-                                 bool is_write,
-                                 MemTxAttrs attrs)
- {
--    int access_size_min, access_size_max;
--    int access_size, i;
--
--    if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-+    if (mr->ops->valid.accepts
-+        && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
-         return false;
-     }
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index 362e99109e..c2c6e441b3 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -132,6 +132,16 @@ address to the page size (getpagesize(2)) by default. However, some
+ types of backends may require an alignment different than the page
+ size. In that case, QEMU v2.12.0 and later provide 'align' option to
+ memory-backend-file to allow users to specify the proper alignment.
++For device dax (e.g., /dev/dax0.0), this alignment needs to match the
++alignment requirement of the device dax. The NUM of 'align=NUM' option
++must be larger than or equal to the 'align' of device dax.
++We can use one of the following commands to show the 'align' of device dax.
++
++    ndctl list -X
++    daxctl list -R
++
++In order to get the proper 'align' of device dax, you need to install
++the library 'libdaxctl'.
  
--    if (!mr->ops->valid.accepts) {
--        return true;
--    }
--
--    access_size_min = mr->ops->valid.min_access_size;
--    if (!mr->ops->valid.min_access_size) {
--        access_size_min = 1;
-+    if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-+        return false;
-     }
- 
--    access_size_max = mr->ops->valid.max_access_size;
-+    /* Treat zero as compatibility all valid */
-     if (!mr->ops->valid.max_access_size) {
--        access_size_max = 4;
-+        return true;
-     }
- 
--    access_size = MAX(MIN(size, access_size_max), access_size_min);
--    for (i = 0; i < size; i += access_size) {
--        if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
--                                    is_write, attrs)) {
--            return false;
--        }
-+    if (size > mr->ops->valid.max_access_size
-+        || size < mr->ops->valid.min_access_size) {
-+        return false;
-     }
--
-     return true;
- }
- 
+ For example, device dax require the 2 MB alignment, so we can use
+ following QEMU command line options to use it (/dev/dax0.0) as the
 -- 
 2.26.2
 
