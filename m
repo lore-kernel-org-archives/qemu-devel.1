@@ -2,66 +2,67 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E6FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDB2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:25:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FBA620738
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:23:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BA9120738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:25:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhHz68f6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBA620738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ii+7254+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA9120738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo5Mi-0003W5-8e
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:23:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44360)
+	id 1jo5PY-0006BJ-D0
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:25:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jo5Kw-0001CJ-8z
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:21:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32660
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jo5Ot-0005hE-5k
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:25:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46785
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jo5Ku-0007SP-I9
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:21:09 -0400
+ id 1jo5Oq-0000v0-ON
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:25:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593004867;
+ s=mimecast20190719; t=1593005111;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=h8MpwGGFbwCaM5Hok0BnuzoGyUBDUATarLzfpCkPpfM=;
- b=QhHz68f6bA0mzGdm374ICNmXw033EJJ1bLiXLce2otqBhhnuPOBTHNoMBDUxvjGWBozSeC
- pjvH2xrw8EFQCNTVGSIf6X3h1tWyer487izYiu1wi24VCMEH3GPdad5dpONNnjmb79D7MF
- XRR4wRbLez4nk3W5XhYdlquosEyXARQ=
+ bh=Rd6FbrLNcjT+8fBhd5ysRRBjX9NzfZ/4et6Yapu02mQ=;
+ b=ii+7254+yqdTrhwTufVhJd9hECYSiQwUfviL1cZc8kSO17nxSuGcoSJiSfyjVAfZgQ/dC6
+ Erp/NJ6ggL973YjkAScxDbiRQL9a/b7yspY1FKFhiCeeulKsmqmZGu+m2HvcOjunJ/DpRF
+ JWstd5+LZbikA4Zyz9Cu2wl0vdcrjpo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-qGFINxxGN2WUoJUIJUvHpQ-1; Wed, 24 Jun 2020 09:21:05 -0400
-X-MC-Unique: qGFINxxGN2WUoJUIJUvHpQ-1
+ us-mta-191-ZIbBzWjxO9y7DRU9AreblA-1; Wed, 24 Jun 2020 09:25:09 -0400
+X-MC-Unique: ZIbBzWjxO9y7DRU9AreblA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAAB1107B26F;
- Wed, 24 Jun 2020 13:21:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17622800D5C;
+ Wed, 24 Jun 2020 13:25:07 +0000 (UTC)
 Received: from [10.36.112.159] (ovpn-112-159.ams2.redhat.com [10.36.112.159])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 91DDD7CAA3;
- Wed, 24 Jun 2020 13:20:47 +0000 (UTC)
-Subject: Re: [PATCH v1 02/10] vhost_net: use the function qemu_get_peer
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 04EB61C8;
+ Wed, 24 Jun 2020 13:24:51 +0000 (UTC)
+Subject: Re: [PATCH v1 04/10] virtio-pci: implement queue_enabled method
 To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
  eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
 References: <20200622153756.19189-1-lulu@redhat.com>
- <20200622153756.19189-3-lulu@redhat.com>
+ <20200622153756.19189-5-lulu@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -117,21 +118,21 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <56322041-3323-abd6-ab2c-c0f70d9046cb@redhat.com>
-Date: Wed, 24 Jun 2020 15:20:46 +0200
+Message-ID: <2a5cf3dd-4dcd-e807-c28a-aaf2a901e8f8@redhat.com>
+Date: Wed, 24 Jun 2020 15:24:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622153756.19189-3-lulu@redhat.com>
+In-Reply-To: <20200622153756.19189-5-lulu@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -165,14 +166,42 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 22/06/2020 17:37, Cindy Lu wrote:
-> user the qemu_get_peer to replace the old process
+> From: Jason Wang <jasowang@redhat.com>
 > 
+> With version 1, we can detect whether a queue is enabled via
+> queue_enabled.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->  hw/net/vhost_net.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
+>  hw/virtio/virtio-pci.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 4cb784389c..3918aa9f6c 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1107,6 +1107,23 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+>      return pci_get_address_space(dev);
+>  }
+>  
+> +static bool  virtio_queue_check_enabled(VirtIODevice *vdev, int n)
+> +{
+> +    return  virtio_queue_get_desc_addr(vdev, n) != 0;
+> +}
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+This function is already defined under a different name in
+hw/virtio/virtio.c:
+
+
+   3287 bool virtio_queue_enabled(VirtIODevice *vdev, int n)
+   3288 {
+   3289     return virtio_queue_get_desc_addr(vdev, n) != 0;
+   3290 }
+
+As this file includes "hw/virtio/virtio.h" you can use it directly.
+
+Thanks,
+Laurent
 
 
