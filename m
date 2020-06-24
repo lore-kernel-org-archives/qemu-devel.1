@@ -6,70 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1043EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 918E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D03752084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:38:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF8420706
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:40:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtvX0/46"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D03752084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKXpl8it"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF8420706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo3jr-0003B9-2g
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:38:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40612)
+	id 1jo3lp-0006ii-KT
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3cB-0004Fh-Qh
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47874
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c9-0004CH-NN
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56910
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c2-0007y3-Ir
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:51 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c2-0007xk-1K
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1592998241;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=eM5iqr2FFJ/KmKCoaf2j9QYBByiH0+UI7k7ir+RfAMc=;
- b=HtvX0/46nGaG+MZR3e6oOeK/cpNOdx5m35Uj8CWQpZVIHrRmmqLSYr5F4O4y0fQqQ3r27z
- Xk6V4txz1nwkRFDKlaxamEkJtS2AFfo0EM6W8BY+psxgR0lnQoV6Cpr4X1VEqMA4NwA+dN
- pZl5vnuLvTCHKXqphwS/uuNKeSxGpMI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TblcahrtK9GAL2ZcADuEIqlUQPhrGCfzXjv5e1jl7J4=;
+ b=XKXpl8it/Xz5J7JKF97GqrSnu5NfFVDq7DJ0J+ny23l5YZx8xkWMeV6D1VT9fyO/x+v0pT
+ zeWlfNoauxsHebvERDXLWbOkvRtgCSnyvif6+48aOLcNaWIhTbQw7UqFhIvnbvRLXS4PUb
+ w7P7gjfg+WIHdIQJTp4Zvr7ucyHNFhg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-dqLEo0l0PsSmVeatgoFsUw-1; Wed, 24 Jun 2020 07:30:39 -0400
-X-MC-Unique: dqLEo0l0PsSmVeatgoFsUw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-196-VOSqbSpkOoGavhgbuCfKHg-1; Wed, 24 Jun 2020 07:30:37 -0400
+X-MC-Unique: VOSqbSpkOoGavhgbuCfKHg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 906A418A822B;
- Wed, 24 Jun 2020 11:30:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 463FFA0BD9;
+ Wed, 24 Jun 2020 11:30:36 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 40F581C8;
- Wed, 24 Jun 2020 11:30:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 76C2A512FE;
+ Wed, 24 Jun 2020 11:30:27 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 5FEC631E60; Wed, 24 Jun 2020 13:30:27 +0200 (CEST)
+ id A208645DB; Wed, 24 Jun 2020 13:30:26 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 18/20] audio: add soundhw deprecation notice
-Date: Wed, 24 Jun 2020 13:30:24 +0200
-Message-Id: <20200624113026.13343-19-kraxel@redhat.com>
+Subject: [PATCH v4 01/20] stubs: add isa_create_simple
+Date: Wed, 24 Jun 2020 13:30:07 +0200
+Message-Id: <20200624113026.13343-2-kraxel@redhat.com>
 In-Reply-To: <20200624113026.13343-1-kraxel@redhat.com>
 References: <20200624113026.13343-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -101,31 +105,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- docs/system/deprecated.rst | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Needed for -soundhw cleanup.
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 3a255591c341..4cbf3bba3944 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -82,6 +82,15 @@ should specify an ``audiodev=`` property.  Additionally, when using
- vnc, you should specify an ``audiodev=`` propery if you plan to
- transmit audio through the VNC protocol.
- 
-+Creating sound card devices using ``-soundhw`` (since 5.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ stubs/isa-bus.c     | 7 +++++++
+ stubs/Makefile.objs | 1 +
+ 2 files changed, 8 insertions(+)
+ create mode 100644 stubs/isa-bus.c
+
+diff --git a/stubs/isa-bus.c b/stubs/isa-bus.c
+new file mode 100644
+index 000000000000..522f448997d4
+--- /dev/null
++++ b/stubs/isa-bus.c
+@@ -0,0 +1,7 @@
++#include "qemu/osdep.h"
++#include "hw/isa/isa.h"
 +
-+Sound card devices should be created using ``-device`` instead.  The
-+names are the same for most devices.  The exceptions are ``hda`` which
-+needs two devices (``-device intel-hda --device hda-duplex``) and
-+``pcspk`` which can be activated using ``-machine
-+pcspk-audiodev=<name>``.
-+
- ``-mon ...,control=readline,pretty=on|off`` (since 4.1)
- '''''''''''''''''''''''''''''''''''''''''''''''''''''''
- 
++ISADevice *isa_create_simple(ISABus *bus, const char *name)
++{
++    g_assert_not_reached();
++}
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 28e48171d1f3..869204668231 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -7,6 +7,7 @@ stub-obj-y += fdset.o
+ stub-obj-y += gdbstub.o
+ stub-obj-y += iothread-lock.o
+ stub-obj-y += is-daemonized.o
++stub-obj-y += isa-bus.o
+ stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+ stub-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
+ stub-obj-y += monitor-core.o
 -- 
 2.18.4
 
