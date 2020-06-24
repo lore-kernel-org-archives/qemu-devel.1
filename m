@@ -2,106 +2,90 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A26AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCE0C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:36:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E59FB2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:32:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59FB2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 77C702077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:36:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeyUQL48"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C702077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joB8Z-0005sR-4r
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:32:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41888)
+	id 1joBBk-0008AL-Kd
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:36:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1joB7B-0004KW-Jo; Wed, 24 Jun 2020 15:31:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32624)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1joB74-0001Va-JG; Wed, 24 Jun 2020 15:31:21 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05OJ2ugL127443; Wed, 24 Jun 2020 15:31:10 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31vbmtahm3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 24 Jun 2020 15:31:10 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05OJ300Y127952;
- Wed, 24 Jun 2020 15:31:09 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31vbmtahkb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 24 Jun 2020 15:31:09 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05OJJlcD005739;
- Wed, 24 Jun 2020 19:31:09 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma02dal.us.ibm.com with ESMTP id 31uursytmn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 24 Jun 2020 19:31:08 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05OJV6vV29622572
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 24 Jun 2020 19:31:06 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 961BFBE054;
- Wed, 24 Jun 2020 19:31:07 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B98AEBE051;
- Wed, 24 Jun 2020 19:31:06 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.58.244])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 24 Jun 2020 19:31:06 +0000 (GMT)
-Subject: Re: [PATCH 30/46] s390x/pci: Fix harmless mistake in zpci's property
- fid's setter
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBAb-0007Xw-2E
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:34:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55748
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBAY-0003XG-Sk
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:34:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593027288;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ko5v4OmHyrf41NYQOndcTA/l9ssvaiJP8pj0vd8womg=;
+ b=KeyUQL48W4G5DP+tx8TVs9fvHs4ea35OniHYnqXpJh9iUGNMe3cYR3jTLMUzihNO8W20CA
+ 0a43ppS2uesyws+inYsEhNKib99aTkL13i2SrzQ6/X58GTHlH1UMN1LZgz+Nnh6gzr9MXK
+ lCPYKPq5iCIfE+Gx0YGGsIrCgxbNX2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-Bo35uOX7MbajXtdebpdzsg-1; Wed, 24 Jun 2020 15:34:42 -0400
+X-MC-Unique: Bo35uOX7MbajXtdebpdzsg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19BBE805EE1;
+ Wed, 24 Jun 2020 19:34:41 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DE062B4A7;
+ Wed, 24 Jun 2020 19:34:39 +0000 (UTC)
+Subject: Re: [PATCH 09/46] error: Avoid error_propagate() after
+ migrate_add_blocker()
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-31-armbru@redhat.com>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <87d11b9d-5296-2b93-0115-0045c91e571b@linux.ibm.com>
-Date: Wed, 24 Jun 2020 15:31:06 -0400
+ <20200624164344.3778251-10-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <9974605c-b769-2324-5f0c-092c00dd7c57@redhat.com>
+Date: Wed, 24 Jun 2020 14:34:39 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-31-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200624164344.3778251-10-armbru@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-24_15:2020-06-24,
- 2020-06-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0 spamscore=0
- phishscore=0 clxscore=1011 cotscore=-2147483648 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006240126
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 15:31:11
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,43 +99,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- pbonzini@redhat.com
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 12:43 PM, Markus Armbruster wrote:
-> s390_pci_set_fid() sets zpci->fid_defined to true even when
-> visit_type_uint32() failed.  Reproducer: "-device zpci,fid=junk".
-> Harmless in practice, because qdev_device_add() then fails, throwing
-> away @zpci.  Fix it anyway.
+On 6/24/20 11:43 AM, Markus Armbruster wrote:
+> When migrate_add_blocker(blocker, &errp) is followed by
+> error_propagate(errp, err), we can often just as well do
+> migrate_add_blocker(..., errp).
 > 
-> Cc: Matthew Rosato <mjrosato@linux.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
+> Do that with this Coccinelle script:
+
+> 
+> Double-check @err is not used afterwards.  Dereferencing it would be
+> use after free, but checking whether it's null would be legitimate.
+> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   hw/s390x/s390-pci-bus.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index be8535304e..2e0eab1c69 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -1265,7 +1265,9 @@ static void s390_pci_set_fid(Object *obj, Visitor *v, const char *name,
->           return;
->       }
->   
-> -    visit_type_uint32(v, name, ptr, errp);
-> +    if (!visit_type_uint32(v, name, ptr, errp)) {
-> +        return;
-> +    }
->       zpci->fid_defined = true;
->   }
->   
-> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Assuming no major overhaul of patch #22:
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
