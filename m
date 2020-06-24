@@ -4,69 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38096C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C680EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:47:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 038BD20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:45:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 935F02073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:47:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBaTxWix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 038BD20836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z09/Dk7U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 935F02073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8WY-0005hf-3y
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:45:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51412)
+	id 1jo8YT-0000Cm-Qv
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:47:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VE-00030K-2e
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58004
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V7-0002fp-G6
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:43:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53202
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V7-00054G-5A
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:43:59 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V5-00053c-72
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:43:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017032;
+ s=mimecast20190719; t=1593017030;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pktL9AI4yzCoRsOgCmHscvSfQiJ6qHLUehFnntuUG+U=;
- b=LBaTxWixKkq0FeU06qjcjsSIoCiJ5x0UJKrCh2lwsLG8ZRfDhA4GqtB1YEM9Ik8iQAeMNj
- nCCZiHziqUT14Omz4Fd0s5WhJ4IiIHpKO0NtevF2DlqtUL3KKpcJF74Cs1QEwy7+vanJ0c
- GWs4vhPE3I9L7UtfwrcHiVtDpqLGuUY=
+ bh=7AjbhnE7cJNNC8tz2AVmy8PW25SpZa4k7KJTLcs6W4A=;
+ b=Z09/Dk7UmkZHmegAJNIjPxPHjJYBcyXyv2wG9TxWIT76NFmOpGY26zCNNkr+2a9rCyuQ6K
+ F8flSe9y5kWUJIGeB1hytqB6Kad8AoBsHerXQ4La1tSPIAjQobMhEf6uRkcgN5FHIzvQGA
+ Idfn2pt87ZKJUePVjijAomhompK0Fuw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-LDmbJXX8M8mxHALDYLV91Q-1; Wed, 24 Jun 2020 12:43:50 -0400
-X-MC-Unique: LDmbJXX8M8mxHALDYLV91Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-464-w3tpjY4jMTy6h7zaqMLe9w-1; Wed, 24 Jun 2020 12:43:48 -0400
+X-MC-Unique: w3tpjY4jMTy6h7zaqMLe9w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F2D418585A6;
- Wed, 24 Jun 2020 16:43:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED25C18585A1;
+ Wed, 24 Jun 2020 16:43:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F12185D9C5;
- Wed, 24 Jun 2020 16:43:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9231D619C0;
+ Wed, 24 Jun 2020 16:43:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 156A7113847B; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id E4A881138471; Wed, 24 Jun 2020 18:43:44 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 14/46] qemu-option: Factor out helper opt_create()
-Date: Wed, 24 Jun 2020 18:43:12 +0200
-Message-Id: <20200624164344.3778251-15-armbru@redhat.com>
+Subject: [PATCH 04/46] macio: Tidy up error handling in
+ macio_newworld_realize()
+Date: Wed, 24 Jun 2020 18:43:02 +0200
+Message-Id: <20200624164344.3778251-5-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -95,64 +97,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+ ehabkost@redhat.com, qemu-block@nongnu.org,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, pbonzini@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is just one use so far.  The next commit will add more.
+macio_newworld_realize() effectively ignores ns->gpio realization
+errors, leaking the Error object.  Fortunately, macio_gpio_realize()
+can't actually fail.  Tidy up.
 
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- util/qemu-option.c | 27 ++++++++++++++++++---------
- 1 file changed, 18 insertions(+), 9 deletions(-)
+ hw/misc/macio/macio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index d9293814b4..3cdf0c0800 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -502,6 +502,23 @@ int qemu_opt_unset(QemuOpts *opts, const char *name)
-     }
- }
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 7cfe357cc4..bedf10e77b 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -329,7 +329,9 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+                                  &error_abort);
+         memory_region_add_subregion(&s->bar, 0x50,
+                                     sysbus_mmio_get_region(sysbus_dev, 0));
+-        qdev_realize(DEVICE(&ns->gpio), BUS(&s->macio_bus), &err);
++        if (!qdev_realize(DEVICE(&ns->gpio), BUS(&s->macio_bus), errp)) {
++            return;
++        }
  
-+static QemuOpt *opt_create(QemuOpts *opts, const char *name, char *value,
-+                           bool prepend)
-+{
-+    QemuOpt *opt = g_malloc0(sizeof(*opt));
-+
-+    opt->name = g_strdup(name);
-+    opt->str = value;
-+    opt->opts = opts;
-+    if (prepend) {
-+        QTAILQ_INSERT_HEAD(&opts->head, opt, next);
-+    } else {
-+        QTAILQ_INSERT_TAIL(&opts->head, opt, next);
-+    }
-+
-+    return opt;
-+}
-+
- static void opt_set(QemuOpts *opts, const char *name, char *value,
-                     bool prepend, bool *help_wanted, Error **errp)
- {
-@@ -519,16 +536,8 @@ static void opt_set(QemuOpts *opts, const char *name, char *value,
-         return;
-     }
- 
--    opt = g_malloc0(sizeof(*opt));
--    opt->name = g_strdup(name);
--    opt->opts = opts;
--    if (prepend) {
--        QTAILQ_INSERT_HEAD(&opts->head, opt, next);
--    } else {
--        QTAILQ_INSERT_TAIL(&opts->head, opt, next);
--    }
-+    opt = opt_create(opts, name, value, prepend);
-     opt->desc = desc;
--    opt->str = value;
-     qemu_opt_parse(opt, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
+         /* PMU */
+         object_initialize_child(OBJECT(s), "pmu", &s->pmu, TYPE_VIA_PMU);
 -- 
 2.26.2
 
