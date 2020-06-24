@@ -2,85 +2,86 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C363BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A16C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:53:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E4F120663
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64E3920663
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:53:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cONPX1F6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4F120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moJpyLkW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E3920663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo4rw-0001dN-R6
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:51:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34378)
+	id 1jo4uI-0003sR-MR
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:53:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo4qn-0000CN-Ke
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:50:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41248
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo4ql-0004PY-Uw
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:50:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593002999;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jDlM8Fso+2XIFRLHpqgyykwf6RsW1F6vY29jFDO97NM=;
- b=cONPX1F6HcnLnzwcJOuSRt/1STICMls112VN/Dwt43x1hBhdGsRBT37D8bM654ntkBa4E7
- DMDwNcAtdSOiX/fQ8G1Sg0nugpSnFvjrudUA7qFuK9iJbFlSkkr2zgB/y8EiwL9pZIIZmr
- FnToog/xDND9sJaCdEwaijOPQJsrCvc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-HhEJ7rKLPuyCXIukeqpuRQ-1; Wed, 24 Jun 2020 08:49:55 -0400
-X-MC-Unique: HhEJ7rKLPuyCXIukeqpuRQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4914800D5C;
- Wed, 24 Jun 2020 12:49:53 +0000 (UTC)
-Received: from gondolin (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C1033100EBB8;
- Wed, 24 Jun 2020 12:49:44 +0000 (UTC)
-Date: Wed, 24 Jun 2020 14:49:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Subject: Re: [PATCH v3 8/8] s390: guest support for diagnose 0x318
-Message-ID: <20200624144942.4a562f0e.cohuck@redhat.com>
-In-Reply-To: <20200618222258.23287-9-walling@linux.ibm.com>
-References: <20200618222258.23287-1-walling@linux.ibm.com>
- <20200618222258.23287-9-walling@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jo4tg-00039H-0Y
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:53:00 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33149)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jo4te-00060P-6V
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:52:59 -0400
+Received: by mail-lj1-x243.google.com with SMTP id s1so2440100ljo.0
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 05:52:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=L2VfXr+wrRkLpcYiMpgSJbGnKK49VpSgllN39LKBgUE=;
+ b=moJpyLkWwhBSb97Itz2uOmKHAMBB6Shej3HOy3IyJQvTM53KA9KJhMHnL8FYt+zjuA
+ nIbGXg9dMF2oENgkDQ+3pX5Z1CScve4fPLZn9mlVnNuYz5BroRrDm2sGdQbqMx0aBzoG
+ +WgXWUeGIFcnNAoyk+pqzBmM0GxGq84p2OKqR/PmnVjUQw7iahHZmPfrhyJ7nRnUr/vV
+ 2TupTloIhqaJXHtUSvZTVGyCPCK5+X5mifUMSUJjZNQq5eOzPJqS8KJLhIFhbjfmmepB
+ TJmbG2tRZh/rHWnArCMYPwUMHbjw5ZFKu8UjcK5UlWOHEy8PdKF3jQn+u33ukIwJ/zCz
+ zU4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=L2VfXr+wrRkLpcYiMpgSJbGnKK49VpSgllN39LKBgUE=;
+ b=EpIhP+IjQyVoXh2rhDDqqV+REBAnrlzXFpCQhTR2hq3rvOLsLex6Q8CjBu3i6vUBP3
+ YxKkNCm71mbJopxgPpyE9mkG0aTaLHPMuR5SgRGYwKU4/gn+y/XBJ3Wtkbh5GBTGV6Bt
+ iqbKJgoeXpvtaeI5BaExJ8xqz/B9uPLx+bVST2BSKkBJZhlM2S4YAKfPNXPNTccyFGy+
+ FcTP7EbQiRn0u5ivlpqWfKLtcczgm06R2Xnuo9HHlonGzoVAlIJimkiq3rsDSJDocR7p
+ GIrwImFKXKfi8FzXaA+609bfbSqPMi2xcb+U8WRmj6ZP2GHq6gFOWdq7h6+PDT1HKpYp
+ TRVQ==
+X-Gm-Message-State: AOAM532x1od5IetA/NgKurr/bddVVW1Oa58ogp+hrXdbrKHSDoSmqDil
+ rwIOJ5GXR9XZUfHX5xsyPd5Xu07q37Pvqgx5/j4=
+X-Google-Smtp-Source: ABdhPJyIxbtadZc95+Z5PRSpPgsxAcE1qBgoXjjgpynlW/K8aJOqdQu1yqcI78stkMCEvVZ69GuBZqLEw98bdJ76kdI=
+X-Received: by 2002:a2e:b8c2:: with SMTP id s2mr14830277ljp.368.1593003176111; 
+ Wed, 24 Jun 2020 05:52:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200624121939.10282-1-jandryuk@gmail.com>
+ <000a01d64a23$4a595e90$df0c1bb0$@xen.org>
+In-Reply-To: <000a01d64a23$4a595e90$df0c1bb0$@xen.org>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Wed, 24 Jun 2020 08:52:44 -0400
+Message-ID: <CAKf6xpuiRj_b+M+E0wBzPhraLxdebL6xr_1dMGc-jnzhWb0mhg@mail.gmail.com>
+Subject: Re: [PATCH] xen: Fix xen-legacy-backend qdev types
+To: Paul Durrant <paul@xen.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=jandryuk@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,55 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
- mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>,
+ Stefano Stabellini <sstabellini@kernel.org>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jun 2020 18:22:58 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+On Wed, Jun 24, 2020 at 8:30 AM Paul Durrant <xadimgnik@gmail.com> wrote:
+>
+> > -----Original Message-----
+> > From: Jason Andryuk <jandryuk@gmail.com>
+> > Sent: 24 June 2020 13:20
+> > To: Stefano Stabellini <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Paul
+> > Durrant <paul@xen.org>; xen-devel@lists.xenproject.org
+> > Cc: Jason Andryuk <jandryuk@gmail.com>; qemu-devel@nongnu.org
+> > Subject: [PATCH] xen: Fix xen-legacy-backend qdev types
+> >
+> > xen-sysdev is a TYPE_SYS_BUS_DEVICE.  bus_type should not be changed so
+> > that it can plug into the System bus.  Otherwise this assert triggers:
+> > qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
+> > `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
+> > failed.
+> >
+> > TYPE_XENBACKEND attaches to TYPE_XENSYSBUS, so its class_init needs to
+> > be set accordingly to attach the qdev.  Otherwise the following assert
+> > triggers:
+> > qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
+> > `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
+> > failed.
+> >
+> > TYPE_XENBACKEND is not a subclass of XEN_XENSYSDEV, so it's parent
+> > is just TYPE_DEVICE.  Change that.
+> >
+> > Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+>
+> Clearly we raced. This patch and my patch #1 are identical so I'm happy to give my ack to this.
 
-> DIAGNOSE 0x318 (diag318) is an s390 instruction that allows the storage
-> of diagnostic information that is collected by the firmware in the case
-> of hardware/firmware service events.
-> 
-> QEMU handles the instruction by storing the info in the CPU state. A
-> subsequent register sync will communicate the data to the hypervisor.
-> 
-> QEMU handles the migration via a VM State Description.
-> 
-> This feature depends on the Extended-Length SCCB (els) feature. If
-> els is not present, then a warning will be printed and the SCLP bit
-> that allows the Linux kernel to execute the instruction will not be
-> set.
-> 
-> Availability of this instruction is determined by byte 134 (aka fac134)
-> bit 0 of the SCLP Read Info block. This coincidentally expands into the
-> space used for CPU entries, which means VMs running with the diag318
-> capability may not be able to read information regarding all CPUs
-> unless the guest kernel supports an extended-length SCCB.
+Yeah, looks like you beat me by a hair :)
 
-We cannot do anything about that, I guess.
+Either way it gets fixed is fine by me.
 
-> 
-> This feature is not supported in protected virtualization mode.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  hw/s390x/sclp.c                     |  5 +++++
->  include/hw/s390x/sclp.h             |  3 +++
->  target/s390x/cpu.h                  |  3 ++-
->  target/s390x/cpu_features.h         |  1 +
->  target/s390x/cpu_features_def.inc.h |  3 +++
->  target/s390x/cpu_models.c           |  1 +
->  target/s390x/gen-features.c         |  1 +
->  target/s390x/kvm.c                  | 31 +++++++++++++++++++++++++++++
->  target/s390x/machine.c              | 17 ++++++++++++++++
->  9 files changed, 64 insertions(+), 1 deletion(-)
-
-LGTM.
-
+Thanks,
+Jason
 
