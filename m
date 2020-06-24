@@ -6,74 +6,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 918E7C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A232BC433E0
 	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BF8420706
+	by mail.kernel.org (Postfix) with ESMTPS id 7187D20707
 	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:40:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKXpl8it"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF8420706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WNZ8MIm+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7187D20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo3lp-0006ii-KT
+	id 1jo3lp-0006i5-MR
 	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:40:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40538)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c9-0004CH-NN
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56910
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3cI-0004Kg-C2
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:58 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28247
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c2-0007xk-1K
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:49 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3cB-00083B-4d
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592998241;
+ s=mimecast20190719; t=1592998250;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TblcahrtK9GAL2ZcADuEIqlUQPhrGCfzXjv5e1jl7J4=;
- b=XKXpl8it/Xz5J7JKF97GqrSnu5NfFVDq7DJ0J+ny23l5YZx8xkWMeV6D1VT9fyO/x+v0pT
- zeWlfNoauxsHebvERDXLWbOkvRtgCSnyvif6+48aOLcNaWIhTbQw7UqFhIvnbvRLXS4PUb
- w7P7gjfg+WIHdIQJTp4Zvr7ucyHNFhg=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=gVUjyxcdLlcziLhdHf0nYU2aUMoIqN9LBjMS0HaSfgs=;
+ b=WNZ8MIm+pep4q5rRP8sDxBDiLhmuDbfJ9sxkr/N6XyGsd7LcJV+ZkEQsJho89+GgG13Ph9
+ KVPX5gIVbtXComjlOCbFt4qLw3x/DohDVdA3+R/D/LOk0M0dLDaXK4HYCFTeBRey6Urgln
+ qJFGNAyuKe9d4xODajA07bUxMiKWLyM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-VOSqbSpkOoGavhgbuCfKHg-1; Wed, 24 Jun 2020 07:30:37 -0400
-X-MC-Unique: VOSqbSpkOoGavhgbuCfKHg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-371-yv1UHhFhMCuc9LN8ROSymw-1; Wed, 24 Jun 2020 07:30:46 -0400
+X-MC-Unique: yv1UHhFhMCuc9LN8ROSymw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 463FFA0BD9;
- Wed, 24 Jun 2020 11:30:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 737DB100CCC2;
+ Wed, 24 Jun 2020 11:30:45 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76C2A512FE;
- Wed, 24 Jun 2020 11:30:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 057001A836;
+ Wed, 24 Jun 2020 11:30:37 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A208645DB; Wed, 24 Jun 2020 13:30:26 +0200 (CEST)
+ id E563931E28; Wed, 24 Jun 2020 13:30:26 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 01/20] stubs: add isa_create_simple
-Date: Wed, 24 Jun 2020 13:30:07 +0200
-Message-Id: <20200624113026.13343-2-kraxel@redhat.com>
+Subject: [PATCH v4 08/20] audio: deprecate -soundhw gus
+Date: Wed, 24 Jun 2020 13:30:14 +0200
+Message-Id: <20200624113026.13343-9-kraxel@redhat.com>
 In-Reply-To: <20200624113026.13343-1-kraxel@redhat.com>
 References: <20200624113026.13343-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,42 +101,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Needed for -soundhw cleanup.
+Switch to deprecated_register_soundhw().
+Remove the now obsolete init function.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- stubs/isa-bus.c     | 7 +++++++
- stubs/Makefile.objs | 1 +
- 2 files changed, 8 insertions(+)
- create mode 100644 stubs/isa-bus.c
+ hw/audio/gus.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/stubs/isa-bus.c b/stubs/isa-bus.c
-new file mode 100644
-index 000000000000..522f448997d4
---- /dev/null
-+++ b/stubs/isa-bus.c
-@@ -0,0 +1,7 @@
-+#include "qemu/osdep.h"
-+#include "hw/isa/isa.h"
-+
-+ISADevice *isa_create_simple(ISABus *bus, const char *name)
-+{
-+    g_assert_not_reached();
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 28e48171d1f3..869204668231 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -7,6 +7,7 @@ stub-obj-y += fdset.o
- stub-obj-y += gdbstub.o
- stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
-+stub-obj-y += isa-bus.o
- stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- stub-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
- stub-obj-y += monitor-core.o
+diff --git a/hw/audio/gus.c b/hw/audio/gus.c
+index c8df2bde6b32..7e4a8cadad6f 100644
+--- a/hw/audio/gus.c
++++ b/hw/audio/gus.c
+@@ -286,12 +286,6 @@ static void gus_realizefn (DeviceState *dev, Error **errp)
+     AUD_set_active_out (s->voice, 1);
+ }
+ 
+-static int GUS_init (ISABus *bus)
+-{
+-    isa_create_simple (bus, TYPE_GUS);
+-    return 0;
+-}
+-
+ static Property gus_properties[] = {
+     DEFINE_AUDIO_PROPERTIES(GUSState, card),
+     DEFINE_PROP_UINT32 ("freq",    GUSState, freq,        44100),
+@@ -322,7 +316,7 @@ static const TypeInfo gus_info = {
+ static void gus_register_types (void)
+ {
+     type_register_static (&gus_info);
+-    isa_register_soundhw("gus", "Gravis Ultrasound GF1", GUS_init);
++    deprecated_register_soundhw("gus", "Gravis Ultrasound GF1", 1, TYPE_GUS);
+ }
+ 
+ type_init (gus_register_types)
 -- 
 2.18.4
 
