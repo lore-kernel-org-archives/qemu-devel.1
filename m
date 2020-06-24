@@ -2,97 +2,84 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03A1C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C0C9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:51:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D7AF20781
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36EC220720
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yyn9Vb3b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7AF20781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0bpJWkF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36EC220720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo2xV-0005qQ-NE
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:48:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54292)
+	id 1jo2zk-0000WH-Ds
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:51:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jo2ti-0000rY-69
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:44:54 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37348)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jo2tf-0007Xo-Fd
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:44:53 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y18so915718plr.4
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 03:44:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NPuODA5fSgxiIW6iJpbMrQsxewuE64kAisz5nousKIc=;
- b=Yyn9Vb3b+0PjHu5yINKohpnEbpTJ2F/L7p7R+/KmuvOlDsgRcfYtVUsTMMlSjkeJZg
- sF8I0AqoQgE9bzqWXCc24Zsmj6Z4CdD5O7zNhRQPZWqUvWLVYFqHP9OJfeb6LZxtEvga
- IQUddHhwgMBMtSwWTyO5lUe8Oim6/+qu01WsaSbgbiF681+5yCVlam7SCTA4GZvZAnzJ
- YWAX3ZwgytOaQ4NsQG+xawKSyo7fVu6L0qpXeok8TqcxZdwmhcOblpCKklyuROcx2YOu
- O/t2Nxmdw7JfhS9Z6nlNSNHT3U0pm7/OnBEiFGNH6U6V6iSWG9t0sKuciv7cC67bvnB7
- JbXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NPuODA5fSgxiIW6iJpbMrQsxewuE64kAisz5nousKIc=;
- b=VxsClCdUYfC81jDU6S2ga2IW0izXslYDi2s/ZecTUrMn3Pw8eg+jnthcnDP0RdWRDz
- NykqARMAOTCbbCofPhq+VW3oZOCEZg7ZXPZ8XO8dt/sCkmzooFb7i2+jsJzx2UpoGj6P
- q1kdUIWzTMQ0/gD0K1oGsGevJFtnRXAB9Ji6eJx/2R7I4U0PqSqILeeWtR8VB2EfI6wE
- TYyX+5tyY2itGLCn+oY69jbj/BfAcTIX2/uNkce/yd9zVV0KGFVvgpCZvUHF1KKAV7TD
- VwSsip+KKk3jv7FX1Qz1bHMnDlUBfKgT0jdIaD2nxJcT5rqaedPAfPWZ0rRdSm2RX1KH
- XHEg==
-X-Gm-Message-State: AOAM5313K37N0vY/jglcYjVep2OEzAPC+2/aYt7Qv0nTzGH+Cqv68SEB
- sVZGupMOaINOB7LY4la5HjA=
-X-Google-Smtp-Source: ABdhPJzo39JdJnOZ14BsOK8ZlLEnjCgFrRCNVef8TXkxs3ntn4PxkV35jXQE+45BXtGAx0qL82Yr8A==
-X-Received: by 2002:a17:90a:fe0c:: with SMTP id
- ck12mr28981708pjb.209.1592995490127; 
- Wed, 24 Jun 2020 03:44:50 -0700 (PDT)
-Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
- [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id q6sm19772395pff.163.2020.06.24.03.44.47
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jun 2020 03:44:49 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH V6 2/4] hw/intc: Add Loongson liointc support
-Date: Wed, 24 Jun 2020 18:45:29 +0800
-Message-Id: <1592995531-32600-3-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1592995531-32600-1-git-send-email-chenhc@lemote.com>
-References: <1592995531-32600-1-git-send-email-chenhc@lemote.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo2y8-0006in-5T
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:49:29 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48444
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo2y1-0000eM-Op
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:49:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592995760;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=HVbnfpN7J8rwVYEM7vYpng/fziEjFHpSje4rIAuB7XY=;
+ b=L0bpJWkFCJ6AOR89fEmcnMzBehg2LBNK5XusyoMDsLoW44PbIZcVymdDw6dW/CVctIlvlm
+ 9O9cw5fm2zMZ0sR/Bei1Y2/TGBofs98owBuut/loSsHsjXeKf5oj04cCn8RavrTfrLf6YV
+ 5j9WQPH1XxzEFBwlCPXgbHibRlsPUbE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-2qli9S2rMwqy7JfRPgV2aw-1; Wed, 24 Jun 2020 06:49:19 -0400
+X-MC-Unique: 2qli9S2rMwqy7JfRPgV2aw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 202B787950B
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 10:49:18 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com
+ (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D160C7FE82
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 10:49:17 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/31] Misc patches for 2020-06-24
+Date: Wed, 24 Jun 2020 06:48:45 -0400
+Message-Id: <20200624104917.375143-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,299 +92,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Loongson-3 has an integrated liointc (Local I/O interrupt controller).
-It is similar to goldfish interrupt controller, but more powerful (e.g.,
-it can route external interrupt to multi-cores).
+The following changes since commit 171199f56f5f9bdf1e5d670d09ef1351d8f01bae:
 
-Documents about Loongson-3's liointc:
-1, https://wiki.godson.ac.cn/ip_block:liointc;
-2, The "I/O中断" section of Loongson-3's user mannual, part 1.
+  Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-apply-20200619-3' into staging (2020-06-22 14:45:25 +0100)
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- hw/intc/Kconfig            |   3 +
- hw/intc/Makefile.objs      |   1 +
- hw/intc/loongson_liointc.c | 241 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 245 insertions(+)
- create mode 100644 hw/intc/loongson_liointc.c
+are available in the Git repository at:
 
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index f562342..2ae1e89 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -64,3 +64,6 @@ config OMPIC
- 
- config RX_ICU
-     bool
-+
-+config LOONGSON_LIOINTC
-+    bool
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index a420263..3ac2b40 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -51,3 +51,4 @@ obj-$(CONFIG_MIPS_CPS) += mips_gic.o
- obj-$(CONFIG_NIOS2) += nios2_iic.o
- obj-$(CONFIG_OMPIC) += ompic.o
- obj-$(CONFIG_IBEX) += ibex_plic.o
-+obj-$(CONFIG_LOONGSON_LIOINTC) += loongson_liointc.o
-diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c
-new file mode 100644
-index 0000000..e39e39e
---- /dev/null
-+++ b/hw/intc/loongson_liointc.c
-@@ -0,0 +1,241 @@
-+/*
-+ * QEMU Loongson Local I/O interrupt controler.
-+ *
-+ * Copyright (c) 2020 Jiaxun Yang <jiaxun.yang@flygoat.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "qemu/module.h"
-+#include "hw/irq.h"
-+#include "hw/qdev-properties.h"
-+
-+#define D(x)
-+
-+#define NUM_IRQS    32
-+
-+#define NUM_CORES   4
-+#define NUM_IPS     4
-+#define NUM_PARENTS (NUM_CORES * NUM_IPS)
-+#define PARENT_COREx_IPy(x, y)    (NUM_IPS * x + y)
-+
-+#define R_MAPPER_START    0x0
-+#define R_MAPPER_END      0x20
-+#define R_ISR           R_MAPPER_END
-+#define R_IEN           0x24
-+#define R_IEN_SET       0x28
-+#define R_IEN_CLR       0x2c
-+#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)
-+#define R_END           0x64
-+
-+#define TYPE_LOONGSON_LIOINTC "loongson.liointc"
-+#define LOONGSON_LIOINTC(obj) \
-+        OBJECT_CHECK(struct loongson_liointc, (obj), TYPE_LOONGSON_LIOINTC)
-+
-+struct loongson_liointc {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+    qemu_irq parent_irq[NUM_PARENTS];
-+
-+    uint8_t mapper[NUM_IRQS]; /* 0:3 for core, 4:7 for IP */
-+    uint32_t isr;
-+    uint32_t ien;
-+    uint32_t per_core_isr[NUM_CORES];
-+
-+    /* state of the interrupt input pins */
-+    uint32_t pin_state;
-+    bool parent_state[NUM_PARENTS];
-+};
-+
-+static void update_irq(struct loongson_liointc *p)
-+{
-+    uint32_t irq, core, ip;
-+    uint32_t per_ip_isr[NUM_IPS] = {0};
-+
-+    /* level triggered interrupt */
-+    p->isr = p->pin_state;
-+
-+    /* Clear disabled IRQs */
-+    p->isr &= p->ien;
-+
-+    /* Clear per_core_isr */
-+    for (core = 0; core < NUM_CORES; core++) {
-+        p->per_core_isr[core] = 0;
-+    }
-+
-+    /* Update per_core_isr and per_ip_isr */
-+    for (irq = 0; irq < NUM_IRQS; irq++) {
-+        if (!(p->isr & (1 << irq))) {
-+            continue;
-+        }
-+
-+        for (core = 0; core < NUM_CORES; core++) {
-+            if ((p->mapper[irq] & (1 << core))) {
-+                p->per_core_isr[core] |= (1 << irq);
-+            }
-+        }
-+
-+        for (ip = 0; ip < NUM_IPS; ip++) {
-+            if ((p->mapper[irq] & (1 << (ip + 4)))) {
-+                per_ip_isr[ip] |= (1 << irq);
-+            }
-+        }
-+    }
-+
-+    /* Emit IRQ to parent! */
-+    for (core = 0; core < NUM_CORES; core++) {
-+        for (ip = 0; ip < NUM_IPS; ip++) {
-+            int parent = PARENT_COREx_IPy(core, ip);
-+            if (p->parent_state[parent] !=
-+                (!!p->per_core_isr[core] && !!per_ip_isr[ip])) {
-+                p->parent_state[parent] = !p->parent_state[parent];
-+                qemu_set_irq(p->parent_irq[parent], p->parent_state[parent]);
-+            }
-+        }
-+    }
-+}
-+
-+static uint64_t
-+liointc_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    struct loongson_liointc *p = opaque;
-+    uint32_t r = 0;
-+
-+    /* Mapper is 1 byte */
-+    if (size == 1 && addr < R_MAPPER_END) {
-+        r = p->mapper[addr];
-+        goto out;
-+    }
-+
-+    /* Rest is 4 byte */
-+    if (size != 4 || (addr % 4)) {
-+        goto out;
-+    }
-+
-+    if (addr >= R_PERCORE_ISR(0) &&
-+        addr < R_PERCORE_ISR(NUM_CORES)) {
-+        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        r = p->per_core_isr[core];
-+        goto out;
-+    }
-+
-+    switch (addr) {
-+    case R_ISR:
-+        r = p->isr;
-+        break;
-+    case R_IEN:
-+        r = p->ien;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+out:
-+    D(qemu_log("%s: size=%d addr=%lx val=%x\n", __func__, size, addr, r));
-+    return r;
-+}
-+
-+static void
-+liointc_write(void *opaque, hwaddr addr,
-+          uint64_t val64, unsigned int size)
-+{
-+    struct loongson_liointc *p = opaque;
-+    uint32_t value = val64;
-+
-+    D(qemu_log("%s: size=%d, addr=%lx val=%x\n", __func__, size, addr, value));
-+
-+    /* Mapper is 1 byte */
-+    if (size == 1 && addr < R_MAPPER_END) {
-+        p->mapper[addr] = value;
-+        goto out;
-+    }
-+
-+    /* Rest is 4 byte */
-+    if (size != 4 || (addr % 4)) {
-+        goto out;
-+    }
-+
-+    if (addr >= R_PERCORE_ISR(0) &&
-+        addr < R_PERCORE_ISR(NUM_CORES)) {
-+        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        p->per_core_isr[core] = value;
-+        goto out;
-+    }
-+
-+    switch (addr) {
-+    case R_IEN_SET:
-+        p->ien |= value;
-+        break;
-+    case R_IEN_CLR:
-+        p->ien &= ~value;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+out:
-+    update_irq(p);
-+}
-+
-+static const MemoryRegionOps pic_ops = {
-+    .read = liointc_read,
-+    .write = liointc_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void irq_handler(void *opaque, int irq, int level)
-+{
-+    struct loongson_liointc *p = opaque;
-+
-+    p->pin_state &= ~(1 << irq);
-+    p->pin_state |= level << irq;
-+    update_irq(p);
-+}
-+
-+static void loongson_liointc_init(Object *obj)
-+{
-+    struct loongson_liointc *p = LOONGSON_LIOINTC(obj);
-+    int i;
-+
-+    qdev_init_gpio_in(DEVICE(obj), irq_handler, 32);
-+
-+    for (i = 0; i < NUM_PARENTS; i++) {
-+        sysbus_init_irq(SYS_BUS_DEVICE(obj), &p->parent_irq[i]);
-+    }
-+
-+    memory_region_init_io(&p->mmio, obj, &pic_ops, p,
-+                         "loongson.liointc", R_END);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &p->mmio);
-+}
-+
-+static const TypeInfo loongson_liointc_info = {
-+    .name          = TYPE_LOONGSON_LIOINTC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(struct loongson_liointc),
-+    .instance_init = loongson_liointc_init,
-+};
-+
-+static void loongson_liointc_register_types(void)
-+{
-+    type_register_static(&loongson_liointc_info);
-+}
-+
-+type_init(loongson_liointc_register_types)
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 7fc58934d34e939489e20af4c97aeb095c1f2b20:
+
+  i386: Mask SVM features if nested SVM is disabled (2020-06-24 04:37:59 -0400)
+
+----------------------------------------------------------------
+* Various fixes
+* libdaxctl support to correctly align devdax character devices (Jingqi)
+* initial-all-set support for live migration (Jay)
+* forbid '-numa node, mem' for 5.1 and newer machine types (Igor)
+* x87 fixes (Joseph)
+* Tighten memory_region_access_valid (Michael) and fix fallout (myself)
+* Replay fixes (Pavel)
+
+----------------------------------------------------------------
+Anthony PERARD (1):
+      xen: Actually fix build without passthrough
+
+David CARLIER (1):
+      util/getauxval: Porting to FreeBSD getauxval feature
+
+Eduardo Habkost (1):
+      i386: Mask SVM features if nested SVM is disabled
+
+Eric Blake (1):
+      osdep: Make MIN/MAX evaluate arguments only once
+
+Igor Mammedov (1):
+      numa: forbid '-numa node, mem' for 5.1 and newer machine types
+
+Jay Zhou (1):
+      kvm: support to get/set dirty log initial-all-set capability
+
+Jingqi Liu (3):
+      configure: add libdaxctl support
+      exec: fetch the alignment of Linux devdax pmem character device nodes
+      docs/nvdimm: add description of alignment requirement of device dax
+
+Jon Doron (1):
+      hyperv: vmbus: Remove the 2nd IRQ
+
+Joseph Myers (10):
+      target/i386: reimplement f2xm1 using floatx80 operations
+      softfloat: merge floatx80_mod and floatx80_rem
+      softfloat: fix floatx80 remainder pseudo-denormal check for zero
+      softfloat: do not return pseudo-denormal from floatx80 remainder
+      softfloat: do not set denominator high bit for floatx80 remainder
+      softfloat: return low bits of quotient from floatx80_modrem
+      target/i386: reimplement fprem, fprem1 using floatx80 operations
+      target/i386: reimplement fyl2xp1 using floatx80 operations
+      target/i386: reimplement fyl2x using floatx80 operations
+      target/i386: reimplement fpatan using floatx80 operations
+
+Liao Pingfang (1):
+      Makefile: Install qemu-[qmp/ga]-ref.* into the directory "interop"
+
+Marcelo Tosatti (1):
+      kvm: i386: allow TSC to differ by NTP correction bounds without TSC scaling
+
+Michael S. Tsirkin (1):
+      memory: Revert "memory: accept mismatching sizes in memory_region_access_valid"
+
+Paolo Bonzini (4):
+      libqos: usb-hcd-ehci: use 32-bit write for config register
+      libqos: pci-pc: use 32-bit write for EJ register
+      vmport: move compat properties to hw_compat_5_0
+      ibex_uart: fix XOR-as-pow
+
+Pavel Dovgaluk (2):
+      replay: notify the main loop when there are no instructions
+      replay: synchronize on every virtual timer callback
+
+Tao Xu (1):
+      target/i386: Add notes for versioned CPU models
+
+Thomas Huth (1):
+      hw/scsi/megasas: Fix possible out-of-bounds array access in tracepoints
+
+ Makefile                            |   10 +-
+ accel/kvm/kvm-all.c                 |   21 +-
+ accel/tcg/translate-all.c           |    6 +-
+ configure                           |   29 +
+ cpus.c                              |   15 +-
+ docs/index.html.in                  |    4 +-
+ docs/nvdimm.txt                     |   10 +
+ docs/system/deprecated.rst          |   37 +-
+ exec.c                              |   54 +-
+ fpu/softfloat.c                     |   87 ++-
+ hw/arm/virt.c                       |    2 +-
+ hw/char/ibex_uart.c                 |    2 +-
+ hw/core/machine.c                   |    8 +-
+ hw/core/numa.c                      |    7 +
+ hw/hyperv/vmbus.c                   |    3 +-
+ hw/i386/acpi-build.c                |    4 +-
+ hw/i386/pc.c                        |    1 -
+ hw/i386/pc_piix.c                   |    1 +
+ hw/i386/pc_q35.c                    |    1 +
+ hw/ppc/spapr.c                      |    2 +-
+ hw/scsi/megasas.c                   |   36 +-
+ hw/usb/hcd-xhci.h                   |    2 +-
+ hw/xen/Makefile.objs                |    2 +-
+ include/block/block.h               |    4 +-
+ include/exec/cpu-all.h              |    8 +-
+ include/exec/cpu-defs.h             |    7 +-
+ include/fpu/softfloat.h             |    3 +
+ include/hw/hyperv/vmbus-bridge.h    |    3 +-
+ include/qemu/osdep.h                |   55 +-
+ memory.c                            |   29 +-
+ migration/qemu-file.c               |    2 +-
+ qemu-options.hx                     |    9 +-
+ replay/replay.c                     |    2 +-
+ target/i386/cpu.c                   |    9 +
+ target/i386/fpu_helper.c            | 1396 +++++++++++++++++++++++++++++++----
+ target/i386/kvm.c                   |   46 +-
+ target/m68k/softfloat.c             |   83 ---
+ target/m68k/softfloat.h             |    1 -
+ tests/qtest/libqos/pci-pc.c         |    2 +-
+ tests/qtest/test-x86-cpuid-compat.c |    4 +-
+ tests/qtest/usb-hcd-ehci-test.c     |    2 +-
+ tests/tcg/i386/test-i386-f2xm1.c    | 1140 ++++++++++++++++++++++++++++
+ tests/tcg/i386/test-i386-fpatan.c   | 1071 +++++++++++++++++++++++++++
+ tests/tcg/i386/test-i386-fyl2x.c    | 1161 +++++++++++++++++++++++++++++
+ tests/tcg/i386/test-i386-fyl2xp1.c  | 1156 +++++++++++++++++++++++++++++
+ util/getauxval.c                    |   10 +
+ util/qemu-timer.c                   |   32 +-
+ 47 files changed, 6209 insertions(+), 370 deletions(-)
+ create mode 100644 tests/tcg/i386/test-i386-f2xm1.c
+ create mode 100644 tests/tcg/i386/test-i386-fpatan.c
+ create mode 100644 tests/tcg/i386/test-i386-fyl2x.c
+ create mode 100644 tests/tcg/i386/test-i386-fyl2xp1.c
 -- 
-2.7.0
+2.26.2
 
 
