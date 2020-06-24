@@ -2,87 +2,74 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2715AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2558C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E484120B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:23:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D09A20823
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSg5pq7m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E484120B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="ce/fSDkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D09A20823
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo0gb-0001DI-4u
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44124)
+	id 1jo0kx-0002Xi-Oc
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:27:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0fs-0000nC-66
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:22:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33892)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0fp-0002zS-Ll
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:22:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592986943;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=br1GPiaFaAnYFVR7xm/sUIBxRJ2R2ci8XpWCvV+YlfI=;
- b=MSg5pq7mD+S8GBVfIg8iGpJyPzOh72z/RIVNO8wPfjStdtjVIguzF1odpRxUQuzD40ux6z
- QbHCTbvpRYEZiRXJBcQMXQzeZ3FJBKnQfHkuMmQtBnOqH3dLnD0PaFCCMXWtewQCwu5YHP
- 9pn77fZx/mnKd8AnyL0ryaRNHVzkHfQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-6Vke0o8JOfSxVoJSwH874g-1; Wed, 24 Jun 2020 04:22:21 -0400
-X-MC-Unique: 6Vke0o8JOfSxVoJSwH874g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3289F80400C;
- Wed, 24 Jun 2020 08:22:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B23E60F89;
- Wed, 24 Jun 2020 08:22:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A55A1113846D; Wed, 24 Jun 2020 10:22:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH] qom: Allow object_property_add_child() to fail
-References: <20200623155452.30954-1-eric.auger@redhat.com>
-Date: Wed, 24 Jun 2020 10:22:14 +0200
-In-Reply-To: <20200623155452.30954-1-eric.auger@redhat.com> (Eric Auger's
- message of "Tue, 23 Jun 2020 17:54:52 +0200")
-Message-ID: <87eeq4dgax.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jo0kM-00028V-A0
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:27:06 -0400
+Received: from nylar.uni-paderborn.de ([2001:638:502:c003::18]:34656)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jo0kJ-0007MJ-2w
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:27:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=In-Reply-To:Content-Type:MIME-Version:
+ References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+ Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=1ifRmDmpAiuLc8szhRsPc1HIUP5X2VpVMYfZ/s/WXDI=; b=ce/fSDkHljpRxH4Oytgv3H7sK
+ emz5fSt9dHX74CPw4F0AT3pW4cz2ZWZQuk33r+oBhU2nj34p3JU4c3GRmddf3OnfaCnEjygZ2BGDR
+ fUxDRTazcPRYtGxY8y2MWyTKEl+2TVAFZhCjnjUWQlqcFe8oo2EKCM8tL3g3QNRyJJd0E=;
+Date: Wed, 24 Jun 2020 10:26:55 +0200
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: David Brenken <david.brenken@efs-auto.org>
+Subject: Re: [PATCH v3 1/1] tricore: added triboard with tc27x_soc
+Message-ID: <20200624082655.wotnfeha24ctul2r@schnipp-desktop>
+References: <20200622131934.10328-1-david.brenken@efs-auto.org>
+ <20200622131934.10328-2-david.brenken@efs-auto.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200622131934.10328-2-david.brenken@efs-auto.org>
+X-IMT-Spam-Score: 0.0 ()
+X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=8624600, da=80596281,
+ mc=208, sc=3, hc=205, sp=1, fso=8624600, re=0, sd=0, hd=0
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2020.6.24.81818, AntiVirus-Engine: 5.74.0,
+ AntiVirus-Data: 2020.6.24.5740000
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+Received-SPF: pass client-ip=2001:638:502:c003::18;
+ envelope-from=kbastian@mail.uni-paderborn.de; helo=nylar.uni-paderborn.de
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,47 +82,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com, eric.auger.pro@gmail.com
+Cc: qemu-devel@nongnu.org, Lars Biermanski <lars.biermanski@efs-auto.de>,
+ Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+ David Brenken <david.brenken@efs-auto.de>,
+ Robert Rasche <robert.rasche@efs-auto.de>,
+ Andreas Konopik <andreas.konopik@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> writes:
+On Mon, Jun 22, 2020 at 03:19:34PM +0200, David Brenken wrote:
+> From: Andreas Konopik <andreas.konopik@efs-auto.de>
+> +const MemmapEntry tc27x_soc_memmap[] = {
+> +    [TC27XD_DSPR2]     = { 0x50000000,   0x1E000 },
+> +    [TC27XD_DCACHE2]   = { 0x5001E000,    0x2000 },
+> +    [TC27XD_DTAG2]     = { 0x500C0000,     0xC00 },
 
-> object_property_add() does not allow object_property_try_add()
-> to gracefully fail as &error_abort is passed as an error handle.
->
-> However such failure can easily be triggered from the QMP shell when,
-> for instance, one attempts to create an object with an id that already
-> exists:
->
-> For instance, call twice:
-> object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
-> and QEMU aborts.
->
-> This behavior is undesired as a user/management application mistake
-> in reusing a property ID shouldn't result in loss of the VM and live
-> data within.
->
-> This patch introduces two new functions, object_property_add_err() and
-> object_property_add_child_err() whose prototype features an error handle.
-> object_property_add_child_err() now gets called from user_creatable_add_type.
-> This solution was chosen instead of changing the prototype of existing
-> functions because the number of existing callers is huge.
->
-> The error now is returned gracefully to the QMP client.
->
-> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
-> {"return": {}}
-> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
-> {"error": {"class": "GenericError", "desc": "attempt to add duplicate property
-> 'mem2' to object (type 'container')"}}
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The size changed from 0xa00 to 0xc00 from v2. The manual states that it has no
+size. I guess you inferred the size from the address range. How does real hw
+behave if you access DTAG2?
 
-Recent regression, my fault.  Please point that out, and add
+> +    [TC27XD_PSPR2]     = { 0x50100000,    0x8000 },
+> +    [TC27XD_PCACHE2]   = { 0x50108000,    0x4000 },
+> +    [TC27XD_PTAG2]     = { 0x501C0000,    0x1800 },
+> +    [TC27XD_DSPR1]     = { 0x60000000,   0x1E000 },
+> +    [TC27XD_DCACHE1]   = { 0x6001E000,    0x2000 },
+> +    [TC27XD_DTAG1]     = { 0x600C0000,     0xC00 },
+> +    [TC27XD_PSPR1]     = { 0x60100000,    0x8000 },
+> +    [TC27XD_PCACHE1]   = { 0x60108000,    0x4000 },
+> +    [TC27XD_PTAG1]     = { 0x601C0000,    0x1800 },
+> +    [TC27XD_DSPR0]     = { 0x70000000,   0x1C000 },
+> +    [TC27XD_PSPR0]     = { 0x70100000,    0x6000 },
+> +    [TC27XD_PCACHE0]   = { 0x70106000,    0x2000 },
+> +    [TC27XD_PTAG0]     = { 0x701C0000,     0xC00 },
+> +    [TC27XD_PFLASH0_C] = { 0x80000000,  0x200000 },
+> +    [TC27XD_PFLASH1_C] = { 0x80200000,  0x200000 },
+> +    [TC27XD_OLDA_C]    = { 0x8FE70000,    0x8000 },
+> +    [TC27XD_BROM_C]    = { 0x8FFF8000,    0x8000 },
+> +    [TC27XD_LMURAM_C]  = { 0x90000000,    0x8000 },
+> +    [TC27XD_EMEM_C]    = { 0x9F000000,  0x100000 },
+> +    [TC27XD_PFLASH0_U] = { 0xA0000000,       0x0 },
+> +    [TC27XD_PFLASH1_U] = { 0xA0200000,       0x0 },
+> +    [TC27XD_DFLASH0]   = { 0xAF000000,  0x104000 },
+> +    [TC27XD_DFLASH1]   = { 0xAF110000,   0x10000 },
+> +    [TC27XD_OLDA_U]    = { 0xAFE70000,       0x0 },
+> +    [TC27XD_BROM_U]    = { 0xAFFF8000,       0x0 },
+> +    [TC27XD_LMURAM_U]  = { 0xB0000000,       0x0 },
+> +    [TC27XD_EMEM_U]    = { 0xBF000000,       0x0 },
+> +    [TC27XD_PSPRX]     = { 0xC0000000,       0x0 },
+> +    [TC27XD_DSPRX]     = { 0xD0000000,       0x0 },
+> +};
 
-  Fixes: d2623129a7dec1d3041ad1221dda1ca49c667532
+Why not use KiB/MiB sizes as before? I created a patch for that. Can you check
+that I didn't skrew up the sizes?
 
+--- a/hw/tricore/tc27x_soc.c
++++ b/hw/tricore/tc27x_soc.c
+@@ -26,44 +26,45 @@
+ #include "hw/misc/unimp.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/log.h"
++#include "qemu/units.h"
+ #include "cpu.h"
+
+ #include "hw/tricore/tc27x_soc.h"
+ #include "hw/tricore/triboard.h"
+
+ const MemmapEntry tc27x_soc_memmap[] = {
+-    [TC27XD_DSPR2]     = { 0x50000000,   0x1E000 },
+-    [TC27XD_DCACHE2]   = { 0x5001E000,    0x2000 },
+-    [TC27XD_DTAG2]     = { 0x500C0000,     0xC00 },
+-    [TC27XD_PSPR2]     = { 0x50100000,    0x8000 },
+-    [TC27XD_PCACHE2]   = { 0x50108000,    0x4000 },
+-    [TC27XD_PTAG2]     = { 0x501C0000,    0x1800 },
+-    [TC27XD_DSPR1]     = { 0x60000000,   0x1E000 },
+-    [TC27XD_DCACHE1]   = { 0x6001E000,    0x2000 },
+-    [TC27XD_DTAG1]     = { 0x600C0000,     0xC00 },
+-    [TC27XD_PSPR1]     = { 0x60100000,    0x8000 },
+-    [TC27XD_PCACHE1]   = { 0x60108000,    0x4000 },
+-    [TC27XD_PTAG1]     = { 0x601C0000,    0x1800 },
+-    [TC27XD_DSPR0]     = { 0x70000000,   0x1C000 },
+-    [TC27XD_PSPR0]     = { 0x70100000,    0x6000 },
+-    [TC27XD_PCACHE0]   = { 0x70106000,    0x2000 },
+-    [TC27XD_PTAG0]     = { 0x701C0000,     0xC00 },
+-    [TC27XD_PFLASH0_C] = { 0x80000000,  0x200000 },
+-    [TC27XD_PFLASH1_C] = { 0x80200000,  0x200000 },
+-    [TC27XD_OLDA_C]    = { 0x8FE70000,    0x8000 },
+-    [TC27XD_BROM_C]    = { 0x8FFF8000,    0x8000 },
+-    [TC27XD_LMURAM_C]  = { 0x90000000,    0x8000 },
+-    [TC27XD_EMEM_C]    = { 0x9F000000,  0x100000 },
+-    [TC27XD_PFLASH0_U] = { 0xA0000000,       0x0 },
+-    [TC27XD_PFLASH1_U] = { 0xA0200000,       0x0 },
+-    [TC27XD_DFLASH0]   = { 0xAF000000,  0x104000 },
+-    [TC27XD_DFLASH1]   = { 0xAF110000,   0x10000 },
+-    [TC27XD_OLDA_U]    = { 0xAFE70000,       0x0 },
+-    [TC27XD_BROM_U]    = { 0xAFFF8000,       0x0 },
+-    [TC27XD_LMURAM_U]  = { 0xB0000000,       0x0 },
+-    [TC27XD_EMEM_U]    = { 0xBF000000,       0x0 },
+-    [TC27XD_PSPRX]     = { 0xC0000000,       0x0 },
+-    [TC27XD_DSPRX]     = { 0xD0000000,       0x0 },
++    [TC27XD_DSPR2]     = { 0x50000000,            120 * KiB },
++    [TC27XD_DCACHE2]   = { 0x5001E000,              8 * KiB },
++    [TC27XD_DTAG2]     = { 0x500C0000,                0xC00 },
++    [TC27XD_PSPR2]     = { 0x50100000,             32 * KiB },
++    [TC27XD_PCACHE2]   = { 0x50108000,             16 * KiB },
++    [TC27XD_PTAG2]     = { 0x501C0000,               0x1800 },
++    [TC27XD_DSPR1]     = { 0x60000000,            120 * KiB },
++    [TC27XD_DCACHE1]   = { 0x6001E000,              8 * KiB },
++    [TC27XD_DTAG1]     = { 0x600C0000,                0xC00 },
++    [TC27XD_PSPR1]     = { 0x60100000,             32 * KiB },
++    [TC27XD_PCACHE1]   = { 0x60108000,             16 * KiB },
++    [TC27XD_PTAG1]     = { 0x601C0000,               0x1800 },
++    [TC27XD_DSPR0]     = { 0x70000000,            112 * KiB },
++    [TC27XD_PSPR0]     = { 0x70100000,             24 * KiB },
++    [TC27XD_PCACHE0]   = { 0x70106000,              8 * KiB },
++    [TC27XD_PTAG0]     = { 0x701C0000,                0xC00 },
++    [TC27XD_PFLASH0_C] = { 0x80000000,              2 * MiB },
++    [TC27XD_PFLASH1_C] = { 0x80200000,              2 * MiB },
++    [TC27XD_OLDA_C]    = { 0x8FE70000,             32 * KiB },
++    [TC27XD_BROM_C]    = { 0x8FFF8000,             32 * KiB },
++    [TC27XD_LMURAM_C]  = { 0x90000000,             32 * KiB },
++    [TC27XD_EMEM_C]    = { 0x9F000000,              1 * MiB },
++    [TC27XD_PFLASH0_U] = { 0xA0000000,                  0x0 },
++    [TC27XD_PFLASH1_U] = { 0xA0200000,                  0x0 },
++    [TC27XD_DFLASH0]   = { 0xAF000000,   1 * MiB + 16 * KiB },
++    [TC27XD_DFLASH1]   = { 0xAF110000,             64 * KiB },
++    [TC27XD_OLDA_U]    = { 0xAFE70000,                  0x0 },
++    [TC27XD_BROM_U]    = { 0xAFFF8000,                  0x0 },
++    [TC27XD_LMURAM_U]  = { 0xB0000000,                  0x0 },
++    [TC27XD_EMEM_U]    = { 0xBF000000,                  0x0 },
++    [TC27XD_PSPRX]     = { 0xC0000000,                  0x0 },
++    [TC27XD_DSPRX]     = { 0xD0000000,                  0x0 },
+
+The remainder looks good to me.
+
+Cheers,
+Bastian
 
