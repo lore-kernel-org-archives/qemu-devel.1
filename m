@@ -7,75 +7,77 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DFDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9C332084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DB522084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXN5WdXW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9C332084D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FmOIftKy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB522084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo34c-000382-7W
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
+	id 1jo352-0003xf-BB
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2zg-0000wc-H0
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30609
+ id 1jo2zj-00014v-Un
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:07 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22798
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2ze-0001FJ-Ml
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:04 -0400
+ id 1jo2zh-0001I2-6n
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592995862;
+ s=mimecast20190719; t=1592995864;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nBWaIJo4bFpLkQ8TajhjWPCF9H4gQ3+pqbE7kQrqxq8=;
- b=IXN5WdXWmH7Orlzcx5y6dofBNId0+WBGN+NFJhF2O5kNHHR2orXfG6W6coCJwhKBkFw7bM
- Ty/skI/Lv0/FqNw2Vic1qlxkK4h57VlVbuvSD1bqVhkgJjl8ZpC8BHIPb8M/IdshgcXRj4
- cqKcN7i1uHSiW2/KOBg04mgwAWkrFd4=
+ bh=gq6A4Pmc9D+wI4Z4Xz25DoQrl3qHiAAck89mQP9dahw=;
+ b=FmOIftKy1BbaE+eAQzUjbpupW6wQoobfgpaug3rs71eCcXGPuAbuOC7savNwPQD+YNtrFo
+ 5E8vuqZScw8YzU5YB5BUaEfSHbai0zmD/GmwI95HCdtTLdGRtYvVIxzJgQXAzAvdj9YVrt
+ v0gLSXyhLb5+XpLaNZQZxSo0aQXb2ZY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-6D_vO6aZNeK1dBF5bZa3Ow-1; Wed, 24 Jun 2020 06:50:59 -0400
-X-MC-Unique: 6D_vO6aZNeK1dBF5bZa3Ow-1
+ us-mta-94-Aj7CYDDlNLuGvGuePXWmVg-1; Wed, 24 Jun 2020 06:51:02 -0400
+X-MC-Unique: Aj7CYDDlNLuGvGuePXWmVg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9182918A8231;
- Wed, 24 Jun 2020 10:50:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B3461005512;
+ Wed, 24 Jun 2020 10:51:01 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com
  (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B1C371695;
- Wed, 24 Jun 2020 10:50:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CC561DC;
+ Wed, 24 Jun 2020 10:51:00 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/31] replay: notify the main loop when there are no
- instructions
-Date: Wed, 24 Jun 2020 06:50:23 -0400
-Message-Id: <20200624105048.375353-6-pbonzini@redhat.com>
+Subject: [PULL 09/31] exec: fetch the alignment of Linux devdax pmem character
+ device nodes
+Date: Wed, 24 Jun 2020 06:50:26 -0400
+Message-Id: <20200624105048.375353-9-pbonzini@redhat.com>
 In-Reply-To: <20200624104917.375143-1-pbonzini@redhat.com>
 References: <20200624104917.375143-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,67 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>,
- Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Dan Williams <dan.j.williams@intel.com>,
+ Joao Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
+From: Jingqi Liu <jingqi.liu@intel.com>
 
-When QEMU is executed in console mode without any external event sources,
-main loop may sleep for a very long time. But in case of replay
-there is another event source - event log.
-This patch adds main loop notification when the vCPU loop has nothing
-to do and main loop should process the inputs from the event log.
+If the backend file is devdax pmem character device, the alignment
+specified by the option 'align=NUM' in the '-object memory-backend-file'
+needs to match the alignment requirement of the devdax pmem character device.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Message-Id: <159013007895.28110.2020104406699709721.stgit@pasha-ThinkPad-X280>
+This patch uses the interfaces of libdaxctl to fetch the devdax pmem file
+'align', so that we can compare it with the NUM of 'align=NUM'.
+The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+
+It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
+
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Message-Id: <20200429085011.63752-2-jingqi.liu@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ exec.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/cpus.c b/cpus.c
-index 7317ae06b9..41d1c5099f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1374,6 +1374,13 @@ static int64_t tcg_get_icount_limit(void)
-     }
+diff --git a/exec.c b/exec.c
+index d6712fba7e..37c921f364 100644
+--- a/exec.c
++++ b/exec.c
+@@ -77,6 +77,10 @@
+ 
+ #include "monitor/monitor.h"
+ 
++#ifdef CONFIG_LIBDAXCTL
++#include <daxctl/libdaxctl.h>
++#endif
++
+ //#define DEBUG_SUBPAGE
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1745,6 +1749,46 @@ static int64_t get_file_size(int fd)
+     return size;
  }
  
-+static void notify_aio_contexts(void)
++static int64_t get_file_align(int fd)
 +{
-+    /* Wake up other AioContexts.  */
-+    qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
-+    qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
++    int64_t align = -1;
++#if defined(__linux__) && defined(CONFIG_LIBDAXCTL)
++    struct stat st;
++
++    if (fstat(fd, &st) < 0) {
++        return -errno;
++    }
++
++    /* Special handling for devdax character devices */
++    if (S_ISCHR(st.st_mode)) {
++        g_autofree char *path = NULL;
++        g_autofree char *rpath = NULL;
++        struct daxctl_ctx *ctx;
++        struct daxctl_region *region;
++        int rc = 0;
++
++        path = g_strdup_printf("/sys/dev/char/%d:%d",
++                    major(st.st_rdev), minor(st.st_rdev));
++        rpath = realpath(path, NULL);
++
++        rc = daxctl_new(&ctx);
++        if (rc) {
++            return -1;
++        }
++
++        daxctl_region_foreach(ctx, region) {
++            if (strstr(rpath, daxctl_region_get_path(region))) {
++                align = daxctl_region_get_align(region);
++                break;
++            }
++        }
++        daxctl_unref(ctx);
++    }
++#endif /* defined(__linux__) && defined(CONFIG_LIBDAXCTL) */
++
++    return align;
 +}
 +
- static void handle_icount_deadline(void)
+ static int file_ram_open(const char *path,
+                          const char *region_name,
+                          bool *created,
+@@ -2296,7 +2340,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
  {
-     assert(qemu_in_vcpu_thread());
-@@ -1382,9 +1389,7 @@ static void handle_icount_deadline(void)
-                                                       QEMU_TIMER_ATTR_ALL);
+     RAMBlock *new_block;
+     Error *local_err = NULL;
+-    int64_t file_size;
++    int64_t file_size, file_align;
  
-         if (deadline == 0) {
--            /* Wake up other AioContexts.  */
--            qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
--            qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
-+            notify_aio_contexts();
-         }
+     /* Just support these ram flags by now. */
+     assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+@@ -2332,6 +2376,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
      }
- }
-@@ -1407,6 +1412,10 @@ static void prepare_icount_for_run(CPUState *cpu)
-         cpu->icount_extra = cpu->icount_budget - insns_left;
  
-         replay_mutex_lock();
++    file_align = get_file_align(fd);
++    if (file_align > 0 && mr && file_align > mr->align) {
++        error_setg(errp, "backing store align 0x%" PRIx64
++                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
++                   file_align, mr->align);
++        return NULL;
++    }
 +
-+        if (cpu->icount_budget == 0 && replay_has_checkpoint()) {
-+            notify_aio_contexts();
-+        }
-     }
- }
- 
+     new_block = g_malloc0(sizeof(*new_block));
+     new_block->mr = mr;
+     new_block->used_length = size;
 -- 
 2.26.2
 
