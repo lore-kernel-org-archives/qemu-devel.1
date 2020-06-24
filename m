@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49CC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09057C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14DEF2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEC9F2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:08:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6WLUZEf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14DEF2072E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ko9pAtv1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEC9F2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joCda-0001cm-9e
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 17:08:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38910)
+	id 1joCdc-0001iC-3t
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 17:08:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCcd-0000YZ-Sl
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:07:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55137
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCb1-0006df-5b
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:06:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53893
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCcc-0006o1-8T
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:07:55 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCay-0006U0-Vd
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:06:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593032873;
+ s=mimecast20190719; t=1593032772;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iOwh2eQCHyUuay/2WvRUP1ThY4cvlI9TA0bg7s+a8so=;
- b=f6WLUZEfu2tqV5SuqshEdug0iODEsTWQcEPcC49lui8arxvJ2sRNatWEvocdq1QZPRXE0l
- cMZKsrAHHiqRl+eCReu244cJBJ7URUaktzdNWitcJCIGUExk1f2u5s2ZEKJ8JQVAfKo00M
- Wu37axn8Uqmn5UXR8AoFMQPxalY8Aq4=
+ bh=1jAwlRWfXY+qq3+eNT2MOlPttHxRE7zf5fDJTPYXz/g=;
+ b=Ko9pAtv1MMy3ezVgnUpyXYFpbIyKKnD8fTz+TQLi8lybjTH7Rn2XrJl3rcIs7oN5gZAAHY
+ qwm+24+AepVmyCICryprDfEfbsV6mdcmvYyX7NYjA4N8icWXgQvxNj9PpnymoRmuO16TId
+ wFi6gQZKePYxxKmLAYPL1NFWpE6L5gs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-AM7zDpMONWuNx9FQ0ZHg2g-1; Wed, 24 Jun 2020 17:07:49 -0400
-X-MC-Unique: AM7zDpMONWuNx9FQ0ZHg2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-360-ExTSMnrUN2emIoKOZ-zMRw-1; Wed, 24 Jun 2020 17:06:10 -0400
+X-MC-Unique: ExTSMnrUN2emIoKOZ-zMRw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F93C18FF661;
- Wed, 24 Jun 2020 21:07:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744D610059A3;
+ Wed, 24 Jun 2020 21:06:09 +0000 (UTC)
 Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A7937FEA8;
- Wed, 24 Jun 2020 21:07:47 +0000 (UTC)
-Subject: Re: [PATCH 33/46] qom: Crash more nicely on
- object_property_get_link() failure
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9266CBA45;
+ Wed, 24 Jun 2020 21:06:08 +0000 (UTC)
+Subject: Re: [PATCH 32/46] qom: Rename qdev_get_type() to object_get_type()
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-34-armbru@redhat.com>
+ <20200624164344.3778251-33-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <4e9b4972-b34e-2576-2a45-56e572c64293@redhat.com>
-Date: Wed, 24 Jun 2020 16:07:47 -0500
+Message-ID: <21a18c43-5a26-5ecf-4a3c-38b2dc857598@redhat.com>
+Date: Wed, 24 Jun 2020 16:06:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-34-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-33-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,39 +104,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 11:43 AM, Markus Armbruster wrote:
-> Pass &error_abort instead of NULL where the returned value is
-> dereferenced or asserted to be non-null.
+> Commit 2f262e06f0 lifted qdev_get_type() from qdev to object without
+> renaming it accordingly.  Do that now.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
+>   qom/object.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 
-> @@ -63,8 +64,8 @@ hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
->           return -1;
->       }
->   
-> -    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container", NULL);
-> -
-> +    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container",
-> +                                         &error_abort);
->       assert(parent_mr);
-
-Do we still need to keep the assert?
-
-> +++ b/hw/ppc/spapr_pci_nvlink2.c
-> @@ -141,9 +141,10 @@ static void spapr_phb_pci_collect_nvgpu(PCIBus *bus, PCIDevice *pdev,
->       if (tgt) {
->           Error *local_err = NULL;
->           SpaprPhbPciNvGpuConfig *nvgpus = opaque;
-> -        Object *mr_gpu = object_property_get_link(po, "nvlink2-mr[0]", NULL);
-> +        Object *mr_gpu = object_property_get_link(po, "nvlink2-mr[0]",
-> +                                                  &error_abort);
->           Object *mr_npu = object_property_get_link(po, "nvlink2-atsd-mr[0]",
-> -                                                  NULL);
-> +                                                  &error_abort);
->   
->           g_assert(mr_gpu || mr_npu);
-
-Likewise.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
