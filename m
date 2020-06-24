@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD01EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E45C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B7B2088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5F732088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZa9DVs8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B7B2088E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0BH1ZQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F732088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo13k-0000cc-Rb
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48554)
+	id 1jo14C-0001Mk-1V
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:47:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uu-0001AI-5X
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:38:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39223
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uq-0000wo-1s
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:56 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36919
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uj-00027a-12
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:59 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uh-00026O-Q7
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592987868;
+ s=mimecast20190719; t=1592987866;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v8RoWBaFDHIWifW7sr94ccs74UGdVOjvHbolf2g5ag4=;
- b=ZZa9DVs8Gz2rajfvLCi6bLOSgq9qMfQMB0LN9GDz9V+OQJXlnayN0YjcjSCOguCASWBxUc
- E1k9vBKgKIQHm3PheGeP3xjAOwfb0CeA+xHpyEiPsIovxuYe6rO/PzoCf2DAw0bXI+1Tf9
- WX2QWVVeRo580iWyhJpTmSWyenZSrgw=
+ bh=IBuWJeUdSlFDG1n5rSJL7eqW1pQQCWjeqmk23CBp2OE=;
+ b=Y0BH1ZQ+9fr+I8MgzfLwnETyx7PTdBZwjdxvJ6wWxWFc9zVwqCxlCymr87pU1YNueRVGNO
+ eq6iAkwSBlBk2iAYUMpvxbjcmiSbiP+NSMMfBwV7SAYGCJ6cv3k+zStO+8eIC3hjLXWfKM
+ dijoBPLsTWgxkJOlWiKy0IdyHL5E2KY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-1Naq4esFP96X6j_14BefPQ-1; Wed, 24 Jun 2020 04:37:46 -0400
-X-MC-Unique: 1Naq4esFP96X6j_14BefPQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-250-_MIhRCfMOoKSb-nA8xVGjg-1; Wed, 24 Jun 2020 04:37:44 -0400
+X-MC-Unique: _MIhRCfMOoKSb-nA8xVGjg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C979A1B18BC0;
- Wed, 24 Jun 2020 08:37:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20DC6107ACCD;
+ Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 475C010013D9;
- Wed, 24 Jun 2020 08:37:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D98FE8927E;
+ Wed, 24 Jun 2020 08:37:42 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D571F1138487; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
+ id BC3021138480; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 25/25] arm/{bcm2835, fsl-imx25,
- fsl-imx6}: Fix realize error API violations
-Date: Wed, 24 Jun 2020 10:37:37 +0200
-Message-Id: <20200624083737.3086768-26-armbru@redhat.com>
+Subject: [PATCH v2 18/25] riscv_hart: Fix riscv_harts_realize() error API
+ violations
+Date: Wed, 24 Jun 2020 10:37:30 +0200
+Message-Id: <20200624083737.3086768-19-armbru@redhat.com>
 In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
 References: <20200624083737.3086768-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,10 +96,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,101 +110,61 @@ latter kind twice without clearing it in between is wrong: if the
 first call sets an error, it no longer points to NULL for the second
 call.
 
-bcm2835_peripherals_realize(), fsl_imx25_realize() and
-fsl_imx6_realize() are wrong that way: they pass &err to
-object_property_set_uint() and object_property_set_bool() without
-checking it, and then to sysbus_realize().  Harmless, because the
-former can't actually fail here.
+riscv_harts_realize() is wrong that way: it passes @errp to
+riscv_hart_realize() in a loop.  I can't tell offhand whether this can
+fail.
 
-Fix by passing &error_abort instead.
+Fix by checking for failure in each iteration.
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: qemu-arm@nongnu.org
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Bin Meng <bmeng.cn@gmail.com>
+Cc: qemu-riscv@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/arm/bcm2835_peripherals.c | 12 ++++--------
- hw/arm/fsl-imx25.c           | 12 +++++-------
- hw/arm/fsl-imx6.c            | 12 +++++-------
- 3 files changed, 14 insertions(+), 22 deletions(-)
+ hw/riscv/riscv_hart.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 1e975d7eec..7ffdf62067 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -283,16 +283,12 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-      * For the exact details please refer to the Arasan documentation:
-      *   SD3.0_Host_AHB_eMMC4.4_Usersguide_ver5.9_jan11_10.pdf
-      */
--    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version", &err);
-+    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version",
-+                             &error_abort);
-     object_property_set_uint(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
--                             &err);
-+                             &error_abort);
-     object_property_set_bool(OBJECT(&s->sdhci), true, "pending-insert-quirk",
--                             &err);
+diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+index e26c382259..f59fe52f0f 100644
+--- a/hw/riscv/riscv_hart.c
++++ b/hw/riscv/riscv_hart.c
+@@ -40,19 +40,13 @@ static void riscv_harts_cpu_reset(void *opaque)
+     cpu_reset(CPU(cpu));
+ }
+ 
+-static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
++static bool riscv_hart_realize(RISCVHartArrayState *s, int idx,
+                                char *cpu_type, Error **errp)
+ {
+-    Error *err = NULL;
+-
+     object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx], cpu_type);
+     s->harts[idx].env.mhartid = s->hartid_base + idx;
+     qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
+-    qdev_realize(DEVICE(&s->harts[idx]), NULL, &err);
 -    if (err) {
 -        error_propagate(errp, err);
 -        return;
 -    }
--
-+                             &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index f32f9bce0f..7ab5c98fbe 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -260,15 +260,13 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-         };
++    return qdev_realize(DEVICE(&s->harts[idx]), NULL, errp);
+ }
  
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 2, "sd-spec-version",
--                                 &err);
-+                                 &error_abort);
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
--                                 "capareg", &err);
-+                                 "capareg",
-+                                 &error_abort);
-         object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
--                                 "vendor", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+                                 "vendor",
-+                                 &error_abort);
-         sysbus_realize(SYS_BUS_DEVICE(&s->esdhc[i]), &err);
-         if (err) {
-             error_propagate(errp, err);
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index d4bc4fae93..4ae3c3efc2 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -336,15 +336,13 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+ static void riscv_harts_realize(DeviceState *dev, Error **errp)
+@@ -63,7 +57,9 @@ static void riscv_harts_realize(DeviceState *dev, Error **errp)
+     s->harts = g_new0(RISCVCPU, s->num_harts);
  
-         /* UHS-I SDIO3.0 SDR104 1.8V ADMA */
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 3, "sd-spec-version",
--                                 &err);
-+                                 &error_abort);
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABILITIES,
--                                 "capareg", &err);
-+                                 "capareg",
-+                                 &error_abort);
-         object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
--                                 "vendor", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+                                 "vendor",
-+                                 &error_abort);
-         sysbus_realize(SYS_BUS_DEVICE(&s->esdhc[i]), &err);
-         if (err) {
-             error_propagate(errp, err);
+     for (n = 0; n < s->num_harts; n++) {
+-        riscv_hart_realize(s, n, s->cpu_type, errp);
++        if (!riscv_hart_realize(s, n, s->cpu_type, errp)) {
++            return;
++        }
+     }
+ }
+ 
 -- 
 2.26.2
 
