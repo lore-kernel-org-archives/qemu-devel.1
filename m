@@ -6,75 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A01C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B08AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:00:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 911C22065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:00:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE8B720738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORsTPLPW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 911C22065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cWJuTV+E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8B720738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8l5-0006tM-PI
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:00:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52038)
+	id 1jo8lO-00076B-Qw
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:00:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8Vf-0004H0-6p
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29438
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VU-0003rN-5E
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46909
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VD-00058m-6E
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:26 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VB-00056x-Qt
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017037;
+ s=mimecast20190719; t=1593017035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=enTkFSOQASjvAyg+vQlaDie7X92R4sXChIaRoalejTk=;
- b=ORsTPLPWQjVuBD5x5SVWZbt6EVbXVk4EXz7Prpq3mMIBXJF89h1M2wI/JGraJKyO3FRn41
- zOhyEvZqdUEHpKiS9hP1J2xcKTREMuu5Omyuqdhb7S7NJHfNxeJaj+0QB6wfYbRRKUAqmp
- JZf9sV00V0vQoIIdBFiw02su5bgxSxI=
+ bh=iv5jsw8Qu10tKDuXJWYnW772497s6X8/d3y77EvOOD4=;
+ b=cWJuTV+EKLbvlDjrOtpOASjhAN7JxdSBxuUsCvvv9NZDyPu/ltA4i6tzmYgsM4v9D/kGHp
+ tujvUyEunN+zRiiUrXUWmX8nV2/wFxZB3XQNLyZTlJ7TwmZ/7PmJZ21M2OWub4MN0vMzUv
+ q68vKU4qzlDWRr1yV+cBXRL7pm78RNs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-BCPW0Bu6M6OU5onFkBdGSA-1; Wed, 24 Jun 2020 12:43:53 -0400
-X-MC-Unique: BCPW0Bu6M6OU5onFkBdGSA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-345-rR_Zk2FwPjmwnb6OpwONYw-1; Wed, 24 Jun 2020 12:43:53 -0400
+X-MC-Unique: rR_Zk2FwPjmwnb6OpwONYw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EEF313E6;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 671428015FA;
  Wed, 24 Jun 2020 16:43:52 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA8E4891E8;
- Wed, 24 Jun 2020 16:43:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D05D60F8A;
+ Wed, 24 Jun 2020 16:43:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5F648113848F; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id 76A8B1138494; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 34/46] qom: Don't handle impossible object_property_get_link()
- failure
-Date: Wed, 24 Jun 2020 18:43:32 +0200
-Message-Id: <20200624164344.3778251-35-armbru@redhat.com>
+Subject: [PATCH 39/46] qom: Smooth error checking manually
+Date: Wed, 24 Jun 2020 18:43:37 +0200
+Message-Id: <20200624164344.3778251-40-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -101,228 +100,202 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Don't handle object_property_get_link() failure that can't happen
-unless the programmer screwed up, pass &error_abort.
+When foo(..., &err) is followed by error_propagate(errp, err), we can
+often just as well do foo(..., errp).  The previous commit did that
+for simple cases with Coccinelle.  Do it for a few more manually.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/arm/bcm2835_peripherals.c |  7 +------
- hw/arm/bcm2836.c             |  7 +------
- hw/display/bcm2835_fb.c      |  8 +-------
- hw/dma/bcm2835_dma.c         |  9 +--------
- hw/gpio/bcm2835_gpio.c       | 15 ++-------------
- hw/intc/nios2_iic.c          |  8 +-------
- hw/misc/bcm2835_mbox.c       |  9 +--------
- hw/misc/bcm2835_property.c   | 17 ++---------------
- hw/usb/hcd-dwc2.c            |  9 +--------
- 9 files changed, 11 insertions(+), 78 deletions(-)
+ hw/core/bus.c              |  6 +-----
+ hw/s390x/s390-virtio-ccw.c | 15 +++++++--------
+ qom/object.c               |  9 ++-------
+ qom/qom-qobject.c          |  5 +----
+ target/i386/cpu.c          | 19 +++++--------------
+ 5 files changed, 16 insertions(+), 38 deletions(-)
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 8313410ffe..3c40bda91e 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -134,12 +134,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-     uint64_t ram_size, vcram_size;
-     int n;
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 00d1d31762..6b987b6946 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -166,11 +166,7 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
  
--    obj = object_property_get_link(OBJECT(dev), "ram", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required ram link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
-+    obj = object_property_get_link(OBJECT(dev), "ram", &error_abort);
- 
-     ram = MEMORY_REGION(obj);
-     ram_size = memory_region_size(ram);
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 51d156f0c5..35281df8c3 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -77,12 +77,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
- 
-     /* common peripherals from bcm2835 */
- 
--    obj = object_property_get_link(OBJECT(dev), "ram", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required ram link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
-+    obj = object_property_get_link(OBJECT(dev), "ram", &error_abort);
- 
-     object_property_add_const_link(OBJECT(&s->peripherals), "ram", obj);
- 
-diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-index c6263808a2..c4bfed2740 100644
---- a/hw/display/bcm2835_fb.c
-+++ b/hw/display/bcm2835_fb.c
-@@ -401,7 +401,6 @@ static void bcm2835_fb_reset(DeviceState *dev)
- static void bcm2835_fb_realize(DeviceState *dev, Error **errp)
+ bool qbus_realize(BusState *bus, Error **errp)
  {
-     BCM2835FBState *s = BCM2835_FB(dev);
 -    Error *err = NULL;
-     Object *obj;
+-
+-    object_property_set_bool(OBJECT(bus), "realized", true, &err);
+-    error_propagate(errp, err);
+-    return !err;
++    return object_property_set_bool(OBJECT(bus), "realized", true, errp);
+ }
  
-     if (s->vcram_base == 0) {
-@@ -409,12 +408,7 @@ static void bcm2835_fb_realize(DeviceState *dev, Error **errp)
-         return;
+ void qbus_unrealize(BusState *bus)
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 62af349c31..877ea2af9d 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -69,20 +69,19 @@ static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
+                               Error **errp)
+ {
+     S390CPU *cpu = S390_CPU(object_new(typename));
+-    Error *err = NULL;
++    S390CPU *ret = NULL;
+ 
+-    if (!object_property_set_int(OBJECT(cpu), "core-id", core_id, &err)) {
++    if (!object_property_set_int(OBJECT(cpu), "core-id", core_id, errp)) {
+         goto out;
+     }
+-    qdev_realize(DEVICE(cpu), NULL, &err);
++    if (!qdev_realize(DEVICE(cpu), NULL, errp)) {
++        goto out;
++    }
++    ret = cpu;
+ 
+ out:
+     object_unref(OBJECT(cpu));
+-    if (err) {
+-        error_propagate(errp, err);
+-        cpu = NULL;
+-    }
+-    return cpu;
++    return ret;
+ }
+ 
+ static void s390_init_cpus(MachineState *machine)
+diff --git a/qom/object.c b/qom/object.c
+index eb814e41be..684540a09f 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -547,7 +547,6 @@ bool object_initialize_child_with_propsv(Object *parentobj,
+                               void *childobj, size_t size, const char *type,
+                               Error **errp, va_list vargs)
+ {
+-    Error *local_err = NULL;
+     bool ok = false;
+     Object *obj;
+     UserCreatable *uc;
+@@ -563,7 +562,7 @@ bool object_initialize_child_with_propsv(Object *parentobj,
+ 
+     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+     if (uc) {
+-        if (!user_creatable_complete(uc, &local_err)) {
++        if (!user_creatable_complete(uc, errp)) {
+             object_unparent(obj);
+             goto out;
+         }
+@@ -581,8 +580,6 @@ out:
+      * the reference taken by object_property_add_child().
+      */
+     object_unref(obj);
+-
+-    error_propagate(errp, local_err);
+     return ok;
+ }
+ 
+@@ -735,7 +732,6 @@ Object *object_new_with_propv(const char *typename,
+ {
+     Object *obj;
+     ObjectClass *klass;
+-    Error *local_err = NULL;
+     UserCreatable *uc;
+ 
+     klass = object_class_by_name(typename);
+@@ -760,7 +756,7 @@ Object *object_new_with_propv(const char *typename,
+ 
+     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+     if (uc) {
+-        if (!user_creatable_complete(uc, &local_err)) {
++        if (!user_creatable_complete(uc, errp)) {
+             if (id != NULL) {
+                 object_unparent(obj);
+             }
+@@ -772,7 +768,6 @@ Object *object_new_with_propv(const char *typename,
+     return obj;
+ 
+  error:
+-    error_propagate(errp, local_err);
+     object_unref(obj);
+     return NULL;
+ }
+diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
+index 62ac5e07ac..21ce22de94 100644
+--- a/qom/qom-qobject.c
++++ b/qom/qom-qobject.c
+@@ -34,15 +34,12 @@ QObject *object_property_get_qobject(Object *obj, const char *name,
+                                      Error **errp)
+ {
+     QObject *ret = NULL;
+-    Error *local_err = NULL;
+     Visitor *v;
+ 
+     v = qobject_output_visitor_new(&ret);
+-    object_property_get(obj, name, v, &local_err);
+-    if (!local_err) {
++    if (object_property_get(obj, name, v, errp)) {
+         visit_complete(v, &ret);
+     }
+-    error_propagate(errp, local_err);
+     visit_free(v);
+     return ret;
+ }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 26ba40656d..b7c9f0fa72 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5251,16 +5251,13 @@ static void x86_cpu_to_dict_full(X86CPU *cpu, QDict *props)
+ static void object_apply_props(Object *obj, QDict *props, Error **errp)
+ {
+     const QDictEntry *prop;
+-    Error *err = NULL;
+ 
+     for (prop = qdict_first(props); prop; prop = qdict_next(props, prop)) {
+         if (!object_property_set_qobject(obj, qdict_entry_key(prop),
+-                                         qdict_entry_value(prop), &err)) {
++                                         qdict_entry_value(prop), errp)) {
+             break;
+         }
+     }
+-
+-    error_propagate(errp, err);
+ }
+ 
+ /* Create X86CPU object according to model+props specification */
+@@ -6318,19 +6315,18 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+     FeatureWord w;
+     int i;
+     GList *l;
+-    Error *local_err = NULL;
+ 
+     for (l = plus_features; l; l = l->next) {
+         const char *prop = l->data;
+-        if (!object_property_set_bool(OBJECT(cpu), prop, true, &local_err)) {
+-            goto out;
++        if (!object_property_set_bool(OBJECT(cpu), prop, true, errp)) {
++            return;
+         }
      }
  
--    obj = object_property_get_link(OBJECT(dev), "dma-mr", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required dma-mr link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
-+    obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
+     for (l = minus_features; l; l = l->next) {
+         const char *prop = l->data;
+-        if (!object_property_set_bool(OBJECT(cpu), prop, false, &local_err)) {
+-            goto out;
++        if (!object_property_set_bool(OBJECT(cpu), prop, false, errp)) {
++            return;
+         }
+     }
  
-     /* Fill in the parts of initial_config that are not set by QOM properties */
-     s->initial_config.xres_virtual = s->initial_config.xres;
-diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-index 4cd9dab745..eb0002a2b9 100644
---- a/hw/dma/bcm2835_dma.c
-+++ b/hw/dma/bcm2835_dma.c
-@@ -376,16 +376,9 @@ static void bcm2835_dma_reset(DeviceState *dev)
- static void bcm2835_dma_realize(DeviceState *dev, Error **errp)
- {
-     BCM2835DMAState *s = BCM2835_DMA(dev);
--    Error *err = NULL;
-     Object *obj;
- 
--    obj = object_property_get_link(OBJECT(dev), "dma-mr", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required dma-mr link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
+@@ -6428,11 +6424,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+     if (env->cpuid_xlevel2 == UINT32_MAX) {
+         env->cpuid_xlevel2 = env->cpuid_min_xlevel2;
+     }
 -
-+    obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
-     s->dma_mr = MEMORY_REGION(obj);
-     address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_DMA "-memory");
- 
-diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
-index 91ce3d10cc..abdddbc67c 100644
---- a/hw/gpio/bcm2835_gpio.c
-+++ b/hw/gpio/bcm2835_gpio.c
-@@ -312,22 +312,11 @@ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
- {
-     BCM2835GpioState *s = BCM2835_GPIO(dev);
-     Object *obj;
--    Error *err = NULL;
- 
--    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required sdhci link not found: %s",
--                __func__, error_get_pretty(err));
--        return;
+-out:
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
 -    }
-+    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &error_abort);
-     s->sdbus_sdhci = SD_BUS(obj);
- 
--    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required sdhost link not found: %s",
--                __func__, error_get_pretty(err));
--        return;
--    }
-+    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &error_abort);
-     s->sdbus_sdhost = SD_BUS(obj);
  }
  
-diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
-index 3a5d86c2a4..1a5df8c89a 100644
---- a/hw/intc/nios2_iic.c
-+++ b/hw/intc/nios2_iic.c
-@@ -66,14 +66,8 @@ static void altera_iic_init(Object *obj)
- static void altera_iic_realize(DeviceState *dev, Error **errp)
- {
-     struct AlteraIIC *pv = ALTERA_IIC(dev);
--    Error *err = NULL;
- 
--    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
--    if (!pv->cpu) {
--        error_setg(errp, "altera,iic: CPU link not found: %s",
--                   error_get_pretty(err));
--        return;
--    }
-+    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &error_abort);
- }
- 
- static void altera_iic_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
-index 2afa06a746..9f73cbd5e4 100644
---- a/hw/misc/bcm2835_mbox.c
-+++ b/hw/misc/bcm2835_mbox.c
-@@ -308,15 +308,8 @@ static void bcm2835_mbox_realize(DeviceState *dev, Error **errp)
- {
-     BCM2835MboxState *s = BCM2835_MBOX(dev);
-     Object *obj;
--    Error *err = NULL;
--
--    obj = object_property_get_link(OBJECT(dev), "mbox-mr", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required mbox-mr link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
- 
-+    obj = object_property_get_link(OBJECT(dev), "mbox-mr", &error_abort);
-     s->mbox_mr = MEMORY_REGION(obj);
-     address_space_init(&s->mbox_as, s->mbox_mr, TYPE_BCM2835_MBOX "-memory");
-     bcm2835_mbox_reset(dev);
-diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-index 3e228ca0ae..73941bdae9 100644
---- a/hw/misc/bcm2835_property.c
-+++ b/hw/misc/bcm2835_property.c
-@@ -392,24 +392,11 @@ static void bcm2835_property_realize(DeviceState *dev, Error **errp)
- {
-     BCM2835PropertyState *s = BCM2835_PROPERTY(dev);
-     Object *obj;
--    Error *err = NULL;
--
--    obj = object_property_get_link(OBJECT(dev), "fb", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required fb link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
- 
-+    obj = object_property_get_link(OBJECT(dev), "fb", &error_abort);
-     s->fbdev = BCM2835_FB(obj);
- 
--    obj = object_property_get_link(OBJECT(dev), "dma-mr", &err);
--    if (obj == NULL) {
--        error_setg(errp, "%s: required dma-mr link not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
--
-+    obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
-     s->dma_mr = MEMORY_REGION(obj);
-     address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_PROPERTY "-memory");
- 
-diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
-index 72cbd051f3..56f91f6bee 100644
---- a/hw/usb/hcd-dwc2.c
-+++ b/hw/usb/hcd-dwc2.c
-@@ -1274,15 +1274,8 @@ static void dwc2_realize(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     DWC2State *s = DWC2_USB(dev);
-     Object *obj;
--    Error *err = NULL;
- 
--    obj = object_property_get_link(OBJECT(dev), "dma-mr", &err);
--    if (err) {
--        error_setg(errp, "dwc2: required dma-mr link not found: %s",
--                   error_get_pretty(err));
--        return;
--    }
--    assert(obj != NULL);
-+    obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
- 
-     s->dma_mr = MEMORY_REGION(obj);
-     address_space_init(&s->dma_as, s->dma_mr, "dwc2");
+ /*
 -- 
 2.26.2
 
