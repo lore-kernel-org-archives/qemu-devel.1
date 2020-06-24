@@ -2,82 +2,81 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F11C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 18:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EBFC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:00:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF70A20738
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 18:34:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1034206C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:00:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLmMZw4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF70A20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Va+VQsOH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1034206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joADk-0006NN-6W
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 14:34:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56614)
+	id 1joAd7-0002E1-NN
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:00:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joACd-0005ZA-2K
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:32:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59699
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joAby-00008m-2W
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:59:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26523
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joACa-0002Ch-6T
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:32:54 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joAbw-0004Ai-4D
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:59:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593023571;
+ s=mimecast20190719; t=1593025143;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pjCZ4OlVYiwO+9V1faaAdjoudryf7+cBMrwrmKdSZd0=;
- b=bLmMZw4L4M+ciaNwxrOOiSv9EKIzRiyU51RhdcOrtGbf2JOgl46h0ztxGI3yt1fZut4j7o
- Pr1ERrxbf4wa9IGss1PyiSUhVIjTBDczmdIW8RknYabCMp0Ds93GbMFqyGUNE3HySqdjvm
- LtOULsmXJvcWCKEt7VW7q7kfkn1iW9Y=
+ bh=V0D7vPdEyzxR/vZxoI5iMUC2l4pcRKAvIP5CXZIWDIU=;
+ b=Va+VQsOHPmmgaqdHE06I7vCj3tA2ivSqEWE45WU2UsdBhJ/25EKTrBPdI6qIcjerVqdbFt
+ 1ibML0mYr5tL+NLwWLHapvhAc3jCgLNSy4r1Bomk1g0cwNlTxI/Chl8Iymxido6Yxmptvp
+ d4nlnam3+2C4r7a3/0S77EjM8e+2MVk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-Hc-7qI70MgWFG-mRXY6NTw-1; Wed, 24 Jun 2020 14:32:49 -0400
-X-MC-Unique: Hc-7qI70MgWFG-mRXY6NTw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-281-tHPpVBmBOj6wx-_-lIwStQ-1; Wed, 24 Jun 2020 14:59:01 -0400
+X-MC-Unique: tHPpVBmBOj6wx-_-lIwStQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B05187950B;
- Wed, 24 Jun 2020 18:32:48 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B8C2B47C;
- Wed, 24 Jun 2020 18:32:44 +0000 (UTC)
-Subject: Re: [PATCH 08/46] error: Avoid unnecessary error_propagate() after
- error_setg()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-9-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <f8a0cce6-11ba-6182-6f90-b94594cd8b39@redhat.com>
-Date: Wed, 24 Jun 2020 13:32:41 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10DFD8015F0;
+ Wed, 24 Jun 2020 18:58:59 +0000 (UTC)
+Received: from x1.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57FD860F8A;
+ Wed, 24 Jun 2020 18:58:57 +0000 (UTC)
+Date: Wed, 24 Jun 2020 12:55:26 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v25 13/17] vfio: create mapped iova list when
+ vIOMMU is enabled
+Message-ID: <20200624125526.5488954c@x1.home>
+In-Reply-To: <1592684486-18511-14-git-send-email-kwankhede@nvidia.com>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-14-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-9-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,111 +97,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 11:43 AM, Markus Armbruster wrote:
-> Replace
-> 
->      error_setg(&err, ...);
->      error_propagate(errp, err);
-> 
-> by
-> 
->      error_setg(errp, ...);
-> 
-> Related pattern:
+On Sun, 21 Jun 2020 01:51:22 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Nice explanation.
+> Create mapped iova list when vIOMMU is enabled. For each mapped iova
+> save translated address. Add node to list on MAP and remove node from
+> list on UNMAP.
+> This list is used to track dirty pages during migration.
 
-> Bonus: the elimination of gotos will make later patches in this series
-> easier to review.
-> 
-> Candidates for conversion tracked down with this Coccinelle script:
-> 
->      @@
->      identifier err, errp;
->      expression list args;
->      @@
->      -    error_setg(&err, args);
->      +    error_setg(errp, args);
-> 	 ... when != err
-> 	 error_propagate(errp, err);
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+This seems like a lot of overhead to support that the VM might migrate.
+Is there no way we can build this when we start migration, for example
+replaying the mappings at that time?  Thanks,
+
+Alex
+
+ 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 > ---
->   backends/cryptodev.c        | 11 +++---
->   backends/hostmem-file.c     | 19 +++-------
->   backends/hostmem-memfd.c    | 15 ++++----
->   backends/hostmem.c          | 27 ++++++--------
->   block/throttle-groups.c     | 22 +++++------
->   hw/hyperv/vmbus.c           |  5 +--
->   hw/i386/pc.c                | 35 ++++++------------
->   hw/mem/nvdimm.c             | 17 ++++-----
->   hw/mem/pc-dimm.c            | 14 +++----
->   hw/misc/aspeed_sdmc.c       |  3 +-
->   hw/ppc/rs6000_mc.c          |  9 ++---
->   hw/ppc/spapr.c              | 73 ++++++++++++++++---------------------
->   hw/ppc/spapr_pci.c          | 14 +++----
->   hw/s390x/ipl.c              | 23 +++++-------
->   hw/s390x/sclp.c             | 12 ++----
->   hw/xen/xen_pt_config_init.c |  3 +-
->   iothread.c                  | 12 +++---
->   net/colo-compare.c          | 20 ++++------
->   net/dump.c                  | 10 ++---
->   net/filter-buffer.c         | 10 ++---
->   qga/commands-win32.c        | 16 +++-----
->   21 files changed, 151 insertions(+), 219 deletions(-)
-
-A bit bigger, and starts to be too complex to ask Coccinelle to directly 
-fix it (but at least using it for identification is nice).  But the 
-patch is still manageable, and hopefully not too many instances creep 
-back in during the meantime while waiting for this series to land.
-
-> @@ -140,7 +138,6 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
->       HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
->   
->       if (host_memory_backend_mr_inited(backend)) {
-> -
->           error_setg(errp, "cannot change property 'pmem' of %s.",
->                      object_get_typename(o));
->           return;
-
-Unrelated cleanup.  Does it belong in a different patch?
-
-> @@ -148,13 +145,9 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
->   
->   #ifndef CONFIG_LIBPMEM
->       if (value) {
-> -        Error *local_err = NULL;
-> -
-> -        error_setg(&local_err,
-> -                   "Lack of libpmem support while setting the 'pmem=on'"
-> +        error_setg(errp, "Lack of libpmem support while setting the 'pmem=on'"
->                      " of %s. We can't ensure data persistence.",
-
-Pre-existing - doesn't follow our usual error message content 
-conventions regarding trailing '.'.
-
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1517,15 +1517,16 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
->        */
->       if (plugged_dev->hotplugged && bus->devices[PCI_DEVFN(slotnr, 0)] &&
->           PCI_FUNC(pdev->devfn) != 0) {
-> -        error_setg(&local_err, "PCI: slot %d function 0 already ocuppied by %s,"
-> +        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->                      " additional functions can no longer be exposed to guest.",
-
-Another one.  Also, s/ocuppied/occupied/ while touching it.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>  hw/vfio/common.c              | 58 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/vfio/vfio-common.h |  8 ++++++
+>  2 files changed, 60 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index e0d3d4585a65..6921a78e9ba5 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -408,8 +408,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>  }
+>  
+>  /* Called with rcu_read_lock held.  */
+> -static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> -                           bool *read_only)
+> +static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                               ram_addr_t *ram_addr, bool *read_only)
+>  {
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+> @@ -440,8 +440,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+>          return false;
+>      }
+>  
+> -    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> -    *read_only = !writable || mr->readonly;
+> +    if (vaddr) {
+> +        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    }
+> +
+> +    if (ram_addr) {
+> +        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
+> +    }
+> +
+> +    if (read_only) {
+> +        *read_only = !writable || mr->readonly;
+> +    }
+>  
+>      return true;
+>  }
+> @@ -451,7 +460,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+>      VFIOContainer *container = giommu->container;
+>      hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> -    bool read_only;
+>      void *vaddr;
+>      int ret;
+>  
+> @@ -467,7 +475,10 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>  
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        ram_addr_t ram_addr;
+> +        bool read_only;
+> +
+> +        if (!vfio_get_xlat_addr(iotlb, &vaddr, &ram_addr, &read_only)) {
+>              goto out;
+>          }
+>          /*
+> @@ -485,8 +496,28 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>                           "0x%"HWADDR_PRIx", %p) = %d (%m)",
+>                           container, iova,
+>                           iotlb->addr_mask + 1, vaddr, ret);
+> +        } else {
+> +            VFIOIovaRange *iova_range;
+> +
+> +            iova_range = g_malloc0(sizeof(*iova_range));
+> +            iova_range->iova = iova;
+> +            iova_range->size = iotlb->addr_mask + 1;
+> +            iova_range->ram_addr = ram_addr;
+> +
+> +            QLIST_INSERT_HEAD(&giommu->iova_list, iova_range, next);
+>          }
+>      } else {
+> +        VFIOIovaRange *iova_range, *tmp;
+> +
+> +        QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
+> +            if (iova_range->iova >= iova &&
+> +                iova_range->iova + iova_range->size <= iova +
+> +                                                       iotlb->addr_mask + 1) {
+> +                QLIST_REMOVE(iova_range, next);
+> +                g_free(iova_range);
+> +            }
+> +        }
+> +
+>          ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
+>          if (ret) {
+>              error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> @@ -643,6 +674,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>              g_free(giommu);
+>              goto fail;
+>          }
+> +        QLIST_INIT(&giommu->iova_list);
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>          memory_region_iommu_replay(giommu->iommu, &giommu->n);
+>  
+> @@ -741,6 +773,13 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+>              if (MEMORY_REGION(giommu->iommu) == section->mr &&
+>                  giommu->n.start == section->offset_within_region) {
+> +                VFIOIovaRange *iova_range, *tmp;
+> +
+> +                QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, tmp) {
+> +                    QLIST_REMOVE(iova_range, next);
+> +                    g_free(iova_range);
+> +                }
+> +
+>                  memory_region_unregister_iommu_notifier(section->mr,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> @@ -1538,6 +1577,13 @@ static void vfio_disconnect_container(VFIOGroup *group)
+>          QLIST_REMOVE(container, next);
+>  
+>          QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
+> +            VFIOIovaRange *iova_range, *itmp;
+> +
+> +            QLIST_FOREACH_SAFE(iova_range, &giommu->iova_list, next, itmp) {
+> +                QLIST_REMOVE(iova_range, next);
+> +                g_free(iova_range);
+> +            }
+> +
+>              memory_region_unregister_iommu_notifier(
+>                      MEMORY_REGION(giommu->iommu), &giommu->n);
+>              QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 5a57a78ec517..56b75e4a8bc4 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -89,11 +89,19 @@ typedef struct VFIOContainer {
+>      QLIST_ENTRY(VFIOContainer) next;
+>  } VFIOContainer;
+>  
+> +typedef struct VFIOIovaRange {
+> +    hwaddr iova;
+> +    size_t size;
+> +    ram_addr_t ram_addr;
+> +    QLIST_ENTRY(VFIOIovaRange) next;
+> +} VFIOIovaRange;
+> +
+>  typedef struct VFIOGuestIOMMU {
+>      VFIOContainer *container;
+>      IOMMUMemoryRegion *iommu;
+>      hwaddr iommu_offset;
+>      IOMMUNotifier n;
+> +    QLIST_HEAD(, VFIOIovaRange) iova_list;
+>      QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
+>  } VFIOGuestIOMMU;
+>  
 
 
