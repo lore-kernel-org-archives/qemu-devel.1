@@ -2,80 +2,85 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B904C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2765D207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87718207DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:53:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYzxxXbW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2765D207DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2Or3Eu7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87718207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo19e-0003nA-DO
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:53:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48624)
+	id 1jo1AG-0004lC-Lv
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uw-0001Hh-Of
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:38:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59166
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jo0w8-0004Y8-9h
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:39:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37437
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uj-000286-PG
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:38:02 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jo0w5-0003FV-Us
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:39:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592987868;
+ s=mimecast20190719; t=1592987953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n9LivGaeRzJLdwRKYcbd/3+fqEYyCcLCXcStNN17dX8=;
- b=XYzxxXbWoA7v5MexPq/Yauz/lkyY2gE0a0JciHX1F0PHI0mXO9f1uWYmMKdItSXvTGrR5F
- 3i/z4amNwhDhNPujJWv3Ww4FMEx+41VWVxcoZLnG9AmxKiBTIWOC/dIeoKHKeDSFBpFzNH
- YRdviqOkSnwErddxwXDxAU/kH723t2Q=
+ bh=HQ2wiLk3tzOP0QdrTu3mfTU7V47hcrES0lKpotIlI1Y=;
+ b=Q2Or3Eu7c9gB5PIg/VCgWxsM/kGpniU0UKCzb5WNR9lpsf2kGLixyH7iZao3M3gQCnuEDT
+ vrMJUigogNZT3ee929suNbTq6W/k1lIIlMUg/tC2yqw6p2hODrtD+eDSVSze1YpsNzmuXO
+ kFiriRSYrtBqLMwLUJC+poc2EDwC7K4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-vhKog43aNJ6Hw3-SbTuKqQ-1; Wed, 24 Jun 2020 04:37:44 -0400
-X-MC-Unique: vhKog43aNJ6Hw3-SbTuKqQ-1
+ us-mta-315-IvBR9P_wMqy0RMJMyWcicQ-1; Wed, 24 Jun 2020 04:39:11 -0400
+X-MC-Unique: IvBR9P_wMqy0RMJMyWcicQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEDE4800C60;
- Wed, 24 Jun 2020 08:37:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D35A61981;
- Wed, 24 Jun 2020 08:37:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B4D16113847E; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/25] hw/arm: Drop useless object_property_set_link()
- error handling
-Date: Wed, 24 Jun 2020 10:37:28 +0200
-Message-Id: <20200624083737.3086768-17-armbru@redhat.com>
-In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
-References: <20200624083737.3086768-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27E64805EEF;
+ Wed, 24 Jun 2020 08:39:10 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 27D6360F80;
+ Wed, 24 Jun 2020 08:38:58 +0000 (UTC)
+Subject: Re: [PATCH v4 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200623093244.24931-1-eric.auger@redhat.com>
+ <20200623093244.24931-2-eric.auger@redhat.com>
+ <87mu4thl2a.fsf@dusky.pond.sub.org>
+ <8f5bf2be-96bd-5cd0-d60c-7123e83cb264@redhat.com>
+ <878sgcevew.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f9d52484-0e28-74ed-45ce-c1196cadbaec@redhat.com>
+Date: Wed, 24 Jun 2020 10:38:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <878sgcevew.fsf@dusky.pond.sub.org>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,252 +101,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: peter.maydell@linaro.org, jean-philippe@linaro.org, mst@redhat.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, qemu-arm@nongnu.org,
+ pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-object_property_set_link() fails when the property doesn't exist, is
-not settable, or its .check() method fails.  These are all programming
-errors here, so passing it &error_abort is appropriate.
+Hi Markus,
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Cédric Le Goater" <clg@kaod.org>
-Cc: Andrew Jeffery <andrew@aj.id.au>
-Cc: Joel Stanley <joel@jms.id.au>
-Cc: qemu-arm@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
----
- hw/arm/armsse.c         | 53 ++++++++++-------------------------------
- hw/arm/armv7m.c         |  7 ++----
- hw/arm/aspeed_ast2600.c | 20 ++++------------
- hw/arm/aspeed_soc.c     | 14 ++++-------
- hw/arm/nrf51_soc.c      |  6 +----
- 5 files changed, 24 insertions(+), 76 deletions(-)
+On 6/24/20 10:10 AM, Markus Armbruster wrote:
+> Auger Eric <eric.auger@redhat.com> writes:
+> 
+>> Hi Markus,
+>>
+>> On 6/23/20 5:13 PM, Markus Armbruster wrote:
+>>> Eric Auger <eric.auger@redhat.com> writes:
+>>>
+>>>> Introduce a new property defining a reserved region:
+>>>> <low address>:<high address>:<type>.
+>>>>
+>>>> This will be used to encode reserved IOVA regions.
+>>>>
+>>>> For instance, in virtio-iommu use case, reserved IOVA regions
+>>>> will be passed by the machine code to the virtio-iommu-pci
+>>>> device (an array of those). The type of the reserved region
+>>>> will match the virtio_iommu_probe_resv_mem subtype value:
+>>>> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+>>>> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
+>>>>
+>>>> on PC/Q35 machine, this will be used to inform the
+>>>> virtio-iommu-pci device it should bypass the MSI region.
+>>>> The reserved region will be: 0xfee00000:0xfeefffff:1.
+>>>>
+>>>> On ARM, we can declare the ITS MSI doorbell as an MSI
+>>>> region to prevent MSIs from being mapped on guest side.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v3 -> v4:
+>>>> - use ':' instead of commas as separators.
+>>>> - rearrange error messages
+>>>> - check snprintf returned value
+>>>> - dared to keep Markus' R-b despite those changes
+>>>> ---
+>>>>  include/exec/memory.h        |  6 +++
+>>>>  include/hw/qdev-properties.h |  3 ++
+>>>>  include/qemu/typedefs.h      |  1 +
+>>>>  hw/core/qdev-properties.c    | 89 ++++++++++++++++++++++++++++++++++++
+>>>>  4 files changed, 99 insertions(+)
+>>>>
+>>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>>> index 7207025bd4..d7a53b96cc 100644
+>>>> --- a/include/exec/memory.h
+>>>> +++ b/include/exec/memory.h
+>>>> @@ -51,6 +51,12 @@ extern bool global_dirty_log;
+>>>>  
+>>>>  typedef struct MemoryRegionOps MemoryRegionOps;
+>>>>  
+>>>> +struct ReservedRegion {
+>>>> +    hwaddr low;
+>>>> +    hwaddr high;
+>>>> +    unsigned int type;
+>>>
+>>> Suggest to s/unsigned int/unsigned/.
+>>>
+>>>> +};
+>>>> +
+>>>>  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+>>>>  
+>>>>  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+>>>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>>>> index 5252bb6b1a..95d0e7201d 100644
+>>>> --- a/include/hw/qdev-properties.h
+>>>> +++ b/include/hw/qdev-properties.h
+>>>> @@ -19,6 +19,7 @@ extern const PropertyInfo qdev_prop_string;
+>>>>  extern const PropertyInfo qdev_prop_chr;
+>>>>  extern const PropertyInfo qdev_prop_tpm;
+>>>>  extern const PropertyInfo qdev_prop_macaddr;
+>>>> +extern const PropertyInfo qdev_prop_reserved_region;
+>>>>  extern const PropertyInfo qdev_prop_on_off_auto;
+>>>>  extern const PropertyInfo qdev_prop_multifd_compression;
+>>>>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>>>> @@ -184,6 +185,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>>>>      DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
+>>>>  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+>>>>      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
+>>>> +#define DEFINE_PROP_RESERVED_REGION(_n, _s, _f)         \
+>>>> +    DEFINE_PROP(_n, _s, _f, qdev_prop_reserved_region, ReservedRegion)
+>>>>  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+>>>>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+>>>>  #define DEFINE_PROP_MULTIFD_COMPRESSION(_n, _s, _f, _d) \
+>>>> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+>>>> index ce4a78b687..15f5047bf1 100644
+>>>> --- a/include/qemu/typedefs.h
+>>>> +++ b/include/qemu/typedefs.h
+>>>> @@ -58,6 +58,7 @@ typedef struct ISABus ISABus;
+>>>>  typedef struct ISADevice ISADevice;
+>>>>  typedef struct IsaDma IsaDma;
+>>>>  typedef struct MACAddr MACAddr;
+>>>> +typedef struct ReservedRegion ReservedRegion;
+>>>>  typedef struct MachineClass MachineClass;
+>>>>  typedef struct MachineState MachineState;
+>>>>  typedef struct MemoryListener MemoryListener;
+>>>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>>>> index ead35d7ffd..193d0d95f9 100644
+>>>> --- a/hw/core/qdev-properties.c
+>>>> +++ b/hw/core/qdev-properties.c
+>>>> @@ -15,6 +15,7 @@
+>>>>  #include "chardev/char.h"
+>>>>  #include "qemu/uuid.h"
+>>>>  #include "qemu/units.h"
+>>>> +#include "qemu/cutils.h"
+>>>>  
+>>>>  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>>>>                                    Error **errp)
+>>>> @@ -578,6 +579,94 @@ const PropertyInfo qdev_prop_macaddr = {
+>>>>      .set   = set_mac,
+>>>>  };
+>>>>  
+>>>> +/* --- Reserved Region --- */
+>>>> +
+>>>> +/*
+>>>> + * accepted syntax version:
+>>>
+>>> "version" feels redundant.  Suggest to capitalize "Accepted".
+>>>
+>>>> + *   <low address>:<high address>:<type>
+>>>> + *   where low/high addresses are uint64_t in hexadecimal
+>>>> + *   and type is an unsigned integer in decimal
+>>>> + */
+>>>> +static void get_reserved_region(Object *obj, Visitor *v, const char *name,
+>>>> +                                void *opaque, Error **errp)
+>>>> +{
+>>>> +    DeviceState *dev = DEVICE(obj);
+>>>> +    Property *prop = opaque;
+>>>> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
+>>>> +    char buffer[64];
+>>>> +    char *p = buffer;
+>>>> +    int rc;
+>>>> +
+>>>> +    rc = snprintf(buffer, sizeof(buffer), "0x%"PRIx64":0x%"PRIx64":%u",
+>>>> +                  rr->low, rr->high, rr->type);
+>>>> +    assert(rc < sizeof(buffer));
+>>>> +
+>>>> +    visit_type_str(v, name, &p, errp);
+>>>> +}
+>>>> +
+>>>> +static void set_reserved_region(Object *obj, Visitor *v, const char *name,
+>>>> +                                void *opaque, Error **errp)
+>>>> +{
+>>>> +    DeviceState *dev = DEVICE(obj);
+>>>> +    Property *prop = opaque;
+>>>> +    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
+>>>> +    Error *local_err = NULL;
+>>>> +    const char *endptr;
+>>>> +    char *str;
+>>>> +    int ret;
+>>>> +
+>>>> +    if (dev->realized) {
+>>>> +        qdev_prop_set_after_realize(dev, name, errp);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    visit_type_str(v, name, &str, &local_err);
+>>>> +    if (local_err) {
+>>>> +        error_propagate(errp, local_err);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    ret = qemu_strtou64(str, &endptr, 16, &rr->low);
+>>>> +    if (ret) {
+>>>> +        error_setg(errp, "start address of '%s'"
+>>>> +                   " must be a hexadecimal integer", name);
+>>>> +        goto out;
+>>>> +    }
+>>>> +    if (*endptr != ':') {
+>>>> +        goto separator_error;
+>>>> +    }
+>>>> +
+>>>> +    ret = qemu_strtou64(endptr + 1, &endptr, 16, &rr->high);
+>>>> +    if (ret) {
+>>>> +        error_setg(errp, "end address of '%s'"
+>>>> +                   " must be a hexadecimal integer", name);
+>>>> +        goto out;
+>>>> +    }
+>>>> +    if (*endptr != ':') {
+>>>> +        goto separator_error;
+>>>> +    }
+>>>> +
+>>>> +    ret = qemu_strtoui(endptr + 1, &endptr, 10, &rr->type);
+>>>> +    if (ret) {
+>>>> +        error_setg(errp, "type of '%s'"
+>>>> +                   " must be an unsigned integer in decimal", name);
+>>>
+>>> Suggest "must be a non-negative decimal integer".
+>>>
+>>> Whatever uses the property needs a range check.  I can't see that the
+>>> patches that follow.  What am I missing?
+>> Do you mean, you would expect the virtio-iommu-pci device to abort in
+>> case a wrong VIRTIO reserved region type has been registered?
+> 
+> Knowing nothing about reserved region types, I (naively?) assume that a
+> finite set of types are encoded as small integers.  Any other integers
+> are then meaningless, and should be rejected.
+you're right.
+> 
+>> Effectively I could do that.
+>>
+>> For the time being, unexpected types are considered as RESERVED type.
+>> Also reserved regions are set by the machinesa nd we don't expect users
+>> to set them directly so I thought it was sufficient.
+> 
+> One, rejecting invalid values is useful even when they're set
+> programmatically, because it can catch programming errors.
+> 
+> Two, expecting users to only do what you expect is walking on rather
+> thin ice ;)
+Agreed, I will add an assert()
 
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index e8f8f60abc..c73cc6badf 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -564,16 +564,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                                                 &s->container, -1);
-         }
-         object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
--                                 "memory", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
--        object_property_set_link(cpuobj, OBJECT(s), "idau", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+                                 "memory", &error_abort);
-+        object_property_set_link(cpuobj, OBJECT(s), "idau", &error_abort);
-         sysbus_realize(SYS_BUS_DEVICE(cpuobj), &err);
-         if (err) {
-             error_propagate(errp, err);
-@@ -700,11 +692,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         object_property_set_link(OBJECT(&s->mpc[i]), OBJECT(&s->sram[i]),
--                                 "downstream", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+                                 "downstream", &error_abort);
-         sysbus_realize(SYS_BUS_DEVICE(&s->mpc[i]), &err);
-         if (err) {
-             error_propagate(errp, err);
-@@ -755,11 +743,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer0), 0,
-                        armsse_get_common_irq_in(s, 3));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer0), 0);
--    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[0]", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[0]",
-+                             &error_abort);
- 
-     qdev_prop_set_uint32(DEVICE(&s->timer1), "pclk-frq", s->mainclk_frq);
-     sysbus_realize(SYS_BUS_DEVICE(&s->timer1), &err);
-@@ -770,12 +755,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer1), 0,
-                        armsse_get_common_irq_in(s, 4));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer1), 0);
--    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[1]", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--
-+    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[1]",
-+                             &error_abort);
- 
-     qdev_prop_set_uint32(DEVICE(&s->dualtimer), "pclk-frq", s->mainclk_frq);
-     sysbus_realize(SYS_BUS_DEVICE(&s->dualtimer), &err);
-@@ -786,11 +767,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dualtimer), 0,
-                        armsse_get_common_irq_in(s, 5));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dualtimer), 0);
--    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[2]", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[2]",
-+                             &error_abort);
- 
-     if (info->has_mhus) {
-         /*
-@@ -815,12 +793,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-             port = g_strdup_printf("port[%d]", i + 3);
-             mr = sysbus_mmio_get_region(mhu_sbd, 0);
-             object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr),
--                                     port, &err);
-+                                     port, &error_abort);
-             g_free(port);
--            if (err) {
--                error_propagate(errp, err);
--                return;
--            }
- 
-             /*
-              * Each MHU has an irq line for each CPU:
-@@ -967,11 +941,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->s32ktimer), 0,
-                        armsse_get_common_irq_in(s, 2));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->s32ktimer), 0);
--    object_property_set_link(OBJECT(&s->apb_ppc1), OBJECT(mr), "port[0]", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->apb_ppc1), OBJECT(mr), "port[0]",
-+                             &error_abort);
- 
-     sysbus_realize(SYS_BUS_DEVICE(&s->apb_ppc1), &err);
-     if (err) {
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index ce83586e03..3308211e9c 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -170,11 +170,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-     object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
-                              &error_abort);
-     if (object_property_find(OBJECT(s->cpu), "idau", NULL)) {
--        object_property_set_link(OBJECT(s->cpu), s->idau, "idau", &err);
--        if (err != NULL) {
--            error_propagate(errp, err);
--            return;
--        }
-+        object_property_set_link(OBJECT(s->cpu), s->idau, "idau",
-+                                 &error_abort);
-     }
-     if (object_property_find(OBJECT(s->cpu), "init-svtor", NULL)) {
-         object_property_set_uint(OBJECT(s->cpu), s->init_svtor,
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 08b3592e36..4efac02e2b 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -341,11 +341,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* I2C */
--    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram",
-+                             &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->i2c), &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -363,11 +360,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* FMC, The number of CS is set at the board level */
--    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram",
-+                             &error_abort);
-     object_property_set_int(OBJECT(&s->fmc), sc->memmap[ASPEED_SDRAM],
-                             "sdram-base", &err);
-     if (err) {
-@@ -388,11 +382,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     /* SPI */
-     for (i = 0; i < sc->spis_num; i++) {
-         object_property_set_link(OBJECT(&s->spi[i]), OBJECT(s->dram_mr),
--                                 "dram", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+                                 "dram", &error_abort);
-         object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
-         sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
-         if (err) {
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index ec21de50ce..03b91bade6 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -300,11 +300,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* I2C */
--    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram",
-+                             &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->i2c), &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -315,11 +312,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-                        aspeed_soc_get_irq(s, ASPEED_I2C));
- 
-     /* FMC, The number of CS is set at the board level */
--    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram",
-+                             &error_abort);
-     object_property_set_int(OBJECT(&s->fmc), sc->memmap[ASPEED_SDRAM],
-                             "sdram-base", &err);
-     if (err) {
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 5a8961ddbb..20dd8b5897 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -66,11 +66,7 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-     }
- 
-     object_property_set_link(OBJECT(&s->cpu), OBJECT(&s->container), "memory",
--            &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+                             &error_abort);
-     sysbus_realize(SYS_BUS_DEVICE(&s->cpu), &err);
-     if (err) {
-         error_propagate(errp, err);
--- 
-2.26.2
+Thanks!
+
+Eric
+> 
 
 
