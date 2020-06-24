@@ -2,77 +2,92 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC64C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B41C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 392AD2053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 138BB2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xen.org header.i=@xen.org header.b="lLt2C+uu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 392AD2053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xen.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHiigOlf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138BB2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo4Ny-0002zx-DF
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:20:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53740)
+	id 1jo4PP-0004pg-DM
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:21:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paul@xen.org>) id 1jo4Me-0001iw-0f
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:18:52 -0400
-Received: from mail.xenproject.org ([104.130.215.37]:41818)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paul@xen.org>) id 1jo4Mb-0004Ub-8T
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:18:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
- s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
- In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
- Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
- Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=N/I4v8ZDmbVyJ5v5uM4VjOF7rLFaxzrV35vC/IJzksA=; b=lLt2C+uuKQnj7hdrvVOUwqTmOc
- 6mvivoKpj2mcC21dDbNQfw4TWLRKSULpTUGgzd25DC8kwHlqRizrzV3HUR9DbL5N4J3sjdFzS7+Rl
- cRCyHUZbwb3LjveMQRyODxZQ2B1ueU6ynTq2P9rKxbofMWbp9V8guYfzhYMH+HyZu39s=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
- by mail.xenproject.org with esmtp (Exim 4.92)
- (envelope-from <paul@xen.org>)
- id 1jo4MX-0000gD-A9; Wed, 24 Jun 2020 12:18:45 +0000
-Received: from 54-240-197-224.amazon.com ([54.240.197.224]
- helo=u2f063a87eabd5f.cbg10.amazon.com)
- by xenbits.xenproject.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <paul@xen.org>)
- id 1jo4MX-0005fi-17; Wed, 24 Jun 2020 12:18:45 +0000
-From: Paul Durrant <paul@xen.org>
-To: xen-devel@lists.xenproject.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 1/2] xen: fix legacy 'xen-sysdev' and 'xen-backend' bus types
-Date: Wed, 24 Jun 2020 13:18:40 +0100
-Message-Id: <20200624121841.17971-2-paul@xen.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200624121841.17971-1-paul@xen.org>
-References: <20200624121841.17971-1-paul@xen.org>
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jo4Ng-0002xt-UL
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:19:57 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44659)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jo4Ne-0005Ae-QY
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:19:56 -0400
+Received: by mail-qk1-x742.google.com with SMTP id b4so1527240qkn.11
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 05:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JeHrzBkl0W7YnFDNGzpK6Omqdh1SbNjh/JeqkFtYTYM=;
+ b=bHiigOlfRJSOsDQUtI5OujwKxFy5ZwqLJpXGvaYBK5AXFjeFbyHjglZbPkR19/LD7K
+ h8CxXew/iIM3amWTrmT8GzthWz80A4LojXAoLSAoYRfa/o4CTcMsaQ2MqCrcMmFyhmh3
+ d65C6+bnnMFHZZUPCaKXHD8xuou/AYrpxpUHIZa4MUJAlOttRnvcUjqEMH2Azqysu6bY
+ TrHvRBr4AOZ6qj8jPD4cTiibdikz02cW95d1+1iV6+6F0gl4CxgTZ/isKtni95qDKvs8
+ hvmgb3+i7qzDkgRzLqAXFCJLilOQw7Y8u8kX0+9KDGdInvcMVCtQ7P0FjE9jy1kZkcpR
+ aIkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JeHrzBkl0W7YnFDNGzpK6Omqdh1SbNjh/JeqkFtYTYM=;
+ b=Mza+dI6PeRzYVPSTkX0CFCYj7wfnhFZ4M0Wq9CvNOg8TythuGatxbRtvNjPZ8mz9wr
+ WVASIpwN+jMnmomCS8W4sD8XXV9tPpO9AZ3omWBSKTlcdtq8hFVvJCV7Zuj05T72HC9a
+ v0I2EEBzh3HyEb+81fiBQDylvaPQsTpbKUEVEXpmA0Eiu6+rHdzR4Mv7NbfnRD4/dToX
+ eIcZ2tqWvKjy4HSXySAna0tqMJX5/WfMJNbf73EHrIjGLzLD1gjTsVrxxQ5LGZ48pHab
+ R6sAwpMZjx2plugKJESUTrNSVd/bXOI8imptjI0BMr1sMRdUtNASl3pzEEsvwjI3R4Wp
+ Pk0Q==
+X-Gm-Message-State: AOAM533bhH/v5vf2kaha8TBgeAmNDxqE9PJOsEiPMm2EzqtXk8L0vdVv
+ YqK4vU4CcoM/mmSpffmk/Yo=
+X-Google-Smtp-Source: ABdhPJx3ZT4gYwkDD4T3fNbH4/7YMHFKibhaBWBHBCSo0bX+lInlvhxyUp1HwIUySWDeId8zj6gV/Q==
+X-Received: by 2002:a37:451:: with SMTP id 78mr16239725qke.117.1593001193342; 
+ Wed, 24 Jun 2020 05:19:53 -0700 (PDT)
+Received: from shine.lan ([2001:470:8:67e:ad7b:336a:2d40:4130])
+ by smtp.gmail.com with ESMTPSA id x4sm3685635qtj.50.2020.06.24.05.19.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 24 Jun 2020 05:19:52 -0700 (PDT)
+From: Jason Andryuk <jandryuk@gmail.com>
+To: Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul@xen.org>,
+ xen-devel@lists.xenproject.org
+Subject: [PATCH] xen: Fix xen-legacy-backend qdev types
+Date: Wed, 24 Jun 2020 08:19:39 -0400
+Message-Id: <20200624121939.10282-1-jandryuk@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=104.130.215.37; envelope-from=paul@xen.org;
- helo=mail.xenproject.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 08:18:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
+ envelope-from=jandryuk@gmail.com; helo=mail-qk1-x742.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,34 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Paul Durrant <pdurrant@amazon.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Jason Andryuk <jandryuk@gmail.com>
+Cc: qemu-devel@nongnu.org, Jason Andryuk <jandryuk@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paul Durrant <pdurrant@amazon.com>
-
-'xen-sysdev' plugs into the 'System' bus type, not 'xen-sysbus. That bus type
-is what 'xen-backend' plugs into.
-'xen-sysdev' is drived form 'sys-bus-device' so the bus type need not be
-overridden. 'xen-backend' is derived from 'device', which plugs into the
-generic 'bus' type, so its bus type should be overridden to 'xen-sysbus'.
-
-Without this patch, the following assertion will fail:
-
+xen-sysdev is a TYPE_SYS_BUS_DEVICE.  bus_type should not be changed so
+that it can plug into the System bus.  Otherwise this assert triggers:
 qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
 `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
 failed.
 
-Reported-by: Jason Andryuk <jandryuk@gmail.com>
-Fixes: 81cb05732efb ("qdev: Assert devices are plugged into a bus that can take them")
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+TYPE_XENBACKEND attaches to TYPE_XENSYSBUS, so its class_init needs to
+be set accordingly to attach the qdev.  Otherwise the following assert
+triggers:
+qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
+`dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
+failed.
+
+TYPE_XENBACKEND is not a subclass of XEN_XENSYSDEV, so it's parent
+is just TYPE_DEVICE.  Change that.
+
+Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
 ---
  hw/xen/xen-legacy-backend.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -144,6 +153,6 @@ index 2335ee2e65..c5c75c0064 100644
  
  static const TypeInfo xensysdev_info = {
 -- 
-2.20.1
+2.25.1
 
 
