@@ -2,78 +2,80 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A7DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C66C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 737A220836
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2076021473
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YupbBSE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 737A220836
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hr+g/3ZP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2076021473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo4lD-0005YK-MC
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:44:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60880)
+	id 1jo4lI-0005hP-D9
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:44:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jo4kG-0004MQ-Cm
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:43:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30718
+ id 1jo4kJ-0004Qb-Hh
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:43:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50967
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jo4kE-0008S9-D4
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:43:15 -0400
+ id 1jo4kH-0008UB-U4
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:43:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593002593;
+ s=mimecast20190719; t=1593002596;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=edF9tcRREG+COGXcqLPERC2mWl5hUACnU9MBNgwxXNY=;
- b=YupbBSE1JGbnjVE+Ae+SrOSfqDDl9XkhM1UjGwWrwvDVTFSNRuS2yzsJKl9w3AoeAk/IZL
- 5P7/uhOhfLO3PN4T5EImNEranF/mOkP+93o5p6uvgD3/MjXgBCQsJtBUcVt8I4MOFCY2Kd
- u+l48HXlZyu98Zr1aCe0OBJW4J21Kg4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sy2E6fDFrrUa0s58uBcE20HeImA76gOFOqgx7UfR2yc=;
+ b=Hr+g/3ZPaRva3Nnl3W7nCGyB8/6yeVONh09JNEbbVXOEbSF+NbA6SPn74CZvXjFStxaALQ
+ tsDPGiywpG9iJMN8xMQOUgK+o24UdA28p/OVRw0NtQpXVTzOOAES6wOaOGxlbl8+Dvcvqy
+ klOF/O8lr31gL6a4+wU0/pq/cGoOtms=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-OEbHWvHdNoe-hduTVrHAsg-1; Wed, 24 Jun 2020 08:43:11 -0400
-X-MC-Unique: OEbHWvHdNoe-hduTVrHAsg-1
+ us-mta-289-0gBaSDxsPyy-XyMoMNo79Q-1; Wed, 24 Jun 2020 08:43:15 -0400
+X-MC-Unique: 0gBaSDxsPyy-XyMoMNo79Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56BE7804008;
- Wed, 24 Jun 2020 12:43:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9953D8015F7;
+ Wed, 24 Jun 2020 12:43:14 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE9C62B4AC;
- Wed, 24 Jun 2020 12:43:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E77022B4AC;
+ Wed, 24 Jun 2020 12:43:12 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
  armbru@redhat.com
-Subject: [PATCH v2 0/2] Avoid abort on QMP attempt to add an object with
- duplicate id
-Date: Wed, 24 Jun 2020 14:42:59 +0200
-Message-Id: <20200624124301.7112-1-eric.auger@redhat.com>
+Subject: [PATCH v2 2/2] tests/qmp-cmd-test: Add qmp/object-add-duplicate-id
+Date: Wed, 24 Jun 2020 14:43:01 +0200
+Message-Id: <20200624124301.7112-3-eric.auger@redhat.com>
+In-Reply-To: <20200624124301.7112-1-eric.auger@redhat.com>
+References: <20200624124301.7112-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,38 +100,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Attempting to add an object through QMP with an id that is
-already used leads to a qemu abort. This is a regression since
-d2623129a7de ("qom: Drop parameter @errp of object_property_add()
-& friends").
+This new test checks that attempting to create an object
+with an existing ID gracefully fails.
 
-The first patch fixes the issue and the second patch adds a test
-to check the error is gracefully returned to the QMP client.
-
-Best Regards
-
-Eric
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/qom-graceful-v2
-
-History:
-- v1 -> v2:
-  - use the try terminology.
-  - turn object_property_try_add() into a non-static function
-  - add the test
-
-
-Eric Auger (2):
-  qom: Introduce object_property_try_add_child()
-  tests/qmp-cmd-test: Add qmp/object-add-duplicate-id
-
- include/qom/object.h       | 24 ++++++++++++++++++++++--
- qom/object.c               | 22 +++++++++++++++++-----
- qom/object_interfaces.c    |  7 +++++--
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
  tests/qtest/qmp-cmd-test.c | 18 ++++++++++++++++++
- 4 files changed, 62 insertions(+), 9 deletions(-)
+ 1 file changed, 18 insertions(+)
 
+diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+index 9f5228cd99..9510051c35 100644
+--- a/tests/qtest/qmp-cmd-test.c
++++ b/tests/qtest/qmp-cmd-test.c
+@@ -213,6 +213,22 @@ static void test_object_add_without_props(void)
+     qtest_quit(qts);
+ }
+ 
++static void test_object_add_with_duplicate_id(void)
++{
++    QTestState *qts;
++    QDict *resp;
++
++    qts = qtest_init(common_args);
++    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
++                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
++    g_assert_nonnull(resp);
++    g_assert(qdict_haskey(resp, "return"));
++    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
++                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
++    qmp_assert_error_class(resp, "GenericError");
++    qtest_quit(qts);
++}
++
+ int main(int argc, char *argv[])
+ {
+     QmpSchema schema;
+@@ -225,6 +241,8 @@ int main(int argc, char *argv[])
+ 
+     qtest_add_func("qmp/object-add-without-props",
+                    test_object_add_without_props);
++    qtest_add_func("qmp/object-add-duplicate-id",
++                   test_object_add_with_duplicate_id);
+     /* TODO: add coverage of generic object-add failure modes */
+ 
+     ret = g_test_run();
 -- 
 2.20.1
 
