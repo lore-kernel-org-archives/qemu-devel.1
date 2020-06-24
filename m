@@ -2,80 +2,81 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4277320857
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B92D320B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIzpqL5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4277320857
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cst2b2gd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B92D320B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo46m-0007xF-5j
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:02:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48250)
+	id 1jo4Hy-0005aL-V3
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:14:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo45q-0007RO-UA
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:01:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45233
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4HQ-00058g-KG
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:13:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27092
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo45m-0003uP-NS
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:01:30 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4HO-0001cZ-5L
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:13:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593000083;
+ s=mimecast20190719; t=1593000804;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8lmBr6uqtqtjQuFcFXe5/BwSLNKq9Dm7vKMbw4AG+N4=;
- b=eIzpqL5Y/2WrRsyioxLYB2deGR+QRoDxRwADdWFACgCELfBryqOKlER7F8IiyCT4wVTvWY
- Z8JDNb8EJ4+iHzJytRaiuAuS/0b/1J3m5bDXrVDVvDxRI2ELudds+e65EhQbYOy+WKe2aP
- m8P3cM3kVHX+GQrezld6OyAUZ4SO6CY=
+ bh=wUi1n0qfjFSkYnlGaY4UfyiNEpwHVEdFpNe0mQI3Nao=;
+ b=cst2b2gdWlncFm2XlYrSH/GeG3/fRH62jxpFB5JFteFihto/eNSEaXd3tyjRDnZLnQ24PA
+ ecPnscE6TlgGFA3ErnPpVT8P/JCzWKhu3zCiYnXnoxBHiWHtnYnCybIhTqVsbnl71c1ees
+ xhbWp55fRWu5niw6a2YMLJdCHSiU3v4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-PU9EUpbIOXqwfAB_MVls5Q-1; Wed, 24 Jun 2020 08:01:22 -0400
-X-MC-Unique: PU9EUpbIOXqwfAB_MVls5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-300-mntkSjrcOQKRveBdVEDYpQ-1; Wed, 24 Jun 2020 08:13:19 -0400
+X-MC-Unique: mntkSjrcOQKRveBdVEDYpQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C131618FE860;
- Wed, 24 Jun 2020 12:01:20 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-35.ams2.redhat.com [10.36.114.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 380B25EDE2;
- Wed, 24 Jun 2020 12:01:18 +0000 (UTC)
-Subject: Re: [PATCH v3 2/8] s390/sclp: check sccb len before filling in data
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200618222258.23287-1-walling@linux.ibm.com>
- <20200618222258.23287-3-walling@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a31704ca-3821-dc19-e82f-772a11c0a5fd@redhat.com>
-Date: Wed, 24 Jun 2020 14:01:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5352805EE1
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 12:13:18 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 96858891D8;
+ Wed, 24 Jun 2020 12:13:18 +0000 (UTC)
+Subject: Re: [PULL 25/31] osdep: Make MIN/MAX evaluate arguments only once
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200624104917.375143-1-pbonzini@redhat.com>
+ <20200624105048.375353-25-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1101afa3-7523-4408-8918-265b1f2dbc3b@redhat.com>
+Date: Wed, 24 Jun 2020 07:13:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200618222258.23287-3-walling@linux.ibm.com>
+In-Reply-To: <20200624105048.375353-25-pbonzini@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,26 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
- svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
- rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/06/2020 00.22, Collin Walling wrote:
-> The SCCB must be checked for a sufficient length before it is filled
-> with any data. If the length is insufficient, then the SCLP command
-> is suppressed and the proper response code is set in the SCCB header.
+On 6/24/20 5:50 AM, Paolo Bonzini wrote:
+> From: Eric Blake <eblake@redhat.com>
 > 
-> Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   hw/s390x/sclp.c | 24 ++++++++++++------------
->   1 file changed, 12 insertions(+), 12 deletions(-)
+> I'm not aware of any immediate bugs in qemu where a second runtime
+> evalution of the arguments to MIN() or MAX() causes a problem, but
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+evaluation
+
+> Update the MIN/MAX macros to only evaluate their argument once at
+> runtime;
+
+> Use of MIN when MIN_CONST is needed:
+> 
+> In file included from /home/eblake/qemu/qemu-img.c:25:
+> /home/eblake/qemu/include/qemu/osdep.h:249:5: error: braced-group within expression allowed only inside a function
+>    249 |     ({                                                  \
+>        |     ^
+> /home/eblake/qemu/qemu-img.c:92:12: note: in expansion of macro â€˜MINâ€™
+
+UTF-8 mojibake in the commit message ;(
+
+
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> Message-Id: <20200604215236.2798244-1-eblake@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+
+> +#define MIN_CONST(a, b)                                         \
+> +    __builtin_choose_expr(                                      \
+> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
+> +        (a) < (b) ? (a) : (b),                                  \
+> +        ((void)0))
+
+This one is correct...
+
+> +#undef MAX
+> +#define MAX(a, b)                                       \
+> +    ({                                                  \
+> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
+> +        _a > _b ? _a : _b;                              \
+> +    })
+> +#define MAX_CONST(a, b)                                         \
+> +    __builtin_choose_expr(                                      \
+> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
+> +        (a) > (b) ? (a) : (b),                                  \
+> +        __builtin_unreachable())
+
+...but this one should also use ((void)0), to match the commit message.
+
+> +
+> +/* Minimum function that returns zero only if both values are zero.
+>    * Intended for use with unsigned values only. */
+
+And checkpatch complains about the formatting here.
+
+Ah well.  I had all these things fixed in my tree, but failed to post a 
+v5.  Not worth holding up this pull request in isolation, but if there 
+are any other build issues, I'll post a v5 of this patch, otherwise a 
+followup.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
