@@ -2,91 +2,99 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EE0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34525C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68B37206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:33:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B817B2088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:35:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLUDmarG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68B37206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2LFNMpx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B817B2088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo7Or-00060S-MA
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:33:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58122)
+	id 1jo7QU-0008As-M9
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:35:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jo7Nd-0004op-Ml
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:32:05 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43886)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jo7Nb-0000H7-Le
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:32:05 -0400
-Received: by mail-wr1-x444.google.com with SMTP id j4so239403wrp.10
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=TArnMat3Ju35uYmx6r3OwOxR+VLxrI0NAkcmv5YaMzE=;
- b=SLUDmarGXnbBCS5mX/u5Pac8ZP0idNHHapGfx9wZ8CcvYYqqPLaV743ZR2G5tHgGnW
- jCj6IulBfrLgO7ZLu/fadR+LE6bQUI+/kwRI+mZ7T5Bo8Av67/mkhct6NfFsqCtgvoEf
- 33uU0Gl8bL7h9bvOpyhOdIvyCVN0sFzjVHPnH3YoDL+t88svrBAnXd0BRweIau1H/ydq
- 39m2adjuWZXLBjHDZXyfbb/ElE1lO379jhDPqNUfjdNHHOen0fqJk5+uYH6GT+k1xPoa
- 8nDm+5mEzvQuCPRkwBB8D8S5YTA5u3AiRxRc1K3ArzpTOA6eq7NJQ1bC5BMh61vcfMHm
- DVYg==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo7P5-0006Lq-BU
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:33:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36121
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo7P3-00015d-3A
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:33:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593012812;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2IY4kfAazOamsJ2rglgbr9uUCx26PGHw/nCbFA0J9aU=;
+ b=Q2LFNMpxgjtQqMT43hgpQsbHEWZ7WiTIvGq1jxdFxbBSYMmVqz2Uncoq/GvKlo+HGOEydK
+ GtbCK4ijbsOMJn2tJ5eF9wqeSbcwNUhexQ+qshuY5HCsFf8CpB07pcADalEQipl7FTaGht
+ gt6q0CNzOgs08/KgZsrta3MrCLc2tDw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-y0A-_DF8O5KqPMXdfTajbQ-1; Wed, 24 Jun 2020 11:33:27 -0400
+X-MC-Unique: y0A-_DF8O5KqPMXdfTajbQ-1
+Received: by mail-wr1-f72.google.com with SMTP id p9so3133702wrx.10
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:33:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=TArnMat3Ju35uYmx6r3OwOxR+VLxrI0NAkcmv5YaMzE=;
- b=ZDqpToJPrZqMXf6BjSWRBMiFC+8oNtbm0z+k5O31DppGwzqzVHHCYm+xT+PT0BYlJC
- fcibktGHPmGFFgO3sGfvd15tl2aU2Gp0vMk6qMkc1LVnzcJr9L9zM4A8qf6a9Wx5G/Ew
- MvOac/VGJMcja4ikzdE6F4X6g7/A07wIJLkCFZmFsYpWEcT+8RQE3XqPK1VQw3VGtZCE
- AJtUQlwn9AtlfSOIyF+GMFjWUmpq8s512VqtOoeGi5nzvzNSRnG0wmp4rfgN0+6+b2v/
- 9PKqkXJ34NKnS8S2NI7ruvGPrgng70UsDMGjLAsLdx4u4eqxHQUb1UE3EvlYKEtibVju
- McdA==
-X-Gm-Message-State: AOAM531Kg8ij3G7vUGA2kISz9mSz69fItlMd0oReuxt9kdWwB0V5P2pE
- OnnReQJcAnQdrN3SEYe0AoJqGAsV
-X-Google-Smtp-Source: ABdhPJxwk81LN1LOetlGly/C/bZr5jEBCxCzuvXBfdjLJc4UAuSfaT3ESPX/qx28wu4bGx/B0w/Rbw==
-X-Received: by 2002:a5d:6150:: with SMTP id y16mr33949474wrt.219.1593012722020; 
- Wed, 24 Jun 2020 08:32:02 -0700 (PDT)
-Received: from AK-L.domain.name ([197.58.65.131])
- by smtp.gmail.com with ESMTPSA id b184sm2011299wmc.20.2020.06.24.08.32.00
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=2IY4kfAazOamsJ2rglgbr9uUCx26PGHw/nCbFA0J9aU=;
+ b=jgpDEEALGvddw3cp3z0Dtex9MZaof+m8v1TcGYJ3Rq2sod5Puk7UpINTfkWMjVusXy
+ pN2go0O1fROzOGhF2tvFADZOBWFXJh3PJ9WX5eV4zp3ooXiecOshjbXGq+KxdqFS972G
+ cggD389Lzk03s7uxDmP4YE01YAySRUbWz7Oyc9VT43tNlH+kN8+5U7MG9c6jR/2AsfxD
+ t1ootTFkkWmcyBwiAyy0TCJAg6Wl/XCQ0BJiB/yi72RGDTKSESJnVWOfeQVLTkAgWoWU
+ L4skEnI47+RzfCw0Fhyh0U2pOxPyyBRobMu+6MeQSF8k5lOJz3uGY3t1dTm4aVTi7Ou0
+ ldnw==
+X-Gm-Message-State: AOAM530BSATNOeMXmCJ8pLEaXhAloYyW8fewRT3MJTQFqPCPLs/SwrF+
+ oPBdf1gzAJ1MMhKGzmnMVWd8gg1z8wcq6/7jDLB/yuBchMnrHQxE4Nkn2com+JgeVT8+1EYL8Z4
+ 5TnNC9QLW/AKCBMc=
+X-Received: by 2002:adf:dd4a:: with SMTP id u10mr11687499wrm.169.1593012806272; 
+ Wed, 24 Jun 2020 08:33:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJySnKVbQKJhBaTK/KwtMP21zCfT+mDQq5XbAceQ8gdEtymFRJRySSqyc91p8UVlZToDj9zmpw==
+X-Received: by 2002:adf:dd4a:: with SMTP id u10mr11687457wrm.169.1593012806015; 
+ Wed, 24 Jun 2020 08:33:26 -0700 (PDT)
+Received: from redhat.com ([82.166.20.53])
+ by smtp.gmail.com with ESMTPSA id c70sm8302514wme.32.2020.06.24.08.33.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 08:32:01 -0700 (PDT)
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com,
- alex.bennee@linaro.org, eblake@redhat.com, rth@twiddle.net,
- ldoktor@redhat.com, ehabkost@redhat.com, crosa@redhat.com
-Subject: [PATCH v3 1/3] scripts/performance: Add topN_perf.py script
-Date: Wed, 24 Jun 2020 17:31:40 +0200
-Message-Id: <20200624153142.13247-2-ahmedkhaledkaraman@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200624153142.13247-1-ahmedkhaledkaraman@gmail.com>
-References: <20200624153142.13247-1-ahmedkhaledkaraman@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ Wed, 24 Jun 2020 08:33:25 -0700 (PDT)
+Date: Wed, 24 Jun 2020 11:33:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v4 00/21] virtio-mem: Paravirtualized memory hot(un)plug
+Message-ID: <20200624113157-mutt-send-email-mst@kernel.org>
+References: <20200610115419.51688-1-david@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200610115419.51688-1-david@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,202 +107,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, teawater <teawaterz@linux.alibaba.com>,
+ Alex Shi <alex.shi@linux.alibaba.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Richard Henderson <rth@twiddle.net>, Eric Farman <farman@linux.ibm.com>,
+ Lukas Straub <lukasstraub2@web.de>, Eduardo Habkost <ehabkost@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ Tony Krowiak <akrowiak@linux.ibm.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Syntax:
-topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
-                 <qemu executable> [<qemu executable options>] \
-                 <target executable> [<target execurable options>]
+On Wed, Jun 10, 2020 at 01:53:58PM +0200, David Hildenbrand wrote:
+> This is the very basic, initial version of virtio-mem. More info on
+> virtio-mem in general can be found in the Linux kernel driver v2 posting
+> [1] and in patch #10. The Linux driver is currently on its way upstream.
+> 
+> This series is based on [3]:
+>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
+>      buses"
+> And [4]:
+>     "[PATCH v2] hmp: Make json format optional for qom-set"
+> 
+> The patches can be found at:
+>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v4
 
-[-h] - Print the script arguments help message.
-[-n] - Specify the number of top functions to print.
-     - If this flag is not specified, the tool defaults to 25.
 
-Example of usage:
-topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
+OK so looks sane to me.
+IIUC there are a couple of minor tweaks still so I'm expecting v5
+of this.
+You want me to merge this, right?
 
-Example Output:
- No.  Percentage  Name                       Caller
-----  ----------  -------------------------  -------------------------
-   1      16.25%  float64_mul                qemu-x86_64
-   2      12.01%  float64_sub                qemu-x86_64
-   3      11.99%  float64_add                qemu-x86_64
-   4       5.69%  helper_mulsd               qemu-x86_64
-   5       4.68%  helper_addsd               qemu-x86_64
-   6       4.43%  helper_lookup_tb_ptr       qemu-x86_64
-   7       4.28%  helper_subsd               qemu-x86_64
-   8       2.71%  f64_compare                qemu-x86_64
-   9       2.71%  helper_ucomisd             qemu-x86_64
-  10       1.04%  helper_pand_xmm            qemu-x86_64
-  11       0.71%  float64_div                qemu-x86_64
-  12       0.63%  helper_pxor_xmm            qemu-x86_64
-  13       0.50%  0x00007f7b7004ef95         [JIT] tid 491
-  14       0.50%  0x00007f7b70044e83         [JIT] tid 491
-  15       0.36%  helper_por_xmm             qemu-x86_64
-  16       0.32%  helper_cc_compute_all      qemu-x86_64
-  17       0.30%  0x00007f7b700433f0         [JIT] tid 491
-  18       0.30%  float64_compare_quiet      qemu-x86_64
-  19       0.27%  soft_f64_addsub            qemu-x86_64
-  20       0.26%  round_to_int               qemu-x86_64
 
-Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
----
- scripts/performance/topN_perf.py | 142 +++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
- create mode 100755 scripts/performance/topN_perf.py
-
-diff --git a/scripts/performance/topN_perf.py b/scripts/performance/topN_perf.py
-new file mode 100755
-index 0000000000..d2b939c375
---- /dev/null
-+++ b/scripts/performance/topN_perf.py
-@@ -0,0 +1,142 @@
-+#!/usr/bin/env python3
-+
-+#  Print the top N most executed functions in QEMU using perf.
-+#  Syntax:
-+#  topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
-+#           <qemu executable> [<qemu executable options>] \
-+#           <target executable> [<target execurable options>]
-+#
-+#  [-h] - Print the script arguments help message.
-+#  [-n] - Specify the number of top functions to print.
-+#       - If this flag is not specified, the tool defaults to 25.
-+#
-+#  Example of usage:
-+#  topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
-+#
-+#  This file is a part of the project "TCG Continuous Benchmarking".
-+#
-+#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-+#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+#
-+#  This program is free software: you can redistribute it and/or modify
-+#  it under the terms of the GNU General Public License as published by
-+#  the Free Software Foundation, either version 2 of the License, or
-+#  (at your option) any later version.
-+#
-+#  This program is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+#  GNU General Public License for more details.
-+#
-+#  You should have received a copy of the GNU General Public License
-+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
-+
-+import argparse
-+import os
-+import subprocess
-+import sys
-+
-+
-+# Parse the command line arguments
-+parser = argparse.ArgumentParser(
-+    usage='topN_perf.py [-h] [-n] <number of displayed top functions >  -- '
-+          '<qemu executable> [<qemu executable options>] '
-+          '<target executable> [<target executable options>]')
-+
-+parser.add_argument('-n', dest='top', type=int, default=25,
-+                    help='Specify the number of top functions to print.')
-+
-+parser.add_argument('command', type=str, nargs='+', help=argparse.SUPPRESS)
-+
-+args = parser.parse_args()
-+
-+# Extract the needed variables from the args
-+command = args.command
-+top = args.top
-+
-+# Insure that perf is installed
-+check_perf = subprocess.run(["which", "perf"], stdout=subprocess.DEVNULL)
-+if check_perf.returncode:
-+    sys.exit("Please install perf before running the script!")
-+
-+# Insure user has previllage to run perf
-+check_perf_executability = subprocess.run(["perf", "stat", "ls", "/"],
-+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-+if check_perf_executability.returncode:
-+    sys.exit(
-+"""
-+Error:
-+You may not have permission to collect stats.
-+
-+Consider tweaking /proc/sys/kernel/perf_event_paranoid,
-+which controls use of the performance events system by
-+unprivileged users (without CAP_SYS_ADMIN).
-+
-+  -1: Allow use of (almost) all events by all users
-+      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK
-+   0: Disallow ftrace function tracepoint by users without CAP_SYS_ADMIN
-+      Disallow raw tracepoint access by users without CAP_SYS_ADMIN
-+   1: Disallow CPU event access by users without CAP_SYS_ADMIN
-+   2: Disallow kernel profiling by users without CAP_SYS_ADMIN
-+
-+To make this setting permanent, edit /etc/sysctl.conf too, e.g.:
-+   kernel.perf_event_paranoid = -1
-+"""
-+)
-+
-+# Run perf record
-+perf_record = subprocess.run((["perf", "record"] + command),
-+                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-+if perf_record.returncode:
-+    os.unlink('perf.data')
-+    sys.exit(perf_record.stderr.decode("utf-8"))
-+
-+# Save perf report output to perf_report.out
-+with open("perf_report.out", "w") as output:
-+    perf_report = subprocess.run(
-+        ["perf", "report", "--stdio"], stdout=output, stderr=subprocess.PIPE)
-+    if perf_report.returncode:
-+        os.unlink('perf.data')
-+        output.close()
-+        os.unlink('perf_report.out')
-+        sys.exit(perf_report.stderr.decode("utf-8"))
-+
-+# Read the reported data to functions[]
-+functions = []
-+with open("perf_report.out", "r") as data:
-+    # Only read lines that are not comments (comments start with #)
-+    # Only read lines that are not empty
-+    functions = [line for line in data.readlines() if line and line[0]
-+                 != '#' and line[0] != "\n"]
-+
-+# Limit the number of top functions to "top"
-+number_of_top_functions = top if len(functions) > top else len(functions)
-+
-+# Store the data of the top functions in top_functions[]
-+top_functions = functions[:number_of_top_functions]
-+
-+# Print table header
-+print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
-+                                                         'Percentage',
-+                                                         'Name',
-+                                                         'Caller',
-+                                                         '-' * 4,
-+                                                         '-' * 10,
-+                                                         '-' * 30,
-+                                                         '-' * 25))
-+
-+
-+# Print top N functions
-+for (index, function) in enumerate(top_functions, start=1):
-+    function_data = function.split()
-+    function_percentage = function_data[0]
-+    function_name = function_data[-1]
-+    function_caller = ' '.join(function_data[2:-2])
-+    print('{:>4}  {:>10}  {:<30}  {}'.format(index,
-+                                             function_percentage,
-+                                             function_name,
-+                                             function_caller))
-+
-+# Remove intermediate files
-+os.unlink('perf.data')
-+os.unlink('perf_report.out')
--- 
-2.17.1
+> "The basic idea of virtio-mem is to provide a flexible,
+> cross-architecture memory hot(un)plug solution that avoids many limitations
+> imposed by existing technologies, architectures, and interfaces."
+> 
+> There are a lot of addons in the works (esp. protection of unplugged
+> memory, better hugepage support (esp. when reading unplugged memory),
+> resizeable memory backends, support for more architectures, ...), this is
+> the very basic version to get the ball rolling.
+> 
+> The first 8 patches make sure we don't have any sudden surprises e.g., if
+> somebody tries to pin all memory in RAM blocks, resulting in a higher
+> memory consumption than desired. The remaining patches add basic virtio-mem
+> along with support for x86-64. The last patch indicates to the guest OS
+> the maximum possible PFN using ACPI SRAT, such that Linux can properly
+> enable the swiotlb when booting only with DMA memory.
+> 
+> [1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
+> [2] https://lkml.kernel.org/r/20200507140139.17083-1-david@redhat.com
+> [3] https://lkml.kernel.org/r/20200525084511.51379-1-david@redhat.com
+> [3] https://lkml.kernel.org/r/20200610075153.33892-1-david@redhat.com
+> 
+> Based-on: <20200525084511.51379-1-david@redhat.com>
+> Based-on: <20200610075153.33892-1-david@redhat.com>
+> Cc: teawater <teawaterz@linux.alibaba.com>
+> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> 
+> v3 -> v4
+> - Adapt to virtio-mem config layout change (block size now is 64bit)
+> - Added "numa: Auto-enable NUMA when any memory devices are possible"
+> 
+> v2 -> v3:
+> - Rebased on upstream/[3]
+> - "virtio-mem: Exclude unplugged memory during migration"
+> -- Added
+> - "virtio-mem: Paravirtualized memory hot(un)plug"
+> -- Simplify bitmap operations, find consecutive areas
+> -- Tweak error messages
+> -- Reshuffle some checks
+> -- Minor cleanups
+> - "accel/kvm: Convert to ram_block_discard_disable()"
+> - "target/i386: sev: Use ram_block_discard_disable()"
+> -- Keep asserts clean of functional things
+> 
+> v1 -> v2:
+> - Rebased to object_property_*() changes
+> - "exec: Introduce ram_block_discard_(disable|require)()"
+> -- Change the function names and rephrase/add comments
+> - "virtio-balloon: Rip out qemu_balloon_inhibit()"
+> -- Add and use "migration_in_incoming_postcopy()"
+> - "migration/rdma: Use ram_block_discard_disable()"
+> -- Add a comment regarding pin_all vs. !pin_all
+> - "virtio-mem: Paravirtualized memory hot(un)plug"
+> -- Replace virtio_mem_discard_inhibited() by
+>    migration_in_incoming_postcopy()
+> -- Drop some asserts
+> -- Drop virtio_mem_bad_request(), use virtio_error() directly, printing
+>    more information
+> -- Replace "Note: Discarding should never fail ..." comments by
+>    error_report()
+> -- Replace virtio_stw_p() by cpu_to_le16()
+> -- Drop migration_addr and migration_block_size
+> -- Minor cleanups
+> - "linux-headers: update to contain virtio-mem"
+> -- Updated to latest v4 in Linux
+> - General changes
+> -- Fixup the users of the renamed ram_block_discard_(disable|require)
+> -- Use "X: cannot disable RAM discard"-styled error messages
+> - Added
+> -- "virtio-mem: Migration sanity checks"
+> -- "virtio-mem: Add trace events"
+> 
+> David Hildenbrand (21):
+>   exec: Introduce ram_block_discard_(disable|require)()
+>   vfio: Convert to ram_block_discard_disable()
+>   accel/kvm: Convert to ram_block_discard_disable()
+>   s390x/pv: Convert to ram_block_discard_disable()
+>   virtio-balloon: Rip out qemu_balloon_inhibit()
+>   target/i386: sev: Use ram_block_discard_disable()
+>   migration/rdma: Use ram_block_discard_disable()
+>   migration/colo: Use ram_block_discard_disable()
+>   linux-headers: update to contain virtio-mem
+>   virtio-mem: Paravirtualized memory hot(un)plug
+>   virtio-pci: Proxy for virtio-mem
+>   MAINTAINERS: Add myself as virtio-mem maintainer
+>   hmp: Handle virtio-mem when printing memory device info
+>   numa: Handle virtio-mem in NUMA stats
+>   pc: Support for virtio-mem-pci
+>   virtio-mem: Allow notifiers for size changes
+>   virtio-pci: Send qapi events when the virtio-mem size changes
+>   virtio-mem: Migration sanity checks
+>   virtio-mem: Add trace events
+>   virtio-mem: Exclude unplugged memory during migration
+>   numa: Auto-enable NUMA when any memory devices are possible
+> 
+>  MAINTAINERS                                 |   8 +
+>  accel/kvm/kvm-all.c                         |   4 +-
+>  balloon.c                                   |  17 -
+>  exec.c                                      |  52 ++
+>  hw/arm/virt.c                               |   2 +
+>  hw/core/numa.c                              |  17 +-
+>  hw/i386/Kconfig                             |   1 +
+>  hw/i386/microvm.c                           |   1 +
+>  hw/i386/pc.c                                |  50 +-
+>  hw/i386/pc_piix.c                           |   1 +
+>  hw/i386/pc_q35.c                            |   1 +
+>  hw/s390x/s390-virtio-ccw.c                  |  22 +-
+>  hw/vfio/ap.c                                |  10 +-
+>  hw/vfio/ccw.c                               |  11 +-
+>  hw/vfio/common.c                            |  53 +-
+>  hw/vfio/pci.c                               |   6 +-
+>  hw/virtio/Kconfig                           |  11 +
+>  hw/virtio/Makefile.objs                     |   2 +
+>  hw/virtio/trace-events                      |  10 +
+>  hw/virtio/virtio-balloon.c                  |   8 +-
+>  hw/virtio/virtio-mem-pci.c                  | 157 ++++
+>  hw/virtio/virtio-mem-pci.h                  |  34 +
+>  hw/virtio/virtio-mem.c                      | 872 ++++++++++++++++++++
+>  include/exec/memory.h                       |  41 +
+>  include/hw/boards.h                         |   1 +
+>  include/hw/pci/pci.h                        |   1 +
+>  include/hw/vfio/vfio-common.h               |   4 +-
+>  include/hw/virtio/virtio-mem.h              |  86 ++
+>  include/migration/colo.h                    |   2 +-
+>  include/migration/misc.h                    |   2 +
+>  include/standard-headers/linux/virtio_ids.h |   1 +
+>  include/standard-headers/linux/virtio_mem.h | 211 +++++
+>  include/sysemu/balloon.h                    |   2 -
+>  migration/migration.c                       |  15 +-
+>  migration/postcopy-ram.c                    |  23 -
+>  migration/rdma.c                            |  18 +-
+>  migration/savevm.c                          |  11 +-
+>  monitor/hmp-cmds.c                          |  16 +
+>  monitor/monitor.c                           |   1 +
+>  qapi/misc.json                              |  64 +-
+>  target/i386/sev.c                           |   7 +
+>  41 files changed, 1730 insertions(+), 126 deletions(-)
+>  create mode 100644 hw/virtio/virtio-mem-pci.c
+>  create mode 100644 hw/virtio/virtio-mem-pci.h
+>  create mode 100644 hw/virtio/virtio-mem.c
+>  create mode 100644 include/hw/virtio/virtio-mem.h
+>  create mode 100644 include/standard-headers/linux/virtio_mem.h
+> 
+> -- 
+> 2.26.2
 
 
