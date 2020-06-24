@@ -2,80 +2,97 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E45C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F7CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5F732088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C70DE2088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0BH1ZQ+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F732088E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKQRdFIQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C70DE2088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo14C-0001Mk-1V
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:47:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48480)
+	id 1jo14X-0002KL-Vv
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:47:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uq-0000wo-1s
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36919
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jo0vN-0002fk-LH
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:38:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26111
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uh-00026O-Q7
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:55 -0400
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jo0vL-0002bx-Uo
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:38:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592987866;
+ s=mimecast20190719; t=1592987907;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IBuWJeUdSlFDG1n5rSJL7eqW1pQQCWjeqmk23CBp2OE=;
- b=Y0BH1ZQ+9fr+I8MgzfLwnETyx7PTdBZwjdxvJ6wWxWFc9zVwqCxlCymr87pU1YNueRVGNO
- eq6iAkwSBlBk2iAYUMpvxbjcmiSbiP+NSMMfBwV7SAYGCJ6cv3k+zStO+8eIC3hjLXWfKM
- dijoBPLsTWgxkJOlWiKy0IdyHL5E2KY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-_MIhRCfMOoKSb-nA8xVGjg-1; Wed, 24 Jun 2020 04:37:44 -0400
-X-MC-Unique: _MIhRCfMOoKSb-nA8xVGjg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20DC6107ACCD;
- Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D98FE8927E;
- Wed, 24 Jun 2020 08:37:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BC3021138480; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 18/25] riscv_hart: Fix riscv_harts_realize() error API
- violations
-Date: Wed, 24 Jun 2020 10:37:30 +0200
-Message-Id: <20200624083737.3086768-19-armbru@redhat.com>
-In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
-References: <20200624083737.3086768-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ bh=vB0+TGMPvFpsPFAl/NhmlTbqS5r69JrqhbMCAxJyx7I=;
+ b=EKQRdFIQJt6STghHlV+83rDfq/bYPdVL0bx2+odV0+Duq9f7QBlA5EW/Wk6NYCCpbUC70b
+ lp4EsytI69xG+TUhchdmrTE9YfTHZU6cq0j6VK+0HlFb9pKn12oQ7iizaMApZZ9XgB7i+1
+ HeXXBcabWvoFxYiVKAcIprvWL1Okf0g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-163-CF6ou7qaPm6uObT894tmiQ-1; Wed, 24 Jun 2020 04:38:25 -0400
+X-MC-Unique: CF6ou7qaPm6uObT894tmiQ-1
+Received: by mail-wm1-f69.google.com with SMTP id c66so2050186wma.8
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 01:38:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=hIFhjT6uyZvlAAekKGA251eEdikZuCrpA9NtomezBN0=;
+ b=lGUf91lQr2CuL6jdF8p2nkQSE2B4fwXO8LYZ2mskqsJ8P4CGn2vHRpJwligSosDhMw
+ 2UpaBsKqXq3mbmQE/eWyyiC7iJ62Q9hTsdl5iwEHQQrZSlulh9dGOsxpV5pHwjSO5C8J
+ 7bZQZ1rZV9s7Nsqp8tf83K/66vonfpXhRIUzlfUwqR7LEno2tIq0KIGZWwTVdSmNb2kz
+ AP8b4wH55AtaaMteOLda5wWnW+ymOEXlJzubLLjXRAoK7CTaC9nxgSLVTor/2m0mBTdO
+ R62CLTw6bMY5i8IfWyBROZeiQIh/3ZxpKIcQJICE2EKCy3N6DKMwn3JF19Nav6hz551F
+ rK0g==
+X-Gm-Message-State: AOAM530tAunDgxFBxB9hlK291hUtmJH6ptCGQA8x5Dc8C1frGOhalb0B
+ QBBwv9UKu3u6a9OsHJ23f9X/HzTWkvH7wcImy5WSpI7h0fSCeS6TPDs97mSOq/RmwAI5mD19ILK
+ JmfbE4ArfOihrtbM=
+X-Received: by 2002:adf:e4d0:: with SMTP id v16mr17041841wrm.193.1592987904315; 
+ Wed, 24 Jun 2020 01:38:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwqu5YLR4WmNogiz7GRuotM+N0WgB8Bn92lXTIRcdpURNx5VTGFwz+cjZ+UKL5TJCRuU5MfjA==
+X-Received: by 2002:adf:e4d0:: with SMTP id v16mr17041808wrm.193.1592987904042; 
+ Wed, 24 Jun 2020 01:38:24 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:466:71c0:918b:168e:d1a7:f3b9?
+ ([2a01:e0a:466:71c0:918b:168e:d1a7:f3b9])
+ by smtp.gmail.com with ESMTPSA id p17sm6897836wma.47.2020.06.24.01.38.22
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 24 Jun 2020 01:38:23 -0700 (PDT)
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH] trivial: Remove extra character in configure help
+From: Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <20200624083337.912846-1-dinechin@redhat.com>
+Date: Wed, 24 Jun 2020 10:38:21 +0200
+Message-Id: <CC0192CB-4A6A-467C-B8A6-E4C418C79A52@redhat.com>
+References: <20200624083337.912846-1-dinechin@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dinechin@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,76 +113,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: qemu-trivial@nongnu.org, GitLab via <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-pointer to a variable containing NULL.  Passing an argument of the
-latter kind twice without clearing it in between is wrong: if the
-first call sets an error, it no longer points to NULL for the second
-call.
+Please ignore. The =3DB appears intentional, even if it offsets the whole h=
+elp text.
 
-riscv_harts_realize() is wrong that way: it passes @errp to
-riscv_hart_realize() in a loop.  I can't tell offhand whether this can
-fail.
+Maybe replace with =3DL to indicate a list is expected?
 
-Fix by checking for failure in each iteration.
-
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Bin Meng <bmeng.cn@gmail.com>
-Cc: qemu-riscv@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/riscv_hart.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index e26c382259..f59fe52f0f 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -40,19 +40,13 @@ static void riscv_harts_cpu_reset(void *opaque)
-     cpu_reset(CPU(cpu));
- }
- 
--static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
-+static bool riscv_hart_realize(RISCVHartArrayState *s, int idx,
-                                char *cpu_type, Error **errp)
- {
--    Error *err = NULL;
--
-     object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx], cpu_type);
-     s->harts[idx].env.mhartid = s->hartid_base + idx;
-     qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
--    qdev_realize(DEVICE(&s->harts[idx]), NULL, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
-+    return qdev_realize(DEVICE(&s->harts[idx]), NULL, errp);
- }
- 
- static void riscv_harts_realize(DeviceState *dev, Error **errp)
-@@ -63,7 +57,9 @@ static void riscv_harts_realize(DeviceState *dev, Error **errp)
-     s->harts = g_new0(RISCVCPU, s->num_harts);
- 
-     for (n = 0; n < s->num_harts; n++) {
--        riscv_hart_realize(s, n, s->cpu_type, errp);
-+        if (!riscv_hart_realize(s, n, s->cpu_type, errp)) {
-+            return;
-+        }
-     }
- }
- 
--- 
-2.26.2
+> On 24 Jun 2020, at 10:33, Christophe de Dinechin <dinechin@redhat.com> wr=
+ote:
+>=20
+> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> ---
+> configure | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/configure b/configure
+> index ba88fd1824..c7a6a5adfe 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1787,7 +1787,7 @@ Advanced options (experts only):
+>   --block-drv-ro-whitelist=3DL
+>                            set block driver read-only whitelist
+>                            (affects only QEMU, not qemu-img)
+> -  --enable-trace-backends=3DB Set trace backend
+> +  --enable-trace-backends=3D Set trace backend
+>                            Available backends: $trace_backend_list
+>   --with-trace-file=3DNAME   Full PATH,NAME of file to store traces
+>                            Default:trace-<pid>
+> --=20
+> 2.26.2
+>=20
+>=20
 
 
