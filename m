@@ -2,92 +2,81 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FE3C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31502C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4050920663
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:30:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F061320644
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:44:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyMZa9g2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4050920663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDvnjP8e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F061320644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo2fp-0002Og-G5
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:30:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50830)
+	id 1jo2tm-0000hE-6M
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jo2f0-0001aG-AQ
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:29:42 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:33017)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jo2sw-0008R1-3d
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:44:06 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33191)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jo2ex-000857-NW
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:29:42 -0400
-Received: by mail-wr1-x436.google.com with SMTP id j94so1766482wrj.0
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 03:29:39 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jo2su-00077Y-7o
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:44:05 -0400
+Received: by mail-pl1-x644.google.com with SMTP id 35so924405ple.0
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 03:44:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=L/M44pw6Sj0jQWJNPY8bz6QSJKszKrTbkOfiJgdRQek=;
- b=hyMZa9g2LwQq2bNyRHjHVcBMtvyxaNClreQTHyu0tZWF91VEgE6oZmacss4GjgSkY+
- u39aWTKO7HGT8igc6iob4PPqflkB54QBBF9iS9fWfM4UJsUFIXzGARc/wQOfR+UEFLTP
- ljNLB0/A+sRqJQui5OcDuXf1tRGz5vg0r6lK01qiZAzfbBB2YivPRYCTsbyx/79sE4/+
- PKOa9KfLumpomoYN7ciSDWHpasR8L/AA+3eX0I9dt48zAyyiKGn+/v0IDINHy0blMIhg
- bPE6UMiNocQBNzwsZpVfqq6GwIxFBYGGI2tTgC6KlxQ1nxyE1e/d1emwEVWhqBiuTDEr
- BGcg==
+ h=from:to:cc:subject:date:message-id;
+ bh=crJOGTJIhgzNMNcqLm3cWyp+Nn5GJBKZ9M1TJO+NThw=;
+ b=iDvnjP8eQo3Z/sD44yErgBuEPFGrsJcvdioveH8K4Q9xx09siJFN/NSS4ShnNweRtB
+ uz77JCC2Y1NfGg7K7ly9amOyTQrklmkbIHRhpRK0jAV2NVkaE8nzbtXanwskVPOXYztU
+ LiqWLwf+aJ0WvN31l1O7Yt7Aulnj2heo9Ld0P+0aylW3XMeQfo1e5o5JTtsswCBAZa8c
+ jCTKrVuVXPGcf3i+j0YBK20UPoRq5tEqHmhPhaIxytI2riM0EtT1n25XptmiYoowsfIW
+ qJ3Iwt6zQEMjU6TzW02KwbaJcP4vM323P8i3vPMIx5trhSG6SHvC/gcJnbn5CNIcXrG5
+ Ozdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=L/M44pw6Sj0jQWJNPY8bz6QSJKszKrTbkOfiJgdRQek=;
- b=Ev4wvKasJadA3G31vXVfeb6eHcfjU6rQMbZHNzJ12Fu5NiY7k1auSsbcxKf1ZA7dke
- h9b45lX1F4vXu7bd7paXZSUubsxbWd23EcOOcZW+CPvobqIYlNSPbDN2j9I7m2N78Oda
- UeWKQ54JW3Qh7wYlUqpi9YuGbh0r74zI/6cUuBOLCRCRLtLIvnIRp3P/y6AYgjymBJcR
- /Eyd+0NFB2wg7pdY3dZFLCjimSVcxLfnw1AuAlOBkAU9Y/lszPX99crLI15Jl6tuKYs2
- P1HnRqX4qCY5gJurYTYmE50Jib+bXNad6NR0SqqlGWSLySLSF0evvKGuixRI28wscDU9
- dtJQ==
-X-Gm-Message-State: AOAM5308dRBHZNFm2w3P9v0ezyJonzY0+aD32AbxJQIjMH2rC4ieIgkj
- 9XozJuB9+RT6Z+mAFLr7tcg=
-X-Google-Smtp-Source: ABdhPJxE9feSwol6Kklwvh3VZkAguHITTU8sBNe2WESkl417qGR/iAhk29Jn3pdBYy/8JQSBkI1htg==
-X-Received: by 2002:adf:f350:: with SMTP id e16mr27815906wrp.43.1592994578119; 
- Wed, 24 Jun 2020 03:29:38 -0700 (PDT)
-Received: from CBGR90WXYV0 (54-240-197-236.amazon.com. [54.240.197.236])
- by smtp.gmail.com with ESMTPSA id e5sm24855173wrs.33.2020.06.24.03.29.37
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=crJOGTJIhgzNMNcqLm3cWyp+Nn5GJBKZ9M1TJO+NThw=;
+ b=i/NMIdWp+5bJx5AmJrb552uUrTtqvqr7vgKS7C7fkDXqycEWbt6AJtbLLZRTJ0Xw1y
+ OKbiF3czkyNTS/sN8QoCu4vXlCGOLY89agsad5FJBO9nx+z/xymzy1Uq1y3bvg6oh6k/
+ sffz+vBdXhFOKxha5N+PDgJskK7A3HNsb2lMMAUxrf7M5rNStkFCkGzmCU7+t4DR3Zd+
+ t2JFRqr6DFEgmolfw5HewsrhU56Fyn4AjWHTBEs6gQSuinH9SvcofzXoMTmcqmpBld2E
+ zEedUIU45mtFvtBQCF5ST0selsamJJD8d8JuwtmQvpqHRS0a59/sVo/7Ci29K/HhgCFI
+ oEGg==
+X-Gm-Message-State: AOAM530rCnwI3zX1Ia5mElh4FiR9LWZ684g4pC5L4qlyZVctp1gLmsU7
+ GPFR+CzfN3QuelIptPnsxD0=
+X-Google-Smtp-Source: ABdhPJw3nDrv+OGyQgFCPX7g8EmJ00NDSp31bio5AsfAZ+Ai50a1uUt9M5VBlbILcxNrY3J8HKZsDQ==
+X-Received: by 2002:a17:90a:260b:: with SMTP id
+ l11mr29252429pje.210.1592995442435; 
+ Wed, 24 Jun 2020 03:44:02 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id q6sm19772395pff.163.2020.06.24.03.43.59
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jun 2020 03:29:37 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: "'Jason Andryuk'" <jandryuk@gmail.com>
-References: <CAKf6xpuSD3NC2bLPQN75e2pR8asu9Ey1xTGxTNeCR_1MGsnPOg@mail.gmail.com>
- <ac4dfe3b-7981-49bb-25a2-08578da150d5@ilande.co.uk>
- <CAKf6xpvs6mNowsiAzbfQGLGp0aY0zKgUD=DVpSorWHycm--J8g@mail.gmail.com>
- <87k0zykwdl.fsf@dusky.pond.sub.org> <000001d64953$f67a1f00$e36e5d00$@xen.org>
- <CAKf6xpt02SndxVkhqy52z7ZPCHtOhX1R5d7JQbeC8tVauBRm4Q@mail.gmail.com>
-In-Reply-To: <CAKf6xpt02SndxVkhqy52z7ZPCHtOhX1R5d7JQbeC8tVauBRm4Q@mail.gmail.com>
-Subject: RE: sysbus failed assert for xen_sysdev
-Date: Wed, 24 Jun 2020 11:29:36 +0100
-Message-ID: <000801d64a12$5c7c11f0$157435d0$@xen.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQIJfv1jP4fCJU6d0eNUL65zTb1lhAKJjZPCAZLY/IEByWeHdwFU8pWtAkUeRcOoNSQ3UA==
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=xadimgnik@gmail.com; helo=mail-wr1-x436.google.com
+ Wed, 24 Jun 2020 03:44:01 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH V6 0/4] mips: Add Loongson-3 machine support (with KVM)
+Date: Wed, 24 Jun 2020 18:45:27 +0800
+Message-Id: <1592995531-32600-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,8 +84,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,109 +98,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Anthony PERARD' <anthony.perard@citrix.com>,
- 'xen-devel' <xen-devel@lists.xenproject.org>,
- 'Mark Cave-Ayland' <mark.cave-ayland@ilande.co.uk>,
- 'Markus Armbruster' <armbru@redhat.com>, 'QEMU' <qemu-devel@nongnu.org>
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Jason Andryuk <jandryuk@gmail.com>
-> Sent: 24 June 2020 04:24
-> To: Paul Durrant <paul@xen.org>
-> Cc: Markus Armbruster <armbru@redhat.com>; Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>; Anthony
-> PERARD <anthony.perard@citrix.com>; xen-devel <xen-devel@lists.xenproject.org>; QEMU <qemu-
-> devel@nongnu.org>
-> Subject: Re: sysbus failed assert for xen_sysdev
-> 
-> On Tue, Jun 23, 2020 at 7:46 AM Paul Durrant <xadimgnik@gmail.com> wrote:
-> >
-> > > -----Original Message-----
-> > > From: Markus Armbruster <armbru@redhat.com>
-> > > Sent: 23 June 2020 09:41
-> > > To: Jason Andryuk <jandryuk@gmail.com>
-> > > Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>; Anthony PERARD <anthony.perard@citrix.com>;
-> xen-
-> > > devel <xen-devel@lists.xenproject.org>; Paul Durrant <paul@xen.org>; QEMU <qemu-devel@nongnu.org>
-> > > Subject: Re: sysbus failed assert for xen_sysdev
-> > >
-> > > Jason Andryuk <jandryuk@gmail.com> writes:
-> > > > Then it gets farther... until
-> > > > qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
-> > > > Assertion `dev->realized' failed.
-> > > >
-> > > > dev->id is NULL. The failing device is:
-> > > > (gdb) p *dev.parent_obj.class.type
-> > > > $12 = {name = 0x555556207770 "cfi.pflash01",
-> > > >
-> >
-> > Having commented out the call to xen_be_init() entirely (and xen_bus_init() for good measure) I also
-> get this assertion failure, so
-> > I don't think is related.
-> 
-> Yes, this is something different.  pc_pflash_create() calls
-> qdev_new(TYPE_PFLASH_CFI01), but it is only realized in
-> pc_system_flash_map()...  and pc_system_flash_map() isn't called for
-> Xen.
-> 
-> Removing the call to pc_system_flash_create() from pc_machine_initfn()
-> lets QEMU startup and run a Xen HVM again.  xen_enabled() doesn't work
-> there since accelerators have not been initialized yes, I guess?
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, in QEMU we just define two CPU types:
 
-Looks like it can be worked round by the following:
+1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 1497d0e4ae..977d40afb8 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -186,9 +186,12 @@ static void pc_init1(MachineState *machine,
-     if (!xen_enabled()) {
-         pc_memory_init(pcms, system_memory,
-                        rom_memory, &ram_memory);
--    } else if (machine->kernel_filename != NULL) {
--        /* For xen HVM direct kernel boot, load linux here */
--        xen_load_linux(pcms);
-+    } else {
-+        pc_system_flash_cleanup_unused(pcms);
-+        if (machine->kernel_filename != NULL) {
-+            /* For xen HVM direct kernel boot, load linux here */
-+            xen_load_linux(pcms);
-+        }
-     }
+Loongson-3 lacks English documents. I've tried to translated them with
+translate.google.com, and the machine translated documents (together
+with their original Chinese versions) are available here.
 
-     gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index ec2a3b3e7e..0ff47a4b59 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -108,7 +108,7 @@ void pc_system_flash_create(PCMachineState *pcms)
-     }
- }
+Loongson-3A R1 (Loongson-3A1000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf (Chinese Version)
 
--static void pc_system_flash_cleanup_unused(PCMachineState *pcms)
-+void pc_system_flash_cleanup_unused(PCMachineState *pcms)
- {
-     char *prop_name;
-     int i;
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index e6135c34d6..497f2b7ab7 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -187,6 +187,7 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
+Loongson-3A R2 (Loongson-3A2000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
 
- /* pc_sysfw.c */
- void pc_system_flash_create(PCMachineState *pcms);
-+void pc_system_flash_cleanup_unused(PCMachineState *pcms);
- void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+Loongson-3A R3 (Loongson-3A3000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf (Chinese Version)
 
- /* acpi-build.c */
+Loongson-3A R4 (Loongson-3A4000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
+http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
+User Manual Part 2:
+I'm sorry that it is unavailable now.
 
+We are preparing to add QEMU's Loongson-3 support. MIPS VZ extension is
+fully supported in Loongson-3A R4+, so we at first add QEMU/KVM support
+in this series. And the next series will add QEMU/TCG support (it will
+emulate Loongson-3A R1).
 
-> 
-> Regards,
-> Jason
+We already have a full functional Linux kernel (based on Linux-5.4.x LTS
+but not upstream yet) here:
 
+https://github.com/chenhuacai/linux
+
+How to use QEMU/Loongson-3?
+1, Download kernel source from the above URL;
+2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+3, Boot a Loongson-3A4000 host with this kernel;
+4, Build QEMU-5.0.0 with this patchset;
+5, modprobe kvm;
+6, Use QEMU with TCG (available in future):
+       qemu-system-mips64el -M loongson3-virt,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ...
+   Use QEMU with KVM (available at present):
+       qemu-system-mips64el -M loongson3-virt,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ...
+
+   The "-cpu" parameter is optional here and QEMU will use the correct type for TCG/KVM automatically.
+
+V1 -> V2:
+1, Add a cover letter;
+2, Improve CPU definitions;
+3, Remove LS7A-related things (Use GPEX instead);
+4, Add a description of how to run QEMU/Loongson-3.
+
+V2 -> V3:
+1, Fix all possible checkpatch.pl errors and warnings.
+
+V3 -> V4:
+1, Sync code with upstream;
+2, Remove merged patches;
+3, Fix build failure without CONFIG_KVM;
+4, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>.
+
+V4 -> V5:
+1, Improve coding style;
+2, Remove merged patches;
+3, Rename machine name from "loongson3" to "loongson3-virt";
+4, Rework the "loongson3-virt" machine to drop any ISA things;
+5, Rework "hw/mips: Implement the kvm_type() hook in MachineClass";
+6, Add Jiaxun Yang as a reviewer of Loongson-3.
+
+V5 -> V6:
+1, Fix license preamble;
+2, Improve commit messages;
+3, Add hw/intc/loongson_liointc.c to MAINTAINERS;
+4, Fix all possible checkpatch.pl errors and warnings.
+
+Huacai Chen(4):
+ hw/mips: Implement the kvm_type() hook in MachineClass
+ hw/intc: Add Loongson liointc support
+ hw/mips: Add Loongson-3 machine support (with KVM)
+ MAINTAINERS: Add Loongson-3 maintainer and reviewer
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ MAINTAINERS                          |   7 +
+ default-configs/mips64el-softmmu.mak |   1 +
+ hw/intc/Kconfig                      |   3 +
+ hw/intc/Makefile.objs                |   1 +
+ hw/intc/loongson_liointc.c           | 241 +++++++++
+ hw/mips/Kconfig                      |  11 +
+ hw/mips/Makefile.objs                |   1 +
+ hw/mips/loongson3_virt.c             | 978 +++++++++++++++++++++++++++++++++++
+ target/mips/kvm.c                    |  20 +
+ target/mips/kvm_mips.h               |  11 +
+ 10 files changed, 1274 insertions(+)
+ create mode 100644 hw/intc/loongson_liointc.c
+ create mode 100644 hw/mips/loongson3_virt.c
+--
+2.7.0
 
