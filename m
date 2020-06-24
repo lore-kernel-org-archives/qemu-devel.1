@@ -7,76 +7,74 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1CFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 07:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A4BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 07:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1562720768
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 07:47:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 908BF20768
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 07:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnAwAwjb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1562720768
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUmfbPOi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 908BF20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo08B-0000pd-Bj
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 03:47:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35086)
+	id 1jo08w-0001jc-Tg
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 03:48:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo07c-0000P4-V1
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 03:47:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34115
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo08I-00016z-AV
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 03:47:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47654
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo07a-0003JT-Ia
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 03:47:04 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jo08G-0003SZ-2A
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 03:47:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592984821;
+ s=mimecast20190719; t=1592984862;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0ou7ADfnUhyIcV5I78WK5liA/xoEajOYEZTDBywOFck=;
- b=ZnAwAwjbi/ypQ/W4k1q+FJV+/YOst7fPCtVUtXEXBvAjZiOPFd05XGGj2IECj07OyVmu1C
- SVvTk+rEI6pIkH0pSM8M97RzQPYF+S+deuUuXovWX78Fp5eDZVTz0tCn5SAnpjfXGmkxIv
- rc0BZKbUfPLWD8nYrnbR245BwM6DoMc=
+ bh=5bwAvA3Lx7II3hLnDMr27ARHMJ8EVo4UY6pvp+QaTvQ=;
+ b=hUmfbPOi65LyoJM1MGpLl/QWIX7sBQesUEnXFeSFY5gD/kNQIPB6RzTf1XMLcitD1nC1uF
+ NErX3JxwyZbt/JZz/dE4cW6gU0sSolhK+fWvPG6N8crbv2KkH317BHzQa++4Fum/m5O7lz
+ w6pOC/rMqEFk29xOiqjhhgS0DiyRUNk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-1nlDul_VOkuoIYVLnBvUVg-1; Wed, 24 Jun 2020 03:46:59 -0400
-X-MC-Unique: 1nlDul_VOkuoIYVLnBvUVg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-315-m-53LQzjO2iGxex9eKsHCw-1; Wed, 24 Jun 2020 03:47:39 -0400
+X-MC-Unique: m-53LQzjO2iGxex9eKsHCw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47ABBBFC0
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:46:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DF821940920
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:47:38 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-132.ams2.redhat.com [10.36.112.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F2F31A835;
- Wed, 24 Jun 2020 07:46:51 +0000 (UTC)
-Subject: Re: [PATCH] libqos: pci-pc: use 32-bit write for EJ register
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6882B1C4;
+ Wed, 24 Jun 2020 07:47:31 +0000 (UTC)
+Subject: Re: [PATCH] libqos: usb-hcd-ehci: use 32-bit write for config register
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200623161852.19477-1-pbonzini@redhat.com>
+References: <20200623161852.19477-2-pbonzini@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <63b916b5-cca7-e2fd-5a7b-fe12984eaf45@redhat.com>
-Date: Wed, 24 Jun 2020 09:46:49 +0200
+Message-ID: <9d1c30ab-9944-712a-16e7-c2d3240f23e1@redhat.com>
+Date: Wed, 24 Jun 2020 09:47:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200623161852.19477-1-pbonzini@redhat.com>
+In-Reply-To: <20200623161852.19477-2-pbonzini@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,26 +105,24 @@ On 23/06/2020 18.18, Paolo Bonzini wrote:
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   tests/qtest/libqos/pci-pc.c | 2 +-
+>   tests/qtest/usb-hcd-ehci-test.c | 2 +-
 >   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tests/qtest/libqos/pci-pc.c b/tests/qtest/libqos/pci-pc.c
-> index 0bc591d1da..3bb2eb3ba8 100644
-> --- a/tests/qtest/libqos/pci-pc.c
-> +++ b/tests/qtest/libqos/pci-pc.c
-> @@ -186,7 +186,7 @@ void qpci_unplug_acpi_device_test(QTestState *qts, const char *id, uint8_t slot)
->       g_assert(!qdict_haskey(response, "error"));
->       qobject_unref(response);
->   
-> -    qtest_outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
-> +    qtest_outl(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
->   
->       qtest_qmp_eventwait(qts, "DEVICE_DELETED");
+> diff --git a/tests/qtest/usb-hcd-ehci-test.c b/tests/qtest/usb-hcd-ehci-test.c
+> index 5251d539e9..c51e8bb223 100644
+> --- a/tests/qtest/usb-hcd-ehci-test.c
+> +++ b/tests/qtest/usb-hcd-ehci-test.c
+> @@ -96,7 +96,7 @@ static void pci_ehci_port_1(void)
+>   static void pci_ehci_config(void)
+>   {
+>       /* hands over all ports from companion uhci to ehci */
+> -    qpci_io_writew(ehci1.dev, ehci1.bar, 0x60, 1);
+> +    qpci_io_writel(ehci1.dev, ehci1.bar, 0x60, 1);
 >   }
+>   
+>   static void pci_uhci_port_2(void)
 
-I was a little bit afraid that this could cause endianess issues on big 
-endian hosts, but I gave it a try on a s390x machine and it seems to 
-work fine.
+Passes "make check-qtest-x86_64" on a s390x host, too:
 
 Tested-by: Thomas Huth <thuth@redhat.com>
 
