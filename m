@@ -2,75 +2,88 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB0EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE909C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:56:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37C7120663
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A71820706
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:56:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2RHXJ5R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37C7120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8JBHbmR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A71820706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo4vM-0006K5-Eq
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35514)
+	id 1jo4wk-0007s3-DF
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:56:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ardb@kernel.org>)
- id 1jo4uZ-0004it-Oz; Wed, 24 Jun 2020 08:53:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60036)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ardb@kernel.org>)
- id 1jo4uX-0006gE-Me; Wed, 24 Jun 2020 08:53:55 -0400
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com
- [209.85.167.175])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo4w8-0007PP-Jt
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:55:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24525
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo4w5-0007yr-Lt
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:55:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593003328;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lxrz40v3iMU/gpHSdRUPQOGQyvxEPZKEcn3QfEJYYgM=;
+ b=h8JBHbmR9N8fWalnbap8+O4UtuuxhZzF82GMWAaqNyqAUCTBVXsL2lHn2EQZYk4sYHZ1oy
+ vBLMOqD4+P5P3dwVAcRBj7UwEHc9EkaV2YiARlWd8ujsmQoQ8emUUP2OeL1uOWExu9b675
+ oyv/NgYaqc6OItrZhq/Rbg/FBqRdLrs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-3xp6kFdMOb25wJVtErTcSg-1; Wed, 24 Jun 2020 08:55:26 -0400
+X-MC-Unique: 3xp6kFdMOb25wJVtErTcSg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0D6EE20663;
- Wed, 24 Jun 2020 12:53:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593003231;
- bh=koLxx148mbpqdiW2kEPWmz5wBKOteWXDRyclRZ9Cn7A=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=n2RHXJ5RH8EpmJl4uNmdvecGrK7uTgbqWu8OTD9jtzP7MEr58ufQP4HdpkCzi6w/A
- g78XcWi3R/tBRWbKOqYY8XXCSxc0Y/zlTTxc8JtGnhlaHnDhrvPWQKd5cxbDw7KTXs
- vz9dehsBsYENYTElsdJ8cLGsTYHisVF3jdd+55S8=
-Received: by mail-oi1-f175.google.com with SMTP id s10so1479180oih.10;
- Wed, 24 Jun 2020 05:53:51 -0700 (PDT)
-X-Gm-Message-State: AOAM532QaMzon3jioRtwbECWgioyDPifiMaJk2EWk+OtvKO3VfaEzdzc
- t19c9bLPJS6FgzGGOWp5LT3aBYlVOR0yNwTEoyY=
-X-Google-Smtp-Source: ABdhPJyPvK/7b5NELHV6Po4OwghBmwCf8ilfuEYXTgQXhNMfhbFKXsaC7ocppN1eO/65RzB4oGxx0mXzk1WZjVgXj/0=
-X-Received: by 2002:aca:b241:: with SMTP id b62mr19014806oif.47.1593003230431; 
- Wed, 24 Jun 2020 05:53:50 -0700 (PDT)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29BF21B18BC2;
+ Wed, 24 Jun 2020 12:55:25 +0000 (UTC)
+Received: from gondolin (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 06CAF8FF60;
+ Wed, 24 Jun 2020 12:55:02 +0000 (UTC)
+Date: Wed, 24 Jun 2020 14:55:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v3 6/8] s390/sclp: add extended-length sccb support for
+ kvm guest
+Message-ID: <20200624145500.69f9ab24.cohuck@redhat.com>
+In-Reply-To: <d627e738-7414-4c7f-52ce-4972dfc30544@redhat.com>
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-7-walling@linux.ibm.com>
+ <20200624143635.2d87c1ca.cohuck@redhat.com>
+ <d627e738-7414-4c7f-52ce-4972dfc30544@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200622140620.17229-1-eric.auger@redhat.com>
-In-Reply-To: <20200622140620.17229-1-eric.auger@redhat.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 24 Jun 2020 14:53:39 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFkms+fRm9=HM0zTtsG+77ajzHv95rVqMgXLsdougG0Kw@mail.gmail.com>
-Message-ID: <CAMj1kXFkms+fRm9=HM0zTtsG+77ajzHv95rVqMgXLsdougG0Kw@mail.gmail.com>
-Subject: Re: [PATCH v7 0/3] vTPM/aarch64 ACPI support
-To: Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=198.145.29.99; envelope-from=ardb@kernel.org;
- helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 08:53:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,90 +96,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, thuth@redhat.com,
- Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, imammedo@redhat.com, eric.auger.pro@gmail.com,
- philmd@redhat.com, stefanb@linux.ibm.com
+Cc: Collin Walling <walling@linux.ibm.com>, frankja@linux.ibm.com,
+ mst@redhat.com, david@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 22 Jun 2020 at 16:06, Eric Auger <eric.auger@redhat.com> wrote:
->
-> Those patches bring MMIO TPM TIS ACPI support in machvirt.
->
-> On ARM, the TPM2 table is added when the TPM TIS sysbus
-> device is dynamically instantiated in machvirt.
->
-> Also the TPM2 device object is described in the DSDT.
->
-> Many thanks to Ard for his support.
->
-> Tested with LUKS partition automatic decryption. Also
-> tested with new bios-tables-test dedicated tests,
-> sent separately.
->
-> Best Regards
->
-> Eric
->
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v5.0-tpm-acpi-v7
->
-> History:
->
-> v6 -> v7:
-> - Collected Stefan and Igor's R-bs
-> - Eventually removed Acpi20TPM2 struct
-> - Updated the reference to the spec v1.2 rev8
->
-> v5 -> v6:
-> - added reference to the spec
-> - add some comments about LAML and LASA fields which are
->   strangely undocumented in the spec for TPM2.0. So I kept
->   the decision to keep the Acpi20TPM2 struct for documentation
->   purpose.
->
-> v4 -> v5:
-> - Move of build_tpm2() in the generic acpi code was upstreamed
->   but this does not correspond to latest proposed version.
-> - Rebase on top of edfcb1f21a
->
-> v3 -> v4:
-> - some rework in build_tpm2() as suggested by Igor
-> - Restored tpm presence check in acpi_dsdt_add_tpm()
-> - add the doc related patch
->
-> v2 -> v3:
-> - Rebase on top of Stefan's
->   "acpi: tpm: Do not build TCPA table for TPM 2"
-> - brings conversion to build_append
->
-> v1 -> v2:
-> - move build_tpm2() in the generic code (Michael)
-> - collect Stefan's R-b on 3/3
->
-> Eric Auger (3):
->   acpi: Some build_tpm2() code reshape
->   arm/acpi: Add the TPM2.0 device under the DSDT
->   docs/specs/tpm: ACPI boot now supported for TPM/ARM
->
+On Wed, 24 Jun 2020 14:40:58 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-For the series
+> On 24/06/2020 14.36, Cornelia Huck wrote:
+> > On Thu, 18 Jun 2020 18:22:56 -0400
+> > Collin Walling <walling@linux.ibm.com> wrote:
+> >   
+> >> As more features and facilities are added to the Read SCP Info (RSCPI)
+> >> response, more space is required to store them. The space used to store
+> >> these new features intrudes on the space originally used to store CPU
+> >> entries. This means as more features and facilities are added to the
+> >> RSCPI response, less space can be used to store CPU entries.
+> >>
+> >> With the Extended-Length SCCB (ELS) facility, a KVM guest can execute
+> >> the RSCPI command and determine if the SCCB is large enough to store a
+> >> complete reponse. If it is not large enough, then the required length
+> >> will be set in the SCCB header.
+> >>
+> >> The caller of the SCLP command is responsible for creating a
+> >> large-enough SCCB to store a complete response. Proper checking should
+> >> be in place, and the caller should execute the command once-more with
+> >> the large-enough SCCB.
+> >>
+> >> This facility also enables an extended SCCB for the Read CPU Info
+> >> (RCPUI) command.
+> >>
+> >> When this facility is enabled, the boundary violation response cannot
+> >> be a result from the RSCPI, RSCPI Forced, or RCPUI commands.
+> >>
+> >> In order to tolerate kernels that do not yet have full support for this
+> >> feature, a "fixed" offset to the start of the CPU Entries within the
+> >> Read SCP Info struct is set to allow for the original 248 max entries
+> >> when this feature is disabled.
+> >>
+> >> Additionally, this is introduced as a CPU feature to protect the guest
+> >> from migrating to a machine that does not support storing an extended
+> >> SCCB. This could otherwise hinder the VM from being able to read all
+> >> available CPU entries after migration (such as during re-ipl).
+> >>
+> >> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> >> ---
+> >>   hw/s390x/sclp.c                     | 21 ++++++++++++++++++++-
+> >>   include/hw/s390x/sclp.h             |  1 +
+> >>   target/s390x/cpu_features_def.inc.h |  1 +
+> >>   target/s390x/gen-features.c         |  1 +
+> >>   target/s390x/kvm.c                  |  8 ++++++++
+> >>   5 files changed, 31 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> >> index 0dfbe6e5ec..f7c49e339e 100644
+> >> --- a/hw/s390x/sclp.c
+> >> +++ b/hw/s390x/sclp.c
+> >> @@ -56,6 +56,18 @@ static bool sccb_has_valid_boundary(uint64_t sccb_addr, uint32_t code,
+> >>       uint64_t sccb_boundary = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
+> >>   
+> >>       switch (code & SCLP_CMD_CODE_MASK) {
+> >> +    case SCLP_CMDW_READ_SCP_INFO:
+> >> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+> >> +    case SCLP_CMDW_READ_CPU_INFO:
+> >> +        /*
+> >> +         * An extended-length SCCB is only allowed for Read SCP/CPU Info and
+> >> +         * is allowed to exceed the 4k boundary. The respective commands will
+> >> +         * set the length field to the required length if an insufficient
+> >> +         * SCCB length is provided.
+> >> +         */
+> >> +        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB)) {
+> >> +            return true;
+> >> +        }  
+> > 
+> > Add a fallthrough annotation?  
+> 
+> ... otherwise Coverity and friends will complain later.
 
-Tested-by: Ard Biesheuvel <ardb@kernel.org>
+Nod.
 
-Thanks!
+> 
+> >>       default:
+> >>           if (sccb_max_addr < sccb_boundary) {
+> >>               return true;
+> >> @@ -72,6 +84,10 @@ static bool sccb_sufficient_len(SCCB *sccb, int num_cpus, int data_len)
+> >>   
+> >>       if (be16_to_cpu(sccb->h.length) < required_len) {
+> >>           sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> >> +        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) &&
+> >> +            sccb->h.control_mask[2] & SCLP_VARIABLE_LENGTH_RESPONSE) {
+> >> +            sccb->h.length = required_len;
+> >> +        }
+> >>           return false;
+> >>       }
+> >>       return true;
+> >> @@ -101,7 +117,9 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+> >>    */
+> >>   static inline int get_read_scp_info_data_len(void)
+> >>   {
+> >> -    return offsetof(ReadInfo, entries);
+> >> +    return s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) ?
+> >> +           offsetof(ReadInfo, entries) :
+> >> +           SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
+> >>   }
+> >>   
+> >>   /* Provide information about the configuration, CPUs and storage */
+> >> @@ -116,6 +134,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> >>       CPUEntry *entries_start = (void *)sccb + data_len;
+> >>   
+> >>       if (!sccb_sufficient_len(sccb, machine->possible_cpus->len, data_len)) {
+> >> +        warn_report("insufficient sccb size to store read scp info response");  
+> > 
+> > Hm, this warning is triggered by a guest action, isn't it? Not sure how
+> > helpful it is.  
+> 
+> I think this should be qemu_log_mask(LOG_GUEST_ERROR, ...) instead?
 
->  docs/specs/tpm.rst          |  2 --
->  include/hw/acpi/acpi-defs.h | 18 -------------
->  hw/acpi/aml-build.c         | 51 +++++++++++++++++++++++--------------
->  hw/arm/virt-acpi-build.c    | 34 +++++++++++++++++++++++++
->  4 files changed, 66 insertions(+), 39 deletions(-)
->
-> --
-> 2.20.1
->
+Yes, that sounds better.
+
 
