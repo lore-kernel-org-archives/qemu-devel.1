@@ -2,81 +2,82 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68557C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1BEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:28:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 340D120707
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 164C620707
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 12:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SndhmGe0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340D120707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmXR0VFY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164C620707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo4Te-0000sj-GW
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55532)
+	id 1jo4VY-0002gC-9D
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 08:28:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4Sl-00082y-NF
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:25:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39937
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4Ug-00029v-SP
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:27:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39749
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4Sk-0007H4-5D
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:25:11 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo4Ue-0008QO-OZ
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 08:27:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593001509;
+ s=mimecast20190719; t=1593001627;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0vJILAh5AxJ5gSwtN9dYM+j0dVufgsYkgAD1olwa2F8=;
- b=SndhmGe0VTBbotDfVlP7StqqDbsixLw96EW/VnZYrIDXs99YbkiLpzDlsmwwNE/VYAbD4L
- Z6qC0aZxnXS1fB35mZLLKq7AR5UQ0TyRhgqWMM3bIvYR5EO/ADq16xdE/VcSjTK+T/EkTc
- I3sl6sRUllXN1VEDHYsdxfqNDWGe21U=
+ bh=y93SOVWsYUYXEGDC2GnWK9PfbQrWGU5LRW7eWa4JomI=;
+ b=NmXR0VFYvWSuMvbHXTvOicBp7paEk5chgsCUZsk9i7tk3G3M5ODFQAcFPwL0fgHoddoHNl
+ +FPovMbm9oU7LmVFyEZFZvKJqgVk/7T7o62AJz1MYN15yJCUQBWkosgENNInVWI46W2Qrl
+ soBjjZMg6pp1xz7oFDR1U4zoDA9kOXE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-SZ3A-_dmPSC-8oKRvdIj_A-1; Wed, 24 Jun 2020 08:25:05 -0400
-X-MC-Unique: SZ3A-_dmPSC-8oKRvdIj_A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-253-GOvM9ceKODC6EzJpOq3pzg-1; Wed, 24 Jun 2020 08:27:05 -0400
+X-MC-Unique: GOvM9ceKODC6EzJpOq3pzg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACE391005513;
- Wed, 24 Jun 2020 12:25:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EF1B1005512;
+ Wed, 24 Jun 2020 12:27:04 +0000 (UTC)
 Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D1B9F60C1D;
- Wed, 24 Jun 2020 12:24:53 +0000 (UTC)
-Subject: Re: [PATCH v4 18/20] audio: add soundhw deprecation notice
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DE983100EBB8;
+ Wed, 24 Jun 2020 12:26:53 +0000 (UTC)
+Subject: Re: [PATCH v4 20/20] audio: set default value for pcspk.iobase
+ property
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 References: <20200624113026.13343-1-kraxel@redhat.com>
- <20200624113026.13343-19-kraxel@redhat.com>
+ <20200624113026.13343-21-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <78d93efb-c15f-d035-5591-b33b695c3219@redhat.com>
-Date: Wed, 24 Jun 2020 07:24:53 -0500
+Message-ID: <0c0f22d4-2c74-7d7f-d577-73b85c2452d7@redhat.com>
+Date: Wed, 24 Jun 2020 07:26:53 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624113026.13343-19-kraxel@redhat.com>
+In-Reply-To: <20200624113026.13343-21-kraxel@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,35 +109,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 6:30 AM, Gerd Hoffmann wrote:
+> Allows to drop the explicit qdev_prop_set_uint32 call in pcspk_init.
+
+"allows to $verb" is not idiomatic, better is "allows ${verb}ing" 
+[Allows dropping] or "allows $subject to $verb" [Allows us to drop].
+
+> 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->   docs/system/deprecated.rst | 9 +++++++++
->   1 file changed, 9 insertions(+)
-> 
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 3a255591c341..4cbf3bba3944 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -82,6 +82,15 @@ should specify an ``audiodev=`` property.  Additionally, when using
->   vnc, you should specify an ``audiodev=`` propery if you plan to
->   transmit audio through the VNC protocol.
->   
-> +Creating sound card devices using ``-soundhw`` (since 5.1)
-> +''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-> +
-> +Sound card devices should be created using ``-device`` instead.  The
-> +names are the same for most devices.  The exceptions are ``hda`` which
-> +needs two devices (``-device intel-hda --device hda-duplex``) and
-
-Both spellings work, but it looks inconsistent to have one -device and 
-the other --device.
-
-> +``pcspk`` which can be activated using ``-machine
-> +pcspk-audiodev=<name>``.
-> +
->   ``-mon ...,control=readline,pretty=on|off`` (since 4.1)
->   '''''''''''''''''''''''''''''''''''''''''''''''''''''''
->   
+>   include/hw/audio/pcspk.h | 6 +-----
+>   hw/audio/pcspk.c         | 2 +-
+>   2 files changed, 2 insertions(+), 6 deletions(-)
 > 
 
 -- 
