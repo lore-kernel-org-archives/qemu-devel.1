@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4901DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D4BD20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11CF620706
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VjQLtfMW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4BD20707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TtI2/rqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11CF620706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo3no-0001JT-DS
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:42:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40676)
+	id 1jo3nt-0001Yg-9F
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3cD-0004J9-IA
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22941
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3cB-0004EE-1o
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30517
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c3-0007zD-Ft
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:53 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo3c2-0007y4-HW
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:30:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592998242;
+ s=mimecast20190719; t=1592998241;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=1Q7npfp7pBdZV5AqIfLpiFnKGUenub9kzRD4QTal6XE=;
- b=VjQLtfMWd1ra/jtfW5uCViH3fAQRuZ1oYy8i9zr+dFKj+5Se4x6DCAUQDQXDI7dMZE17/E
- ofJV8qE4zbKLyCsHXB+7uAGpyOWEtWmI1+U/rY3WKuiHqj5ihZVICpl5dpzAZWtRVLnVUl
- rmaeiXVhtcejXHqTdqmck6wsmfdD0Ck=
+ references:references; bh=y8oK1IS+EFYwCrcadvYwCaYeNhaoALj922vvoKka4WM=;
+ b=TtI2/rqP9opNtzvuuEvQz2LBdYxqY+Oc4lEG4n66fLGRbnP1t05O+cSiY5aToSP1NeQLI4
+ eSWRvn0aN4OUZz+AB5YAPA6EGOBqiFEU8v3B+Hn/Zx2XfhKb/iCcuZmGsDypiID/zCk5GK
+ ReurZFShFo+t86BMfL7QBncoL++7QJw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-JgK0LXIcN-CwhL-wy4CiGQ-1; Wed, 24 Jun 2020 07:30:39 -0400
-X-MC-Unique: JgK0LXIcN-CwhL-wy4CiGQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-49-x-DEcjazOWabiNPBG0V1uA-1; Wed, 24 Jun 2020 07:30:39 -0400
+X-MC-Unique: x-DEcjazOWabiNPBG0V1uA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D28FD100CCC5;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF7BD107ACF2;
  Wed, 24 Jun 2020 11:30:37 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6D57B6106A;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 63D825C660;
  Wed, 24 Jun 2020 11:30:37 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1E66031E43; Wed, 24 Jun 2020 13:30:27 +0200 (CEST)
+ id 2C75631E47; Wed, 24 Jun 2020 13:30:27 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/20] pc_basic_device_init: drop has_pit arg
-Date: Wed, 24 Jun 2020 13:30:18 +0200
-Message-Id: <20200624113026.13343-13-kraxel@redhat.com>
+Subject: [PATCH v4 13/20] pc_basic_device_init: drop no_vmport arg
+Date: Wed, 24 Jun 2020 13:30:19 +0200
+Message-Id: <20200624113026.13343-14-kraxel@redhat.com>
 In-Reply-To: <20200624113026.13343-1-kraxel@redhat.com>
 References: <20200624113026.13343-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -103,73 +103,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we pass pcms anyway, we don't need the has_pit arg any more.
+Now that we pass pcms anyway, we don't need the no_vmport arg any more.
 No functional change.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
  include/hw/i386/pc.h | 1 -
  hw/i386/pc.c         | 3 +--
- hw/i386/pc_piix.c    | 2 +-
- hw/i386/pc_q35.c     | 2 +-
- 4 files changed, 3 insertions(+), 5 deletions(-)
+ hw/i386/pc_piix.c    | 1 -
+ hw/i386/pc_q35.c     | 1 -
+ 4 files changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9b94926410c0..3512dcfd3d27 100644
+index 3512dcfd3d27..283754f42bd5 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -165,7 +165,6 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+@@ -164,7 +164,6 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+                           ISABus *isa_bus, qemu_irq *gsi,
                            ISADevice **rtc_state,
                            bool create_fdctrl,
-                           bool no_vmport,
--                          bool has_pit,
+-                          bool no_vmport,
                            uint32_t hpet_irqs);
  void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd);
  void pc_cmos_init(PCMachineState *pcms,
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 9afb003dfc21..dfe8ba07e982 100644
+index dfe8ba07e982..ba88e1dfb80f 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1181,7 +1181,6 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+@@ -1180,7 +1180,6 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+                           ISABus *isa_bus, qemu_irq *gsi,
                            ISADevice **rtc_state,
                            bool create_fdctrl,
-                           bool no_vmport,
--                          bool has_pit,
+-                          bool no_vmport,
                            uint32_t hpet_irqs)
  {
      int i;
-@@ -1232,7 +1231,7 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+@@ -1247,7 +1246,7 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+     i8257_dma_init(isa_bus, 0);
  
-     qemu_register_boot_set(pc_boot_set, *rtc_state);
+     /* Super I/O */
+-    pc_superio_init(isa_bus, create_fdctrl, no_vmport);
++    pc_superio_init(isa_bus, create_fdctrl, pcms->vmport != ON_OFF_AUTO_ON);
+ }
  
--    if (!xen_enabled() && has_pit) {
-+    if (!xen_enabled() && pcms->pit_enabled) {
-         if (kvm_pit_in_kernel()) {
-             pit = kvm_pit_init(isa_bus, 0x40);
-         } else {
+ void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)
 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 605252fe7936..1242ed811804 100644
+index 1242ed811804..2752b108001c 100644
 --- a/hw/i386/pc_piix.c
 +++ b/hw/i386/pc_piix.c
-@@ -236,7 +236,7 @@ static void pc_init1(MachineState *machine,
+@@ -236,7 +236,6 @@ static void pc_init1(MachineState *machine,
  
      /* init basic PC hardware */
      pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, true,
--                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
-+                         (pcms->vmport != ON_OFF_AUTO_ON),
+-                         (pcms->vmport != ON_OFF_AUTO_ON),
                           0x4);
  
      pc_nic_init(pcmc, isa_bus, pci_bus);
 diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index e4b15f27227a..25dc40896673 100644
+index 25dc40896673..b8c8eaa691f6 100644
 --- a/hw/i386/pc_q35.c
 +++ b/hw/i386/pc_q35.c
-@@ -276,7 +276,7 @@ static void pc_q35_init(MachineState *machine)
+@@ -276,7 +276,6 @@ static void pc_q35_init(MachineState *machine)
  
      /* init basic PC hardware */
      pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, !mc->no_floppy,
--                         (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
-+                         (pcms->vmport != ON_OFF_AUTO_ON),
+-                         (pcms->vmport != ON_OFF_AUTO_ON),
                           0xff0104);
  
      /* connect pm stuff to lpc */
