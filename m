@@ -2,79 +2,82 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69C4C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B206C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 18:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4192206EB
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:57:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A6D4206EB
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 18:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfWllCgO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4192206EB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLY+Yh6O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6D4206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo9ec-00031o-0e
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:57:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44602)
+	id 1jo9kz-0007F6-IT
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 14:04:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jo9dx-0002bI-6C
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 13:57:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29543
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo9k3-0005XP-Uy
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:03:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45721
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jo9du-0006LM-Ej
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 13:57:04 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo9k1-00012r-Nq
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 14:03:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593021420;
+ s=mimecast20190719; t=1593021800;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PEjyCUyE3sWVZkGYeKg9uWZfDhdSTHNNM4bGtfd+Xg4=;
- b=GfWllCgOpld9EEa/Sw7CADz4xPOnckTJnbCFQ8BiCx5DNI3XV4+JU6Z71olzvor3oWTizf
- H76kl2oWwd0xCSRQyf3psgHGM4uOx/nt+espOTMUGuRXGnksNwjneIZy1QSKMCEcmi4Cjc
- O1OzqS9tmnlFz0o0SRCmtigRaIjDOqU=
+ bh=lXBOR0EA1Bxzz1drkW7Sd4QXmuZ+UhZnFzoclc9SfdQ=;
+ b=aLY+Yh6OgJ8R3Kof6JO2BWVWL9GLQtEIrcRZi4o0wmuhXQ4R3If8/epF7LqH2xcoa2npLm
+ VT1hBepEyNin2Bs65HFNPw2oPlLjW6SW89ZDHB4k7Ez+OwxNWABbIEdFNxeX/L3y10XaOe
+ hKE6Noo7XAEhjks4o3tlpp8ZqoZjzjk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-DH3F2a6MOI6snMh9HIjN3A-1; Wed, 24 Jun 2020 13:56:58 -0400
-X-MC-Unique: DH3F2a6MOI6snMh9HIjN3A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-134-LVRT6PKdONmqnAeIJjsotg-1; Wed, 24 Jun 2020 14:03:18 -0400
+X-MC-Unique: LVRT6PKdONmqnAeIJjsotg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11116800C64;
- Wed, 24 Jun 2020 17:56:57 +0000 (UTC)
-Received: from work-vm (ovpn-112-192.ams2.redhat.com [10.36.112.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C03715C557;
- Wed, 24 Jun 2020 17:56:55 +0000 (UTC)
-Date: Wed, 24 Jun 2020 18:56:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jason Andryuk <jandryuk@gmail.com>
-Subject: Re: Migration vmdesc and xen-save-devices-state
-Message-ID: <20200624175653.GA49433@work-vm>
-References: <CAKf6xptNySqXOHAZJiiBq=h99GBQcS8Cbzmpyqzy-ucxX8Od2Q@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91A7D107ACCD;
+ Wed, 24 Jun 2020 18:03:17 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDED55BACC;
+ Wed, 24 Jun 2020 18:03:16 +0000 (UTC)
+Subject: Re: [PATCH 03/46] qdev: Smooth error checking of qdev_realize() &
+ friends
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-4-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c503f65b-9d1e-6a1b-502a-fdcc4bfa4bcf@redhat.com>
+Date: Wed, 24 Jun 2020 13:03:12 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAKf6xptNySqXOHAZJiiBq=h99GBQcS8Cbzmpyqzy-ucxX8Od2Q@mail.gmail.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+In-Reply-To: <20200624164344.3778251-4-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,67 +98,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xen-devel <xen-devel@lists.xenproject.org>, QEMU <qemu-devel@nongnu.org>,
- zhang.zhanghailiang@huawei.com
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jason Andryuk (jandryuk@gmail.com) wrote:
-> Hi,
+On 6/24/20 11:43 AM, Markus Armbruster wrote:
+> Convert
 > 
-> At some point, QEMU changed to add a json VM description (vmdesc)
-> after the migration data.  The vmdesc is not needed to restore the
-> migration data, but qemu_loadvm_state() will read and discard the
-> vmdesc to clear the stream when should_send_vmdesc() is true.
-
-About 5 years ago :-)
-
-> xen-save-devices-state generates its migration data without a vmdesc.
-> xen-load-devices-state in turn calls qemu_loadvm_state() which tries
-> to load vmdesc since should_send_vmdesc is true for xen.  When
-> restoring from a file, this is fine since it'll return EOF, print
-> "Expected vmdescription section, but got 0" and end the restore
-> successfully.
+>      foo(..., &err);
+>      if (err) {
+>          ...
+>      }
 > 
-> Linux stubdoms load their migration data over a console, so they don't
-> hit the EOF and end up waiting.  There does seem to be a timeout
-> though and restore continues after a delay, but we'd like to eliminate
-> the delay.
+> to
 > 
-> Two options to address this are to either:
-> 1) set suppress_vmdesc for the Xen machines to bypass the
-> should_send_vmdesc() check.
-> or
-> 2) just send the vmdesc data.
+>      if (!foo(..., &err)) {
+>          ...
+>      }
 > 
-> Since vmdesc is just discarded, maybe #1 should be followed.
+> for qdev_realize(), qdev_realize_and_unref(), qbus_realize() and their
+> wrappers isa_realize_and_unref(), pci_realize_and_unref(),
+> sysbus_realize(), sysbus_realize_and_unref(), usb_realize_and_unref().
+> Coccinelle script:
 
-#1 does sound simple!
+Automated patching is so much easier than manual :)
 
-> If going with #2, qemu_save_device_state() needs to generate the
-> vmdesc data.  Looking at qemu_save_device_state() and
-> qemu_savevm_state_complete_precopy_non_iterable(), they are both very
-> similar and could seemingly be merged.  qmp_xen_save_devices_state()
-> could even leverage the bdrv_inactivate_all() call in
-> qemu_savevm_state_complete_precopy_non_iterable().
+> Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
+> ARMSSE being used both as typedef and function-like macro there.
+> Convert manually.
 > 
-> The would make qemu_save_device_state a little more heavywight, which
-> could impact COLO.  I'm not sure how performance sensitive the COLO
-> code is, and I haven't measured anything.
+> Eliminate error_propagate() that are now unnecessary.  Delete @err
+> that are now unused.  Clean up whitespace.
 
-COLO snapshots are potentially quite sensitive; although we've got a
-load of other things we could do with speeding up, we could do without
-making them noticably heavier.
+Well, so there's still some manual stuff.  But that's okay; hopefully we 
+don't have too many stragglers reintroduced via pending patches.
 
-Dave
-
-> Does anyone have thoughts or opinions on the subject?
 > 
-> Thanks,
-> Jason
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+
+>   65 files changed, 248 insertions(+), 768 deletions(-)
+
+Quite a big trim.  But I didn't spot any obvious problems.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
