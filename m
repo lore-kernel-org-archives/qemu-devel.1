@@ -2,75 +2,71 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7D4C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85126C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59DBF2088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F5F320899
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKkeiP1M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59DBF2088E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsPszrIp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F5F320899
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo0va-0002gg-He
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48166)
+	id 1jo0vd-0002mO-GV
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:38:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uf-0000W6-Kg
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uf-0000Vk-D4
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32144
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50134
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ue-00023J-2i
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ud-00021D-1m
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592987863;
+ s=mimecast20190719; t=1592987861;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XXsaSCasWDFpZ3PZVoUNR/9T03YSXCZ9MgAnpkIvYv4=;
- b=XKkeiP1MDMLroAH2qNO/hmmO4E4o4gJFjGlYy1Ecaw4/Fkuyci943IOeCKxZZ3uxxzBGlY
- aU2ZPBZsyBSJNx3+x2qtmr8Th/YI9Sii2gonvmNcGoImUfqsDNSayzKfYW6C/BirPU9eeu
- x3+zAQKNixo6ssvEtsKgllgseiD5n7o=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=WaZdn6zm9+tpJOz4Pft3MkTcN+oMUBwwWkOCh0WowA4=;
+ b=VsPszrIpprCx48qD9sVDc4mJQYoQWL3/XDeKYLLofFni9YwTfGIm3hMJ8ODiMBIp3h5cRt
+ Yre8U/rWGw/03mlHf4ycZsJsI6OMnvriNsfvNrUdjIW3Jkfc1/p1pCw4LXrQwsJfPifqIF
+ iRyCd01HCxJZjuq8Yxf0BABwBlvE/1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-43JCMRDwOnW9UaLd8FB9ig-1; Wed, 24 Jun 2020 04:37:41 -0400
-X-MC-Unique: 43JCMRDwOnW9UaLd8FB9ig-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-248-d14o7KjeOU6I-erQHpNkPQ-1; Wed, 24 Jun 2020 04:37:40 -0400
+X-MC-Unique: d14o7KjeOU6I-erQHpNkPQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D3E4800C60;
- Wed, 24 Jun 2020 08:37:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55316800C60
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:37:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D1D7E71693;
- Wed, 24 Jun 2020 08:37:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F34B610013D9
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:37:38 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 924581138475; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
+ id 7A929113846D; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/25] spapr: Plug minor memory leak in spapr_machine_init()
-Date: Wed, 24 Jun 2020 10:37:19 +0200
-Message-Id: <20200624083737.3086768-8-armbru@redhat.com>
-In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
-References: <20200624083737.3086768-1-armbru@redhat.com>
+Subject: [PATCH v2 00/25] Error handling fixes & cleanups
+Date: Wed, 24 Jun 2020 10:37:12 +0200
+Message-Id: <20200624083737.3086768-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -95,37 +91,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr_machine_init() leaks an Error object when
-kvmppc_check_papr_resize_hpt() fails and spapr->resize_hpt is
-SPAPR_RESIZE_HPT_DISABLED, i.e. when the host doesn't support hash
-page table resizing, and the user didn't ask for it.  As harmless as
-memory leaks can possibly be.  Plug it.
+This series addresses a number of error handling issues I found while
+working on error handling improvements.  It's based on my "[PULL
+00/16] Qdev patches for 2020-06-23" merged into current master.
 
-Fixes: 30f4b05bd090564181554d0890605eb2c143e4ea
-Cc: David Gibson <dgibson@redhat.com>
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/ppc/spapr.c | 1 +
- 1 file changed, 1 insertion(+)
+Based-on: <20200623142326.2349416-1-armbru@redhat.com>
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bd9345cdac..9bd2183ead 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2731,6 +2731,7 @@ static void spapr_machine_init(MachineState *machine)
-         error_report_err(resize_hpt_err);
-         exit(1);
-     }
-+    error_free(resize_hpt_err);
- 
-     spapr->rma_size = spapr_rma_size(spapr, &error_fatal);
- 
+v2:
+* PATCH 04: Two more instances, in tests/check-qom-proplist
+* PATCH 12: Dropped; PATCH 04 takes care of it
+* PATCH 17: One more instance due to rebase; R-by kept
+* PATCH 22-25: New
+
+Markus Armbruster (25):
+  net/virtio: Fix failover_replug_primary() return value regression
+  pci: Delete useless error_propagate()
+  Clean up some calls to ignore Error objects the right way
+  tests: Use &error_abort where appropriate
+  tests: Use error_free_or_abort() where appropriate
+  usb/dev-mtp: Fix Error double free after inotify failure
+  spapr: Plug minor memory leak in spapr_machine_init()
+  qga: Plug unlikely memory leak in guest-set-memory-blocks
+  sd/milkymist-memcard: Plug minor memory leak in realize
+  test-util-filemonitor: Plug unlikely memory leak
+  vnc: Plug minor memory leak in vnc_display_open()
+  aspeed: Clean up roundabout error propagation
+  qdev: Drop qbus_set_bus_hotplug_handler() parameter @errp
+  qdev: Drop qbus_set_hotplug_handler() parameter @errp
+  hw: Fix error API violation around object_property_set_link()
+  hw/arm: Drop useless object_property_set_link() error handling
+  riscv/sifive_u: Fix sifive_u_soc_realize() error API violations
+  riscv_hart: Fix riscv_harts_realize() error API violations
+  mips/cps: Fix mips_cps_realize() error API violations
+  x86: Fix x86_cpu_new() error API violations
+  amd_iommu: Fix amdvi_realize() error API violation
+  arm/stm32f205 arm/stm32f405: Fix realize error API violation
+  aspeed: Fix realize error API violation
+  hw/arm/armsse: Fix armsse_realize() error API violation
+  arm/{bcm2835,fsl-imx25,fsl-imx6}: Fix realize error API violations
+
+ include/hw/qdev-core.h             |   5 +-
+ chardev/char-socket.c              |   6 +-
+ hw/9pfs/9p.c                       |   6 +-
+ hw/acpi/pcihp.c                    |   3 +-
+ hw/acpi/piix4.c                    |   2 +-
+ hw/arm/armsse.c                    |  61 +++++-----------
+ hw/arm/armv7m.c                    |   7 +-
+ hw/arm/aspeed_ast2600.c            |  35 ++++-----
+ hw/arm/aspeed_soc.c                |  29 +++-----
+ hw/arm/bcm2835_peripherals.c       |  12 ++--
+ hw/arm/fsl-imx25.c                 |  12 ++--
+ hw/arm/fsl-imx6.c                  |  12 ++--
+ hw/arm/nrf51_soc.c                 |   6 +-
+ hw/arm/stm32f205_soc.c             |   2 +-
+ hw/arm/stm32f405_soc.c             |   2 +-
+ hw/arm/virt.c                      |   4 +-
+ hw/char/virtio-serial-bus.c        |   4 +-
+ hw/core/bus.c                      |   8 +--
+ hw/display/virtio-gpu-pci.c        |   2 +-
+ hw/display/virtio-vga.c            |   2 +-
+ hw/dma/sparc32_dma.c               |   6 +-
+ hw/dma/xilinx_axidma.c             |  12 +---
+ hw/i386/amd_iommu.c                |   6 +-
+ hw/i386/x86.c                      |  12 +---
+ hw/mips/cps.c                      |  35 +++++----
+ hw/misc/macio/macio.c              |   3 +-
+ hw/net/virtio-net.c                |   2 +-
+ hw/net/xilinx_axienet.c            |  12 +---
+ hw/pci/pci.c                       |   3 -
+ hw/pci/pcie.c                      |   2 +-
+ hw/pci/shpc.c                      |   2 +-
+ hw/ppc/spapr.c                     |   4 +-
+ hw/ppc/spapr_drc.c                 |   4 +-
+ hw/ppc/spapr_pci.c                 |   4 +-
+ hw/riscv/riscv_hart.c              |  14 ++--
+ hw/riscv/sifive_u.c                |  12 +++-
+ hw/s390x/ap-bridge.c               |   2 +-
+ hw/s390x/css-bridge.c              |   2 +-
+ hw/s390x/s390-pci-bus.c            |  14 +---
+ hw/scsi/scsi-bus.c                 |   2 +-
+ hw/scsi/virtio-scsi.c              |   4 +-
+ hw/scsi/vmw_pvscsi.c               |   2 +-
+ hw/sd/milkymist-memcard.c          |   5 +-
+ hw/usb/bus.c                       |   2 +-
+ hw/usb/dev-mtp.c                   |   2 -
+ hw/usb/dev-smartcard-reader.c      |   2 +-
+ hw/virtio/virtio-iommu-pci.c       |   2 +-
+ hw/xen/xen-bus.c                   |   2 +-
+ hw/xen/xen-legacy-backend.c        |   2 +-
+ qga/commands-posix.c               |   1 +
+ tests/check-block-qdict.c          |  24 ++-----
+ tests/check-qobject.c              |   5 +-
+ tests/check-qom-proplist.c         |  14 ++--
+ tests/test-base64.c                |   3 +-
+ tests/test-bdrv-graph-mod.c        |   4 +-
+ tests/test-block-iothread.c        |   3 +-
+ tests/test-crypto-cipher.c         |   8 +--
+ tests/test-io-task.c               |   4 +-
+ tests/test-logging.c               |  12 +---
+ tests/test-qemu-opts.c             |  22 ++----
+ tests/test-replication.c           | 109 +++++++++--------------------
+ tests/test-string-input-visitor.c  |  33 +++------
+ tests/test-string-output-visitor.c |  16 ++---
+ tests/test-util-filemonitor.c      |   1 +
+ ui/vnc.c                           |   6 +-
+ 65 files changed, 229 insertions(+), 432 deletions(-)
+
 -- 
 2.26.2
 
