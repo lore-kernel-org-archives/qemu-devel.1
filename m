@@ -2,46 +2,46 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEDEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 00:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D06C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 00:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11E372078D
+	by mail.kernel.org (Postfix) with ESMTPS id 0DEFC2078D
 	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 00:11:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E372078D
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DEFC2078D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joFUZ-0003eH-8A
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 20:11:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54514)
+	id 1joFUa-0003fY-6R
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 20:11:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joFTi-0002V1-5c
+ id 1joFTi-0002VS-Th
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 20:10:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56512)
+Received: from indium.canonical.com ([91.189.90.7]:56498)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joFTg-0003ts-2y
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 20:10:53 -0400
+ id 1joFTg-0003te-1n
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 20:10:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1joFTf-0001WD-2v
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:10:51 +0000
+ id 1joFTe-0001c2-32
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:10:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 14CA82E80E7
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:10:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 12D012E804E
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:10:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Jun 2020 00:03:09 -0000
+Date: Wed, 24 Jun 2020 23:59:54 -0000
 From: Roman Bolshakov <1818937@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: bwibking cuser2 fliker09 kisg roolebo
 X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
 X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
 References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159304339004.25979.10058162678834211454.malone@gac.canonical.com>
+Message-Id: <159304319494.17592.1612783851271462376.malone@chaenomeles.canonical.com>
 Subject: [Bug 1818937] Re: Crash with HV_ERROR on macOS host
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3cc5494b0299fd0c3bd313229a6a37ebcf75b161
+X-Launchpad-Hash: 9c8cf88645fb9b3972241a10dcadc783f6ca48d0
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 20:10:50
@@ -90,7 +90,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The issue should be fixed in QEMU v5.0+
+I'm not exactly sure what commit improved the situation (either
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3De37aa8b0e410 or
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfbafbb6db7742)  but I have
+noticed that sporadic failures are gone after the series was applied:
+https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg03977.html
+
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
