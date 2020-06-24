@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAD7C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B63C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B0AA2077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 865202077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:39:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Im53mSbf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0AA2077D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsBw80ST"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 865202077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joBET-0002Wu-NS
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:38:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43600)
+	id 1joBFS-0003dZ-S4
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:39:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBDR-0001tE-HD
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:37:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25937
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBEh-0002re-43
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:39:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47217
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBDP-00053x-0O
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:37:49 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBEf-0005Wm-Q0
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:39:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593027465;
+ s=mimecast20190719; t=1593027545;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=46rqIa44ftxXrqKXiCIIFcJ4uC9AJsefNHRLKrVrmh0=;
- b=Im53mSbf1y2lx+5Skyhdg6nUfiQno50pg187clNGeIl26xKZ2CUXV9lKgdoOT0GJ8ELOhn
- I/0G2xALKOHxs2gqqx1LpiUpXmT50DORGA79THWx1S2fnwAC/2IwLpvFZORsKcT9h+TZWq
- nVx/9jXN49i60Q5H0hy3X0hGYFcwk3A=
+ bh=c3ZcWTQOnSrzKJHRQMobWoPMezlYpGsP+ECIMFauOVI=;
+ b=VsBw80ST26jFgVRqK0uBblYljPz41BswWdeyBHIC9O9kMSHum26BS3YV8GFZY3ir7d/Hd9
+ xcpUgHniXmXOxQrT0dP4yruT6LJqXpVLZEp3Y2/kzdCoSxY+vmi4y/MDdJ69JFLYP7K7Zk
+ /yY+HH+pbffbNfkOHzOKrXtgjBkDhAc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-OuCLL45EPe2sseLKGmYeKA-1; Wed, 24 Jun 2020 15:37:42 -0400
-X-MC-Unique: OuCLL45EPe2sseLKGmYeKA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-358-BIYssu7XP0eNr4FOe6ohpg-1; Wed, 24 Jun 2020 15:39:01 -0400
+X-MC-Unique: BIYssu7XP0eNr4FOe6ohpg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16B3019057A4;
- Wed, 24 Jun 2020 19:37:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4437D805EF1;
+ Wed, 24 Jun 2020 19:39:00 +0000 (UTC)
 Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F4305BAC4;
- Wed, 24 Jun 2020 19:37:40 +0000 (UTC)
-Subject: Re: [PATCH 11/46] qemu-option: Make uses of find_desc_by_name() more
- similar
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA4C78FF61;
+ Wed, 24 Jun 2020 19:38:59 +0000 (UTC)
+Subject: Re: [PATCH 12/46] qemu-option: Factor out helper
+ find_default_by_name()
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-12-armbru@redhat.com>
+ <20200624164344.3778251-13-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <f3f6c741-adcb-34c1-6bfd-bf0a7715cf58@redhat.com>
-Date: Wed, 24 Jun 2020 14:37:40 -0500
+Message-ID: <56eeace8-8f9d-49f3-2526-f217dc61e53e@redhat.com>
+Date: Wed, 24 Jun 2020 14:38:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-12-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-13-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -105,12 +105,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 11:43 AM, Markus Armbruster wrote:
-> This is to make the next commit easier to review.
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   util/qemu-option.c | 32 ++++++++++++++++++--------------
->   1 file changed, 18 insertions(+), 14 deletions(-)
+>   util/qemu-option.c | 47 ++++++++++++++++++++++++++--------------------
+>   1 file changed, 27 insertions(+), 20 deletions(-)
 > 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
