@@ -2,79 +2,78 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965ECC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFE1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 642D520B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 299932088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:38:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7aQnuPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642D520B1F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZ7iu2MP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 299932088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo0vd-0002nz-Ih
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:38:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48218)
+	id 1jo0vk-00038u-BX
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:38:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0uh-0000YZ-1x
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:47 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23849
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0um-0000nv-Ok
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30914
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ue-00023t-Vx
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:46 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0ug-00025J-Da
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:37:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592987864;
+ s=mimecast20190719; t=1592987865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=d/zNBLVNetSddXJjo9hxS9J+W0d8hwauSV+gbhSfTCE=;
- b=C7aQnuPLJwon4mLqO9K2cB7IXHTzxOi5ey3TRYrZSm2DFMBGG/uisxwXzS9NtznvFd1UKH
- hcjRUo6jOF8/xtAvMLah+9mNGYOIOuAOur+s1A6ddhYSjP+1RYyESNQRc9kFBQ07ywB36Z
- s0q67ESES5escJ5hhjPyNMtl6449W28=
+ bh=gZGpqjNhU3VLrZIjNN+wDj8VUXVmtMcVJTCwh6ZL+O0=;
+ b=QZ7iu2MPkCuhsogzoaQNYYS32jXYHIukRAiBZw/Y4TKcYBzexXvcKy1O3NBYU8hw/wKnB3
+ cE3Uz9oGLtFjwL8UWD9ppA6DxhNwgcFL4GIE+lwVUNtN1laaZOIOl8LlzOO/Ypu/sdAKsQ
+ rZAcJ8uH4yxpelg43NIjkAvdcvo9tyA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-WtYsYTXpN6m1AxWlJlCM0w-1; Wed, 24 Jun 2020 04:37:42 -0400
-X-MC-Unique: WtYsYTXpN6m1AxWlJlCM0w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-458-mvuRLvRBM6--BA6Bu4nHuA-1; Wed, 24 Jun 2020 04:37:44 -0400
+X-MC-Unique: mvuRLvRBM6--BA6Bu4nHuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92163805EE3
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:37:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 402A61005512;
+ Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61C581A836;
- Wed, 24 Jun 2020 08:37:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 059EF78FDB;
+ Wed, 24 Jun 2020 08:37:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9D10F1138478; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
+ id C347D1138482; Wed, 24 Jun 2020 10:37:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/25] test-util-filemonitor: Plug unlikely memory leak
-Date: Wed, 24 Jun 2020 10:37:22 +0200
-Message-Id: <20200624083737.3086768-11-armbru@redhat.com>
+Subject: [PATCH v2 20/25] x86: Fix x86_cpu_new() error API violations
+Date: Wed, 24 Jun 2020 10:37:32 +0200
+Message-Id: <20200624083737.3086768-21-armbru@redhat.com>
 In-Reply-To: <20200624083737.3086768-1-armbru@redhat.com>
 References: <20200624083737.3086768-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,32 +94,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-test_file_monitor_events() leaks an Error object when
-qemu_file_monitor_add_watch() fails, which seems unlikely.  Plug it.
+The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+pointer to a variable containing NULL.  Passing an argument of the
+latter kind twice without clearing it in between is wrong: if the
+first call sets an error, it no longer points to NULL for the second
+call.
 
-Cc: Daniel P. Berrangé <berrange@redhat.com>
+x86_cpu_new() is wrong that way: it passes &local_err to
+object_property_set_uint() without checking it, and then to
+qdev_realize().  Harmless, because the former can't actually fail
+here.
+
+Fix by checking for failure right away.  While there, replace
+qdev_realize(); object_unref() by qdev_realize_and_unref().
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-util-filemonitor.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/i386/x86.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.c
-index 45009c69f4..8f0eff3d03 100644
---- a/tests/test-util-filemonitor.c
-+++ b/tests/test-util-filemonitor.c
-@@ -495,6 +495,7 @@ test_file_monitor_events(void)
-             if (*op->watchid < 0) {
-                 g_printerr("Unable to add watch %s",
-                            error_get_pretty(local_err));
-+                error_free(local_err);
-                 goto cleanup;
-             }
-             if (debug) {
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 34229b45c7..3a7029e6db 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -118,16 +118,10 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+ 
+ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
+ {
+-    Object *cpu = NULL;
+-    Error *local_err = NULL;
++    Object *cpu = object_new(MACHINE(x86ms)->cpu_type);
+ 
+-    cpu = object_new(MACHINE(x86ms)->cpu_type);
+-
+-    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+-    qdev_realize(DEVICE(cpu), NULL, &local_err);
+-
+-    object_unref(cpu);
+-    error_propagate(errp, local_err);
++    object_property_set_uint(cpu, apic_id, "apic-id", &error_abort);
++    qdev_realize_and_unref(DEVICE(cpu), NULL, errp);
+ }
+ 
+ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
 -- 
 2.26.2
 
