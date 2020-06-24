@@ -2,86 +2,70 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D68BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 09:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2EAC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 09:03:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0804120857
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 09:02:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiqgeHc3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0804120857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07D1620857
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 09:03:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D1620857
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo1IJ-00041B-An
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 05:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55864)
+	id 1jo1JZ-00054U-B8
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 05:03:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jo1Go-0003WO-Ee
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 05:00:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43715
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jo1Gm-0006wW-51
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 05:00:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592989235;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=MEHMTaLh1c0eNVyV63lKg5QYoGN7PpUq2YzYXaswtBo=;
- b=fiqgeHc3yfiZARuphJC4AWC1l6BKki7dpLYnlwmQU6dUOGdvtoz5n1Qe2nKwQhMRdzXIkZ
- AF6a+vGMaq5EhGb/3MHUnYeDByNzjlf3afHLRuahVqFHbRXGCEMH1LoWhG2Ol26lmJI9LB
- CbfCWrfW01EgLkXFdclOeO8nQfq7AMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-QOaZq18-N0qCd4Z6AvG66g-1; Wed, 24 Jun 2020 05:00:29 -0400
-X-MC-Unique: QOaZq18-N0qCd4Z6AvG66g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA6A9188361F;
- Wed, 24 Jun 2020 09:00:26 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 823C67FD03;
- Wed, 24 Jun 2020 08:59:58 +0000 (UTC)
-Date: Wed, 24 Jun 2020 09:59:56 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH] trivial: Remove extra character in configure help
-Message-ID: <20200624085956.GE774096@redhat.com>
-References: <20200624083337.912846-1-dinechin@redhat.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jo1It-0004eC-TD
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 05:02:47 -0400
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:46845)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jo1Iq-0007Qp-Km
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 05:02:47 -0400
+Received: from player776.ha.ovh.net (unknown [10.108.42.184])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id AD3F596D38
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 11:02:34 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player776.ha.ovh.net (Postfix) with ESMTPSA id 86AFE13BF48F5;
+ Wed, 24 Jun 2020 09:02:28 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G0053783f976-a773-47c2-b8ee-0de6436fd136,C444FAC41FF2550221413609A00B1E8A3B07177F)
+ smtp.auth=groug@kaod.org
+Date: Wed, 24 Jun 2020 11:02:27 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 03/25] Clean up some calls to ignore Error objects
+ the right way
+Message-ID: <20200624110227.054838a4@bahia.lan>
+In-Reply-To: <20200624083737.3086768-4-armbru@redhat.com>
+References: <20200624083737.3086768-1-armbru@redhat.com>
+ <20200624083737.3086768-4-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200624083337.912846-1-dinechin@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 1633117816349235598
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekjedgtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepteekgeejiedvteeufeekfffhtddtgfegkeekkefgleefheejgfehtdelheeivefhnecuffhomhgrihhnpehinhgvthdrhhhoshhtnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.50.32; envelope-from=groug@kaod.org;
+ helo=7.mo69.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 05:02:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,43 +78,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: Jerome Forissier <jerome@forissier.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 10:33:37AM +0200, Christophe de Dinechin wrote:
-> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, 24 Jun 2020 10:37:15 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Receiving the error in a local variable only to free it is less clear
+> (and also less efficient) than passing NULL.  Clean up.
 > 
-> diff --git a/configure b/configure
-> index ba88fd1824..c7a6a5adfe 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1787,7 +1787,7 @@ Advanced options (experts only):
->    --block-drv-ro-whitelist=L
->                             set block driver read-only whitelist
->                             (affects only QEMU, not qemu-img)
-> -  --enable-trace-backends=B Set trace backend
-> +  --enable-trace-backends= Set trace backend
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Cc: Jerome Forissier <jerome@forissier.org>
+> CC: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-This is just following the style of the option above. "B" is a
-placeholder for the desired backend(s).
+It doesn't seem to be different from v1, so:
 
->                             Available backends: $trace_backend_list
->    --with-trace-file=NAME   Full PATH,NAME of file to store traces
->                             Default:trace-<pid>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
+and
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Acked-by: Greg Kurz <groug@kaod.org> # for 9pfs
+
+>  chardev/char-socket.c | 6 ++----
+>  hw/9pfs/9p.c          | 6 ++----
+>  hw/arm/virt.c         | 4 +---
+>  hw/ppc/spapr_drc.c    | 4 +---
+>  ui/vnc.c              | 3 +--
+>  5 files changed, 7 insertions(+), 16 deletions(-)
+> 
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index afebeec5c3..b0cae97960 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -815,22 +815,20 @@ static void tcp_chr_tls_init(Chardev *chr)
+>  {
+>      SocketChardev *s = SOCKET_CHARDEV(chr);
+>      QIOChannelTLS *tioc;
+> -    Error *err = NULL;
+>      gchar *name;
+>  
+>      if (s->is_listen) {
+>          tioc = qio_channel_tls_new_server(
+>              s->ioc, s->tls_creds,
+>              s->tls_authz,
+> -            &err);
+> +            NULL);
+>      } else {
+>          tioc = qio_channel_tls_new_client(
+>              s->ioc, s->tls_creds,
+>              s->addr->u.inet.host,
+> -            &err);
+> +            NULL);
+>      }
+>      if (tioc == NULL) {
+> -        error_free(err);
+>          tcp_chr_disconnect(chr);
+>          return;
+>      }
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 45a788f6e6..9755fba9a9 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -1399,7 +1399,6 @@ static void coroutine_fn v9fs_attach(void *opaque)
+>      size_t offset = 7;
+>      V9fsQID qid;
+>      ssize_t err;
+> -    Error *local_err = NULL;
+>  
+>      v9fs_string_init(&uname);
+>      v9fs_string_init(&aname);
+> @@ -1437,9 +1436,8 @@ static void coroutine_fn v9fs_attach(void *opaque)
+>          error_setg(&s->migration_blocker,
+>                     "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
+>                     s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
+> -        err = migrate_add_blocker(s->migration_blocker, &local_err);
+> -        if (local_err) {
+> -            error_free(local_err);
+> +        err = migrate_add_blocker(s->migration_blocker, NULL);
+> +        if (err < 0) {
+>              error_free(s->migration_blocker);
+>              s->migration_blocker = NULL;
+>              clunk_fid(s, fid);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index caceb1e4a0..29b9d5b2e6 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -217,11 +217,9 @@ static bool cpu_type_valid(const char *cpu)
+>  
+>  static void create_kaslr_seed(VirtMachineState *vms, const char *node)
+>  {
+> -    Error *err = NULL;
+>      uint64_t seed;
+>  
+> -    if (qemu_guest_getrandom(&seed, sizeof(seed), &err)) {
+> -        error_free(err);
+> +    if (qemu_guest_getrandom(&seed, sizeof(seed), NULL)) {
+>          return;
+>      }
+>      qemu_fdt_setprop_u64(vms->fdt, node, "kaslr-seed", seed);
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 2689104295..951bcdf2c0 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -1163,16 +1163,14 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+>      drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+>  
+>      if (!drc->fdt) {
+> -        Error *local_err = NULL;
+>          void *fdt;
+>          int fdt_size;
+>  
+>          fdt = create_device_tree(&fdt_size);
+>  
+>          if (drck->dt_populate(drc, spapr, fdt, &drc->fdt_start_offset,
+> -                              &local_err)) {
+> +                              NULL)) {
+>              g_free(fdt);
+> -            error_free(local_err);
+>              rc = SPAPR_DR_CC_RESPONSE_ERROR;
+>              goto out;
+>          }
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 12a12714e1..0702a76cce 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -458,9 +458,8 @@ static VncServerInfo2List *qmp_query_server_entry(QIOChannelSocket *ioc,
+>      Error *err = NULL;
+>      SocketAddress *addr;
+>  
+> -    addr = qio_channel_socket_get_local_address(ioc, &err);
+> +    addr = qio_channel_socket_get_local_address(ioc, NULL);
+>      if (!addr) {
+> -        error_free(err);
+>          return prev;
+>      }
+>  
 
 
