@@ -2,85 +2,58 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF86C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A961C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BA7220823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:09:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hk1emvPE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BA7220823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B9F320823
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:10:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9F320823
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8u9-0005Wp-FD
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:09:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52200)
+	id 1jo8vB-00082V-Ct
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8Vk-0004Sv-OB
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33645
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VD-000592-Ns
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017037;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fyOrQXF65hyfyQ8tp79aXLLHb3DkZ3DgTCZOrqgfpI4=;
- b=hk1emvPE1Rl5Q2b0RSFdsE6pdIFP+QQsilhVgjzDUBG9ybaKsjeWBnRibvNxE8ST/kz4K/
- 65P9DWblExKLzoLo6fCdAAo/bNWWxC6Ve9Qysc5xJRhZy0gOFwyX4W8L5oSkiQojzK/kgw
- KFYcgOCIpbvQoXlw2GWElW7vXgEdWSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-dV0d0y0gOgKyQ2Os3GyI9g-1; Wed, 24 Jun 2020 12:43:52 -0400
-X-MC-Unique: dV0d0y0gOgKyQ2Os3GyI9g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F036F18585A8;
- Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BED22891E8;
- Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 580EE113848D; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 32/46] qom: Rename qdev_get_type() to object_get_type()
-Date: Wed, 24 Jun 2020 18:43:30 +0200
-Message-Id: <20200624164344.3778251-33-armbru@redhat.com>
-In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
-References: <20200624164344.3778251-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jo8Yx-0001vL-Gb
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:47:51 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:44118)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jo8Yt-00074E-IV
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:47:50 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id CCAB274633E;
+ Wed, 24 Jun 2020 18:47:37 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id A941374633D; Wed, 24 Jun 2020 18:47:37 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
+References: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
+Subject: [PATCH v4] sm501: Fix and optimize overlap check
+Date: Wed, 24 Jun 2020 18:42:18 +0200
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+To: qemu-devel@nongnu.org
+Message-Id: <20200624164737.A941374633D@zero.eik.bme.hu>
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 12:47:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,43 +67,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 2f262e06f0 lifted qdev_get_type() from qdev to object without
-renaming it accordingly.  Do that now.
+When doing reverse blit we need to check if source and dest overlap
+but it is not trivial due to possible different base and pitch of
+source and dest. Do rectangle overlap if base and pitch match,
+otherwise just check if memory area containing the rects overlaps so
+rects could possibly overlap.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- qom/object.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This version fixes overlap check according to Peter's suggestion, only
+resending this patch as v4, others still valid from v3. Let me know if
+you want the whole series resent instead.
 
-diff --git a/qom/object.c b/qom/object.c
-index b8aac074c2..f6e9f0e413 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -2359,7 +2359,7 @@ object_class_property_add_tm(ObjectClass *klass, const char *name,
-                                      NULL, NULL, prop);
- }
+ hw/display/sm501.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 2db347dcbc..9cccc68c35 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -690,6 +690,7 @@ static void sm501_2d_operation(SM501State *s)
+     unsigned int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
+     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
+     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
++    bool overlap = false;
  
--static char *qdev_get_type(Object *obj, Error **errp)
-+static char *object_get_type(Object *obj, Error **errp)
- {
-     return g_strdup(object_get_typename(obj));
- }
-@@ -2702,7 +2702,7 @@ void object_class_property_set_description(ObjectClass *klass,
+     if ((s->twoD_stretch >> 16) & 0xF) {
+         qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
+@@ -784,16 +785,21 @@ static void sm501_2d_operation(SM501State *s)
+                          ldn_he_p(&s->local_mem[src_base + si], bypp));
+                 break;
+             }
+-            /* Check for overlaps, this could be made more exact */
+-            uint32_t sb, se, db, de;
+-            sb = src_base + src_x + src_y * (width + src_pitch);
+-            se = sb + width + height * (width + src_pitch);
+-            db = dst_base + dst_x + dst_y * (width + dst_pitch);
+-            de = db + width + height * (width + dst_pitch);
+-            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+-                /* regions may overlap: copy via temporary */
+-                int llb = width * bypp;
+-                int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
++            /* If reverse blit do simple check for overlaps */
++            if (rtl && src_base == dst_base && src_pitch == dst_pitch) {
++                overlap = (src_x < dst_x + width && src_x + width > dst_x &&
++                           src_y < dst_y + height && src_y + height > dst_y);
++            } else if (rtl) {
++                unsigned int sb, se, db, de;
++                sb = src_base + (src_x + src_y * src_pitch) * bypp;
++                se = sb + (width + (height - 1) * src_pitch) * bypp;
++                db = dst_base + (dst_x + dst_y * dst_pitch) * bypp;
++                de = db + (width + (height - 1) * dst_pitch) * bypp;
++                overlap = (db < se && sb < de);
++            }
++            if (overlap) {
++                /* pixman can't do reverse blit: copy via temporary */
++                int tmp_stride = DIV_ROUND_UP(width * bypp, sizeof(uint32_t));
+                 uint32_t *tmp = tmp_buf;
  
- static void object_class_init(ObjectClass *klass, void *data)
- {
--    object_class_property_add_str(klass, "type", qdev_get_type,
-+    object_class_property_add_str(klass, "type", object_get_type,
-                                   NULL);
- }
- 
+                 if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
 -- 
-2.26.2
+2.21.3
 
 
