@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B93C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C083C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 414342084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1992088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 10:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XEJMdoV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 414342084D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZlYvu9A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1992088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo31T-000461-Ho
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:52:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56366)
+	id 1jo321-0004yd-Dh
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 06:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2zb-0000ky-7f
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:50:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33841
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jo2zc-0000nj-Jd
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56684
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jo2zY-00019r-TA
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:50:58 -0400
+ id 1jo2za-0001B8-Cr
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592995856;
+ s=mimecast20190719; t=1592995857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/POFAYYLNsnH4TRhS2nYFgSY4Zw3kK2ip22psNYwRa4=;
- b=XEJMdoV45bdO2f50K8vh0y2gAw8cHAJlY9R9JmVbBghFW+jxSp7Jjwk4osgdrZ/KATqh1q
- qb5ZGuETR5XFUqd9QrbwGYaUmwkeiWa0BCRRLzUKEcP9jUdZ/xnBSDyyPI5XaVO7FBRa4x
- jdNxnpIlVXW/L2HCDXHhHYKcYKisiQc=
+ bh=bhRxMbOaLQYAJuVE9Lz+Ebq4ZowpOqvvxaz28eKqdPk=;
+ b=gZlYvu9AzvKRqmJxQJR2B6ZzsLTBDpthK/kM81nXlWYnVTAFQoU3CE+Js4BrqxICaxzSRt
+ vY8rTK4XO+30UNJoCjBjcB+/fdAO/Bsyo9ntZaWKwjhWwM2Ofs3Z3kjElZuZtOpYgJP99b
+ K0ljkp6Oc0S0uu+bCoATbWnJOtpl76Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-M7-MZmvBNqa5MKl9ZRDGqQ-1; Wed, 24 Jun 2020 06:50:54 -0400
-X-MC-Unique: M7-MZmvBNqa5MKl9ZRDGqQ-1
+ us-mta-143-O54kM9ijO-WUyhcs9TzOrQ-1; Wed, 24 Jun 2020 06:50:54 -0400
+X-MC-Unique: O54kM9ijO-WUyhcs9TzOrQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 107EE10059AA;
- Wed, 24 Jun 2020 10:50:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADED0106B242
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 10:50:53 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com
  (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 988D671695;
- Wed, 24 Jun 2020 10:50:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 414711DC;
+ Wed, 24 Jun 2020 10:50:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/31] util/getauxval: Porting to FreeBSD getauxval feature
-Date: Wed, 24 Jun 2020 06:50:19 -0400
-Message-Id: <20200624105048.375353-2-pbonzini@redhat.com>
+Subject: [PULL 03/31] libqos: usb-hcd-ehci: use 32-bit write for config
+ register
+Date: Wed, 24 Jun 2020 06:50:20 -0400
+Message-Id: <20200624105048.375353-3-pbonzini@redhat.com>
 In-Reply-To: <20200624104917.375143-1-pbonzini@redhat.com>
 References: <20200624104917.375143-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,43 +96,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David CARLIER <devnexen@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David CARLIER <devnexen@gmail.com>
+The memory region ops have min_access_size == 4 so obey it.
 
-FreeBSD has a similar API for auxiliary vector.
-
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Message-Id: <CA+XhMqxTU6PUSQBpbA9VrS1QZfqgrCAKUCtUF-x2aF=fCMTDOw@mail.gmail.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/getauxval.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tests/qtest/usb-hcd-ehci-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/util/getauxval.c b/util/getauxval.c
-index 36afdfb9e6..b124107d61 100644
---- a/util/getauxval.c
-+++ b/util/getauxval.c
-@@ -98,6 +98,16 @@ unsigned long qemu_getauxval(unsigned long type)
-     return 0;
+diff --git a/tests/qtest/usb-hcd-ehci-test.c b/tests/qtest/usb-hcd-ehci-test.c
+index 5251d539e9..c51e8bb223 100644
+--- a/tests/qtest/usb-hcd-ehci-test.c
++++ b/tests/qtest/usb-hcd-ehci-test.c
+@@ -96,7 +96,7 @@ static void pci_ehci_port_1(void)
+ static void pci_ehci_config(void)
+ {
+     /* hands over all ports from companion uhci to ehci */
+-    qpci_io_writew(ehci1.dev, ehci1.bar, 0x60, 1);
++    qpci_io_writel(ehci1.dev, ehci1.bar, 0x60, 1);
  }
  
-+#elif defined(__FreeBSD__)
-+#include <sys/auxv.h>
-+
-+unsigned long qemu_getauxval(unsigned long type)
-+{
-+    unsigned long aux = 0;
-+    elf_aux_info(type, &aux, sizeof(aux));
-+    return aux;
-+}
-+
- #else
- 
- unsigned long qemu_getauxval(unsigned long type)
+ static void pci_uhci_port_2(void)
 -- 
 2.26.2
 
