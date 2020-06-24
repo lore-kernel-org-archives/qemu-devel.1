@@ -2,85 +2,85 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 718B5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D3D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:22:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B7982072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D99C62072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:22:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/hUvLMv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7982072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="uekNdOKG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D99C62072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo6IF-0005GA-Gz
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60518)
+	id 1jo6IY-0006FW-U4
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:22:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jo659-0005zc-3V
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:08:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41533
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jo657-0004jj-Ca
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:08:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593007732;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jBMJMvbJpICrv0jM2pKWkiaC2LZ+F06Z/ZK/AOtK1e4=;
- b=b/hUvLMvmMw0VrUO23wBm1fkRfoVnz/QcCEkZv9u0RgtBA25KIfI6nATsMCkb4tcc5djjZ
- aIi2MZNBMWynRG9pdNjD5Sr0mQCk5DIOq+sSaKHSkZKzoj2UbMG3xgBjOBmyIMTIYhd8rw
- Tk67eOGRBbJSSlLulzamt2dNt63ZXxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-ly0BFLBlMnOEGspFsl_dXA-1; Wed, 24 Jun 2020 10:08:48 -0400
-X-MC-Unique: ly0BFLBlMnOEGspFsl_dXA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jo6EC-0006e9-3q
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:18:16 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:44812 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jo6EA-000855-Cb
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:18:15 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id E11B04C87D;
+ Wed, 24 Jun 2020 14:18:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1593008289;
+ x=1594822690; bh=6QB49fEcdVYjMJyFzjzxrY6cuGEWQ8BAwBLUNLflGWE=; b=
+ uekNdOKGpEk4W9QcRO2sujaQL6khv4iN+HgtTCqBP1gTzJr2+T6FYkQKm+1nOSTy
+ J7YQe0PR6wuih4IxMXD3jY/zHGMIRtqvMzOef3tmRA5ZZJxKdTd+RPGligY3UbTT
+ ENQ84Th5r3ELycVDqPRZseSaSMPxjf/jME2/7hlSIQM=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id u_JrxUopq9FY; Wed, 24 Jun 2020 17:18:09 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD0631937FC4;
- Wed, 24 Jun 2020 14:08:46 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.11])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3070778FC5;
- Wed, 24 Jun 2020 14:08:37 +0000 (UTC)
-Date: Wed, 24 Jun 2020 16:08:34 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v4] arm/virt: Add memory hot remove support
-Message-ID: <20200624160834.5191b73e@redhat.com>
-In-Reply-To: <20200622124157.20360-1-shameerali.kolothum.thodi@huawei.com>
-References: <20200622124157.20360-1-shameerali.kolothum.thodi@huawei.com>
+ by mta-01.yadro.com (Postfix) with ESMTPS id 7861B47D4C;
+ Wed, 24 Jun 2020 17:18:08 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Wed, 24
+ Jun 2020 17:18:08 +0300
+Date: Wed, 24 Jun 2020 17:18:07 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [RFC RESEND v7 0/4] QEMU cpus.c refactoring
+Message-ID: <20200624141807.GD25104@SPB-NB-133.local>
+References: <20200622134534.4418-1-cfontana@suse.de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200622134534.4418-1-cfontana@suse.de>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 10:18:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,169 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, linuxarm@huawei.com,
- xuwei5@hisilicon.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- qemu-arm@nongnu.org, prime.zeng@hisilicon.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 22 Jun 2020 13:41:57 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> This adds support for memory(pc-dimm) hot remove on arm/virt that
-> uses acpi ged device.
+On Mon, Jun 22, 2020 at 03:45:30PM +0200, Claudio Fontana wrote:
+> Motivation and higher level steps:
 > 
-> NVDIMM hot removal is not yet supported.
+> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
-> v2 --> v3
->   -Addressed Eric's comments on v3. 
-> v2 --> v3
->   -Addressed Eric's review comment and added check for NVDIMM.
-> RFC v1 --> v2
->   -Rebased on top of latest Qemu master.
->   -Dropped "RFC" and tested with kernel 5.7-rc6
-> ---
->  hw/acpi/generic_event_device.c | 29 ++++++++++++++++
->  hw/arm/virt.c                  | 62 ++++++++++++++++++++++++++++++++--
->  2 files changed, 89 insertions(+), 2 deletions(-)
+> MAIN OPEN POINTS:
 > 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 1cb34111e5..b8abdefa1c 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -193,6 +193,33 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
->      }
->  }
->  
-> +static void acpi_ged_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                       DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if ((object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
-> +                       !(object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)))) {
-> +        acpi_memory_unplug_request_cb(hotplug_dev, &s->memhp_state, dev, errp);
-> +    } else {
-> +        error_setg(errp, "acpi: device unplug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void acpi_ged_unplug_cb(HotplugHandler *hotplug_dev,
-> +                               DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        acpi_memory_unplug_cb(&s->memhp_state, dev, errp);
-> +    } else {
-> +        error_setg(errp, "acpi: device unplug for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
->  static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
->  {
->      AcpiGedState *s = ACPI_GED(adev);
-> @@ -318,6 +345,8 @@ static void acpi_ged_class_init(ObjectClass *class, void *data)
->      dc->vmsd = &vmstate_acpi_ged;
->  
->      hc->plug = acpi_ged_device_plug_cb;
-> +    hc->unplug_request = acpi_ged_unplug_request_cb;
-> +    hc->unplug = acpi_ged_unplug_cb;
->  
->      adevc->send_event = acpi_ged_send_event;
->  }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index caceb1e4a0..80ef2d7b7a 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2177,11 +2177,68 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->      }
->  }
->  
-> +static void virt_dimm_unplug_request(HotplugHandler *hotplug_dev,
-> +                                     DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (!vms->acpi_dev) {
-> +        error_setg(&local_err,
-> +                   "memory hotplug is not enabled: missing acpi-ged device");
-> +        goto out;
-> +    }
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-> +        error_setg(&local_err,
-> +                   "nvdimm device hot unplug is not supported yet.");
-> +        goto out;
-> +    }
-> +
-> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(vms->acpi_dev), dev,
-> +                                   &local_err);
-> +out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
-> +                             DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    Error *local_err = NULL;
-> +
-> +    hotplug_handler_unplug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
-> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(vms));
-> +    qdev_unrealize(dev);
+> * confirmation on hvf state (Roman).
+> 
 
-doesn't pc_dimm_unplug() do unrealize already?
-(/me wonders why it doesn't explode here,
-are we leaking a refference somewhere so dimm is still alive?)
+Hi Claudio,
 
-> +
-> +out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                            DeviceState *dev, Error **errp)
->  {
-> -    error_setg(errp, "device unplug request for unsupported device"
-> -               " type: %s", object_get_typename(OBJECT(dev)));
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_dimm_unplug_request(hotplug_dev, dev, errp);
-> +    } else {
-> +        error_setg(errp, "device unplug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-> +                                          DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_dimm_unplug(hotplug_dev, dev, errp);
-> +    } else {
-> +        error_setg(errp, "virt: device unplug for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
->  }
->  
->  static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-> @@ -2262,6 +2319,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      hc->pre_plug = virt_machine_device_pre_plug_cb;
->      hc->plug = virt_machine_device_plug_cb;
->      hc->unplug_request = virt_machine_device_unplug_request_cb;
-> +    hc->unplug = virt_machine_device_unplug_cb;
->      mc->numa_mem_supported = true;
->      mc->nvdimm_supported = true;
->      mc->auto_enable_numa_with_memhp = true;
+I'm sorry for delay. I'm wrapping up another round of HVF cleanup that
+should make it easier to do hvf-specific changes in patch 4. I expect to
+send the cleanup series today.
 
+> * missing reviewed-by for patch 4 in the series
+> 
+
+I wonder if it would help to split patch 4 out of the series if nobody
+objects patches 1-3. At least it will be easier to rebase the last one
+alone. Then patch 4 might become a series on its own.
+
+Regards,
+Roman
 
