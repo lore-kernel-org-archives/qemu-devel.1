@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B545C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19472C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1645D2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:07:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBBDF2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 21:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aDyHe001"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1645D2072E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gBRLJz8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBDF2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joCc1-0007bT-8i
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 17:07:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38334)
+	id 1joCcE-0007pF-VW
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 17:07:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCaY-0005u6-3b
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:05:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20365
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCZN-0004ab-Uf
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:04:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55668
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCaV-0006KY-SU
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:05:45 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joCZL-00068n-R9
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 17:04:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593032742;
+ s=mimecast20190719; t=1593032669;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GoeW8gajJmWLqtYbv0tXC1bxUOPBvwa6snKUFs3QNoY=;
- b=aDyHe001Y4GNU2qA/2R0LWzzbpIopdA701pY9XQ3xReM4lpfo7av1sEhuJFYOWbN8yj2zX
- 7Vld4VrcGusIu06JtsE0y1dVuz+tRL0wllOKY2vDh/Yyq2gpLefC/5wpF9jRHONjakNAHt
- xBbVi63SobYaF2PIXwx+k6DNlzi4uzY=
+ bh=M14avp/25cQHy7CLNGy/zkHcL2UIQt9pUgi0SEFKI8g=;
+ b=gBRLJz8PWBXcrYgqutNgjDL93gsa5IGyFg/skDa9tjNlrxHJ62DmnX2VCFBWa8sQK8ZQpY
+ ru2eIOmmi7tShSC12eD1cQqkmPKQ/Jv0A2bJlxmNi8o5yLwJKWcnOM7+OZ7TNUoU1IsCZj
+ eS7quMw0qEzRI9FIY77hRU01my58jvg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-2NDb5uGYMdm0t6pfr_Gw1Q-1; Wed, 24 Jun 2020 17:05:40 -0400
-X-MC-Unique: 2NDb5uGYMdm0t6pfr_Gw1Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-199-rvX7vnDWNm6thpTWbv3hYA-1; Wed, 24 Jun 2020 17:04:28 -0400
+X-MC-Unique: rvX7vnDWNm6thpTWbv3hYA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5BCC8015F5;
- Wed, 24 Jun 2020 21:05:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 365A0BFC2;
+ Wed, 24 Jun 2020 21:04:26 +0000 (UTC)
 Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 15C602B4AD;
- Wed, 24 Jun 2020 21:05:39 +0000 (UTC)
-Subject: Re: [PATCH 31/46] qom: Use error_reportf_err() instead of
- g_printerr() in examples
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A1E5071660;
+ Wed, 24 Jun 2020 21:04:24 +0000 (UTC)
+Subject: Re: [PATCH 29/46] acpi: Avoid unnecessary error_propagate() after
+ error_setg()
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-32-armbru@redhat.com>
+ <20200624164344.3778251-30-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <ce694e63-1138-03d8-dda2-5b536a12db11@redhat.com>
-Date: Wed, 24 Jun 2020 16:05:38 -0500
+Message-ID: <97dc9d52-38d3-aa69-72bd-c4942b8eb7fc@redhat.com>
+Date: Wed, 24 Jun 2020 16:04:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-32-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-30-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,10 +105,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 11:43 AM, Markus Armbruster wrote:
+> The commit before previous enables another round of the transformation
+> from recent commit "error: Avoid unnecessary error_propagate() after
+> error_setg()".
+> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   include/qom/object.h | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
+>   hw/acpi/core.c | 15 ++++++---------
+>   1 file changed, 6 insertions(+), 9 deletions(-)
 > 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
