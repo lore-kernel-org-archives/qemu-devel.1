@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D4BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E970EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:29:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A23CA20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7FA920836
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:29:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jehXDHGH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23CA20836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFN4WrbT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FA920836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo3ae-0001fQ-TV
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:29:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39434)
+	id 1jo3at-00026E-WD
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:29:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jo3Yi-0006jC-6t
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:27:16 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:33864)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jo3Yg-000769-FC
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jo3Yh-0006iR-Q5
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:27:15 -0400
-Received: by mail-lf1-x141.google.com with SMTP id u25so1092578lfm.1
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 04:27:14 -0700 (PDT)
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36075)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jo3Yd-00075G-QN
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:27:15 -0400
+Received: by mail-lj1-x244.google.com with SMTP id i3so2153207ljg.3
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 04:27:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BAeSGl1wtUV2bgf5JPD0BJDHcmlodz8SVwPxsOzMRHc=;
- b=jehXDHGHMq11GHr2PO+lTcoZv9Q56gkk82ZMxNx1YtrDQ8niyHFuFkBfF6zx9Mywra
- dTk0wvasfo3IH+VDl5nOJ4uiq8ip3oCKPDuwCBzvBSfCauxL1o5TusErG+LA6WUaPZSG
- MPaQUEnDYXW71f/BvhUrwIqF2VZ2k5gk7APcBs9yU3a3orF6hfg6pzXgmYGfJxzHPmWn
- 876MFClASv5gQgnVeenOZvn6m76/0pSESDCNW8hkgsaXUVtwziIVZg8E2RySAztjF7Fn
- NFTdV13u0Ri/f08fubdkmHlWRWeKEbs+TdbaXIEdpEg6WR6wKjq0TSfmVLZKE1QeXi1F
- UX1Q==
+ bh=v/NS9YgRb0NXpU+G0HRMzylRBMOp+QQCcs98Z10vCR8=;
+ b=LFN4WrbTHl5vTrshZmaHadc0Qnsu1rytPPNixo8yLuTJ0WR1ijl63DEZgCnk/QNNdw
+ PNshVgPMrZWHF8ifp2ujUEf8SAquKwpZaivE1wZG5cYOCaazc6zzB8dYllCXgZcXh1+P
+ P0aJK6U6RkOCRgb7PFxiPgRd/Saa5QAzCMVKZkO78wSKlILRza8Zz/mlXrM1cleZFa7Z
+ SmPKUtLNFREi/1/FtvRo5niRFRgQATsREoGR12/GXPMjvxOoS4Fo0UdOr4QstkyieCUT
+ NZe+WPaEO2Cl3T0YwzhnLcm0TpokHeX9prQ87EfJGiP2uPKEPw96p9RKWGva0QQvi67p
+ eyyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BAeSGl1wtUV2bgf5JPD0BJDHcmlodz8SVwPxsOzMRHc=;
- b=mxhKMp83VWiVyQ7+T+jaqi8WAyvb40Ch9mqlIdiK1UOTlmn86M/ovvitIIPMbmoZH3
- i7/73AQjUBY5LArNqAR5hJ90ebcu/byflQ8RrD08wwcdz7PNdYGaZh1Ex/YlqzafnVJj
- Woq46BrySjV9oZxbVeLzc66nYYZBtYVIJlUWtSL/fiwJ2SCNh0J/Y0XBLRF+pDh0F+31
- GCXsqmFLEA4WPnr50q/f3N2Q0RoGGGdq4AV0vkVkMRW6EJ2H8cuzQx+gWRrstYoIJvXR
- OCIDB+qbSCObpbNfKo3GV6WmPjahj1aYc7P7QuRRwdkE23tpBfOVMWi1GZT+OXfGbGaY
- Rr0g==
-X-Gm-Message-State: AOAM533ej00ShWMD52Aiph0mgnso9SL7I0gKGoRgZF2KJKm0g8UAg3xi
- ft/BXcSTK7OfswlOIcqWLhBvGBRcc3Q6Ug==
-X-Google-Smtp-Source: ABdhPJyEGOW1mTkWeQRXEHGuDLsa348Ai+v6YelZ67o7zBE1JBKscm/49RtMq8LP+wL/egMpNSqdjQ==
-X-Received: by 2002:ac2:5691:: with SMTP id 17mr6961101lfr.209.1592998032680; 
- Wed, 24 Jun 2020 04:27:12 -0700 (PDT)
+ bh=v/NS9YgRb0NXpU+G0HRMzylRBMOp+QQCcs98Z10vCR8=;
+ b=fEnpsfSKTS84b9j72RdL1TlIgIz0pIsD6J5YMC9v7Y4wY6SJMcCJhdJwkZdPQdPm12
+ oiPai0vvkYCND3UFin8D3E3v7SG02Uq7rNCn/xKc+64e4coZS9YbnvHROkYmHAcD0Zft
+ aT6XEeBjrAhA6zX68lRXaRY4NVbidsRHEgz+Cl5j8F38bite+v9OsoD5H/jDYUsyqNzN
+ AmsRpzWzVo5eQj0uq/KzQurMJNQLCOIJU/fX2/VF0Og7HgUy8GtcgH1iViCv1EHtG574
+ UPtfj1Em/evJGkZo947jVEr+zdiF78Id3m8RoxWZS6PYXBYBr7eSVOjps3b3/5nduVVc
+ gu9g==
+X-Gm-Message-State: AOAM531teGV6pYCa/XYmXajpDyPiqn0eYuElcB7J8EyPQK2ea2a+J44+
+ llTgKtBd1fOdegGtoX6ksQn+fhGCmAg3VQ==
+X-Google-Smtp-Source: ABdhPJzqr/1zZummamrFZO2v2riepgtsy9VSAyfbkr8HQKRT0QJRwTd6aw1WRXQYI5IM9+/6iow9tg==
+X-Received: by 2002:a2e:3a17:: with SMTP id h23mr13128295lja.7.1592998029809; 
+ Wed, 24 Jun 2020 04:27:09 -0700 (PDT)
 Received: from localhost.localdomain (193-239-39-51.ksi-system.net.
  [193.239.39.51])
- by smtp.gmail.com with ESMTPSA id d6sm1202635lja.77.2020.06.24.04.27.11
+ by smtp.gmail.com with ESMTPSA id d6sm1202635lja.77.2020.06.24.04.27.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 04:27:12 -0700 (PDT)
+ Wed, 24 Jun 2020 04:27:09 -0700 (PDT)
 From: Szymon Lukasz <noh4hss@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/6] char-stdio: add support for the terminal size
-Date: Wed, 24 Jun 2020 13:26:38 +0200
-Message-Id: <20200624112640.82673-5-noh4hss@gmail.com>
+Subject: [PATCH v2 1/6] main-loop: change the handling of SIGWINCH
+Date: Wed, 24 Jun 2020 13:26:35 +0200
+Message-Id: <20200624112640.82673-2-noh4hss@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200624112640.82673-1-noh4hss@gmail.com>
 References: <20200624112640.82673-1-noh4hss@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=noh4hss@gmail.com; helo=mail-lf1-x141.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=noh4hss@gmail.com; helo=mail-lj1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,101 +106,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement chr_get_winsize for the stdio backend
-and trigger CHR_EVENT_RESIZE upon SIGWINCH delivery.
+Block SIGWINCH, so it is delivered only via signalfd.
+Install a handler that uses NotifierList to tell
+interested parties about SIGWINCH delivery.
 
 Signed-off-by: Szymon Lukasz <noh4hss@gmail.com>
 ---
- chardev/char-stdio.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ include/qemu/main-loop.h |  4 ++++
+ ui/curses.c              | 11 ++++++-----
+ util/main-loop.c         | 21 +++++++++++++++++++++
+ 3 files changed, 31 insertions(+), 5 deletions(-)
 
-diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
-index 82eaebc1db..1edc82fc6e 100644
---- a/chardev/char-stdio.c
-+++ b/chardev/char-stdio.c
-@@ -34,7 +34,9 @@
- #include "chardev/char-win-stdio.h"
- #else
- #include <termios.h>
-+#include <sys/ioctl.h>
- #include "chardev/char-fd.h"
-+#include "qemu/main-loop.h"
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index a6d20b0719..f27dba1fd8 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -325,4 +325,8 @@ typedef struct MainLoopPoll {
+ void main_loop_poll_add_notifier(Notifier *notify);
+ void main_loop_poll_remove_notifier(Notifier *notify);
+ 
++#ifndef _WIN32
++void sigwinch_add_notifier(Notifier *n);
++#endif
++
  #endif
+diff --git a/ui/curses.c b/ui/curses.c
+index a59b23a9cf..e5895d506f 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -34,6 +34,7 @@
+ #include <iconv.h>
  
- #ifndef _WIN32
-@@ -45,6 +47,13 @@ static bool stdio_in_use;
- static bool stdio_allow_signal;
- static bool stdio_echo_state;
- 
-+typedef struct {
-+    FDChardev parent;
-+    Notifier resize_notifier;
-+} StdioChardev;
-+
-+#define STDIO_CHARDEV(obj) OBJECT_CHECK(StdioChardev, (obj), TYPE_CHARDEV_STDIO)
-+
- static void term_exit(void)
- {
-     if (stdio_in_use) {
-@@ -82,11 +91,32 @@ static void term_stdio_handler(int sig)
-     qemu_chr_set_echo_stdio(NULL, stdio_echo_state);
+ #include "qapi/error.h"
++#include "qemu/main-loop.h"
+ #include "qemu/module.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+@@ -146,7 +147,7 @@ static void curses_resize(DisplayChangeListener *dcl,
  }
  
-+static int qemu_chr_get_winsize_stdio(Chardev *chr, uint16_t *cols,
-+                                      uint16_t *rows)
-+{
-+    struct winsize ws;
+ #if !defined(_WIN32) && defined(SIGWINCH) && defined(KEY_RESIZE)
+-static volatile sig_atomic_t got_sigwinch;
++static bool got_sigwinch;
+ static void curses_winch_check(void)
+ {
+     struct winsize {
+@@ -169,17 +170,17 @@ static void curses_winch_check(void)
+     invalidate = 1;
+ }
+ 
+-static void curses_winch_handler(int signum)
++static void curses_winch_handler(Notifier *n, void *data)
+ {
+     got_sigwinch = true;
+ }
+ 
+ static void curses_winch_init(void)
+ {
+-    struct sigaction old, winch = {
+-        .sa_handler  = curses_winch_handler,
++    static Notifier n = {
++        .notify = curses_winch_handler
+     };
+-    sigaction(SIGWINCH, &winch, &old);
++    sigwinch_add_notifier(&n);
+ }
+ #else
+ static void curses_winch_check(void) {}
+diff --git a/util/main-loop.c b/util/main-loop.c
+index eda63fe4e0..0f5c8f3af1 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -90,6 +90,7 @@ static int qemu_signal_init(Error **errp)
+     sigaddset(&set, SIGIO);
+     sigaddset(&set, SIGALRM);
+     sigaddset(&set, SIGBUS);
++    sigaddset(&set, SIGWINCH);
+     /* SIGINT cannot be handled via signalfd, so that ^C can be used
+      * to interrupt QEMU when it is being run under gdb.  SIGHUP and
+      * SIGTERM are also handled asynchronously, even though it is not
+@@ -111,6 +112,26 @@ static int qemu_signal_init(Error **errp)
+     return 0;
+ }
+ 
++static NotifierList sigwinch_notifiers =
++    NOTIFIER_LIST_INITIALIZER(sigwinch_notifiers);
 +
-+    if (ioctl(1, TIOCGWINSZ, &ws) < 0) {
-+        return -1;
++static void sigwinch_handler(int signum)
++{
++    notifier_list_notify(&sigwinch_notifiers, NULL);
++}
++
++void sigwinch_add_notifier(Notifier *n)
++{
++    if (notifier_list_empty(&sigwinch_notifiers)) {
++        struct sigaction action = {
++            .sa_handler = sigwinch_handler,
++        };
++        sigaction(SIGWINCH, &action, NULL);
 +    }
 +
-+    *cols = ws.ws_col;
-+    *rows = ws.ws_row;
-+    return 0;
++    notifier_list_add(&sigwinch_notifiers, n);
 +}
 +
-+static void term_resize_notify(Notifier *n, void *data)
-+{
-+    StdioChardev *s = container_of(n, StdioChardev, resize_notifier);
-+    qemu_chr_be_event(CHARDEV(s), CHR_EVENT_RESIZE);
-+}
-+
- static void qemu_chr_open_stdio(Chardev *chr,
-                                 ChardevBackend *backend,
-                                 bool *be_opened,
-                                 Error **errp)
- {
-+    StdioChardev *s = STDIO_CHARDEV(chr);
-     ChardevStdio *opts = backend->u.stdio.data;
-     struct sigaction act;
+ #else /* _WIN32 */
  
-@@ -116,6 +146,9 @@ static void qemu_chr_open_stdio(Chardev *chr,
-         stdio_allow_signal = opts->signal;
-     }
-     qemu_chr_set_echo_stdio(chr, false);
-+
-+    s->resize_notifier.notify = term_resize_notify;
-+    sigwinch_add_notifier(&s->resize_notifier);
- }
- #endif
- 
-@@ -139,6 +172,7 @@ static void char_stdio_class_init(ObjectClass *oc, void *data)
- #ifndef _WIN32
-     cc->open = qemu_chr_open_stdio;
-     cc->chr_set_echo = qemu_chr_set_echo_stdio;
-+    cc->chr_get_winsize = qemu_chr_get_winsize_stdio;
- #endif
- }
- 
-@@ -155,6 +189,7 @@ static const TypeInfo char_stdio_type_info = {
-     .parent = TYPE_CHARDEV_WIN_STDIO,
- #else
-     .parent = TYPE_CHARDEV_FD,
-+    .instance_size = sizeof(StdioChardev),
- #endif
-     .instance_finalize = char_stdio_finalize,
-     .class_init = char_stdio_class_init,
+ static int qemu_signal_init(Error **errp)
 -- 
 2.27.0
 
