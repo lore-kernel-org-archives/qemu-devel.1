@@ -6,69 +6,67 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400AFC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F6DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DD282073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F73720738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsgSGlx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD282073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlMTnisL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F73720738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8Z6-0001YF-7O
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:48:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51518)
+	id 1jo8bJ-0005NX-QO
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:50:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VI-0003Eb-EV
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35048
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VJ-0003HJ-8U
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30111
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V9-00055F-8o
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V9-000558-Az
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017034;
+ s=mimecast20190719; t=1593017033;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UVOHo3gG9cNfj4OFo3XM9B+iB1czPL6Q9CNxTX7cqts=;
- b=RsgSGlx5qTdZ0/Je2jjxM3tkOY0E6ifuqs7vAQrkOmIxbyQW3Dk8ULDHAHqcRqlLVP1SKd
- LQd9tiaspRhTHob1h6gkhM5Lo1kICxTV/xBePFQE7J8cplJQBmQt93zMekU/ziZISzlGc6
- Me4r5bXMfRL+Jcq85UpDeaujgfgw0cU=
+ bh=3Sh0UAY1+Hr4CyavGL5vHaBvy5U4c3TrBNo8FN91rFE=;
+ b=VlMTnisL8MS7RFbOKnq9yZpDrLGIKM+LlzdCfQaLC4bUUH6ij7PWcOjO5Ac1JG3wH/iJnu
+ Ldkhbc5glwhpIqbLg8dmhw5odxQ3pmDVblwf41hY1BNM+fSdSx/44UjOYT0mois99oKOh6
+ 0I5NpztbRBH/y/VsRK2KtnHRbbBTZEg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-32mMslssMhKxPYY9LtYLPg-1; Wed, 24 Jun 2020 12:43:50 -0400
-X-MC-Unique: 32mMslssMhKxPYY9LtYLPg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-235-UM1UQfI_OIyGk9wsuP1Ksg-1; Wed, 24 Jun 2020 12:43:50 -0400
+X-MC-Unique: UM1UQfI_OIyGk9wsuP1Ksg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD2A8804003;
- Wed, 24 Jun 2020 16:43:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36CBE8015F6;
+ Wed, 24 Jun 2020 16:43:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 856285D9D3;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF60B1A90F;
  Wed, 24 Jun 2020 16:43:48 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0E5D11138479; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id 11C95113847A; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/46] qemu-option: Factor out helper find_default_by_name()
-Date: Wed, 24 Jun 2020 18:43:10 +0200
-Message-Id: <20200624164344.3778251-13-armbru@redhat.com>
+Subject: [PATCH 13/46] qemu-option: Simplify around find_default_by_name()
+Date: Wed, 24 Jun 2020 18:43:11 +0200
+Message-Id: <20200624164344.3778251-14-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -104,137 +102,48 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- util/qemu-option.c | 47 ++++++++++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 20 deletions(-)
+ util/qemu-option.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
 diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 9941005c91..ddcf3072c5 100644
+index ddcf3072c5..d9293814b4 100644
 --- a/util/qemu-option.c
 +++ b/util/qemu-option.c
-@@ -142,6 +142,13 @@ static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
-     return NULL;
+@@ -286,11 +286,9 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+     opt = qemu_opt_find(opts, name);
+     if (!opt) {
+         def_val = find_default_by_name(opts, name);
+-        if (def_val) {
+-            return def_val;
+-        }
++        return def_val;
+     }
+-    return opt ? opt->str : NULL;
++    return opt->str;
  }
  
-+static const char *find_default_by_name(QemuOpts *opts, const char *name)
-+{
-+    const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
-+
-+    return desc ? desc->def_value_str : NULL;
-+}
-+
- void parse_option_size(const char *name, const char *value,
-                        uint64_t *ret, Error **errp)
- {
-@@ -270,7 +277,7 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
- const char *qemu_opt_get(QemuOpts *opts, const char *name)
+ void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
+@@ -320,7 +318,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
  {
      QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
+     const char *def_val;
+-    char *str = NULL;
++    char *str;
  
      if (opts == NULL) {
          return NULL;
-@@ -278,9 +285,9 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
- 
+@@ -329,10 +327,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
      opt = qemu_opt_find(opts, name);
      if (!opt) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            return desc->def_value_str;
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            return def_val;
-         }
+         def_val = find_default_by_name(opts, name);
+-        if (def_val) {
+-            str = g_strdup(def_val);
+-        }
+-        return str;
++        return g_strdup(def_val);
      }
-     return opt ? opt->str : NULL;
-@@ -312,7 +319,7 @@ const char *qemu_opt_iter_next(QemuOptsIter *iter)
- char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     char *str = NULL;
- 
-     if (opts == NULL) {
-@@ -321,9 +328,9 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            str = g_strdup(desc->def_value_str);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            str = g_strdup(def_val);
-         }
-         return str;
-     }
-@@ -349,7 +356,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
-                                      bool defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     bool ret = defval;
- 
-     if (opts == NULL) {
-@@ -358,9 +365,9 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
- 
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_bool(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_bool(name, def_val, &ret, &error_abort);
-         }
-         return ret;
-     }
-@@ -386,7 +393,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
-                                            uint64_t defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     uint64_t ret = defval;
- 
-     if (opts == NULL) {
-@@ -395,9 +402,9 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
- 
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_number(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_number(name, def_val, &ret, &error_abort);
-         }
-         return ret;
-     }
-@@ -424,7 +431,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
-                                          uint64_t defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     uint64_t ret = defval;
- 
-     if (opts == NULL) {
-@@ -433,9 +440,9 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
- 
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_size(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_size(name, def_val, &ret, &error_abort);
-         }
-         return ret;
-     }
+     str = opt->str;
+     opt->str = NULL;
 -- 
 2.26.2
 
