@@ -2,76 +2,79 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00438C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2715AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:23:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD43F2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:16:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E484120B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:23:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9+kK2T8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD43F2082F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSg5pq7m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E484120B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo0Zq-0006Uz-0O
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:16:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42162)
+	id 1jo0gb-0001DI-4u
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:23:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jo0Xf-0003OS-OF
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:13:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60713
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0fs-0000nC-66
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:22:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33892)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jo0Xd-0004oZ-GP
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:13:59 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0fp-0002zS-Ll
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:22:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592986436;
+ s=mimecast20190719; t=1592986943;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EDZgEmRf8j0GpS6UKy/5+lBRYRt3sbpiBRR7BzwR3M4=;
- b=b9+kK2T8GEoQWQ+ZdRQ2S2Bzo2DtVJySggwrqTWAF4JUeqPoPra6LhgVcQksZ3ZhnEnJk7
- slQy1CyoeOF8/iCaEOivgpsErshLynnmmbUg0QFQWQs4M4xdTI8BAraWPtCNIIv6/+cmyj
- kybnmXnk/vXYKjD5PjSXPJX/AA3QKhY=
+ bh=br1GPiaFaAnYFVR7xm/sUIBxRJ2R2ci8XpWCvV+YlfI=;
+ b=MSg5pq7mD+S8GBVfIg8iGpJyPzOh72z/RIVNO8wPfjStdtjVIguzF1odpRxUQuzD40ux6z
+ QbHCTbvpRYEZiRXJBcQMXQzeZ3FJBKnQfHkuMmQtBnOqH3dLnD0PaFCCMXWtewQCwu5YHP
+ 9pn77fZx/mnKd8AnyL0ryaRNHVzkHfQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-dJHVHx8WPO2nS1-Jkk6tVQ-1; Wed, 24 Jun 2020 04:13:54 -0400
-X-MC-Unique: dJHVHx8WPO2nS1-Jkk6tVQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-7-6Vke0o8JOfSxVoJSwH874g-1; Wed, 24 Jun 2020 04:22:21 -0400
+X-MC-Unique: 6Vke0o8JOfSxVoJSwH874g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8E11804031;
- Wed, 24 Jun 2020 08:13:53 +0000 (UTC)
-Received: from localhost (ovpn-113-239.ams2.redhat.com [10.36.113.239])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AD6317DBA;
- Wed, 24 Jun 2020 08:13:53 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL v2 1/2] iotests: Fix 051 output after qdev_init_nofail() removal
-Date: Wed, 24 Jun 2020 10:13:48 +0200
-Message-Id: <20200624081349.121791-2-mreitz@redhat.com>
-In-Reply-To: <20200624081349.121791-1-mreitz@redhat.com>
-References: <20200624081349.121791-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3289F80400C;
+ Wed, 24 Jun 2020 08:22:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B23E60F89;
+ Wed, 24 Jun 2020 08:22:16 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A55A1113846D; Wed, 24 Jun 2020 10:22:14 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH] qom: Allow object_property_add_child() to fail
+References: <20200623155452.30954-1-eric.auger@redhat.com>
+Date: Wed, 24 Jun 2020 10:22:14 +0200
+In-Reply-To: <20200623155452.30954-1-eric.auger@redhat.com> (Eric Auger's
+ message of "Tue, 23 Jun 2020 17:54:52 +0200")
+Message-ID: <87eeq4dgax.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -92,53 +95,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Eric Auger <eric.auger@redhat.com> writes:
 
-Commit 96927c744 replaced qdev_init_nofail() call by
-isa_realize_and_unref() which has a different error
-message. Update the test output accordingly.
+> object_property_add() does not allow object_property_try_add()
+> to gracefully fail as &error_abort is passed as an error handle.
+>
+> However such failure can easily be triggered from the QMP shell when,
+> for instance, one attempts to create an object with an id that already
+> exists:
+>
+> For instance, call twice:
+> object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
+> and QEMU aborts.
+>
+> This behavior is undesired as a user/management application mistake
+> in reusing a property ID shouldn't result in loss of the VM and live
+> data within.
+>
+> This patch introduces two new functions, object_property_add_err() and
+> object_property_add_child_err() whose prototype features an error handle.
+> object_property_add_child_err() now gets called from user_creatable_add_type.
+> This solution was chosen instead of changing the prototype of existing
+> functions because the number of existing callers is huge.
+>
+> The error now is returned gracefully to the QMP client.
+>
+> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+> {"return": {}}
+> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+> {"error": {"class": "GenericError", "desc": "attempt to add duplicate property
+> 'mem2' to object (type 'container')"}}
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Gitlab CI error after merging b77b5b3dc7:
-https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
+Recent regression, my fault.  Please point that out, and add
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200616154949.6586-1-philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/051.pc.out | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 0ea80d35f0..da8ad87187 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive if=ide
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
-+(qemu) QEMU_PROG: Device needs media, but drive is empty
- 
- Testing: -drive if=virtio
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
-+(qemu) QEMU_PROG: Block node is read-only
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--- 
-2.26.2
+  Fixes: d2623129a7dec1d3041ad1221dda1ca49c667532
 
 
