@@ -2,75 +2,75 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2039C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73263C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:59:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76792214DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 420CD20768
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:59:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJ++jmo9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76792214DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYDfuA8w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 420CD20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joBXi-0002ny-HW
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:58:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46884)
+	id 1joBYg-000402-Id
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:59:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBR5-0005vl-2O
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:51:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53088
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBUe-0000Ej-A5
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:55:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60787
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBQ7-0003ZN-Ta
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:51:54 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBUb-0005pN-Rb
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:55:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593028255;
+ s=mimecast20190719; t=1593028532;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lTp0AOAl/za374zGgDg7swlQLdlyVD/uSBFbX4wWVko=;
- b=RJ++jmo9ag4LMOogcr5QmWV96KgEJcLdfmNFF+P5bX5YBqreUNacIcFfb38Etz4yj+Xu+F
- xbOYFyIrIxLK2mF/qgleUupr/MTm25TpTZHmKaFn9EzkEeGpwyFraV9UEnZGuIpgowjiKR
- Kq2kx4Jl0o6DthE7UkoQUiH64SdpmiI=
+ bh=uZ6MlYtRovI2Ch+t/I8qWwlonBQhQemax8sG+PT10k0=;
+ b=fYDfuA8wSX1hbTb+4qv47n2CdDKkeLiHBcRDcUwZiJO2fPfer3qw2rTzzxJJl2Ooo9XRSb
+ yIurP7f30V8zRSTUFZDSUnU0CF2t4MfOe10FI5wmERn1IRaa6q1SE9yM/xnn5o+qf5wFe1
+ ByBzoEAvRVjevUaruW+ThygW4gYUx4M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391--Svk12eQOVCYD9oTAxBiqg-1; Wed, 24 Jun 2020 15:50:51 -0400
-X-MC-Unique: -Svk12eQOVCYD9oTAxBiqg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-277-ciJbjozuOnW08vqU31radg-1; Wed, 24 Jun 2020 15:55:31 -0400
+X-MC-Unique: ciJbjozuOnW08vqU31radg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65ABB100A61E;
- Wed, 24 Jun 2020 19:50:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1806100CCC0;
+ Wed, 24 Jun 2020 19:55:29 +0000 (UTC)
 Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB3195D9C5;
- Wed, 24 Jun 2020 19:50:49 +0000 (UTC)
-Subject: Re: [PATCH 15/46] qemu-option: Tidy up opt_set() not to free
- arguments on failure
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 43D395BAC4;
+ Wed, 24 Jun 2020 19:55:29 +0000 (UTC)
+Subject: Re: [PATCH 16/46] qemu-option: Make functions taking Error ** return
+ bool, not void
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-16-armbru@redhat.com>
+ <20200624164344.3778251-17-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <3f298381-d979-b9e7-e5ea-68ab081c77c9@redhat.com>
-Date: Wed, 24 Jun 2020 14:50:49 -0500
+Message-ID: <75354a5a-acb9-b937-be69-ff9ae82da17c@redhat.com>
+Date: Wed, 24 Jun 2020 14:55:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-16-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-17-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -105,25 +105,29 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 11:43 AM, Markus Armbruster wrote:
-> opt_set() frees its argument @value on failure.  Slightly unclean;
-> functions ideally do nothing on failure.
-> 
-> To tidy this up, move opt_create() from opt_set() into its callers,
-> along with the cleanup.
+> See recent commit "error: Document Error API usage rules" for
+> rationale.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   util/qemu-option.c | 33 ++++++++++++++++++---------------
->   1 file changed, 18 insertions(+), 15 deletions(-)
+>   include/qemu/option.h | 16 ++++----
+>   blockdev.c            |  5 ++-
+>   util/qemu-option.c    | 92 +++++++++++++++++++++++++------------------
+>   3 files changed, 64 insertions(+), 49 deletions(-)
 > 
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 3cdf0c0800..14946e81f2 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -519,36 +519,39 @@ static QemuOpt *opt_create(QemuOpts *opts, const char *name, char *value,
->       return opt;
->   }
->   
+
+> -static void qemu_opts_from_qdict_entry(QemuOpts *opts,
+> +static bool qemu_opts_from_qdict_entry(QemuOpts *opts,
+>                                          const QDictEntry *entry,
+>                                          Error **errp)
+>   {
+>       const char *key = qdict_entry_key(entry);
+>       QObject *obj = qdict_entry_value(entry);
+> -    char buf[32], *tmp = NULL;
+> +    char buf[32];
+> +    g_autofree char *tmp = NULL;
+
+A bit fancier than a straight mechanical conversion here, but it works.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
