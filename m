@@ -2,94 +2,88 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0497CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F90620CC7
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:14:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F90620CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4A7A206A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 03:24:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/aYoqRJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A7A206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnvs9-0000VG-8L
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 23:14:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
+	id 1jnw1s-0004FY-16
+	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 23:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jnvrP-0008Ef-Hx
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:14:03 -0400
-Received: from mga17.intel.com ([192.55.52.151]:26997)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jnvrM-0003EY-FL
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:14:03 -0400
-IronPort-SDR: O6I4KSuxUVwTEtddYK5odXF0II89TL2RsXLMn9UFJfkB9LSSNL2l+HJmNdqbOugB3IVYfTHXnv
- /EBUsNfvBZYA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="124567737"
-X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; d="scan'208";a="124567737"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Jun 2020 20:13:54 -0700
-IronPort-SDR: D11Ep5ymVPAHU/ciH22Xur6MBsb/KFL/h17GxEErYDCsPIURCILMrNAORxWDewu1F3xj/6TZ0P
- 8/fgpUu82ZCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; d="scan'208";a="452484586"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga005.jf.intel.com with ESMTP; 23 Jun 2020 20:13:54 -0700
-Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 23 Jun 2020 20:13:54 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 24 Jun 2020 11:13:51 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 24 Jun 2020 11:13:51 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>
-Subject: RE: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
- and clean up
-Thread-Topic: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
- and clean up
-Thread-Index: AQHWD7P+xm/8Bq9SCE2KY4WVvkZ5vqiHGCMAgFkFkQCABcLnsP//vzCAgAHrdpA=
-Date: Wed, 24 Jun 2020 03:13:51 +0000
-Message-ID: <ad352186b43349f08b93ffa8ffbff525@intel.com>
-References: <20200411033824.19389-1-chen.zhang@intel.com>
- <c8ce4348-d81c-1d10-ff82-74be39a03b5a@redhat.com>
- <20200619194611.057b48ed@luklap> <5660d3b43c8d4fb4ab0a42e0bf67eaa4@intel.com>
- <cb77d0c2-f3ee-2ba9-e495-3fc325eb122c@redhat.com>
-In-Reply-To: <cb77d0c2-f3ee-2ba9-e495-3fc325eb122c@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jnw1H-0003ov-O8
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:24:15 -0400
+Received: from mail-lj1-x22e.google.com ([2a00:1450:4864:20::22e]:37687)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1jnw1G-0007xx-3v
+ for qemu-devel@nongnu.org; Tue, 23 Jun 2020 23:24:15 -0400
+Received: by mail-lj1-x22e.google.com with SMTP id e4so957524ljn.4
+ for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 20:24:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zATyIOC89HCqUhnBoh+lwkWVcOVUh3I8uyFWbAFlEoM=;
+ b=k/aYoqRJ6SpGM7scsWsZcHmoGIprlLyky0mNM0bxVvdwLKy7eXzAEQ9NkP3DtYw4nR
+ TQdxap2VMFzlvJc7mxNU9NWuXuXo5x8vtFKx9/V4b3tNDZxagESQhGTJczG19Q8YY6pc
+ uxKztahkcSYM4f6IttOB9q3iydH3d5QA7exX04t9tE3uHt0j4C3Kqcvsb55J4iaX+Qkk
+ 4M0nebTMRqMXKY7ztHXRVnjgh5uRdSx151SPeFLRE4pWVpI1TIVl8Dgqd+1LqN4gCOjn
+ u1NnUMYIC9EmRj03AjoXYn0652bEEFgYbrJQB/4DvvFy3zS7yBXHKheNulZi3P4nzlpd
+ jz8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zATyIOC89HCqUhnBoh+lwkWVcOVUh3I8uyFWbAFlEoM=;
+ b=gjU+nJQ57ASoxrZmbw3iIcE9TKFMoIYZgViFE5O1CNtIOv4FRGNrvTbYICXjrLE+9A
+ oq/6rYH+ztG2hySYDnpxfNu4Q6ztu/pUzCJE2dQPAf0Ja2taXWyaNRjR3uRgOC6ANt53
+ iznEBu1Y2czUwuQJw3H3h6dWiUmj5AC25lWp+XgE3r6C1ztVtiajqOexETzl4VZigoTK
+ 36LelzKA5mKM2oAk0udjC5jZ+ey5PtOy7LosWdSaZWCxhHB9tPWBD53FsgODF8WN11Qw
+ sgIjg6uBc5b+wkzgAAnAsWw8NkB5D0qBCk2LX+zP+vXLFGwNgxrFq7FJXReIbDwjfkkC
+ f/+Q==
+X-Gm-Message-State: AOAM532P4mJOvyhVTG7h8f366I6mJLRE0tCyuz+Z8/2mZE08OkXkY9C+
+ mVxuOrWVREIA1WmxafLWxqg3qdbUo6Z+NRZgAiI=
+X-Google-Smtp-Source: ABdhPJy82cR6TDBLKeUrr7BsPQumqJX34a+ZGAf4Ewtmd6TzkP5ojuvgG5SLPlkHR12eACs2CaeuiXrWP9f+JXzNVZY=
+X-Received: by 2002:a2e:b8c2:: with SMTP id s2mr13599176ljp.368.1592969051504; 
+ Tue, 23 Jun 2020 20:24:11 -0700 (PDT)
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.151; envelope-from=chen.zhang@intel.com;
- helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 23:13:55
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CAKf6xpuSD3NC2bLPQN75e2pR8asu9Ey1xTGxTNeCR_1MGsnPOg@mail.gmail.com>
+ <ac4dfe3b-7981-49bb-25a2-08578da150d5@ilande.co.uk>
+ <CAKf6xpvs6mNowsiAzbfQGLGp0aY0zKgUD=DVpSorWHycm--J8g@mail.gmail.com>
+ <87k0zykwdl.fsf@dusky.pond.sub.org> <000001d64953$f67a1f00$e36e5d00$@xen.org>
+In-Reply-To: <000001d64953$f67a1f00$e36e5d00$@xen.org>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Tue, 23 Jun 2020 23:23:59 -0400
+Message-ID: <CAKf6xpt02SndxVkhqy52z7ZPCHtOhX1R5d7JQbeC8tVauBRm4Q@mail.gmail.com>
+Subject: Re: sysbus failed assert for xen_sysdev
+To: Paul Durrant <paul@xen.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22e;
+ envelope-from=jandryuk@gmail.com; helo=mail-lj1-x22e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,47 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
-b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogVHVlc2RheSwgSnVuZSAyMywgMjAyMCAxOjU0IFBN
-DQo+IFRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBMdWthcyBTdHJhdWIN
-Cj4gPGx1a2Fzc3RyYXViMkB3ZWIuZGU+DQo+IENjOiBxZW11LWRldiA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPjsgWmhhbmcgQ2hlbg0KPiA8emhhbmdja2lkQGdtYWlsLmNvbT4NCj4gU3ViamVjdDog
-UmU6IFtQQVRDSCAwLzJdIG5ldC9jb2xvLWNvbXBhcmUuYzogRXhwb3NlICJtYXhfcXVldWVfc2l6
-ZSIgdG8NCj4gdXNlcnMgYW5kIGNsZWFuIHVwDQo+IA0KPiANCj4gT24gMjAyMC82LzIzIOS4iuWN
-iDk6NDcsIFpoYW5nLCBDaGVuIHdyb3RlOg0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
-ZS0tLS0tDQo+ID4+IEZyb206IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5kZT4NCj4g
-Pj4gU2VudDogU2F0dXJkYXksIEp1bmUgMjAsIDIwMjAgMTo0NyBBTQ0KPiA+PiBUbzogSmFzb24g
-V2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4NCj4gPj4gQ2M6IFpoYW5nLCBDaGVuIDxjaGVuLnpo
-YW5nQGludGVsLmNvbT47IHFlbXUtZGV2IDxxZW11LQ0KPiA+PiBkZXZlbEBub25nbnUub3JnPjsg
-WmhhbmcgQ2hlbiA8emhhbmdja2lkQGdtYWlsLmNvbT4NCj4gPj4gU3ViamVjdDogUmU6IFtQQVRD
-SCAwLzJdIG5ldC9jb2xvLWNvbXBhcmUuYzogRXhwb3NlICJtYXhfcXVldWVfc2l6ZSINCj4gPj4g
-dG8gdXNlcnMgYW5kIGNsZWFuIHVwDQo+ID4+DQo+ID4+IE9uIEZyaSwgMjQgQXByIDIwMjAgMTA6
-MTk6NDggKzA4MDANCj4gPj4gSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4gd3JvdGU6
-DQo+ID4+DQo+ID4+PiBPbiAyMDIwLzQvMTEg5LiK5Y2IMTE6MzgsIFpoYW5nIENoZW4gd3JvdGU6
-DQo+ID4+Pj4gRnJvbTogWmhhbmcgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+DQo+ID4+Pj4N
-Cj4gPj4+PiBUaGlzIHNlcmllcyBtYWtlIGEgd2F5IHRvIGNvbmZpZyBDT0xPICJtYXhfcXVldWVf
-c2l6ZSIgcGFyYW1ldGVycw0KPiA+Pj4+IGFjY29yZGluZyB0byB1c2VyJ3Mgc2NlbmFyaW9zIGFu
-ZCBlbnZpcm9ubWVudHMgYW5kIGRvIHNvbWUgY2xlYW4gdXANCj4gPj4+PiBmb3INCj4gPj4gZGVz
-Y3JpcHRpb25zLg0KPiA+Pj4+IFpoYW5nIENoZW4gKDIpOg0KPiA+Pj4+ICAgICBuZXQvY29sby1j
-b21wYXJlLmM6IEV4cG9zZSBjb21wYXJlICJtYXhfcXVldWVfc2l6ZSIgdG8gdXNlcnMNCj4gPj4+
-PiAgICAgcWVtdS1vcHRpb25zLmh4OiBDbGVhbiB1cCBhbmQgZml4IHR5cG8gZm9yIGNvbG8tY29t
-cGFyZQ0KPiA+Pj4+DQo+ID4+Pj4gICAgbmV0L2NvbG8tY29tcGFyZS5jIHwgNDMNCj4gPj4gKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+Pj4+ICAgIHFlbXUt
-b3B0aW9ucy5oeCAgICB8IDMzICsrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQ0KPiA+
-Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgNTkgaW5zZXJ0aW9ucygrKSwgMTcgZGVsZXRpb25zKC0p
-DQo+ID4+Pg0KPiA+Pj4gUXVldWVkIGZvciA1LjEuDQo+ID4+Pg0KPiA+Pj4gVGhhbmtzDQo+ID4+
-Pg0KPiA+Pj4NCj4gPj4gSGksDQo+ID4+IEl0IGxvb2tzIGxpa2UgdGhpcyBoYXNuJ3QgYmVlbiBt
-ZXJnZWQuDQo+ID4gVGhhbmtzIEx1a2FzLg0KPiA+IEhpIEphc29uLCBJIGhhdmUgZG91YmxlIGNo
-ZWNrZWQgb24gdXBzdHJlYW0sIGxvb2tzIG1pc3NlZCB0aGlzIHNlcmllcy4NCj4gPg0KPiA+IFRo
-YW5rcw0KPiA+IFpoYW5nIENoZW4NCj4gDQo+IA0KPiBSaWdodCwgYnV0IHVuZm9ydHVuYXRlbHkg
-aXQgY2FuJ3QgYmUgYXBwbGllZCBjbGVhbmx5IG9uIG1hc3Rlci4NCj4gDQo+IFBsZWFzZSBzZW5k
-IGEgbmV3IHZlcnNpb24uDQo+IA0KPiBTb3JyeS4NCg0KSXQncyBPSywgSSBoYXZlIHNlbmQgVjIg
-dmVyc2lvbiBvZiB0aGlzIHNlcmllcywgcGxlYXNlIG1lcmdlIGl0Lg0KDQpUaGFua3MNClpoYW5n
-IENoZW4NCg0KPiANCj4gVGhhbmtzDQo+IA0KPiANCj4gPg0KPiA+PiBSZWdhcmRzLA0KPiA+PiBM
-dWthcyBTdHJhdWINCg0K
+On Tue, Jun 23, 2020 at 7:46 AM Paul Durrant <xadimgnik@gmail.com> wrote:
+>
+> > -----Original Message-----
+> > From: Markus Armbruster <armbru@redhat.com>
+> > Sent: 23 June 2020 09:41
+> > To: Jason Andryuk <jandryuk@gmail.com>
+> > Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>; Anthony PERARD <anthony.perard@citrix.com>; xen-
+> > devel <xen-devel@lists.xenproject.org>; Paul Durrant <paul@xen.org>; QEMU <qemu-devel@nongnu.org>
+> > Subject: Re: sysbus failed assert for xen_sysdev
+> >
+> > Jason Andryuk <jandryuk@gmail.com> writes:
+> > > Then it gets farther... until
+> > > qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
+> > > Assertion `dev->realized' failed.
+> > >
+> > > dev->id is NULL. The failing device is:
+> > > (gdb) p *dev.parent_obj.class.type
+> > > $12 = {name = 0x555556207770 "cfi.pflash01",
+> > >
+>
+> Having commented out the call to xen_be_init() entirely (and xen_bus_init() for good measure) I also get this assertion failure, so
+> I don't think is related.
+
+Yes, this is something different.  pc_pflash_create() calls
+qdev_new(TYPE_PFLASH_CFI01), but it is only realized in
+pc_system_flash_map()...  and pc_system_flash_map() isn't called for
+Xen.
+
+Removing the call to pc_system_flash_create() from pc_machine_initfn()
+lets QEMU startup and run a Xen HVM again.  xen_enabled() doesn't work
+there since accelerators have not been initialized yes, I guess?
+
+Regards,
+Jason
 
