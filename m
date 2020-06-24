@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6BEC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D538C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 986E120738
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B8D020738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 16:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aw4ceWxy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986E120738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTBGDimJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B8D020738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8bK-0005Qk-R6
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51480)
+	id 1jo8bN-0005Vi-GX
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 12:50:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VH-00039Y-30
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21972
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VJ-0003JC-RO
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33270
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V8-00054x-Gx
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:02 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8V9-00055U-M6
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017033;
+ s=mimecast20190719; t=1593017034;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JQxRcl/cXCoq1BwBfQv5WeXuVpoIpPX1/ZveuWuOKTo=;
- b=Aw4ceWxytnnjbsmdRm5l3n2zTwEwmMPi80kZX2MVFqbUS1LoZFzqTHDx9Or+dq/QLVpQ53
- w87+WtCm+/MsPm7Q8lBOT47PRHDqtdHCB4RdhNQhut9dX9X+zxZgHxWCH+1e8nb8/lC5wm
- Prngmm0hxlcqcuMdTIwYs9vHc39lwc8=
+ bh=P0AHVl1NXCoWOD9ba4irxaJ4QkaxyeIhpI2MHx+auEo=;
+ b=jTBGDimJlDIrL9X4SjzUDLOe0SjxZe0Cr9kk7MuUcUMeaAVWey5ecGEBufnm55M7TvLu/P
+ eQlFQK3OzoyVs3UAjfyFWRFiMdMYsUsR4uq+TtuBuS2/pebHbxNhX2r1nDXh1TqAD/h3RR
+ eLRyJ6FZP7ssyhQD1q+w/Jpwoy3zuhc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-DWG4i87bPnWoJ56umwrP6w-1; Wed, 24 Jun 2020 12:43:51 -0400
-X-MC-Unique: DWG4i87bPnWoJ56umwrP6w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-307-WiyeQZgGOO29BZW6JMsDJg-1; Wed, 24 Jun 2020 12:43:52 -0400
+X-MC-Unique: WiyeQZgGOO29BZW6JMsDJg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 753878015F5;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBD8C18585A5;
  Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BCA08927C;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B6C6B60F8A;
  Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 248E9113847F; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id 54953113848C; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 18/46] qemu-option: Smooth error checking manually
-Date: Wed, 24 Jun 2020 18:43:16 +0200
-Message-Id: <20200624164344.3778251-19-armbru@redhat.com>
+Subject: [PATCH 31/46] qom: Use error_reportf_err() instead of g_printerr() in
+ examples
+Date: Wed, 24 Jun 2020 18:43:29 +0200
+Message-Id: <20200624164344.3778251-32-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,150 +101,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When foo(..., &err) is followed by error_propagate(errp, err), we can
-often just as well do foo(..., errp).  The previous commit did that
-for simple cases with Coccinelle.  Do it for a few more manually.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block.c             | 2 +-
- block/gluster.c     | 8 ++++----
- block/parallels.c   | 2 +-
- block/quorum.c      | 2 +-
- block/replication.c | 2 +-
- block/vxhs.c        | 4 ++--
- hw/net/virtio-net.c | 4 ++--
- 7 files changed, 12 insertions(+), 12 deletions(-)
+ include/qom/object.h | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/block.c b/block.c
-index 77e85f13db..93a5fbf60a 100644
---- a/block.c
-+++ b/block.c
-@@ -6073,7 +6073,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
- 
-     /* Parse -o options */
-     if (options) {
--        if (!qemu_opts_do_parse(opts, options, NULL, &local_err)) {
-+        if (!qemu_opts_do_parse(opts, options, NULL, errp)) {
-             goto out;
-         }
-     }
-diff --git a/block/gluster.c b/block/gluster.c
-index c620880f27..4f1448e2bc 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -523,7 +523,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
- 
-     /* create opts info from runtime_json_opts list */
-     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
--    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
-         goto out;
-     }
- 
-@@ -554,7 +554,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
- 
-         /* create opts info from runtime_type_opts list */
-         opts = qemu_opts_create(&runtime_type_opts, NULL, 0, &error_abort);
--        if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
-+        if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
-             goto out;
-         }
- 
-@@ -584,7 +584,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-         if (gsconf->type == SOCKET_ADDRESS_TYPE_INET) {
-             /* create opts info from runtime_inet_opts list */
-             opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
--            if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
-+            if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
-                 goto out;
-             }
- 
-@@ -632,7 +632,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-         } else {
-             /* create opts info from runtime_unix_opts list */
-             opts = qemu_opts_create(&runtime_unix_opts, NULL, 0, &error_abort);
--            if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
-+            if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
-                 goto out;
-             }
- 
-diff --git a/block/parallels.c b/block/parallels.c
-index ef0d92d05c..0397f3894f 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -828,7 +828,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail_options;
-     }
- 
--    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
-         goto fail_options;
-     }
- 
-diff --git a/block/quorum.c b/block/quorum.c
-index beb3b6dbcc..9ed20e1998 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -922,7 +922,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     opts = qemu_opts_create(&quorum_runtime_opts, NULL, 0, &error_abort);
--    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
-         ret = -EINVAL;
-         goto exit;
-     }
-diff --git a/block/replication.c b/block/replication.c
-index 00a50b095e..7f4ab357a4 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -99,7 +99,7 @@ static int replication_open(BlockDriverState *bs, QDict *options,
- 
-     ret = -EINVAL;
-     opts = qemu_opts_create(&replication_runtime_opts, NULL, 0, &error_abort);
--    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
-         goto fail;
-     }
- 
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 237df4f185..20513a43f4 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -318,7 +318,7 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
- 
--    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -345,7 +345,7 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
-     /* get the 'server.' arguments */
-     qdict_extract_subqdict(options, &backing_options, VXHS_OPT_SERVER".");
- 
--    if (!qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err)) {
-+    if (!qemu_opts_absorb_qdict(tcp_opts, backing_options, errp)) {
-         ret = -EINVAL;
-         goto out;
-     }
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 04b012e487..7502ff0b1e 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3119,8 +3119,8 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
-     qdev_set_parent_bus(n->primary_dev, n->primary_bus);
-     n->primary_should_be_hidden = false;
-     if (!qemu_opt_set_bool(n->primary_device_opts,
--                           "partially_hotplugged", true, &err)) {
--        goto out;
-+                           "partially_hotplugged", true, errp)) {
-+        return false;
-     }
-     hotplug_ctrl = qdev_get_hotplug_handler(n->primary_dev);
-     if (hotplug_ctrl) {
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 94a61ccc3f..b70edd8cd9 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -671,8 +671,7 @@ Object *object_new(const char *typename);
+  *                               NULL);
+  *
+  *   if (!obj) {
+- *     g_printerr("Cannot create memory backend: %s\n",
+- *                error_get_pretty(err));
++ *     error_reportf_err(err, "Cannot create memory backend: ");
+  *   }
+  *   </programlisting>
+  * </example>
+@@ -739,8 +738,7 @@ void object_apply_compat_props(Object *obj);
+  *                          NULL);
+  *
+  *   if (!obj) {
+- *     g_printerr("Cannot set properties: %s\n",
+- *                error_get_pretty(err));
++ *     error_reportf_err(err, "Cannot set properties: ");
+  *   }
+  *   </programlisting>
+  * </example>
 -- 
 2.26.2
 
