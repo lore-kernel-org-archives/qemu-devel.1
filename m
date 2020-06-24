@@ -7,68 +7,70 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28799C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 732C0C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB2AA2077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46A902077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikMbmo4x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB2AA2077D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sr9BhM5B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46A902077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joBPG-0002Fl-70
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
+	id 1joBPO-0002So-Ii
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:50:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joBNh-0000U8-1T
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60501
+ id 1joBNi-0000VM-A6
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22442
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joBNf-0002UR-3q
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:24 -0400
+ id 1joBNf-0002VC-Rp
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593028102;
+ s=mimecast20190719; t=1593028103;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EGTL8pM+8wcrg6Z0enRSYsT9IKK6OQ+RsAB8e7e/w5s=;
- b=ikMbmo4xcSgipdTOwYArkOUS4gyC39ti6I/Xk+YCEnuOsq6rkLzfSjlAHnQ9gDCGh5TXwR
- afbrCR9tXc7trS57PS1ZJ6xQBsKoG0Mt5p2Ro3OjCbwWtOpBgH3+ZPiJuoIpTAqDdM5qEH
- E3IQEhbElcL0GoCclCrxi+V4J2It3CE=
+ bh=ZvYjGhNyObHIyOkeqWSPqWH6UP//RcP1Nz1STBmgdbA=;
+ b=Sr9BhM5BJtyAAxT6Gtjmo/6lATsUKCqV8TmeU1xJddvAdxNDzMT9KHEKpV5eVwVNeAcqD3
+ 4BfOoVw2fW44JBxE+Tma0F+ZY8GFiJJ5NyWAx64l8HFAZO6eBbm3gTYhxSAqbS35QwJlxq
+ TtxUzo89JCutXzMRmrOsnI8PgbQLPHs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-XKw2PMTFOtGSQB6-ayMg4Q-1; Wed, 24 Jun 2020 15:48:19 -0400
-X-MC-Unique: XKw2PMTFOtGSQB6-ayMg4Q-1
+ us-mta-9-_3hopa39MPKG7zbbNSGm-Q-1; Wed, 24 Jun 2020 15:48:21 -0400
+X-MC-Unique: _3hopa39MPKG7zbbNSGm-Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A71F210059A5;
- Wed, 24 Jun 2020 19:48:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADCFE8015F4;
+ Wed, 24 Jun 2020 19:48:20 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C62BF19934;
- Wed, 24 Jun 2020 19:48:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0747C2B4AC;
+ Wed, 24 Jun 2020 19:48:18 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
  armbru@redhat.com
-Subject: [PATCH v3 1/2] qom: Introduce object_property_try_add_child()
-Date: Wed, 24 Jun 2020 21:48:08 +0200
-Message-Id: <20200624194809.26600-2-eric.auger@redhat.com>
+Subject: [PATCH v3 2/2] tests/qmp-cmd-test: Add qmp/object-add-duplicate-id
+Date: Wed, 24 Jun 2020 21:48:09 +0200
+Message-Id: <20200624194809.26600-3-eric.auger@redhat.com>
 In-Reply-To: <20200624194809.26600-1-eric.auger@redhat.com>
 References: <20200624194809.26600-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -100,188 +102,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-object_property_add() does not allow object_property_try_add()
-to gracefully fail as &error_abort is passed as an error handle.
-
-However such failure can easily be triggered from the QMP shell when,
-for instance, one attempts to create an object with an id that already
-exists. This is achived from the following call path:
-
-user_creatable_add_type -> object_property_add_child ->
-object_property_add
-
-For instance, call twice:
-object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
-and QEMU aborts.
-
-This behavior is undesired as a user/management application mistake
-in reusing a property ID shouldn't result in loss of the VM and live
-data within.
-
-This patch introduces a new function, object_property_try_add_child()
-which takes an error handle and turn object_property_try_add() into
-a non-static one.
-
-Now the call path becomes:
-
-user_creatable_add_type -> object_property_try_add_child ->
-object_property_try_add
-
-and the error is returned gracefully to the QMP client.
-
-(QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
-{"return": {}}
-(QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
-{"error": {"class": "GenericError", "desc": "attempt to add duplicate property
-'mem2' to object (type 'container')"}}
+This new test checks that attempting to create an object
+with an existing ID gracefully fails.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
-
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
+ tests/qtest/qmp-cmd-test.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-v2 -> v3:
-- don't take the object reference on failure in
-  object_property_try_add_child
----
- include/qom/object.h    | 24 ++++++++++++++++++++++--
- qom/object.c            | 21 ++++++++++++++++-----
- qom/object_interfaces.c |  7 +++++--
- 3 files changed, 43 insertions(+), 9 deletions(-)
-
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 94a61ccc3f..91cf058d86 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1039,7 +1039,7 @@ Object *object_ref(Object *obj);
- void object_unref(Object *obj);
- 
- /**
-- * object_property_add:
-+ * object_property_try_add:
-  * @obj: the object to add a property to
-  * @name: the name of the property.  This can contain any character except for
-  *  a forward slash.  In general, you should use hyphens '-' instead of
-@@ -1056,10 +1056,22 @@ void object_unref(Object *obj);
-  *   meant to allow a property to free its opaque upon object
-  *   destruction.  This may be NULL.
-  * @opaque: an opaque pointer to pass to the callbacks for the property
-+ * @errp: error handle
-  *
-  * Returns: The #ObjectProperty; this can be used to set the @resolve
-  * callback for child and link properties.
-  */
-+ObjectProperty *object_property_try_add(Object *obj, const char *name,
-+                                        const char *type,
-+                                        ObjectPropertyAccessor *get,
-+                                        ObjectPropertyAccessor *set,
-+                                        ObjectPropertyRelease *release,
-+                                        void *opaque, Error **errp);
-+
-+/**
-+ * object_property_add: same as object_property_try_add with
-+ * errp hardcoded to &error_abort
-+ */
- ObjectProperty *object_property_add(Object *obj, const char *name,
-                                     const char *type,
-                                     ObjectPropertyAccessor *get,
-@@ -1495,10 +1507,11 @@ Object *object_resolve_path_type(const char *path, const char *typename,
- Object *object_resolve_path_component(Object *parent, const char *part);
- 
- /**
-- * object_property_add_child:
-+ * object_property_try_add_child:
-  * @obj: the object to add a property to
-  * @name: the name of the property
-  * @child: the child object
-+ * @errp: error handle
-  *
-  * Child properties form the composition tree.  All objects need to be a child
-  * of another object.  Objects can only be a child of one object.
-@@ -1512,6 +1525,13 @@ Object *object_resolve_path_component(Object *parent, const char *part);
-  *
-  * Returns: The newly added property on success, or %NULL on failure.
-  */
-+ObjectProperty *object_property_try_add_child(Object *obj, const char *name,
-+                                              Object *child, Error **errp);
-+
-+/**
-+ * object_property_add_child: same as object_property_try_add_child with
-+ * errp hardcoded to &error_abort
-+ */
- ObjectProperty *object_property_add_child(Object *obj, const char *name,
-                                           Object *child);
- 
-diff --git a/qom/object.c b/qom/object.c
-index 6ece96bc2b..dc10bb1889 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1132,7 +1132,7 @@ void object_unref(Object *obj)
-     }
+diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+index 9f5228cd99..ceb3296691 100644
+--- a/tests/qtest/qmp-cmd-test.c
++++ b/tests/qtest/qmp-cmd-test.c
+@@ -213,6 +213,23 @@ static void test_object_add_without_props(void)
+     qtest_quit(qts);
  }
  
--static ObjectProperty *
-+ObjectProperty *
- object_property_try_add(Object *obj, const char *name, const char *type,
-                         ObjectPropertyAccessor *get,
-                         ObjectPropertyAccessor *set,
-@@ -1651,8 +1651,8 @@ static void object_finalize_child_property(Object *obj, const char *name,
- }
- 
- ObjectProperty *
--object_property_add_child(Object *obj, const char *name,
--                          Object *child)
-+object_property_try_add_child(Object *obj, const char *name,
-+                              Object *child, Error **errp)
- {
-     g_autofree char *type = NULL;
-     ObjectProperty *op;
-@@ -1661,14 +1661,25 @@ object_property_add_child(Object *obj, const char *name,
- 
-     type = g_strdup_printf("child<%s>", object_get_typename(child));
- 
--    op = object_property_add(obj, name, type, object_get_child_property, NULL,
--                             object_finalize_child_property, child);
-+    op = object_property_try_add(obj, name, type, object_get_child_property,
-+                                 NULL, object_finalize_child_property,
-+                                 child, errp);
-+    if (!op) {
-+        return NULL;
-+    }
-     op->resolve = object_resolve_child_property;
-     object_ref(child);
-     child->parent = obj;
-     return op;
- }
- 
-+ObjectProperty *
-+object_property_add_child(Object *obj, const char *name,
-+                          Object *child)
++static void test_object_add_with_duplicate_id(void)
 +{
-+    return object_property_try_add_child(obj, name, child, &error_abort);
++    QTestState *qts;
++    QDict *resp;
++
++    qts = qtest_init(common_args);
++    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
++                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
++    g_assert_nonnull(resp);
++    g_assert(qdict_haskey(resp, "return"));
++    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
++                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
++    g_assert_nonnull(resp);
++    qmp_assert_error_class(resp, "GenericError");
++    qtest_quit(qts);
 +}
 +
- void object_property_allow_set_link(const Object *obj, const char *name,
-                                     Object *val, Error **errp)
+ int main(int argc, char *argv[])
  {
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 7e26f86fa6..1e05e41d2f 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -82,8 +82,11 @@ Object *user_creatable_add_type(const char *type, const char *id,
-     }
+     QmpSchema schema;
+@@ -225,6 +242,8 @@ int main(int argc, char *argv[])
  
-     if (id != NULL) {
--        object_property_add_child(object_get_objects_root(),
--                                  id, obj);
-+        object_property_try_add_child(object_get_objects_root(),
-+                                      id, obj, &local_err);
-+        if (local_err) {
-+            goto out;
-+        }
-     }
+     qtest_add_func("qmp/object-add-without-props",
+                    test_object_add_without_props);
++    qtest_add_func("qmp/object-add-duplicate-id",
++                   test_object_add_with_duplicate_id);
+     /* TODO: add coverage of generic object-add failure modes */
  
-     user_creatable_complete(USER_CREATABLE(obj), &local_err);
+     ret = g_test_run();
 -- 
 2.20.1
 
