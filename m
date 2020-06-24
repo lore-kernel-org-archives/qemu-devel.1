@@ -2,82 +2,81 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD3FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE22C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4585A20823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F551206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:20:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HF8y6vIR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4585A20823
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdDTA9Jn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F551206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo92v-0003Mx-HS
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:18:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55106)
+	id 1jo94e-0005U4-3G
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:20:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8eJ-000318-34
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:53:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46590
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo8kp-00071s-JA
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 13:00:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45189
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8eF-0000ww-Q4
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:53:22 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jo8kn-00046a-P5
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 13:00:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017598;
+ s=mimecast20190719; t=1593018005;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WvZEfGLkbje2PmwPmlxywRP8vofYtAWH0NIC79T30BQ=;
- b=HF8y6vIRNcy4skUbBbMZzfuSjofru3EQlX6VEgcErk8w0YsIq8qhxAxYQrXsKx0kUoo1++
- NNFYRQ5D+Rg8bIbBOjFh4ChSO9yVMmZ6UYRDdGuBMV3KFMlZ5enKWYwOULZi0JPSf+XWck
- VaKUXFG++DGXObcBLLpa9sp2O4lWP3Y=
+ bh=sNvvdATsTiHWn5OBEYh2CVkcWgJIgwOpU0CYRpLnKsM=;
+ b=SdDTA9Jn9kqnerY43efqWo6I+ZW2vEiewG7nG4mWRr9xS4lS3Ey/5dOEL5yLk/deR7X32g
+ kR4F5jum7+GzgL1jouCQzcuz9DL3p3mCCMqPZ77f8Vztj/Kq3r+11aCVjY4Ne8HA/xjZkX
+ 3zMREVDzbD4TWqi3u0uaoseTMdogH4k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-fhQgBarZM0CRByrgSGD7Rg-1; Wed, 24 Jun 2020 12:53:17 -0400
-X-MC-Unique: fhQgBarZM0CRByrgSGD7Rg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-511-ld-wNINVN9i53lVj07qTjg-1; Wed, 24 Jun 2020 12:59:55 -0400
+X-MC-Unique: ld-wNINVN9i53lVj07qTjg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E474107ACCD;
- Wed, 24 Jun 2020 16:53:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 375B65C66E;
- Wed, 24 Jun 2020 16:53:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B781A11384D4; Wed, 24 Jun 2020 18:53:05 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v10 1/9] error: auto propagated local_err
-References: <20200317151625.20797-1-vsementsov@virtuozzo.com>
- <20200317151625.20797-2-vsementsov@virtuozzo.com>
- <20200610163921.28d824aa@bahia.lan>
- <877dw8dhvk.fsf@dusky.pond.sub.org>
- <20200615083835.54e3fcb1@bahia.lan>
-Date: Wed, 24 Jun 2020 18:53:05 +0200
-In-Reply-To: <20200615083835.54e3fcb1@bahia.lan> (Greg Kurz's message of "Mon, 
- 15 Jun 2020 08:38:35 +0200")
-Message-ID: <87k0zw8ky6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D9C1804002;
+ Wed, 24 Jun 2020 16:59:54 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E23510016DA;
+ Wed, 24 Jun 2020 16:59:53 +0000 (UTC)
+Subject: Re: [PATCH 01/46] error: Improve examples in error.h's big comment
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-2-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <e4da5f5a-2fbb-3c46-f29f-35266cbf63b0@redhat.com>
+Date: Wed, 24 Jun 2020 11:59:52 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200624164344.3778251-2-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,62 +97,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Greg Kurz <groug@kaod.org> writes:
+On 6/24/20 11:42 AM, Markus Armbruster wrote:
+> Show errp instead of &err where &err is actually unusual.  Add a
+> missing declaration.  Add a second error pileup example.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   include/qapi/error.h | 19 +++++++++++++++----
+>   1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> On Mon, 15 Jun 2020 07:21:03 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
->
->> Greg Kurz <groug@kaod.org> writes:
->> 
->> > On Tue, 17 Mar 2020 18:16:17 +0300
->> > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->> >
->> >> Introduce a new ERRP_AUTO_PROPAGATE macro, to be used at start of
->> >> functions with an errp OUT parameter.
->> >> 
->> >> It has three goals:
->> >> 
->> >> 1. Fix issue with error_fatal and error_prepend/error_append_hint: user
->> >> can't see this additional information, because exit() happens in
->> >> error_setg earlier than information is added. [Reported by Greg Kurz]
->> >> 
->> >
->> > I have more of these coming and I'd really like to use ERRP_AUTO_PROPAGATE.
->> >
->> > It seems we have a consensus on the macro itself but this series is gated
->> > by the conversion of the existing code base.
->> >
->> > What about merging this patch separately so that people can start using
->> > it at least ?
->> 
->> Please give me a few more days to finish the work I feel should go in
->> before the conversion.  With any luck, Vladimir can then rebase /
->> recreate the conversion easily, and you can finally use the macro for
->> your own work.
->> 
->
-> Sure. Thanks.
-
-Just posted "[PATCH 00/46] Less clumsy error checking".  The sheer size
-of the thing and the length of its dependency chain explains why it took
-me so long.  I feel bad about delaying you all the same.  Apologies!
-
-I hope we can converge quickly enough to get Vladimir's work on top
-ready in time for the soft freeze.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
