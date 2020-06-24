@@ -2,78 +2,79 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F69C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C442C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC57220823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CDBE20823
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 11:11:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQTkU7tv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC57220823
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWWUls7Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CDBE20823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo3Ih-0004nB-Uw
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:10:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33782)
+	id 1jo3J1-0005aI-Lh
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 07:11:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo3H9-0002c9-0e
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:09:07 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57555
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo302-0001eH-F5
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51404
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jo3H6-0006we-I2
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 07:09:06 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo2zz-0001RE-2U
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 06:51:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592996943;
+ s=mimecast20190719; t=1592995882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ABL/BIURP4y/brQ/9/eVNJkydyJNcTP4uP8+mjwDkA8=;
- b=jQTkU7tv+bivv4QffG8ceUO0X6C88+peJRIKquD3tcXdArJ2dV02Y1zEEwnoqh4xp+u/Sl
- A2RKXRwKxi1SMQ25xTk8TNQNi2P5b4bQG9OGuDcPipJA25/yWi54ZdcQ+Nye98Nh/Yo6Ja
- BR7/IcyOfTlesVJ9Z1+5bgvTKLK7sxg=
+ bh=5IU006YQ88d5veC791l8custkvzJFLj9YkpXAZ+R5j4=;
+ b=QWWUls7YTirqTII9teSxNSyJb+kHTUM91eMYWV5qENh8L0IeeP91Csemam1JklfnDw+WEx
+ cXUMyiV3m7RWIhbfDTfDXNuLhswV+9ozDjqlGWEeN3Cxdj6QVBVRTVIXcVv9DBA6y1P0T0
+ WFrhGQI7Sop+oDCI1SZaYTdCXsWd00Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-5WdVirAjM1GVgIeiith8vw-1; Wed, 24 Jun 2020 07:08:59 -0400
-X-MC-Unique: 5WdVirAjM1GVgIeiith8vw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-464-CFmY9F9MN06ctaA1V4jFoA-1; Wed, 24 Jun 2020 06:51:20 -0400
+X-MC-Unique: CFmY9F9MN06ctaA1V4jFoA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40E4E10059A2;
- Wed, 24 Jun 2020 11:08:58 +0000 (UTC)
-Received: from gondolin (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 726275C3E7;
- Wed, 24 Jun 2020 11:08:49 +0000 (UTC)
-Date: Wed, 24 Jun 2020 13:08:46 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v5 00/12] pc-bios: s390x: Cleanup part 1
-Message-ID: <20200624130846.5ba705a6.cohuck@redhat.com>
-In-Reply-To: <3c30f41c-1875-d288-9f6c-0e7c63b7b4a9@redhat.com>
-References: <20200624075226.92728-1-frankja@linux.ibm.com>
- <20200624124406.2baac59f.cohuck@redhat.com>
- <3c30f41c-1875-d288-9f6c-0e7c63b7b4a9@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBC2F87950F
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 10:51:19 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com
+ (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79214BA45
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 10:51:19 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 30/31] ibex_uart: fix XOR-as-pow
+Date: Wed, 24 Jun 2020 06:50:47 -0400
+Message-Id: <20200624105048.375353-30-pbonzini@redhat.com>
+In-Reply-To: <20200624104917.375143-1-pbonzini@redhat.com>
+References: <20200624104917.375143-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,97 +95,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, david@redhat.com,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 24 Jun 2020 12:46:49 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+The xor-as-pow warning in clang actually detected a genuine bug.
+Fix it.
 
-> On 24/06/2020 12.44, Cornelia Huck wrote:
-> > On Wed, 24 Jun 2020 03:52:14 -0400
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >   
-> >> The bios is in dire need for a cleanup as there are still a lot of
-> >> magic constants being used throughout as well as duplicated code.
-> >>
-> >> In the first part of this series we consolidate constants and
-> >> functions, as well as doing some minor cleanups and fixes.
-> >>
-> >> The patches are available here:
-> >> https://github.com/frankjaa/qemu/pull/new/cleanup_bios
-> >>
-> >> v5:
-> >> 	* Fixed whitespace damage
-> >> 	* Removed reset PSW mask changes in dasd-ipl.c
-> >> 	* Added jump2ipl.c cleanup patches
-> >>
-> >> v4:
-> >> 	* Renamed time.h to s390-time.h
-> >> 	* Fixed function names in sleep()
-> >> 	* Changed order of sense_id_ccw initialization
-> >> 	* Added missing include before sleep()
-> >>
-> >> v3:
-> >> 	* Dropped 0x00 to 0x0/0 patch
-> >> 	* Moved some timing functions into helper.h instead of time.h
-> >> 	* Fixed IPL psw manipulation in dasd-ipl.c
-> >>   	* Minor cosmetic fixes found by review
-> >>
-> >> v2:
-> >> 	* Included cio fixup to get rid of compile errors...
-> >> 	* Minor cosmetic fixes found by review
-> >>
-> >>
-> >> Janosch Frank (12):
-> >>    pc-bios: s390x: cio.c cleanup and compile fix
-> >>    pc-bios: s390x: Consolidate timing functions into time.h
-> >>    pc-bios: s390x: Move sleep and yield to helper.h
-> >>    pc-bios: s390x: Get rid of magic offsets into the lowcore
-> >>    pc-bios: s390x: Remove unneeded dasd-ipl.c reset psw mask changes
-> >>    pc-bios: s390x: Rename PSW_MASK_ZMODE to PSW_MASK_64
-> >>    pc-bios: s390x: Use PSW masks where possible and introduce
-> >>      PSW_MASK_SHORT_ADDR
-> >>    pc-bios: s390x: Move panic() into header and add infinite loop
-> >>    pc-bios: s390x: Use ebcdic2ascii table
-> >>    pc-bios: s390x: Make u32 ptr check explicit
-> >>    pc-bios: s390x: Fix bootmap.c passing PSWs as addresses
-> >>    pc-bios: s390x: Cleanup jump to ipl code
-> >>
-> >>   pc-bios/s390-ccw/bootmap.c     |  9 ++++----
-> >>   pc-bios/s390-ccw/bootmap.h     |  2 +-
-> >>   pc-bios/s390-ccw/cio.c         | 40 +++++++++++++++++++---------------
-> >>   pc-bios/s390-ccw/cio.h         | 17 ++++++++++-----
-> >>   pc-bios/s390-ccw/dasd-ipl.c    |  3 ---
-> >>   pc-bios/s390-ccw/helper.h      | 19 +++++++++++++++-
-> >>   pc-bios/s390-ccw/jump2ipl.c    | 35 ++++++++++++-----------------
-> >>   pc-bios/s390-ccw/main.c        | 15 +++----------
-> >>   pc-bios/s390-ccw/menu.c        |  1 +
-> >>   pc-bios/s390-ccw/netmain.c     | 23 +++----------------
-> >>   pc-bios/s390-ccw/s390-arch.h   |  4 +++-
-> >>   pc-bios/s390-ccw/s390-ccw.h    | 27 ++++++-----------------
-> >>   pc-bios/s390-ccw/s390-time.h   | 23 +++++++++++++++++++
-> >>   pc-bios/s390-ccw/start.S       |  5 +++--
-> >>   pc-bios/s390-ccw/virtio-net.c  |  2 ++
-> >>   pc-bios/s390-ccw/virtio-scsi.c |  2 ++
-> >>   pc-bios/s390-ccw/virtio.c      | 18 +++------------
-> >>   17 files changed, 120 insertions(+), 125 deletions(-)
-> >>   create mode 100644 pc-bios/s390-ccw/s390-time.h
-> >>  
-> > 
-> > Hm... what's the general status of this? Most of the patches have at
-> > least one R-b/A-b already, I see.
-> > 
-> > Do the s390-ccw boot maintainers want to pick this (once the rest has
-> > been looked at) and then send me a pull req, or should I pick it when
-> > it is good to go? Softfreeze is less than two weeks away :)  
-> 
-> I'd like to review the missing parts and run my tests with the patches 
-> applied ... I'm just a little bit swamped right now, so please give me 
-> some more time...
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/char/ibex_uart.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sure, please don't feel hurried :)
+diff --git a/hw/char/ibex_uart.c b/hw/char/ibex_uart.c
+index 3e0dd9968e..45cd724998 100644
+--- a/hw/char/ibex_uart.c
++++ b/hw/char/ibex_uart.c
+@@ -331,7 +331,7 @@ static void ibex_uart_write(void *opaque, hwaddr addr,
+         if (value & UART_CTRL_NCO) {
+             uint64_t baud = ((value & UART_CTRL_NCO) >> 16);
+             baud *= 1000;
+-            baud /= 2 ^ 20;
++            baud >>= 20;
+ 
+             s->char_tx_time = (NANOSECONDS_PER_SECOND / baud) * 10;
+         }
+-- 
+2.26.2
+
 
 
