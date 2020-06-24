@@ -2,80 +2,79 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7F5C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28799C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1F4D2081A
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:48:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB2AA2077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 19:50:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKd2hr7i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F4D2081A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikMbmo4x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB2AA2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joBNX-0000A2-Sr
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:48:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45742)
+	id 1joBPG-0002Fl-70
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 15:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBMT-0007zB-Eq
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:47:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48718
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1joBNh-0000U8-1T
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60501
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joBMQ-0001xN-QN
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:47:08 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1joBNf-0002UR-3q
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 15:48:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593028025;
+ s=mimecast20190719; t=1593028102;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/+uhegA9Mz4DOR2c+wwtdw6/bbhMbpxgP655ZiFQAy8=;
- b=JKd2hr7iltXOUDJSqDsA1PdhZV/UOhPMFcmDlQknN29gyF1/USYcxrNNeYwSAjIOmxJJxu
- 7nHnbD5j+TIpqLH2JSm/6J1ZKAtW/+V5FOs1Pgn+amGUKgzcQtMoxOtWLJZDEV1n7bc4FV
- 0Fpj/ZAxpuFoodaOr8GTvi9h/ISYFXA=
+ bh=EGTL8pM+8wcrg6Z0enRSYsT9IKK6OQ+RsAB8e7e/w5s=;
+ b=ikMbmo4xcSgipdTOwYArkOUS4gyC39ti6I/Xk+YCEnuOsq6rkLzfSjlAHnQ9gDCGh5TXwR
+ afbrCR9tXc7trS57PS1ZJ6xQBsKoG0Mt5p2Ro3OjCbwWtOpBgH3+ZPiJuoIpTAqDdM5qEH
+ E3IQEhbElcL0GoCclCrxi+V4J2It3CE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-W95Icj5GO1S66g1JhxfaSA-1; Wed, 24 Jun 2020 15:47:03 -0400
-X-MC-Unique: W95Icj5GO1S66g1JhxfaSA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-197-XKw2PMTFOtGSQB6-ayMg4Q-1; Wed, 24 Jun 2020 15:48:19 -0400
+X-MC-Unique: XKw2PMTFOtGSQB6-ayMg4Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F41D800C60;
- Wed, 24 Jun 2020 19:47:02 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CFE860F8A;
- Wed, 24 Jun 2020 19:46:58 +0000 (UTC)
-Subject: Re: [PATCH 13/46] qemu-option: Simplify around find_default_by_name()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-14-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <13665429-b6ae-351b-0b96-7810da94f0db@redhat.com>
-Date: Wed, 24 Jun 2020 14:46:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A71F210059A5;
+ Wed, 24 Jun 2020 19:48:18 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C62BF19934;
+ Wed, 24 Jun 2020 19:48:16 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ armbru@redhat.com
+Subject: [PATCH v3 1/2] qom: Introduce object_property_try_add_child()
+Date: Wed, 24 Jun 2020 21:48:08 +0200
+Message-Id: <20200624194809.26600-2-eric.auger@redhat.com>
+In-Reply-To: <20200624194809.26600-1-eric.auger@redhat.com>
+References: <20200624194809.26600-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-14-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -97,73 +96,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 11:43 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   util/qemu-option.c | 13 ++++---------
->   1 file changed, 4 insertions(+), 9 deletions(-)
-> 
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index ddcf3072c5..d9293814b4 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -286,11 +286,9 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
->       opt = qemu_opt_find(opts, name);
->       if (!opt) {
->           def_val = find_default_by_name(opts, name);
-> -        if (def_val) {
-> -            return def_val;
-> -        }
-> +        return def_val;
->       }
-> -    return opt ? opt->str : NULL;
-> +    return opt->str;
->   }
+object_property_add() does not allow object_property_try_add()
+to gracefully fail as &error_abort is passed as an error handle.
 
-You could go with even fewer lines and variables by inverting the logic:
+However such failure can easily be triggered from the QMP shell when,
+for instance, one attempts to create an object with an id that already
+exists. This is achived from the following call path:
 
-if (opt) {
-     return opt->str;
-}
-return find_default_by_name(opts, name);
+user_creatable_add_type -> object_property_add_child ->
+object_property_add
 
+For instance, call twice:
+object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
+and QEMU aborts.
 
->   
->   void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
-> @@ -320,7 +318,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
->   {
->       QemuOpt *opt;
->       const char *def_val;
-> -    char *str = NULL;
-> +    char *str;
->   
->       if (opts == NULL) {
->           return NULL;
-> @@ -329,10 +327,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
->       opt = qemu_opt_find(opts, name);
->       if (!opt) {
->           def_val = find_default_by_name(opts, name);
-> -        if (def_val) {
-> -            str = g_strdup(def_val);
-> -        }
-> -        return str;
-> +        return g_strdup(def_val);
+This behavior is undesired as a user/management application mistake
+in reusing a property ID shouldn't result in loss of the VM and live
+data within.
 
-Similarly, you could drop def_val with:
-  return g_strdup(find_default_by_name(opts, name));
+This patch introduces a new function, object_property_try_add_child()
+which takes an error handle and turn object_property_try_add() into
+a non-static one.
 
-Either way,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Now the call path becomes:
 
+user_creatable_add_type -> object_property_try_add_child ->
+object_property_try_add
+
+and the error is returned gracefully to the QMP client.
+
+(QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+{"return": {}}
+(QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+{"error": {"class": "GenericError", "desc": "attempt to add duplicate property
+'mem2' to object (type 'container')"}}
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
+
+---
+
+v2 -> v3:
+- don't take the object reference on failure in
+  object_property_try_add_child
+---
+ include/qom/object.h    | 24 ++++++++++++++++++++++--
+ qom/object.c            | 21 ++++++++++++++++-----
+ qom/object_interfaces.c |  7 +++++--
+ 3 files changed, 43 insertions(+), 9 deletions(-)
+
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 94a61ccc3f..91cf058d86 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -1039,7 +1039,7 @@ Object *object_ref(Object *obj);
+ void object_unref(Object *obj);
+ 
+ /**
+- * object_property_add:
++ * object_property_try_add:
+  * @obj: the object to add a property to
+  * @name: the name of the property.  This can contain any character except for
+  *  a forward slash.  In general, you should use hyphens '-' instead of
+@@ -1056,10 +1056,22 @@ void object_unref(Object *obj);
+  *   meant to allow a property to free its opaque upon object
+  *   destruction.  This may be NULL.
+  * @opaque: an opaque pointer to pass to the callbacks for the property
++ * @errp: error handle
+  *
+  * Returns: The #ObjectProperty; this can be used to set the @resolve
+  * callback for child and link properties.
+  */
++ObjectProperty *object_property_try_add(Object *obj, const char *name,
++                                        const char *type,
++                                        ObjectPropertyAccessor *get,
++                                        ObjectPropertyAccessor *set,
++                                        ObjectPropertyRelease *release,
++                                        void *opaque, Error **errp);
++
++/**
++ * object_property_add: same as object_property_try_add with
++ * errp hardcoded to &error_abort
++ */
+ ObjectProperty *object_property_add(Object *obj, const char *name,
+                                     const char *type,
+                                     ObjectPropertyAccessor *get,
+@@ -1495,10 +1507,11 @@ Object *object_resolve_path_type(const char *path, const char *typename,
+ Object *object_resolve_path_component(Object *parent, const char *part);
+ 
+ /**
+- * object_property_add_child:
++ * object_property_try_add_child:
+  * @obj: the object to add a property to
+  * @name: the name of the property
+  * @child: the child object
++ * @errp: error handle
+  *
+  * Child properties form the composition tree.  All objects need to be a child
+  * of another object.  Objects can only be a child of one object.
+@@ -1512,6 +1525,13 @@ Object *object_resolve_path_component(Object *parent, const char *part);
+  *
+  * Returns: The newly added property on success, or %NULL on failure.
+  */
++ObjectProperty *object_property_try_add_child(Object *obj, const char *name,
++                                              Object *child, Error **errp);
++
++/**
++ * object_property_add_child: same as object_property_try_add_child with
++ * errp hardcoded to &error_abort
++ */
+ ObjectProperty *object_property_add_child(Object *obj, const char *name,
+                                           Object *child);
+ 
+diff --git a/qom/object.c b/qom/object.c
+index 6ece96bc2b..dc10bb1889 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1132,7 +1132,7 @@ void object_unref(Object *obj)
+     }
+ }
+ 
+-static ObjectProperty *
++ObjectProperty *
+ object_property_try_add(Object *obj, const char *name, const char *type,
+                         ObjectPropertyAccessor *get,
+                         ObjectPropertyAccessor *set,
+@@ -1651,8 +1651,8 @@ static void object_finalize_child_property(Object *obj, const char *name,
+ }
+ 
+ ObjectProperty *
+-object_property_add_child(Object *obj, const char *name,
+-                          Object *child)
++object_property_try_add_child(Object *obj, const char *name,
++                              Object *child, Error **errp)
+ {
+     g_autofree char *type = NULL;
+     ObjectProperty *op;
+@@ -1661,14 +1661,25 @@ object_property_add_child(Object *obj, const char *name,
+ 
+     type = g_strdup_printf("child<%s>", object_get_typename(child));
+ 
+-    op = object_property_add(obj, name, type, object_get_child_property, NULL,
+-                             object_finalize_child_property, child);
++    op = object_property_try_add(obj, name, type, object_get_child_property,
++                                 NULL, object_finalize_child_property,
++                                 child, errp);
++    if (!op) {
++        return NULL;
++    }
+     op->resolve = object_resolve_child_property;
+     object_ref(child);
+     child->parent = obj;
+     return op;
+ }
+ 
++ObjectProperty *
++object_property_add_child(Object *obj, const char *name,
++                          Object *child)
++{
++    return object_property_try_add_child(obj, name, child, &error_abort);
++}
++
+ void object_property_allow_set_link(const Object *obj, const char *name,
+                                     Object *val, Error **errp)
+ {
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 7e26f86fa6..1e05e41d2f 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -82,8 +82,11 @@ Object *user_creatable_add_type(const char *type, const char *id,
+     }
+ 
+     if (id != NULL) {
+-        object_property_add_child(object_get_objects_root(),
+-                                  id, obj);
++        object_property_try_add_child(object_get_objects_root(),
++                                      id, obj, &local_err);
++        if (local_err) {
++            goto out;
++        }
+     }
+ 
+     user_creatable_complete(USER_CREATABLE(obj), &local_err);
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.20.1
 
 
