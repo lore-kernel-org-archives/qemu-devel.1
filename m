@@ -2,98 +2,88 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3EEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7B2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AA2F2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:18:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5F2E20723
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:20:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFUdOEip"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA2F2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r7l13wNi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F2E20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo7AR-0007zo-Tr
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:18:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52968)
+	id 1jo7Ct-00036Z-2x
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo791-0006zr-CW
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:16:59 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23897
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo78z-0003fU-KE
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:16:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593011816;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=OXF8hF1OIIcBhPCW44xt8ui/Pt3p7jUHb6xTAexUjw0=;
- b=dFUdOEipS9GSeKfhoZqdN0R1sYANjhJO20vQ6sj5kUzdlgcvoIa6vUCd14EpccXOLugbSN
- U99YlYJjCwOT1Q+NcKc5wtU9Zct0bDUOLUAD0CQ+4HllquxPN/dac0g9A2tFh5eWXbIm2W
- I0gulOo7tsXFIx90i60YEmZ1oipfQdg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-0qZTtBulOPGxMHcGFI-q_w-1; Wed, 24 Jun 2020 11:16:53 -0400
-X-MC-Unique: 0qZTtBulOPGxMHcGFI-q_w-1
-Received: by mail-wr1-f69.google.com with SMTP id n4so1143914wrj.15
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:16:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1jo7C1-0002XV-LU
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:20:05 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40204)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1jo7Bz-0004Su-M6
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:20:05 -0400
+Received: by mail-ot1-x344.google.com with SMTP id s13so2241695otd.7
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:20:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=A6P+10ehhuHI+NV4NRUjtNn1xDi+8o3ZxUF2YD3J3UM=;
+ b=r7l13wNiKLaDhnd8GPRCH0L0ZEJkuIxr616tBvPgUp3w6SBUrDmIUScPgwXpRpqqLB
+ 4VrbE2Y0QG7yg7bofSpDv4skmVG7BQXr/+VkGVhC4BzqzwEoE6Mdv8G1Hc+GV9YRxWSi
+ Ni4svkx0N4X/+cFFQteE3SdeBN2hWvx085JdDQRXT0sv0KjBG+IJbPSr23299vH8oemJ
+ 7zAehWkFpc4MFvShLGOiYDoI4jcL+mCTyg6HG1HMfPSM9kbqxpEHuNVSSu01vZlesjWR
+ KCryMk7sVyYYHYErvIqD9StKJNrNzUqC9fszmuWtsAJSD3JFQk5JRKi1YsKP0t4so8ie
+ rhpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=OXF8hF1OIIcBhPCW44xt8ui/Pt3p7jUHb6xTAexUjw0=;
- b=MYPrZFS7DZzhm1qv7PjSBpYFCnUalideUlWxZdHciA9ZYlBCidmSpVAh9H4DfrXuZQ
- 2KM958enRCR3vNVi7LJnApva+mvTBQ33BSOYNnsT9zFlsuS6Eets7sUjQh39vB44jkPK
- eQhNi3YcKb4RkF8gI0NaIYMP0zEpIrkUGpxlrg2KTIF1FjACA9YG5XtOgkx+kNPkW9TG
- jqyppFGxnC4v14Gh6Xz3Q8qkNEN/06/AYYwj8JqhAnAXW4XEtGPglY+cX9tgWeu0WPJJ
- UHxvW1JPzGWWir65t75UyzIka5FqECOdjGLae+VHm4trDWaswSalhUnA2DrCgCgfoY6P
- rq4w==
-X-Gm-Message-State: AOAM533anBhw1lAIMrwHs+1sjW3CbZKArKizdN9I9Ix5rpNFUNfr47U+
- etIZXBqER7cN7Ujhtbv6h9xJZhlUZiln0hrvL0wStOnS+j5pDQh5t0ehsJBB7BTfG+Rq1FNTdHs
- 0iH9bbtnW8QhZq0Q=
-X-Received: by 2002:adf:f2cd:: with SMTP id d13mr30192342wrp.378.1593011811900; 
- Wed, 24 Jun 2020 08:16:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBGE9itSQ7nVjbZYnKFEs54EiR5U8leTFlRWfGjPpZXK837OZRbg5ey9+jEkNg0p/ZAuiZUg==
-X-Received: by 2002:adf:f2cd:: with SMTP id d13mr30192314wrp.378.1593011811630; 
- Wed, 24 Jun 2020 08:16:51 -0700 (PDT)
-Received: from redhat.com ([82.166.20.53])
- by smtp.gmail.com with ESMTPSA id a16sm26728208wrx.8.2020.06.24.08.16.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 08:16:50 -0700 (PDT)
-Date: Wed, 24 Jun 2020 11:16:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 0/5] VIRTIO-IOMMU probe request support and MSI bypass
- on ARM
-Message-ID: <20200624111624-mutt-send-email-mst@kernel.org>
-References: <20200624132625.27453-1-eric.auger@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=A6P+10ehhuHI+NV4NRUjtNn1xDi+8o3ZxUF2YD3J3UM=;
+ b=dc1uEoFVBk/5jzOOoAbQkhhnBWuKsWjby2IVYWS2gbhFPcblmHKLgDBFcEv1jcsqNb
+ Y3ISNZV15uo+QsErZ5X4OxCmVAHAYkoiJmSOIW3MuTgVzjbnliIrODOP/K3YEi/bCGt0
+ w3l9zo2yLhtHoTwnAHrb6el/27WkUufO+Zop8jlsafBQQn8/WhAUtw3kDcs56NMfPQd+
+ j7DKVrl2QiLOL7g2RHgnzHOEoDyRRBHE/bCXt5skrMoYWiSWOz7J088Ex4KwRd2QoE1s
+ 4QNo1EOJ42uDMzXpMXqltT+uKx+m1kr+UJPUAwXjSb9NjI/OFAgmVPRcaAOsaW2xCLCe
+ 5fFg==
+X-Gm-Message-State: AOAM532nCc1ib/WF2MWt/xYMhhfy506/C3tA7AgyaIGMfsngHblnJscG
+ bK5PGYuKwV/P7Tib7Lt5e3EFKfK6267V9ncFdYE=
+X-Google-Smtp-Source: ABdhPJz5TNAxbI8WOMICVW12mbRLEWVGO1DahStPxG0P6XB8h+JljNwp5Q9Bggac5xWZXPJ6yQFNVdfbqjeonA6wKoc=
+X-Received: by 2002:a05:6830:18db:: with SMTP id
+ v27mr23578791ote.75.1593012002365; 
+ Wed, 24 Jun 2020 08:20:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200624132625.27453-1-eric.auger@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200624134510.9381-1-kraxel@redhat.com>
+In-Reply-To: <20200624134510.9381-1-kraxel@redhat.com>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Wed, 24 Jun 2020 17:19:51 +0200
+Message-ID: <CABLmASFxUtOJOCYk2epuiJwOh0dbxzer0A=AG42O6QqvXbN+EQ@mail.gmail.com>
+Subject: Re: [PATCH] usb: fix usb-host build on windows.
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000086246c05a8d60221"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=hsp.cat7@gmail.com; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,94 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jean-philippe@linaro.org, qemu-devel@nongnu.org,
- peterx@redhat.com, armbru@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- bbhushan2@marvell.com, eric.auger.pro@gmail.com
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 03:26:20PM +0200, Eric Auger wrote:
-> By default the virtio-iommu translates MSI transactions. This
-> behavior is inherited from ARM SMMU. However the virt machine
-> code knows where the MSI doorbells are, so we can easily
-> declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
-> setting the guest iommu subsystem will not need to map MSIs.
-> This setup will simplify the VFIO integration.
-> 
-> In this series, the ITS or GICV2M doorbells are declared as
-> HW MSI regions to be bypassed by the VIRTIO-IOMMU.
-> 
-> This also paves the way to the x86 integration where the MSI
-> region, [0xFEE00000,0xFEEFFFFF], will be exposed by the q35
-> machine.  However this will be handled in a separate series
-> when not-DT support gets resolved.
-> 
-> Best Regards
-> 
-> Eric
+--00000000000086246c05a8d60221
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, Jun 24, 2020 at 3:45 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-Virtio bits look OK:
+> Seems the new API is not available on windows.
+> Update #ifdefs accordingly.
+>
+> Fixes: 9f815e83e983 ("usb: add hostdevice property to usb-host")
+> Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/host-libusb.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index ad7ed8fb0c67..c474551d8456 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -907,7 +907,7 @@ static int usb_host_open(USBHostDevice *s,
+> libusb_device *dev, int hostfd)
+>              goto fail;
+>          }
+>      } else {
+> -#if LIBUSB_API_VERSION >= 0x01000107
+> +#if LIBUSB_API_VERSION >= 0x01000107 && !defined(CONFIG_WIN32)
+>          trace_usb_host_open_hostfd(hostfd);
+>
+>          rc = libusb_wrap_sys_device(ctx, hostfd, &s->dh);
+> @@ -1107,7 +1107,7 @@ static void usb_host_realize(USBDevice *udev, Error
+> **errp)
+>      QTAILQ_INIT(&s->isorings);
+>      s->hostfd = -1;
+>
+> -#if LIBUSB_API_VERSION >= 0x01000107
+> +#if LIBUSB_API_VERSION >= 0x01000107 && !defined(CONFIG_WIN32)
+>      if (s->hostdevice) {
+>          int fd;
+>          s->needs_autoscan = false;
+> --
+> 2.18.4
+>
+> Thanks for the quick fix, so:
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
 
-Who's merging this? ARM tree?
+--00000000000086246c05a8d60221
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v5.0.0-virtio-iommu-msi-bypass-v5
-> 
-> History:
-> 
-> v4 -> v5:
-> - Take into account some additional comments from Markus:
->   - reserved region type becomes an unsigned + some comment/desc
->     rewording
->   - assert if the type is not RESERVED or MSI
-> 
-> v3 -> v4:
-> - collected Jean and markus's R-bs
-> - tool into account all Markus' comments in [1/5] (except removal of
->   goto)
-> - use ':' as delimitor instead of commas
-> - add example in 4/5 commit message as suggested by Markus
-> 
-> v2 -> v3:
-> - Introduce VIRT_MSI_CTRL_NONE in VirtMSIControllerType
-> - do not fill the remainder of the probe buffer
-> 
-> v1 -> v2:
-> - check which MSI controller is in use and advertise the
->   corresponding MSI doorbell
-> - managed for both ITS and GICv2M
-> - various fixes spotted by Peter and Jean-Philippe, see
->   individual logs
-> 
-> v1: Most of those patches were respinned from
->   [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
->   except the last one which is new
-> 
-> 
-> Eric Auger (5):
->   qdev: Introduce DEFINE_PROP_RESERVED_REGION
->   virtio-iommu: Implement RESV_MEM probe request
->   virtio-iommu: Handle reserved regions in the translation process
->   virtio-iommu-pci: Add array of Interval properties
->   hw/arm/virt: Let the virtio-iommu bypass MSIs
-> 
->  include/exec/memory.h            |   6 ++
->  include/hw/arm/virt.h            |   7 ++
->  include/hw/qdev-properties.h     |   3 +
->  include/hw/virtio/virtio-iommu.h |   2 +
->  include/qemu/typedefs.h          |   1 +
->  hw/arm/virt.c                    |  18 +++++
->  hw/core/qdev-properties.c        |  89 ++++++++++++++++++++++++
->  hw/virtio/virtio-iommu-pci.c     |   3 +
->  hw/virtio/virtio-iommu.c         | 112 +++++++++++++++++++++++++++++--
->  hw/virtio/trace-events           |   1 +
->  10 files changed, 238 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.20.1
+<div dir=3D"ltr"><div dir=3D"ltr">On Wed, Jun 24, 2020 at 3:45 PM Gerd Hoff=
+mann &lt;<a href=3D"mailto:kraxel@redhat.com" target=3D"_blank">kraxel@redh=
+at.com</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">Seems the new API is not available on wind=
+ows.<br>
+Update #ifdefs accordingly.<br>
+<br>
+Fixes: 9f815e83e983 (&quot;usb: add hostdevice property to usb-host&quot;)<=
+br>
+Reported-by: Howard Spoelstra &lt;<a href=3D"mailto:hsp.cat7@gmail.com" tar=
+get=3D"_blank">hsp.cat7@gmail.com</a>&gt;<br>
+Signed-off-by: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com" targe=
+t=3D"_blank">kraxel@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/usb/host-libusb.c | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c<br>
+index ad7ed8fb0c67..c474551d8456 100644<br>
+--- a/hw/usb/host-libusb.c<br>
++++ b/hw/usb/host-libusb.c<br>
+@@ -907,7 +907,7 @@ static int usb_host_open(USBHostDevice *s, libusb_devic=
+e *dev, int hostfd)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0} else {<br>
+-#if LIBUSB_API_VERSION &gt;=3D 0x01000107<br>
++#if LIBUSB_API_VERSION &gt;=3D 0x01000107 &amp;&amp; !defined(CONFIG_WIN32=
+)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0trace_usb_host_open_hostfd(hostfd);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D libusb_wrap_sys_device(ctx, hostfd=
+, &amp;s-&gt;dh);<br>
+@@ -1107,7 +1107,7 @@ static void usb_host_realize(USBDevice *udev, Error *=
+*errp)<br>
+=C2=A0 =C2=A0 =C2=A0QTAILQ_INIT(&amp;s-&gt;isorings);<br>
+=C2=A0 =C2=A0 =C2=A0s-&gt;hostfd =3D -1;<br>
+<br>
+-#if LIBUSB_API_VERSION &gt;=3D 0x01000107<br>
++#if LIBUSB_API_VERSION &gt;=3D 0x01000107 &amp;&amp; !defined(CONFIG_WIN32=
+)<br>
+=C2=A0 =C2=A0 =C2=A0if (s-&gt;hostdevice) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int fd;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;needs_autoscan =3D false;<br>
+-- <br>
+2.18.4<br>
+<br></blockquote><div>Thanks for the quick fix, so:</div><div><br></div><di=
+v>Tested-by: Howard Spoelstra &lt;<a href=3D"mailto:hsp.cat7@gmail.com">hsp=
+.cat7@gmail.com</a>&gt;<br></div></div></div>
 
+--00000000000086246c05a8d60221--
 
