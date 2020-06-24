@@ -6,77 +6,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F8EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042BFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF8320823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:07:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5B5220823
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cj4viWfW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF8320823
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPe9Uo5T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B5220823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8rr-0001M7-VY
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:07:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52048)
+	id 1jo8rz-0001ce-2B
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8Vf-0004IL-JU
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23275
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VW-0003zl-QW
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:18 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44670
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VD-00058H-9u
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:27 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VC-00056y-AO
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593017036;
+ s=mimecast20190719; t=1593017035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O+ptEAkpNUOkRf8tvAkjLnW2zglOQ056ea63xd5HRvg=;
- b=cj4viWfWQbI2BMue3+QqkAedh7q0Q1H0n5Oir04bhVcUU4HLP6LbmHCXTKecRL5G2pVFyz
- 6WRelnracD7yxRLoL6TAr3ZV0wIX0Q2VEG1tFEZJuvVRkAUUn+B8W7qL+2kwlrLLQA6BWz
- rbx4KuxFqY+d3L0lSN4jONplRe9t2Ow=
+ bh=IC8Vr8M6/Rxb1ZPJWgX18Fts6DhkZzLJbAlhdOhLmJ8=;
+ b=bPe9Uo5TDBZ+Vm08HJVZnAwv/vbcsZqq1Hk1Hi2iewt191RHw1rGiWGqpVjtiDtji9Tzuu
+ MwNmYlOZS971dfDk/3C7+TAA35+HINrOlFW+KZMh1a1DWjCL0nlfzhr3I61Gdz70SUn/cp
+ yMNDLOXTh0tLc9T1qk9hAUqaT+u2Q5Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40--7g_EpuhPTykAZJUnkWvAA-1; Wed, 24 Jun 2020 12:43:51 -0400
-X-MC-Unique: -7g_EpuhPTykAZJUnkWvAA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-345-Kq3NjoiqMF2TPDfBOdrXBg-1; Wed, 24 Jun 2020 12:43:53 -0400
+X-MC-Unique: Kq3NjoiqMF2TPDfBOdrXBg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F78B108BD10;
- Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FC2C8015F9;
+ Wed, 24 Jun 2020 16:43:52 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DE28891E8;
- Wed, 24 Jun 2020 16:43:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BF235D9D3;
+ Wed, 24 Jun 2020 16:43:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4A36B1138489; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+ id 852961138498; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 28/46] block/parallels: Simplify parallels_open() after
- previous commit
-Date: Wed, 24 Jun 2020 18:43:26 +0200
-Message-Id: <20200624164344.3778251-29-armbru@redhat.com>
+Subject: [PATCH 43/46] qdev: Smooth error checking manually
+Date: Wed, 24 Jun 2020 18:43:41 +0200
+Message-Id: <20200624164344.3778251-44-armbru@redhat.com>
 In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
 References: <20200624164344.3778251-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,39 +100,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When foo(..., &err) is followed by error_propagate(errp, err), we can
+often just as well do foo(..., errp).  The previous commit did that
+for simple cases with Coccinelle.  Do it for one more manually.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/parallels.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/block/fdc.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 9e85ab995e..3c22dfdc9d 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -839,6 +839,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-                                        &local_err);
-     g_free(buf);
-     if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-         goto fail_options;
-     }
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index fe0ae2d146..a0670c0aa0 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -2527,7 +2527,7 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+     FDrive *drive;
+     DeviceState *dev;
+     BlockBackend *blk;
+-    Error *local_err = NULL;
++    bool ok;
+     const char *fdc_name, *drive_suffix;
  
-@@ -868,15 +869,11 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
- 
- fail_format:
-     error_setg(errp, "Image not in Parallels format");
-+fail_options:
-     ret = -EINVAL;
- fail:
-     qemu_vfree(s->header);
-     return ret;
+     for (i = 0; i < MAX_FD; i++) {
+@@ -2566,11 +2566,9 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+         blk_ref(blk);
+         blk_detach_dev(blk, fdc_dev);
+         fdctrl->qdev_for_drives[i].blk = NULL;
+-        qdev_prop_set_drive_err(dev, "drive", blk, &local_err);
++        ok = qdev_prop_set_drive_err(dev, "drive", blk, errp);
+         blk_unref(blk);
 -
--fail_options:
--    error_propagate(errp, local_err);
--    ret = -EINVAL;
--    goto fail;
- }
- 
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (!ok) {
+             return;
+         }
  
 -- 
 2.26.2
