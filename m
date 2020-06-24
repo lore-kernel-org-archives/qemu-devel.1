@@ -4,77 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39319C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B916AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0911D20857
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84CCF20720
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWdGAHjT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0911D20857
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gxu7cECB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84CCF20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo5Es-000803-79
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:14:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41114)
+	id 1jo5FJ-0000Eb-N2
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:15:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5BG-0002df-RW
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:10 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54625
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5BB-0002Oo-Sl
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58851
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5BE-0001WU-Dh
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:10 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5B5-0001S7-H3
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593004267;
+ s=mimecast20190719; t=1593004258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+fe8BYH1YDyqVe9iNEOk6dpYQe4tDIxPQC7jVI46fPM=;
- b=iWdGAHjTEKc7oHl6fV/xJYSwXOTLZ0P+WhdZE6QwxPXJP2uQCCAGHCb/XsMplu+1FWthIY
- 0ZPNJVW+xLMQYM6HRcqZVDlFjyIxjGeW9hxpXxC84jw1BiSkKmcryIghn6MhQaeR2P1Z6h
- A6gveVHmwdTAi8jLKRG3ElScHEDsm74=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=3arQYzUakvsEsZj46IHWx5U5R2JTza3tPTR92n9R/ag=;
+ b=Gxu7cECBpMDp7ei5WpAK20IEnFpsj0iHft76pMSYgBnUm/0yu3VA9Kjho0hP039nEgQJpR
+ 6845u9pBkLsdVU7Zxt5IWSbjSzrlUHXwiIuadlUPc9hsULyXJ8HEBltn98XNY1WHTi0QRb
+ E67WwwnjLMBCdmPv+JTNeBd64VpmaTs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-PaDtm5KyO8qVG-qsqDf86A-1; Wed, 24 Jun 2020 09:11:06 -0400
-X-MC-Unique: PaDtm5KyO8qVG-qsqDf86A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-174-juzJG9ksMGWUmeYhD7FfrA-1; Wed, 24 Jun 2020 09:10:56 -0400
+X-MC-Unique: juzJG9ksMGWUmeYhD7FfrA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1189A18A8221
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 13:11:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B63805EE5
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 13:10:55 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0BC260C80;
- Wed, 24 Jun 2020 13:10:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 818A979317;
+ Wed, 24 Jun 2020 13:10:46 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E9B6031E28; Wed, 24 Jun 2020 15:10:45 +0200 (CEST)
+ id B530D59CC; Wed, 24 Jun 2020 15:10:45 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 08/10] vga: build virtio-gpu only once
-Date: Wed, 24 Jun 2020 15:10:43 +0200
-Message-Id: <20200624131045.14512-9-kraxel@redhat.com>
+Subject: [PATCH v5 03/10] qdev: device module support
+Date: Wed, 24 Jun 2020 15:10:38 +0200
+Message-Id: <20200624131045.14512-4-kraxel@redhat.com>
 In-Reply-To: <20200624131045.14512-1-kraxel@redhat.com>
 References: <20200624131045.14512-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -82,7 +77,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,36 +98,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/display/Makefile.objs | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Hook module loading into the places where we
+need it when building devices as modules.
 
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 76b3571e4902..d619594ad4d3 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -49,12 +49,12 @@ common-obj-m += qxl.mo
- qxl.mo-objs = qxl.o qxl-logger.o qxl-render.o
- endif
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/core/qdev.c     | 6 ++++--
+ qdev-monitor.c     | 5 +++--
+ qom/qom-qmp-cmds.c | 3 ++-
+ softmmu/vl.c       | 4 ++--
+ 4 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 2131c7f951dd..9de16eae05b7 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -137,6 +137,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
+  */
+ DeviceState *qdev_new(const char *name)
+ {
++    if (!object_class_by_name(name)) {
++        module_load_qom_one(name);
++    }
+     return DEVICE(object_new(name));
+ }
  
--obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
--obj-$(CONFIG_VHOST_USER_GPU) += vhost-user-gpu.o
--obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
--obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) += vhost-user-gpu-pci.o
--obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
--obj-$(CONFIG_VHOST_USER_VGA) += vhost-user-vga.o
-+common-obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
-+common-obj-$(CONFIG_VHOST_USER_GPU) += vhost-user-gpu.o
-+common-obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
-+common-obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) += vhost-user-gpu-pci.o
-+common-obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
-+common-obj-$(CONFIG_VHOST_USER_VGA) += vhost-user-vga.o
- virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
- virtio-gpu.o-libs += $(VIRGL_LIBS)
- virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
+@@ -147,10 +150,9 @@ DeviceState *qdev_new(const char *name)
+  */
+ DeviceState *qdev_try_new(const char *name)
+ {
+-    if (!object_class_by_name(name)) {
++    if (!module_object_class_by_name(name)) {
+         return NULL;
+     }
+-
+     return DEVICE(object_new(name));
+ }
+ 
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 22da107484c5..8e7a7f7bbdbc 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -147,6 +147,7 @@ static void qdev_print_devinfos(bool show_no_user)
+     int i;
+     bool cat_printed;
+ 
++    module_load_qom_all();
+     list = object_class_get_list_sorted(TYPE_DEVICE, false);
+ 
+     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
+@@ -215,13 +216,13 @@ static DeviceClass *qdev_get_device_class(const char **driver, Error **errp)
+     DeviceClass *dc;
+     const char *original_name = *driver;
+ 
+-    oc = object_class_by_name(*driver);
++    oc = module_object_class_by_name(*driver);
+     if (!oc) {
+         const char *typename = find_typename_by_alias(*driver);
+ 
+         if (typename) {
+             *driver = typename;
+-            oc = object_class_by_name(*driver);
++            oc = module_object_class_by_name(*driver);
+         }
+     }
+ 
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+index c5249e44d020..5e2c8cbf333f 100644
+--- a/qom/qom-qmp-cmds.c
++++ b/qom/qom-qmp-cmds.c
+@@ -116,6 +116,7 @@ ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
+ {
+     ObjectTypeInfoList *ret = NULL;
+ 
++    module_load_qom_all();
+     object_class_foreach(qom_list_types_tramp, implements, abstract, &ret);
+ 
+     return ret;
+@@ -130,7 +131,7 @@ ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
+     ObjectPropertyIterator iter;
+     ObjectPropertyInfoList *prop_list = NULL;
+ 
+-    klass = object_class_by_name(typename);
++    klass = module_object_class_by_name(typename);
+     if (klass == NULL) {
+         error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+                   "Device '%s' not found", typename);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f669c06ede4a..1297815a5f5b 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -1772,8 +1772,8 @@ static bool vga_interface_available(VGAInterfaceType t)
+ 
+     assert(t < VGA_TYPE_MAX);
+     return !ti->class_names[0] ||
+-           object_class_by_name(ti->class_names[0]) ||
+-           object_class_by_name(ti->class_names[1]);
++           module_object_class_by_name(ti->class_names[0]) ||
++           module_object_class_by_name(ti->class_names[1]);
+ }
+ 
+ static const char *
 -- 
 2.18.4
 
