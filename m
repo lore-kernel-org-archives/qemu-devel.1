@@ -2,96 +2,110 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEF9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 095DAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:18:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C1EE2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:17:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3A192076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 14:18:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mdjXnnwr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1EE2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnNVFzc8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3A192076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo6DM-0004C2-AY
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:17:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59396)
+	id 1jo6Dv-0005JL-VQ
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 10:18:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jo61a-0005LK-VR
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:05:15 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:35006)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jo61U-0003XG-M8
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:05:14 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id l2so1174056wmf.0
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:05:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OeJNj8ZC3zV8CkJ1XiE1kv6/qIn2cm2cQAQo+Livlkg=;
- b=mdjXnnwr4AEoSGvM85xMNKZwqFsizhFDD96walh/C77iUjymYsig5jydQ5K0mZKJO1
- fGPZfCYB1hQi7QyeD/BBBmZJgua+z7pXPCkYSzSxWFwDza5Tw7KaXSxx2/8Y4sKbnhgh
- G4oee14IJVDe2dVFCaFyxc2lywyVxB+FmmIl3ToveN/+x4nkMLFVRmH+SY9Hd63mauUR
- 4SacVMtg3S+EJb3+lT94cjRTz7pSAj2y4z7Wx1WxjlWWiETju6OcYSMEI46OdiUfmSyL
- 9upTi6QtHzW+IV8XB2rV2BJpZ79xkQrWIwwYeWmUt4DtqKX0XMGfrNr60730nUyklQm1
- OiWg==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo68u-00048E-Li
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:12:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45261
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jo68r-0005v6-VA
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 10:12:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593007964;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dodUbhN5/QDSqZn9CboDe3gOrUSNiRCt1w35WYoFqis=;
+ b=KnNVFzc8UXm7UZRMKXwo+8Kn+Xgqs9tRkZhgCIfjGLZut3Rlxk+BS+lkwwPRW6Ajmtyz+Z
+ FTlxfctRxDMuGygRgZ1aWwWSNNrmvs1XcQ0p1Nm6oFQ1U4tUJMejDcwPkARJhhIhiSGNHq
+ vzyE2Zt3ddr1zngSzyMaVS0tlXf8yBo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-4qhoy6w0N8W8Gnj8EdE0FQ-1; Wed, 24 Jun 2020 10:12:42 -0400
+X-MC-Unique: 4qhoy6w0N8W8Gnj8EdE0FQ-1
+Received: by mail-wr1-f71.google.com with SMTP id w4so1129826wrm.5
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 07:12:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=OeJNj8ZC3zV8CkJ1XiE1kv6/qIn2cm2cQAQo+Livlkg=;
- b=Eq3vMt7LtxJxlJuj5LwQjjySbUoDy6eaR7xDLv7wfMDf2enz+LhYYnZ5DLtRZ1qPGt
- cMGvekTvbt+sxu/FP8jc7PvKARakwDaQ/gL0/NYKBa2o1Y6dMCfVffv350mKnCQC7GBB
- JKiauMam/enuNBzWXqYc6VWQYw2R4cY4z/LOHNxG+rXVQH83nr1ayfMJSFNW9vjK6oUn
- qoByWBLFa9MmuUBpLzIfImsn/AqaCB+gZ5E7bFiqsUn5giv1rpTvTezaRPXvr5DCxczs
- zJDdGwvqvqDukbZQX13yDPUlH1gghuN56fB4AI6cjOfzHTptOsfRrlZ0h4qQs2TTABGv
- wsLg==
-X-Gm-Message-State: AOAM533QtWy6h05e4gPjFcaInaHy8UmQhup67psj5pd1/ZBwCy8EIBJU
- Rtcjwnk0PR9VXJxYytUISmzrgA==
-X-Google-Smtp-Source: ABdhPJxoQcqhAa6507gSJ+tIMYVkDxikC594U+eec6qHiwD1cIxbOX5vabqaZE3lprt6WJ7H0DH0AA==
-X-Received: by 2002:a05:600c:218f:: with SMTP id
- e15mr23451277wme.187.1593007507061; 
- Wed, 24 Jun 2020 07:05:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h14sm11339731wrt.36.2020.06.24.07.04.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 07:05:02 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D9A231FF9E;
- Wed, 24 Jun 2020 15:04:47 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/25] tests/docker: change tag naming scheme of our images
-Date: Wed, 24 Jun 2020 15:04:36 +0100
-Message-Id: <20200624140446.15380-16-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200624140446.15380-1-alex.bennee@linaro.org>
-References: <20200624140446.15380-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dodUbhN5/QDSqZn9CboDe3gOrUSNiRCt1w35WYoFqis=;
+ b=BhfOXeiVbyD7XPcOAN63jpnx5m5gmfZrQBw7M+DZpb9qzBBDyBiluO0gjk7gCWdJs6
+ wxb5Pc2gdm5lQCbir+mQDcx9KEJagKX702oL9cVn1FPNcpDYyheRrQGcKjVzfXRsNQ5X
+ mikzzWZw0nsPyGbtAxjkeP9EVNQS/A3BEgpfPuHbZbE83/FPcF72lOaU4PVbNK8r2sAl
+ LKEsAXWzr5a1Isx2h6pVWqdiPfIeuzuoip4a5Tky/meqgQWQTCHTbAQIWa/ZL9MRQQ9Z
+ c+J86DYa9mic1ncvwlzW3VbB8DpfBES81I9Iud1Xy4sZGYNRI9AKO3HVNPmnZYjdNsv6
+ 6Hxg==
+X-Gm-Message-State: AOAM530ASH3AtlSrw50g26dE0PMpgpp4dyPc4Ah4IbImSUt4t9f7xmLu
+ IdZygOf5jc39RfHHB+WlLfHffAiQN5h+DBgQ2FOBNrgOpwdg8wqI/8sh6B4LVYCGJ4Wig7u9tcF
+ F476PnG+z7FPoMw0=
+X-Received: by 2002:a05:600c:2152:: with SMTP id
+ v18mr8612117wml.5.1593007961481; 
+ Wed, 24 Jun 2020 07:12:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQs7MFErLZgL8vMeAOyTMZEuC7QMxnPp4yHIqekVmaL708/G19pEwnZ36I/DCuxgi2UwOwjA==
+X-Received: by 2002:a05:600c:2152:: with SMTP id
+ v18mr8612108wml.5.1593007961308; 
+ Wed, 24 Jun 2020 07:12:41 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.253.55])
+ by smtp.gmail.com with ESMTPSA id 125sm8611682wmc.23.2020.06.24.07.12.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 24 Jun 2020 07:12:40 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] qom: Introduce object_property_try_add_child()
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, berrange@redhat.com, ehabkost@redhat.com,
+ armbru@redhat.com
+References: <20200624124301.7112-1-eric.auger@redhat.com>
+ <20200624124301.7112-2-eric.auger@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1a144355-27bd-a26f-752e-00c2751d3a1f@redhat.com>
+Date: Wed, 24 Jun 2020 16:12:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200624124301.7112-2-eric.auger@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,394 +118,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We've been misusing the tag naming scheme for some time by overloading
-the post : section with the image type. Really it should be saved for
-the revision of that particular build. Move the details to the other
-side so we have:
+On 24/06/20 14:43, Eric Auger wrote:
+> +    op = object_property_try_add(obj, name, type, object_get_child_property,
+> +                                 NULL, object_finalize_child_property,
+> +                                 child, errp);
+> +    if (!op) {
+> +        goto out;
+> +    }
+>      op->resolve = object_resolve_child_property;
+> +out:
+>      object_ref(child);
+>      child->parent = obj;
+>      return op;
 
-  qemu/image-name
+I think if there's an error you need to return NULL without ref-ing
+child, shouldn't you?
 
-with the implied :latest version added by the tooling.
+You can then add another test that object_property_add_child succeeds
+after object_property_try_add_child fails.
 
-Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include                           | 2 +-
- tests/docker/docker.py                                  | 2 +-
- tests/docker/dockerfiles/debian-alpha-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-amd64-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-amd64.docker            | 2 +-
- tests/docker/dockerfiles/debian-arm64-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-arm64-test-cross.docker | 2 +-
- tests/docker/dockerfiles/debian-armel-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-armhf-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-hppa-cross.docker       | 2 +-
- tests/docker/dockerfiles/debian-m68k-cross.docker       | 2 +-
- tests/docker/dockerfiles/debian-mips-cross.docker       | 2 +-
- tests/docker/dockerfiles/debian-mips64-cross.docker     | 2 +-
- tests/docker/dockerfiles/debian-mips64el-cross.docker   | 2 +-
- tests/docker/dockerfiles/debian-mipsel-cross.docker     | 2 +-
- tests/docker/dockerfiles/debian-powerpc-cross.docker    | 2 +-
- tests/docker/dockerfiles/debian-ppc64-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-ppc64el-cross.docker    | 2 +-
- tests/docker/dockerfiles/debian-riscv64-cross.docker    | 2 +-
- tests/docker/dockerfiles/debian-s390x-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-sh4-cross.docker        | 2 +-
- tests/docker/dockerfiles/debian-sparc64-cross.docker    | 2 +-
- tests/docker/dockerfiles/debian-tricore-cross.docker    | 2 +-
- tests/docker/dockerfiles/debian-win32-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian-win64-cross.docker      | 2 +-
- tests/docker/dockerfiles/debian9-mxe.docker             | 2 +-
- 26 files changed, 26 insertions(+), 26 deletions(-)
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 3e3617816ec..7bac1a67e3e 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -55,7 +55,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- else
- docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 	$(call quiet-command,\
--		$(DOCKER_SCRIPT) build -t qemu:$* -f $< \
-+		$(DOCKER_SCRIPT) build -t qemu/$* -f $< \
- 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
- 		$(if $(NOUSER),,--add-current-user) \
- 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index e630aae1089..cc6f76caa60 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -204,7 +204,7 @@ def _dockerfile_preprocess(df):
-     for l in df.splitlines():
-         if len(l.strip()) == 0 or l.startswith("#"):
-             continue
--        from_pref = "FROM qemu:"
-+        from_pref = "FROM qemu/"
-         if l.startswith(from_pref):
-             # TODO: Alternatively we could replace this line with "FROM $ID"
-             # where $ID is the image's hex id obtained with
-diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
-index 74bcabfdb12..10fe30df0dd 100644
---- a/tests/docker/dockerfiles/debian-alpha-cross.docker
-+++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-amd64-cross.docker b/tests/docker/dockerfiles/debian-amd64-cross.docker
-index 5d890419251..870109ef6af 100644
---- a/tests/docker/dockerfiles/debian-amd64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-amd64-cross.docker
-@@ -4,7 +4,7 @@
- # This docker target is used on non-x86_64 machines which need the
- # x86_64 cross compilers installed.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- MAINTAINER Alex Bennée <alex.bennee@linaro.org>
- 
- # Add the foreign architecture we want and install dependencies
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 957f0bc2e79..8fdfd6a6b04 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -4,7 +4,7 @@
- # This docker target builds on the debian Stretch base image. Further
- # libraries which are not widely available are installed by hand.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
- RUN apt update && \
-diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
-index 09ca0a1ba79..b1a4613da5f 100644
---- a/tests/docker/dockerfiles/debian-arm64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10:latest
- 
- # Add the foreign architecture we want and install dependencies
- RUN dpkg --add-architecture arm64
-diff --git a/tests/docker/dockerfiles/debian-arm64-test-cross.docker b/tests/docker/dockerfiles/debian-arm64-test-cross.docker
-index a44e76d9421..53a9012beb8 100644
---- a/tests/docker/dockerfiles/debian-arm64-test-cross.docker
-+++ b/tests/docker/dockerfiles/debian-arm64-test-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Bullseye base image.
- #
--FROM qemu:debian11
-+FROM qemu/debian11
- 
- # Add the foreign architecture we want and install dependencies
- RUN dpkg --add-architecture arm64
-diff --git a/tests/docker/dockerfiles/debian-armel-cross.docker b/tests/docker/dockerfiles/debian-armel-cross.docker
-index e3794a61c95..b7b1a3585f8 100644
---- a/tests/docker/dockerfiles/debian-armel-cross.docker
-+++ b/tests/docker/dockerfiles/debian-armel-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
- # Add the foreign architecture we want and install dependencies
-diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
-index e163b8b9569..25d76188337 100644
---- a/tests/docker/dockerfiles/debian-armhf-cross.docker
-+++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- # Add the foreign architecture we want and install dependencies
- RUN dpkg --add-architecture armhf
-diff --git a/tests/docker/dockerfiles/debian-hppa-cross.docker b/tests/docker/dockerfiles/debian-hppa-cross.docker
-index 5c68b2d3304..3d6c65a3efc 100644
---- a/tests/docker/dockerfiles/debian-hppa-cross.docker
-+++ b/tests/docker/dockerfiles/debian-hppa-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-m68k-cross.docker b/tests/docker/dockerfiles/debian-m68k-cross.docker
-index 25edc80e9a3..fcb10e35347 100644
---- a/tests/docker/dockerfiles/debian-m68k-cross.docker
-+++ b/tests/docker/dockerfiles/debian-m68k-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-mips-cross.docker b/tests/docker/dockerfiles/debian-mips-cross.docker
-index 08a8e1c29cc..26c154014db 100644
---- a/tests/docker/dockerfiles/debian-mips-cross.docker
-+++ b/tests/docker/dockerfiles/debian-mips-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian-mips64-cross.docker b/tests/docker/dockerfiles/debian-mips64-cross.docker
-index 1a79505d696..09c2ba584e5 100644
---- a/tests/docker/dockerfiles/debian-mips64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-mips64-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-mips64el-cross.docker b/tests/docker/dockerfiles/debian-mips64el-cross.docker
-index 453b53ef72c..c990b683b7a 100644
---- a/tests/docker/dockerfiles/debian-mips64el-cross.docker
-+++ b/tests/docker/dockerfiles/debian-mips64el-cross.docker
-@@ -4,7 +4,7 @@
- # This docker target builds on the debian Stretch base image.
- #
- 
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian-mipsel-cross.docker b/tests/docker/dockerfiles/debian-mipsel-cross.docker
-index 3b6e975c686..0e5dd42d3c4 100644
---- a/tests/docker/dockerfiles/debian-mipsel-cross.docker
-+++ b/tests/docker/dockerfiles/debian-mipsel-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
-index 89dd4fbf870..07e1789650b 100644
---- a/tests/docker/dockerfiles/debian-powerpc-cross.docker
-+++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-ppc64-cross.docker b/tests/docker/dockerfiles/debian-ppc64-cross.docker
-index 4bf88ab02dd..8efe68874ed 100644
---- a/tests/docker/dockerfiles/debian-ppc64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-ppc64-cross.docker
-@@ -2,7 +2,7 @@
- # Docker ppc64 cross-compiler target
- #
- # This docker target builds on the debian Buster base image.
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-ppc64el-cross.docker b/tests/docker/dockerfiles/debian-ppc64el-cross.docker
-index cd386f01d93..1146a06be62 100644
---- a/tests/docker/dockerfiles/debian-ppc64el-cross.docker
-+++ b/tests/docker/dockerfiles/debian-ppc64el-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- # Add the foreign architecture we want and install dependencies
- RUN dpkg --add-architecture ppc64el && \
-diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-index 5e2d6ddb600..2bbff19772a 100644
---- a/tests/docker/dockerfiles/debian-riscv64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index 43fe59836f2..9f2ab51eb09 100644
---- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-+++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- # Add the s390x architecture
- RUN dpkg --add-architecture s390x
-diff --git a/tests/docker/dockerfiles/debian-sh4-cross.docker b/tests/docker/dockerfiles/debian-sh4-cross.docker
-index 9d7663764e4..fd3af895759 100644
---- a/tests/docker/dockerfiles/debian-sh4-cross.docker
-+++ b/tests/docker/dockerfiles/debian-sh4-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-sparc64-cross.docker b/tests/docker/dockerfiles/debian-sparc64-cross.docker
-index 31fd34f120b..f4bb9b561cf 100644
---- a/tests/docker/dockerfiles/debian-sparc64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-sparc64-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian10
-+FROM qemu/debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/tests/docker/dockerfiles/debian-tricore-cross.docker
-index 4a0f7706a39..769d95c77bb 100644
---- a/tests/docker/dockerfiles/debian-tricore-cross.docker
-+++ b/tests/docker/dockerfiles/debian-tricore-cross.docker
-@@ -7,7 +7,7 @@
- #
- # SPDX-License-Identifier: GPL-2.0-or-later
- #
--FROM qemu:debian9
-+FROM qemu/debian9
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
-index d16d6431bc8..b045e821b91 100644
---- a/tests/docker/dockerfiles/debian-win32-cross.docker
-+++ b/tests/docker/dockerfiles/debian-win32-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch MXE base image.
- #
--FROM qemu:debian9-mxe
-+FROM qemu/debian9-mxe
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
-index b0bc960445b..2fc9cfcbc66 100644
---- a/tests/docker/dockerfiles/debian-win64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-win64-cross.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch MXE base image.
- #
--FROM qemu:debian9-mxe
-+FROM qemu/debian9-mxe
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
-diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
-index 62ff1cecf2d..ae2c222a6f0 100644
---- a/tests/docker/dockerfiles/debian9-mxe.docker
-+++ b/tests/docker/dockerfiles/debian9-mxe.docker
-@@ -3,7 +3,7 @@
- #
- # This docker target builds on the debian Stretch base image.
- #
--FROM qemu:debian9
-+FROM qemu/debian9
- 
- MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
- 
--- 
-2.20.1
+Paolo
 
 
