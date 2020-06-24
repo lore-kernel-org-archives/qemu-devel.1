@@ -6,72 +6,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5ADEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6F9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B592D20786
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECDF20786
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 13:14:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJ1iBAEk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B592D20786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvI6YyAn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECDF20786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo5EZ-0007TB-RK
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:14:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41014)
+	id 1jo5Ea-0007Rt-9Q
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 09:14:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5B9-0002J0-Td
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5B9-0002IJ-LX
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20511
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38277
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5B7-0001TV-BJ
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jo5B7-0001TS-8Z
  for qemu-devel@nongnu.org; Wed, 24 Jun 2020 09:11:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1593004260;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=74AeFL074gpoAQc1Wc6wYwTr1cYk2s3cOeuzBhmYolM=;
- b=FJ1iBAEkRK2hMNHwubu1d7hYjVsszWWQR6JRSRFTGzHI2Nx41nlCDrCkwOMzZfwIb9iDoR
- BFqlI7JIeaHjH7aOsLfZE8zL9K1OkdNdXWF8IpBPQLBnX4h+Wknqhjo35+TmC8lm4OM94d
- B4TzKdzrRE7XNhoEYiCTQsKZNoPHUqk=
+ references:references; bh=3JjolbAfJRYmpL2My7tEOtXnKfwWbmvHJVH2SMKlGHw=;
+ b=JvI6YyAns6dEUI8/V3PDF5Q41QjZT8TvP91mrB5WsXwMJ4AOdosg4kSLbu4cMkQetU8vli
+ oZm9Lv5MlEnu0wiKxqF9gkDJRMZrwndn8Dz6oOCUoZFUEA6OTvCLX1QGYR9Gt3pytO4yov
+ btgP3Ks0aGZzdCJzXDNJC7QyPc28/Y0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-6-bqQfVCOBGpEICBn-sx5A-1; Wed, 24 Jun 2020 09:10:56 -0400
-X-MC-Unique: 6-bqQfVCOBGpEICBn-sx5A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-418-BGTmQUNFNQyoLgN9gOb8tw-1; Wed, 24 Jun 2020 09:10:55 -0400
+X-MC-Unique: BGTmQUNFNQyoLgN9gOb8tw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1082E805EE6
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 13:10:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB3101005513
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 13:10:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B981F2B47C;
- Wed, 24 Jun 2020 13:10:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8169B5C240;
+ Wed, 24 Jun 2020 13:10:46 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id CB4AF6DE4; Wed, 24 Jun 2020 15:10:45 +0200 (CEST)
+ id A799097DC; Wed, 24 Jun 2020 15:10:45 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 05/10] ccid: build smartcard as module
-Date: Wed, 24 Jun 2020 15:10:40 +0200
-Message-Id: <20200624131045.14512-6-kraxel@redhat.com>
+Subject: [PATCH v5 02/10] object: qom module support
+Date: Wed, 24 Jun 2020 15:10:37 +0200
+Message-Id: <20200624131045.14512-3-kraxel@redhat.com>
 In-Reply-To: <20200624131045.14512-1-kraxel@redhat.com>
 References: <20200624131045.14512-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 02:33:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -79,7 +77,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,70 +98,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drops libcacard.so dependency from core qemu.
+Little helper function to load modules on demand.  In most cases adding
+module loading support for devices and other objects is just
+s/object_class_by_name/module_object_class_by_name/ in the right spot.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- Makefile.objs        | 1 +
- util/module.c        | 2 ++
- hw/Makefile.objs     | 1 +
- hw/usb/Makefile.objs | 4 +++-
- 4 files changed, 7 insertions(+), 1 deletion(-)
+ include/qom/object.h | 12 ++++++++++++
+ qom/object.c         | 14 ++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 7ce2588b89a3..ca555ede0710 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -59,6 +59,7 @@ common-obj-y += migration/
- common-obj-y += audio/
- common-obj-m += audio/
- common-obj-y += hw/
-+common-obj-m += hw/
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 94a61ccc3fe8..51f188137f1f 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -994,6 +994,18 @@ bool object_class_is_abstract(ObjectClass *klass);
+  */
+ ObjectClass *object_class_by_name(const char *typename);
  
- common-obj-y += replay/
++/**
++ * module_object_class_by_name:
++ * @typename: The QOM typename to obtain the class for.
++ *
++ * For objects which might be provided by a module.  Behaves like
++ * object_class_by_name, but additionally tries to load the module
++ * needed in case the class is not available.
++ *
++ * Returns: The class for @typename or %NULL if not found.
++ */
++ObjectClass *module_object_class_by_name(const char *typename);
++
+ void object_class_foreach(void (*fn)(ObjectClass *klass, void *opaque),
+                           const char *implements_type, bool include_abstract,
+                           void *opaque);
+diff --git a/qom/object.c b/qom/object.c
+index 6ece96bc2bfc..34daaf1280f5 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -985,6 +985,20 @@ ObjectClass *object_class_by_name(const char *typename)
+     return type->class;
+ }
  
-diff --git a/util/module.c b/util/module.c
-index ee560a4b4269..89da9a3cce05 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -261,6 +261,8 @@ static struct {
-     const char *prefix;
-     const char *module;
- } const qom_modules[] = {
-+    { "ccid-card-passthru",    "hw-", "usb-smartcard"         },
-+    { "ccid-card-emulated",    "hw-", "usb-smartcard"         },
- };
- 
- static bool module_loaded_qom_all;
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 4cbe5e4e57d6..af8fd9a510ed 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -43,4 +43,5 @@ devices-dirs-y += smbios/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-+common-obj-m += usb/
- obj-y += $(devices-dirs-y)
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index fa5c3fa1b877..3c5b3d4fadd3 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -29,11 +29,13 @@ common-obj-$(CONFIG_USB_NETWORK)      += dev-network.o
- 
- ifeq ($(CONFIG_USB_SMARTCARD),y)
- common-obj-y                          += dev-smartcard-reader.o
--common-obj-$(CONFIG_SMARTCARD)        += smartcard.mo
-+ifeq ($(CONFIG_SMARTCARD),y)
-+common-obj-m                          += smartcard.mo
- smartcard.mo-objs := ccid-card-passthru.o ccid-card-emulated.o
- smartcard.mo-cflags := $(SMARTCARD_CFLAGS)
- smartcard.mo-libs := $(SMARTCARD_LIBS)
- endif
-+endif
- 
- ifeq ($(CONFIG_POSIX),y)
- common-obj-$(CONFIG_USB_STORAGE_MTP)  += dev-mtp.o
++ObjectClass *module_object_class_by_name(const char *typename)
++{
++    ObjectClass *oc;
++
++    oc = object_class_by_name(typename);
++#ifdef CONFIG_MODULES
++    if (!oc) {
++        module_load_qom_one(typename);
++        oc = object_class_by_name(typename);
++    }
++#endif
++    return oc;
++}
++
+ ObjectClass *object_class_get_parent(ObjectClass *class)
+ {
+     TypeImpl *type = type_get_parent(class->type);
 -- 
 2.18.4
 
