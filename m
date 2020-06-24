@@ -2,99 +2,152 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D0BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1401C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:41:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 209DE206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:39:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 837BE20706
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 15:41:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJkGS4qa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 209DE206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0flFRc7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837BE20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo7Uh-00068K-DZ
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:39:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59660)
+	id 1jo7X2-0000lr-Dr
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 11:41:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo7Sh-0003e7-4R
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:37:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29391
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jo7VW-0007Dp-KQ
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:40:15 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55517
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jo7Se-0002hF-Qj
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:37:18 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jo7VT-0003tS-KP
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 11:40:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593013035;
+ s=mimecast20190719; t=1593013210;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tpj0NoM5Tq/pw550/Z474S9spxgpCHxnuQX1qNNsSss=;
- b=QJkGS4qav5+upRg8U2XEIVu3zZFvxqWDR6WiXcvRUjSdXM5lG0r3UVN8RDjZ5bcz3Kclwg
- 49/FhCKh94Sc8CqvFm8GdEyyqcvF1mZD8C66VG0YWcz6L2rPN71MYPIbcgBY5lrlGiiWmY
- 5kc8agA4ZxSGnuBMatpSw416vnSNbNA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-6kiYw4JqPUi8xJRCib_kow-1; Wed, 24 Jun 2020 11:37:13 -0400
-X-MC-Unique: 6kiYw4JqPUi8xJRCib_kow-1
-Received: by mail-wm1-f71.google.com with SMTP id a7so3001304wmf.1
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:37:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tpj0NoM5Tq/pw550/Z474S9spxgpCHxnuQX1qNNsSss=;
- b=rUn9XV7UF00QbMNWYtBxdaKEMhc/o4Bip9VWJyr06hQaFGTCPlc/26bwBtyrhV6YPE
- GoPx4BT+yeerEu6WWe0vVV/2gjCPKE29I7SzvfMEesuVcPRaQrdGOe8dVsMVaePt4oTl
- eKk48RNFxNbfnAZBgeJ3P6Yj/+RfoE0UUqsRpbm3kFE6qMEn58YxSO54y1lsdLfTzgGu
- inxouBo7bRMx1BvyUfhampCvQORIRvunWa1W7+6UCMX6OaUCUZqvgvBg9EVpqsTf39g4
- iYbHio8ojQOkVZ4ajKIJqJ2HGJz9hL6ICXnVG/cuzTJTcTSEh466OxZPRPBClbISGG7u
- PQ/Q==
-X-Gm-Message-State: AOAM531QErrbqbaOuEwgXokx2+LZ45CzXSilEHsmcESA84coIxNGFjby
- MWZZGJyaTikTVFat4h0gmGdmnHf+/gNqeW+o7PWpvRzmaseOkZ2XjJTrrSE5g9hP6/ybj1zXGyF
- TXwKDvxj7CDsdXmU=
-X-Received: by 2002:a7b:cb18:: with SMTP id u24mr31045484wmj.67.1593013032561; 
- Wed, 24 Jun 2020 08:37:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/qR/G3tTK1LCrNcnGD14xUDykv7FFWHG1535IAiG5gdhErnShnJ8QC3xzbjrZthNWqOOvXQ==
-X-Received: by 2002:a7b:cb18:: with SMTP id u24mr31045448wmj.67.1593013032266; 
- Wed, 24 Jun 2020 08:37:12 -0700 (PDT)
-Received: from redhat.com ([82.166.20.53])
- by smtp.gmail.com with ESMTPSA id u65sm8939288wmg.5.2020.06.24.08.37.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 08:37:11 -0700 (PDT)
-Date: Wed, 24 Jun 2020 11:37:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v25 QEMU 3/3] virtio-balloon: Replace free page hinting
- references to 'report' with 'hint'
-Message-ID: <20200624113417-mutt-send-email-mst@kernel.org>
-References: <20200527041212.12700.60627.stgit@localhost.localdomain>
- <20200527041414.12700.50293.stgit@localhost.localdomain>
- <CAKgT0UdPC1s0c-wqsNc4x8DeZhtZQVMmLArWQ=Z345Mkof650Q@mail.gmail.com>
- <4f37c184-cf62-5711-a737-925533b52d73@redhat.com>
- <CAKgT0Udmxjx66hEhDyqWS1wBkAfEf_hht8FZAOuh3NMDOAOR3w@mail.gmail.com>
- <aea3b6e6-f653-dd0c-5e17-d0c948a6af4b@redhat.com>
- <20200618120121-mutt-send-email-mst@kernel.org>
- <1ee4f06d-f0bb-4155-ee82-1d56c346e2a0@redhat.com>
- <20200624103559-mutt-send-email-mst@kernel.org>
- <a7daa26d-52a2-4834-9cf1-7bdc457e686f@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=EdrIS2DgjFhLgu1LXots+TiBIvDoJEXwyh3mqjgD7c0=;
+ b=D0flFRc78GlQABjCL4QKEzGrKkLTYK9m7hUPvaV0ABJEfKSLf33GBNkZaOodcGP34TvKML
+ dqTFaoYHbEhKbPoi6ITgGwc+Srs7nQsXlUXfNcaMHjmyYj+MBOmeISgy/2PEA5C1DvPTyc
+ MQdJ2p/oTxWv85Y/lTa+MzjHRy/kZd0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-TqtS3dFLPDSvI1nkxTJSYQ-1; Wed, 24 Jun 2020 11:40:08 -0400
+X-MC-Unique: TqtS3dFLPDSvI1nkxTJSYQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC25C835B91;
+ Wed, 24 Jun 2020 15:40:07 +0000 (UTC)
+Received: from [10.10.119.184] (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F5155BAC4;
+ Wed, 24 Jun 2020 15:40:06 +0000 (UTC)
+Subject: Re: [PATCH v2 00/16] Crazy shit around -global (pardon my french)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200622094227.1271650-1-armbru@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c0d6ea24-eb20-3d99-ae02-1d762fd6c9dd@redhat.com>
+Date: Wed, 24 Jun 2020 11:40:05 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <a7daa26d-52a2-4834-9cf1-7bdc457e686f@redhat.com>
+In-Reply-To: <20200622094227.1271650-1-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 01:59:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -117,128 +170,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>
+Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 05:28:59PM +0200, David Hildenbrand wrote:
-> > So at the high level the idea was simple, we just clear the dirty bit
-> > when page is hinted, unless we sent a new command since. Implementation
-> > was reviewed by migration maintainers. If there's a consensus the code
-> > is written so badly we can't maintain it, maybe we should remove it.
-> > Which parts are unmaintainable in your eyes - migration or virtio ones?
-> 
-> QEMU implementation without a propert virtio specification. I hope that
-> we can *at least* finally document the expected behavior. Alex gave it a
-> shot, and I was hoping that Wei could jump in to clarify, help move this
-> forward ... after all he implemented (+designed?) the feature and the
-> virtio interface.
-> 
-> > Or maybe it's the general thing that interface was never specced
-> > properly.
-> 
-> Yes, a spec would be definitely a good starter ...
-> 
-> [...]
-> 
-> >>
-> >> 1. If migration fails during RAM precopy, the guest will never receive a
-> >> DONE notification. Probably easy to fix.
-> >>
-> >> 2. Unclear semantics. Alex tried to document what the actual semantics
-> >> of hinted pages are.
-> > 
-> > I'll reply to that now.
-> > 
-> >> Assume the following in the guest to a previously
-> >> hinted page
-> >>
-> >> /* page was hinted and is reused now */
-> >> if (page[x] != Y)
-> >> 	page[x] == Y;
-> >> /* migration ends, we now run on the destination */
-> >> BUG_ON(page[x] != Y);
-> >> /* BUG, because the content chan
-> > 
-> > The assumption hinting makes is that data in page is writtent to before it's used.
-> > 
-> > 
-> >> A guest can observe that. And that could be a random driver that just
-> >> allocated a page.
-> >>
-> >> (I *assume* in Linux we might catch that using kasan, but I am not 100%
-> >> sure, also, the actual semantics to document are unclear - e.g., for
-> >> other guests)
-> > 
-> > I think it's basically simple: hinting means it's ok to
-> > fill page with trash unless it has been modified since the command
-> > ID supplied.
-> 
-> Yeah, I quite dislike the semantics, especially, as they are different
-> to well-know semantics as e.g., represent in MADV_FREE. Getting changed
-> content when reading is really weird. But it seemed to be easier to
-> implement (low hanging fruit) and nobody complained back then. Well, now
-> we are stuck with it.
-> 
-> [..]
 
-The difference with MADV_FREE is
-- asynchronous (using cmd id to synchronize)
-- zero not guaranteed
 
-right?
+On 6/22/20 5:42 AM, Markus Armbruster wrote:
+> There are three ways to configure backends:
+> 
+> * -nic, -serial, -drive, ... (onboard devices)
+> 
+> * Set the property with -device, or, if you feel masochistic, with
+>   -set device (pluggable devices)
+> 
+> * Set the property with -global (both)
+> 
+> The trouble is -global is terrible.
+> 
+> It gets applied in object_new(), which can't fail.  We treat failure
+> to apply -global as fatal error, except when hot-plugging, where we
+> treat it as warning *boggle*.  I'm not addressing that today.
+> 
+> Some code falls apart when you use both -global and the other way.
+> 
+> To make life more interesting, we gave -drive two roles: with
+> interface type other than none, it's for configuring onboard devices,
+> and with interface type none, it's for defining backends for use with
+> -device and such.  Since we neglect to require interface type none for
+> the latter, you can use one -drive in both roles.  This confuses the
+> code about as much as you, dear reader, probably are by now.
+> 
+> Because this still isn't interesting enough, there's yet another way
+> to configure backends, just for floppies: set the floppy controller's
+> property.  Goes back to the time when floppy wasn't a separate device,
+> and involves some Bad Magic.  Now -global can interact with itself!
+> 
+> Digging through all this took me an embarrassing amount of time.
+> Hair, too.
+> 
+> My patches reject some the silliest uses outright, and deprecate some
+> not so silly ones that have replacements.
+> 
+> Apply on top of my "[PATCH v2 00/58] qdev: Rework how we plug into the
+> parent bus".
+> 
 
-> > 
-> >> There are other concerns I had regarding the iothread (e.g., while
-> >> reporting is active, virtio_ballloon_get_free_page_hints() is
-> >> essentially a busy loop, in contrast to documented -
-> >> continue_to_get_hints will always be true).
-> > 
-> > So that would be a performance issue you are suggesting, right?
+Oof. Thank you for your work in fixing our darkest corners. I sincerely
+appreciate it.
+
+The qdev tree ordering problems don't cause any issues for migration, do
+they?
+
+(I see you already sent a PR, so whatever!)
+
+> Enjoy!
 > 
-> I misread the code, so that comment does no longer apply (see other
-> message).
+> v2:
+> * Rebased; tests/qemu-iotests/172.out regenerated to resolve conflicts
+> * PATCH 10-12: check_non_null() renamed to check_prop_still_unset()
+>   [Philippe]
 > 
-> > 
-> >>> The appeal of hinting is that it's 0 overhead outside migration,
-> >>> and pains were taken to avoid keeping pages locked while
-> >>> hypervisor is busy.
-> >>>
-> >>> If we are to drop hinting completely we need to show that reporting
-> >>> can be comparable, and we'll probably want to add a mode for
-> >>> reporting that behaves somewhat similarly.
-> >>
-> >> Depends on the actual users. If we're dropping a feature that nobody is
-> >> actively using, I don't think we have to show anything.
-> > 
-> > 
-> > I don't know how to find out. So far it doesn't look like we found
-> > any common data corruptions that would indicate no one can use it safely.
-> > Races around reset aren't all that uncommon but I don't think that
-> > qualifies as a deal breaker.
+> Markus Armbruster (16):
+>   iotests/172: Include "info block" in test output
+>   iotests/172: Cover empty filename and multiple use of drives
+>   iotests/172: Cover -global floppy.drive=...
+>   fdc: Reject clash between -drive if=floppy and -global isa-fdc
+>   fdc: Open-code fdctrl_init_isa()
+>   fdc: Deprecate configuring floppies with -global isa-fdc
+>   docs/qdev-device-use.txt: Update section "Default Devices"
+>   blockdev: Deprecate -drive with bogus interface type
+>   qdev: Eliminate get_pointer(), set_pointer()
+>   qdev: Improve netdev property override error a bit
+>   qdev: Reject drive property override
+>   qdev: Reject chardev property override
+>   qdev: Make qdev_prop_set_drive() match the other helpers
+>   arm/aspeed: Drop aspeed_board_init_flashes() parameter @errp
+>   sd/pxa2xx_mmci: Don't crash on pxa2xx_mmci_init() error
+>   sd/milkymist-memcard: Fix error API violation
 > 
-> As I said, there are no libvirt bindings, so at least anything using
-> libvirt does not use it. I'd be curious about actual users.
+>  docs/qdev-device-use.txt            |  17 +-
+>  docs/system/deprecated.rst          |  34 ++
+>  include/hw/block/fdc.h              |   2 +-
+>  include/hw/qdev-properties.h        |  18 +-
+>  include/sysemu/blockdev.h           |   2 +
+>  blockdev.c                          |  27 +-
+>  hw/arm/aspeed.c                     |  16 +-
+>  hw/arm/cubieboard.c                 |   2 +-
+>  hw/arm/exynos4210.c                 |   2 +-
+>  hw/arm/imx25_pdk.c                  |   2 +-
+>  hw/arm/mcimx6ul-evk.c               |   2 +-
+>  hw/arm/mcimx7d-sabre.c              |   2 +-
+>  hw/arm/msf2-som.c                   |   4 +-
+>  hw/arm/nseries.c                    |   4 +-
+>  hw/arm/orangepi.c                   |   2 +-
+>  hw/arm/raspi.c                      |   2 +-
+>  hw/arm/sabrelite.c                  |   6 +-
+>  hw/arm/vexpress.c                   |   3 +-
+>  hw/arm/xilinx_zynq.c                |   7 +-
+>  hw/arm/xlnx-versal-virt.c           |   2 +-
+>  hw/arm/xlnx-zcu102.c                |  10 +-
+>  hw/block/fdc.c                      |  82 ++--
+>  hw/block/nand.c                     |   2 +-
+>  hw/block/pflash_cfi01.c             |   6 +-
+>  hw/block/pflash_cfi02.c             |   2 +-
+>  hw/core/qdev-properties-system.c    | 151 ++++---
+>  hw/core/qdev-properties.c           |  17 +
+>  hw/i386/pc.c                        |   8 +-
+>  hw/ide/qdev.c                       |   4 +-
+>  hw/isa/isa-superio.c                |  18 +-
+>  hw/m68k/q800.c                      |   3 +-
+>  hw/microblaze/petalogix_ml605_mmu.c |   5 +-
+>  hw/ppc/pnv.c                        |   3 +-
+>  hw/ppc/spapr.c                      |   4 +-
+>  hw/scsi/scsi-bus.c                  |   2 +-
+>  hw/sd/milkymist-memcard.c           |   2 +-
+>  hw/sd/pxa2xx_mmci.c                 |  15 +-
+>  hw/sd/sd.c                          |   2 +-
+>  hw/sd/ssi-sd.c                      |   3 +-
+>  hw/sparc64/sun4u.c                  |   9 +-
+>  hw/xtensa/xtfpga.c                  |   3 +-
+>  softmmu/vl.c                        |   8 +
+>  tests/qemu-iotests/172              |  27 +-
+>  tests/qemu-iotests/172.out          | 656 +++++++++++++++++++++++++---
+>  44 files changed, 928 insertions(+), 270 deletions(-)
 > 
-> > 
-> > I find the idea of asynchronously sending hints to host without
-> > waiting for them to be processed intriguing. Not something
-> > I'd work on implementing if we had reporting originally,
-> > but since it's there I'm not sure we should just discard it
-> > at this point.
-> > 
-> >> This feature obviously saw no proper review.
-> > 
-> > I did my best but obviously missed some things.
-> 
-> Yeah, definitely not your fault. People cannot expect maintainers to
-> review everything in detail.
-> 
-> -- 
-> Thanks,
-> 
-> David / dhildenb
 
 
