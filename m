@@ -6,70 +6,85 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2558C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20636C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D09A20823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0DA72088E
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 08:35:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="ce/fSDkH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D09A20823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsuxcAdV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DA72088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo0kx-0002Xi-Oc
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:27:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44968)
+	id 1jo0sK-00073m-0C
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 04:35:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jo0kM-00028V-A0
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:27:06 -0400
-Received: from nylar.uni-paderborn.de ([2001:638:502:c003::18]:34656)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jo0kJ-0007MJ-2w
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:27:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=mail.uni-paderborn.de; s=20170601; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
- Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
- List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=1ifRmDmpAiuLc8szhRsPc1HIUP5X2VpVMYfZ/s/WXDI=; b=ce/fSDkHljpRxH4Oytgv3H7sK
- emz5fSt9dHX74CPw4F0AT3pW4cz2ZWZQuk33r+oBhU2nj34p3JU4c3GRmddf3OnfaCnEjygZ2BGDR
- fUxDRTazcPRYtGxY8y2MWyTKEl+2TVAFZhCjnjUWQlqcFe8oo2EKCM8tL3g3QNRyJJd0E=;
-Date: Wed, 24 Jun 2020 10:26:55 +0200
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-To: David Brenken <david.brenken@efs-auto.org>
-Subject: Re: [PATCH v3 1/1] tricore: added triboard with tc27x_soc
-Message-ID: <20200624082655.wotnfeha24ctul2r@schnipp-desktop>
-References: <20200622131934.10328-1-david.brenken@efs-auto.org>
- <20200622131934.10328-2-david.brenken@efs-auto.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0rH-00061e-QU
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:34:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23209
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo0rF-000805-3D
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 04:34:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592987651;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=onD2F+VlFmLsM+j8BU+AiV1q5udFfVtc993ViDW7dGQ=;
+ b=OsuxcAdVCgIAS/Y3Ag57V6PJVhUb6j0zJ+Hc7rW61WHWODcdIU3qiYB9UsWKevtnUsY+1G
+ DFuBeQC+2cYnoQQS5+hDAyHI7XAm/NDJvMORNCLl3z+lMaztBNjgBbNeYVw9BtVJz0ngSe
+ kL31Q8dIqXrkPx3Bo30O9Y18pbIzfPc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-8-0xNiEROVSbnyBA_ST1cQ-1; Wed, 24 Jun 2020 04:34:09 -0400
+X-MC-Unique: 8-0xNiEROVSbnyBA_ST1cQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEA201883604
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 08:34:07 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC98B10013D9;
+ Wed, 24 Jun 2020 08:34:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2BCE7113846D; Wed, 24 Jun 2020 10:34:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: -enablefips
+References: <7816f22f-2872-06ef-f7ef-40add5a34040@redhat.com>
+ <20200624064954.jmkqonjbqfhso5dr@sirius.home.kraxel.org>
+Date: Wed, 24 Jun 2020 10:34:03 +0200
+In-Reply-To: <20200624064954.jmkqonjbqfhso5dr@sirius.home.kraxel.org> (Gerd
+ Hoffmann's message of "Wed, 24 Jun 2020 08:49:54 +0200")
+Message-ID: <878sgcdfr8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200622131934.10328-2-david.brenken@efs-auto.org>
-X-IMT-Spam-Score: 0.0 ()
-X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=8624600, da=80596281,
- mc=208, sc=3, hc=205, sp=1, fso=8624600, re=0, sd=0, hd=0
-X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2020.6.24.81818, AntiVirus-Engine: 5.74.0,
- AntiVirus-Data: 2020.6.24.5740000
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
-Received-SPF: pass client-ip=2001:638:502:c003::18;
- envelope-from=kbastian@mail.uni-paderborn.de; helo=nylar.uni-paderborn.de
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 00:34:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,140 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Lars Biermanski <lars.biermanski@efs-auto.de>,
- Georg Hofstetter <georg.hofstetter@efs-auto.de>,
- David Brenken <david.brenken@efs-auto.de>,
- Robert Rasche <robert.rasche@efs-auto.de>,
- Andreas Konopik <andreas.konopik@efs-auto.de>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 22, 2020 at 03:19:34PM +0200, David Brenken wrote:
-> From: Andreas Konopik <andreas.konopik@efs-auto.de>
-> +const MemmapEntry tc27x_soc_memmap[] = {
-> +    [TC27XD_DSPR2]     = { 0x50000000,   0x1E000 },
-> +    [TC27XD_DCACHE2]   = { 0x5001E000,    0x2000 },
-> +    [TC27XD_DTAG2]     = { 0x500C0000,     0xC00 },
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-The size changed from 0xa00 to 0xc00 from v2. The manual states that it has no
-size. I guess you inferred the size from the address range. How does real hw
-behave if you access DTAG2?
+> On Tue, Jun 23, 2020 at 11:51:09PM -0400, John Snow wrote:
+>> I never knew what this option did, but the answer is ... strange!
+>> 
+>> It's only defined for linux, in os-posix.c. When called, it calls
+>> fips_set_state(true), located in osdep.c.
+>> 
+>> This will read /proc/sys/crypto/fips_enabled and set the static global
+>> 'fips_enabled' to true if this setting is on.
+>
+> IIRC the idea is to have a global switch to enable fips compilance for
+> the whole distro.  RH specific.  rhel-7 kernel has it.  rhel-8 kernel
+> too, so it probably isn't obsolete.  Not present in mainline kernels.
+>
+> I'm wondering what the point of the -enablefips switch is.  Shouldn't
+> qemu check /proc/sys/crypto/fips_enabled unconditionally instead?
 
-> +    [TC27XD_PSPR2]     = { 0x50100000,    0x8000 },
-> +    [TC27XD_PCACHE2]   = { 0x50108000,    0x4000 },
-> +    [TC27XD_PTAG2]     = { 0x501C0000,    0x1800 },
-> +    [TC27XD_DSPR1]     = { 0x60000000,   0x1E000 },
-> +    [TC27XD_DCACHE1]   = { 0x6001E000,    0x2000 },
-> +    [TC27XD_DTAG1]     = { 0x600C0000,     0xC00 },
-> +    [TC27XD_PSPR1]     = { 0x60100000,    0x8000 },
-> +    [TC27XD_PCACHE1]   = { 0x60108000,    0x4000 },
-> +    [TC27XD_PTAG1]     = { 0x601C0000,    0x1800 },
-> +    [TC27XD_DSPR0]     = { 0x70000000,   0x1C000 },
-> +    [TC27XD_PSPR0]     = { 0x70100000,    0x6000 },
-> +    [TC27XD_PCACHE0]   = { 0x70106000,    0x2000 },
-> +    [TC27XD_PTAG0]     = { 0x701C0000,     0xC00 },
-> +    [TC27XD_PFLASH0_C] = { 0x80000000,  0x200000 },
-> +    [TC27XD_PFLASH1_C] = { 0x80200000,  0x200000 },
-> +    [TC27XD_OLDA_C]    = { 0x8FE70000,    0x8000 },
-> +    [TC27XD_BROM_C]    = { 0x8FFF8000,    0x8000 },
-> +    [TC27XD_LMURAM_C]  = { 0x90000000,    0x8000 },
-> +    [TC27XD_EMEM_C]    = { 0x9F000000,  0x100000 },
-> +    [TC27XD_PFLASH0_U] = { 0xA0000000,       0x0 },
-> +    [TC27XD_PFLASH1_U] = { 0xA0200000,       0x0 },
-> +    [TC27XD_DFLASH0]   = { 0xAF000000,  0x104000 },
-> +    [TC27XD_DFLASH1]   = { 0xAF110000,   0x10000 },
-> +    [TC27XD_OLDA_U]    = { 0xAFE70000,       0x0 },
-> +    [TC27XD_BROM_U]    = { 0xAFFF8000,       0x0 },
-> +    [TC27XD_LMURAM_U]  = { 0xB0000000,       0x0 },
-> +    [TC27XD_EMEM_U]    = { 0xBF000000,       0x0 },
-> +    [TC27XD_PSPRX]     = { 0xC0000000,       0x0 },
-> +    [TC27XD_DSPRX]     = { 0xD0000000,       0x0 },
-> +};
+The switch feels rather silly to me.  If you take the trouble to put
+your host in FIPS mode, requiring -enable-fips to make QEMU to actually
+honor it makes no sense.  If you don't, QEMU's -enable-fips has no
+effect.
 
-Why not use KiB/MiB sizes as before? I created a patch for that. Can you check
-that I didn't skrew up the sizes?
+I may well misremember things (it's been years), but I vaguely recall
+-enable-fips being a lame compromise between "this ought to be upstream"
+and "FIPS is stupid, and I want nothing of it".
 
---- a/hw/tricore/tc27x_soc.c
-+++ b/hw/tricore/tc27x_soc.c
-@@ -26,44 +26,45 @@
- #include "hw/misc/unimp.h"
- #include "exec/address-spaces.h"
- #include "qemu/log.h"
-+#include "qemu/units.h"
- #include "cpu.h"
+>> (Tangent: what does *this* setting actually control? Should QEMU
+>> meaningfully change its behavior when it's set?)
+>
+> fips is a security policy ...
+>
+>> This static global is exposed via the getter fips_get_state(). This
+>> function is called only by vnc.c, and appears to disable the use of the
+>> password option for -vnc.
+>
+> ... yes, "no passwords" is one of the rules.  There are probably more.
+>
+>> (If we really do want to keep it, it should probably go under -global
+>> somewhere instead to help reduce flag clutter, but we'd need to have a
+>> chat about what fips compliance means for literally every other spot in
+>> QEMU that is capable of using or receiving a cleartext password.)
+>
+> Yep.  IIRC for spice this is handled in libspice-server.  We need to
+> look at blockdev encryption I guess.  Any other places where qemu uses
+> passwords directly?  I think we don't have to worry about indirect usage
+> (sasl).
 
- #include "hw/tricore/tc27x_soc.h"
- #include "hw/tricore/triboard.h"
+I'd expect the SASL libraries to honor FIPS mode by themselves.  But
+best ask someone who actually knows how FIPS mode is supposed to work.
 
- const MemmapEntry tc27x_soc_memmap[] = {
--    [TC27XD_DSPR2]     = { 0x50000000,   0x1E000 },
--    [TC27XD_DCACHE2]   = { 0x5001E000,    0x2000 },
--    [TC27XD_DTAG2]     = { 0x500C0000,     0xC00 },
--    [TC27XD_PSPR2]     = { 0x50100000,    0x8000 },
--    [TC27XD_PCACHE2]   = { 0x50108000,    0x4000 },
--    [TC27XD_PTAG2]     = { 0x501C0000,    0x1800 },
--    [TC27XD_DSPR1]     = { 0x60000000,   0x1E000 },
--    [TC27XD_DCACHE1]   = { 0x6001E000,    0x2000 },
--    [TC27XD_DTAG1]     = { 0x600C0000,     0xC00 },
--    [TC27XD_PSPR1]     = { 0x60100000,    0x8000 },
--    [TC27XD_PCACHE1]   = { 0x60108000,    0x4000 },
--    [TC27XD_PTAG1]     = { 0x601C0000,    0x1800 },
--    [TC27XD_DSPR0]     = { 0x70000000,   0x1C000 },
--    [TC27XD_PSPR0]     = { 0x70100000,    0x6000 },
--    [TC27XD_PCACHE0]   = { 0x70106000,    0x2000 },
--    [TC27XD_PTAG0]     = { 0x701C0000,     0xC00 },
--    [TC27XD_PFLASH0_C] = { 0x80000000,  0x200000 },
--    [TC27XD_PFLASH1_C] = { 0x80200000,  0x200000 },
--    [TC27XD_OLDA_C]    = { 0x8FE70000,    0x8000 },
--    [TC27XD_BROM_C]    = { 0x8FFF8000,    0x8000 },
--    [TC27XD_LMURAM_C]  = { 0x90000000,    0x8000 },
--    [TC27XD_EMEM_C]    = { 0x9F000000,  0x100000 },
--    [TC27XD_PFLASH0_U] = { 0xA0000000,       0x0 },
--    [TC27XD_PFLASH1_U] = { 0xA0200000,       0x0 },
--    [TC27XD_DFLASH0]   = { 0xAF000000,  0x104000 },
--    [TC27XD_DFLASH1]   = { 0xAF110000,   0x10000 },
--    [TC27XD_OLDA_U]    = { 0xAFE70000,       0x0 },
--    [TC27XD_BROM_U]    = { 0xAFFF8000,       0x0 },
--    [TC27XD_LMURAM_U]  = { 0xB0000000,       0x0 },
--    [TC27XD_EMEM_U]    = { 0xBF000000,       0x0 },
--    [TC27XD_PSPRX]     = { 0xC0000000,       0x0 },
--    [TC27XD_DSPRX]     = { 0xD0000000,       0x0 },
-+    [TC27XD_DSPR2]     = { 0x50000000,            120 * KiB },
-+    [TC27XD_DCACHE2]   = { 0x5001E000,              8 * KiB },
-+    [TC27XD_DTAG2]     = { 0x500C0000,                0xC00 },
-+    [TC27XD_PSPR2]     = { 0x50100000,             32 * KiB },
-+    [TC27XD_PCACHE2]   = { 0x50108000,             16 * KiB },
-+    [TC27XD_PTAG2]     = { 0x501C0000,               0x1800 },
-+    [TC27XD_DSPR1]     = { 0x60000000,            120 * KiB },
-+    [TC27XD_DCACHE1]   = { 0x6001E000,              8 * KiB },
-+    [TC27XD_DTAG1]     = { 0x600C0000,                0xC00 },
-+    [TC27XD_PSPR1]     = { 0x60100000,             32 * KiB },
-+    [TC27XD_PCACHE1]   = { 0x60108000,             16 * KiB },
-+    [TC27XD_PTAG1]     = { 0x601C0000,               0x1800 },
-+    [TC27XD_DSPR0]     = { 0x70000000,            112 * KiB },
-+    [TC27XD_PSPR0]     = { 0x70100000,             24 * KiB },
-+    [TC27XD_PCACHE0]   = { 0x70106000,              8 * KiB },
-+    [TC27XD_PTAG0]     = { 0x701C0000,                0xC00 },
-+    [TC27XD_PFLASH0_C] = { 0x80000000,              2 * MiB },
-+    [TC27XD_PFLASH1_C] = { 0x80200000,              2 * MiB },
-+    [TC27XD_OLDA_C]    = { 0x8FE70000,             32 * KiB },
-+    [TC27XD_BROM_C]    = { 0x8FFF8000,             32 * KiB },
-+    [TC27XD_LMURAM_C]  = { 0x90000000,             32 * KiB },
-+    [TC27XD_EMEM_C]    = { 0x9F000000,              1 * MiB },
-+    [TC27XD_PFLASH0_U] = { 0xA0000000,                  0x0 },
-+    [TC27XD_PFLASH1_U] = { 0xA0200000,                  0x0 },
-+    [TC27XD_DFLASH0]   = { 0xAF000000,   1 * MiB + 16 * KiB },
-+    [TC27XD_DFLASH1]   = { 0xAF110000,             64 * KiB },
-+    [TC27XD_OLDA_U]    = { 0xAFE70000,                  0x0 },
-+    [TC27XD_BROM_U]    = { 0xAFFF8000,                  0x0 },
-+    [TC27XD_LMURAM_U]  = { 0xB0000000,                  0x0 },
-+    [TC27XD_EMEM_U]    = { 0xBF000000,                  0x0 },
-+    [TC27XD_PSPRX]     = { 0xC0000000,                  0x0 },
-+    [TC27XD_DSPRX]     = { 0xD0000000,                  0x0 },
-
-The remainder looks good to me.
-
-Cheers,
-Bastian
 
