@@ -2,58 +2,86 @@ Return-Path: <SRS0=4Hnu=AF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A961C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11A6C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:11:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B9F320823
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:10:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9F320823
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 8D4862082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jun 2020 17:11:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gux+olTF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4862082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jo8vB-00082V-Ct
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53514)
+	id 1jo8vV-0000R7-Hq
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 13:11:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jo8Yx-0001vL-Gb
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:47:51 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:44118)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jo8Yt-00074E-IV
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:47:50 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id CCAB274633E;
- Wed, 24 Jun 2020 18:47:37 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id A941374633D; Wed, 24 Jun 2020 18:47:37 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
-References: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
-Subject: [PATCH v4] sm501: Fix and optimize overlap check
-Date: Wed, 24 Jun 2020 18:42:18 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8Vf-0004IA-Hd
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52838
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jo8VD-000587-As
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 12:44:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593017036;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=T1CxzJSuKww59L0K/c7s+dgCYGor5N5jJqNWHGKncnU=;
+ b=Gux+olTFf81hggoEs1hhWc0diWGcPFM/a5xWnpuYboaQve5D0NY9ULt93eQnJHMUXMLEep
+ LHxewyqYCxTj58bqt0aMlPipZP/io25MJO1xdiDMSPxJhSQLXMfAPiIXwOrs91HgKC4LUt
+ 3HvWjuDpEM3aeN5PstSmvFeVyLVuli4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-nxtTIbj-PJmxS0gblNKqFA-1; Wed, 24 Jun 2020 12:43:52 -0400
+X-MC-Unique: nxtTIbj-PJmxS0gblNKqFA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4C92800597;
+ Wed, 24 Jun 2020 16:43:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D24E7E59F;
+ Wed, 24 Jun 2020 16:43:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0AD4B1138478; Wed, 24 Jun 2020 18:43:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Message-Id: <20200624164737.A941374633D@zero.eik.bme.hu>
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 12:47:38
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Subject: [PATCH 11/46] qemu-option: Make uses of find_desc_by_name() more
+ similar
+Date: Wed, 24 Jun 2020 18:43:09 +0200
+Message-Id: <20200624164344.3778251-12-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-1-armbru@redhat.com>
+References: <20200624164344.3778251-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 03:27:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,74 +95,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When doing reverse blit we need to check if source and dest overlap
-but it is not trivial due to possible different base and pitch of
-source and dest. Do rectangle overlap if base and pitch match,
-otherwise just check if memory area containing the rects overlaps so
-rects could possibly overlap.
+This is to make the next commit easier to review.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
-This version fixes overlap check according to Peter's suggestion, only
-resending this patch as v4, others still valid from v3. Let me know if
-you want the whole series resent instead.
+ util/qemu-option.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
- hw/display/sm501.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 2db347dcbc..9cccc68c35 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -690,6 +690,7 @@ static void sm501_2d_operation(SM501State *s)
-     unsigned int dst_pitch = (s->twoD_pitch >> 16) & 0x1FFF;
-     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
-     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
-+    bool overlap = false;
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 6119f971a4..9941005c91 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -270,6 +270,7 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
+ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+ {
+     QemuOpt *opt;
++    const QemuOptDesc *desc;
  
-     if ((s->twoD_stretch >> 16) & 0xF) {
-         qemu_log_mask(LOG_UNIMP, "sm501: only XY addressing is supported.\n");
-@@ -784,16 +785,21 @@ static void sm501_2d_operation(SM501State *s)
-                          ldn_he_p(&s->local_mem[src_base + si], bypp));
-                 break;
-             }
--            /* Check for overlaps, this could be made more exact */
--            uint32_t sb, se, db, de;
--            sb = src_base + src_x + src_y * (width + src_pitch);
--            se = sb + width + height * (width + src_pitch);
--            db = dst_base + dst_x + dst_y * (width + dst_pitch);
--            de = db + width + height * (width + dst_pitch);
--            if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
--                /* regions may overlap: copy via temporary */
--                int llb = width * bypp;
--                int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
-+            /* If reverse blit do simple check for overlaps */
-+            if (rtl && src_base == dst_base && src_pitch == dst_pitch) {
-+                overlap = (src_x < dst_x + width && src_x + width > dst_x &&
-+                           src_y < dst_y + height && src_y + height > dst_y);
-+            } else if (rtl) {
-+                unsigned int sb, se, db, de;
-+                sb = src_base + (src_x + src_y * src_pitch) * bypp;
-+                se = sb + (width + (height - 1) * src_pitch) * bypp;
-+                db = dst_base + (dst_x + dst_y * dst_pitch) * bypp;
-+                de = db + (width + (height - 1) * dst_pitch) * bypp;
-+                overlap = (db < se && sb < de);
-+            }
-+            if (overlap) {
-+                /* pixman can't do reverse blit: copy via temporary */
-+                int tmp_stride = DIV_ROUND_UP(width * bypp, sizeof(uint32_t));
-                 uint32_t *tmp = tmp_buf;
+     if (opts == NULL) {
+         return NULL;
+@@ -277,7 +278,7 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
  
-                 if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
+     opt = qemu_opt_find(opts, name);
+     if (!opt) {
+-        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
++        desc = find_desc_by_name(opts->list->desc, name);
+         if (desc && desc->def_value_str) {
+             return desc->def_value_str;
+         }
+@@ -348,6 +349,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+                                      bool defval, bool del)
+ {
+     QemuOpt *opt;
++    const QemuOptDesc *desc;
+     bool ret = defval;
+ 
+     if (opts == NULL) {
+@@ -356,7 +358,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+ 
+     opt = qemu_opt_find(opts, name);
+     if (opt == NULL) {
+-        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
++        desc = find_desc_by_name(opts->list->desc, name);
+         if (desc && desc->def_value_str) {
+             parse_option_bool(name, desc->def_value_str, &ret, &error_abort);
+         }
+@@ -384,6 +386,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
+                                            uint64_t defval, bool del)
+ {
+     QemuOpt *opt;
++    const QemuOptDesc *desc;
+     uint64_t ret = defval;
+ 
+     if (opts == NULL) {
+@@ -392,7 +395,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
+ 
+     opt = qemu_opt_find(opts, name);
+     if (opt == NULL) {
+-        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
++        desc = find_desc_by_name(opts->list->desc, name);
+         if (desc && desc->def_value_str) {
+             parse_option_number(name, desc->def_value_str, &ret, &error_abort);
+         }
+@@ -421,6 +424,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
+                                          uint64_t defval, bool del)
+ {
+     QemuOpt *opt;
++    const QemuOptDesc *desc;
+     uint64_t ret = defval;
+ 
+     if (opts == NULL) {
+@@ -429,7 +433,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
+ 
+     opt = qemu_opt_find(opts, name);
+     if (opt == NULL) {
+-        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
++        desc = find_desc_by_name(opts->list->desc, name);
+         if (desc && desc->def_value_str) {
+             parse_option_size(name, desc->def_value_str, &ret, &error_abort);
+         }
+@@ -540,18 +544,18 @@ void qemu_opt_set_bool(QemuOpts *opts, const char *name, bool val,
+                        Error **errp)
+ {
+     QemuOpt *opt;
+-    const QemuOptDesc *desc = opts->list->desc;
++    const QemuOptDesc *desc;
+ 
+-    opt = g_malloc0(sizeof(*opt));
+-    opt->desc = find_desc_by_name(desc, name);
+-    if (!opt->desc && !opts_accepts_any(opts)) {
++    desc = find_desc_by_name(opts->list->desc, name);
++    if (!desc && !opts_accepts_any(opts)) {
+         error_setg(errp, QERR_INVALID_PARAMETER, name);
+-        g_free(opt);
+         return;
+     }
+ 
++    opt = g_malloc0(sizeof(*opt));
+     opt->name = g_strdup(name);
+     opt->opts = opts;
++    opt->desc = desc;
+     opt->value.boolean = !!val;
+     opt->str = g_strdup(val ? "on" : "off");
+     QTAILQ_INSERT_TAIL(&opts->head, opt, next);
+@@ -561,18 +565,18 @@ void qemu_opt_set_number(QemuOpts *opts, const char *name, int64_t val,
+                          Error **errp)
+ {
+     QemuOpt *opt;
+-    const QemuOptDesc *desc = opts->list->desc;
++    const QemuOptDesc *desc;
+ 
+-    opt = g_malloc0(sizeof(*opt));
+-    opt->desc = find_desc_by_name(desc, name);
+-    if (!opt->desc && !opts_accepts_any(opts)) {
++    desc = find_desc_by_name(opts->list->desc, name);
++    if (!desc && !opts_accepts_any(opts)) {
+         error_setg(errp, QERR_INVALID_PARAMETER, name);
+-        g_free(opt);
+         return;
+     }
+ 
++    opt = g_malloc0(sizeof(*opt));
+     opt->name = g_strdup(name);
+     opt->opts = opts;
++    opt->desc = desc;
+     opt->value.uint = val;
+     opt->str = g_strdup_printf("%" PRId64, val);
+     QTAILQ_INSERT_TAIL(&opts->head, opt, next);
 -- 
-2.21.3
+2.26.2
 
 
