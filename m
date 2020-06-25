@@ -2,93 +2,80 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 922D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C85C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:37:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C1A520789
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:37:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4705207E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:37:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="GUKrxhCu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C1A520789
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YXt9wr8m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4705207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joWkD-0006so-Ae
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 14:37:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36562)
+	id 1joWl0-0007hS-6E
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 14:37:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mdenber@gmx.com>) id 1joWg1-0004wn-8p
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:32:45 -0400
-Received: from mout.gmx.net ([212.227.17.21]:48375)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mdenber@gmx.com>) id 1joWfz-0004FJ-07
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:32:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1593109958;
- bh=eErjgf1ZFT03E6KnoZMERdnsUazevRGlvWvGZEMFBfo=;
- h=X-UI-Sender-Class:Date:From:To:Subject:References:In-Reply-To;
- b=GUKrxhCuUbHZaUXi9OpkXNtAp6HKBk6SPSJVNcH6YRedam8gW6D2nej8wIGZo6y/e
- 9vATVxFZs7NSSRpvg/N446N0Qshnc5hOboRMiaAZUu2CfrP3uT7y2dLCdzHPGqEsjj
- h013Ay3SOve2g6mpuPy1EspBHERci8kN/Fr4Uj5k=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.78] ([8.9.81.230]) by mail.gmx.com (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MulqN-1iyLf31g0Z-00rmXq; Thu, 25
- Jun 2020 20:32:38 +0200
-Message-ID: <5EF4EDC4.3030009@gmx.com>
-Date: Thu, 25 Jun 2020 14:32:36 -0400
-From: Michele Denber <mdenber@gmx.com>
-User-Agent: Mozilla/5.0 (X11; SunOS sun4v;
- rv:10.0.7) Gecko/20121005 Thunderbird/10.0.7
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1joWkM-00075N-2u; Thu, 25 Jun 2020 14:37:14 -0400
+Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:38525)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1joWkK-000610-Bv; Thu, 25 Jun 2020 14:37:13 -0400
+Received: by mail-ej1-x62a.google.com with SMTP id w16so6936679ejj.5;
+ Thu, 25 Jun 2020 11:37:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=GKkAJhwha8cKYDehreDnh5CcXHSeneMe9sSYaVsY27w=;
+ b=YXt9wr8mI5EGf8hHXvAWlhZWUhQ2u9L9nxvm5ZYLe6foyh2ebXGxikhlMN80AAHxoh
+ ldfj+uD0yOcoo1WQ6gmtN7KdNgUtyPTMlZlHQ2GKK++LRmeRsktrIpkYR5QYFAinGRYO
+ tjhVbS1b7atB1SSC8JB3oaoGbbW3lWcIfFJrEF/kkiHrwyrYRIZ13NtkYDj6KWIc3fhW
+ hRTl6sVdooIoD1DO+yD7w2gHR91QAYXqeHbzdHV5c7XQY6fxVnlTtI9BHT64HQ0SIFkR
+ HQPi3JWdKLUPRViFzFOFIEeUZvxULpza6IOA3eshsqkuO1K3mDe7hQcBqRZy1CEE5J/J
+ Y18Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=GKkAJhwha8cKYDehreDnh5CcXHSeneMe9sSYaVsY27w=;
+ b=VWk7I4uEf+twa6kYqW2kkqY7KpvYLljWzLhFwRuihKaNuY+DwDYnKtaJ/A9ETiW6hF
+ /YexPkG+tTOmVyUaQ24Bt8p8Ow+0PY6ihKKnXoYU5gcr+U9IHAouI+2J0Mveqtg3gJqZ
+ orqwSMYKf93rpHo9CUk+4GyeJhSkI7WuiS2oRwdlNk0XCkejS+vqwcUmudEoDgBNbrUV
+ VeWEWpfawiGOawtY6AgTFthmpaJHiZag66ImlNXrPuEkpdSsKaRqK/ngRxx97r87DS+q
+ 7onNgjxAiOUvmrhfbeQwoy0+naY+BkQePvYx2xo3Q+h0weMI1RsVWsUTHnuP6AmvNxZp
+ 7EFA==
+X-Gm-Message-State: AOAM533hQsuKauDfOf5vqKPQOPYNWP/gXvQMTIr3yXE9eIhu3LojCjxs
+ PtSf+5A1ztoZZE0a85wJs8/WfK+SsVm/GPHrUN0Q7RbVurQ=
+X-Google-Smtp-Source: ABdhPJz0W3kJBS2XDZvoXTFb7xuAqW3LOh2L9+PfrRe+E02WpgVX+xtUcbmXKouFxNpXCXWpF+n3Ec3GHOI0/NlHBqA=
+X-Received: by 2002:a17:906:58c:: with SMTP id
+ 12mr25576173ejn.311.1593110229870; 
+ Thu, 25 Jun 2020 11:37:09 -0700 (PDT)
 MIME-Version: 1.0
-To: eblake@redhat.com, qemu-devel@nongnu.org
-Subject: Re: Building in Solaris 11.4
-References: <ae7652b5-86f7-fc52-af01-69096dd3b163@redhat.com>
- <5EF4D332.6040003@gmx.com>
-In-Reply-To: <5EF4D332.6040003@gmx.com>
-Content-Type: multipart/alternative;
- boundary="------------080106010809040705050807"
-X-Provags-ID: V03:K1:8qUhtuFD4z0tO4SlUu3ua1M8YnjK8N1SaSON/DYJhhCEI6BxwPQ
- lIYTuvgvStKGWJdJAxzq2yRSI7sMmsXIZVpNJNg+hHTnV94eHZ/6kqCZqBrGqfDqVLH8Ykf
- cy3xgSB3sfdNRAFG89M6ea1BI2opTY9ij3UVvQYXCWHMwL6VrqybmIrTk/OlhxdQ7Ziyaab
- SdqAqSqipHM6rxtrZvylQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:U++sgU/hy2w=:FjYulp4gjJ1oUP5uO914GD
- ctD8REf5lYJb1cHBKKcVm28rR2qw2xCPE+r1jq6chU411kikQZU9OkruQj5pC3iKFHckF83bJ
- VGCzdUeuGCtQU0Iw/rakF0poy62T50STNl1KrExPmf+flg0XNZmOFdL4fXrXBwTq1NGMS17kk
- xS3NXoL0rhM60m+QZ6dY4PJHOBUetmApK02v3ApUqRu+3xp5KkQn5k/GC5EXu4TosRB+NRkzM
- k4L5UeUlqSRYyLnYfugfLtp4Y7rqjS+7u2dVAY1xl6Dr8/H2g0t6a0shrkXzElbTqzmMBwJTf
- /mJGNPa9yLOnWupKidSMcARRa0KTMoeRGoKSpkk/gWxh1C48X6MGE7dbkbj8vtkBDoNGl8Fw4
- l+JTM5lYPvLJ+N1vaZXiKaaIuP7XCaOfHTRT7CfAMvxmBOFNrydwTPns7VA7AF2r66ZjcfQeY
- t9ta6wa4iB/+FdkVMpuGjJF+dT94G+Iq7lRmx3zkZ0M8aw8mlomtGLF94y4ZLC14dejURLjiq
- R1FRC2+yVByPSFta2m5LjvQSi9uW7h7ikwGYAdVZq8vPuW9UPAz0gaXyQMCnNfeMuPgqupeqd
- 07DHYLoHcEPN+ZjF753eVKuYeFK0B1ZCMod18iKL53O/OVLM0RVPzChELjj0URyTl73iiTjl2
- q4J+2aK6cHkExXlD/VtfvVSwu8ShLyfstAPEdjfV953A9jNjroB8NW4dco7lbO7n31bGvHcmU
- yW+nvmPKIDqkLGu/SkP0UHwVheTFpDCk80k0dM5//hgBG9WKK9ILZMtmWXVO0NKHQiS4/rWoG
- 1KOZdcMxMlaYPoNeX/YkvIJYNzecQYDnhyQdgnAEe0lAJg9QYU9QasCSAU0wrfkhZuuVr5HsN
- zoL+Devd932+O6CLLAKV1rq4DctTOPi9XrtNjuxupe+1huJGDNLj4bkqTGKyUxznMcFNsj7DO
- 8s1CP5X45YNKGd/mWwIZICXqJx0xoAxZxIFWN1iJU9uMe5raO9FAHsG3N5zlYEmUoi8fOzstj
- zIY9aXaMPxC5YCkveJfNKqSx6hgWuKdln685MQA+EQA9FYrWC19Ewf6BJkLEx85NQeaA4LuG4
- hr9wYrPlxcMJE7xcB64PZ+0nMgyLJ1o8rbFb7pzrJCAw9kxNOVpJNIJTGShjkHd5C68YsJ3MN
- ZmKzr3nqLdtS4ayvnMZ8sF425DYeBhU2FXL2fHmCc3zoy+bG0QqEkNfXQ4lBXO4D3dP8C8gLy
- QsaAQ9lYQIqPbZUXw
-Received-SPF: pass client-ip=212.227.17.21; envelope-from=mdenber@gmx.com;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 13:36:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+From: David CARLIER <devnexen@gmail.com>
+Date: Thu, 25 Jun 2020 19:36:59 +0100
+Message-ID: <CA+XhMqyTLP5_Jf=t8OCsMifrme0DgimM8-D=Y0RRR+779052Bg@mail.gmail.com>
+Subject: build: haiky system build fix
+To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
+ envelope-from=devnexen@gmail.com; helo=mail-ej1-x62a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,204 +93,176 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------080106010809040705050807
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+From 25adbdcdc17ef51a41759f16576901338ed8a469 Mon Sep 17 00:00:00 2001
+From: David Carlier <devnexen@gmail.com>
+Date: Thu, 25 Jun 2020 19:32:42 +0000
+Subject: [PATCH] build: haiku system build fix
 
-Subject: 	Re: Building in Solaris 11.4
-Date: 	Wed, 24 Jun 2020 16:48:51 -0500
-From: 	Eric Blake <eblake@redhat.com>
-Organization: 	Red Hat, Inc.
-To: 	Michele Denber <mdenber@gmx.com>, qemu-devel@nongnu.org
+Most of missing features resides in the bsd library.
+Also defining constant equivalence.
 
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ configure            |  4 ++--
+ include/qemu/bswap.h |  2 ++
+ os-posix.c           |  4 ++++
+ util/compatfd.c      |  2 ++
+ util/drm.c           |  2 ++
+ util/main-loop.c     |  3 +++
+ util/oslib-posix.c   | 20 ++++++++++++++++++++
+ util/qemu-openpty.c  |  2 +-
+ 8 files changed, 36 insertions(+), 3 deletions(-)
 
+diff --git a/configure b/configure
+index ba88fd1824..3732ad4e35 100755
+--- a/configure
++++ b/configure
+@@ -901,8 +901,8 @@ SunOS)
+ ;;
+ Haiku)
+   haiku="yes"
+-  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
+-  LIBS="-lposix_error_mapper -lnetwork $LIBS"
++  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -D_BSD_SOURCE $QEMU_CFLAGS"
++  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
+ ;;
+ Linux)
+   audio_drv_list="try-pa oss"
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 2a9f3fe783..1d3e4c24e4 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -8,6 +8,8 @@
+ # include <machine/bswap.h>
+ #elif defined(__FreeBSD__)
+ # include <sys/endian.h>
++#elif defined(__HAIKU__)
++# include <endian.h>
+ #elif defined(CONFIG_BYTESWAP_H)
+ # include <byteswap.h>
 
->
-> As a short-term workaround, you can always do:
->
-> /path/to/bash ./configure
-Ah yes, thank you.  I now recall having that problem building 2.12  in
-Solaris 10 a few years ago.  The default bash in Solaris 11.4 is
-/usr/bin/bash and that won't work.  I used /opt/csw/bin/bash instead and
-that took care of the "local" problem.
+diff --git a/os-posix.c b/os-posix.c
+index 3cd52e1e70..ca07b7702d 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -42,6 +42,8 @@
+ #include <sys/prctl.h>
+ #endif
 
-Similarly, the default Solaris grep is missing the -e option so I
-changed grep to ggrep in configure.  POSIX was always problematic in
-Solaris because, I believe of Sun's efforts to maintain backward
-compatibility.
++#include <sys/mman.h>
++
+ /*
+  * Must set all three of these at once.
+  * Legal combinations are              unset   by name   by uid
+@@ -339,10 +341,12 @@ int os_mlock(void)
+ {
+     int ret = 0;
 
-So now I've got:
++#if !defined(__HAIKU__)
+     ret = mlockall(MCL_CURRENT | MCL_FUTURE);
+     if (ret < 0) {
+         error_report("mlockall: %s", strerror(errno));
+     }
 
-root@hemlock:~/qemu-5.0.0# /opt/csw/bin/bash ./configure --cc=3Dgcc
++#endif
+     return ret;
+ }
+diff --git a/util/compatfd.c b/util/compatfd.c
+index c296f55d14..ee47dd8089 100644
+--- a/util/compatfd.c
++++ b/util/compatfd.c
+@@ -16,7 +16,9 @@
+ #include "qemu/osdep.h"
+ #include "qemu/thread.h"
 
-ERROR: sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T.
-        You probably need to set PKG_CONFIG_LIBDIR
-        to point to the right pkg-config files for your
-        build target
-root@hemlock:~/qemu-5.0.0#
++#if defined(CONFIG_SIGNALFD)
+ #include <sys/syscall.h>
++#endif
 
-I fixed that by saying
+ struct sigfd_compat_info
+ {
+diff --git a/util/drm.c b/util/drm.c
+index a23ff24538..8540578c09 100644
+--- a/util/drm.c
++++ b/util/drm.c
+@@ -38,9 +38,11 @@ int qemu_drm_rendernode_open(const char *rendernode)
 
-# LD_LIBRARY_PATH
-=3D/usr/openwin/lib:opt/csw/lib:/usr/local/lib:/lib:/opt/sfw/lib:/opt/csw/=
-gxx/lib:/usr/X11/lib
-#
-PKG_CONFIG_PATH=3D/opt/csw/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/sfw=
-/lib/pkgconfig:/usr/lib/pkgconfig
-#
-PKG_CONFIG_LIBDIR=3D/opt/csw/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/s=
-fw/lib/pkgconfig:/usr/lib/pkgconfig
-# /opt/csw/bin/bash ./configure --cc=3Dgcc  --extra-cflags=3D"-m32"
+     fd = -1;
+     while ((e = readdir(dir))) {
++#if !defined(__HAIKU__)
+         if (e->d_type != DT_CHR) {
+             continue;
+         }
++#endif
 
-(Thankfully I still have some notes from building QEMU 2.12.)
+         if (strncmp(e->d_name, "renderD", 7)) {
+             continue;
+diff --git a/util/main-loop.c b/util/main-loop.c
+index eda63fe4e0..1ce3081ced 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -85,6 +85,9 @@ static int qemu_signal_init(Error **errp)
+      * by sigwait() in the signal thread. Otherwise, the cpu thread will
+      * not catch it reliably.
+      */
++#ifndef SIGIO
++#define SIGIO SIGPOLL
++#endif
+     sigemptyset(&set);
+     sigaddset(&set, SIG_IPI);
+     sigaddset(&set, SIGIO);
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 39ddc77c85..a18d90a68a 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -38,7 +38,12 @@
+ #include "qemu/sockets.h"
+ #include "qemu/thread.h"
+ #include <libgen.h>
++#if !defined(__HAIKU__)
+ #include <sys/signal.h>
++#else
++#include <kernel/image.h>
++#include <signal.h>
++#endif
+ #include "qemu/cutils.h"
 
-That gave me a successful configure ending with:
+ #ifdef CONFIG_LINUX
+@@ -390,6 +395,21 @@ void qemu_init_exec_dir(const char *argv0)
+             }
+         }
+     }
++#elif defined(__HAIKU__)
++    {
++        image_info ii;
++        int32_t c = 0;
++
++    *buf = '\0';
++    while (get_next_image_info(0, &c, &ii) == B_OK) {
++            if (ii.type == B_APP_IMAGE) {
++                strncpy(buf, ii.name, sizeof(buf));
++            buf[sizeof(buf) - 1] = '\0';
++        p = buf;
++                break;
++            }
++        }
++    }
+ #endif
+     /* If we don't have any way of figuring out the actual executable
+        location then try argv[0].  */
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..c29fc2cbf9 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -35,7 +35,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
 
-The QEMU project intends to remove support for this host OS in
-a future release if nobody volunteers to maintain it and to
-provide a build host for our continuous integration setup.
-configure has succeeded and you can continue to build, but
-if you care about QEMU on this platform you should contact
-us upstream at qemu-devel@nongnu.org.
-
-So I hereby volunteer.  I have an 8 core 64 thread 2.85 GHz. Sun T4-1
-with 64 GB and three 900 GB disks and a 500 MB/50 MB fiber Internet
-connection..
-
-Anyway, that's enough for one day.  On to the gmake.  I'm sure I'll have
-more questions soon :-)
-
-             - Michele
-
-
-
---------------080106010809040705050807
-Content-Type: text/html; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-  <head>
-    <meta content=3D"text/html; charset=3Dwindows-1252"
-      http-equiv=3D"Content-Type">
-  </head>
-  <body text=3D"#000000" bgcolor=3D"#FFFFFF">
-    <table class=3D"moz-email-headers-table" cellpadding=3D"0"
-      cellspacing=3D"0" border=3D"0">
-      <tbody>
-        <tr>
-          <th nowrap=3D"nowrap" valign=3D"BASELINE" align=3D"RIGHT">Subjec=
-t: </th>
-          <td>Re: Building in Solaris 11.4</td>
-        </tr>
-        <tr>
-          <th nowrap=3D"nowrap" valign=3D"BASELINE" align=3D"RIGHT">Date: =
-</th>
-          <td>Wed, 24 Jun 2020 16:48:51 -0500</td>
-        </tr>
-        <tr>
-          <th nowrap=3D"nowrap" valign=3D"BASELINE" align=3D"RIGHT">From: =
-</th>
-          <td>Eric Blake <a class=3D"moz-txt-link-rfc2396E"
-              href=3D"mailto:eblake@redhat.com">&lt;eblake@redhat.com&gt;<=
-/a></td>
-        </tr>
-        <tr>
-          <th nowrap=3D"nowrap" valign=3D"BASELINE" align=3D"RIGHT">Organi=
-zation:
-
-          </th>
-          <td>Red Hat, Inc.</td>
-        </tr>
-        <tr>
-          <th nowrap=3D"nowrap" valign=3D"BASELINE" align=3D"RIGHT">To: </=
-th>
-          <td>Michele Denber <a class=3D"moz-txt-link-rfc2396E"
-              href=3D"mailto:mdenber@gmx.com">&lt;mdenber@gmx.com&gt;</a>,
-            <a class=3D"moz-txt-link-abbreviated"
-              href=3D"mailto:qemu-devel@nongnu.org">qemu-devel@nongnu.org<=
-/a></td>
-        </tr>
-      </tbody>
-    </table>
-    <br>
-    <br>
-    <blockquote cite=3D"mid:5EF4D332.6040003@gmx.com" type=3D"cite">
-      <div class=3D"moz-forward-container">
-        <pre>
-
-As a short-term workaround, you can always do:
-
-/path/to/bash ./configure</pre>
-      </div>
-    </blockquote>
-    Ah yes, thank you.=A0 I now recall having that problem building 2.12=
-=A0
-    in Solaris 10 a few years ago.=A0 The default bash in Solaris 11.4 is
-    /usr/bin/bash and that won't work.=A0 I used /opt/csw/bin/bash instead
-    and that took care of the "local" problem.<br>
-    <br>
-    Similarly, the default Solaris grep is missing the -e option so I
-    changed grep to ggrep in configure.=A0 POSIX was always problematic in
-    Solaris because, I believe of Sun's efforts to maintain backward
-    compatibility.<br>
-    <br>
-    So now I've got:<br>
-    <small><font face=3D"Courier New, Courier, monospace"><br>
-        <a class=3D"moz-txt-link-abbreviated" href=3D"mailto:root@hemlock:=
-~/qemu-5.0.0#">root@hemlock:~/qemu-5.0.0#</a> /opt/csw/bin/bash ./configur=
-e
-        --cc=3Dgcc<br>
-        <br>
-        ERROR: sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T.<br>
-        =A0=A0=A0=A0=A0=A0 You probably need to set PKG_CONFIG_LIBDIR<br>
-        =A0=A0=A0=A0=A0=A0 to point to the right pkg-config files for your=
-<br>
-        =A0=A0=A0=A0=A0=A0 build target<br>
-        <a class=3D"moz-txt-link-abbreviated" href=3D"mailto:root@hemlock:=
-~/qemu-5.0.0#">root@hemlock:~/qemu-5.0.0#</a> </font></small><br>
-    <br>
-    I fixed that by saying<br>
-    <small><font face=3D"Courier New, Courier, monospace"><br>
-        # LD_LIBRARY_PATH
-=3D/usr/openwin/lib:opt/csw/lib:/usr/local/lib:/lib:/opt/sfw/lib:/opt/csw/=
-gxx/lib:/usr/X11/lib<br>
-        #
-PKG_CONFIG_PATH=3D/opt/csw/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/sfw=
-/lib/pkgconfig:/usr/lib/pkgconfig<br>
-        #
-PKG_CONFIG_LIBDIR=3D/opt/csw/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/s=
-fw/lib/pkgconfig:/usr/lib/pkgconfig</font></small><br>
-    <small><font face=3D"Courier New, Courier, monospace">#
-        /opt/csw/bin/bash ./configure --cc=3Dgcc=A0 --extra-cflags=3D"-m32=
-"</font></small><br>
-    <br>
-    (Thankfully I still have some notes from building QEMU 2.12.)<br>
-    <br>
-    That gave me a successful configure ending with:<br>
-    <br>
-    <small><font face=3D"Courier New, Courier, monospace">The QEMU project
-        intends to remove support for this host OS in<br>
-        a future release if nobody volunteers to maintain it and to<br>
-        provide a build host for our continuous integration setup.<br>
-        configure has succeeded and you can continue to build, but<br>
-        if you care about QEMU on this platform you should contact<br>
-        us upstream at <a class=3D"moz-txt-link-abbreviated" href=3D"mailt=
-o:qemu-devel@nongnu.org">qemu-devel@nongnu.org</a>.</font></small><br>
-    <br>
-    So I hereby volunteer.=A0 I have an 8 core 64 thread 2.85 GHz. Sun
-    T4-1 with 64 GB and three 900 GB disks and a 500 MB/50 MB fiber
-    Internet connection..<br>
-    <br>
-    Anyway, that's enough for one day.=A0 On to the gmake.=A0 I'm sure I'l=
-l
-    have more questions soon :-)<br>
-    <br>
-    =A0=A0=A0 =A0=A0=A0 =A0=A0=A0 - Michele<br>
-    <br>
-    <br>
-  </body>
-</html>
-
---------------080106010809040705050807--
+-#if defined(__GLIBC__)
++#if defined(__GLIBC__) || defined(__HAIKU__)
+ # include <pty.h>
+ #elif defined CONFIG_BSD
+ # include <termios.h>
+-- 
+2.26.0
 
