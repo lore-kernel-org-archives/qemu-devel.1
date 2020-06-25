@@ -2,91 +2,147 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C74AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EDFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23DFC206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF69A206B7
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:36:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="TlU7ZDnH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23DFC206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWay6+8A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF69A206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joSy7-0002Fu-F0
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52368)
+	id 1joSzC-0003Jp-3B
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:36:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joSxW-0001ov-2p
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:34:34 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:2706)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joSxT-00010a-Sy
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:34:33 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ef4b5e90000>; Thu, 25 Jun 2020 07:34:17 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 25 Jun 2020 07:34:29 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 25 Jun 2020 07:34:29 -0700
-Received: from [10.40.100.228] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 25 Jun
- 2020 14:34:12 +0000
-Subject: Re: [PATCH QEMU v25 13/17] vfio: create mapped iova list when vIOMMU
- is enabled
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-14-git-send-email-kwankhede@nvidia.com>
- <20200624125526.5488954c@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <b0ee702d-02e5-4cd6-6dcc-047cfcb907b2@nvidia.com>
-Date: Thu, 25 Jun 2020 20:04:08 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1joSya-0002qx-9U
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:35:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50649
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1joSyX-0001eI-QP
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:35:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593095736;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=c5cbthPBTBVmh/3ATC4lvsIJrLOlfRgQPbXwSjhd4gQ=;
+ b=EWay6+8AsmFvK5gZZjqEjx9SB1jj2rSsyV36fm2+nYgu4KoTvcSaqkEtLvw4uBqrq4NiRp
+ eTLeCH2ISLF+11kKOnflLuEuJbBWzM/lqOEftngseGNK4qSflVCufAi5OkEcwTvzY7iepc
+ HApz41qOKfkZ7XrML49XbaK0QuV6aUA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-8pFqKQ2RN1uQLdl-0ynT5A-1; Thu, 25 Jun 2020 10:35:34 -0400
+X-MC-Unique: 8pFqKQ2RN1uQLdl-0ynT5A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86D3F804001;
+ Thu, 25 Jun 2020 14:35:31 +0000 (UTC)
+Received: from [10.36.115.58] (ovpn-115-58.ams2.redhat.com [10.36.115.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E26727FEA0;
+ Thu, 25 Jun 2020 14:35:14 +0000 (UTC)
+Subject: Re: [PATCH v1 08/10] vhost: implement vhost_dev_start method
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
+References: <20200622153756.19189-1-lulu@redhat.com>
+ <20200622153756.19189-9-lulu@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <debee1c4-89d6-27fa-65ff-ec2e630eca63@redhat.com>
+Date: Thu, 25 Jun 2020 16:35:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624125526.5488954c@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200622153756.19189-9-lulu@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1593095657; bh=iP8Add0LqUhTl0yLrmZt9VcOf6WSQ5YIHCkzPpTMaXY=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=TlU7ZDnHwYWcqr9mROht6f/VwkCvSNjQRuVIhMr7BWZU1LoBPDUaZkK5soMzhLWQT
- J9AIht9DbKYZtN+uHx+Xmd/8ChvtcsBIERzSZe2dzSGr7FNL4lQTtnQiSWdrFSCGje
- Lo3gFwEaPal/RqUb1WsysI4DnLn1oh8q7g5Nb6BXlMskL1VrhYn0+BmUiveYnSCbl6
- HAzAcg9gd3rWPjWshLwuebDhWtPYZ9rlTAV/TS2L3Z2DtOwldiIaWEjq2k+DMDGF+T
- K/mBAJsawfO8M/khxA3np4xp5zSerwzT7aMSrfI+bVMYNSEzEUIPB82282vdTCA7bC
- zH1fR3IIECcBQ==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:34:30
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,60 +155,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 22/06/2020 17:37, Cindy Lu wrote:
+> use the vhost_dev_start callback to send the status to backend
 
+I agree with Jason, squash this patch with the previous one.
 
-On 6/25/2020 12:25 AM, Alex Williamson wrote:
-> On Sun, 21 Jun 2020 01:51:22 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  hw/virtio/vhost.c         | 17 +++++++++++++++++
+>  include/hw/virtio/vhost.h |  2 ++
+>  2 files changed, 19 insertions(+)
 > 
->> Create mapped iova list when vIOMMU is enabled. For each mapped iova
->> save translated address. Add node to list on MAP and remove node from
->> list on UNMAP.
->> This list is used to track dirty pages during migration.
-> 
-> This seems like a lot of overhead to support that the VM might migrate.
-> Is there no way we can build this when we start migration, for example
-> replaying the mappings at that time?  Thanks,
-> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 01ebe12f28..bfd7f9ce1f 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -744,6 +744,7 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+>      }
+>  }
+>  
+> +
+>  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+>                                      struct vhost_virtqueue *vq,
+>                                      unsigned idx, bool enable_log)
+> @@ -1661,6 +1662,11 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+>          }
+>      }
+>  
+> +    r = vhost_set_start(hdev, true);
 
-In my previous version I tried to go through whole range and find valid 
-iotlb, as below:
+Perhaps you can use the same kind of name we have for the queue
+(queue_set_started()) and use something like vhost_dev_set_started()?
 
-+        if (memory_region_is_iommu(section->mr)) {
-+            iotlb = address_space_get_iotlb_entry(container->space->as, 
-iova,
-+                                                 true, 
-MEMTXATTRS_UNSPECIFIED);
+> +    if (r) {
+> +        goto fail_log;
+> +    }
+> +
+>      if (vhost_dev_has_iommu(hdev)) {
+>          hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
+>  
+> @@ -1697,6 +1703,8 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
+>      /* should only be called after backend is connected */
+>      assert(hdev->vhost_ops);
+>  
+> +    vhost_set_start(hdev, false);
+> +
+>      for (i = 0; i < hdev->nvqs; ++i) {
+>          vhost_virtqueue_stop(hdev,
+>                               vdev,
+> @@ -1722,3 +1730,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
+>  
+>      return -1;
+>  }
+> +
+> +int vhost_set_start(struct vhost_dev *hdev, bool started)
+> +{
+> +
+> +    if (hdev->vhost_ops->vhost_dev_start) {
+> +        hdev->vhost_ops->vhost_dev_start(hdev, started);
 
-When mapping doesn't exist, qemu throws error as below:
+The "return" is missing.
 
-qemu-system-x86_64: vtd_iova_to_slpte: detected slpte permission error 
-(iova=0x0, level=0x3, slpte=0x0, write=1)
-qemu-system-x86_64: vtd_iommu_translate: detected translation failure 
-(dev=00:03:00, iova=0x0)
-qemu-system-x86_64: New fault is not recorded due to compression of faults
+And generally a function that only embeds a call to a hook has the same
+as the hook.
 
-Secondly, it iterates through whole range with IOMMU page size 
-granularity which is 4K, so it takes long time resulting in large 
-downtime. With this optimization, downtime with vIOMMU reduced 
-significantly.
+> +    }
+> +    return 0;
+> +}
 
-Other option I will try if I can check that if migration is supported 
-then only create this list.
+so something like:
+
+    int vhost_dev_set_started(struct vhost_dev *hdev, bool started)
+    {
+        if (hdev->vhost_ops->dev_set_started) {
+            return hdev->vhost_ops->dev_set_started(hdev, started);
+        }
+        return 0;
+    }
+
+
+> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+> index 085450c6f8..59ea53f8c2 100644
+> --- a/include/hw/virtio/vhost.h
+> +++ b/include/hw/virtio/vhost.h
+> @@ -92,6 +92,7 @@ struct vhost_dev {
+>      const VhostDevConfigOps *config_ops;
+>  };
+>  
+> +
+>  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>                     VhostBackendType backend_type,
+>                     uint32_t busyloop_timeout);
+> @@ -137,4 +138,5 @@ int vhost_dev_set_inflight(struct vhost_dev *dev,
+>                             struct vhost_inflight *inflight);
+>  int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
+>                             struct vhost_inflight *inflight);
+> +int vhost_set_start(struct vhost_dev *dev, bool started);
+
+There is no need to export it, so set it "static" in hw/virtio/vhost.c
+and move the definition before the use.
 
 Thanks,
-Kirti
+Laurent
+
 
