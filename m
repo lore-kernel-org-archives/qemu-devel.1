@@ -2,85 +2,82 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B83EFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DA7C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FE1B20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:40:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A71622070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:50:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hd2XIizZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE1B20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C27wI0Ha"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A71622070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joMVC-0006ey-Ok
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 03:40:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57084)
+	id 1joMeg-0000hV-St
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 03:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joMUc-00069Y-U3
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:40:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46576
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joMe8-0000C2-17
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:50:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44217
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joMUa-0005vB-Bf
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:40:18 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joMe5-0003PL-6Z
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:50:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593070815;
+ s=mimecast20190719; t=1593071403;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=aOyRaMG6pB2Pma7ZQi66q2ReveXs1zq6X3RG0IZFwsU=;
- b=hd2XIizZDd8H0nfnx6cD/r5zuuC95RVF05l8tGy/tE05FHZltHiS9FR2OSTuqsTJosgInA
- 5ILn2Ao6C12ca3KWf6CtfJbZIAJkpp8IbEASuga3dHDEv/eKLeElQnVMB5n+NbX0LUQocE
- z1w5k9yTH/sJ8p5KusUIMa7rtvnj+7k=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-0L1pZgnWOTe3wAGWB5OdoQ-1; Thu, 25 Jun 2020 03:40:13 -0400
-X-MC-Unique: 0L1pZgnWOTe3wAGWB5OdoQ-1
-Received: by mail-wr1-f72.google.com with SMTP id p10so6210097wrn.19
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:40:13 -0700 (PDT)
+ bh=/o+n2wOdT5Fmx+2sNadno2UFWbmAiyYTb+/NbnaxKLU=;
+ b=C27wI0HaHHicH+9/jMwin7q0EyaIMHnt91nwLvbyV3HLGNDD5tXAlU/AYVhXppfqUfgYls
+ mQ187fHafAcvuEl1G9BZgXx+uH/n9SNB02Nc/Oxcj1gwrpoFk3jFeUVx+mgLOjBHMYgfC1
+ V8PrwYzxWNfRillwc9Wo33ZaJk91y7s=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-lWkseLggOcuq-evBtFkP2w-1; Thu, 25 Jun 2020 03:49:59 -0400
+X-MC-Unique: lWkseLggOcuq-evBtFkP2w-1
+Received: by mail-wr1-f71.google.com with SMTP id y13so6250323wrp.13
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 00:49:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=aOyRaMG6pB2Pma7ZQi66q2ReveXs1zq6X3RG0IZFwsU=;
- b=ftY1qcKtyntgIyrTKaHxXGm6oSXkGXxGuW/mejg1PU+0UZmEKMZgA2tllskigbXa+r
- 517FuNqwQv74DWgkCbbBEfIWSCDah6oI3wQDN7xH4pie9mKvUBNRcE6tR8BLCm1yvk2z
- eu6gO7oAHviVeqOEXZu+7RZFhwkLGVIRLxtT490pSXdQYG8onyuZvLtzHomHH2GA9Vhz
- RNzP2g+KzMs7gJIG2KJYC3P2vbpcEe+UXwVWsJZHDlOJUkNE5L/x9Vw/A4BMPBHeuV+V
- DlET7Q4n+VxEuD7KaBd59iIlCqhx7PlCHzo2oG/hI8vHhAO7LDbXb8TnuowUj/tUfIUH
- zCZA==
-X-Gm-Message-State: AOAM5338aiKJgIKtag0NOZ1cfTbOWdhn/kJwvuSeabfjULWG5BoapOPd
- WEdTm1zaMtr/wQZWshOWCIBYkFBX+i+M583kY4kBAuGc/6YQOzekxWxrqtzhTkMtpl5/6cA5goV
- OI1khgn+p1m7N8V0=
-X-Received: by 2002:a1c:63c2:: with SMTP id x185mr1956192wmb.68.1593070812373; 
- Thu, 25 Jun 2020 00:40:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyAoP7X6GCGzmzRAhPogtXKBAcoW9TtUGbghrU2e1RsOEjaAzkgnEZp7CxvR8olKzjd49WZHg==
-X-Received: by 2002:a1c:63c2:: with SMTP id x185mr1956167wmb.68.1593070812074; 
- Thu, 25 Jun 2020 00:40:12 -0700 (PDT)
+ bh=/o+n2wOdT5Fmx+2sNadno2UFWbmAiyYTb+/NbnaxKLU=;
+ b=n5T1GH3KjPRHBenJ81VslTwrFuBDcR355YCo17HsWR5pyNrD2fJvASQ4pRx0aX1iAg
+ xyaCpHO/iQ6QPRQW3GOZtpDU1humDRu4aDaraFu7fSCXQdkCLgGoyVcmGxoggDW8+rHN
+ wdYEhmy3mR0vJ6lb8wKgwr+wCQdXbmUY0tlmOiivK6x3nCi7KOrKHSg5ivpS3p+Wsdps
+ 0QjDJ5QwhvBXi97CKyOH8Ehe8PKDzc2o3oJokeHME8wIgpaYIHTtFZqcsmH4Dne8BqRj
+ sF2M5EwVmkga5rYqMNyIw1tneGbp8K9QjGH3wc+hYOxzk1NMx37r08YtBSdrV8DP04eN
+ 9joA==
+X-Gm-Message-State: AOAM530/nnyRqsB8uL1Ef/zLNCGnS7ASg7JKUyn4rEsuR7Kre4bjPBp+
+ dBpOhwgWPj4ZHpJwuiNet8sf9FE2nAul32DAzcOz6Dt6+pTN8Dow5jUXhUshYRvI/7G5qEnVYyL
+ EyCt2kv5I/AJjRiE=
+X-Received: by 2002:adf:e482:: with SMTP id i2mr11378416wrm.75.1593071398677; 
+ Thu, 25 Jun 2020 00:49:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz42IZoKfKcz1HwQ3k06qsrnpELNIHRWNyOmlH/HyFeGDP3L7nh8WxtzawP2PgoT4CebpRo+Q==
+X-Received: by 2002:adf:e482:: with SMTP id i2mr11378400wrm.75.1593071398490; 
+ Thu, 25 Jun 2020 00:49:58 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o15sm11022781wmm.31.2020.06.25.00.40.10
+ by smtp.gmail.com with ESMTPSA id y17sm31628974wrd.58.2020.06.25.00.49.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 00:40:11 -0700 (PDT)
-Subject: Re: [PATCH] net: tap: check if the file descriptor is valid before
- using it
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200624190009.300069-1-lvivier@redhat.com>
- <b64d114d-061e-268d-cc48-1680e6188404@redhat.com>
- <d5cc729d-4010-1cf2-792d-903999df6e90@redhat.com>
+ Thu, 25 Jun 2020 00:49:57 -0700 (PDT)
+Subject: Re: [PATCH v9 00/10] accel: Allow targets to use Kconfig
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200618123342.10693-1-philmd@redhat.com>
+ <5332815d-49d7-21da-e752-c39c5b35adc4@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
  bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
@@ -104,20 +101,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <570e41d1-0176-b349-20ba-367bf60416f4@redhat.com>
-Date: Thu, 25 Jun 2020 09:40:10 +0200
+Message-ID: <05a17243-6203-0663-2bc1-e5efd59c4e67@redhat.com>
+Date: Thu, 25 Jun 2020 09:49:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <d5cc729d-4010-1cf2-792d-903999df6e90@redhat.com>
+In-Reply-To: <5332815d-49d7-21da-e752-c39c5b35adc4@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -125,7 +122,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,139 +135,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Samuel Ortiz <sameo@linux.intel.com>, haxm-team <haxm-team@intel.com>,
+ Claudio Fontana <cfontana@suse.de>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 9:38 AM, Laurent Vivier wrote:
-> On 25/06/2020 08:19, Philippe Mathieu-Daudé wrote:
->> On 6/24/20 9:00 PM, Laurent Vivier wrote:
->>> qemu_set_nonblock() checks that the file descriptor can be used and, if
->>> not, crashes QEMU. An assert() is used for that. The use of assert() is
->>> used to detect programming error and the coredump will allow to debug
->>> the problem.
->>>
->>> But in the case of the tap device, this assert() can be triggered by
->>> a misconfiguration by the user. At startup, it's not a real problem, but it
->>> can also happen during the hot-plug of a new device, and here it's a
->>> problem because we can crash a perfectly healthy system.
->>>
->>> For instance:
->>>  # ip link add link virbr0 name macvtap0 type macvtap mode bridge
->>>  # ip link set macvtap0 up
->>>  # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
->>>  # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
->>>  (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
->>>  (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
->>>  (qemu) device_del net0
->>>  (qemu) netdev_del hostnet0
->>>  (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
->>>  qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
->>>  Aborted (core dumped)
->>>
->>> To avoid that, check the file descriptor is valid before passing it to qemu_set_non_block() for
->>> "fd=" and "fds=" parameters.
->>>
->>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>> ---
->>>  include/qemu/sockets.h |  1 +
->>>  net/tap.c              | 13 +++++++++++++
->>>  util/oslib-posix.c     |  5 +++++
->>>  util/oslib-win32.c     |  6 ++++++
->>>  4 files changed, 25 insertions(+)
->>>
->>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
->>> index 57cd049d6edd..5b0c2d77ddad 100644
->>> --- a/include/qemu/sockets.h
->>> +++ b/include/qemu/sockets.h
->>> @@ -17,6 +17,7 @@ int qemu_socket(int domain, int type, int protocol);
->>>  int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
->>>  int socket_set_cork(int fd, int v);
->>>  int socket_set_nodelay(int fd);
->>> +bool qemu_fd_is_valid(int fd);
->>>  void qemu_set_block(int fd);
->>>  void qemu_set_nonblock(int fd);
->>>  int socket_set_fast_reuse(int fd);
->>> diff --git a/net/tap.c b/net/tap.c
->>> index 6207f61f84ab..f65966aaccd8 100644
->>> --- a/net/tap.c
->>> +++ b/net/tap.c
->>> @@ -795,6 +795,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
->>>              return -1;
->>>          }
->>>  
->>> +        /* Check if fd is valid */
->>> +        if (!qemu_fd_is_valid(fd)) {
->>> +            error_setg(errp, "Invalid file descriptor %d", fd);
->>> +            return -1;
->>> +        }
->>> +
->>>          qemu_set_nonblock(fd);
->>>  
->>>          vnet_hdr = tap_probe_vnet_hdr(fd);
->>> @@ -843,6 +849,13 @@ int net_init_tap(const Netdev *netdev, const char *name,
->>>                  goto free_fail;
->>>              }
->>>  
->>> +            /* Check if fd is valid */
->>> +            if (!qemu_fd_is_valid(fd)) {
->>> +                error_setg(errp, "Invalid file descriptor %d", fd);
->>> +                ret = -1;
->>> +                goto free_fail;
->>> +            }
->>> +
->>>              qemu_set_nonblock(fd);
->>>  
->>>              if (i == 0) {
->>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->>> index 916f1be2243a..8d5705f598d3 100644
->>> --- a/util/oslib-posix.c
->>> +++ b/util/oslib-posix.c
->>> @@ -244,6 +244,11 @@ void qemu_anon_ram_free(void *ptr, size_t size)
->>>      qemu_ram_munmap(-1, ptr, size);
->>>  }
->>>  
->>> +bool qemu_fd_is_valid(int fd)
->>> +{
->>> +    return fcntl(fd, F_GETFL) != -1;
->>> +}
->>> +
->>>  void qemu_set_block(int fd)
->>>  {
->>>      int f;
->>> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
->>> index e9b14ab17847..a6be9445cfdb 100644
->>> --- a/util/oslib-win32.c
->>> +++ b/util/oslib-win32.c
->>> @@ -132,6 +132,12 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
->>>  }
->>>  #endif /* CONFIG_LOCALTIME_R */
->>>  
->>> +bool qemu_fd_is_valid(int fd)
->>> +{
->>> +    /* FIXME: how to check if fd is valid? */
->>> +    return true;
->>> +}
->>
->> Maybe:
->>
->>   bool qemu_fd_is_valid(int fd)
->>   {
->>       unsigned long res; /* ignored */
->>
->>       return ioctlsocket(fd, FIONREAD, &res) == NO_ERROR;
->>   }
+Hi Paolo,
+
+Claudio raised an issue with patch #4, so at this point
+I have to admit again having the KVM-only build merged
+for the next release won't be possible :(
+
+Only patch #9 depends on patch #4. Are you OK to take
+the rest of the series, patches 1-3, 5-8, 10 (all but
+4 and 9). Patches are fully reviewed. If it is easier
+for you I can respin without 4/9.
+
+Thanks,
+
+Phil.
+
+On 6/22/20 6:47 PM, Philippe Mathieu-Daudé wrote:
+> On 6/18/20 2:33 PM, Philippe Mathieu-Daudé wrote:
+>> Missing review:
+>> - 03/10 MAINTAINERS: Cover the HAX accelerator stub
 > 
-> I can do that, but I have no way to test the change doesn't break
-> anything... whereas always returning true ensures me it continues to
-> work as before.
-
-I'm only suggesting in case someone has a clue and way to test ;)
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> I forgot again to include the HAXM team...
+> 
+>> - 04/10 configure: Generate rule to calculate base arch of target
+>>
+>> This series include generic patches I took of the KVM/ARM
+>> specific series which will follow.
+>>
+>> - Update accelerators in MAINTAINERS
+>> - Add accel/Kconfig
+>> - Allow targets to use their how Kconfig
+>>
+[...]
+>>
+>> Previous RFC for semihosting posted earlier:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg631218.html
+>>
+>> Alex Bennée (1):
+>>   configure: Generate rule to calculate the base architecture of a
+>>     target
+>>
+>> Philippe Mathieu-Daudé (9):
+>>   MAINTAINERS: Fix KVM path expansion glob
+>>   MAINTAINERS: Add an 'overall' entry for accelerators
+>>   MAINTAINERS: Cover the HAX accelerator stub
+>>   Makefile: Remove dangerous EOL trailing backslash
+>>   Makefile: Write MINIKCONF variables as one entry per line
+>>   accel/Kconfig: Extract accel selectors into their own config
+>>   accel/Kconfig: Add the TCG selector
+>>   Makefile: Allow target-specific optional Kconfig
+>>   accel/tcg: Add stub for probe_access()
+>>
+>>  configure              | 19 +++++++++++++++++++
+>>  Makefile               | 15 +++++++++++----
+>>  accel/stubs/tcg-stub.c |  7 +++++++
+>>  Kconfig.host           |  7 -------
+>>  MAINTAINERS            | 14 +++++++++++++-
+>>  accel/Kconfig          |  9 +++++++++
+>>  6 files changed, 59 insertions(+), 12 deletions(-)
+>>  create mode 100644 accel/Kconfig
+>>
+> 
 
 
