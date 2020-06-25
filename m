@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A4EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5B2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C893A20672
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B188D206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QISYNTI7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C893A20672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XMAPpvb0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B188D206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRYs-0000BI-VA
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
+	id 1joRZV-0000xM-UJ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:05:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQq-0003zY-6q
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47923
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQN-0002tO-3E
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32882
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQo-0003OX-3b
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:43 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQL-0003Gx-5H
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593089801;
+ s=mimecast20190719; t=1593089772;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=izuy53HpCfbY4Wj31Xz6HKjJGdWIlXO7S22gmtfVZB4=;
- b=QISYNTI7LmCJjnAGfjQCbkGgzzvlk8YepcHh5nIH0QdZGJ4h3F9JH/hZV0y+SVEU7v4rvw
- Lu/5wsfoSsyv+cfiHEUM6wZG9q9wAD1HLGNm8hQBzmc6BWdx26K5Pi+nbcDIEzkEYCpa5G
- DW8s9wxV+CXPmQ9+bxv1hnY4TeqMuIQ=
+ bh=PYiMyhgGreSRjMIeal1RzwAhRK37sLt65WmuhTVhyNw=;
+ b=XMAPpvb0HJEVAP+12DS2pUfS8yZWj2evaM1kvjBT5eUBVMwSfMLm0ApDqS2apEcvlhN2zD
+ kqs6bTSU/c42t/TchaLDDPkEVOUx2/nwGEEVbnVWCzheWStcC5ka/7KJwAo3u0DM1AQTdy
+ kZIDYg7bLgzhA0saK2PSN/X6y6i0U34=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-1B0xbXH9MNK0teScJdRJFw-1; Thu, 25 Jun 2020 08:56:38 -0400
-X-MC-Unique: 1B0xbXH9MNK0teScJdRJFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-389-1Ab0RKHkPL67Dsxe023IWg-1; Thu, 25 Jun 2020 08:56:10 -0400
+X-MC-Unique: 1Ab0RKHkPL67Dsxe023IWg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED55118B9F5C;
- Thu, 25 Jun 2020 12:56:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9FE1800C64;
+ Thu, 25 Jun 2020 12:56:09 +0000 (UTC)
 Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5ED22100239F;
- Thu, 25 Jun 2020 12:56:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 798757932E;
+ Thu, 25 Jun 2020 12:56:03 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 16/19] block/core: add generic infrastructure for
- x-blockdev-amend qmp command
-Date: Thu, 25 Jun 2020 14:55:45 +0200
-Message-Id: <20200625125548.870061-17-mreitz@redhat.com>
+Subject: [PATCH 06/19] iotests: Check whether luks works
+Date: Thu, 25 Jun 2020 14:55:35 +0200
+Message-Id: <20200625125548.870061-7-mreitz@redhat.com>
 In-Reply-To: <20200625125548.870061-1-mreitz@redhat.com>
 References: <20200625125548.870061-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -79,7 +79,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,275 +98,157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Whenever running an iotest for the luks format, we should check whether
+luks actually really works.
 
-blockdev-amend will be used similiar to blockdev-create
-to allow on the fly changes of the structure of the format based block devices.
+Tests that try to create luks-encrypted qcow2 images should do the same.
 
-Current plan is to first support encryption keyslot management for luks
-based formats (raw and embedded in qcow2)
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200608094030.670121-12-mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json      |  42 ++++++++++++++
- qapi/job.json             |   4 +-
- include/block/block_int.h |  21 +++++--
- block/amend.c             | 113 ++++++++++++++++++++++++++++++++++++++
- block/Makefile.objs       |   2 +-
- 5 files changed, 174 insertions(+), 8 deletions(-)
- create mode 100644 block/amend.c
+ tests/qemu-iotests/087        | 1 +
+ tests/qemu-iotests/178        | 1 +
+ tests/qemu-iotests/188        | 1 +
+ tests/qemu-iotests/189        | 1 +
+ tests/qemu-iotests/198        | 1 +
+ tests/qemu-iotests/206        | 1 +
+ tests/qemu-iotests/263        | 1 +
+ tests/qemu-iotests/284        | 1 +
+ tests/qemu-iotests/common.rc  | 3 +++
+ tests/qemu-iotests/iotests.py | 5 +++++
+ 10 files changed, 16 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0e1c6a59f2..c22996282f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4674,6 +4674,48 @@
-   'data': { 'job-id': 'str',
-             'options': 'BlockdevCreateOptions' } }
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index bdfdad3454..678e748c58 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto file
+ _supported_os Linux
++_require_working_luks
  
-+##
-+# @BlockdevAmendOptions:
-+#
-+# Options for amending an image format
-+#
-+# @driver:          Block driver of the node to amend.
-+#
-+# Since: 5.1
-+##
-+{ 'union': 'BlockdevAmendOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+  } }
-+
-+##
-+# @x-blockdev-amend:
-+#
-+# Starts a job to amend format specific options of an existing open block device
-+# The job is automatically finalized, but a manual job-dismiss is required.
-+#
-+# @job-id:          Identifier for the newly created job.
-+#
-+# @node-name:       Name of the block node to work on
-+#
-+# @options:         Options (driver specific)
-+#
-+# @force:           Allow unsafe operations, format specific
-+#                   For luks that allows erase of the last active keyslot
-+#                   (permanent loss of data),
-+#                   and replacement of an active keyslot
-+#                   (possible loss of data if IO error happens)
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'x-blockdev-amend',
-+  'data': { 'job-id': 'str',
-+            'node-name': 'str',
-+            'options': 'BlockdevAmendOptions',
-+            '*force': 'bool' } }
-+
- ##
- # @BlockErrorAction:
- #
-diff --git a/qapi/job.json b/qapi/job.json
-index 5e658281f5..c48a0c3e34 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -19,10 +19,12 @@
- #
- # @create: image creation job type, see "blockdev-create" (since 3.0)
- #
-+# @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
-+#
- # Since: 1.7
- ##
- { 'enum': 'JobType',
--  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
-+  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
+ do_run_qemu()
+ {
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+index 7cf0e27154..f09b27caac 100755
+--- a/tests/qemu-iotests/178
++++ b/tests/qemu-iotests/178
+@@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt raw qcow2
+ _supported_proto file
+ _supported_os Linux
++_require_working_luks
  
- ##
- # @JobStatus:
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ed335519cc..1b86b59af1 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -141,12 +141,27 @@ struct BlockDriver {
-     int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp);
-     void (*bdrv_close)(BlockDriverState *bs);
-+
-+
-     int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
-                                        Error **errp);
-     int coroutine_fn (*bdrv_co_create_opts)(BlockDriver *drv,
-                                             const char *filename,
-                                             QemuOpts *opts,
-                                             Error **errp);
-+
-+    int coroutine_fn (*bdrv_co_amend)(BlockDriverState *bs,
-+                                      BlockdevAmendOptions *opts,
-+                                      bool force,
-+                                      Error **errp);
-+
-+    int (*bdrv_amend_options)(BlockDriverState *bs,
-+                              QemuOpts *opts,
-+                              BlockDriverAmendStatusCB *status_cb,
-+                              void *cb_opaque,
-+                              bool force,
-+                              Error **errp);
-+
-     int (*bdrv_make_empty)(BlockDriverState *bs);
+ echo "== Input validation =="
+ echo
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+index 09b9b6083a..13b225fded 100755
+--- a/tests/qemu-iotests/188
++++ b/tests/qemu-iotests/188
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
++_require_working_luks
  
-     /*
-@@ -441,12 +456,6 @@ struct BlockDriver {
-                                       BdrvCheckResult *result,
-                                       BdrvCheckMode fix);
  
--    int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
--                              BlockDriverAmendStatusCB *status_cb,
--                              void *cb_opaque,
--                              bool force,
--                              Error **errp);
--
-     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
+ size=16M
+diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
+index c9ce9d3bed..e6a84b8a3b 100755
+--- a/tests/qemu-iotests/189
++++ b/tests/qemu-iotests/189
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
++_require_working_luks
  
-     /* TODO Better pass a option string/QDict/QemuOpts to add any rule? */
-diff --git a/block/amend.c b/block/amend.c
-new file mode 100644
-index 0000000000..f4612dcf08
---- /dev/null
-+++ b/block/amend.c
-@@ -0,0 +1,113 @@
-+/*
-+ * Block layer code related to image options amend
-+ *
-+ * Copyright (c) 2018 Kevin Wolf <kwolf@redhat.com>
-+ * Copyright (c) 2020 Red Hat. Inc
-+ *
-+ * Heavily based on create.c
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qemu/job.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qapi-visit-block-core.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/error.h"
-+
-+typedef struct BlockdevAmendJob {
-+    Job common;
-+    BlockdevAmendOptions *opts;
-+    BlockDriverState *bs;
-+    bool force;
-+} BlockdevAmendJob;
-+
-+static int coroutine_fn blockdev_amend_run(Job *job, Error **errp)
-+{
-+    BlockdevAmendJob *s = container_of(job, BlockdevAmendJob, common);
-+    int ret;
-+
-+    job_progress_set_remaining(&s->common, 1);
-+    ret = s->bs->drv->bdrv_co_amend(s->bs, s->opts, s->force, errp);
-+    job_progress_update(&s->common, 1);
-+    qapi_free_BlockdevAmendOptions(s->opts);
-+    return ret;
-+}
-+
-+static const JobDriver blockdev_amend_job_driver = {
-+    .instance_size = sizeof(BlockdevAmendJob),
-+    .job_type      = JOB_TYPE_AMEND,
-+    .run           = blockdev_amend_run,
-+};
-+
-+void qmp_x_blockdev_amend(const char *job_id,
-+                          const char *node_name,
-+                          BlockdevAmendOptions *options,
-+                          bool has_force,
-+                          bool force,
-+                          Error **errp)
-+{
-+    BlockdevAmendJob *s;
-+    const char *fmt = BlockdevDriver_str(options->driver);
-+    BlockDriver *drv = bdrv_find_format(fmt);
-+    BlockDriverState *bs = bdrv_find_node(node_name);
-+
-+
-+    if (!drv) {
-+        error_setg(errp, "Block driver '%s' not found or not supported", fmt);
-+        return;
-+    }
-+
-+    /*
-+     * If the driver is in the schema, we know that it exists. But it may not
-+     * be whitelisted.
-+     */
-+    if (bdrv_uses_whitelist() && !bdrv_is_whitelisted(drv, false)) {
-+        error_setg(errp, "Driver is not whitelisted");
-+        return;
-+    }
-+
-+    if (bs->drv != drv) {
-+        error_setg(errp,
-+                   "x-blockdev-amend doesn't support changing the block driver");
-+        return;
-+    }
-+
-+    /* Error out if the driver doesn't support .bdrv_co_amend */
-+    if (!drv->bdrv_co_amend) {
-+        error_setg(errp, "Driver does not support x-blockdev-amend");
-+        return;
-+    }
-+
-+    /* Create the block job */
-+    s = job_create(job_id, &blockdev_amend_job_driver, NULL,
-+                   bdrv_get_aio_context(bs), JOB_DEFAULT | JOB_MANUAL_DISMISS,
-+                   NULL, NULL, errp);
-+    if (!s) {
-+        return;
-+    }
-+
-+    s->bs = bs,
-+    s->opts = QAPI_CLONE(BlockdevAmendOptions, options),
-+    s->force = has_force ? force : false;
-+    job_start(&s->common);
-+}
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 96028eedce..577e578bc2 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -19,7 +19,7 @@ block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
- block-obj-$(CONFIG_POSIX) += file-posix.o
- block-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- block-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
--block-obj-y += null.o mirror.o commit.o io.o create.o
-+block-obj-y += null.o mirror.o commit.o io.o create.o amend.o
- block-obj-y += throttle-groups.o
- block-obj-$(CONFIG_LINUX) += nvme.o
  
+ size=16M
+diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+index fb0d5a29d3..aeb059d5ea 100755
+--- a/tests/qemu-iotests/198
++++ b/tests/qemu-iotests/198
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
++_require_working_luks
+ 
+ 
+ size=16M
+diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+index f42432a838..11bc51f256 100755
+--- a/tests/qemu-iotests/206
++++ b/tests/qemu-iotests/206
+@@ -24,6 +24,7 @@ import iotests
+ from iotests import imgfmt
+ 
+ iotests.script_initialize(supported_fmts=['qcow2'])
++iotests.verify_working_luks()
+ 
+ with iotests.FilePath('t.qcow2') as disk_path, \
+      iotests.FilePath('t.qcow2.base') as backing_path, \
+diff --git a/tests/qemu-iotests/263 b/tests/qemu-iotests/263
+index d2c030fae9..f598a12899 100755
+--- a/tests/qemu-iotests/263
++++ b/tests/qemu-iotests/263
+@@ -40,6 +40,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
++_require_working_luks
+ 
+ 
+ size=1M
+diff --git a/tests/qemu-iotests/284 b/tests/qemu-iotests/284
+index 071e89b33e..9f6c29a79c 100755
+--- a/tests/qemu-iotests/284
++++ b/tests/qemu-iotests/284
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2
+ _supported_proto generic
+ _supported_os Linux
++_require_working_luks
+ 
+ 
+ size=1M
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index f3667f48ab..7ac46edc1f 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -605,6 +605,9 @@ _supported_fmt()
+     # setting IMGFMT_GENERIC to false.
+     for f; do
+         if [ "$f" = "$IMGFMT" -o "$f" = "generic" -a "$IMGFMT_GENERIC" = "true" ]; then
++            if [ "$IMGFMT" = "luks" ]; then
++                _require_working_luks
++            fi
+             return
+         fi
+     done
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 039170a8a3..e1ddfcb662 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -1010,12 +1010,17 @@ def _verify_image_format(supported_fmts: Sequence[str] = (),
+         # similar to
+         #   _supported_fmt generic
+         # for bash tests
++        if imgfmt == 'luks':
++            verify_working_luks()
+         return
+ 
+     not_sup = supported_fmts and (imgfmt not in supported_fmts)
+     if not_sup or (imgfmt in unsupported_fmts):
+         notrun('not suitable for this image format: %s' % imgfmt)
+ 
++    if imgfmt == 'luks':
++        verify_working_luks()
++
+ def _verify_protocol(supported: Sequence[str] = (),
+                      unsupported: Sequence[str] = ()) -> None:
+     assert not (supported and unsupported)
 -- 
 2.26.2
 
