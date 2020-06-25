@@ -2,88 +2,85 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E77F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A907C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3F6D206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 025F9206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtsMCa1/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F6D206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BNnl7G5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 025F9206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUoq-0007qo-W3
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57338)
+	id 1joUp1-0008A6-9j
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:33:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUl2-0002kF-8B
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38085
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUl0-0002UA-Mq
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593102586;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9ayP1mCWFsPpODHDVmnJ8Vsl+6aR2uTSK1foOO3oEjo=;
- b=EtsMCa1/3qi0ZV4TRuqA53JIU6H6OqEphkAKCObB8es5HpRpSfJYKFYMO9Z8PWCN51JX2P
- UfIOjPD08IlpXWCts1mru14Zgt12uDnvD09IShefYaaaaTinNY9YsrtqS/fi7i5M5qguxF
- aSV3+5ZLQ1Jkq4MMczBzOcNOmBRTcEQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-2Us3fmHPOVanKMugvYThCw-1; Thu, 25 Jun 2020 12:29:41 -0400
-X-MC-Unique: 2Us3fmHPOVanKMugvYThCw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0674107ACCD
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:29:40 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-114-254.ams2.redhat.com
- [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A542BD01E7;
- Thu, 25 Jun 2020 16:29:39 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, virtio-fs@redhat.com, stefanha@redhat.com,
- vgoyal@redhat.com
-Subject: [PATCH 2/3] virtiofsd: Check capability calls
-Date: Thu, 25 Jun 2020 17:29:28 +0100
-Message-Id: <20200625162929.46672-3-dgilbert@redhat.com>
-In-Reply-To: <20200625162929.46672-1-dgilbert@redhat.com>
-References: <20200625162929.46672-1-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joUln-0003tL-Rw
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:30:35 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joUlm-0002mz-A9
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:30:35 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w17so4784344oie.6
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 09:30:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SH5uWQM18zzBJk03lB86wlRTLsFrMGNi4yUPo/BbQA0=;
+ b=BNnl7G5p3VN8GrbIktkbS8TYXolmXv+QuvsQVkoy0mjC7qT1t1NLgCJWBnE1J+3GMl
+ 5WSbBylbuF+i+pGYHQLigdU1zWSri2f4qXb2MHv2yHifFg2BuHm5gfjXkZnO0uXauy3W
+ Wxt3zFCNh3c32RZtTytpqqbnOeR7uq5nSYnvBf2ZOhAF92CiCy59i8Do6OxhS8nesvi0
+ j8EMZFeMnYUqrAlpJPWz1mWcaGhM4hBJ/ZSfyPDArgvmGCWKm3w2EVs20LM7rsT+ofKB
+ epqrTaJR9HqF4j64eVlbiDox5Ia5WHFtr5vcwhhvgihHvIcI3xqMz1I6XF42AjvJ6K+Q
+ puvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SH5uWQM18zzBJk03lB86wlRTLsFrMGNi4yUPo/BbQA0=;
+ b=gmraG+7R9EC152FZcdF2Y5mQjnKt6bTd1zD/flZlqSdz47q070Gj35ybas5BY7l1VC
+ c/NCBq24L/Ig+O7c/je3jz+XeFS6xuRIMRxqTvhxGK7Mih51l9HptERAhX/PrvcOedTK
+ RXGIfAn7ysicWt2VOjfrgW+888+pMd4ZJMlvASQthaA/uz8jxCohnKgWLEN5pII3Px4h
+ Ok7XiFJmQWmk2AECN+90WuxzgekINrtMwN5k4ojS7GGXKC3XYfUoLQRWAHIQu/GG5s9L
+ 7p76ehCvRHRhg/5o45GxVomsOvO5SJNV/vnM3kAZ7knPSWAC7XX0n4a2ec1x9hkZFreD
+ o3cw==
+X-Gm-Message-State: AOAM5302qnpoo6hBzcR4XH3BlA635CjkLR5kHBEkeiM1lx58IDOWcxxA
+ jV3MLbdEQP8Qlh3Xx0r8kuD8rdx+/rkBejma8TCr9yKwXQQ=
+X-Google-Smtp-Source: ABdhPJy9Y/DYVxxut5fz3bi/1+pNP3N5iOIV987D67n8MhhVTc+7pdmdToZebI72GM0Gd1oOjrDmAwJFeJvr9BO1wTc=
+X-Received: by 2002:a54:4694:: with SMTP id k20mr2865797oic.146.1593102633270; 
+ Thu, 25 Jun 2020 09:30:33 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200605041733.415188-1-richard.henderson@linaro.org>
+ <20200605041733.415188-6-richard.henderson@linaro.org>
+In-Reply-To: <20200605041733.415188-6-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 17:30:22 +0100
+Message-ID: <CAFEAcA-T+Vg-3Ruz_8avQrL0KULavP+UoM+RrAF_Y6=t-sZKwg@mail.gmail.com>
+Subject: Re: [PATCH v2 05/17] bsd-user: Tidy VERIFY_READ/VERIFY_WRITE
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,57 +93,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, 5 Jun 2020 at 05:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> These constants are only ever used with access_ok, and friends.
+> Rather than translating them to PAGE_* bits, let them equal
+> the PAGE_* bits to begin.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  bsd-user/qemu.h | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 
-Check the capability calls worked.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+(We really should either get bsd-user up to speed and
+maintained or just delete it...)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index e373e3b36e..99d562046a 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2589,7 +2589,7 @@ static void setup_capabilities(void)
-      */
-     capng_setpid(syscall(SYS_gettid));
-     capng_clear(CAPNG_SELECT_BOTH);
--    capng_updatev(CAPNG_ADD, CAPNG_PERMITTED | CAPNG_EFFECTIVE,
-+    if (capng_updatev(CAPNG_ADD, CAPNG_PERMITTED | CAPNG_EFFECTIVE,
-             CAP_CHOWN,
-             CAP_DAC_OVERRIDE,
-             CAP_DAC_READ_SEARCH,
-@@ -2599,11 +2599,21 @@ static void setup_capabilities(void)
-             CAP_SETUID,
-             CAP_MKNOD,
-             CAP_SETFCAP,
--            -1);
-+            -1)) {
-+        fuse_log(FUSE_LOG_ERR, "%s: capng_updatev failed\n", __func__);
-+        exit(1);
-+    }
- 
--    capng_apply(CAPNG_SELECT_BOTH);
-+    if (capng_apply(CAPNG_SELECT_BOTH)) {
-+        fuse_log(FUSE_LOG_ERR, "%s: capng_apply failed\n", __func__);
-+        exit(1);
-+    }
- 
-     cap.saved = capng_save_state();
-+    if (!cap.saved) {
-+        fuse_log(FUSE_LOG_ERR, "%s: capng_save_state failed\n", __func__);
-+        exit(1);
-+    }
-     pthread_mutex_unlock(&cap.mutex);
- }
- 
--- 
-2.26.2
-
+thanks
+-- PMM
 
