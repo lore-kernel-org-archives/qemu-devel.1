@@ -2,88 +2,101 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7781BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB923C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39016207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:48:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmgtQk9C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39016207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 927EA206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:57:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 927EA206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joSFC-0004Hp-HB
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:48:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38142)
+	id 1joSNu-0007ra-PV
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:57:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joSDz-0003Qa-RM
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:47:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60059
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joSDy-0003ke-0l
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:47:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593092848;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/VtBwskcANejUgifJiqNoxSc0B1ul23RZQ2iVt7kayw=;
- b=QmgtQk9CndF+IwhT+j0F2IOlCIZY19r9xbHYfAUOLFs4TnvX/gqauE0I8zXfLmluk0As9I
- HvNrXIXrv22j91ZnU49gkQL7cNSM7dby7bNFaIvKkZhY4kHKzVsKjYssS4xBwJ8rxyyUQ3
- AiBZAyKV4dZsZtFfsfS3BqcL7C0//mM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-8Xe4NMlJOZOR77zWETOBtg-1; Thu, 25 Jun 2020 09:47:23 -0400
-X-MC-Unique: 8Xe4NMlJOZOR77zWETOBtg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A05FBFC7;
- Thu, 25 Jun 2020 13:47:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44D6B100EBA4;
- Thu, 25 Jun 2020 13:47:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C818711384D4; Thu, 25 Jun 2020 15:47:20 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 20/46] block: Avoid error accumulation in bdrv_img_create()
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-21-armbru@redhat.com>
- <77f15d66-ba25-0cb8-2896-457aea313fc3@redhat.com>
-Date: Thu, 25 Jun 2020 15:47:20 +0200
-In-Reply-To: <77f15d66-ba25-0cb8-2896-457aea313fc3@redhat.com> (Eric Blake's
- message of "Wed, 24 Jun 2020 15:14:21 -0500")
-Message-ID: <877dvvz28n.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1joSNC-0007RP-98
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:57:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40740
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1joSNA-0002Fw-IB
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:57:02 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05PDWpCP088216; Thu, 25 Jun 2020 09:56:57 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31uwymse10-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jun 2020 09:56:56 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05PDngid017871;
+ Thu, 25 Jun 2020 13:56:56 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma04dal.us.ibm.com with ESMTP id 31uurq7g7f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jun 2020 13:56:56 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05PDutm846858584
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 25 Jun 2020 13:56:55 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 95EB4112062;
+ Thu, 25 Jun 2020 13:56:55 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9267F112063;
+ Thu, 25 Jun 2020 13:56:55 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 25 Jun 2020 13:56:55 +0000 (GMT)
+Subject: Re: [PULL v1 0/8] Merge tpm 2020/06/25 v1
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20200625132325.2025245-1-stefanb@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <ab351123-5a55-6f67-550f-72b7c8de9eeb@linux.ibm.com>
+Date: Thu, 25 Jun 2020 09:56:55 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <20200625132325.2025245-1-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-25_08:2020-06-25,
+ 2020-06-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ suspectscore=0 impostorscore=0 cotscore=-2147483648 adultscore=0
+ mlxlogscore=874 mlxscore=0 phishscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006250087
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 08:13:37
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,44 +109,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On 6/25/20 9:23 AM, Stefan Berger wrote:
 
-> On 6/24/20 11:43 AM, Markus Armbruster wrote:
->> When creating an image fails because the format doesn't support option
->> "backing_file" or "backing_fmt", bdrv_img_create() first has
->> qemu_opt_set() put a generic error into @local_err, then puts the real
->> error into @errp with error_setg(), and then propagates the former to
->> the latter, which throws away the generic error.  A bit complicated,
->> but works.
->
-> Hmm - may interact with my series to deprecate -b without -F.  We'll
-> deal with the fallout based on whatever lands first.
->
->>
->> Not that qemu_opt_set() returns a useful value, we can simply ignore
->
-> s/Not/Now/
+Peter,
 
-Will fix.
+   please do not apply. Something is not working well.
 
->> the generic error instead.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   block.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> Aha - you fixed 2 of the 4 cases that I noticed in 17/46.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+    Stefan
 
-Thanks!
+> This series of patches enables TPM TIS interrupts on PCs via IRQ 13 and disables
+> it for ARM.
+>
+>     Stefan
+>
+> The following changes since commit 0250c595c9dd61221515221e92737422c75dd38b:
+>
+>    Merge remote-tracking branch 'remotes/armbru/tags/pull-qdev-2020-06-23' into staging (2020-06-25 09:34:52 +0100)
+>
+> are available in the Git repository at:
+>
+>    git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2020-06-25-1
+>
+> for you to fetch changes up to dcee2d2f6111a3a7b3ec2c5e6ff8ad1f679e907b:
+>
+>    tpm: Disable interrupt support for TIS on sysbus (2020-06-25 08:45:53 -0400)
+>
+> ----------------------------------------------------------------
+> Stefan Berger (8):
+>        tpm_tis: Allow lowering of IRQ also when locality is not active
+>        tpm: Extend TPMIfClass with get_irqnum() function
+>        tests: Temporarily ignore DSDT table differences
+>        tpm: Split TPM_TIS_IRQ into TPM_TIS_ISA_IRQ and TPM_TIS_SYSBUS_IRQ
+>        acpi: Enable TPM IRQ
+>        tests: Add updated DSDT
+>        tpm: Guard irq related ops in case interrupts are disabled
+>        tpm: Disable interrupt support for TIS on sysbus
+>
+>   hw/i386/acpi-build.c         |  11 +++++------
+>   hw/tpm/tpm_tis_common.c      |  12 +++++++++---
+>   hw/tpm/tpm_tis_isa.c         |  17 ++++++++++++++---
+>   hw/tpm/tpm_tis_sysbus.c      |  12 +++++++++++-
+>   include/hw/acpi/tpm.h        |   3 ++-
+>   include/sysemu/tpm.h         |  12 ++++++++++++
+>   tests/data/acpi/q35/DSDT.tis | Bin 8357 -> 8360 bytes
+>   7 files changed, 53 insertions(+), 14 deletions(-)
+>
 
 
