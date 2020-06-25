@@ -2,101 +2,86 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C84C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08CC3206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:55:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ljSt4YTY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08CC3206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E9691206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:56:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9691206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joVAJ-0007KH-8y
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:55:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35878)
+	id 1joVB9-0008Nb-9W
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joV9R-0006Ht-JZ
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:55:01 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36130)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1joVAA-0007LG-0T
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:55:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joV9P-0004gQ-If
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:55:01 -0400
-Received: by mail-pg1-x543.google.com with SMTP id p3so3560197pgh.3
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 09:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=wYC5IYJjTNZDnMPFwIwmpQTVqAlfDoQB96PN41pXC3o=;
- b=ljSt4YTYFmDenRtOhyt1jOLd5Msq/g33Yh1MuYOe7IqGDnfjrZh6bNS3kVNFgTslXl
- oedZK6pQsPj2HjFYw9jsuqD8OPcf4FyMlsIXnNcgV7IStTHnEdJPR/wbmDtHZwZxYOGN
- ebHvflNtkV7vTpuH1mvTDvyGSdgKvLGVxAg1q5p+UFgwbqhmmw3LOnVL4bePvW/+cdsV
- vLttuB18a4W1jfXFc6FknngT9U9YM/1i43dtzWveGKSOF90rYDB3kWlCjClpj+wey0gj
- E7Q0z/1vUwrdGEcLKE6f4lkHJ3PNxS0iLWSJqDqQ4mikgPOkEGJASU0U/4FzKsuiSZ+k
- nArA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wYC5IYJjTNZDnMPFwIwmpQTVqAlfDoQB96PN41pXC3o=;
- b=iOrdbjti68Cr1XThOHR+MgyZzEUMLLk+7JfpNnvFrryJnHhXw6JzKzW88mPKSqdnvF
- uHob3ygppHBrThUbW14b7OZvdUGyx1nZprklWfFLZ0R41cnGN0jZzvrAR0tNRs2rYY0I
- edUvFHUNcwJlb85ZMZMDxBfV83In0uefsjjd205pvPV483Nzxcw2s21IaSZeukPDkkOf
- 753MLoHfrhsN8m+hxjiQDsZi9/+geE7gxqOYy6E0tK5d6v6mxxUxeAzXcr8sRLWbfsBY
- toA9MsdTv/Yw8gdgKvfSuD7WoSto3dHqdRyqaveAOrWewO4zfriEe/9zdRloagkfrTla
- OYIA==
-X-Gm-Message-State: AOAM531RR7UiQ9byOjGmYsbfgiJkIyk8xEV7qWlpTS5QiUqzqp9T8W30
- Itxqt54o7z00QvbJte2kqFzJwA==
-X-Google-Smtp-Source: ABdhPJzecfHborDcVleOvUCWanRVBOC/B0KyECD8Ij8q6yhndspCwHLvmGc2KtfsdRb0jOj6sWaz5g==
-X-Received: by 2002:a63:1e60:: with SMTP id p32mr26285770pgm.172.1593104097711; 
- Thu, 25 Jun 2020 09:54:57 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id y7sm8697823pgk.93.2020.06.25.09.54.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 09:54:57 -0700 (PDT)
-Subject: Re: [PATCH v8 38/45] target/arm: Complete TBI clearing for user-only
- for SVE
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200623193658.623279-1-richard.henderson@linaro.org>
- <20200623193658.623279-39-richard.henderson@linaro.org>
- <CAFEAcA8xy_Q-6zXexBEHLR=WSYTXVvttL9V4HqiMPmtRm__TEw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9e80eb42-655f-9ffa-264a-f72627efdf42@linaro.org>
-Date: Thu, 25 Jun 2020 09:54:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1joVA7-0005L2-PT
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:55:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1joVA4-0002Xf-7C
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2A5732E80E7
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:55:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8xy_Q-6zXexBEHLR=WSYTXVvttL9V4HqiMPmtRm__TEw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 25 Jun 2020 16:48:22 -0000
+From: Frank Heimes <1859656@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=maas; status=Triaged; importance=Low;
+ assignee=lee.trager@canonical.com; 
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
+ assignee=maas; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-cloke fheimes ltrager paelzer sfeole
+X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
+X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
+References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
+Message-Id: <159310370237.25145.7359310882983120366.malone@gac.canonical.com>
+Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
+ initial deploy
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e13d3f893ca5492b14094dd09f359244308b167a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 12:55:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,44 +90,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.spickett@linaro.org, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
+Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 5:52 AM, Peter Maydell wrote:
-> On Tue, 23 Jun 2020 at 20:37, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> There are a number of paths by which the TBI is still intact
->> for user-only in the SVE helpers.
->>
->> Because we currently always set TBI for user-only, we do not
->> need to pass down the actual TBI setting from above, and we
->> can remove the top byte in the inner-most primitives, so that
->> none are forgotten.  Moreover, this keeps the "dirty" pointer
->> around at the higher levels, where we need it for any MTE checking.
->>
->> Since the normal case, especially for user-only, goes through
->> RAM, this clearing merely adds two insns per page lookup, which
->> will be completely in the noise.
-> 
-> Can we have an assert() somewhere suitable that TBI is set?
-> That way if we ever do have an SVE-capable linux-user which
-> doesn't set TBI for some reason we'll get a useful reminder
-> that we need to fix something.
+Maybe this will 'automagically' get fixed and change if MAAS got rebased on=
+ LXD.
+LXD 4.2 comes with KVM support for s390x and the MAAS version that is going=
+ to be based on LXD is (iirc) 2.9?
 
-At what level would you like such an assert?
-At present we have, in arm_cpu_reset,
+-- =
 
-      /*
-       * Enable TBI0 and TBI1.  While the real kernel only enables TBI0,
-       * turning on both here will produce smaller code and otherwise
-       * make no difference to the user-level emulation.
-       */
-      env->cp15.tcr_el[1].raw_tcr = (3ULL << 37);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859656
 
+Title:
+  [2.6] Unable to reboot s390x KVM machine after initial deploy
 
-r~
+Status in MAAS:
+  Triaged
+Status in QEMU:
+  Incomplete
+Status in Ubuntu on IBM z Systems:
+  Triaged
+
+Bug description:
+  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
+  Arch: S390x
+
+  Appears that MAAS can not find the s390x bootloader to boot from the
+  disk, not sure how maas determines this.  However this was working in
+  the past. I had originally thought that if the maas machine was
+  deployed then it defaulted to boot from disk.
+
+  If I force the VM to book from disk, the VM starts up as expected.
+
+  Reproduce:
+
+  - Deploy Disco on S390x KVM instance
+  - Reboot it
+
+  on the KVM console...
+
+  Connected to domain s2lp6g001
+  Escape character is ^]
+  done
+  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
+  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
+  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
+  Trying pxelinux.cfg files...
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  Failed to load OS from network
+
+  =3D=3D> /var/log/maas/rackd.log <=3D=3D
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
+0x.bin requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
+5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+1-52-54-00-e5-d7-bb requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA0 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64B requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF6 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+A requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+ requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
+efault requested by 10.246.75.160
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
