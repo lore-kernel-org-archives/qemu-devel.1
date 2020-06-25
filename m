@@ -2,89 +2,85 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D39EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A59ADC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:05:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 655E9207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F12F2080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:05:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="We/CYXSD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655E9207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xvIew33V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F12F2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTPZ-0002AD-Mq
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:03:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59428)
+	id 1joTR2-0003xN-M0
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:05:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1joTOZ-0001GW-8D
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:02:31 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:42592 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1joTOX-0008Fy-9O
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:02:30 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id D70E14C8B7;
- Thu, 25 Jun 2020 15:02:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1593097344;
- x=1594911745; bh=oThQCtlFTIagl9wbYElNC61m9nqZMW5iRBPlY3X6ybs=; b=
- We/CYXSD4+mGFTrKzHBOs0I8tV8Et+PZ0VKYgXENErczJXUN+5/L7EpXdiM4pqka
- IqChhuu1l8lsKvlyuw8jWziaar6BOo+nGwmZlvSTdr7uVXl7hxBnTB6yG7Of7Xo0
- Vi1zeeu9zsSdjQbSw4QXrElpi1p2zorHDVSPqsBBBGs=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 73Tg2a8X_EDr; Thu, 25 Jun 2020 18:02:24 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 9F4484C8AD;
- Thu, 25 Jun 2020 18:02:24 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 25
- Jun 2020 18:02:24 +0300
-Date: Thu, 25 Jun 2020 18:02:23 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 6/8] i386: hvf: Drop hvf_reset_vcpu()
-Message-ID: <20200625150223.GH25104@SPB-NB-133.local>
-References: <20200624225850.16982-1-r.bolshakov@yadro.com>
- <20200624225850.16982-7-r.bolshakov@yadro.com>
- <ac800efc-c51d-e44c-de5c-cdef81d24dec@redhat.com>
- <20200625123637.GG25104@SPB-NB-133.local>
- <34821aae-e8f5-adc6-eab5-0a6f6b2835e8@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joTPX-0002Jw-Bj
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:03:31 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36910)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joTPV-0000GE-C2
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:03:30 -0400
+Received: by mail-ot1-x341.google.com with SMTP id v13so5549470otp.4
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:03:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HTb+xpKiag52nCtXX03TGGS5qGkDtFzSLzjCAHkQg6k=;
+ b=xvIew33VqOP1FxolMSvdkdM2Chf0vi7WcrF9CuxJOJrXw5aNWLhvqetgkv3gPS7R67
+ 8nqhp6sHda7CCY4qYRT0etgcus1Qo8Nu1fg9ohVpsAiZO7E9uJkcSPo6mpq01OClFRTn
+ Xex0nGkUCwkouDmZE89V/HoUbEsMOLk1bzGDGS1BXRU/wflRKaF4TB4za8AXQk5GNxrF
+ qctBSj6icN87B/ZEp8+9z/hKzTouI/s0wepmXsdvRfYmtvj0AaSnr3FSB3+0i2oZvHOM
+ C75aaWrEc5CcpHMLaSP35Ay5wfQmBg3LXd2QVpOEd/AEisdcw42A4DuePHAxJ87HzFfO
+ L1dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HTb+xpKiag52nCtXX03TGGS5qGkDtFzSLzjCAHkQg6k=;
+ b=BkFN8Tn6zwRRdnCmDEGnE+qCxrr0rcdeDlokNfp72Kw1N/VrsvynU8DSPekFXkP3X/
+ VMOnkVb9EMlbTsIL2t3g+j84fbQm96ERpMzVQkSvqgNWr62KcDqprO+mkxsSOi2AOHbP
+ tjvDfACKv3WmQ7kgkwB21032Fva2CXS5xRxYXj/OZfALammXGTiTWQLOVHB7RsGCeUNw
+ 7PaLem2KVMXofhX1iM17s25yeI9Z+R3blCadaHtcVHOkIYIGLZXbTCtkMBhtpj3o/+qh
+ Seaiaordu4F93Oh7zFbv3P8OJf66jDCp107n4fe3e/WBWwwrq5pOz9JCIAUvcUZEGETQ
+ CRqw==
+X-Gm-Message-State: AOAM533FDWQsUL3D8JV6OHQgVY8rHMXeT4LWbLo5F9GUS8/NKqLhQLMR
+ s3vUvXBBiDh23symPWvPoGloNOnYxGu+CQv8kpS8hA==
+X-Google-Smtp-Source: ABdhPJwtk5bLyw/xFaVuYwC2QMeHMbPS+FKCvUjug6WOVXVnffuij4/sIq+dSB71qsv2X4c7RSHAWhFr2Sy0vrQpetY=
+X-Received: by 2002:a9d:5786:: with SMTP id q6mr13299082oth.135.1593097408039; 
+ Thu, 25 Jun 2020 08:03:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <34821aae-e8f5-adc6-eab5-0a6f6b2835e8@redhat.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 11:02:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+References: <20200611161500.23580-1-eric.auger@redhat.com>
+ <20200611161500.23580-4-eric.auger@redhat.com>
+In-Reply-To: <20200611161500.23580-4-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 16:03:17 +0100
+Message-ID: <CAFEAcA-+eFh7q5-gQwTWxMCSV38ErwB-GZoigW+_sP-=Pmp1kw@mail.gmail.com>
+Subject: Re: [PATCH RESEND 3/9] hw/arm/smmu: Simplify the IOTLB key format
+To: Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,59 +93,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
- Claudio Fontana <cfontana@suse.de>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ zhangfei.gao@foxmail.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Will Deacon <will@kernel.org>, Rob Herring <robh@kernel.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 03:30:38PM +0200, Paolo Bonzini wrote:
-> On 25/06/20 14:36, Roman Bolshakov wrote:
-> > 
-> > Yes, there's such a place. post-init and post-reset invoke
-> > hvf_put_registers() and the latter one calls hvf_put_segments().
-> > hvf_put_segments() sets CR4 and CR0 via macvm_set_cr0/macvm_set_cr4
-> > using the CR0/CR4 from env. So, the reset is relying on generic QEMU
-> > CPUX86State now. LMA in EFER is reset there as well.
-> 
-> Ok, do you want to send a follow-up or a v2 of this?
-> 
+On Thu, 11 Jun 2020 at 17:15, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> Instead of using a Jenkins hash function to generate
+> the key let's just use a 64 bit unsigned integer that
+> contains the asid and the 40 upper bits of the iova.
+> A maximum of 52-bit IOVA is supported. This change in the
+> key format also prepares for the addition of new fields
+> in subsequent patches (granule and level).
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-I'm still trying to understand what I should do :)
+> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+> index 1dceec5cb1..7b9d2f0eb7 100644
+> --- a/include/hw/arm/smmu-common.h
+> +++ b/include/hw/arm/smmu-common.h
+> @@ -88,11 +88,6 @@ typedef struct SMMUPciBus {
+>      SMMUDevice   *pbdev[]; /* Parent array is sparse, so dynamically alloc */
+>  } SMMUPciBus;
+>
+> -typedef struct SMMUIOTLBKey {
+> -    uint64_t iova;
+> -    uint16_t asid;
+> -} SMMUIOTLBKey;
 
-> > I don't know any alternative for PDPTE and VMCS Entry Controls in
-> > CPUX86State, that's why I left explicit reset of the VMCS fields in
-> > post-reset.
-> 
-> VMCS entry controls should be handled by macvm_set_cr0 as well, because
-> QEMU does not use any except for the LMA bit.  They are initialized zero
-> 
->     wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS,
-> 	  cap2ctrl(hvf_state->hvf_caps->vmx_cap_entry, 0));
-> 
-> but in practice the last argument ends up being zero all the time.
-> 
+I think we should keep the SMMUIOTLBKey type to abstract out what
+the key type is under the hood, so it would now be
+ typedef uint64_t SMMUIOTLBKey;
 
-macvm_set_cr0() sets/clears LMA in entry controls only in case of
-transitions into/out of long mode in enter_long_mode() in
-exit_long_mode(), respectively. But macvm_set_cr0() doesn't load
-EFER.LMA from CPUX86State into VMCS entry controls during reset and
-that's where hvf_put_registers() might not behave properly.
+(and then the code that works with SMMUIOTLBKeys should never
+directly look at it as a uint64_t. If you wanted you could
+put the abstraction layer into place with the existing
+SMMUIOTLBKey type and then change the type in a second patch.)
 
-As far as I understand you propose to drop explicit LMA reset in
-post-reset and rather impove synchronization between efer and entry
-controls in macvm_set_cr0(), right? In that case I don't see a
-regression in the series, and if possible I'd prefer a follow up patch
-for the issue.
+> +uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
 
-> PDPTEs are not a problem, because they are not used after reset (only if
-> CR4.PAE=CR4.PG=1 and EFER.LME=0).
-> 
+This should return SMMUIOTLBKey rather than uint64_t,
+or pass in the pointer, like:
+   smmu_get_iotlb_key(SMMUIOTLBKey *key, uint16_t asid, uint64_t iova);
 
-Ok, good, then we're leaving PDPTE initialization as is in post-reset.
-
-Thanks,
-Roman
-
+thanks
+-- PMM
 
