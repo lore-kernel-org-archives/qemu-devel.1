@@ -2,79 +2,92 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD77C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 19:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5368C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 19:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F28A2075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 19:11:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F28A2075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 904FC2075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 19:13:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nx4DP8tL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 904FC2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joXHl-0003Sx-UH
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 15:11:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45770)
+	id 1joXJV-0005LJ-M5
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 15:13:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joXH3-00034A-IM
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 15:11:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40890)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1joXIT-0004RH-Nc; Thu, 25 Jun 2020 15:12:29 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39213)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joXH0-0008Me-C4
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 15:11:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1joXGy-0002kq-4X
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 19:10:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2059B2E8105
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 19:10:56 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1joXIS-0000ZW-3d; Thu, 25 Jun 2020 15:12:29 -0400
+Received: by mail-il1-x143.google.com with SMTP id k6so6334417ili.6;
+ Thu, 25 Jun 2020 12:12:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zO3MmrpcjuV25Jzf8+6bs2iEgnVSEVoU/K9kpd78Mss=;
+ b=nx4DP8tLK+ng9V8qjpbkPVn75cFsfYXH7dtVjJH32G4UjVcp8c2RhnrI7mAiAq0zHx
+ lkbAQRP7RSeG4/nkC4cuFx/HG+O1bpQoMrJUqWAdljj7gYSw2FwQRb+xeHQdvEGHTxC8
+ DqdGTgqShL8oHCCgQ4dJTlZPLpmQr0YpOdIH5NyA+JiYezcnLAdDsQjG/kKOpf+HuUI8
+ RHFi981FdWnKttBYrT7lk4461D7V+CX1+xOS+mSWW/9VXrkRZTrQUsdePKd4RIgfHbbN
+ /0f5FVyRuCBF49B0nGxR9jeNGGL2yAFOPPA78yWpdVg7TD9kEwpd8V6Q99R8Sg0cVBcC
+ BJFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zO3MmrpcjuV25Jzf8+6bs2iEgnVSEVoU/K9kpd78Mss=;
+ b=ZdquKFp93FQQmA4Lq0IaTZ/0qZh52UvppI7SE/uW++n+/MLTNkVQfJn3rbSlHU7uhK
+ 6UODQa9mmwYHFMq0c6tEl98JaAEHvUY9u8XFeoiMSqgkvzg/hZFKjUkPBPgCrMSayQ0W
+ 3f2DaFkUQ+st1B/+zQ3oPxhlnor3vMdkaUQe4+hhPnfmzfrtfVbFjj7TJYqCpcntw1LF
+ MMl5O92zirF87XPlRqAFI8wUd5YOLxBuNhYIRmm+XXDJ0BOqSp++KAHosF4nuHm5Exwf
+ kTybO2hpWnwaNmSrs24K2Aib6nhf3BVwip7ZrtInAQGyil4m4SSBu/oNi7e6ZpNhWGXV
+ PsyA==
+X-Gm-Message-State: AOAM532vt/r61WUM9dmoYyDYL6SvG/lpWxEQkuQ51OLbtOp0iiFRldKT
+ 3jkQ7OSfHrQWKCQEUI1YvCTuZ4lpKi1aDTq/Zwo=
+X-Google-Smtp-Source: ABdhPJyE6cBRk/ZrWiKIptVXTUwYb4H/Jqs2qA+qAM7ADDpnkZ9ooth+sIbKZhyTwpnmaGROqlfVqNMao65UqZojzzQ=
+X-Received: by 2002:a92:c213:: with SMTP id j19mr29061908ilo.40.1593112346675; 
+ Thu, 25 Jun 2020 12:12:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 Jun 2020 18:59:50 -0000
-From: =?utf-8?q?Eugenio_P=C3=A9rez?= <1885175@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: iommu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eperezma
-X-Launchpad-Bug-Reporter: =?utf-8?q?Eugenio_P=C3=A9rez_=28eperezma=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Eugenio_P=C3=A9rez_=28eperezma=29?=
-Message-Id: <159311159018.14164.3191713731245794696.malonedeb@wampee.canonical.com>
-Subject: [Bug 1885175] [NEW] memory.c range assertion hit at full invalidating
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7dd2aa421e877d90e2fcfacb2220d108580ffe2b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 15:10:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+References: <cover.1585262586.git.alistair.francis@wdc.com>
+ <931db85d6890ed4bc2b527fd1011197cd28299aa.1585262586.git.alistair.francis@wdc.com>
+ <a7f32084-2060-1de5-8308-987bcddf1e6d@linaro.org>
+In-Reply-To: <a7f32084-2060-1de5-8308-987bcddf1e6d@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 25 Jun 2020 12:02:50 -0700
+Message-ID: <CAKmqyKPdGp+5n_fRuzi74JK8z8rcXMU+KiJw5v2nTMApHqXauA@mail.gmail.com>
+Subject: Re: [PATCH for 5.0 v1 1/2] riscv: Don't use stage-2 PTE lookup
+ protection flags
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,435 +96,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885175 <1885175@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Thu, Mar 26, 2020 at 4:50 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 3/26/20 3:44 PM, Alistair Francis wrote:
+> > When doing the fist of a two stage lookup (Hypervisor extensions) don't
+> > set the current protection flags from the second stage lookup of the
+> > base address PTE.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/cpu_helper.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > index d3ba9efb02..f36d184b7b 100644
+> > --- a/target/riscv/cpu_helper.c
+> > +++ b/target/riscv/cpu_helper.c
+> > @@ -452,10 +452,11 @@ restart:
+> >          hwaddr pte_addr;
+> >
+> >          if (two_stage && first_stage) {
+> > +            int vbase_prot;
+> >              hwaddr vbase;
+> >
+> >              /* Do the second stage translation on the base PTE address. */
+> > -            get_physical_address(env, &vbase, prot, base, access_type,
+> > +            get_physical_address(env, &vbase, &vbase_prot, base, access_type,
+> >                                   mmu_idx, false, true);
+> >
+> >              pte_addr = vbase + idx * ptesize;
+> >
+>
+> Certainly stage2 pte lookup has nothing to do with the original lookup, so
+> using a new variable for prot is correct.
+>
+> So as far as this minimal patch,
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> However, this bit of code doesn't look right:
 
-I am able to hit this assertion when a Red Hat 7 guest virtio_net device
-raises an "Invalidation" of all the TLB entries. This happens in the
-guest's startup if 'intel_iommu=3Don' argument is passed to the guest
-kernel and right IOMMU/ATS devices are declared in qemu's command line.
+Thanks for the comments here. Coming back to this after a while.
 
-Command line: /home/qemu/x86_64-softmmu/qemu-system-x86_64 -name
-guest=3Drhel7-test,debug-threads=3Don -machine pc-q35-5.1,accel=3Dkvm,usb=
-=3Doff
-,dump-guest-core=3Doff,kernel_irqchip=3Dsplit -cpu
-Broadwell,vme=3Don,ss=3Don,vmx=3Don,f16c=3Don,rdrand=3Don,hypervisor=3Don,a=
-rat=3Don
-,tsc-adjust=3Don,umip=3Don,arch-
-capabilities=3Don,xsaveopt=3Don,pdpe1gb=3Don,abm=3Don,skip-l1dfl-
-vmentry=3Don,rtm=3Don,hle=3Don -m 8096 -realtime mlock=3Doff -smp
-2,sockets=3D2,cores=3D1,threads=3D1 -uuid d022ecbf-679e-4755-87ce-eb87fc5bb=
-c5d
--display none -no-user-config -nodefaults -rtc base=3Dutc,driftfix=3Dslew
--global kvm-pit.lost_tick_policy=3Ddelay -no-hpet -no-shutdown -global
-ICH9-LPC.disable_s3=3D1 -global ICH9-LPC.disable_s4=3D1 -boot strict=3Don
--device intel-iommu,intremap=3Don,device-iotlb=3Don -device pcie-root-
-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,addr=
-=3D0x1
--device pcie-root-
-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x1.0x1 -device =
-pcie-
-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x1.0x2 -de=
-vice
-pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x1.0x3
--device pcie-root-
-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x1.0x4 -device =
-pcie-
-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x1.0x5 -de=
-vice
-pcie-root-port,port=3D0xe,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=3D0x1.0x6
--device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 -device v=
-irtio-
-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 -drive file=3D/home
-/virtio-test2.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0 -device
-virtio-blk-pci,scsi=3Doff,bus=3Dpci.4,addr=3D0x0,drive=3Ddrive-virtio-disk0=
-,id
-=3Dvirtio-disk0,bootindex=3D1 -netdev tap,id=3Dhostnet0,vhost=3Don,vhostfor=
-ce=3Don
--device virtio-net-
-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:0d:1d:f2,bus=3Dpci.1,addr=3D=
-0x0,iommu_platform=3Don,ats=3Don
--device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 -object rng-
-random,id=3Dobjrng0,filename=3D/dev/urandom -device virtio-rng-
-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 -s -msg timestamp=3Don
+>
+> (1) Similarly, what has the original access_type got to do with the PTE lookup?
+>  Seems like this should be MMU_DATA_LOAD always.
 
-Full backtrace:
+Fixed in master now
 
-#0  0x00007ffff521370f in raise () at /lib64/libc.so.6
-#1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
-#2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
-#3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
-#4  0x0000555555888171 in memory_region_notify_one (notifier=3D0x7ffde05dfd=
-e8, entry=3D0x7ffde5dfe200) at /home/qemu/memory.c:1918
-#5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=3D0x555556f6=
-c0b0, iommu_idx=3D0, entry=3D...) at /home/qemu/memory.c:1941
-#6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=3D0x555557609000=
-, inv_desc=3D0x7ffde5dfe2d0)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/hw/i386/intel_iommu.c:2468
-#7  0x0000555555951e6a in vtd_process_inv_desc (s=3D0x555557609000) at /hom=
-e/qemu/hw/i386/intel_iommu.c:2531
-#8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=3D0x555557609000) at /home/=
-qemu/hw/i386/intel_iommu.c:2563
-#9  0x00005555559520e5 in vtd_handle_iqt_write (s=3D0x555557609000) at /hom=
-e/qemu/hw/i386/intel_iommu.c:2590
-#10 0x0000555555952b45 in vtd_mem_write (opaque=3D0x555557609000, addr=3D13=
-6, val=3D2688, size=3D4) at /home/qemu/hw/i386/intel_iommu.c:2837
-#11 0x0000555555883e17 in memory_region_write_accessor
-=C2=A0=C2=A0=C2=A0=C2=A0(mr=3D0x555557609330, addr=3D136, value=3D0x7ffde5d=
-fe478, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D...) at /home/qemu/m=
-emory.c:483
-#12 0x000055555588401d in access_with_adjusted_size
-=C2=A0=C2=A0=C2=A0=C2=A0(addr=3D136, value=3D0x7ffde5dfe478, size=3D4, acce=
-ss_size_min=3D4, access_size_max=3D8, access_fn=3D
-=C2=A0=C2=A0=C2=A0=C2=A00x555555883d38 <memory_region_write_accessor>, mr=
-=3D0x555557609330, attrs=3D...) at /home/qemu/memory.c:544
-#13 0x0000555555886f37 in memory_region_dispatch_write (mr=3D0x555557609330=
-, addr=3D136, data=3D2688, op=3DMO_32, attrs=3D...)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/memory.c:1476
-#14 0x0000555555827a03 in flatview_write_continue
-=C2=A0=C2=A0=C2=A0=C2=A0(fv=3D0x7ffde00935d0, addr=3D4275634312, attrs=3D..=
-., ptr=3D0x7ffff7ff0028, len=3D4, addr1=3D136, l=3D4, mr=3D0x555557609330) =
-at /home/qemu/exec.c:3146
-#15 0x0000555555827b48 in flatview_write (fv=3D0x7ffde00935d0, addr=3D42756=
-34312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3186
-#16 0x0000555555827e9d in address_space_write
-=C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4) at /home/qemu/ex=
-ec.c:3277
-#17 0x0000555555827f0a in address_space_rw
-=C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4, is_write=3Dtrue)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3287
-#18 0x000055555589b633 in kvm_cpu_exec (cpu=3D0x555556b65640) at /home/qemu=
-/accel/kvm/kvm-all.c:2511
-#19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=3D0x555556b65640) at =
-/home/qemu/cpus.c:1284
-#20 0x0000555555dafff1 in qemu_thread_start (args=3D0x555556b8c3b0) at util=
-/qemu-thread-posix.c:521
-#21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
-#22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
+>
+> (2) Why is the get_physical_address return value ignored?  On failure, surely
+> this should be some sort of PTE lookup failure.
 
---
+Also fixed in master now
 
-If we examinate *entry in frame 4 of backtrace:
-*entry =3D {target_as =3D 0x555556f6c050, iova =3D 0x0, translated_addr =3D=
- 0x0, addr_mask =3D 0xffffffffffffffff, perm =3D 0x0}
+>
+> (3) Do we need to validate vbase_prot for write before updating the PTE for
+> Access or Dirty?  That seems like a loop-hole to allow silent modification of
+> hypervisor read-only memory.
 
-Which (I think) tries to invalidate all the TLB registers of the device.
+That's a good point.
 
-Just deleting that assert is enough for the VM to start and communicate
-using IOMMU, but maybe a better alternative is possible. We could move
-it to the caller functions in other cases than IOMMU invalidation, or
-make it conditional only if not invalidating.
+Updating the accessed bit seems correct to me as we did access it and
+that doesn't then provide write permissions.
 
-Guest kernel version: kernel-3.10.0-1151.el7.x86_64
+Updating the dirty bit would provide write permissions, but we would
+only change the dirty bit on a store and vbase_prot is now always a
+load.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+If the PTE was already dirty then we might incorrectly provide write
+access though.
 
+>
+> I do wonder if it might be easier to manage all of this by using additional
+> TLBs to handle the stage2 and physical address spaces.  That's probably too
+> invasive for this stage of development though.
 
-** Tags: iommu
+Do you mean change riscv_cpu_mmu_index() to take into account
+virtulisation and have more then the current 3 (M, S and U) MMU
+indexes?
 
-** Description changed:
+Alistair
 
-  I am able to hit this assertion when a Red Hat 7 guest virtio_net device
-  raises an "Invalidation" of all the TLB entries. This happens in the
-  guest's startup if 'intel_iommu=3Don' argument is passed to the guest
-  kernel and right IOMMU/ATS devices are declared in qemu's command line.
-  =
-
-  Command line: /home/qemu/x86_64-softmmu/qemu-system-x86_64 -name
-  guest=3Drhel7-test,debug-threads=3Don -machine pc-q35-5.1,accel=3Dkvm,usb=
-=3Doff
-  ,dump-guest-core=3Doff,kernel_irqchip=3Dsplit -cpu
-  Broadwell,vme=3Don,ss=3Don,vmx=3Don,f16c=3Don,rdrand=3Don,hypervisor=3Don=
-,arat=3Don
-  ,tsc-adjust=3Don,umip=3Don,arch-
-  capabilities=3Don,xsaveopt=3Don,pdpe1gb=3Don,abm=3Don,skip-l1dfl-
-  vmentry=3Don,rtm=3Don,hle=3Don -m 8096 -realtime mlock=3Doff -smp
-  2,sockets=3D2,cores=3D1,threads=3D1 -uuid d022ecbf-679e-4755-87ce-eb87fc5=
-bbc5d
-  -display none -no-user-config -nodefaults -rtc base=3Dutc,driftfix=3Dslew
-  -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet -no-shutdown -global
-  ICH9-LPC.disable_s3=3D1 -global ICH9-LPC.disable_s4=3D1 -boot strict=3Don
-  -device intel-iommu,intremap=3Don,device-iotlb=3Don -device pcie-root-
-  port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,ad=
-dr=3D0x1
-  -device pcie-root-
-  port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x1.0x1 -devic=
-e pcie-
-  root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x1.0x2 -=
-device
-  pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x1.=
-0x3
-  -device pcie-root-
-  port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x1.0x4 -devic=
-e pcie-
-  root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x1.0x5 -=
-device
-  pcie-root-port,port=3D0xe,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=3D0x1.=
-0x6
-  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 -device=
- virtio-
-  serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 -drive file=3D/home
-  /virtio-test2.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0 -dev=
-ice
-  virtio-blk-pci,scsi=3Doff,bus=3Dpci.4,addr=3D0x0,drive=3Ddrive-virtio-dis=
-k0,id
-  =3Dvirtio-disk0,bootindex=3D1 -netdev tap,id=3Dhostnet0,vhost=3Don,vhostf=
-orce=3Don
-  -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:0d:1d:f2,bus=3Dpci.1,addr=
-=3D0x0,iommu_platform=3Don,ats=3Don
-  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 -object r=
-ng-
-  random,id=3Dobjrng0,filename=3D/dev/urandom -device virtio-rng-
-  pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 -s -msg timestamp=3Don
-  =
-
-  Full backtrace:
-  =
-
-  #0  0x00007ffff521370f in raise () at /lib64/libc.so.6
-  #1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
-  #2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
-  #3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
-  #4  0x0000555555888171 in memory_region_notify_one (notifier=3D0x7ffde05d=
-fde8, entry=3D0x7ffde5dfe200) at /home/qemu/memory.c:1918
-  #5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=3D0x555556=
-f6c0b0, iommu_idx=3D0, entry=3D...) at /home/qemu/memory.c:1941
-  #6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=3D0x5555576090=
-00, inv_desc=3D0x7ffde5dfe2d0)
--     at /home/qemu/hw/i386/intel_iommu.c:2468
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/hw/i386/intel_iommu.c:2468
-  #7  0x0000555555951e6a in vtd_process_inv_desc (s=3D0x555557609000) at /h=
-ome/qemu/hw/i386/intel_iommu.c:2531
-  #8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=3D0x555557609000) at /hom=
-e/qemu/hw/i386/intel_iommu.c:2563
-  #9  0x00005555559520e5 in vtd_handle_iqt_write (s=3D0x555557609000) at /h=
-ome/qemu/hw/i386/intel_iommu.c:2590
-  #10 0x0000555555952b45 in vtd_mem_write (opaque=3D0x555557609000, addr=3D=
-136, val=3D2688, size=3D4) at /home/qemu/hw/i386/intel_iommu.c:2837
-  #11 0x0000555555883e17 in memory_region_write_accessor
--     (mr=3D0x555557609330, addr=3D136, value=3D0x7ffde5dfe478, size=3D4, s=
-hift=3D0, mask=3D4294967295, attrs=3D...) at /home/qemu/memory.c:483
-+ =C2=A0=C2=A0=C2=A0=C2=A0(mr=3D0x555557609330, addr=3D136, value=3D0x7ffde=
-5dfe478, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D...) at /home/qemu=
-/memory.c:483
-  #12 0x000055555588401d in access_with_adjusted_size
--     (addr=3D136, value=3D0x7ffde5dfe478, size=3D4, access_size_min=3D4, a=
-ccess_size_max=3D8, access_fn=3D
--     0x555555883d38 <memory_region_write_accessor>, mr=3D0x555557609330, a=
-ttrs=3D...) at /home/qemu/memory.c:544
-+ =C2=A0=C2=A0=C2=A0=C2=A0(addr=3D136, value=3D0x7ffde5dfe478, size=3D4, ac=
-cess_size_min=3D4, access_size_max=3D8, access_fn=3D
-+ =C2=A0=C2=A0=C2=A0=C2=A00x555555883d38 <memory_region_write_accessor>, mr=
-=3D0x555557609330, attrs=3D...) at /home/qemu/memory.c:544
-  #13 0x0000555555886f37 in memory_region_dispatch_write (mr=3D0x5555576093=
-30, addr=3D136, data=3D2688, op=3DMO_32, attrs=3D...)
--     at /home/qemu/memory.c:1476
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/memory.c:1476
-  #14 0x0000555555827a03 in flatview_write_continue
--     (fv=3D0x7ffde00935d0, addr=3D4275634312, attrs=3D..., ptr=3D0x7ffff7f=
-f0028, len=3D4, addr1=3D136, l=3D4, mr=3D0x555557609330) at /home/qemu/exec=
-.c:3146
-+ =C2=A0=C2=A0=C2=A0=C2=A0(fv=3D0x7ffde00935d0, addr=3D4275634312, attrs=3D=
-..., ptr=3D0x7ffff7ff0028, len=3D4, addr1=3D136, l=3D4, mr=3D0x555557609330=
-) at /home/qemu/exec.c:3146
-  #15 0x0000555555827b48 in flatview_write (fv=3D0x7ffde00935d0, addr=3D427=
-5634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4)
--     at /home/qemu/exec.c:3186
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3186
-  #16 0x0000555555827e9d in address_space_write
--     (as=3D0x5555567ca640 <address_space_memory>, addr=3D4275634312, attrs=
-=3D..., buf=3D0x7ffff7ff0028, len=3D4) at /home/qemu/exec.c:3277
-+ =C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4) at /home/qemu/ex=
-ec.c:3277
-  #17 0x0000555555827f0a in address_space_rw
--     (as=3D0x5555567ca640 <address_space_memory>, addr=3D4275634312, attrs=
-=3D..., buf=3D0x7ffff7ff0028, len=3D4, is_write=3Dtrue)
--     at /home/qemu/exec.c:3287
-+ =C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4, is_write=3Dtrue)
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3287
-  #18 0x000055555589b633 in kvm_cpu_exec (cpu=3D0x555556b65640) at /home/qe=
-mu/accel/kvm/kvm-all.c:2511
-  #19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=3D0x555556b65640) a=
-t /home/qemu/cpus.c:1284
-  #20 0x0000555555dafff1 in qemu_thread_start (args=3D0x555556b8c3b0) at ut=
-il/qemu-thread-posix.c:521
-  #21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
-  #22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
-  =
-
-  --
-  =
-
-  If we examinate *entry in frame 4 of backtrace:
-  *entry =3D {target_as =3D 0x555556f6c050, iova =3D 0x0, translated_addr =
-=3D 0x0, addr_mask =3D 0xffffffffffffffff, perm =3D 0x0}
-  =
-
-  Which (I think) tries to invalidate all the TLB registers of the device.
-  =
-
-  Just deleting that assert is enough for the VM to start and communicate
-  using IOMMU, but maybe a better alternative is possible. We could move
-  it to the caller functions in other cases than IOMMU invalidation, or
-  make it conditional only if not invalidating.
-  =
-
-- Guest kernel version: kernel-3.10.0-1136.el7
-+ Guest kernel version: kernel-3.10.0-1151.el7.x86_64
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885175
-
-Title:
-  memory.c range assertion hit at full invalidating
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am able to hit this assertion when a Red Hat 7 guest virtio_net
-  device raises an "Invalidation" of all the TLB entries. This happens
-  in the guest's startup if 'intel_iommu=3Don' argument is passed to the
-  guest kernel and right IOMMU/ATS devices are declared in qemu's
-  command line.
-
-  Command line: /home/qemu/x86_64-softmmu/qemu-system-x86_64 -name
-  guest=3Drhel7-test,debug-threads=3Don -machine
-  pc-q35-5.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff,kernel_irqchip=3Ds=
-plit
-  -cpu
-  Broadwell,vme=3Don,ss=3Don,vmx=3Don,f16c=3Don,rdrand=3Don,hypervisor=3Don=
-,arat=3Don
-  ,tsc-adjust=3Don,umip=3Don,arch-
-  capabilities=3Don,xsaveopt=3Don,pdpe1gb=3Don,abm=3Don,skip-l1dfl-
-  vmentry=3Don,rtm=3Don,hle=3Don -m 8096 -realtime mlock=3Doff -smp
-  2,sockets=3D2,cores=3D1,threads=3D1 -uuid d022ecbf-679e-4755-87ce-
-  eb87fc5bbc5d -display none -no-user-config -nodefaults -rtc
-  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
-pet
-  -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
-  ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device intel-iommu,intremap=3D=
-on
-  ,device-iotlb=3Don -device pcie-root-
-  port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,ad=
-dr=3D0x1
-  -device pcie-root-
-  port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x1.0x1 -devic=
-e pcie-
-  root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x1.0x2 -=
-device
-  pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x1.=
-0x3
-  -device pcie-root-
-  port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x1.0x4 -devic=
-e pcie-
-  root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x1.0x5 -=
-device
-  pcie-root-port,port=3D0xe,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=3D0x1.=
-0x6
-  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 -device
-  virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 -drive
-  file=3D/home/virtio-test2.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virti=
-o-
-  disk0 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.4,addr=3D0x0,drive=3Ddr=
-ive-
-  virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -netdev
-  tap,id=3Dhostnet0,vhost=3Don,vhostforce=3Don -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:0d:1d:f2,bus=3Dpci.1,addr=
-=3D0x0,iommu_platform=3Don,ats=3Don
-  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 -object r=
-ng-
-  random,id=3Dobjrng0,filename=3D/dev/urandom -device virtio-rng-
-  pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 -s -msg timestamp=3Don
-
-  Full backtrace:
-
-  #0  0x00007ffff521370f in raise () at /lib64/libc.so.6
-  #1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
-  #2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
-  #3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
-  #4  0x0000555555888171 in memory_region_notify_one (notifier=3D0x7ffde05d=
-fde8, entry=3D0x7ffde5dfe200) at /home/qemu/memory.c:1918
-  #5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=3D0x555556=
-f6c0b0, iommu_idx=3D0, entry=3D...) at /home/qemu/memory.c:1941
-  #6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=3D0x5555576090=
-00, inv_desc=3D0x7ffde5dfe2d0)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/hw/i386/intel_iommu.c:2468
-  #7  0x0000555555951e6a in vtd_process_inv_desc (s=3D0x555557609000) at /h=
-ome/qemu/hw/i386/intel_iommu.c:2531
-  #8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=3D0x555557609000) at /hom=
-e/qemu/hw/i386/intel_iommu.c:2563
-  #9  0x00005555559520e5 in vtd_handle_iqt_write (s=3D0x555557609000) at /h=
-ome/qemu/hw/i386/intel_iommu.c:2590
-  #10 0x0000555555952b45 in vtd_mem_write (opaque=3D0x555557609000, addr=3D=
-136, val=3D2688, size=3D4) at /home/qemu/hw/i386/intel_iommu.c:2837
-  #11 0x0000555555883e17 in memory_region_write_accessor
-  =C2=A0=C2=A0=C2=A0=C2=A0(mr=3D0x555557609330, addr=3D136, value=3D0x7ffde=
-5dfe478, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D...) at /home/qemu=
-/memory.c:483
-  #12 0x000055555588401d in access_with_adjusted_size
-  =C2=A0=C2=A0=C2=A0=C2=A0(addr=3D136, value=3D0x7ffde5dfe478, size=3D4, ac=
-cess_size_min=3D4, access_size_max=3D8, access_fn=3D
-  =C2=A0=C2=A0=C2=A0=C2=A00x555555883d38 <memory_region_write_accessor>, mr=
-=3D0x555557609330, attrs=3D...) at /home/qemu/memory.c:544
-  #13 0x0000555555886f37 in memory_region_dispatch_write (mr=3D0x5555576093=
-30, addr=3D136, data=3D2688, op=3DMO_32, attrs=3D...)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/memory.c:1476
-  #14 0x0000555555827a03 in flatview_write_continue
-  =C2=A0=C2=A0=C2=A0=C2=A0(fv=3D0x7ffde00935d0, addr=3D4275634312, attrs=3D=
-..., ptr=3D0x7ffff7ff0028, len=3D4, addr1=3D136, l=3D4, mr=3D0x555557609330=
-) at /home/qemu/exec.c:3146
-  #15 0x0000555555827b48 in flatview_write (fv=3D0x7ffde00935d0, addr=3D427=
-5634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3186
-  #16 0x0000555555827e9d in address_space_write
-  =C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4) at /home/qemu/ex=
-ec.c:3277
-  #17 0x0000555555827f0a in address_space_rw
-  =C2=A0=C2=A0=C2=A0=C2=A0(as=3D0x5555567ca640 <address_space_memory>, addr=
-=3D4275634312, attrs=3D..., buf=3D0x7ffff7ff0028, len=3D4, is_write=3Dtrue)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/qemu/exec.c:3287
-  #18 0x000055555589b633 in kvm_cpu_exec (cpu=3D0x555556b65640) at /home/qe=
-mu/accel/kvm/kvm-all.c:2511
-  #19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=3D0x555556b65640) a=
-t /home/qemu/cpus.c:1284
-  #20 0x0000555555dafff1 in qemu_thread_start (args=3D0x555556b8c3b0) at ut=
-il/qemu-thread-posix.c:521
-  #21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
-  #22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
-
-  --
-
-  If we examinate *entry in frame 4 of backtrace:
-  *entry =3D {target_as =3D 0x555556f6c050, iova =3D 0x0, translated_addr =
-=3D 0x0, addr_mask =3D 0xffffffffffffffff, perm =3D 0x0}
-
-  Which (I think) tries to invalidate all the TLB registers of the
-  device.
-
-  Just deleting that assert is enough for the VM to start and
-  communicate using IOMMU, but maybe a better alternative is possible.
-  We could move it to the caller functions in other cases than IOMMU
-  invalidation, or make it conditional only if not invalidating.
-
-  Guest kernel version: kernel-3.10.0-1151.el7.x86_64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885175/+subscriptions
+>
+>
+> r~
 
