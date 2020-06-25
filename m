@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ECBC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E3EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F55B20768
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAC6920768
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHmonHds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F55B20768
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8vluRn3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC6920768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTJp-0006ge-MX
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:57:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57716)
+	id 1joTLr-0008GU-1d
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTJ6-0005rb-7P
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:56:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35427
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joTKp-0007O6-D9
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:58:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50284
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTJ4-000655-9R
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:56:51 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joTKn-0006dH-BV
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:58:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593097009;
+ s=mimecast20190719; t=1593097116;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DCysxeUtxGy+ZJdT/rzeTwgFWw3YiOBxRjqVLfi1iGk=;
- b=iHmonHdsL0UDR4ki7jN0vdFstX/nHssZ8WfMJc89A/GHi/lfHi+tCpbw8xLIG0RaFWEWEn
- VzH2NRGoB5BolRIGmj6GY8fyuxLENFELsk9Wu6uJJ0nVlVrUGuAabg8JnDrfmlcmbuj8Rw
- iw9KTdNg1cYlFN1iCf3GeSgH9MfQDyU=
+ bh=tle+TkX4DNf0GNesfJCGHU4713BXzPl+2oPXHOpjej4=;
+ b=L8vluRn30Nu/i+cyPknsI+BA6yvvyMoq1f9ncd7YiX8uiB8bUvKJeGDSFJ1LYlBR5L7lkW
+ +jKbauSeqoNc9l8synzTfdJ7Un/O453zv9u02BSf6WziJmphYEJPJzg4bYJu3R9KVGJ3DV
+ hez74xZKhYn4MTYcgqnXU3PeYA9sC+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-_AjvTvAtMQORcP5LTfwztQ-1; Thu, 25 Jun 2020 10:56:44 -0400
-X-MC-Unique: _AjvTvAtMQORcP5LTfwztQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-350-X4PIV-mXM0G9f1AxQslBQQ-1; Thu, 25 Jun 2020 10:58:17 -0400
+X-MC-Unique: X4PIV-mXM0G9f1AxQslBQQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCFA3193F564;
- Thu, 25 Jun 2020 14:56:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 877657B603;
- Thu, 25 Jun 2020 14:56:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1379A11384D4; Thu, 25 Jun 2020 16:56:40 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 22/46] qapi: Make visitor functions taking Error ** return
- bool, not void
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-23-armbru@redhat.com>
- <1de6c7d2-636a-4185-e069-3e03c953ed84@redhat.com>
-Date: Thu, 25 Jun 2020 16:56:40 +0200
-In-Reply-To: <1de6c7d2-636a-4185-e069-3e03c953ed84@redhat.com> (Eric Blake's
- message of "Wed, 24 Jun 2020 15:43:24 -0500")
-Message-ID: <87pn9nxkgn.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68479108BD09;
+ Thu, 25 Jun 2020 14:58:15 +0000 (UTC)
+Received: from w520.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E274575550;
+ Thu, 25 Jun 2020 14:57:52 +0000 (UTC)
+Date: Thu, 25 Jun 2020 08:57:52 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v25 09/17] vfio: Add load state functions to
+ SaveVMHandlers
+Message-ID: <20200625085752.185db479@w520.home>
+In-Reply-To: <1cb6dc9d-53b6-b978-9cb8-b4d7daaca400@nvidia.com>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-10-git-send-email-kwankhede@nvidia.com>
+ <20200624125437.664869ce@x1.home>
+ <1cb6dc9d-53b6-b978-9cb8-b4d7daaca400@nvidia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -85,7 +85,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,280 +98,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
  pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu, 25 Jun 2020 19:46:22 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 6/24/20 11:43 AM, Markus Armbruster wrote:
->> See recent commit "error: Document Error API usage rules" for
->> rationale.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   docs/devel/qapi-code-gen.txt  |  51 +++++------
->>   include/qapi/clone-visitor.h  |   8 +-
->>   include/qapi/visitor-impl.h   |  26 +++---
->>   include/qapi/visitor.h        | 102 ++++++++++++---------
->>   audio/audio_legacy.c          |  15 ++--
->>   qapi/opts-visitor.c           |  58 +++++++-----
->>   qapi/qapi-clone-visitor.c     |  33 ++++---
->>   qapi/qapi-dealloc-visitor.c   |  27 ++++--
->>   qapi/qapi-visit-core.c        | 165 ++++++++++++++++++----------------
->>   qapi/qobject-input-visitor.c  | 109 +++++++++++++---------
->>   qapi/qobject-output-visitor.c |  27 ++++--
->>   qapi/string-input-visitor.c   |  62 +++++++------
->>   qapi/string-output-visitor.c  |  32 ++++---
->>   scripts/qapi/visit.py         |  58 +++++-------
->>   14 files changed, 435 insertions(+), 338 deletions(-)
->
-> Hefty, but I don't see a sane way to split it further.
+> On 6/25/2020 12:24 AM, Alex Williamson wrote:
+> > On Sun, 21 Jun 2020 01:51:18 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> Sequence  during _RESUMING device state:
+> >> While data for this device is available, repeat below steps:
+> >> a. read data_offset from where user application should write data.
+> >> b. write data of data_size to migration region from data_offset.
+> >> c. write data_size which indicates vendor driver that data is written in
+> >>     staging buffer.
+> >>
+> >> For user, data is opaque. User should write data in the same order as
+> >> received.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> ---
+> >>   hw/vfio/migration.c  | 177 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>   hw/vfio/trace-events |   3 +
+> >>   2 files changed, 180 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> >> index ef1150c1ff02..faacea5327cb 100644
+> >> --- a/hw/vfio/migration.c
+> >> +++ b/hw/vfio/migration.c
+> >> @@ -302,6 +302,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+> >>       return qemu_file_get_error(f);
+> >>   }
+> >>   
+> >> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+> >> +{
+> >> +    VFIODevice *vbasedev = opaque;
+> >> +    uint64_t data;
+> >> +
+> >> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
+> >> +        int ret;
+> >> +
+> >> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
+> >> +        if (ret) {
+> >> +            error_report("%s: Failed to load device config space",
+> >> +                         vbasedev->name);
+> >> +            return ret;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    data = qemu_get_be64(f);
+> >> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
+> >> +        error_report("%s: Failed loading device config space, "
+> >> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
+> >> +        return -EINVAL;
+> >> +    }
+> >> +
+> >> +    trace_vfio_load_device_config_state(vbasedev->name);
+> >> +    return qemu_file_get_error(f);
+> >> +}
+> >> +
+> >>   /* ---------------------------------------------------------------------- */
+> >>   
+> >>   static int vfio_save_setup(QEMUFile *f, void *opaque)
+> >> @@ -472,12 +499,162 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+> >>       return ret;
+> >>   }
+> >>   
+> >> +static int vfio_load_setup(QEMUFile *f, void *opaque)
+> >> +{
+> >> +    VFIODevice *vbasedev = opaque;
+> >> +    VFIOMigration *migration = vbasedev->migration;
+> >> +    int ret = 0;
+> >> +
+> >> +    if (migration->region.mmaps) {
+> >> +        ret = vfio_region_mmap(&migration->region);
+> >> +        if (ret) {
+> >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
+> >> +                         vbasedev->name, migration->region.nr,
+> >> +                         strerror(-ret));
+> >> +            return ret;  
+> > 
+> > 
+> > Not fatal.
+> >  
+> 
+> As discussed on 07/17 patch of this series, it should fall back to 
+> read/write, right?
 
-I kept its scope as narrow as I could.  More on that below.
+Yes, it's worth an error_report() but not a migration abort imo.
+Thanks,
 
->> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
->> index a7794ef658..9bfc57063c 100644
->> --- a/docs/devel/qapi-code-gen.txt
->> +++ b/docs/devel/qapi-code-gen.txt
->
->> -    void visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
->> +    bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
->>       {
->>           Error *err = NULL;
->>   -        visit_type_int(v, "integer", &obj->integer, &err);
->> -        if (err) {
->> -            goto out;
->> +        if (!visit_type_int(v, "integer", &obj->integer, errp)) {
->> +            return false;
->>           }
->>           if (visit_optional(v, "string", &obj->has_string)) {
->> -            visit_type_str(v, "string", &obj->string, &err);
->> -            if (err) {
->> -                goto out;
->> +            if (!visit_type_str(v, "string", &obj->string, errp)) {
->> +                return false;
->>               }
->>           }
->
-> Is this worth compressing two 'if's into one:
->
-> if (visit_optional(...) &&
->     !visit_type_str(...)) {
->     return false;
-> }
+Alex
 
-This is due to the structure of the code generator:
-
-       for memb in members:
-           ret += gen_if(memb.ifcond)
-           if memb.optional:
-               ret += mcgen('''
-       if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
-   ''',
-                            name=memb.name, c_name=c_name(memb.name))
-               push_indent()
-           ret += mcgen('''
-       if (!visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, errp)) {
-           return false;
-       }
-   ''',
-                        c_type=memb.type.c_name(), name=memb.name,
-                        c_name=c_name(memb.name))
-           if memb.optional:
-               pop_indent()
-               ret += mcgen('''
-       }
-   ''')
-           ret += gen_endif(memb.ifcond)
-
-Note how we splice in the if (visit_optional(...)) without affecting the
-common part.
-
-I doubt messing with it is worthwhile.
-
->> -
->> -    out:
->>           error_propagate(errp, err);
->> +        return !err;
->
-> Now that 'err' is never anything but NULL, why aren't you dropping the
-> error_propagate() and merely using 'return true;'?
-
-We can't drop the error_propagate() just yet, because the generator can
-still generate code that needs it, just not for this particular input.
-
-Narrow scope: this patch does just enough to make the functions return
-bool.  It freely uses such bool function values for this purpose, but it
-refrains from exploiting them for more.  That's left to later patches,
-in this case PATCH 25.
-
->>       }
->>   -    void visit_type_UserDefOne(Visitor *v, const char *name,
->> UserDefOne **obj, Error **errp)
->> +    bool visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp)
->>       {
->>           Error *err = NULL;
->>   -        visit_start_struct(v, name, (void **)obj,
->> sizeof(UserDefOne), &err);
->> -        if (err) {
->> -            goto out;
->> +        if (!visit_start_struct(v, name, (void **)obj, sizeof(UserDefOne), errp)) {
->> +            return false;
->>           }
->>           if (!*obj) {
->>               /* incomplete */
->> @@ -1461,19 +1457,18 @@ Example:
->
-> Adding context:
->
->>             assert(visit_is_dealloc(v));
->>             goto out_obj;
->>         }
->>         visit_type_UserDefOne_members(v, *obj, &err);
->>         if (err) {
->>             goto out_obj;
->
-> Should this be:
->
->> if (!visit_type_UserDefOne_members(v, *obj, &err)) {
->>     goto out_obj;
-
-Also left for PATCH 25.
-
->>         }
->>         visit_check_struct(v, &err);
->>     out_obj:
->>         visit_end_struct(v, (void **)obj);
->>         if (err && visit_is_input(v)) {
->
->
->>               qapi_free_UserDefOne(*obj);
->>               *obj = NULL;
->>           }
->> -    out:
->>           error_propagate(errp, err);
->> +        return !err;
->
-> Here, err is still used by out_obj:, so this one is fine.
->
->>       }
->>   -    void visit_type_UserDefOneList(Visitor *v, const char *name,
->> UserDefOneList **obj, Error **errp)
->> +    bool visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp)
->>       {
->>           Error *err = NULL;
->>           UserDefOneList *tail;
->>           size_t size = sizeof(**obj);
->>   -        visit_start_list(v, name, (GenericList **)obj, size,
->> &err);
->> -        if (err) {
->> -            goto out;
->> +        if (!visit_start_list(v, name, (GenericList **)obj, size, errp)) {
->> +            return false;
->>           }
->>             for (tail = *obj; tail;
->> @@ -1492,21 +1487,19 @@ Example:
->
-> Adding context:
->
->>              tail = (UserDefOneList *)visit_next_list(v, (GenericList *)tail, size)) {
->>             visit_type_UserDefOne(v, NULL, &tail->value, &err);
->>             if (err) {
->>                 break;
->>             }
->
-> Should this be:
-> if (visit_type_UserDefOne(...)) {
->     break;
-
-Likewise.
-
->>         }
->>
->>         if (!err) {
->>             visit_check_list(v, &err);
->>         }
->>         visit_end_list(v, (void **)obj);
->>         if (err && visit_is_input(v)) {
->
->
->>               qapi_free_UserDefOneList(*obj);
->>               *obj = NULL;
->>           }
->> -    out:
->>           error_propagate(errp, err);
->> +        return !err;
->>       }
->
-> Again, err is still used, so this one is fine.
->
->>   -    void visit_type_q_obj_my_command_arg_members(Visitor *v,
->> q_obj_my_command_arg *obj, Error **errp)
->> +    bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
->>       {
->>           Error *err = NULL;
->>   -        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
->> -        if (err) {
->> -            goto out;
->> +        if (!visit_type_UserDefOneList(v, "arg1", &obj->arg1, errp)) {
->> +            return false;
->>           }
->> -
->> -    out:
->>           error_propagate(errp, err);
->> +        return !err;
->>       }
->
-> But this is another one where err is unused.
-
-Generated by the code as visit_type_UserDefOne_members() above.
-
->>     [Uninteresting stuff omitted...]
->> diff --git a/include/qapi/clone-visitor.h b/include/qapi/clone-visitor.h
->> index 5b665ee38c..adf9a788e2 100644
->> --- a/include/qapi/clone-visitor.h
->
->> +++ b/include/qapi/visitor.h
->> @@ -286,6 +284,8 @@ void visit_free(Visitor *v);
->>    * On failure, set *@obj to NULL and store an error through @errp.
->>    * Can happen only when @v is an input visitor.
->>    *
->> + * Return true on succes, false on failure.
->
-> success
->
-> (copied several times in this file)
-
-Will fix.
-
->> +++ b/qapi/qapi-clone-visitor.c
->
->> -static void qapi_clone_type_int64(Visitor *v, const char *name, int64_t *obj,
->> +static bool qapi_clone_type_int64(Visitor *v, const char *name, int64_t *obj,
->>                                      Error **errp)
->
-> Pre-existing indentation glitch that you could fix while here.
-
-Will do.
-
->>   {
->>       QapiCloneVisitor *qcv = to_qcv(v);
->>         assert(qcv->depth);
->>       /* Value was already cloned by g_memdup() */
->> +    return true;
->>   }
->>   -static void qapi_clone_type_uint64(Visitor *v, const char *name,
->> +static bool qapi_clone_type_uint64(Visitor *v, const char *name,
->>                                       uint64_t *obj, Error **errp)
->
-> Ditto for several more functions in this file.
-
-ACK.
-
-Thanks!
+> >> +        }
+> >> +    }
+> >> +
+> >> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK,
+> >> +                                   VFIO_DEVICE_STATE_RESUMING);
+> >> +    if (ret) {
+> >> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
+> >> +    }
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static int vfio_load_cleanup(void *opaque)
+> >> +{
+> >> +    vfio_save_cleanup(opaque);
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
+> >> +{
+> >> +    VFIODevice *vbasedev = opaque;
+> >> +    VFIOMigration *migration = vbasedev->migration;
+> >> +    int ret = 0;
+> >> +    uint64_t data, data_size;
+> >> +
+> >> +    data = qemu_get_be64(f);
+> >> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
+> >> +
+> >> +        trace_vfio_load_state(vbasedev->name, data);
+> >> +
+> >> +        switch (data) {
+> >> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
+> >> +        {
+> >> +            ret = vfio_load_device_config_state(f, opaque);
+> >> +            if (ret) {
+> >> +                return ret;
+> >> +            }
+> >> +            break;
+> >> +        }
+> >> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
+> >> +        {
+> >> +            data = qemu_get_be64(f);
+> >> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
+> >> +                return ret;
+> >> +            } else {
+> >> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
+> >> +                             vbasedev->name, data);
+> >> +                return -EINVAL;  
+> > 
+> > This is essentially just a compatibility failure, right?  For instance
+> > some future version of QEMU might include additional data between these
+> > markers that we don't understand and therefore we fail the migration.
+> >   
+> 
+> Yes.
+> 
+> Thanks,
+> Kirti
+> 
+> Thanks,
+> > 
+> > Alex
+> >   
+> >> +            }
+> >> +            break;
+> >> +        }
+> >> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
+> >> +        {
+> >> +            VFIORegion *region = &migration->region;
+> >> +            uint64_t data_offset = 0, size;
+> >> +
+> >> +            data_size = size = qemu_get_be64(f);
+> >> +            if (data_size == 0) {
+> >> +                break;
+> >> +            }
+> >> +
+> >> +            ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
+> >> +                        region->fd_offset +
+> >> +                        offsetof(struct vfio_device_migration_info,
+> >> +                        data_offset));
+> >> +            if (ret != sizeof(data_offset)) {
+> >> +                error_report("%s:Failed to get migration buffer data offset %d",
+> >> +                             vbasedev->name, ret);
+> >> +                return -EINVAL;
+> >> +            }
+> >> +
+> >> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
+> >> +                                              data_size);
+> >> +
+> >> +            while (size) {
+> >> +                void *buf = NULL;
+> >> +                uint64_t sec_size;
+> >> +                bool buffer_mmaped;
+> >> +
+> >> +                buf = get_data_section_size(region, data_offset, size,
+> >> +                                            &sec_size);
+> >> +
+> >> +                buffer_mmaped = (buf != NULL);
+> >> +
+> >> +                if (!buffer_mmaped) {
+> >> +                    buf = g_try_malloc(sec_size);
+> >> +                    if (!buf) {
+> >> +                        error_report("%s: Error allocating buffer ", __func__);
+> >> +                        return -ENOMEM;
+> >> +                    }
+> >> +                }
+> >> +
+> >> +                qemu_get_buffer(f, buf, sec_size);
+> >> +
+> >> +                if (!buffer_mmaped) {
+> >> +                    ret = pwrite(vbasedev->fd, buf, sec_size,
+> >> +                                 region->fd_offset + data_offset);
+> >> +                    g_free(buf);
+> >> +
+> >> +                    if (ret != sec_size) {
+> >> +                        error_report("%s: Failed to set migration buffer %d",
+> >> +                                vbasedev->name, ret);
+> >> +                        return -EINVAL;
+> >> +                    }
+> >> +                }
+> >> +                size -= sec_size;
+> >> +                data_offset += sec_size;
+> >> +            }
+> >> +
+> >> +            ret = pwrite(vbasedev->fd, &data_size, sizeof(data_size),
+> >> +                         region->fd_offset +
+> >> +                       offsetof(struct vfio_device_migration_info, data_size));
+> >> +            if (ret != sizeof(data_size)) {
+> >> +                error_report("%s: Failed to set migration buffer data size %d",
+> >> +                             vbasedev->name, ret);
+> >> +                return -EINVAL;
+> >> +            }
+> >> +            break;
+> >> +        }
+> >> +
+> >> +        default:
+> >> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
+> >> +            return -EINVAL;
+> >> +        }
+> >> +
+> >> +        data = qemu_get_be64(f);
+> >> +        ret = qemu_file_get_error(f);
+> >> +        if (ret) {
+> >> +            return ret;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >>   static SaveVMHandlers savevm_vfio_handlers = {
+> >>       .save_setup = vfio_save_setup,
+> >>       .save_cleanup = vfio_save_cleanup,
+> >>       .save_live_pending = vfio_save_pending,
+> >>       .save_live_iterate = vfio_save_iterate,
+> >>       .save_live_complete_precopy = vfio_save_complete_precopy,
+> >> +    .load_setup = vfio_load_setup,
+> >> +    .load_cleanup = vfio_load_cleanup,
+> >> +    .load_state = vfio_load_state,
+> >>   };
+> >>   
+> >>   /* ---------------------------------------------------------------------- */
+> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> >> index 9a1c5e17d97f..4a4bd3ba9a2a 100644
+> >> --- a/hw/vfio/trace-events
+> >> +++ b/hw/vfio/trace-events
+> >> @@ -157,3 +157,6 @@ vfio_save_device_config_state(const char *name) " (%s)"
+> >>   vfio_save_pending(const char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible 0x%"PRIx64
+> >>   vfio_save_iterate(const char *name, int data_size) " (%s) data_size %d"
+> >>   vfio_save_complete_precopy(const char *name) " (%s)"
+> >> +vfio_load_device_config_state(const char *name) " (%s)"
+> >> +vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
+> >> +vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64  
+> >   
+> 
 
 
