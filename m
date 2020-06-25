@@ -2,92 +2,122 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BECAEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11633C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88E88206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:50:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0818206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:59:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FxlwyNu5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E88206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivsPUx8n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0818206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joLi9-0000Nq-Ru
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:50:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46316)
+	id 1joLrY-0002Wg-5C
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1joLhP-0008LA-N0
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:49:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22832
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joLqx-0001yz-II
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:59:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33216
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1joLhO-0004c9-18
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:49:27 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joLqv-0000lS-Ij
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:59:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593067765;
+ s=mimecast20190719; t=1593068356;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=DBRx8nKGtqkPfGO9Xu367XTw0d50xrdqwJlmq+Ewni4=;
- b=FxlwyNu5LKiupyAziVU0gJz0RgARhrRnlvbKWjtKzQSdz/GBwu3oG7skF1uwzkeMqBt3kl
- ZIaaIDJVngect2E21yb3k2GgZXHo6xUtJOu2yomiKgBPyEM0qO6FJtJNHv2eHL8rrm1MXp
- 4YIlkcwHyEhsnsiemkSzcV+srPMUqLI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-Fb9E0By1NzmKmxH38tX4bw-1; Thu, 25 Jun 2020 02:49:20 -0400
-X-MC-Unique: Fb9E0By1NzmKmxH38tX4bw-1
-Received: by mail-wr1-f71.google.com with SMTP id i10so6099787wrn.21
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:49:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DBRx8nKGtqkPfGO9Xu367XTw0d50xrdqwJlmq+Ewni4=;
- b=KyAvE4fb3BxLawjYcK62vVUa3xfLU7+Uw7MH+QZncy4IRrxnmnL6Cf3pZpPZV8HjJS
- lNcwhbqTm8aoBzlA2uxSaYx2H1s0STvSvUQxVFn929Fjf+RyjJ87xj1WDYSAgha95Ruj
- Loswk85UN+TvPXxC5tuf5p/ClB+YCb2HF2k0JxU8eNkfKxoNBmC5mlvyuhoZ24vh7JG0
- pFjVTTAmFB+5B53InXWosIPEHS42L9SWWKZs7f+DQ11f4vSDo5RVx1zg+phSUAPOrLcZ
- XvApvQCgrjtwcE6JHyVqd2xa81apjbXY02VR1syl3qKVEgzOftgxifsuCCYyBCzwwHrc
- UpnQ==
-X-Gm-Message-State: AOAM533GokBymCQOYegn3vevdcyNv3Po/MBBmnnDUgS+7UC8wAMHlH5n
- 4BR9ySOcRvMcP1Ic+YL7phDj1//g9ibwvr/cQx78FWWq3bdlmlPkGG0+xF7bD1sIvmoZ1qxqsiO
- VW+kRQujfs0bmADo=
-X-Received: by 2002:a7b:c186:: with SMTP id y6mr1806862wmi.82.1593067759440;
- Wed, 24 Jun 2020 23:49:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJydMxH5tpwrTKaXYN/BCPWQ/a2C4UeVJ9ZhmgB814zZ9j4D/jbFWF022zQ01WZNekKFNJZlHA==
-X-Received: by 2002:a7b:c186:: with SMTP id y6mr1806843wmi.82.1593067759176;
- Wed, 24 Jun 2020 23:49:19 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- l18sm1797602wrm.52.2020.06.24.23.49.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Jun 2020 23:49:18 -0700 (PDT)
-Date: Thu, 25 Jun 2020 02:49:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PULL 00/19] virtio,acpi,pci: fixes, cleanups, tools.
-Message-ID: <20200625024751-mutt-send-email-mst@kernel.org>
-References: <20200624230609.703104-1-mst@redhat.com>
- <041fe41e-e9b5-77dd-d69c-0afdcbfd638c@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4YmFKv5BPyvUP3dHFPJ60Okn4MqIBG/j/Iz9R2fJchw=;
+ b=ivsPUx8nHfT0ceTT0pCVd2fwVK8gkLn8HbC7UsNeofhrDtOErkIS3unCw1F2spcgBr2AFS
+ mMIu/GaOGiT5HaOwPyALZw2BgQIV9+QHNCQ1Q7aUABcLw0HzN1HKpF3ABuSwsVJYmuim+A
+ gpEbhh80st723PYc4mPOmNSn7gCOKOw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-DbKryyKLOgmq3gfQAN4SSQ-1; Thu, 25 Jun 2020 02:59:13 -0400
+X-MC-Unique: DbKryyKLOgmq3gfQAN4SSQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1826804003;
+ Thu, 25 Jun 2020 06:59:10 +0000 (UTC)
+Received: from [10.36.113.65] (ovpn-113-65.ams2.redhat.com [10.36.113.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 462C491D99;
+ Thu, 25 Jun 2020 06:59:01 +0000 (UTC)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619094820.GJ17085@umbus.fritz.box>
+ <a1f47bc3-40d6-f46e-42e7-9c44597c3c90@redhat.com>
+ <20200625054201.GE172395@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <778050eb-c6b2-e471-1945-598520fdc894@redhat.com>
+Date: Thu, 25 Jun 2020 08:59:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <041fe41e-e9b5-77dd-d69c-0afdcbfd638c@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+In-Reply-To: <20200625054201.GE172395@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -110,77 +140,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
+ pasic@linux.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com, mdroth@linux.vnet.ibm.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 07:47:41AM +0200, Thomas Huth wrote:
-> On 25/06/2020 01.06, Michael S. Tsirkin wrote:
-> > The following changes since commit d4b78317b7cf8c0c635b70086503813f79ff21ec:
-> > 
-> >    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200623' into staging (2020-06-23 18:57:05 +0100)
-> > 
-> > are available in the Git repository at:
-> > 
-> >    git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> > 
-> > for you to fetch changes up to f6f746db6bae1ba74967fd7bea2bb5e169502948:
-> > 
-> >    tests: disassemble-asm.sh: generate AML in readable format (2020-06-24 19:03:57 -0400)
-> > 
-> > ----------------------------------------------------------------
-> > virtio,acpi,pci: fixes, cleanups, tools.
-> > 
-> > Fixes, cleanups in ACPI, PCI, virtio.
-> > A handy script for testing ACPI.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > ----------------------------------------------------------------
-> > Ani Sinha (1):
-> >        Rename use_acpi_pci_hotplug to more appropriate use_acpi_hotplug_bridge
-> > 
-> > Eric Auger (3):
-> >        acpi: Some build_tpm2() code reshape
-> >        arm/acpi: Add the TPM2.0 device under the DSDT
-> >        docs/specs/tpm: ACPI boot now supported for TPM/ARM
-> > 
-> > Gerd Hoffmann (12):
-> >        qtest: allow DSDT acpi table changes
-> >        acpi: bios-tables-test: show more context on asl diffs
-> >        acpi: move aml builder code for floppy device
-> >        floppy: make isa_fdc_get_drive_max_chs static
-> >        floppy: move cmos_get_fd_drive_type() from pc
-> >        acpi: move aml builder code for i8042 (kbd+mouse) device
-> >        acpi: factor out fw_cfg_add_acpi_dsdt()
-> >        acpi: simplify build_isa_devices_aml()
-> >        acpi: drop serial/parallel enable bits from dsdt
-> >        acpi: drop build_piix4_pm()
-> >        acpi: q35: drop _SB.PCI0.ISA.LPCD opregion.
-> >        tests/acpi: update expected data files
-> > 
-> > Michael S. Tsirkin (1):
-> >        tests: disassemble-asm.sh: generate AML in readable format
-> > 
-> > Raphael Norwitz (1):
-> >        Stop vhost-user sending uninitialized mmap_offsets
-> > 
-> > Thomas Huth (1):
-> >        tests/qtest/bios-tables: Only run the TPM test with CONFIG_TPM enabled
 > 
->  Hi Michael!
+>> So it's wrapping architecture-specific data in a common
+>> parameter. Hmm.
 > 
-> Please drop my patch from your pull request - the issue has already been
-> solved by Eric's patch that already got merged:
+> Well, I don't know I'd say "wrapping".  You have a common parameter
+> that points to an object with a well defined interface.  The available
+> implementations of that object will tend to be either zero or one per
+> architecture, but there's no theoretical reason it has to be.  Indeed
+> we expect at least 2 for x86 (SEV and the Intel one who's name I never
+> remember).  Extra ones are entirely plausible for POWER and maybe s390
+> too, when an updated version of PEF or PV inevitably rolls around.
 > 
-> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=55b9757c7e58092
+> Some sort of new HTL scheme which could work across multiple archs is
+> much less likely, but it's not totally impossible either.
 > 
->  Thanks,
->   Thomas
+>>>>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+>>>>> can be extended to cover the Intel and s390 mechanisms as well,
+>>>>> though.
+>>>>
+>>>> The only approach on s390x to not glue command line properties to the
+>>>> cpu model would be to remove the CPU model feature and replace it by the
+>>>> command line parameter. But that would, of course, be an incompatible break.
+>>>
+>>> I don't really understand why you're so against setting the cpu
+>>> default parameters from the machine.  The machine already sets basic
+>>> configuration for all sorts of devices in the VM, that's kind of what
+>>> it's for.
+>>
+>> It's a general design philosophy that the CPU model (especially the host
+>> CPU model) does not depend on other command line parameters (except the
+>> accelerator, and I think in corner cases on the machine). Necessary for
+>> reliable host model probing by libvirt, for example.
+> 
+> Ok, I've proposed a revision which doesn't require altering the CPU
+> model elsewhere in this thread.
+> 
+>> We also don't have similar things for nested virt.
+> 
+> I'm not sure what you're getting at there.
+
+Sorry, back when we introduced nested virt there was a similar
+(internal?) discussion, to enable/disable it via a machine flag and not
+via 1..X CPU features. We went for the latter, because it matches the
+actual architecture and allows for easy migration checks etc. Nested
+virt also collides with some features currently (e.g., huge page backing
+for the guest), but not as severe as encrypted virtualization.
+
+> 
+>>>> How do upper layers actually figure out if memory encryption etc is
+>>>> available? on s390x, it's simply via the expanded host CPU model.
+>>>
+>>> Haven't really tackled that yet.  But one way that works for multiple
+>>> systems has got to be better than a separate one for each, right?
+>>
+>> I think that's an important piece. Especially once multiple different
+>> approaches are theoretically available one wants to sense from upper layers.
+> 
+> Fair point.
+> 
+> So... IIRC there's a general way of looking at available properties
+> for any object, including the machine.  So we can probe for
+> availability of the "host-trust-limitation" property itself easily
+> enough.
+
+You can have a look at how it's currently probed by libvirt in
+
+https://www.redhat.com/archives/libvir-list/2020-June/msg00518.html
+
+For now, the s390x check consists of
+- checking if /sys/firmware/uv is available
+- checking if the kernel cmdline contains 'prot_virt=1'
+
+The sev check is
+- checking if /sys/module/kvm_amd/parameters/sev contains the
+   value '1'
+- checking if /dev/sev
+
+So at least libvirt does not sense via the CPU model on s390x yet.
+
+> 
+> I guess we do need a way of probing for what implementations of the
+> htl interface are available.  And, if we go down that path, if there
+> are any pre-generated htl objects available.
+> 
+>> At least on s390x, it really is like just another CPU-visible feature
+>> that tells the guest that it can switch to protected mode.
+> 
+> Right.. which is great for you, since you already have a nice
+> orthogonal interface for that.   On POWER, (a) CPU model isn't enough
+> since you need a running ultravisor as well and (b) CPU feature
+> detection is already a real mess for.. reasons.
+
+I can understand the pain of the latter ... :)
 
 
-OK done. Peter I pushed a new tag dropping a couple of patches
-accordingly. Same name.
+-- 
+Thanks,
+
+David / dhildenb
 
 
