@@ -2,75 +2,81 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CA7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CF3920775
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E652A20775
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:52:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUEW0OCM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF3920775
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKFTDV0M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E652A20775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUAJ-000602-Ro
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:51:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38332)
+	id 1joUAn-0006rr-1m
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:52:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjW-0007Cq-Gd
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:24:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40738
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTnd-00044v-AC
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:28:25 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43792
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjU-0001fp-2A
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:24:10 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTnZ-0007Ds-TN
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:28:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098647;
+ s=mimecast20190719; t=1593098900;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=px690KZXEVCO252pekmpFFy39zpeKmqhd0SmMuE62dc=;
- b=JUEW0OCMXoRqSRj4n/pBbpkFgJ0ZkuqTZ+17i4EKuU4FOEsWQv5ix5GY17kILfK662xWhT
- AyrBa06tVKQqpvRZHVUr2NDWmH4S514l0sOWw8/9HOqlg0iZiQzuSCjm5FiU268uCMY8go
- lGtndGsEB6gVojyQTY7hF+2yfaMhppk=
+ bh=0NJdPxpW2f+Ko8kRsxEnTVAj7SKVEYRdbw+1TWTfJww=;
+ b=YKFTDV0M8afeInxQgsCvoUwVv1i5H+usLKXRRwAHRv6J5s1apowoI7nRZL1n8bZyPKYvHt
+ f+D0o/o6WnYrJTqNHbhjidX6cwQy72/yLDA91KKdQ8cPd/EzM86wZakzJ8iQtlh6Q+Vy0E
+ MTD1yBdrnTofVTz3S7vtQIvg79rVFAY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-mcU7tWIsNjObie9vJ_9h8g-1; Thu, 25 Jun 2020 11:24:04 -0400
-X-MC-Unique: mcU7tWIsNjObie9vJ_9h8g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-481-v1FWzhAYM16QegKSlhNjVQ-1; Thu, 25 Jun 2020 11:28:18 -0400
+X-MC-Unique: v1FWzhAYM16QegKSlhNjVQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED29B804002;
- Thu, 25 Jun 2020 15:24:02 +0000 (UTC)
-Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E9FE79334;
- Thu, 25 Jun 2020 15:24:02 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v7 47/47] iotests: Test committing to overridden backing
-Date: Thu, 25 Jun 2020 17:22:15 +0200
-Message-Id: <20200625152215.941773-48-mreitz@redhat.com>
-In-Reply-To: <20200625152215.941773-1-mreitz@redhat.com>
-References: <20200625152215.941773-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89A8980401F;
+ Thu, 25 Jun 2020 15:28:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 56AAE78120;
+ Thu, 25 Jun 2020 15:28:17 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BD09D11384D4; Thu, 25 Jun 2020 17:28:15 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 01/46] error: Improve examples in error.h's big comment
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-2-armbru@redhat.com>
+ <20200625164400.5f63e74d@bahia.lan>
+Date: Thu, 25 Jun 2020 17:28:15 +0200
+In-Reply-To: <20200625164400.5f63e74d@bahia.lan> (Greg Kurz's message of "Thu, 
+ 25 Jun 2020 16:44:00 +0200")
+Message-ID: <87o8p7upv4.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -91,104 +97,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/040     | 61 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/040.out |  4 +--
- 2 files changed, 63 insertions(+), 2 deletions(-)
+Greg Kurz <groug@kaod.org> writes:
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index e7fa244738..dfd46ddcbe 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -890,6 +890,67 @@ class TestCommitWithFilters(iotests.QMPTestCase):
-         # 3 has been comitted into 2
-         self.pattern_files[3] = self.img2
- 
-+class TestCommitWithOverriddenBacking(iotests.QMPTestCase):
-+    img_base_a = os.path.join(iotests.test_dir, 'base_a.img')
-+    img_base_b = os.path.join(iotests.test_dir, 'base_b.img')
-+    img_top = os.path.join(iotests.test_dir, 'top.img')
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, self.img_base_a, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img_base_b, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-b', self.img_base_a, \
-+                 self.img_top)
-+
-+        self.vm = iotests.VM()
-+        self.vm.launch()
-+
-+        # Use base_b instead of base_a as the backing of top
-+        result = self.vm.qmp('blockdev-add', **{
-+                                'node-name': 'top',
-+                                'driver': iotests.imgfmt,
-+                                'file': {
-+                                    'driver': 'file',
-+                                    'filename': self.img_top
-+                                },
-+                                'backing': {
-+                                    'node-name': 'base',
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': self.img_base_b
-+                                    }
-+                                }
-+                            })
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(self.img_top)
-+        os.remove(self.img_base_a)
-+        os.remove(self.img_base_b)
-+
-+    def test_commit_to_a(self):
-+        # Try committing to base_a (which should fail, as top's
-+        # backing image is base_b instead)
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top',
-+                             base=self.img_base_a)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
-+    def test_commit_to_b(self):
-+        # Try committing to base_b (which should work, since that is
-+        # actually top's backing image)
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top',
-+                             base=self.img_base_b)
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.vm.event_wait('BLOCK_JOB_READY')
-+        self.vm.qmp('block-job-complete', device='commit')
-+        self.vm.event_wait('BLOCK_JOB_COMPLETED')
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'],
-                  supported_protocols=['file'])
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 4823c113d5..1bb1dc5f0e 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--...............................................................
-+.................................................................
- ----------------------------------------------------------------------
--Ran 63 tests
-+Ran 65 tests
- 
- OK
--- 
-2.26.2
+> On Wed, 24 Jun 2020 18:42:59 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> Show errp instead of &err where &err is actually unusual.  Add a
+>> missing declaration.  Add a second error pileup example.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  include/qapi/error.h | 19 +++++++++++++++----
+>>  1 file changed, 15 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/include/qapi/error.h b/include/qapi/error.h
+>> index ad5b6e896d..1a5ea25e12 100644
+>> --- a/include/qapi/error.h
+>> +++ b/include/qapi/error.h
+>> @@ -16,15 +16,15 @@
+>>   * Error reporting system loosely patterned after Glib's GError.
+>>   *
+>>   * Create an error:
+>> - *     error_setg(&err, "situation normal, all fouled up");
+>> + *     error_setg(errp, "situation normal, all fouled up");
+>>   *
+>>   * Create an error and add additional explanation:
+>> - *     error_setg(&err, "invalid quark");
+>> - *     error_append_hint(&err, "Valid quarks are up, down, strange, "
+>> + *     error_setg(errp, "invalid quark");
+>> + *     error_append_hint(errp, "Valid quarks are up, down, strange, "
+>>   *                       "charm, top, bottom.\n");
+>>   *
+>>   * Do *not* contract this to
+>> - *     error_setg(&err, "invalid quark\n"
+>> + *     error_setg(errp, "invalid quark\n" // WRONG!
+>>   *                "Valid quarks are up, down, strange, charm, top, bottom.");
+>>   *
+>>   * Report an error to the current monitor if we have one, else stderr:
+>> @@ -108,12 +108,23 @@
+>>   *     }
+>>   *
+>>   * Do *not* "optimize" this to
+>> + *     Error *err = NULL;
+>>   *     foo(arg, &err);
+>>   *     bar(arg, &err); // WRONG!
+>>   *     if (err) {
+>>   *         handle the error...
+>>   *     }
+>>   * because this may pass a non-null err to bar().
+>> + *
+>> + * Likewise, do *not*
+>> + *     Error *err = NULL;
+>> + *     if (cond1) {
+>> + *         error_setg(err, ...);
+>
+> s/err/&err
+>
+>> + *     }
+>> + *     if (cond2) {
+>> + *         error_setg(err, ...); // WRONG!
+>
+> ditto
+
+Good catch!
+
+> With that fixed:
+>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+
+Thanks!
+
+>
+>> + *     }
+>> + * because this may pass a non-null err to error_setg().
+>>   */
+>>  
+>>  #ifndef ERROR_H
 
 
