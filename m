@@ -2,93 +2,125 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FC2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE9CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5BC42076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:42:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77F15206C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:44:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LjmyiUzH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5BC42076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TA4ln7eI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F15206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joT53-0004jR-2a
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54062)
+	id 1joT6f-00068K-QJ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54730)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joT4H-0004HT-Dd
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:41:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24892
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1joT4F-0003nQ-EP
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:41:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593096089;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xyiCndXQ4xUfCSI66t9OM/wHwBbqrpKuJsmtNIW0WPs=;
- b=LjmyiUzHmKQFp2YCa1IbhZmj5FcDrVKGxJAoZt6mKlPGORfRypfPfIeC7qxQKolqI4lRMl
- M4Kn3OI6KRP5P77mGCEcHgwzTGJ56oRx9oDvp9poTsIeQ1IkSup/rMQtJk01U6nHJAomPV
- NHei9Gxv4+++gsyVKeMjuzdRgcj1JJ4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-ca_VDb40N2-UrO2xvh2fHg-1; Thu, 25 Jun 2020 10:41:21 -0400
-X-MC-Unique: ca_VDb40N2-UrO2xvh2fHg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88274A0BF6;
- Thu, 25 Jun 2020 14:41:11 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D8FB95DAA0;
- Thu, 25 Jun 2020 14:41:10 +0000 (UTC)
-Subject: Re: [PATCH 07/46] error: Avoid more error_propagate() when error is
- not used here
-To: Markus Armbruster <armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1joT63-0005Ya-PE; Thu, 25 Jun 2020 10:43:23 -0400
+Received: from mail-eopbgr40139.outbound.protection.outlook.com
+ ([40.107.4.139]:10138 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1joT5z-0004h0-Jo; Thu, 25 Jun 2020 10:43:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jvG1APk1pU0JJGSlsHZLWpX/ehBf5DMKtvRvPZJYWIOgkBYzNw8trFaXdXbVf+ddPiBVvcJb/yQDXwwwg6sExLAPlavfG1kwizkIv7SGBKByPNMEB4yl7Kj9FbuO+xmfxARTGZVat2lKwJKsI8ZxLJ6PWuCLM8UY7qSfv8DG/03PcM4qQ2oGh0dkWDkpQVrSPf12vyL+2suQARpOpCvyTpvHlAbRKtP17+bmw59gxVFYX5UlWQ6c/Qxh5vR+jjVEmoLX9nbXY6deMYHZmzHadVztedbopEIpWZBVgdLvTBp9m3/6GbZTal4+DGtXilbXsTZHflRvqlxJnFaxTOpKUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MtCqeSNYejp64HGw0Wwd/QBBH6y8yV+UXajruXOMRis=;
+ b=Hc10qK/gBR7a/G7CUHNN9bHguBi+9iSwJfW3X8E+OSgwXbTzY5PVzmE0aCo/mQpdlUS0xO9G3MV5OXeCCA/IihMHUyY3iwY/73rtG30ccOaLpwShGfeiIqvLIcqSA6OU87W0NGscZmD5/yarROhxF5M6Pz79595D1rq50keU2WnYZ0JQ3odPh0zW1MOrW/Iu/+AoxBCPtktKLT7d8FCRoyz8earm129Nir4JeIRaicxTsBo198k9YD2NZqsHGYWkUq4k6pPBnGqvF/RcbbTBfcluP73MRW7JFd8SJPFVET2doDaeSuVH8HqF7OIfwRgbZDh4CQTXZR9CSrAJ0ahgsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MtCqeSNYejp64HGw0Wwd/QBBH6y8yV+UXajruXOMRis=;
+ b=TA4ln7eIeYhyC5e4ee4K+QDBMzEhqa3Of7sbEPOfXwloFUbvMl8gKRsqFsY9ZTasfXFjgy3KmOgYKZw2nKfDSey6ZV38hNMxhzOgQ30hdhrc3VVm9I3P8MlkpLwgw46NkXd1YgeVFG9PpN/O3Umgz7Qx581MAvCzcEVQMnZ18uo=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB5080.eurprd08.prod.outlook.com (2603:10a6:20b:e2::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.23; Thu, 25 Jun
+ 2020 14:43:16 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.020; Thu, 25 Jun 2020
+ 14:43:16 +0000
+Subject: Re: [PATCH 01/46] error: Improve examples in error.h's big comment
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-8-armbru@redhat.com>
- <88bc4c25-4a47-4c28-4b96-b7ea6c14173d@redhat.com>
- <87h7uz1f8d.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <3370c2f8-3579-7900-3f7b-f1e0930d1c0f@redhat.com>
-Date: Thu, 25 Jun 2020 09:41:10 -0500
+ <20200624164344.3778251-2-armbru@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <a15bdf92-220c-6f5f-0540-3967f84e2d9c@virtuozzo.com>
+Date: Thu, 25 Jun 2020 17:43:13 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <87h7uz1f8d.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200624164344.3778251-2-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-ClientProxiedBy: AM0PR02CA0101.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::42) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.69) by
+ AM0PR02CA0101.eurprd02.prod.outlook.com (2603:10a6:208:154::42) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21 via Frontend
+ Transport; Thu, 25 Jun 2020 14:43:15 +0000
+X-Originating-IP: [185.215.60.69]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: def92bf0-3952-4ea2-d1be-08d81916184a
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5080:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5080D5B05B4D789ECD993D5BC1920@AM6PR08MB5080.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:324;
+X-Forefront-PRVS: 0445A82F82
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Vy/UtN7N/libHbMjxhIPl5XUhbVRp1+epdFAU1LPIRA/6XOr1hMEOUlQbCyxEmq8ftzBhxHvjJvEQgFxW5UQ7p8jqodFVn4XJLYfWB5MaK5cvOo4I+9I5pHM5E0HSrhFpXPh/pGUK/jkN7P2+2CiAMlh8jq7v3B7sQEo2V2jN74xAIciaVSYWeZwR4XjeMUyZOCU/HSD61lEg+u47pbpSh/gHez/B8B+LbNC5zkvR23+ClqoJ+gp4XsEE6hWtEcmrj/ywa845v8yoTGcd4HR6BvRM9m9T99yOTaN/LDo7MSIwKja4UFZgVOTnfuhIHPjVMIvEJzWP3sP8TnDSvfISw9UFEnTYD/HMkhP87twhUP2DV0ClIN7YwMLpBDAyhoG
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(39840400004)(396003)(136003)(346002)(5660300002)(6486002)(956004)(2616005)(31686004)(66946007)(66476007)(66556008)(4326008)(36756003)(26005)(186003)(16526019)(83380400001)(4744005)(52116002)(16576012)(8936002)(478600001)(8676002)(2906002)(316002)(86362001)(31696002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: bAnf+CizRhXwd0iQWgNGhbTpcRDq9ZzV1zpn2/YMcHQsMkyEnM2zpPySvv+cLcsSGxoLYi7SKxB0zkCPwLvn+1GVeCRCKPkVsOsP9QtpXsc7BYXn3gpj9g+7duOIHLAxAPEf1dm/UgnP6yrHoseMNlvwjlUEcJrU6sjZ1m/CpONI4Nx2QLUz19Gsh9rWkgg/OSbvpSouUmM3f5v8m8CXMZRXBdK0RiPCo/MjLN3htv+yZXpYePcgVMrgiQPwJN9K5Ynl8OeT+Pd6nRSMqNyEFRtHmgFzP40muQh8srfj8uyqpjOFbBYNLxr/LbKX5TUteLKDsjIth4saRflJ64o8ryAKbCJweAgONCioUgKz3Ldyaqc5U2q8Gg1br0H2kc6cathib6KNE5VrpR+P/X+suyBBAJFJkUqVCUuGTCUBawOQgOFBhNqJ263/SYlfIJKbvxRlhbQerX8Umgyt/gmGgBmdZfShJBSuDzY/fin5BI4=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: def92bf0-3952-4ea2-d1be-08d81916184a
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2020 14:43:16.1213 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PnjQqlZnMk3CAwI2DCZmDMHF2Fw/TnLGPHNRlbZjOjz6T9rkLIYjyYwjN4vPZ98fK9TEOwVivgK6K7aTz9Tca70gC/JJMXgxTLvaZDsta2g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5080
+Received-SPF: pass client-ip=40.107.4.139;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:43:17
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,43 +133,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 7:50 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+24.06.2020 19:42, Markus Armbruster wrote:
+> Show errp instead of &err where &err is actually unusual.  Add a
+> missing declaration.  Add a second error pileup example.
 > 
->> On 6/24/20 11:43 AM, Markus Armbruster wrote:
->>> When all we do with an Error we receive into a local variable is
->>> propagating to somewhere else, we can just as well receive it there
->>> right away.  The previous commit did that for simple cases with
->>> Coccinelle.  Do it for a few more manually.
->>>
+> Signed-off-by: Markus Armbruster<armbru@redhat.com>
 
->>>          if (!bus && qdev_hotplug &&
->>> !qdev_get_machine_hotplug_handler(dev)) {
->>>            /* No bus, no machine hotplug handler --> device is not hotpluggable */
->>> -        error_setg(&err, "Device '%s' can not be hotplugged on this machine",
->>> +        error_setg(errp, "Device '%s' can not be hotplugged on this machine",
->>
->> Should we s/can not/cannot/ while touching this?
-> 
-> The longer and the more mechanical the patch, the less willing I am to
-> include "while we're there" improvements.  This one may still be okay.
-> But you pointed out a few more error message improvements in later
-> reviews.  Perhaps collecting them all into an omnibus error message
-> patch would be better.
-
-Yes, collecting a single followup patch for grammar/spelling fixes found 
-throughout the series is a good idea.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Best regards,
+Vladimir
 
