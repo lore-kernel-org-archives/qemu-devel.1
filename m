@@ -6,71 +6,70 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0104EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF528C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:17:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D7A20767
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8813C20781
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:17:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFJL8wXL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D7A20767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjlbazS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8813C20781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTbN-0005CV-VK
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:15:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34708)
+	id 1joTck-0007NE-Q2
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:17:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTaH-0004CC-HF
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:14:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53366
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTbK-0005gP-TJ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:15:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50826
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTaG-0005cR-1J
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:14:37 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTbF-0006BG-D7
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:15:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098075;
+ s=mimecast20190719; t=1593098136;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=z6icmUe1KBT8zposWNXrOeX+CYD6iN3C9FXOdae4sbs=;
- b=jFJL8wXLhliFwg9bnoTQZDxHQCBCVOXJKXh8vn3vpxKsZiYhJi4d3xOu8dMxKZzwA9WnwX
- 2BLdriSf7VmYrQaneBDrYxgS+fPxY7/nG8XiEEsf5wSDk0bdSQhju4Pw96vD2B5YYaXIh6
- /1Cire4xJ0KIN67Xa7efgRV/sLEmvwM=
+ bh=8nQxovoW5z7Jti6zAjFOYXXJVqpr7PqjHpy/Y+f6HzM=;
+ b=FjlbazS4iCN0lmUMrg8TmTj68LrU8iSfG+AYfr2A3cZeHrz44RX7nRSxZuz2HoUE1brwQJ
+ Kt56mxDOh3yLOgUFUW71uC+ycKZ0zlppIhLbO7WkSz5Af+E2rQ5cS6OF/saU2LiQgTH5zX
+ 8Nt9eX32a5MM8aQUJUX8HiKpD3zYVrQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-ULvQnrnfNrCJCsCdxd3D2w-1; Thu, 25 Jun 2020 11:14:31 -0400
-X-MC-Unique: ULvQnrnfNrCJCsCdxd3D2w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-255-jp4gi2EDNYKREob2_jS3mA-1; Thu, 25 Jun 2020 11:15:34 -0400
+X-MC-Unique: jp4gi2EDNYKREob2_jS3mA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42AF564ADA;
- Thu, 25 Jun 2020 15:14:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEC0919200C5;
+ Thu, 25 Jun 2020 15:15:33 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B04360BE1;
- Thu, 25 Jun 2020 15:14:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CF315C661;
+ Thu, 25 Jun 2020 15:15:33 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9050A11384D4; Thu, 25 Jun 2020 17:14:28 +0200 (CEST)
+ id D31E911384D4; Thu, 25 Jun 2020 17:15:29 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 37/46] qom: Make functions taking Error ** return bool,
- not void
+Subject: Re: [PATCH 43/46] qdev: Smooth error checking manually
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-38-armbru@redhat.com>
- <8d687a39-29f6-e5a5-6da5-cef9cbdaed6d@redhat.com>
-Date: Thu, 25 Jun 2020 17:14:28 +0200
-In-Reply-To: <8d687a39-29f6-e5a5-6da5-cef9cbdaed6d@redhat.com> (Eric Blake's
- message of "Wed, 24 Jun 2020 16:32:46 -0500")
-Message-ID: <874kqzxjmz.fsf@dusky.pond.sub.org>
+ <20200624164344.3778251-44-armbru@redhat.com>
+ <aba1dbee-8183-9907-8e9c-08dd4dbad4b4@redhat.com>
+Date: Thu, 25 Jun 2020 17:15:29 +0200
+In-Reply-To: <aba1dbee-8183-9907-8e9c-08dd4dbad4b4@redhat.com> (Eric Blake's
+ message of "Wed, 24 Jun 2020 16:42:57 -0500")
+Message-ID: <87zh8rw50u.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
@@ -98,7 +97,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
  pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -107,25 +107,38 @@ Sender: "Qemu-devel"
 Eric Blake <eblake@redhat.com> writes:
 
 > On 6/24/20 11:43 AM, Markus Armbruster wrote:
->> See recent commit "error: Document Error API usage rules" for
->> rationale.
+>> When foo(..., &err) is followed by error_propagate(errp, err), we can
+>> often just as well do foo(..., errp).  The previous commit did that
+>> for simple cases with Coccinelle.  Do it for one more manually.
 >>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
+>>   hw/block/fdc.c | 8 +++-----
+>>   1 file changed, 3 insertions(+), 5 deletions(-)
+>>
 >
->> @@ -524,25 +527,29 @@ void object_initialize(void *data, size_t size, const char *typename)
->>       object_initialize_with_type(data, size, type);
->>   }
->>   -void object_initialize_child_with_props(Object *parentobj,
->> +bool object_initialize_child_with_props(Object *parentobj,
->>                                const char *propname,
->>                                void *childobj, size_t size, const char *type,
->>                                Error **errp, ...)
+>> @@ -2566,11 +2566,9 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
+>>           blk_ref(blk);
+>>           blk_detach_dev(blk, fdc_dev);
+>>           fdctrl->qdev_for_drives[i].blk = NULL;
+>> -        qdev_prop_set_drive_err(dev, "drive", blk, &local_err);
+>> +        ok = qdev_prop_set_drive_err(dev, "drive", blk, errp);
+>>           blk_unref(blk);
 >
-> Is it worth tweaking indentation while here?
+> Perhaps some glib g_auto* magic could make this even easier (to mark a
+> variable to be blk_unref'd when it goes out of scope).  But for now,
+> your pattern is fine.
 
-Can do.
+It's PATCH 43, my hatchet needs sharpening, and my arm hurts ;)
 
+>> -
+>> -        if (local_err) {
+>> -            error_propagate(errp, local_err);
+>> +        if (!ok) {
+>>               return;
+>>           }
+>>   
+>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
 Thanks!
