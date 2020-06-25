@@ -2,88 +2,86 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D09DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC3AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D057F2076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D9D52076E
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rvaQT5kg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D057F2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hArdeGkl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9D52076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joPUP-0004R8-4g
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:52:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43174)
+	id 1joPYn-0005p9-Jp
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1joPTo-00041G-Ry
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:51:40 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:56698 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1joPTm-0000tN-Po
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:51:40 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id B191D4C8B4;
- Thu, 25 Jun 2020 10:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1593082294;
- x=1594896695; bh=YIHFpX7Wl/PNFlBMRH9m9ishLL0UcTxqOzHrnzEjPK8=; b=
- rvaQT5kgjtiNVafLmH+LjvEXUBMraL+I4PlXwo5+rl+DS+Sx5PK2NDmW1LYF8wx7
- 7bz/3vf8S7GZfJ6ZREM0oRi23gREs863i2sUpT4nUacujxamsiIVipbkDe+rSk/A
- 7wG8oC9lt73lyXLCwdv28yr4GOyscJ6hqcBeaFvs1kI=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K8vOuYDqZ1CR; Thu, 25 Jun 2020 13:51:34 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 0E90541287;
- Thu, 25 Jun 2020 13:51:34 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 25
- Jun 2020 13:51:34 +0300
-Date: Thu, 25 Jun 2020 13:51:33 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [PATCH 4/8] i386: hvf: Implement CPU kick
-Message-ID: <20200625105133.GF25104@SPB-NB-133.local>
-References: <20200624225850.16982-1-r.bolshakov@yadro.com>
- <20200624225850.16982-5-r.bolshakov@yadro.com>
- <77df3139-501d-d4b9-c651-35de66474d57@suse.de>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joPXs-0005Fv-C9
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:55:52 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33448)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joPXq-00045K-PM
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:55:52 -0400
+Received: by mail-ot1-x344.google.com with SMTP id n6so4864600otl.0
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 03:55:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Q2M7GQPC2tQspLAFffQmoNlxDsOGbT5YJ7CLVCmMh0U=;
+ b=hArdeGkloosVFvDlJRUPV5UQd1ms12Z1Z/HFYM5jFJt54Nvzmgu+0rMCKUmFyqSlX0
+ zqYPmZyewUrWyBjBXvike4u1bjenov3xWbMckyGB6OHjRaAZw6tra+U1Zixu1yB7l6Ek
+ NA/sqKdUpKoQSBHfYCKejigNFwWAjs0QfQmMsbNW8uuNwQLoIVMDEQz9iiZulFhPVHxq
+ bhlNcp1Z5X/qOGLUGrmD3GyWzwe+io9+b94ZQAII3PWvq2g4jQAoIINQk0WH1eHLhYN7
+ qWdHKAt/LvH3WXSaqfGd3rfab/ZM5FTTufK1sm4IZCr2LBV3db55lzWeq3W76/7fbkIq
+ xS6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Q2M7GQPC2tQspLAFffQmoNlxDsOGbT5YJ7CLVCmMh0U=;
+ b=qumy4dV7y8q/B/6O4N1Y62sCSu23wDAXw9kSXbkRG2sB/FmAFdpHVawv8+4uXfhPjH
+ bxPTdZq8HEt8vJOMOBxMZYpuCY07mQATNpLvjqOSTZnAdlOcnYDnOSNza6WBNpbCgkKj
+ 5gFulNJxybYUMv+Dn9hYJi0LGlpFZ63lp/bFCvfHyJ3fJ26d9jwhzZOtDagBaa5+sVjg
+ KJQdo0XsY6UbsEOFlROeBMmhEsJ47A/QsdF2SORrzPEGdBduKShj9w9MOFUVCn9rzi4G
+ GfGgs+S7GU+a1iQ6CNXMhBEBoAumQ7q1Vhg8SVHH8AlsETJc2WCSvce7+C1YVYbwL0Vs
+ NFuw==
+X-Gm-Message-State: AOAM531jEyKIe9wdWfmSvTTNjgtCgYFOH4ZBqBHo0QfLtgMNw8NwwebH
+ f8PmXoEn/hqojVLr0c46Mh8yRLVuGykf5cTCx6/YSg==
+X-Google-Smtp-Source: ABdhPJybLWf/akeHNMwA9GV3iKSwZp1qa4nW0/AgFOwDhnsSM3Ormqawu+qj/hhmK8fJSapuOtDirwphvP2XRsz8H6M=
+X-Received: by 2002:a05:6830:8d:: with SMTP id
+ a13mr26091000oto.91.1593082549370; 
+ Thu, 25 Jun 2020 03:55:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <77df3139-501d-d4b9-c651-35de66474d57@suse.de>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 06:51:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
+ <20200623193658.623279-26-richard.henderson@linaro.org>
+In-Reply-To: <20200623193658.623279-26-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 11:55:38 +0100
+Message-ID: <CAFEAcA_Hp2MfmTJY0qVZHVGkppzCaD_ZF8TvCMDVJn_XLYQ-+Q@mail.gmail.com>
+Subject: Re: [PATCH v8 25/45] target/arm: Implement helper_mte_check1
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,87 +94,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: david.spickett@linaro.org, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 09:07:04AM +0200, Claudio Fontana wrote:
-> Hi Roman,
-> 
-> On 6/25/20 12:58 AM, Roman Bolshakov wrote:
-> > HVF doesn't have a CPU kick and without it it's not possible to perform
-> > an action on CPU thread until a VMEXIT happens. The kick is also needed
-> > for timely interrupt delivery.
-> > 
-> > Existing implementation of CPU kick sends SIG_IPI (aka SIGUSR1) to vCPU
-> > thread, but it's different from what hv_vcpu_interrupt does. The latter
-> > one results in invocation of mp_cpus_kick() in XNU kernel [1].
-> > 
-> > While at it, correct type of hvf_fd to the type of hv_vcpuid_t to avoid
-> > compilation warnings.
-> > 
-> > 1. https://opensource.apple.com/source/xnu/xnu-6153.81.5/osfmk/i386/mp.c
-> > 
-> > Cc: Cameron Esfahani <dirty@apple.com>
-> > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> > ---
-> >  cpus.c                | 13 +++++++++----
-> >  include/hw/core/cpu.h |  2 +-
-> >  include/sysemu/hvf.h  |  1 +
-> >  target/i386/hvf/hvf.c | 11 +++++++++++
-> >  4 files changed, 22 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/cpus.c b/cpus.c
-> > index 26709677d3..36f38ce5c8 100644
-> > --- a/cpus.c
-> > +++ b/cpus.c
-> > @@ -1783,10 +1783,15 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
-> >          return;
-> >      }
-> >      cpu->thread_kicked = true;
-> > -    err = pthread_kill(cpu->thread->thread, SIG_IPI);
-> > -    if (err && err != ESRCH) {
-> > -        fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
-> > -        exit(1);
-> > +
-> > +    if (hvf_enabled()) {
-> > +        hvf_vcpu_kick(cpu);
-> 
-> could this be moved to qemu_cpu_kick, where we have already the ifs for accelerator types tcg and hax?
-> 
+On Tue, 23 Jun 2020 at 20:37, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Fill out the stub that was added earlier.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v8: Remove ra argument to mte_probe1 (pmm).
+> ---
+>  target/arm/internals.h  |  48 +++++++++++++++
+>  target/arm/mte_helper.c | 132 +++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 179 insertions(+), 1 deletion(-)
 
-Hi Claudio,
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-I did this because of cpu->thread_kicked which is not set or tested in
-qemu_cpu_kick(). It's not used for tcg and mttcg but hax does seem to
-use the qemu_cpu_kick_thread() and additionally sets cpu->exit_request
-in qemu_cpu_kick(). There's a difference between hax/kvm and hvf, they
-use different ways of siginalling the kick. hax/kvm use POSIX signals
-while HVF sends an IPI from the host LAPIC to deliver the kick. The
-patch highlights the difference.
-
-As far as I understand if thread_kicked is set, multiple cpu kicks are
-coalesced until thread_kicked is cleared. So, the answer to your
-question: It could be moved to qemu_cpu_kick but then kick debouncing
-should be duplicated inside hvf_vcpu_kick().
-
-Regards,
-Roman
-
-> Not terribly important if then my cpus-refactoring goes forward, but on its own that should be the proper place for if (hvf_enabled()) I think.
-> 
-> 
-> 
-> > +    } else {
-> > +        err = pthread_kill(cpu->thread->thread, SIG_IPI);
-> > +        if (err && err != ESRCH) {
-> > +            fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
-> > +            exit(1);
-> > +        }
-> >      }
-> >  #else /* _WIN32 */
-> >      if (!qemu_cpu_is_self(cpu)) {
+thanks
+-- PMM
 
