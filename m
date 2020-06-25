@@ -2,86 +2,69 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A6AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 03:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F60C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 03:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB28E20706
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 03:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88E8920709
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 03:53:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HLzehYXP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB28E20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eMuEFYAm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E8920709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joIRE-0001cP-8g
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 23:20:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37002)
+	id 1joIwl-0006kL-PA
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 23:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1joIQd-00018J-58
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 23:19:55 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:34813)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1joIQb-0001r3-6O
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 23:19:54 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id a80so2052357ybg.1
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 20:19:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=P/0wT5AVlfJU51+aOXmXuOFRQiK5GOEuvWtw0JpdSQw=;
- b=HLzehYXPr5Tyja0osk+SAA7sNvb+Fab+4kapFvH+KvWSEWJ5IGg6C32MSsPtS4lK1Z
- uGqttIPjgSVUZvOkrpuSB32efRB83q1Z5Dew/wxxREWuwJ+lauvG4LmgB3eZKk6MsdUw
- bEL4IU0r1uDnDHLT+SJmA0E/Fp3mMUuAEAaLM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=P/0wT5AVlfJU51+aOXmXuOFRQiK5GOEuvWtw0JpdSQw=;
- b=VZeCS163Cqyrhi5zgvNKWa7JCzJ8KfXYo2NeC6faNsP/22Lt4y/p+HJugbEYfkpXcQ
- rq/A+tVjiwlZBXjOkX1fX4h/hxv8Ldmt3skPeYQkEbvJTaBsqnvmytAkLzAk+IzDbyAu
- ZENkAzAlVCefOOji90srC3REm80e9Y/E52gOpeGrC9rWiDOHLWQr282U+gwXMcYISU1E
- lnGh7g2BBmzT1XWD4adsNtjqaVyNzeV2dExlzG827u9tar3pMStL/095xas1x5eqZri2
- toX2OvIR6Xa+jDlyjf+++wUrY3cQhbooklJJLnnSF1O6//ajD8OI/ChsKFUiRo3/JXlU
- lKYw==
-X-Gm-Message-State: AOAM533q13J5Z2ZJ794leubpMdyTaywnRenzSvABM1N1WaqGiyNP1931
- D9/Mva5fpCj9Y9phqVZZkaxf7KPqQuuXUs7Vz9+Gdg==
-X-Google-Smtp-Source: ABdhPJxOI2fK9y/k2WkcPq882SYyIsC2sJOLvkYjbPix6M6XdiWsN8n1J/jIsJVcum82+cSgYTjPTMdR1UYrDogyUmw=
-X-Received: by 2002:a25:b8c:: with SMTP id 134mr52632321ybl.428.1593055190376; 
- Wed, 24 Jun 2020 20:19:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1joIwA-0006E4-M6; Wed, 24 Jun 2020 23:52:31 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57851 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1joIw7-0003dV-H5; Wed, 24 Jun 2020 23:52:30 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49smLD6xcFz9sSt; Thu, 25 Jun 2020 13:52:20 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1593057140;
+ bh=M/qDfRI8OQqzYJWCn/1VR1SPOvZkiiY5fPPgtoyCWo8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=eMuEFYAmvg3X4/tqdFCPapgmNgyfTFa37aLR4+DHrMX1OYIRArq+hEOUIeYRR5k7N
+ XF9XWIbGIRaMaHzJyeT7zyBAclZLR/FtxVeF4XTbQjJTRbucPIun5N2gUFvvh2j8A8
+ niKNL5X7DbQRrpuX47ID04BZQJQCJuB5y/tQBCOg=
+Date: Thu, 25 Jun 2020 13:52:15 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 07/25] spapr: Plug minor memory leak in
+ spapr_machine_init()
+Message-ID: <20200625035215.GE69292@umbus.fritz.box>
+References: <20200624083737.3086768-1-armbru@redhat.com>
+ <20200624083737.3086768-8-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com>
- <20200618191655.GI2769@work-vm> <20200618192717.GE3814@redhat.com>
- <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
- <20200619191540.GI3154@redhat.com>
-In-Reply-To: <20200619191540.GI3154@redhat.com>
-From: Chirantan Ekbote <chirantan@chromium.org>
-Date: Thu, 25 Jun 2020 12:19:39 +0900
-Message-ID: <CAJFHJroGNbfO-tXqrod_snCHcnN4NKjX8t9LTeroyiNEwjtVcQ@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-To: Vivek Goyal <vgoyal@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
- envelope-from=chirantan@google.com; helo=mail-yb1-xb42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -94
-X-Spam_score: -9.5
-X-Spam_bar: ---------
-X-Spam_report: (-9.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Uwl7UQhJk99r8jnw"
+Content-Disposition: inline
+In-Reply-To: <20200624083737.3086768-8-armbru@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 22:09:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,62 +77,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: David Gibson <dgibson@redhat.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 20, 2020 at 4:15 AM Vivek Goyal <vgoyal@redhat.com> wrote:
->
-> On Fri, Jun 19, 2020 at 01:46:20PM +0900, Chirantan Ekbote wrote:
-> > On Fri, Jun 19, 2020 at 4:27 AM Vivek Goyal <vgoyal@redhat.com> wrote:
-> > >
-> > > On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Vivek Goyal (vgoyal@redhat.com) wrote:
-> > > > > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
-> > > > > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
-> > > > > > whitelisted set of capabilities that we require.  This improves security in
-> > > > > > case virtiofsd is compromised by making it hard for an attacker to gain further
-> > > > > > access to the system.
-> > > > >
-> > > > > Hi Stefan,
-> > > > >
-> > > > > I just noticed that this patch set breaks overlayfs on top of virtiofs.
-> > > > >
-> > > > > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
-> > > > > need CAP_SYS_ADMIN.
-> > > > >
-> >
-> > Not just that but it needs CAP_SYS_ADMIN in the init namespace[1].  We
-> > have the same problem.  Our virtiofs process has CAP_SYS_ADMIN in a
-> > user namespace and it cannot set any trusted or security xattrs.  The
-> > security xattrs check is at least namespace aware so you only need
-> > CAP_SYS_ADMIN in the namespace that mounted the fs but that doesn't
-> > help us much.
-> >
-> > We ended up working around it by prefixing "user.virtiofs." to the
-> > xattr name[2], which has its own problems but there was pretty much no
-> > chance that we would be able to give the fs device CAP_SYS_ADMIN in
-> > the init namespace.
->
-> Chirantan,
->
-> So you ended up renaming all "trusted", "security" and "system" xattrs?
-> Only "user" xattrs are complete passthrough?
->
 
-No, we only rename "security" xattrs (except for selinux).
+--Uwl7UQhJk99r8jnw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> IOW, security.selinux will be renamed to user.virtiofs.security.selinux
-> on host?
->
+On Wed, Jun 24, 2020 at 10:37:19AM +0200, Markus Armbruster wrote:
+> spapr_machine_init() leaks an Error object when
+> kvmppc_check_papr_resize_hpt() fails and spapr->resize_hpt is
+> SPAPR_RESIZE_HPT_DISABLED, i.e. when the host doesn't support hash
+> page table resizing, and the user didn't ask for it.  As harmless as
+> memory leaks can possibly be.  Plug it.
+>=20
+> Fixes: 30f4b05bd090564181554d0890605eb2c143e4ea
+> Cc: David Gibson <dgibson@redhat.com>
+> Cc: qemu-ppc@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-We don't relabel security.selinux because it only requires CAP_FOWNER
-in the process's user namespace and it also does its own MAC-based
-checks.  Also we have some tools that label files beforehand so it
-seemed easier to leave them unchanged.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Chirantan
+> ---
+>  hw/ppc/spapr.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index bd9345cdac..9bd2183ead 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2731,6 +2731,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+>          error_report_err(resize_hpt_err);
+>          exit(1);
+>      }
+> +    error_free(resize_hpt_err);
+> =20
+>      spapr->rma_size =3D spapr_rma_size(spapr, &error_fatal);
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Uwl7UQhJk99r8jnw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70H20ACgkQbDjKyiDZ
+s5IJjBAAxa/djQbmQ+EhGAJ2gA4ijYwS677gPt4vfiSEN0M7IsD5Y/SLGI6r/vqk
+92iZlgL8JIfSf+E25s+J6Jh8zruXPXvecowPq1DLUV3a9VwpxxaFvoGwmcPZ3fdW
+KdFqMByr4Sd4vrU4EsCbWru1kD5Iy6R7bcMrVTQ7a10idoPkaN22EEpETBr/r54j
+A+6hADQEukAfv0Ti2uBvoPDNNUyI9QJ3cVPho1bHKOF1z5+pLmW8xtNcKM+ooPnk
+edt31O+uf8fYZg1W8Du8V8Nym2qLyKTzfocvTmJPXKG03xsOcfo1f2npraaZ2dNY
+TrMMAFTHZb1tV8AJWPXFYqQgpL9Nw3JTkFnDPJQjQX5clnVHK/8Ytvn13kg9scae
+v+j+rA7005xrbJJQNlU1ZPR/LH2YB/AtD8cQgCmfsbAGBNgitWqiEJ7LAStu6tvf
+2mIYRjDzwQF3Op6/jUWYZ32IOAh6QgQGEiUlJG8Ihxa2+G1X/TRPf5gEAUsw18mW
+RCuVtgVmGVzK/wQlD7Eb1/uZ4WEnpM+27XtjZlVz1KIjq3J9dz8oq1J2FFDLZls8
+zDMUwQ9f/V7ac95vRG3odS37N6Mk3kVYnPlxkOVw9xQ1vDwqNbMTDmTzb6JxCewY
+4dYqpiSFABol2DpRGqtmbnPVPSb7dvK0W/8aIhDdhI0JVugDIoM=
+=Nga8
+-----END PGP SIGNATURE-----
+
+--Uwl7UQhJk99r8jnw--
 
