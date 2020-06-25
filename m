@@ -2,79 +2,76 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2417FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50797C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF35320675
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BD6120767
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPshYVGD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF35320675
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqCmDqki"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD6120767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUls-0003fj-5a
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57300)
+	id 1joUnM-0005II-6P
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUky-0002dT-2t
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35230
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1joUkx-0002by-6Q
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26702
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUkw-0002TK-Hv
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:43 -0400
+ id 1joUkv-0002T4-Ok
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593102581;
+ s=mimecast20190719; t=1593102580;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T6DlQfx4ERDr8imxa0nlFWolD5gVXxlxA3CSYrP+pEw=;
- b=SPshYVGD0lK3P1OPwIPo2ijZZr+GVUnde+YZutw9zW8SZnKlrOUmmiJpIAQNoW3J+nbPyZ
- 3jvhGs88IvjjElQy8ic0g8rES2SgQKxosFLnpCO/nKKmROb0H/Z8Pk1XkiBsdD/N5idxYP
- gzEf44UP91XBWc7N9jI9z2aWUjw773E=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=sOtQM5TJzb7VVqS1nI//99VGQmQoX1T8jzpfYyOfcjw=;
+ b=HqCmDqkidVgY0v5UFcQAzD7OEtavkHhfg5bgo5s0lPjnEqOiqZglN1FRVwPNQEKGLBSxLs
+ Hp7c/dB+CbKXawkt3FYbEQL47nleknk52d0rC9k9pCTBEVivWzFd4xrZ1i20RzQvKEBTSX
+ IuMQ6ef0rOfW1e1xjhuEljjLzP9M7Xg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-dedZBiT3OQa9MUuDXW83PQ-1; Thu, 25 Jun 2020 12:29:40 -0400
-X-MC-Unique: dedZBiT3OQa9MUuDXW83PQ-1
+ us-mta-360-NxIRuMs2Or-lWkA9ANxVow-1; Thu, 25 Jun 2020 12:29:38 -0400
+X-MC-Unique: NxIRuMs2Or-lWkA9ANxVow-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E189464
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:29:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3DAEEC1A3
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:29:37 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-254.ams2.redhat.com
  [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6003DA09BF;
- Thu, 25 Jun 2020 16:29:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 979761C8;
+ Thu, 25 Jun 2020 16:29:31 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, virtio-fs@redhat.com, stefanha@redhat.com,
  vgoyal@redhat.com
-Subject: [PATCH 1/3] virtiofsd: Terminate capability list
-Date: Thu, 25 Jun 2020 17:29:27 +0100
-Message-Id: <20200625162929.46672-2-dgilbert@redhat.com>
-In-Reply-To: <20200625162929.46672-1-dgilbert@redhat.com>
-References: <20200625162929.46672-1-dgilbert@redhat.com>
+Subject: [PATCH 0/3] virtiofsd capability changes and addition
+Date: Thu, 25 Jun 2020 17:29:26 +0100
+Message-Id: <20200625162929.46672-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -102,35 +99,28 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-capng_updatev is a varargs function that needs a -1 to terminate it,
-but it was missing.
+Hi,
+  This is a set of changes relating to the capability restirctions
+introduced in virtiofsd back in a59feb483b8.
 
-In practice what seems to have been happening is that it's added the
-capabilities we asked for, then runs into junk on the stack, so if
-we're unlucky it might be adding some more, but in reality it's
-failing - but after adding the capabilities we asked for.
+The first one is a potentially important fix; the missing terminator
+could mean extra capabilities are added based on junk on the stack;
+although that's not been seen in practice.
 
-Fixes: a59feb483b8 ("virtiofsd: only retain file system capabilities")
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tools/virtiofsd/passthrough_ll.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 2ce7c96085..e373e3b36e 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2598,7 +2598,9 @@ static void setup_capabilities(void)
-             CAP_SETGID,
-             CAP_SETUID,
-             CAP_MKNOD,
--            CAP_SETFCAP);
-+            CAP_SETFCAP,
-+            -1);
-+
-     capng_apply(CAPNG_SELECT_BOTH);
- 
-     cap.saved = capng_save_state();
+
+
+Dr. David Alan Gilbert (3):
+  virtiofsd: Terminate capability list
+  virtiofsd: Check capability calls
+  virtiofsd: Allow addition or removal of capabilities
+
+ docs/tools/virtiofsd.rst         |  5 +++
+ tools/virtiofsd/helper.c         |  2 +
+ tools/virtiofsd/passthrough_ll.c | 68 +++++++++++++++++++++++++++++---
+ 3 files changed, 70 insertions(+), 5 deletions(-)
+
 -- 
 2.26.2
 
