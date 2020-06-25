@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A65C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D3AF208C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB51D2089D
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:53:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoUds5Hg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3AF208C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CUaRXi+5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB51D2089D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUB9-0007e4-Dk
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:52:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37692)
+	id 1joUBf-00005i-5c
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:53:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTit-0006Iy-0s
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39144
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjX-0007F0-Bk
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:24:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42211
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTio-0001Gk-4x
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:30 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjT-0001dh-41
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:24:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098603;
+ s=mimecast20190719; t=1593098645;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lQUia8OoMgalBsALIOPf4VeyZUKjuCFth09x2HxRiII=;
- b=XoUds5HgMKdV99GlGMkdtT/XZyKUCagjdKwXWE+xX0Y8M34mr1u5/aR2urt/TCHh1nD4Bl
- xLpg3K1/COH2fthFphxtLUFDfYDuIdP31JA9AsOn17CR6ruwmUy5Av+PFr3fpwcV6579mY
- UWOPqdkN5tB4PhYVvX5chd9p518VxGQ=
+ bh=gOsCU0ZB3WqmX998CoRcC04iyDuhkn2FLcrzX97G6yI=;
+ b=CUaRXi+5EVNpOiII+pmSw9bSzxtkxpRbJZUhSHDFuw0gdrYUR23u2xnLNGGm85qmenE24e
+ CP0QUVannLS5KRxu/IU1hqpp8ZLLHHXxvpYuL74jAOv1LZm7EziYtELEsr7/oxTThZpxFp
+ jhOMfbExTId+K0Z+2IbEAAYhj9dqh3E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-qWKZUqPcONCRpvIXjNfdeA-1; Thu, 25 Jun 2020 11:23:21 -0400
-X-MC-Unique: qWKZUqPcONCRpvIXjNfdeA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-181-LxlPylEuOlyp3Qgif0HbtQ-1; Thu, 25 Jun 2020 11:24:01 -0400
+X-MC-Unique: LxlPylEuOlyp3Qgif0HbtQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC9B6A0BD7;
- Thu, 25 Jun 2020 15:23:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B198F804002;
+ Thu, 25 Jun 2020 15:24:00 +0000 (UTC)
 Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 52F7F5C296;
- Thu, 25 Jun 2020 15:23:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 543C21A913;
+ Thu, 25 Jun 2020 15:24:00 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 28/47] block/null: Implement bdrv_get_allocated_file_size
-Date: Thu, 25 Jun 2020 17:21:56 +0200
-Message-Id: <20200625152215.941773-29-mreitz@redhat.com>
+Subject: [PATCH v7 46/47] iotests: Add test for commit in sub directory
+Date: Thu, 25 Jun 2020 17:22:14 +0200
+Message-Id: <20200625152215.941773-47-mreitz@redhat.com>
 In-Reply-To: <20200625152215.941773-1-mreitz@redhat.com>
 References: <20200625152215.941773-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,84 +98,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is trivial, so we might as well do it.
+Add a test for committing an overlay in a sub directory to one of the
+images in its backing chain, using both relative and absolute filenames.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/null.c               | 7 +++++++
- tests/qemu-iotests/153.out | 2 +-
- tests/qemu-iotests/184.out | 6 ++++--
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/020     | 44 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/020.out | 10 +++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/block/null.c b/block/null.c
-index 15e1d56746..cc9b1d4ea7 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -262,6 +262,11 @@ static void null_refresh_filename(BlockDriverState *bs)
-              bs->drv->format_name);
- }
- 
-+static int64_t null_allocated_file_size(BlockDriverState *bs)
-+{
-+    return 0;
-+}
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index 20f8f185d0..d5b5d34058 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -31,6 +31,11 @@ _cleanup()
+     _cleanup_test_img
+     _rm_test_img "$TEST_IMG.base"
+     _rm_test_img "$TEST_IMG.orig"
 +
- static const char *const null_strong_runtime_opts[] = {
-     BLOCK_OPT_SIZE,
-     NULL_OPT_ZEROES,
-@@ -277,6 +282,7 @@ static BlockDriver bdrv_null_co = {
-     .bdrv_file_open         = null_file_open,
-     .bdrv_parse_filename    = null_co_parse_filename,
-     .bdrv_getlength         = null_getlength,
-+    .bdrv_get_allocated_file_size = null_allocated_file_size,
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT.base"
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT.mid"
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT"
++    rmdir "$TEST_DIR/subdir" &> /dev/null
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-     .bdrv_co_preadv         = null_co_preadv,
-     .bdrv_co_pwritev        = null_co_pwritev,
-@@ -297,6 +303,7 @@ static BlockDriver bdrv_null_aio = {
-     .bdrv_file_open         = null_file_open,
-     .bdrv_parse_filename    = null_aio_parse_filename,
-     .bdrv_getlength         = null_getlength,
-+    .bdrv_get_allocated_file_size = null_allocated_file_size,
+@@ -134,6 +139,45 @@ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
+ $QEMU_IMG commit "$TEST_IMG"
+ _cleanup
  
-     .bdrv_aio_preadv        = null_aio_preadv,
-     .bdrv_aio_pwritev       = null_aio_pwritev,
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index b2a90caa6b..8659e6463b 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -461,7 +461,7 @@ No conflict:
- image: null-co://
- file format: null-co
- virtual size: 1 GiB (1073741824 bytes)
--disk size: unavailable
-+disk size: 0 B
- 
- Conflict:
- qemu-img: --force-share/-U conflicts with image options
-diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
-index 3deb3cfb94..28b104da89 100644
---- a/tests/qemu-iotests/184.out
-+++ b/tests/qemu-iotests/184.out
-@@ -29,7 +29,8 @@ Testing:
-             "image": {
-                 "virtual-size": 1073741824,
-                 "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"null-co\"}}",
--                "format": "throttle"
-+                "format": "throttle",
-+                "actual-size": SIZE
-             },
-             "iops_wr": 0,
-             "ro": false,
-@@ -56,7 +57,8 @@ Testing:
-             "image": {
-                 "virtual-size": 1073741824,
-                 "filename": "null-co://",
--                "format": "null-co"
-+                "format": "null-co",
-+                "actual-size": SIZE
-             },
-             "iops_wr": 0,
-             "ro": false,
++
++echo
++echo 'Testing commit in sub-directory with relative filenames'
++echo
++
++pushd "$TEST_DIR" > /dev/null
++
++mkdir subdir
++
++TEST_IMG="subdir/t.$IMGFMT.base" _make_test_img 1M
++TEST_IMG="subdir/t.$IMGFMT.mid" _make_test_img -b "t.$IMGFMT.base"
++TEST_IMG="subdir/t.$IMGFMT" _make_test_img -b "t.$IMGFMT.mid"
++
++# Should work
++$QEMU_IMG commit -b "t.$IMGFMT.mid" "subdir/t.$IMGFMT"
++
++# Might theoretically work, but does not in practice (we have to
++# decide between this and the above; and since we always represent
++# backing file names as relative to the overlay, we go for the above)
++$QEMU_IMG commit -b "subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT" 2>&1 | \
++    _filter_imgfmt
++
++# This should work as well
++$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT"
++
++popd > /dev/null
++
++# Now let's try with just absolute filenames
++# (This will not work with external data files, though, because when
++# using relative paths for those, qemu will always resolve them
++# relative to its CWD.  Therefore, it cannot find those data files now
++# that we left $TEST_DIR.)
++if _get_data_file '' > /dev/null; then
++    echo 'Image committed.' # Skip test
++else
++    $QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" \
++        "$TEST_DIR/subdir/t.$IMGFMT"
++fi
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
+index 4b722b2dd0..228c37dded 100644
+--- a/tests/qemu-iotests/020.out
++++ b/tests/qemu-iotests/020.out
+@@ -1094,4 +1094,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driv
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Block job failed: No space left on device
++
++Testing commit in sub-directory with relative filenames
++
++Formatting 'subdir/t.IMGFMT.base', fmt=IMGFMT size=1048576
++Formatting 'subdir/t.IMGFMT.mid', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base
++Formatting 'subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.mid
++Image committed.
++qemu-img: Did not find 'subdir/t.IMGFMT.mid' in the backing chain of 'subdir/t.IMGFMT'
++Image committed.
++Image committed.
+ *** done
 -- 
 2.26.2
 
