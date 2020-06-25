@@ -2,70 +2,91 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 792E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 02:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 02:24:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4206C207DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 02:10:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A79DD2077D
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 02:24:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N5fE3UdK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4206C207DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ppi6CYKA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79DD2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joHLK-0005Ci-E0
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 22:10:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53180)
+	id 1joHYW-0008KP-SI
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jun 2020 22:24:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joHKY-0004NW-3k
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 22:09:34 -0400
-Received: from ozlabs.org ([203.11.71.1]:39369)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joHKU-0004D5-Am
- for qemu-devel@nongnu.org; Wed, 24 Jun 2020 22:09:33 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49sk3N47Vsz9sRf; Thu, 25 Jun 2020 12:09:20 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1593050960;
- bh=wLxRiOlJfHpZrw5cRoWmPvZAEqa0wW8enf0YYsUhtZ8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=N5fE3UdKcqvtysVRPqfAYRAPLqY9OMtZ5MELpu9GwVTPAtEXpYKi1BvzEU6DKjx3t
- M2287qr6ZF9VfTMPfIK6RY96hKga8I3AOicHG5kZ+0EKuRhAXBdj/rfOx0NRiALAry
- lt4n6zNqU5WDxmN7QOL2noUS0TI7OFjQWBTEYO6Y=
-Date: Thu, 25 Jun 2020 11:41:25 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: P J P <ppandit@redhat.com>
-Subject: Re: [PATCH v2 6/9] spapr_pci: add spapr msi read method
-Message-ID: <20200625014125.GC69292@umbus.fritz.box>
-References: <20200624185523.762240-1-ppandit@redhat.com>
- <20200624185523.762240-7-ppandit@redhat.com>
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1joHXq-0007uD-Cc
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 22:23:18 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55487)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1joHXo-0002iA-RM
+ for qemu-devel@nongnu.org; Wed, 24 Jun 2020 22:23:18 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g75so4040794wme.5
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 19:23:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ULTg9UyWOXgF9C/tXxMXVqM1cSKZ/nseYlm/7h6hF6A=;
+ b=ppi6CYKAYxRJCN2JJeZMbNKGQEOP6gTCYhSRJhf9JHwFIurtI2iD4qMV84hjaEH22+
+ vTcM52wB2Ax0Qgdst1AHVxSJVXB3qtbC/km3pQeanor7HBtTYOBRiDmDTE8mkwB4kVDB
+ z5204WOYZIzHI+anVOB7iGytUDK1G+nItYLfDz9Cg5KadkYFq7PS1MCVjCRSAsFtt7hq
+ 8NW6f8dy8sjLaUPA6HJldpeXFn55XDyGFLTY3MFxvrtsn1a3+lqvkiOO2CEp9s4p457Z
+ cCZtzKAiwCsiGEpIZuZKVLfSQkFVssrksPM49Mcf4dIobJtsl8i5zV6nf/t6m9oI4QnW
+ Kbmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ULTg9UyWOXgF9C/tXxMXVqM1cSKZ/nseYlm/7h6hF6A=;
+ b=omRLMuizFFb0uluJ4NXc2tx1s1p17l640iZxsZ0EoZucIQr8DMRwedIfKEQe2TYxvF
+ jkY+Oumgm45KPQPbV+dZ0mOctwoTItl1X5bYCbzued8+KmVZQ5F5nB1ZvocDrBrDrgX7
+ 8HcNip7/sUgnjvW2u23m3jwFfU6c5pOkv/Rw9U2JSP1SjjIezxIRyLS//lFgjHxZMLlF
+ bTSe/oHa3bJiURIEE4bX//rtPcnlK94Zv6VVhPjNu5nVSQZ6b/UVYGEr0UDs9Hku+vYD
+ oYBkY7o7EwjQpaZodt+m3pMAUReU6SGt3GjRgfvOeeIFcYTut6XjIH4xo1HtIu36HzlR
+ mwOw==
+X-Gm-Message-State: AOAM530wepE0asYVlpeqVoCMLJkaXWyTJw8ALaa6DEyCJm2xFFa6ik/n
+ Y82366RM1gQA3bg6SnUUSR4=
+X-Google-Smtp-Source: ABdhPJz0pSv8/3GFp5/bXx2Hlx9c4sXP+Zal9B84wbBWmI0QJvjb87myCHHymtKcK4qYt6619j8Q8g==
+X-Received: by 2002:a1c:1fd1:: with SMTP id f200mr756553wmf.162.1593051794768; 
+ Wed, 24 Jun 2020 19:23:14 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-155-64.inter.net.il. [84.229.155.64])
+ by smtp.gmail.com with ESMTPSA id z16sm19719024wrr.35.2020.06.24.19.23.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 24 Jun 2020 19:23:13 -0700 (PDT)
+Date: Thu, 25 Jun 2020 05:23:12 +0300
+From: Jon Doron <arilou@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v3 2/3] i386: acpi: vmbus: Add _ADR definition
+Message-ID: <20200625022312.GA5487@jondnuc>
+References: <20200618030027.759594-1-arilou@gmail.com>
+ <20200618030027.759594-3-arilou@gmail.com>
+ <20200623170605.08e46f87@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Fig2xvG2VGoz8o/s"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20200624185523.762240-7-ppandit@redhat.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 22:09:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200623170605.08e46f87@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=arilou@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,105 +99,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: rvkagan@yandex-team.ru, pbonzini@redhat.com, vkuznets@redhat.com,
+ mail@maciej.szmigiero.name, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 23/06/2020, Igor Mammedov wrote:
+>On Thu, 18 Jun 2020 06:00:26 +0300
+>Jon Doron <arilou@gmail.com> wrote:
+>
+>> It seems like latest HyperV sets _ADR to 0 in the ACPI for the VMBS
+>
+>that's a hardly a good reason to add this.
+>To me looks like a pointless addition,
+>_ADR mostly is used when device resides on a bus with standard ennumeration
+>algorithm (i.e. PCI, ...).
+>
+>Value is also wrong  for the bus it's placed currently,
+>and with the next patch it won't make a sense altogether.
+>
+>Pls, drop this patch unless Windows refuses to work without it.
+>
 
---Fig2xvG2VGoz8o/s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Windows seems to handle fine without this.
 
-On Thu, Jun 25, 2020 at 12:25:20AM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->=20
-> Add spapr msi mmio read method to avoid NULL pointer dereference
-> issue.
->=20
-> Reported-by: Lei Sun <slei.casper@gmail.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/spapr_pci.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 329002ac04..7033352834 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -52,6 +52,7 @@
->  #include "sysemu/kvm.h"
->  #include "sysemu/hostmem.h"
->  #include "sysemu/numa.h"
-> +#include "qemu/log.h"
-> =20
->  /* Copied from the kernel arch/powerpc/platforms/pseries/msi.c */
->  #define RTAS_QUERY_FN           0
-> @@ -738,6 +739,12 @@ static PCIINTxRoute spapr_route_intx_pin_to_irq(void=
- *opaque, int pin)
->      return route;
->  }
-> =20
-> +static uint64_t spapr_msi_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-> +    return 0;
-> +}
-> +
->  /*
->   * MSI/MSIX memory region implementation.
->   * The handler handles both MSI and MSIX.
-> @@ -755,8 +762,10 @@ static void spapr_msi_write(void *opaque, hwaddr add=
-r,
->  }
-> =20
->  static const MemoryRegionOps spapr_msi_ops =3D {
-> -    /* There is no .read as the read result is undefined by PCI spec */
-> -    .read =3D NULL,
-> +    /* .read result is undefined by PCI spec
-> +     * define .read method to avoid assert failure in memory_region_init=
-_io
-> +     */
-> +    .read =3D spapr_msi_read,
->      .write =3D spapr_msi_write,
->      .endianness =3D DEVICE_LITTLE_ENDIAN
->  };
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Fig2xvG2VGoz8o/s
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70AMUACgkQbDjKyiDZ
-s5KbKw//Z9fOAZRi7OvyHmPebS+3Ymlzc8/s1LfIrkUGXNLGFdtZtwDF+fPOYDLq
-DuF4SRsp/MJiOKKLRycwOB7MI7Euq3LYgvis4vnUDb2cdWB4JS9CnXrkyQZiMCWv
-Xn5nUSJh4l+LkOAe4lCzXAquScuRPoczwlonBH19AFqIXrI44dI03wor1BxqOdE1
-NuSN+78sNy0i+Cxn7ZIgYk5XnWSGAsNPsjPNPIEeu/VBeY70NNT/YcGuv1pWmm0z
-pfuM6lqSgTq1OccZY1I22G8wNAGheovGQSDTdbLk5sW7IhIDly67z+hY1bgJRt4R
-vb2N2V8D/YIISOQuHOkohf5ZIrCUdd/TI7/mVetHF8o4gj4mHh1UhzoWHUmiUaSJ
-/pVoOrP+hGJnj9XefjCx+9UBRvl1/WZ1GyOVQLsM/sNPHcxqBuv6sNtV5Fj8vWzA
-ZUC4sE3rH29JgWlcVlolfZG13Afl/falm5NPD7B9Cn8ylXXSDnaulkRXNAb42h6G
-Oc2gu+YBzkETIoI3L0249qfSMdhQPMUBuT45nsjPl3L5ejZ1jsKoEVc14csxS3E+
-O7+geOJ81/AvSWRdff40iPg44PmYEY3loVyOz9Kf4OAuJUkJ+Zc6Ey/t1m49dGLo
-aCtSa/Zh1xsYmP519SIIwDJA3b62ae713NE1U7fxL5QbnDtHc18=
-=zgSG
------END PGP SIGNATURE-----
-
---Fig2xvG2VGoz8o/s--
+>>
+>> Signed-off-by: Jon Doron <arilou@gmail.com>
+>> ---
+>>  hw/i386/acpi-build.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 91af0d2d0d..6d9df38e31 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -1061,6 +1061,7 @@ static Aml *build_vmbus_device_aml(VMBusBridge *vmbus_bridge)
+>>
+>>      dev = aml_device("VMBS");
+>>      aml_append(dev, aml_name_decl("STA", aml_int(0xF)));
+>> +    aml_append(dev, aml_name_decl("_ADR", aml_int(0x0)));
+>>      aml_append(dev, aml_name_decl("_HID", aml_string("VMBus")));
+>>      aml_append(dev, aml_name_decl("_UID", aml_int(0x0)));
+>>      aml_append(dev, aml_name_decl("_DDN", aml_string("VMBUS")));
+>
 
