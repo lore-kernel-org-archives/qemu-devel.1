@@ -2,93 +2,68 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9DCC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17344C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AAC320709
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:52:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5BD420709
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:53:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eA+irAK7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AAC320709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="g6i56Vsc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5BD420709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joKoR-0000As-GN
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 01:52:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34374)
+	id 1joKpd-0001aC-4H
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 01:53:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joKne-0007Gn-1i
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 01:51:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20925
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joKnZ-0005mC-8M
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 01:51:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593064304;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UbuHHAPAMR4xlyB7J3QyXIJlrJTtGqpzW/1S2hywvUk=;
- b=eA+irAK7OrXcA1XoLt/yu+VwWtwep/naKEYwIkcEOUASJpT4rUgVtzwr89m6GCHw3WwPLT
- rrI/bi9ydUqyOchId0+6xfEOspRpLYqWjMiO2gZA4siK1nejhhls7U5B9hfb0tX/ROXsUA
- vQqy5eEfszJ8MxFpMAfypLMi1/zDfoY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-HHs6AaqiND63-F-Wh_Efrw-1; Thu, 25 Jun 2020 01:51:42 -0400
-X-MC-Unique: HHs6AaqiND63-F-Wh_Efrw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C091464;
- Thu, 25 Jun 2020 05:51:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 736515BAC7;
- Thu, 25 Jun 2020 05:51:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 87C7B11384D4; Thu, 25 Jun 2020 07:51:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH QEMU v25 17/17] qapi: Add VFIO devices migration stats in
- Migration stats
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-18-git-send-email-kwankhede@nvidia.com>
- <87zh8ucknj.fsf@dusky.pond.sub.org>
- <fa9c879c-f062-7589-231c-b34fb0a107a7@nvidia.com>
-Date: Thu, 25 Jun 2020 07:51:30 +0200
-In-Reply-To: <fa9c879c-f062-7589-231c-b34fb0a107a7@nvidia.com> (Kirti
- Wankhede's message of "Wed, 24 Jun 2020 02:46:39 +0530")
-Message-ID: <87eeq34rrx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1joKjf-0000kn-Lb; Thu, 25 Jun 2020 01:47:43 -0400
+Received: from ozlabs.org ([203.11.71.1]:41177)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1joKjd-0004VB-HF; Thu, 25 Jun 2020 01:47:43 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49spv50fKWz9sTC; Thu, 25 Jun 2020 15:47:28 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1593064049;
+ bh=EEmTbZZVcmzkrdOgtIVLfWGut2RQOlCho8VlMoYE5zc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=g6i56VscgZX7GjhhX4rwun/gt9BfGwz8rULD0Of1Yem9eSAGCD3JRxQRsSr5sVy/g
+ X9Ep7Sk9lIPTiKxUZL+a6lanNLJh4cSOHUNYI7ik7dCI2AkjbPRa7XZvj+MwgsOSWU
+ XyIoT5MaDytwjMhjY9W3lO6E4vtXtMHY8Glrh7T0=
+Date: Thu, 25 Jun 2020 15:47:23 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200625054723.GG172395@umbus.fritz.box>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
+ <20200624090648.6bdf82bd.cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Fnm8lRGFTVS/3GuM"
+Content-Disposition: inline
+In-Reply-To: <20200624090648.6bdf82bd.cohuck@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 22:09:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,130 +76,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, alex.williamson@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, mst@redhat.com, david@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, pasic@linux.ibm.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
+ mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kirti Wankhede <kwankhede@nvidia.com> writes:
 
-> On 6/23/2020 12:51 PM, Markus Armbruster wrote:
->> QAPI review only.
->>
->> The only changes since I reviewed v23 is the rename of VfioStats member
->> @bytes to @transferred, and the move of MigrationInfo member @vfio next
->> to @ram and @disk.  Good.  I'm copying my other questions in the hope of
->> getting answers :)
->>
->> Kirti Wankhede <kwankhede@nvidia.com> writes:
->>
->>> Added amount of bytes transferred to the target VM by all VFIO devices
->>>
->>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> [...]
->>> diff --git a/qapi/migration.json b/qapi/migration.json
->>> index d5000558c6c9..952864b05455 100644
->>> --- a/qapi/migration.json
->>> +++ b/qapi/migration.json
->>> @@ -146,6 +146,18 @@
->>>               'active', 'postcopy-active', 'postcopy-paused',
->>>               'postcopy-recover', 'completed', 'failed', 'colo',
->>>               'pre-switchover', 'device', 'wait-unplug' ] }
->>> +##
->>> +# @VfioStats:
->>> +#
->>> +# Detailed VFIO devices migration statistics
->>> +#
->>> +# @transferred: amount of bytes transferred to the target VM by VFIO devices
->>> +#
->>> +# Since: 5.1
->>> +#
->>> +##
->>> +{ 'struct': 'VfioStats',
->>> +  'data': {'transferred': 'int' } }
->>
->> Pardon my ignorance...  What exactly do VFIO devices transfer to the
->> target VM? How is that related to MigrationInfo member @ram? 
->>
->
-> Sorry I missed to reply your question on earlier version.
+--Fnm8lRGFTVS/3GuM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Happens :)
+On Wed, Jun 24, 2020 at 09:06:48AM +0200, Cornelia Huck wrote:
+> On Mon, 22 Jun 2020 16:27:28 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>=20
+> > On 19.06.20 04:05, David Gibson wrote:
+> > > A number of hardware platforms are implementing mechanisms whereby the
+> > > hypervisor does not have unfettered access to guest memory, in order
+> > > to mitigate the security impact of a compromised hypervisor.
+> > >=20
+> > > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > > to accomplish this in a different way, using a new memory protection
+> > > level plus a small trusted ultravisor.  s390 also has a protected
+> > > execution environment.
+> > >=20
+> > > The current code (committed or draft) for these features has each
+> > > platform's version configured entirely differently.  That doesn't seem
+> > > ideal for users, or particularly for management layers.
+> > >=20
+> > > AMD SEV introduces a notionally generic machine option
+> > > "machine-encryption", but it doesn't actually cover any cases other
+> > > than SEV.
+> > >=20
+> > > This series is a proposal to at least partially unify configuration
+> > > for these mechanisms, by renaming and generalizing AMD's
+> > > "memory-encryption" property.  It is replaced by a
+> > > "host-trust-limitation" property pointing to a platform specific
+> > > object which configures and manages the specific details.
+> > >=20
+> > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> > > can be extended to cover the Intel and s390 mechanisms as well,
+> > > though. =20
+> >=20
+> > Let me try to summarize what I understand what you try to achieve:
+> > one command line parameter for all platforms that=20
+> >=20
+> > common across all platforms:
+> > - disable KSM
+> > - by default enables iommu_platform
+> >=20
+> >=20
+> > per platform:
+> > - setup the necessary encryption scheme when appropriate
+> > - block migration
+> > -....
+> >=20
+> >=20
+> > The tricky part is certainly the per platform thing. For example on
+> > s390 we just have a cpumodel flag that provides interfaces to the guest
+> > to switch into protected mode via the ultravisor. This works perfectly
+> > fine with the host model, so no need to configure anything.  The platfo=
+rm
+> > code then disables KSM _on_switchover_ and not in general. Because the=
+=20
+> > guest CAN switch into protected, but it does not have to.
+> >=20
+> > So this feels really hard to do right. Would a virtual BoF on KVM forum
+> > be too late? We had a BoF on protected guests last year and that was
+> > valuable.
+>=20
+> Maybe we can do some kind of call to discuss this earlier? (Maybe in
+> the KVM call slot on Tuesdays?) I think it would be really helpful if
+> everybody would have at least a general understanding about how
+> encryption/protection works on the different architectures.
 
-> VFIO device transfer vfio device's state, data from VFIO device and
-> guest memory pages pinned for dma operation.
-> For example in case of GPU, vfio device state is GPUs current state to
-> be saved that will be restored during resume and device data is data
-> from onboard framebuffer. Pinned memory is marked dirty and
-> transferred to target VM as part of global dirty page tracking for
-> RAM.
-> VFIO device can add significant amount of data in migration stream
-> (depending on FB size in GB), transferred byte count is important
-> parameter to be monitored.
+Yes, I think this would be a good idea.  KVM Forum is probably later
+than we want, plus since it is virtual, I probably won't be shifting
+into the right timezone to attend much of it.
 
-Can we work this into documentation somehow?
+I don't know when that Tuesday KVM call is.  Generally the best
+available time for Australia/Europe meetings this time of year is 9am
+CET / 5pm AEST.  As a once off I could go somewhat later into my
+evening, though.
 
-Have you considered adding something on VFIO migration to docs/?  Then a
-link with a short description could suffice here.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->> MigrationStats has much more information, and some of it is pretty
->> useful to track how migration is doing, in particular whether it
->> converges, and how fast.  Absent in VfioStats due to "not implemented",
->> or due to "can't be done"?
->>
->
-> Vfio device migration interface is same as RAM's migration interface
-> (using SaveVMHandlers). Converge part is already take care by
-> .save_live_pending hook where *res_precopy_only is set to vfio devices
-> pending_bytes, migration->pending_bytes
->
-> How fast - I'm not sure how this can be calculated.
+--Fnm8lRGFTVS/3GuM
+Content-Type: application/pgp-signature; name="signature.asc"
 
-My concern is providing management applications the means they need to
-monitor migration.  Have you solicited input from management application
-developers on what's needed?
+-----BEGIN PGP SIGNATURE-----
 
-"Same as RAM's migration" makes me suspect the same stats are needed.
-This may well be a subset of the stats provided for RAM.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70OmsACgkQbDjKyiDZ
+s5LT1A/+IwaLiZZ3b7YhAaur+c0t0DHFTO6Kc2RYpqJrHL1qEhm794BeLB7FyFzb
+mi1sQs3TzS3fXAzO3Smjd3hJLDXTdz6Ffi8efAI/ftRxzi2Llhd9qaO8u8y+d1Kg
+dziTxoe9doUU4Y2WNz+cNKxcNYC/+N3Zv7WurDuQ0lutKs1YE3NN7wcebiZf4RRv
+aL1XIyHpBRe827Om1gsNBICkFxzvkXk0vg8IO5KttISNEUMMJly5JC9szcCOTX6h
+x1DUKdWS/JK3YNc2M7PN5rwupy1ws9iW9LEIyWwAQXHU7PL3MVrHTUjOJNlhGxUl
+tPsPL+SteLhhgmwQVxB3D2WskmJsJ2i37e7TzlbCaZXiO3eiBvz+6pQQ1LVz2/++
+bdlHNKlLl7iaHjnIaUtqgamCCy4AXnPJI83IuQGY9spdJHd4PMrqDBiPo3m2xSe3
+U4C3KD+Bz5LsfqACaN8HGr91QrIAXIE3ajUf6zqHuTdP9BUeps9rArV64cJ/vhYE
+I86ixvvO0Bfyy9eu0AXtG+rupjLvFdF9mWhQ8kIK98+QXYCh8FuN8OEZ6A+eAT04
+pRlRFqyx5AJy2CHW1ik0XEw68jY/A404+N5b4GABMjDxdQ0C52j5xDQiuycTUkGJ
+vAjWg8x2UrQP3v7qmunRTQnDY6X2pfXbPetCJftbv9ZDQ86UevA=
+=CtJc
+-----END PGP SIGNATURE-----
 
-Missing stats we need can be added on top, as long as it's done in a
-timely manner.  But we better know how to compute them, or how to do
-without.
-
-> Thanks,
-> Kirti
->
->> Byte counts should use QAPI type 'size'.  Many existing ones don't.
->> Since MigrationStats uses 'int', I'll let the migration maintainers
->> decide whether they want 'int' or 'size' here.
->>
->>>   ##
->>>   # @MigrationInfo:
->>> @@ -207,11 +219,16 @@
->>>   #
->>>   # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
->>>   #
->>> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
->>> +#        only returned if VFIO device is present, migration is supported by all
->>> +#         VFIO devices and status is 'active' or 'completed' (since 5.1)
->>> +#
->>>   # Since: 0.14.0
->>>   ##
->>>   { 'struct': 'MigrationInfo',
->>>     'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
->>>              '*disk': 'MigrationStats',
->>> +           '*vfio': 'VfioStats',
->>>              '*xbzrle-cache': 'XBZRLECacheStats',
->>>              '*total-time': 'int',
->>>              '*expected-downtime': 'int',
->>
-
+--Fnm8lRGFTVS/3GuM--
 
