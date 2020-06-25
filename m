@@ -2,79 +2,90 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD3DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD1DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 552F520781
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:06:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9F4E20781
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mGh0MsJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 552F520781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JbuYMn5I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9F4E20781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joa0f-0003iF-Jg
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 18:06:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60240)
+	id 1joaBn-0006b3-56
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 18:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
- id 1joZzH-00020V-4J
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:04:51 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34173)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joaAd-0005tH-Nc
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:16:36 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46267)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
- id 1joZzE-0001TE-OI
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:04:50 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f7so4466542wrw.1
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 15:04:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joaAb-0003Vs-54
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:16:35 -0400
+Received: by mail-pf1-x443.google.com with SMTP id b16so3677141pfi.13
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 15:16:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=3EUYQpC70D9Loz0SWVXQKzo9Z+PggfBQJAuynLuJD3w=;
- b=mGh0MsJ71Je829bnOR/C1wiyL1nvX4y+aI7pdrMZ3tFvAuEbOxG0bTLehQ1BEv90Jo
- GWc/+1L/I0jl3UZzipYUJfnmrAtMSkrKBSF1F436K75o6AENCeNQts7EaLosNBRDtwzV
- rXhVKAVpFKgcXjRE//X9OaNDSlIlWHa5wRoPXUVoP/jLIc4SGyrqLAIsqDzx7zWJYFi6
- I/s2M2d5RYMsJyXkQUEYrEfExvArVjO4lrqDzF2D9BpU54s5B4EWRQTU8bX6sDz0yAj2
- vzTZUHmPMV9AN3cJHgHsfhNDQlZQcIzzKgTmUcam73W+c4N4jdOq6erv884BKESUgvnP
- o8OQ==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ytgSCXirQ/gNtbGdXqATNvET+/yVuoIGtac1C2Wow+g=;
+ b=JbuYMn5IZBVvXsI9NNBZ+hJmBix5fJThuQSbA76p1zggfa1MDHAQo2yHf3Ql3B5HLi
+ 6qVlwXmyCBrPzdqob4CzOS7rVy2GyvCBPVqSq1PXMfre89WThvQgK6wF1RkaMokI3sam
+ IS1BbZpQ0/2DDP/ZJcWzYMmAF6gTi+lMINwXkeOJ3mU3S0xUQSix1nUoNubny9qXN3Gs
+ NeVQAFb0vyRrCSifmnthHNdasI6YdQLCtXoLeuks+I234+9xX2qhyOT/osKO5jjo1/m4
+ o7veKciBoYNxDvPPlzCr4Fe6zuWkMkgEsS7zFC1hMTfp5puIy9Rh7bhAw0jrMPJ0/Okd
+ dAdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=3EUYQpC70D9Loz0SWVXQKzo9Z+PggfBQJAuynLuJD3w=;
- b=YbzuPtpTLvbPOeAjaFZb2l6DMl8qE6Et7LKXU+qTbRPAOBXKLttRjHAnmgtaaihtid
- +xXpz+0rWt5bXNplq3iQAOnQKY18Y5kCvpTCIQhdOfNuA2EZDoznrY69jtG7/tYhVuJl
- rooPvqXLSVGBBT5erDyaxkD+0bXW6r0NRhl4nf1sZp45c4+VCSHU76BU3zIoB44n5Myz
- PgbWpbj+twJTz4fpM5RyvWGuTf1xI8rBYZf3ub8AG2+iQohDC6nOb01Uqmk9Ur+7JQ4w
- R3b4ZUNdZ5MPnn94oJ0Fna+37vi5k5BRX9l1gxUkkKwcvOKFsINMY7yE+3RLDZwqiwBT
- mMlg==
-X-Gm-Message-State: AOAM532OnpWVPUcRwhV0964kzAtqS6RWmw/MsM41mQx0XUpRwuYjMZu9
- txdwPMjoPLjZFWqE6o6uwh+uIrwsw4Pm9A==
-X-Google-Smtp-Source: ABdhPJwLMjYHPm/T05j/OPeSTzDa4iO9aTTq5XvQf47lS9tv9j13Kw+qnkzbMCjrSv0RA24BY0pimQ==
-X-Received: by 2002:adf:e7c8:: with SMTP id e8mr369120wrn.20.1593122687020;
- Thu, 25 Jun 2020 15:04:47 -0700 (PDT)
-Received: from moi-limbo-9350.home
- (host86-139-146-71.range86-139.btcentralplus.com. [86.139.146.71])
- by smtp.gmail.com with ESMTPSA id l190sm13939277wml.12.2020.06.25.15.04.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 25 Jun 2020 15:04:46 -0700 (PDT)
-From: Beata Michalska <beata.michalska@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 2/2] target/arm: kvm: Handle misconfigured dabt injection
-Date: Thu, 25 Jun 2020 23:03:36 +0100
-Message-Id: <20200625220336.10186-3-beata.michalska@linaro.org>
-In-Reply-To: <20200625220336.10186-1-beata.michalska@linaro.org>
-References: <20200625220336.10186-1-beata.michalska@linaro.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=beata.michalska@linaro.org; helo=mail-wr1-x441.google.com
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ytgSCXirQ/gNtbGdXqATNvET+/yVuoIGtac1C2Wow+g=;
+ b=tSrt0aoqyB6mixqyC/FjitoAY13155t8YB/5ERk5BkjaVBZ3fQsjO3DwLUEtqaRpoN
+ DNeOdIVkXnKwIKAGWm9RLqKK15plbqBgmfYfRxgy9rh4+qqziVzmrNeG5RTRK5sWTpXk
+ rK4qmlorPoMqF1qT1UhCbzGL82K+tV05CjwK3psd94QHfq6r72OiOnWRhLWfQ2IWfcXb
+ qMSfwHxCI80/kEgZhA+DNWrKdO9UVGew9zUeh/qV4qWDopoqCae9YgM4y3+8tiIZ2hdq
+ 4TdMMC+pyAJm2gcHNyq4GpZ75ADYFVqaVnzWUPPzGpz61mFqc9HnASfE4IaZ5CH8PSGE
+ aSpw==
+X-Gm-Message-State: AOAM533lGCs+KW/7kqMErb1jVvEFV8rIT8Ouxqv1E8VYEA3wix5yf5Tn
+ 0jUpGf8SInpu5x1CEwD/7Tm1EQ==
+X-Google-Smtp-Source: ABdhPJz/hqebaTyIcfXXubyY6xMpzgXM7NkxyWVIdsA9812sSsxzGa4AdIxyRV3imLlAsajWdMO6yw==
+X-Received: by 2002:a63:e74b:: with SMTP id j11mr11990pgk.237.1593123390736;
+ Thu, 25 Jun 2020 15:16:30 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id m7sm21169770pgg.69.2020.06.25.15.16.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 25 Jun 2020 15:16:29 -0700 (PDT)
+Subject: Re: [PATCH v8 44/45] target/arm: Add allocation tag storage for
+ system mode
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
+ <20200623193658.623279-45-richard.henderson@linaro.org>
+ <CAFEAcA_svDHEDP5g3aaEL6_b-8hy0AB8oRBWj=y6G1K_r6E9nQ@mail.gmail.com>
+ <f15d6bf6-03ef-70fe-2f40-0665d49b0851@linaro.org>
+ <CAFEAcA_qOznfoAWtXGh-85C86fSft5ccSKQKv_uVw6-9bD4Oag@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <91051d8a-d105-4119-c3af-6fe7f797bd33@linaro.org>
+Date: Thu, 25 Jun 2020 15:16:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_qOznfoAWtXGh-85C86fSft5ccSKQKv_uVw6-9bD4Oag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,225 +107,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, Christoffer.Dall@arm.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: David Spickett <david.spickett@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Injecting external data abort through KVM might trigger
-an issue on kernels that do not get updated to include the KVM fix.
-For those and aarch32 guests, the injected abort gets misconfigured
-to be an implementation defined exception. This leads to the guest
-repeatedly re-running the faulting instruction.
+On 6/25/20 10:09 AM, Peter Maydell wrote:
+>>> Comment says we're checking a memory attribute, but the code
+>>> is checking for TLB_MMIO, which isn't the same thing.
+>>
+>> Comment is not trying to allude to Normal vs Device, but "ram" vs "mmio" in the
+>> qemu sense.
+> 
+> Oh, I see: maybe "if not backed by host RAM, then" ? I tend to
+> assume "normal memory" means "Normal memory" :-)
 
-Add support for handling that case.
+Sure, changed.  Also noticed two more places where calling via mte_probe1
+should not fault.
 
-[
-  Fixed-by: 018f22f95e8a
-	('KVM: arm: Fix DFSR setting for non-LPAE aarch32 guests')
-  Fixed-by: 21aecdbd7f3a
-	('KVM: arm: Make inject_abt32() inject an external abort instead')
-]
 
-Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
----
- target/arm/cpu.h     |  2 ++
- target/arm/kvm.c     | 30 +++++++++++++++++++++++++++++-
- target/arm/kvm32.c   | 34 ++++++++++++++++++++++++++++++++++
- target/arm/kvm64.c   | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/kvm_arm.h | 10 ++++++++++
- 5 files changed, 124 insertions(+), 1 deletion(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 677584e..ed0ff09 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -570,6 +570,8 @@ typedef struct CPUARMState {
-         uint64_t esr;
-     } serror;
- 
-+    uint8_t ext_dabt_raised; /* Tracking/verifying injection of ext DABT */
-+
-     /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
-     uint32_t irq_line_state;
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 265c4b8..85a09ea 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -749,6 +749,29 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
- 
- void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- {
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+
-+    if (unlikely(env->ext_dabt_raised)) {
-+        /*
-+         * Verifying that the ext DABT has been properly injected,
-+         * otherwise risking indefinitely re-running the faulting instruction
-+         * Covering a very narrow case for kernels 5.5..5.5.4
-+         * when injected abort was misconfigured to be
-+         * an IMPLEMENTATION DEFINED exception (for 32-bit EL1)
-+         */
-+        if (!arm_feature(env, ARM_FEATURE_AARCH64) &&
-+            unlikely(!kvm_arm_verify_ext_dabt_pending(cs))) {
-+
-+            error_report("Data abort exception with no valid ISS generated by "
-+                   "guest memory access. KVM unable to emulate faulting "
-+                   "instruction. Failed to inject an external data abort "
-+                   "into the guest.");
-+            abort();
-+       }
-+       /* Clear the status */
-+       env->ext_dabt_raised = 0;
-+    }
- }
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-@@ -833,6 +856,8 @@ void kvm_arm_vm_state_change(void *opaque, int running, RunState state)
- static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-                              uint64_t fault_ipa)
- {
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-     /*
-      * Request KVM to inject the external data abort into the guest
-      */
-@@ -852,7 +877,10 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-          */
-         events.exception.ext_dabt_pending = 1;
- 
--        return kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-+        if (!kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events)) {
-+            env->ext_dabt_raised = 1;
-+            return 0;
-+        }
-     } else {
-         error_report("Data abort exception triggered by guest memory access "
-                      "at physical address: 0x"  TARGET_FMT_lx,
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 7b3a19e..0af46b4 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -559,3 +559,37 @@ void kvm_arm_pmu_init(CPUState *cs)
- {
-     qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
- }
-+
-+#define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
-+#define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
-+/*
-+ *DFSR:
-+ *      TTBCR.EAE == 0
-+ *          FS[4]   - DFSR[10]
-+ *          FS[3:0] - DFSR[3:0]
-+ *      TTBCR.EAE == 1
-+ *          FS, bits [5:0]
-+ */
-+#define DFSR_FSC(lpae, v) \
-+    ((lpae) ? ((v) & 0x3F) : (((v) >> 6) | ((v) & 0x1F)))
-+
-+#define DFSC_EXTABT(lpae) ((lpae) ? 0x10 : 0x08)
-+
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-+{
-+    uint32_t dfsr_val;
-+
-+    if (!kvm_get_one_reg(cs, ARM_REG_DFSR, &dfsr_val)) {
-+        ARMCPU *cpu = ARM_CPU(cs);
-+        CPUARMState *env = &cpu->env;
-+        uint32_t ttbcr;
-+        int lpae = 0;
-+
-+        if (!kvm_get_one_reg(cs, ARM_REG_TTBCR, &ttbcr)) {
-+            lpae = arm_feature(env, ARM_FEATURE_LPAE) && (ttbcr & TTBCR_EAE);
-+        }
-+        /* The verification is based on FS filed of the DFSR reg only*/
-+        return (DFSR_FSC(lpae, dfsr_val) == DFSC_EXTABT(lpae));
-+    }
-+    return false;
-+}
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index f09ed9f..88cf10c 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -1497,3 +1497,52 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
- 
-     return false;
- }
-+
-+#define ARM64_REG_ESR_EL1 ARM64_SYS_REG(3, 0, 5, 2, 0)
-+#define ARM64_REG_TCR_EL1 ARM64_SYS_REG(3, 0, 2, 0, 2)
-+
-+/*
-+ * ESR_EL1
-+ * ISS encoding
-+ * AARCH64: DFSC,   bits [5:0]
-+ * AARCH32:
-+ *      TTBCR.EAE == 0
-+ *          FS[4]   - DFSR[10]
-+ *          FS[3:0] - DFSR[3:0]
-+ *      TTBCR.EAE == 1
-+ *          FS, bits [5:0]
-+ */
-+#define ESR_DFSC(aarch64, lpae, v)        \
-+    ((aarch64 || (lpae)) ? ((v) & 0x3F)   \
-+               : (((v) >> 6) | ((v) & 0x1F)))
-+
-+#define ESR_DFSC_EXTABT(aarch64, lpae) \
-+    ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
-+
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-+{
-+    uint64_t dfsr_val;
-+
-+    if (!kvm_get_one_reg(cs, ARM64_REG_ESR_EL1, &dfsr_val)) {
-+        ARMCPU *cpu = ARM_CPU(cs);
-+        CPUARMState *env = &cpu->env;
-+        int aarch64_mode = arm_feature(env, ARM_FEATURE_AARCH64);
-+        int lpae = 0;
-+
-+        if (!aarch64_mode) {
-+            uint64_t ttbcr;
-+
-+            if (!kvm_get_one_reg(cs, ARM64_REG_TCR_EL1, &ttbcr)) {
-+                lpae = arm_feature(env, ARM_FEATURE_LPAE)
-+                        && (ttbcr & TTBCR_EAE);
-+            }
-+        }
-+        /*
-+         * The verification here is based on the DFSC bits
-+         * of the ESR_EL1 reg only
-+         */
-+         return (ESR_DFSC(aarch64_mode, lpae, dfsr_val) ==
-+                ESR_DFSC_EXTABT(aarch64_mode, lpae));
-+    }
-+    return false;
-+}
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 48bf5e1..471ddd1 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -453,6 +453,16 @@ struct kvm_guest_debug_arch;
- void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
- 
- /**
-+ * kvm_arm_verify_ext_dabt_pending:
-+ * @cs: CPUState
-+ *
-+ * Verify the fault status code wrt the Ext DABT injection
-+ *
-+ * Returns: true if the fault status code is as expected, false otherwise
-+ */
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs);
-+
-+/**
-  * its_class_name:
-  *
-  * Return the ITS class name to use depending on whether KVM acceleration
--- 
-2.7.4
-
+r~
 
