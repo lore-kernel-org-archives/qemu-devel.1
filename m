@@ -2,122 +2,146 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C89C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7317C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1830C20720
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72CE0206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 07:39:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ffQV9IBD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1830C20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPL6d7Kx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72CE0206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joM84-0001j5-CR
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 03:17:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51818)
+	id 1joMTo-0005fX-PJ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 03:39:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1joM7N-0001EP-7v; Thu, 25 Jun 2020 03:16:17 -0400
-Received: from mail-eopbgr20104.outbound.protection.outlook.com
- ([40.107.2.104]:6830 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1joM7J-0000xI-4B; Thu, 25 Jun 2020 03:16:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CJBwNziMyFXftvk44SnpjSZt5GQ1HEWRrZN6CWwpZHpyBXU1pcX+jdfCs7ZKlF09IykCHBQIwYCsmtTRR2suOLdfa4fURR0jVtSrK8CBV4UxSP3zdfZLjdVZjQ8++l6RBuH18h+o6r/FC22NssbXIrXGsF0xQWXVVptvR8bl5Md6RuRHZU6qNl5vZgCZ/Li43QLn8pmt2NvvaYw+xOJYZ0rYiGnEe0v2VNQbRpzbUj6I86d72HA0A1BMsBHj57fc6TCsIRGj8U3ayECdRKk0WPZTgMWBpwgsSh96DGkAk7XYoK57yrCKOiDxyIIZEEPCvwF02IAHq9ierGcFxwtx/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ffIVD8A3IlQEYxtP+uXuPFY1ReUvBpv6W0JTOQRmJIY=;
- b=UOEphwowtc6hwNZC6YEhjJW7vQ6hEUn+qdbHG+ZHb0rVR7VXXo0Yq4hxuSA3RXlrAoMGRurrzf0HkPc9sNneCRcA1xc9h6+GsSOcELbrkClPKysLEXgZaGX0N+13ASNt7GuBgMzUMQNc6s9L1eoV988wv+yX5xq1IeylHz4CgQIvC/6yGXBsw1HAvp3W6NOxzTkfynmZDLumlnj33WvRUTa4CiTJ+yVbHCpR/Gk0XqjDBH3Jxywm5VGyyaHtPeFxL2EK9nThAHfz8LFOGHcQ0Y/yot0iB09Z41/Xip/Ont4+2mbxibS9xyAEbyVbImEAktZv3j3iOb2Ec0QVBxtmew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ffIVD8A3IlQEYxtP+uXuPFY1ReUvBpv6W0JTOQRmJIY=;
- b=ffQV9IBDGUJpwLj7m4b76DDekWPxD78W44bNtq58a5sLIzE7gcBNo+egJaPklXeBMKPq3fBfmS+zC/O8bbSF97hzcRErrEjR7iYmffZHGG63/NZsPR6V5h42dNP9epWwqMhr8Jg/S/De+umtgyCnXXU7jCRl91r3qTWZS9iVBrA=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1842.eurprd08.prod.outlook.com (2603:10a6:203:3c::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.23; Thu, 25 Jun
- 2020 07:16:08 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.020; Thu, 25 Jun 2020
- 07:16:08 +0000
-Subject: Re: [PATCH 02/46] error: Document Error API usage rules
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-3-armbru@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <db1af786-075d-b656-b280-d25ad34bbbe6@virtuozzo.com>
-Date: Thu, 25 Jun 2020 10:16:06 +0300
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1joMTA-0005EQ-RT
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:38:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39841
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1joMT8-0004lr-EF
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 03:38:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593070725;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=OAlBIuPagnJRQ/AGyFPD/0Yc3HunyJ35QY/ajJ5pqkI=;
+ b=LPL6d7KxRpx0tCN8Ocd1Zi6nxHOor2CfWV44zXS5u35eeubjAcReKjP0Pw7MgzCemnd0Gv
+ 7M0wARhpJpMqRdnhh4P/WY/Go40xw8oBNOWWPugDKhEb2imOtUjth6ItNK/ntWLDEfKjpW
+ al5oh0VPgww8RkLWcZzJEjtm+dgZx2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-7qWm-m3IMZ-gX6goVO8p9A-1; Thu, 25 Jun 2020 03:38:43 -0400
+X-MC-Unique: 7qWm-m3IMZ-gX6goVO8p9A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81ED4107ACF9;
+ Thu, 25 Jun 2020 07:38:42 +0000 (UTC)
+Received: from [10.36.114.40] (ovpn-114-40.ams2.redhat.com [10.36.114.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABFD87FEA0;
+ Thu, 25 Jun 2020 07:38:36 +0000 (UTC)
+Subject: Re: [PATCH] net: tap: check if the file descriptor is valid before
+ using it
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200624190009.300069-1-lvivier@redhat.com>
+ <b64d114d-061e-268d-cc48-1680e6188404@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <d5cc729d-4010-1cf2-792d-903999df6e90@redhat.com>
+Date: Thu, 25 Jun 2020 09:38:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
-In-Reply-To: <20200624164344.3778251-3-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0P190CA0014.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.69) by
- AM0P190CA0014.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3131.20 via Frontend Transport; Thu, 25 Jun 2020 07:16:07 +0000
-X-Originating-IP: [185.215.60.69]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a9fcaea2-09c2-4cdc-9258-08d818d7a157
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1842:
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB184252A6F9075ED50951AA96C1920@AM5PR0801MB1842.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 0445A82F82
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ayQZb1HcDrrqPx9boR/pfIpYdDaIU4KFuVFmHbKsFvGRz+XQYtNB4FMCeoqiBnfRz1fI0vIlTuU1Aa55m0cTK32W17qfKUDbxbqBEV91dZL9kqyHNezXk39josgnffu2JLC4gZq8T6eb5NOOH8x/868o00YsDKicgHOe0KWGaM5LOkLAuRyxPg+eIIoK9KjS7TKHRHnMBhjtQzIM6axc426SqKTJRT+2jVT3z3dmFJqd7pndJh9ZOyNnEI5SRPhEc03RyHwm8am3W8GPYbe2OhOCz/c9XsOaOaCxUhMl9oEExJ5Egyl5og5Hev2P+L44tj/Vfjz563rTQ3k+GzDppUxJoaPM05QTzrEsw0zvtf9u963KdCJg93IjAk1/Q6pf
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(366004)(396003)(136003)(39840400004)(66946007)(31686004)(26005)(66556008)(66476007)(52116002)(16526019)(4326008)(83380400001)(478600001)(186003)(36756003)(31696002)(2906002)(86362001)(5660300002)(8676002)(16576012)(956004)(6486002)(8936002)(2616005)(316002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: mEfSYGiz5SZdQWXCWwwkY3k9E+ZwqBkdL41UE0o8ARJIpMZdttbug3M2GQN74/zAGcdGvU90T/1E+xn6+ZxjLCelXKyxhndBD8GhPeYvs7FyRwc9BeTn/ntHHG0T9yK0PylPQVzlp9tRjHCJ/0cJK5y/2ytXiDDnWzxSMgBkEf3uzhndbTMpKjdZAjd0cxWt/VwzZwHa17+5ZDI9ks7U3Gcrh+34eqDPUNWrOF+LwlWof/u4M0quJCNrj47W09mUE2odpK6lnomNpKFv4mSb/pJlu6CXHBqw7klaYSawCEocLsX79SVSudDyG5NCKLNDxW5lvZcHwcbou5J7Cl5ws5Ee25tjJ/wmEqy9eqsNbe35kYxTX463gT1JDIMnM1oSO8towL+U6CHTzoIGQ70mV44NdVsqda98d2q//1poqfLl4n/GK107JJxULpoWob/hpLhoVcSPOzwji/pOu+ydenBW1iknon/TuYTiZU4neeo=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9fcaea2-09c2-4cdc-9258-08d818d7a157
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2020 07:16:07.9230 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t32qY5KrYGmDqzesb5f72WKCW9F9YvaSnQsbS89qr9llk5gb4u0jSGwtOmFKsOKuGoCEGyGyqX6/g7bAqpgBQl8RelxA2yFmuu+bqSlG2VM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1842
-Received-SPF: pass client-ip=40.107.2.104;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 03:16:09
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <b64d114d-061e-268d-cc48-1680e6188404@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,101 +154,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, peter.maydell@linaro.org
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24.06.2020 19:43, Markus Armbruster wrote:
-> This merely codifies existing practice, with one exception: the rule
-> advising against returning void, where existing practice is mixed.
+On 25/06/2020 08:19, Philippe Mathieu-Daudé wrote:
+> On 6/24/20 9:00 PM, Laurent Vivier wrote:
+>> qemu_set_nonblock() checks that the file descriptor can be used and, if
+>> not, crashes QEMU. An assert() is used for that. The use of assert() is
+>> used to detect programming error and the coredump will allow to debug
+>> the problem.
+>>
+>> But in the case of the tap device, this assert() can be triggered by
+>> a misconfiguration by the user. At startup, it's not a real problem, but it
+>> can also happen during the hot-plug of a new device, and here it's a
+>> problem because we can crash a perfectly healthy system.
+>>
+>> For instance:
+>>  # ip link add link virbr0 name macvtap0 type macvtap mode bridge
+>>  # ip link set macvtap0 up
+>>  # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
+>>  # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
+>>  (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
+>>  (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
+>>  (qemu) device_del net0
+>>  (qemu) netdev_del hostnet0
+>>  (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
+>>  qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
+>>  Aborted (core dumped)
+>>
+>> To avoid that, check the file descriptor is valid before passing it to qemu_set_non_block() for
+>> "fd=" and "fds=" parameters.
+>>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>> ---
+>>  include/qemu/sockets.h |  1 +
+>>  net/tap.c              | 13 +++++++++++++
+>>  util/oslib-posix.c     |  5 +++++
+>>  util/oslib-win32.c     |  6 ++++++
+>>  4 files changed, 25 insertions(+)
+>>
+>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+>> index 57cd049d6edd..5b0c2d77ddad 100644
+>> --- a/include/qemu/sockets.h
+>> +++ b/include/qemu/sockets.h
+>> @@ -17,6 +17,7 @@ int qemu_socket(int domain, int type, int protocol);
+>>  int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+>>  int socket_set_cork(int fd, int v);
+>>  int socket_set_nodelay(int fd);
+>> +bool qemu_fd_is_valid(int fd);
+>>  void qemu_set_block(int fd);
+>>  void qemu_set_nonblock(int fd);
+>>  int socket_set_fast_reuse(int fd);
+>> diff --git a/net/tap.c b/net/tap.c
+>> index 6207f61f84ab..f65966aaccd8 100644
+>> --- a/net/tap.c
+>> +++ b/net/tap.c
+>> @@ -795,6 +795,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>>              return -1;
+>>          }
+>>  
+>> +        /* Check if fd is valid */
+>> +        if (!qemu_fd_is_valid(fd)) {
+>> +            error_setg(errp, "Invalid file descriptor %d", fd);
+>> +            return -1;
+>> +        }
+>> +
+>>          qemu_set_nonblock(fd);
+>>  
+>>          vnet_hdr = tap_probe_vnet_hdr(fd);
+>> @@ -843,6 +849,13 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>>                  goto free_fail;
+>>              }
+>>  
+>> +            /* Check if fd is valid */
+>> +            if (!qemu_fd_is_valid(fd)) {
+>> +                error_setg(errp, "Invalid file descriptor %d", fd);
+>> +                ret = -1;
+>> +                goto free_fail;
+>> +            }
+>> +
+>>              qemu_set_nonblock(fd);
+>>  
+>>              if (i == 0) {
+>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>> index 916f1be2243a..8d5705f598d3 100644
+>> --- a/util/oslib-posix.c
+>> +++ b/util/oslib-posix.c
+>> @@ -244,6 +244,11 @@ void qemu_anon_ram_free(void *ptr, size_t size)
+>>      qemu_ram_munmap(-1, ptr, size);
+>>  }
+>>  
+>> +bool qemu_fd_is_valid(int fd)
+>> +{
+>> +    return fcntl(fd, F_GETFL) != -1;
+>> +}
+>> +
+>>  void qemu_set_block(int fd)
+>>  {
+>>      int f;
+>> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+>> index e9b14ab17847..a6be9445cfdb 100644
+>> --- a/util/oslib-win32.c
+>> +++ b/util/oslib-win32.c
+>> @@ -132,6 +132,12 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
+>>  }
+>>  #endif /* CONFIG_LOCALTIME_R */
+>>  
+>> +bool qemu_fd_is_valid(int fd)
+>> +{
+>> +    /* FIXME: how to check if fd is valid? */
+>> +    return true;
+>> +}
 > 
-> When the Error API was created, we adopted the (unwritten) rule to
-> return void when the function returns no useful value on success,
-> unlike GError, which recommends to return true on success and false on
-> error then.
+> Maybe:
 > 
-> When a function returns a distinct error value, say false, a checked
-> call that passes the error up looks like
+>   bool qemu_fd_is_valid(int fd)
+>   {
+>       unsigned long res; /* ignored */
 > 
->      if (!frobnicate(..., errp)) {
->          handle the error...
->      }
-> 
-> When it returns void, we need
-> 
->      Error *err = NULL;
-> 
->      frobnicate(..., &err);
->      if (err) {
->          handle the error...
->          error_propagate(errp, err);
->      }
-> 
-> Not only is this more verbose, it also creates an Error object even
-> when @errp is null, &error_abort or &error_fatal.
-> 
-> People got tired of the additional boilerplate, and started to ignore
-> the unwritten rule.  The result is confusion among developers about
-> the preferred usage.
-> 
-> The written rule will hopefully reduce the confusion.
-> 
-> The remainder of this series will update a substantial amount of code
-> to honor the rule.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   include/qapi/error.h | 26 ++++++++++++++++++++++++++
->   1 file changed, 26 insertions(+)
-> 
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index 1a5ea25e12..c3d84d610a 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -15,6 +15,32 @@
->   /*
->    * Error reporting system loosely patterned after Glib's GError.
->    *
-> + * Rules:
-> + *
-> + * - Functions that use Error to report errors have an Error **errp
-> + *   parameter.  It should be the last parameter, except for functions
-> + *   taking variable arguments.
-> + *
-> + * - You may pass NULL to not receive the error, &error_abort to abort
-> + *   on error, &error_fatal to exit(1) on error, or a pointer to a
-> + *   variable containing NULL to receive the error.
-> + *
-> + * - The value of @errp should not affect control flow.
+>       return ioctlsocket(fd, FIONREAD, &res) == NO_ERROR;
+>   }
 
-What do you mean? Incoming state of errp, or *errp after some call of another
-function? Should we then update this paragraph, when introduce
-ERRP_AUTO_PROPAGATE?
+I can do that, but I have no way to test the change doesn't break
+anything... whereas always returning true ensures me it continues to
+work as before.
 
-> + *
-> + * - On success, the function should not use @errp.  On failure, it
-> + *   should set a new error, e.g. with error_setg(errp, ...), or
-> + *   propagate an existing one, e.g. with error_propagate(errp, ...).
-> + *
-> + * - Whenever practical, also return a value that indicates success /
-> + *   failure.  This can make the error checking more concise, and can
-> + *   avoid useless error object creation and destruction.  Note that
-> + *   we still have many functions returning void.  We recommend
-> + *   • bool-valued functions return true on success / false on failure,
-> + *   • pointer-valued functions return non-null / null pointer, and
-> + *   • integer-valued functions return non-negative / negative.
-> + *
-> + * How to:
-> + *
->    * Create an error:
->    *     error_setg(errp, "situation normal, all fouled up");
->    *
-> 
+Thanks,
+Laurent
 
-
--- 
-Best regards,
-Vladimir
 
