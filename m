@@ -2,119 +2,79 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0487EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40719C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8ED62076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05BB820679
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:21:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJXQ1c/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8ED62076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cxt6YdTp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05BB820679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joOzI-0006l3-0t
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:20:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
+	id 1joP0E-0007ke-6k
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:21:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joOy7-0005ga-2V
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:18:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34721
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1joOz7-0006mR-Ut
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:19:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21824
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joOy5-0004b1-Eq
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:18:54 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1joOz6-0004qJ-1g
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:19:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593080332;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BYfyxwH8B4OmTB/AZfIPNmDyfSFBH5zqBt+BCao1KxI=;
- b=CJXQ1c/fBFebMgLcO05KaqhA+/HoQhZp7mYyrTUdskvzA01XcxM3DSiApf5AoYlU5/5no0
- Y/Gl2vdjzuhjnRAqxtduUy/fS5zZoha8Mgs6VQ7zZX8ZdYIbQw4nLZHOC7S6QR/Cm9budw
- FvsgEdzrnJji2WcF3tBrv+WQMvbjSbA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-BXFWZCJ6P56z1o3jlnsc3g-1; Thu, 25 Jun 2020 06:18:48 -0400
-X-MC-Unique: BXFWZCJ6P56z1o3jlnsc3g-1
-Received: by mail-wm1-f71.google.com with SMTP id v24so6734431wmh.3
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 03:18:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=BYfyxwH8B4OmTB/AZfIPNmDyfSFBH5zqBt+BCao1KxI=;
- b=XJ6WPQZ5QGHoxuw47vO7aUmdTtwDAXLEn3kRfLHtO1TZc3c2AcqimbtvuTgVU/1iBJ
- GwAaPsmN6HWHrZjgwhl47MavwIi6osm5pCCzX93KmzFQbPzMMgZxBPsiNTfkQTFIrByR
- 0hAi4IWWMuVteCA6mmpr28MQStJgm7b01ctpQ8PZ15b5v9X5sGpvBZ8ZSFpA8RFX2SkB
- fzQybviQDy7coKIDcGNf0a+8n00ak2Ik2WLCJCi4ZtQ7fZRn7n+ScGTBVpJrW8ONeMHO
- ymkhnjDOCn68+DVHof/MJJ+ce2bZBr504IWoxgqwvu6YAqE7Meyrrv/Dn+I+W8T2zSWR
- 76Gg==
-X-Gm-Message-State: AOAM532Nr7hZqNtv2oWxyvPApsRk/1TfOv0eNGDY6gMKrspX8bcYsJg7
- 81y0J8MGUCBSfn+sEsCLd3keJxB52KkxTkxdQtZfVwWbEGWVCp6y4o6CKMocZnPCPpOEum9/kCN
- wcARN49nUyyvdQeY=
-X-Received: by 2002:adf:f542:: with SMTP id j2mr21719520wrp.61.1593080327318; 
- Thu, 25 Jun 2020 03:18:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlQ3IliyIPwf5ku6BQ566y5wzQSnRE+UUNGb8+wkTzjeOCYzQzNnkfMFCxh40YVN0OSYKeWQ==
-X-Received: by 2002:adf:f542:: with SMTP id j2mr21719498wrp.61.1593080327049; 
- Thu, 25 Jun 2020 03:18:47 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r1sm30491595wrn.29.2020.06.25.03.18.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 03:18:46 -0700 (PDT)
-Subject: Re: [PATCH] hw/virtio/virtio-iommu-pci.c: Fix typo in error message
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200625100811.12690-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f847f16f-ab78-24ac-3071-b2ed3b8950a0@redhat.com>
-Date: Thu, 25 Jun 2020 12:18:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ s=mimecast20190719; t=1593080395;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=dtZQl4SfDExZ8IZ3rj+jtkq2HKdik8QAr1ComnNLyt4=;
+ b=Cxt6YdTpZA6QOFmFBC713zfoaBxtjn4IgXkhdR2yaAFnct49OlxzmCwLo0m9iRkXhNLaXa
+ vtV4myfZe3dZS1M04XvFsAIP7zJj/B8zq/5Jx2ekMNQAvThoqVsm00kcz13Obx4IktXLlS
+ CpKe71gxkCGy7mTl/vqNN368aDtHP18=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-CgmBDKZ6OoGAPOWWTamJ8Q-1; Thu, 25 Jun 2020 06:19:51 -0400
+X-MC-Unique: CgmBDKZ6OoGAPOWWTamJ8Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FB70107ACCA;
+ Thu, 25 Jun 2020 10:19:50 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 714C9619C0;
+ Thu, 25 Jun 2020 10:19:39 +0000 (UTC)
+Date: Thu, 25 Jun 2020 11:19:35 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Marc Hartmayer <mhartmay@linux.ibm.com>
+Subject: Re: [RFC 0/4] Enable virtio-fs on s390x
+Message-ID: <20200625101935.GF1009994@redhat.com>
+References: <20200625100430.22407-1-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625100811.12690-1-peter.maydell@linaro.org>
-Content-Language: en-US
+In-Reply-To: <20200625100430.22407-1-mhartmay@linux.ibm.com>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -122,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,37 +95,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 12:08 PM, Peter Maydell wrote:
-> Fix a typo in an error message in virtio_iommu_pci_realize():
-> "Check you machine" should be "Check your machine".
+On Thu, Jun 25, 2020 at 12:04:26PM +0200, Marc Hartmayer wrote:
+> This RFC is about enabling virtio-fs on s390x. For that we need
+>  + some shim code (first patch), and we need
+>  + libvhost-user to deal with virtio endiannes as mandated by the spec.
+>  
+> The second part is trickier, because unlike QEMU we are not certain
+> about the guest's native endianness, which is needed to handle the
+> legacy-interface appropriately. In fact, this is the reason why just
+> RFC.
 > 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/virtio/virtio-iommu-pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-> index 632533abaf7..32e3215d1df 100644
-> --- a/hw/virtio/virtio-iommu-pci.c
-> +++ b/hw/virtio/virtio-iommu-pci.c
-> @@ -48,7 +48,7 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->                     "%s machine fails to create iommu-map device tree bindings",
->                     mc->name);
->          error_append_hint(errp,
-> -                          "Check you machine implements a hotplug handler "
-> +                          "Check your machine implements a hotplug handler "
->                            "for the virtio-iommu-pci device\n");
->          error_append_hint(errp, "Check the guest is booted without FW or with "
->                            "-no-acpi\n");
-> 
+> One of the open questions is whether to build separate versions, one
+> for guest little endian and one for guest big endian, or do we want
+> something like a command line option? (Digression on the libvirt
+> modeling)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+When you talk about  big vs little endian, are you referring to TCG
+scenarios with mixed host/guest arch, or arches which can support
+either endianess, or both ? i guess it doesn't matter actually, as
+I think the latter forces a specific answer.
+
+Considering that some architectures allow the guest OS to flip between
+big & little endian as they boot, libvirt cannot know what endianess
+the guest is using when it launches virtiofsd. It thus cannot pick
+between two different endianness builds of virtiofsd automatically.
+This would force the user to tell libvirt what arch the guest is using
+at the time they define the guest. This is an undesirable restriction
+for use cases where the admin of the guest OS has no direct control
+over the host config.
+
+IOW, I think the only practical answer is to have a single binary that
+automagically does the right thing at runtime according to guest
+endianess that currently is in use.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
