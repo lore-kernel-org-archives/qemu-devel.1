@@ -2,80 +2,79 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1EDC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53488C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:10:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 101EE20706
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BD4E20773
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:10:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SGuI/aBQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 101EE20706
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vrM/RykY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD4E20773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joVMy-0004d1-C6
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 13:09:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
+	id 1joVON-0005in-Aw
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 13:10:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joVMF-00041g-Hk
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:08:15 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44436)
+ id 1joVNf-0005Cs-K7
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:09:43 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37394)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joVMD-0002yx-DJ
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:08:15 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 5so3945603oty.11
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 10:08:12 -0700 (PDT)
+ id 1joVNd-0003ez-8E
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:09:43 -0400
+Received: by mail-oi1-x244.google.com with SMTP id a3so5617136oid.4
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 10:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dCwmRyVnG6xrIjiESn7a0o4CEYbggaskdFoErN4t87g=;
- b=SGuI/aBQCJSO0CtzizLWFyrzx5oKVF6ITZbx50Ek+nFeiBGQP63Rk+IdbBFeYaSIOF
- saYioGYOgZnZdNsaUBpI6FRpEEEpmzNCZCHJEzo/nOVdfgzFoRPvZ0zN/huWk9xAgnw5
- difZt0UmiS3nnUOcFcS8Kv4WWKJh5sAyOYOrY4+vjctkpyB0bj5J6I+HAcXsQ81JZ3vw
- R8SJpxws3JHF5V1xe/XbPKH8v01QHGjWTXw5WZ0ic0JbJ8Vy0SKjWt80OYFUI6rjqsub
- YfEU+6dM88YcWXtSP9qV0JCPG0dpYJL22WDj7ReAVYl1En+S5cdkpeYFiHxMQNyGwWfr
- 0qtA==
+ :cc; bh=VCtLKjHDdYEXKPaRNYd1QCINSZ6kmh4o8EMfO046g/Q=;
+ b=vrM/RykYT5oBdHbi6tF+ifhoZv2OxITIgVJueoVhbJ7XsV3/y6rnOfdd85NNwMsY4K
+ /h6w1PQOxypOMmPcS2jENmRYnZE/1HGgUUy+oFg2340iMaWOzJh8giZZVObwOeVdzDTc
+ TzH4CcuCjHjZJFWlrdVl5VGYB8OcsZtXb0D6abx6FI457Nv8YWwwpZIA09sABH7ga0e6
+ PzJFYoPyP2Y0PTTZMg21rj5d8uKXjm7QcFc9kXh04DwRwTXnUYGFVRyez4usWJlkDoxf
+ NlXynPD63SuWChx/MhDarwrpC119ALIBvMxRcSYs4fpWGS/4vFsntgS2tci5Cwd4qu28
+ Bbzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=dCwmRyVnG6xrIjiESn7a0o4CEYbggaskdFoErN4t87g=;
- b=Q6r1hvqGwHdBDcmIbNiEQoNIsAUK520mreehuczyKOgRJfsNpR8+jZTLXHQnaBhv/N
- 7/U7S3BSsDtiU21pcjFubdt/eMAleBVEW2CZvIpzbxy0lIRRbgKXmSDqCerUenTe2g4a
- wuoTuqd3Y0YkJvInSFx/j3Sjl7+zKYz74uwZ84eDouT9g0frJsmZu7gRSLOX6LGjdH5U
- jmVUE10xSWQ1UE6cbfH2g5jvZmC9FHSb6jM+IUNjrnW5nbaZxnmiblMMpadIAL/rTzdN
- JfykpNk2Sfo5ncQgbP7AZyt4YuQXDqB2kPJrv9sCYxQIkrkisnPcMj4mEYSJnq3V9fcB
- WOUg==
-X-Gm-Message-State: AOAM531qOxah2elh+hYP5Zge4qK5DKP02XjJ8SYaND3qBiQCvuFqEXAd
- olzxIu+Boi0Dcv7nPcPyh/LTVqpMYXgcnEaI/MX/fA==
-X-Google-Smtp-Source: ABdhPJxqQGSpQwQTwKLtSdo9dkZSpz6tQTwL5MOTs+sZgxmKBOJeM5wVcWfpKUjMKjHPRza+p3/zsn+YSETX/8GMmAg=
-X-Received: by 2002:a05:6830:8d:: with SMTP id
- a13mr27561805oto.91.1593104892098; 
- Thu, 25 Jun 2020 10:08:12 -0700 (PDT)
+ bh=VCtLKjHDdYEXKPaRNYd1QCINSZ6kmh4o8EMfO046g/Q=;
+ b=QyrgGMzqq0nc7yC4o52AJBEuobqC1BFyqaJc9tUqxak0pqKkpQZgWctgFQe6YOJL9x
+ jXiyPGlM0iGLLjffU43YcWpqqTRoB8yEx9NVLIokMon8Mlw9uf8JGamoycqy8//ZB5uN
+ tJvSliBp3YmShlGTYeXpbaj6ou0yH2TJyRq1Cfv37k8k9UArKslDipWsj9bwLj/s2DeJ
+ 6RWQQCf58m1xAGM3iCgpuJKpdtOzPanazXZzUP1mMlXeWLaMspWf9Y5ZJSye3pP2dfDZ
+ PSFfZsRGB39imajEx1DL4zeYdhBMsTXG2wmSSoKMm1g4a7JsqDvS1NkpGm2+3KmQNbfY
+ bsog==
+X-Gm-Message-State: AOAM530fL3RRu18VZWnVXpglJ+mLSY/q8KjSwR8MIntu4xafsIcnfy6p
+ DORyEvpQkyOTUgJqqDeH8qvl8gIZEmaTd5tGubg9Rw==
+X-Google-Smtp-Source: ABdhPJzkw7hPJeH8I658vpQSwekdHphR/JxiQCfLWEERqf/4kFt0JtJUn5QEPCdBvslNoVyKoIxbAzIrs31gYtV/Tgo=
+X-Received: by 2002:a54:4694:: with SMTP id k20mr3018771oic.146.1593104980015; 
+ Thu, 25 Jun 2020 10:09:40 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200623193658.623279-1-richard.henderson@linaro.org>
- <20200623193658.623279-39-richard.henderson@linaro.org>
- <CAFEAcA8xy_Q-6zXexBEHLR=WSYTXVvttL9V4HqiMPmtRm__TEw@mail.gmail.com>
- <9e80eb42-655f-9ffa-264a-f72627efdf42@linaro.org>
-In-Reply-To: <9e80eb42-655f-9ffa-264a-f72627efdf42@linaro.org>
+ <20200623193658.623279-45-richard.henderson@linaro.org>
+ <CAFEAcA_svDHEDP5g3aaEL6_b-8hy0AB8oRBWj=y6G1K_r6E9nQ@mail.gmail.com>
+ <f15d6bf6-03ef-70fe-2f40-0665d49b0851@linaro.org>
+In-Reply-To: <f15d6bf6-03ef-70fe-2f40-0665d49b0851@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 18:07:59 +0100
-Message-ID: <CAFEAcA_bpthPdThRwVaWRyOWkLqbF_cja8w-bga8RHBDHO=r9Q@mail.gmail.com>
-Subject: Re: [PATCH v8 38/45] target/arm: Complete TBI clearing for user-only
- for SVE
+Date: Thu, 25 Jun 2020 18:09:28 +0100
+Message-ID: <CAFEAcA_qOznfoAWtXGh-85C86fSft5ccSKQKv_uVw6-9bD4Oag@mail.gmail.com>
+Subject: Re: [PATCH v8 44/45] target/arm: Add allocation tag storage for
+ system mode
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,36 +102,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jun 2020 at 17:54, Richard Henderson
+On Thu, 25 Jun 2020 at 18:02, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> On 6/25/20 5:52 AM, Peter Maydell wrote:
-> > On Tue, 23 Jun 2020 at 20:37, Richard Henderson
+> On 6/25/20 6:03 AM, Peter Maydell wrote:
+> > On Tue, 23 Jun 2020 at 20:38, Richard Henderson
 > > <richard.henderson@linaro.org> wrote:
 > >>
-> >> There are a number of paths by which the TBI is still intact
-> >> for user-only in the SVE helpers.
+> >> Look up the physical address for the given virtual address,
+> >> convert that to a tag physical address, and finally return
+> >> the host address that backs it.
 > >>
-> >> Because we currently always set TBI for user-only, we do not
-> >> need to pass down the actual TBI setting from above, and we
-> >> can remove the top byte in the inner-most primitives, so that
-> >> none are forgotten.  Moreover, this keeps the "dirty" pointer
-> >> around at the higher levels, where we need it for any MTE checking.
+> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> >> ---
+> >>  target/arm/mte_helper.c | 126 ++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 126 insertions(+)
 > >>
-> >> Since the normal case, especially for user-only, goes through
-> >> RAM, this clearing merely adds two insns per page lookup, which
-> >> will be completely in the noise.
 > >
-> > Can we have an assert() somewhere suitable that TBI is set?
-> > That way if we ever do have an SVE-capable linux-user which
-> > doesn't set TBI for some reason we'll get a useful reminder
-> > that we need to fix something.
+> >> +    /* If not normal memory, there is no tag storage: access unchecked. */
+> >> +    if (unlikely(flags & TLB_MMIO)) {
+> >
+> > Comment says we're checking a memory attribute, but the code
+> > is checking for TLB_MMIO, which isn't the same thing.
 >
-> At what level would you like such an assert?
+> Comment is not trying to allude to Normal vs Device, but "ram" vs "mmio" in the
+> qemu sense.
 
-I don't particularly care, as long as we get notified if our
-assumption that TBI is always set gets broken (ie we change
-that bit of CPU reset code for some reason).
+Oh, I see: maybe "if not backed by host RAM, then" ? I tend to
+assume "normal memory" means "Normal memory" :-)
 
 thanks
 -- PMM
