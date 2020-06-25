@@ -4,66 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD81DC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B08D207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:35:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67FEE207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:35:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="REEk348E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B08D207D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zid1OHS+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67FEE207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTuV-0005iQ-Pv
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:35:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37366)
+	id 1joTuc-0005xz-JD
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:35:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTiU-0005nV-Fd
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47476
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTiV-0005pX-SA
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:07 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45277
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTiS-0000zQ-MM
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:06 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTiU-00010O-5s
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098584;
+ s=mimecast20190719; t=1593098585;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Rlozvh1JefoYwHhG98f7k+4WjYRuc6ZDe5vc/mVckIQ=;
- b=REEk348EZ65plUlW6n3ZXXCiFhEaoJ/c1Zk1z+aTtPCY/2BSlXRc93e966QKUNcW9W7ize
- mO9d3o43PsoxBWsP9ae3qRj9+7R4jcc+3eHwqLb/UL9fJxud6LlEEps+bWozqDFNo9WUvp
- uKurTclkfn4rQKedgeU0LF2iNv7PHHk=
+ bh=Lsugp79RAMNcHG74w7ZGLRAAjt0YELvG0KbMAv1dqUk=;
+ b=Zid1OHS+8I/f8UBdlYAhdcllNfzMgn7l+rRVhGJSl8XwMQABK8ELBgv7JCPYzuy/PU7DEa
+ HDxtw1IXPEhgIX2bpa/fyaB9zH77ZrZuJYN0TFjn76Nnaa3hKnNWEW5GKxmXd4jIwFQePj
+ GA2JOtkG0Jv9X25Ee98qap6KqiD5q/M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-ZQbqtHwVOsqeR4XIABQghg-1; Thu, 25 Jun 2020 11:23:02 -0400
-X-MC-Unique: ZQbqtHwVOsqeR4XIABQghg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-150-uKKlE8xoNJe1IIbDriV24A-1; Thu, 25 Jun 2020 11:23:00 -0400
+X-MC-Unique: uKKlE8xoNJe1IIbDriV24A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C3B7800C60;
- Thu, 25 Jun 2020 15:23:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8638107ACCD;
+ Thu, 25 Jun 2020 15:22:58 +0000 (UTC)
 Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A78365DAA0;
- Thu, 25 Jun 2020 15:23:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C91F2B4A8;
+ Thu, 25 Jun 2020 15:22:58 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 19/47] vmdk: Drop vmdk_co_flush()
-Date: Thu, 25 Jun 2020 17:21:47 +0200
-Message-Id: <20200625152215.941773-20-mreitz@redhat.com>
+Subject: [PATCH v7 18/47] block: Flush all children in generic code
+Date: Thu, 25 Jun 2020 17:21:46 +0200
+Message-Id: <20200625152215.941773-19-mreitz@redhat.com>
 In-Reply-To: <20200625152215.941773-1-mreitz@redhat.com>
 References: <20200625152215.941773-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -98,50 +99,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before HEAD^, we needed this because bdrv_co_flush() by itself would
-only flush bs->file.  With HEAD^, bdrv_co_flush() will flush all
-children on which a WRITE or WRITE_UNCHANGED permission has been taken.
-Thus, vmdk no longer needs to do it itself.
+If the driver does not support .bdrv_co_flush() so bdrv_co_flush()
+itself has to flush the children of the given node, it should not flush
+just bs->file->bs, but in fact all children that might have been written
+to (judging from the permissions taken on them).
 
+This is a bug fix for qcow2 images with an external data file, as they
+so far did not flush that data_file node.
+
+In any case, the BLKDBG_EVENT() should be emitted on the primary child,
+because that is where a blkdebug node would be if there is any.
+
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/vmdk.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ block/io.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 62da465126..a23890e6ec 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2802,21 +2802,6 @@ static void vmdk_close(BlockDriverState *bs)
-     error_free(s->migration_blocker);
- }
+diff --git a/block/io.c b/block/io.c
+index 097a3861d8..c2af7711d6 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2769,6 +2769,8 @@ static int coroutine_fn bdrv_flush_co_entry(void *opaque)
  
--static coroutine_fn int vmdk_co_flush(BlockDriverState *bs)
--{
--    BDRVVmdkState *s = bs->opaque;
--    int i, err;
--    int ret = 0;
--
--    for (i = 0; i < s->num_extents; i++) {
--        err = bdrv_co_flush(s->extents[i].file->bs);
--        if (err < 0) {
--            ret = err;
--        }
--    }
--    return ret;
--}
--
- static int64_t vmdk_get_allocated_file_size(BlockDriverState *bs)
+ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
  {
-     int i;
-@@ -3075,7 +3060,6 @@ static BlockDriver bdrv_vmdk = {
-     .bdrv_close                   = vmdk_close,
-     .bdrv_co_create_opts          = vmdk_co_create_opts,
-     .bdrv_co_create               = vmdk_co_create,
--    .bdrv_co_flush_to_disk        = vmdk_co_flush,
-     .bdrv_co_block_status         = vmdk_co_block_status,
-     .bdrv_get_allocated_file_size = vmdk_get_allocated_file_size,
-     .bdrv_has_zero_init           = vmdk_has_zero_init,
++    BdrvChild *primary_child = bdrv_primary_child(bs);
++    BdrvChild *child;
+     int current_gen;
+     int ret = 0;
+ 
+@@ -2798,7 +2800,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+     }
+ 
+     /* Write back cached data to the OS even with cache=unsafe */
+-    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_OS);
++    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_OS);
+     if (bs->drv->bdrv_co_flush_to_os) {
+         ret = bs->drv->bdrv_co_flush_to_os(bs);
+         if (ret < 0) {
+@@ -2808,15 +2810,15 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+ 
+     /* But don't actually force it to the disk with cache=unsafe */
+     if (bs->open_flags & BDRV_O_NO_FLUSH) {
+-        goto flush_parent;
++        goto flush_children;
+     }
+ 
+     /* Check if we really need to flush anything */
+     if (bs->flushed_gen == current_gen) {
+-        goto flush_parent;
++        goto flush_children;
+     }
+ 
+-    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
++    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_DISK);
+     if (!bs->drv) {
+         /* bs->drv->bdrv_co_flush() might have ejected the BDS
+          * (even in case of apparent success) */
+@@ -2860,8 +2862,17 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+     /* Now flush the underlying protocol.  It will also have BDRV_O_NO_FLUSH
+      * in the case of cache=unsafe, so there are no useless flushes.
+      */
+-flush_parent:
+-    ret = bs->file ? bdrv_co_flush(bs->file->bs) : 0;
++flush_children:
++    ret = 0;
++    QLIST_FOREACH(child, &bs->children, next) {
++        if (child->perm & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) {
++            int this_child_ret = bdrv_co_flush(child->bs);
++            if (!ret) {
++                ret = this_child_ret;
++            }
++        }
++    }
++
+ out:
+     /* Notify any pending flushes that we have completed */
+     if (ret == 0) {
 -- 
 2.26.2
 
