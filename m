@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C453C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 309E0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:14:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 205EF20768
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:14:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 205EF20768
+	by mail.kernel.org (Postfix) with ESMTPS id 0688820768
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:14:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0688820768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joZCE-0002Rq-DU
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 17:14:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47778)
+	id 1joZCb-0002zl-AJ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 17:14:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
- id 1joZBH-0001Lk-Q6; Thu, 25 Jun 2020 17:13:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6732)
+ id 1joZBY-0001jF-KK; Thu, 25 Jun 2020 17:13:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8812)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
- id 1joZBF-0007XS-Tn; Thu, 25 Jun 2020 17:13:11 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ id 1joZBW-0007Za-Va; Thu, 25 Jun 2020 17:13:28 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05PL3hZH149548; Thu, 25 Jun 2020 17:13:00 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31vbn7kxv1-1
+ 05PL3FhA171365; Thu, 25 Jun 2020 17:13:21 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31vx91a4av-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 25 Jun 2020 17:13:00 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05PL6IDq027079;
- Thu, 25 Jun 2020 21:12:58 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma04wdc.us.ibm.com with ESMTP id 31uuryf3fx-1
+ Thu, 25 Jun 2020 17:13:21 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05PL5fXg024586;
+ Thu, 25 Jun 2020 21:13:20 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma04dal.us.ibm.com with ESMTP id 31uurqavcj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 25 Jun 2020 21:12:58 +0000
+ Thu, 25 Jun 2020 21:13:20 +0000
 Received: from b03ledav001.gho.boulder.ibm.com
  (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05PLCvED27656576
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05PLDG6r30605750
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 25 Jun 2020 21:12:57 GMT
+ Thu, 25 Jun 2020 21:13:16 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C652D6E052;
- Thu, 25 Jun 2020 21:12:57 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1607B6E04C;
+ Thu, 25 Jun 2020 21:13:19 +0000 (GMT)
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBBF46E04C;
- Thu, 25 Jun 2020 21:12:56 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 5AC826E053;
+ Thu, 25 Jun 2020 21:13:18 +0000 (GMT)
 Received: from [9.160.117.167] (unknown [9.160.117.167])
  by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Thu, 25 Jun 2020 21:12:56 +0000 (GMT)
+ Thu, 25 Jun 2020 21:13:17 +0000 (GMT)
 Content-Type: text/plain;
 	charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v3 1/8] target/ppc: Introduce Power ISA 3.1 flag
+Subject: Re: [PATCH v3 2/8] target/ppc: add byte-reverse br[dwh] instructions
 From: Lijun Pan <ljp@linux.vnet.ibm.com>
-In-Reply-To: <bc918ea4-8023-9186-b603-27e9050ac8d2@linaro.org>
-Date: Thu, 25 Jun 2020 16:12:55 -0500
+In-Reply-To: <199eadcf-9d05-ce25-8b7a-6a0e1a01c1a1@linaro.org>
+Date: Thu, 25 Jun 2020 16:13:17 -0500
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <835A870F-32B8-4A36-ABC8-850365BE7827@linux.vnet.ibm.com>
+Message-Id: <C02EC1A9-FC40-4B03-A8AD-ADC42CF9EFE3@linux.vnet.ibm.com>
 References: <20200625170018.64265-1-ljp@linux.ibm.com>
- <20200625170018.64265-2-ljp@linux.ibm.com>
- <bc918ea4-8023-9186-b603-27e9050ac8d2@linaro.org>
+ <20200625170018.64265-3-ljp@linux.ibm.com>
+ <199eadcf-9d05-ce25-8b7a-6a0e1a01c1a1@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 X-TM-AS-GCONF: 00
@@ -79,10 +79,10 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-25_16:2020-06-25,
  2020-06-25 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- adultscore=0 impostorscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- cotscore=-2147483648 suspectscore=0 bulkscore=0 clxscore=1011
- lowpriorityscore=0 mlxlogscore=954 classifier=spam adjust=0 reason=mlx
+ mlxscore=0 suspectscore=2
+ lowpriorityscore=0 mlxlogscore=722 clxscore=1015 impostorscore=0
+ phishscore=0 spamscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.12.0-2004280000 definitions=main-2006250124
 Received-SPF: none client-ip=148.163.156.1;
  envelope-from=ljp@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
@@ -113,80 +113,80 @@ Sender: "Qemu-devel"
 
 
 
-> On Jun 25, 2020, at 12:40 PM, Richard Henderson =
+> On Jun 25, 2020, at 12:42 PM, Richard Henderson =
 <richard.henderson@linaro.org> wrote:
 >=20
 > On 6/25/20 10:00 AM, Lijun Pan wrote:
->> +    /* POWER ISA 3.1                                                 =
-        */
->> +    PPC2_ISA310        =3D 0x0000000000100000ULL,
+>> +static void gen_brh(DisasContext *ctx)
+>> +{
+>> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>> +    TCGv_i64 t1 =3D tcg_temp_new_i64();
+>> +    TCGv_i64 t2 =3D tcg_temp_new_i64();
+>> +
+>> +    tcg_gen_movi_i64(t0, 0x00ff00ff00ff00ffull);
+>> +    tcg_gen_shri_i64(t1, cpu_gpr[rS(ctx->opcode)], 8);
+>> +    tcg_gen_and_i64(t2, t1, t0);
+>> +    tcg_gen_and_i64(t1, cpu_gpr[rS(ctx->opcode)], t0);
+>> +    tcg_gen_shli_i64(t1, t1, 8);
+>> +    tcg_gen_or_i64(cpu_gpr[rA(ctx->opcode)], t1, t2);
+>> +
+>> +    tcg_temp_free_i64(t0);
+>> +    tcg_temp_free_i64(t1);
+>> +    tcg_temp_free_i64(t2);
+>> +}
+>> +
+>> static opcode_t opcodes[] =3D {
+>> +#if defined(TARGET_PPC64)
+>> +GEN_HANDLER_E(brd, 0x1F, 0x1B, 0x05, 0x0000F801, PPC_NONE, =
+PPC2_ISA310),
+>> +GEN_HANDLER_E(brw, 0x1F, 0x1B, 0x04, 0x0000F801, PPC_NONE, =
+PPC2_ISA310),
+>> +GEN_HANDLER_E(brh, 0x1F, 0x1B, 0x06, 0x0000F801, PPC_NONE, =
+PPC2_ISA310),
+>> +#endif
 >=20
-> This goes in the first patch, but...
+> No.  You haven't even tested this -- it doesn't compile.
 >=20
->> #define PPC_TCG_INSNS2 (PPC2_BOOKE206 | PPC2_VSX | PPC2_PRCNTL | =
-PPC2_DBRX | \
->>                         PPC2_ISA205 | PPC2_VSX207 | PPC2_PERM_ISA206 =
-| \
->> @@ -2199,7 +2201,7 @@ enum {
->>                         PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 | \
->>                         PPC2_ALTIVEC_207 | PPC2_ISA207S | PPC2_DFP | =
-\
->>                         PPC2_FP_CVT_S64 | PPC2_TM | PPC2_PM_ISA206 | =
-\
->> -                        PPC2_ISA300)
->> +                        PPC2_ISA300 | PPC2_ISA310)
+>>  CC      ppc-softmmu/target/ppc/translate.o
+>> /home/rth/qemu/qemu/target/ppc/translate.c: In function =
+=E2=80=98gen_brd=E2=80=99:
+>> /home/rth/qemu/qemu/target/ppc/translate.c:6980:32: error: passing =
+argument 1 of =E2=80=98tcg_gen_bswap64_i64=E2=80=99 from incompatible =
+pointer type [-Werror=3Dincompatible-pointer-types]
+>> 6980 |     tcg_gen_bswap64_i64(cpu_gpr[rA(ctx->opcode)], =
+cpu_gpr[rS(ctx->opcode)]);
+>>      |                         ~~~~~~~^~~~~~~~~~~~~~~~~
+>>      |                                |
+>>      |                                TCGv_i32 {aka struct TCGv_i32_d =
+*}
+>> In file included from /home/rth/qemu/qemu/target/ppc/translate.c:26:
+>> /home/rth/qemu/qemu/include/tcg/tcg-op.h:533:35: note: expected =
+=E2=80=98TCGv_i64=E2=80=99 {aka =E2=80=98struct TCGv_i64_d *=E2=80=99} =
+but argument is of type =E2=80=98TCGv_i32=E2=80=99 {aka =E2=80=98struct =
+TCGv_i32_d *=E2=80=99}
+>>  533 | void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg);
+>>      |                          ~~~~~~~~~^~~
+>> /home/rth/qemu/qemu/target/ppc/translate.c:6980:58: error: passing =
+argument 2 of =E2=80=98tcg_gen_bswap64_i64=E2=80=99 from incompatible =
+pointer type [-Werror=3Dincompatible-pointer-types]
+>> 6980 |     tcg_gen_bswap64_i64(cpu_gpr[rA(ctx->opcode)], =
+cpu_gpr[rS(ctx->opcode)]);
+>>      |                                                   =
+~~~~~~~^~~~~~~~~~~~~~~~~
+>>      |                                                          |
+>>      |                                                          =
+TCGv_i32 {aka struct TCGv_i32_d *}
 >=20
-> ... all of the rest belongs in a separate patch, which will be sorted =
-to the
-> end of the patch set.
+> and so forth.
 >=20
-
-Do you mean the first patch has
-=E2=80=9C
->> +    /* POWER ISA 3.1                                                 =
-        */
->> +    PPC2_ISA310        =3D 0x0000000000100000ULL,
-
-=E2=80=9C
-the second patch has
-
-=E2=80=9C
->> #define PPC_TCG_INSNS2 (PPC2_BOOKE206 | PPC2_VSX | PPC2_PRCNTL | =
-PPC2_DBRX | \
->>                         PPC2_ISA205 | PPC2_VSX207 | PPC2_PERM_ISA206 =
-| \
->> @@ -2199,7 +2201,7 @@ enum {
->>                         PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 | \
->>                         PPC2_ALTIVEC_207 | PPC2_ISA207S | PPC2_DFP | =
-\
->>                         PPC2_FP_CVT_S64 | PPC2_TM | PPC2_PM_ISA206 | =
-\
->> -                        PPC2_ISA300)
->> +                        PPC2_ISA300 | PPC2_ISA310)
-
-
-+++ b/target/ppc/translate_init.inc.c
-@@ -9206,7 +9206,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void =
-*data)
-                        PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
-                        PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
-                        PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
--                        PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
-+                        PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL | =
-PPC2_ISA310;
-
-"
-
-
-> It's ok to keep the second patch at the beginning during development, =
-so that
-> you can test each instruction as you add it.  But for final commit you =
-do not
-> want to enable the feature until it is complete.
+> I warned you before about this.  Why are you still building only a =
+restricted
+> set of targets?
 >=20
 
-Do you mean not submiting the second patch until all the instructions =
-are enabled in the future?
+I will configure all the target-list, and add "#if =
+defined(TARGET_PPC64)" for all gen_brd/w/h().
 
-Lijun=
+Lijun
+
 
