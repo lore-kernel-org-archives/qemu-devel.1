@@ -2,94 +2,89 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 472ABC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD1DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FDBF206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19153204EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:51:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDA0ro3H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FDBF206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOL18td3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19153204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRII-000747-BP
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46746)
+	id 1joRLj-00006r-CO
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1joRHW-000638-DO
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:47:06 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44937)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1joRHU-0007st-NN
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:47:06 -0400
-Received: by mail-pl1-x643.google.com with SMTP id bh7so2737265plb.11
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 05:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:date:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=CZT7KsVFJoXgYIQ3BDxgFCsw5gMPVNSQWfr6gj8r6+M=;
- b=gDA0ro3HinoNN646EZ526zz61wT6PxS1E89YrXZBcLxfqfjBdSZostB4M+CBoAYkjC
- LNqUusxHjzNDT0M1dKGCDQ9JKxXMZPFAZhgvXaBUuZReINPVR22ng2snepOPrnYT1Xc8
- 8rNndyobkgcPJBiDGuKuoyir9rXk7W+ggWmGY/spcDvIJqY3hIs/lAh76+hC3YuaaCLA
- TcFjyisfbW8L/uUE/McxbuXVLigWXRVF48Fff1mWsvo/WkJD7Cuf85XMZjORSq7Bh7uX
- OEU63DghCkGmL7NM2sWxh+ldtAuICgXP02L0A2aKNsDDBO9UWPu7oOI8ts2VHFV+jN7L
- alRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=CZT7KsVFJoXgYIQ3BDxgFCsw5gMPVNSQWfr6gj8r6+M=;
- b=mUkvLpm/3cnZjebQfY50ErxhIftUy1g/uOrCbcEGUjMPoABwA7b8CxbciSwAoUnD7r
- /sCjKDi+I0dABqSih0kLU1RuuO5JH3PcZ1wdi6zX9L1Ly+pK5wSFhF+41cqWWc+Ng1YL
- RAJBP49O0E+SspIFLgT8tYTICn0i8lLsO75DOyhr+i9/sssolwyS581U1bF3FZADIrk9
- MJzvs7s9fcuNBp5S18l2k+SE7RlNCWMNnSlajSB/xgdX/qv1nmT8kBMFg44OqN6Ofgmq
- zO9wZGE38BOk2F2tgAQcw0tQhmmooXWLzCgTFI9zPbkMa6QRKe4bCs/chfC2Jokk8mfl
- EjWQ==
-X-Gm-Message-State: AOAM533AbhsviTcgrnk6dKx2Fq4ArAFDtrzZQ5dcf0oEGoILuh8nMiX8
- ahC16chgUhJmLkznqYH1wEc=
-X-Google-Smtp-Source: ABdhPJwrbFNVGwgJUJvMcBbXPA+bgUMMHDdlMYQHvvTCQrbvam5M3xd7TOYskcsOfg8ZDRqD+vN3xQ==
-X-Received: by 2002:a17:90a:2843:: with SMTP id
- p3mr2920281pjf.187.1593089222902; 
- Thu, 25 Jun 2020 05:47:02 -0700 (PDT)
-Received: from localhost ([2001:e42:102:1532:160:16:113:140])
- by smtp.gmail.com with ESMTPSA id z85sm23989743pfc.66.2020.06.25.05.47.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 25 Jun 2020 05:47:02 -0700 (PDT)
-From: Coiby Xu <coiby.xu@gmail.com>
-X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
-Date: Thu, 25 Jun 2020 20:46:56 +0800
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v9 0/5] vhost-user block device backend implementation
-Message-ID: <20200625124656.ddca4ofgfhdgoerj@Rk>
-References: <20200614183907.514282-1-coiby.xu@gmail.com>
- <20200619120746.GA2422025@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joRL9-000867-3e
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:50:51 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31726
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joRL6-0001BG-NQ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:50:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593089447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=cb9rjgVHK9ZSO95oudN0TY8RsdjmqgNZD/MXtS8OJD0=;
+ b=dOL18td3w07ZX5I+GMf8a+/ijJ+oBKNOK9Nls4UVCLYDzoR//X+Q7bSJkiWk/0tq0kSiAV
+ rPlbbPJLQ/TdwJz3YvOP7M5TbE6KpekmuYUJnZclh7Y7hGo3aZ0AL65IdQ1x4khPeetXbU
+ QGL63bLf1iGD+WgzimU4BqX2pJHoOqw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-ltLve2uePEq2SFBY1P21Kw-1; Thu, 25 Jun 2020 08:50:45 -0400
+X-MC-Unique: ltLve2uePEq2SFBY1P21Kw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7498718A0760;
+ Thu, 25 Jun 2020 12:50:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 414E29CA0;
+ Thu, 25 Jun 2020 12:50:44 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BCB1011384D4; Thu, 25 Jun 2020 14:50:42 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 07/46] error: Avoid more error_propagate() when error is
+ not used here
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-8-armbru@redhat.com>
+ <88bc4c25-4a47-4c28-4b96-b7ea6c14173d@redhat.com>
+Date: Thu, 25 Jun 2020 14:50:42 +0200
+In-Reply-To: <88bc4c25-4a47-4c28-4b96-b7ea6c14173d@redhat.com> (Eric Blake's
+ message of "Wed, 24 Jun 2020 13:21:30 -0500")
+Message-ID: <87h7uz1f8d.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200619120746.GA2422025@stefanha-x1.localdomain>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=coiby.xu@gmail.com; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,41 +97,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 01:07:46PM +0100, Stefan Hajnoczi wrote:
->On Mon, Jun 15, 2020 at 02:39:02AM +0800, Coiby Xu wrote:
->> v9
->>  - move logical block size check function to a utility function
->>  - fix issues regarding license, coding style, memory deallocation, etc.
->
->I have replied with patches that you can consider squashing into your
->series. I was testing this patch series and decided it was easier to
->send code than to go back and write review comments since I was already
->on a git branch.
->
->My patches can be combined into your original patches using "git rebase
->-i" and the "fixup" or "squash" directive.
->
->Please add my Signed-off-by: line to affected patches when squashing
->patches so that the git log records that I have confirmed that I have
->permission to contribute this code.
->
->If you have questions about any of the patches, please let me know.
+Eric Blake <eblake@redhat.com> writes:
 
-Besides your Signed-off-by: line, shouldn't I also add copyright info to
-the affected files as follows?
+> On 6/24/20 11:43 AM, Markus Armbruster wrote:
+>> When all we do with an Error we receive into a local variable is
+>> propagating to somewhere else, we can just as well receive it there
+>> right away.  The previous commit did that for simple cases with
+>> Coccinelle.  Do it for a few more manually.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   blockdev.c     |  5 +----
+>>   hw/core/numa.c | 44 ++++++++++++++------------------------------
+>>   qdev-monitor.c | 11 ++++-------
+>>   3 files changed, 19 insertions(+), 41 deletions(-)
+>>
+>> diff --git a/blockdev.c b/blockdev.c
+>> index b66863c42a..73736a4eaf 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -1009,13 +1009,10 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+>>       }
+>>         /* Actual block device init: Functionality shared with
+>> blockdev-add */
+>> -    blk = blockdev_init(filename, bs_opts, &local_err);
+>> +    blk = blockdev_init(filename, bs_opts, errp);
+>>       bs_opts = NULL;
+>>       if (!blk) {
+>> -        error_propagate(errp, local_err);
+>>           goto fail;
+>> -    } else {
+>> -        assert(!local_err);
+>
+> Loses an assertion that blockdev_init() doesn't mis-use errp, but I
+> think the goal of your cleanup work has been to make it easier to
+> prove any function follows the rules, so the assertion doesn't add
+> much at this point.
 
-  * Copyright (c) 2020 Coiby Xu <coiby.xu@gmail.com>
-  *
-  * Copyright (c) 2020 Red Hat, Inc., Stefan Hajnoczi <stefanha@redhat.com>
-  *
+This is an early use of Error in the block layer.  Back then, we were
+concerned about functions that are supposed to either return a value or
+set an error doing both or none.  Since then, we've tacitly decided such
+programming mistakes are too unlikely to be worth littering the code
+with assertions.  Error handling is tediously verbose even without them.
 
+Since this series is about making it somewhat less tediously verbose...
 
---
-Best regards,
-Coiby
+>> +++ b/qdev-monitor.c
+>> @@ -600,7 +600,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>>       const char *driver, *path;
+>>       DeviceState *dev = NULL;
+>>       BusState *bus = NULL;
+>> -    Error *err = NULL;
+>>       bool hide;
+>>         driver = qemu_opt_get(opts, "driver");
+>> @@ -655,15 +654,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>>       dev = qdev_new(driver);
+>>         /* Check whether the hotplug is allowed by the machine */
+>> -    if (qdev_hotplug && !qdev_hotplug_allowed(dev, &err)) {
+>> +    if (qdev_hotplug && !qdev_hotplug_allowed(dev, errp)) {
+>>           /* Error must be set in the machine hook */
+>> -        assert(err);
+>
+> Another such case.
+>
+>>           goto err_del_dev;
+>>       }
+>>         if (!bus && qdev_hotplug &&
+>> !qdev_get_machine_hotplug_handler(dev)) {
+>>           /* No bus, no machine hotplug handler --> device is not hotpluggable */
+>> -        error_setg(&err, "Device '%s' can not be hotplugged on this machine",
+>> +        error_setg(errp, "Device '%s' can not be hotplugged on this machine",
+>
+> Should we s/can not/cannot/ while touching this?
+
+The longer and the more mechanical the patch, the less willing I am to
+include "while we're there" improvements.  This one may still be okay.
+But you pointed out a few more error message improvements in later
+reviews.  Perhaps collecting them all into an omnibus error message
+patch would be better.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
 
