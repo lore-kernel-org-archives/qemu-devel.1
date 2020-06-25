@@ -2,89 +2,73 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F3BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8E2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52B062076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:15:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXA2I6y7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B062076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 59C6B2070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:17:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C6B2070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joOui-0002Ni-Km
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:15:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33276)
+	id 1joOx6-00045k-It
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1joOu7-0001wC-HX
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:14:47 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31016
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1joOvx-0003Dq-UQ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:16:41 -0400
+Resent-Date: Thu, 25 Jun 2020 06:16:41 -0400
+Resent-Message-Id: <E1joOvx-0003Dq-UQ@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21706)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1joOu5-0003ix-9s
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:14:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593080083;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T2fSux9bb+o+V81aE7I3ffJXxyo2lH97r+hupqzEj04=;
- b=hXA2I6y77vjTRChSluVR9o01LIUEPrphGBxbarYfoMUAm4tb3Ejmjpdwfo3CAyPdfnZZOa
- vQknLCYJtjSj7ll5BEEa+z+J65mbNVSrvfE0YnemhApz6cg8jyuHPUzGRxKMsnlQAEk/tk
- W5+RUEsggo+ThcybHhGnLvp42XSIIHc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-PyA7biy_NZG6c-9conpX7g-1; Thu, 25 Jun 2020 06:14:41 -0400
-X-MC-Unique: PyA7biy_NZG6c-9conpX7g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47382BFC2;
- Thu, 25 Jun 2020 10:14:40 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-150.ams2.redhat.com [10.36.112.150])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F6115BAC9;
- Thu, 25 Jun 2020 10:14:35 +0000 (UTC)
-Subject: Re: [PATCH RFC 2/3] gitlab: build all container images during CI
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200622153318.751107-1-berrange@redhat.com>
- <20200622153318.751107-3-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <745e1e86-3042-7b7c-89c7-81eb9a8f7905@redhat.com>
-Date: Thu, 25 Jun 2020 12:14:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1joOvv-0004AM-P9
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:16:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593080193; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BmgBelbeyeXc5dnYJRZdoWWJdCc+c67aU/umJLpxQrlcbVU/xyZN8aIZnFFQhkAHiXcI7BeCvVoZ4834v2jcykgHwHVSiLVR84R7iZSqbItbJuCYbJkdoKkWcpxPVbHKiTHkijVHwDFCAKwKJCEfGkUpxdhZgqi0W3h32RfTyEg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593080193;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=J66z8AY7X7ZKIou/dLJ/muUecW7YFMlCrkZ24WU6Jjw=; 
+ b=DZbFGEvOa6RMG9iEd78HthVOJP9yaQ99wJhZTvRKvDsO2pt6XmnuuIV5XsFGmWtKko4ppCzd3Qyc4KYPZbJEtUFGj7rhWiSeG6/TEXyulHgYrKzI4SEULHKnl3WGGBuFycghUO4UoaWpbx9QOviLK5pHoT0+S8Y9V+WOzJFaxiM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593080192069721.4918132148701;
+ Thu, 25 Jun 2020 03:16:32 -0700 (PDT)
+Message-ID: <159308019061.21628.3941512270240117514@d1fd068a5071>
+Subject: Re: [RFC 0/4] Enable virtio-fs on s390x
+In-Reply-To: <20200625100430.22407-1-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200622153318.751107-3-berrange@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mhartmay@linux.ibm.com
+Date: Thu, 25 Jun 2020 03:16:32 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 06:13:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,72 +81,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, mst@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, stefanha@redhat.com,
+ marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/06/2020 17.33, Daniel P. Berrangé wrote:
-> We have a number of container images in tests/docker/dockerfiles
-> that are intended to provide well defined environments for doing
-> test builds. We want our CI system to use these containers too.
-> 
-> This introduces builds of all of them as the first stage in the
-> CI, so that the built containers are available for later build
-> jobs. The containers are setup to use the GitLab container
-> registry as the cache, so we only pay the penalty of the full
-> build when the dockerfiles change. The main qemu-project/qemu
-> repo is used as a second cache, so that users forking QEMU will
-> see a fast turnaround time on their CI jobs.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->   .gitlab-ci.d/containers.yml | 248 ++++++++++++++++++++++++++++++++++++
->   .gitlab-ci.yml              |   3 +
->   2 files changed, 251 insertions(+)
->   create mode 100644 .gitlab-ci.d/containers.yml
-> 
-> diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
-> new file mode 100644
-> index 0000000000..ea1edbb196
-> --- /dev/null
-> +++ b/.gitlab-ci.d/containers.yml
-> @@ -0,0 +1,248 @@
-> +
-> +
-> +.container_job_template: &container_job_definition
-> +  image: docker:stable
-> +  stage: containers
-> +  services:
-> +    - docker:dind
-> +  before_script:
-> +    - export TAG="$CI_REGISTRY_IMAGE/ci-$NAME:latest"
-> +    - export COMMON_TAG="$CI_REGISTRY/qemu-project/qemu/ci-$NAME:latest"
-> +    - docker info
-> +    - docker login registry.gitlab.com -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-> +  script:
-> +    - docker pull "$TAG" || docker pull "$COMMON_TAG" || true
-> +    - sed -i -e "s,FROM qemu:,FROM $CI_REGISTRY_IMAGE/ci-," tests/docker/dockerfiles/$NAME.docker
-> +    - docker build --cache-from "$TAG" --cache-from "$COMMON_TAG" --tag "$TAG" -f "tests/docker/dockerfiles/$NAME.docker" tests/docker/dockerfiles
-> +    - docker push "$TAG"
-> +  after_script:
-> +    - docker logout
-
-.gitlab-ci.d/edk2.yml uses a "changes" rule to only run the pipeline if 
-something really has been changed. Could you use something similar here? 
-E.g.:
-
-rules:
-  - changes:
-    - .gitlab-ci.d/containers.yml
-    - tests/docker/*
-    - tests/docker/dockerfiles/*
-
-?
-
-  Thomas
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNTEwMDQzMC4yMjQw
+Ny0xLW1oYXJ0bWF5QGxpbnV4LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
+ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
+dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
+MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
+MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIHFnYS9x
+YXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS1jb21tYW5kcy5vCiAgQ0MgICAgICBxZ2EvcWFwaS1nZW5l
+cmF0ZWQvcWdhLXFhcGktaW5pdC1jb21tYW5kcy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1w
+L3FlbXUtdGVzdC9zcmMvY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYzo0NDow
+OgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L29zZGVwLmg6MzI6Mjc6IGZhdGFsIGVy
+cm9yOiBjb25maWctdGFyZ2V0Lmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKICNpbmNsdWRl
+ICJjb25maWctdGFyZ2V0LmgiCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KY29tcGlsYXRp
+b24gdGVybWluYXRlZC4KLS0tCiAgQlVJTEQgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3Rf
+ZG1hLnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgogIFNJR04gICAgcGMt
+Ymlvcy9vcHRpb25yb20vbGludXhib290X2RtYS5iaW4KbWFrZTogKioqIFtjb250cmliL2xpYnZo
+b3N0LXVzZXIvbGlidmhvc3QtdXNlci5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
+aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KLS0t
+CiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNh
+bGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4n
+LCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTc2MzgyNzdiNzUzNjQ3ODk5ZmNi
+MGMzMWVmMDg2MzA1JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11
+bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NP
+TkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScs
+ICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywg
+Jy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9j
+Y2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdXVlbnM4MTQvc3Jj
+L2RvY2tlci1zcmMuMjAyMC0wNi0yNS0wNi4xMy40MS4xNzcxMjovdmFyL3RtcC9xZW11Onoscm8n
+LCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0
+dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5x
+ZW11Lmluc3RhbmNlLnV1aWQ9NzYzODI3N2I3NTM2NDc4OTlmY2IwYzMxZWYwODYzMDUKbWFrZVsx
+XTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdXVlbnM4MTQvc3JjJwptYWtlOiAqKiogW2RvY2tl
+ci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDJtNDkuNTQ0cwp1c2Vy
+ICAgIDBtOC44OTJzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDYyNTEwMDQzMC4yMjQwNy0xLW1oYXJ0bWF5QGxpbnV4LmlibS5jb20v
+dGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
