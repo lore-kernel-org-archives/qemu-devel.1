@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39371C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E38C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:58:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04A272063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D0BC2063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:58:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxlxAzQF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A272063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d3BEBxJU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0BC2063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRRh-0005EX-80
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:57:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49692)
+	id 1joRSd-0007eJ-Mx
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQP-00030m-Qr
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54203
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQB-0002aq-6l
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57921
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQO-0003HU-1D
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:17 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joRQ7-0003EN-Nm
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:56:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593089775;
+ s=mimecast20190719; t=1593089759;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vZsdfrZa9AABbOcAVi25FTFLZq4GcjtpS1hXB4cDpkc=;
- b=IxlxAzQF6Uf1msjH7br566wpIuQEBQrO/vSJDyW/Hnwl1tP26wo0xw7+ZCm4kGWiySFS+U
- GGZ+mTHoafF7M3bkaLTEimi6M632kCAcKqlVD9ZhM7gVhvVusdAmEg2tpEdZkzOc11FnXP
- 4I2asDuU2fVEXctDELtHOV0gccobZd4=
+ bh=dz5I3ID4ZkyuaHcQ4FoVrqB3V35ACFSwE4bK7vOvSBM=;
+ b=d3BEBxJU9Bga0LrYUPYbGoSSi1ExYHwkVaK/FBySgRbPg0lsVnadb3tROkjNqdl7veD1JR
+ LKP+FFVW0j1Te/BOpugXWHJF5Z+iWgz+HAxji4wvxooegwHfHcDZbNihQMoB7VWWl6CYe9
+ j6MB3NL3fIHeYkwT6pr03HZ+KBFXzO0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-GBKJYLTzNs2MGj8VkdeaFQ-1; Thu, 25 Jun 2020 08:56:13 -0400
-X-MC-Unique: GBKJYLTzNs2MGj8VkdeaFQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-150-qdwj9yLhOR2wz4jE0bBNzw-1; Thu, 25 Jun 2020 08:55:53 -0400
+X-MC-Unique: qdwj9yLhOR2wz4jE0bBNzw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 039EA800C64;
- Thu, 25 Jun 2020 12:56:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF46F18A8220;
+ Thu, 25 Jun 2020 12:55:52 +0000 (UTC)
 Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9902379304;
- Thu, 25 Jun 2020 12:56:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26111D021C;
+ Thu, 25 Jun 2020 12:55:51 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 07/19] qcrypto/core: add generic infrastructure for crypto
- options amendment
-Date: Thu, 25 Jun 2020 14:55:36 +0200
-Message-Id: <20200625125548.870061-8-mreitz@redhat.com>
+Subject: [PATCH 01/19] iotests: Make _filter_img_create more active
+Date: Thu, 25 Jun 2020 14:55:30 +0200
+Message-Id: <20200625125548.870061-2-mreitz@redhat.com>
 In-Reply-To: <20200625125548.870061-1-mreitz@redhat.com>
 References: <20200625125548.870061-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,184 +98,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Right now, _filter_img_create just filters out everything that looks
+format-dependent, and applies some filename filters.  That means that we
+have to add another filter line every time some format gets a new
+creation option.  This can be avoided by instead discarding everything
+and just keeping what we know is format-independent (format, size,
+backing file, encryption information[1], preallocation) or just
+interesting to have in the reference output (external data file path).
 
-This will be used first to implement luks keyslot management.
+Furthermore, we probably want to sort these options.  Format drivers are
+not required to define them in any specific order, so the output is
+effectively random (although this has never bothered us until now).  We
+need a specific order for our reference outputs, though.  Unfortunately,
+just using a plain "sort" would change a lot of existing reference
+outputs, so we have to pre-filter the option keys to keep our existing
+order (fmt, size, backing*, data, encryption info, preallocation).
 
-block_crypto_amend_opts_init will be used to convert
-qemu-img cmdline to QCryptoBlockAmendOptions
+Finally, this makes it difficult for _filter_img_create to automagically
+work for QMP output.  Thus, this patch adds a separate
+_filter_img_create_for_qmp function that echos every line verbatim that
+does not start with "Formatting", and pipes those "Formatting" lines to
+_filter_img_create.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200608094030.670121-2-mlevitsk@redhat.com>
+[1] Actually, the only thing that is really important is whether
+    encryption is enabled or not.  A patch by Maxim thus removes all
+    other "encrypt.*" options from the output:
+    https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00339.html
+    But that patch needs to come later so we can get away with changing
+    as few reference outputs in this patch here as possible.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/crypto.json       | 16 ++++++++++++++++
- block/crypto.h         |  3 +++
- crypto/blockpriv.h     |  8 ++++++++
- include/crypto/block.h | 22 ++++++++++++++++++++++
- block/crypto.c         | 17 +++++++++++++++++
- crypto/block.c         | 29 +++++++++++++++++++++++++++++
- 6 files changed, 95 insertions(+)
+ tests/qemu-iotests/112.out       |   2 +-
+ tests/qemu-iotests/141           |   2 +-
+ tests/qemu-iotests/153           |   9 ++-
+ tests/qemu-iotests/common.filter | 109 ++++++++++++++++++++++++-------
+ 4 files changed, 91 insertions(+), 31 deletions(-)
 
-diff --git a/qapi/crypto.json b/qapi/crypto.json
-index b2a4cff683..aeb6c7ef7b 100644
---- a/qapi/crypto.json
-+++ b/qapi/crypto.json
-@@ -309,3 +309,19 @@
-   'base': 'QCryptoBlockInfoBase',
-   'discriminator': 'format',
-   'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
-+
-+
-+
-+##
-+# @QCryptoBlockAmendOptions:
-+#
-+# The options that are available for all encryption formats
-+# when amending encryption settings
-+#
-+# Since: 5.1
-+##
-+{ 'union': 'QCryptoBlockAmendOptions',
-+  'base': 'QCryptoBlockOptionsBase',
-+  'discriminator': 'format',
-+  'data': {
-+            } }
-diff --git a/block/crypto.h b/block/crypto.h
-index b935695e79..06e044c9be 100644
---- a/block/crypto.h
-+++ b/block/crypto.h
-@@ -91,6 +91,9 @@
- QCryptoBlockCreateOptions *
- block_crypto_create_opts_init(QDict *opts, Error **errp);
+diff --git a/tests/qemu-iotests/112.out b/tests/qemu-iotests/112.out
+index ae0318cabe..182655dbf6 100644
+--- a/tests/qemu-iotests/112.out
++++ b/tests/qemu-iotests/112.out
+@@ -5,7 +5,7 @@ QA output created by 112
+ qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 refcount_bits=-1
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
+diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+index 5192d256e3..6d1b7b0d4c 100755
+--- a/tests/qemu-iotests/141
++++ b/tests/qemu-iotests/141
+@@ -68,7 +68,7 @@ test_blockjob()
+     _send_qemu_cmd $QEMU_HANDLE \
+         "$1" \
+         "$2" \
+-        | _filter_img_create | _filter_qmp_empty_return
++        | _filter_img_create_in_qmp | _filter_qmp_empty_return
  
-+QCryptoBlockAmendOptions *
-+block_crypto_amend_opts_init(QDict *opts, Error **errp);
-+
- QCryptoBlockOpenOptions *
- block_crypto_open_opts_init(QDict *opts, Error **errp);
+     # We want this to return an error because the block job is still running
+     _send_qemu_cmd $QEMU_HANDLE \
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index cf961d3609..11e3d28841 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -167,11 +167,10 @@ done
  
-diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
-index 71c59cb542..3c7ccea504 100644
---- a/crypto/blockpriv.h
-+++ b/crypto/blockpriv.h
-@@ -62,6 +62,14 @@ struct QCryptoBlockDriver {
-                   void *opaque,
-                   Error **errp);
+ echo
+ echo "== Creating ${TEST_IMG}.[abc] ==" | _filter_testdir
+-(
+-    $QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}"
+-    $QEMU_IMG create -f qcow2 "${TEST_IMG}.b" -b "${TEST_IMG}"
+-    $QEMU_IMG create -f qcow2 "${TEST_IMG}.c" -b "${TEST_IMG}.b"
+-) | _filter_img_create
++$QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}" | _filter_img_create
++$QEMU_IMG create -f qcow2 "${TEST_IMG}.b" -b "${TEST_IMG}" | _filter_img_create
++$QEMU_IMG create -f qcow2 "${TEST_IMG}.c" -b "${TEST_IMG}.b" \
++    | _filter_img_create
  
-+    int (*amend)(QCryptoBlock *block,
-+                 QCryptoBlockReadFunc readfunc,
-+                 QCryptoBlockWriteFunc writefunc,
-+                 void *opaque,
-+                 QCryptoBlockAmendOptions *options,
-+                 bool force,
-+                 Error **errp);
+ echo
+ echo "== Two devices sharing the same file in backing chain =="
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 03e4f71808..f8cd80ff1f 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -122,38 +122,99 @@ _filter_actual_image_size()
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
+-    data_file_filter=()
+-    if data_file=$(_get_data_file "$TEST_IMG"); then
+-        data_file_filter=(-e "s# data_file=$data_file##")
++    # Split the line into the pre-options part ($filename_part, which
++    # precedes ", fmt=") and the options part ($options, which starts
++    # with "fmt=")
++    # (And just echo everything before the first "^Formatting")
++    readarray formatting_line < <($SED -e 's/, fmt=/\n/')
 +
-     int (*get_info)(QCryptoBlock *block,
-                     QCryptoBlockInfo *info,
-                     Error **errp);
-diff --git a/include/crypto/block.h b/include/crypto/block.h
-index c77ccaf9c0..d274819791 100644
---- a/include/crypto/block.h
-+++ b/include/crypto/block.h
-@@ -144,6 +144,28 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
-                                    void *opaque,
-                                    Error **errp);
++    filename_part=''
++    options=''
++    lines=${#formatting_line[@]}
++    for ((i = 0; i < $lines; i++)); do
++        line=${formatting_line[i]}
++        unset formatting_line[i]
++
++        filename_part="$filename_part$line"
++
++        if echo "$line" | grep -q '^Formatting'; then
++            next_i=$((i + 1))
++            if [ -n "${formatting_line[next_i]}" ]; then
++                options="fmt=${formatting_line[@]}"
++            fi
++            break
++        fi
++    done
++
++    # Set grep_data_file to '\|data_file' to keep it; make it empty
++    # to drop it.
++    # We want to drop it if it is part of the global $IMGOPTS, and we
++    # want to keep it otherwise (if the test specifically wants to
++    # test data files).
++    grep_data_file=(-e data_file)
++    if _get_data_file "$TEST_IMG" > /dev/null; then
++        grep_data_file=()
+     fi
  
-+/**
-+ * qcrypto_block_amend_options:
-+ * @block: the block encryption object
-+ *
-+ * @readfunc: callback for reading data from the volume header
-+ * @writefunc: callback for writing data to the volume header
-+ * @opaque: data to pass to @readfunc and @writefunc
-+ * @options: the new/amended encryption options
-+ * @force: hint for the driver to allow unsafe operation
-+ * @errp: error pointer
-+ *
-+ * Changes the crypto options of the encryption format
-+ *
-+ */
-+int qcrypto_block_amend_options(QCryptoBlock *block,
-+                                QCryptoBlockReadFunc readfunc,
-+                                QCryptoBlockWriteFunc writefunc,
-+                                void *opaque,
-+                                QCryptoBlockAmendOptions *options,
-+                                bool force,
-+                                Error **errp);
+-    $SED "${data_file_filter[@]}" \
++    filename_filters=(
+         -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$SOCK_DIR#SOCK_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+         -e 's#nbd:127.0.0.1:[0-9]\\+#TEST_DIR/t.IMGFMT#g' \
+-        -e 's#nbd+unix:///\??socket=SOCK_DIR/nbd#TEST_DIR/t.IMGFMT#g' \
+-        -e "s# encryption=off##g" \
+-        -e "s# cluster_size=[0-9]\\+##g" \
+-        -e "s# table_size=[0-9]\\+##g" \
+-        -e "s# compat=[^ ]*##g" \
+-        -e "s# compat6=\\(on\\|off\\)##g" \
+-        -e "s# static=\\(on\\|off\\)##g" \
+-        -e "s# zeroed_grain=\\(on\\|off\\)##g" \
+-        -e "s# subformat=[^ ]*##g" \
+-        -e "s# adapter_type=[^ ]*##g" \
+-        -e "s# hwversion=[^ ]*##g" \
+-        -e "s# lazy_refcounts=\\(on\\|off\\)##g" \
+-        -e "s# block_size=[0-9]\\+##g" \
+-        -e "s# block_state_zero=\\(on\\|off\\)##g" \
+-        -e "s# log_size=[0-9]\\+##g" \
+-        -e "s# refcount_bits=[0-9]\\+##g" \
+-        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
+-        -e "s# iter-time=[0-9]\\+##g" \
+-        -e "s# force_size=\\(on\\|off\\)##g" \
+-        -e "s# compression_type=[a-zA-Z0-9]\\+##g"
++        -e 's#nbd+unix:///\??socket=SOCK_DIR/nbd#TEST_DIR/t.IMGFMT#g'
++    )
 +
- 
- /**
-  * qcrypto_block_calculate_payload_offset:
-diff --git a/block/crypto.c b/block/crypto.c
-index 973b57b3eb..dcf8b42bb2 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -202,6 +202,23 @@ block_crypto_create_opts_init(QDict *opts, Error **errp)
-     return ret;
- }
- 
-+QCryptoBlockAmendOptions *
-+block_crypto_amend_opts_init(QDict *opts, Error **errp)
-+{
-+    Visitor *v;
-+    QCryptoBlockAmendOptions *ret;
++    filename_part=$(echo "$filename_part" | $SED "${filename_filters[@]}")
 +
-+    v = qobject_input_visitor_new_flat_confused(opts, errp);
-+    if (!v) {
-+        return NULL;
-+    }
++    # Break the option line before each option (preserving pre-existing
++    # line breaks by replacing them by \0 and restoring them at the end),
++    # then filter out the options we want to keep and sort them according
++    # to some order that all block drivers used at the time of writing
++    # this function.
++    options=$(
++        echo "$options" \
++        | tr '\n' '\0' \
++        | $SED -e 's/ \([a-z0-9_.-]*\)=/\n\1=/g' \
++        | grep -a -e '^fmt' -e '^size' -e '^backing' -e '^preallocation' \
++                  -e '^encrypt' "${grep_data_file[@]}" \
++        | $SED "${filename_filters[@]}" \
++            -e 's/^\(fmt\)/0-\1/' \
++            -e 's/^\(size\)/1-\1/' \
++            -e 's/^\(backing\)/2-\1/' \
++            -e 's/^\(data_file\)/3-\1/' \
++            -e 's/^\(encryption\)/4-\1/' \
++            -e 's/^\(encrypt\.format\)/5-\1/' \
++            -e 's/^\(encrypt\.key-secret\)/6-\1/' \
++            -e 's/^\(encrypt\.iter-time\)/7-\1/' \
++            -e 's/^\(preallocation\)/8-\1/' \
++        | sort \
++        | $SED -e 's/^[0-9]-//' \
++        | tr '\n\0' ' \n' \
++        | $SED -e 's/^ *$//' -e 's/ *$//'
++    )
 +
-+    visit_type_QCryptoBlockAmendOptions(v, NULL, &ret, errp);
-+
-+    visit_free(v);
-+    return ret;
++    if [ -n "$options" ]; then
++        echo "$filename_part, $options"
++    elif [ -n "$filename_part" ]; then
++        echo "$filename_part"
++    fi
 +}
 +
- 
- static int block_crypto_open_generic(QCryptoBlockFormat format,
-                                      QemuOptsList *opts_spec,
-diff --git a/crypto/block.c b/crypto/block.c
-index 6f42b32f1e..eb057948b5 100644
---- a/crypto/block.c
-+++ b/crypto/block.c
-@@ -150,6 +150,35 @@ qcrypto_block_calculate_payload_offset(QCryptoBlockCreateOptions *create_opts,
-     return crypto != NULL;
++# Filter the "Formatting..." line in QMP output (leaving the QMP output
++# untouched)
++# (In contrast to _filter_img_create(), this function does not support
++# multi-line Formatting output)
++_filter_img_create_in_qmp()
++{
++    while read -r line; do
++        if echo "$line" | grep -q '^Formatting'; then
++            echo "$line" | _filter_img_create
++        else
++            echo "$line"
++        fi
++    done
  }
  
-+int qcrypto_block_amend_options(QCryptoBlock *block,
-+                                QCryptoBlockReadFunc readfunc,
-+                                QCryptoBlockWriteFunc writefunc,
-+                                void *opaque,
-+                                QCryptoBlockAmendOptions *options,
-+                                bool force,
-+                                Error **errp)
-+{
-+    if (options->format != block->format) {
-+        error_setg(errp,
-+                   "Cannot amend encryption format");
-+        return -1;
-+    }
-+
-+    if (!block->driver->amend) {
-+        error_setg(errp,
-+                   "Crypto format %s doesn't support format options amendment",
-+                   QCryptoBlockFormat_str(block->format));
-+        return -1;
-+    }
-+
-+    return block->driver->amend(block,
-+                                readfunc,
-+                                writefunc,
-+                                opaque,
-+                                options,
-+                                force,
-+                                errp);
-+}
- 
- QCryptoBlockInfo *qcrypto_block_get_info(QCryptoBlock *block,
-                                          Error **errp)
+ _filter_img_create_size()
 -- 
 2.26.2
 
