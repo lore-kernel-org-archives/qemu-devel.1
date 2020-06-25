@@ -2,72 +2,105 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CAEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE220C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85E9320781
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E9320781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A13EE20702
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:24:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13EE20702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRqU-0002DU-RO
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:23:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59230)
+	id 1joRrd-00043o-Qm
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1joRpw-0001im-Gf; Thu, 25 Jun 2020 09:22:40 -0400
-Resent-Date: Thu, 25 Jun 2020 09:22:40 -0400
-Resent-Message-Id: <E1joRpw-0001im-Gf@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21340)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1joRpr-0002hI-RY; Thu, 25 Jun 2020 09:22:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593091346; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Rq/v+NHMTF9IGJ4yMjI4xTPLtLv4veZ/NbiMer8WmBVUWNPh3DsBXSKDPLkLIaw0nDLfxlwAYq0dAu1tstLDJggtTkqZWNeuzECO0ETuMg+iu+Grqwd7AU1uOdWtFNTfQLM8BvZLs4VT/QTf6PFZaBowQINCjTtGFGDgu2Hm++Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593091346;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qs3/nxT5ycwLtfFW4onXCPmiB8/GS7v4NdjaBc0xkzQ=; 
- b=JcgUgIcVx1TDd1u2mGCMPM6qf8pWfse6uCEXTecyhr4wlMYmUClw6Ci2kxktTQnyidU9QXmZG1ypnUgzTpDyFC2Zv7sZvwULst/v5iHPVrbuPd3lbmJI3PsJBDOzVvpp7yQ050OS0jJHlC5p0aKOpGkWiHBAlt/buCi5k7yHxDc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593091342944224.85908021997125;
- Thu, 25 Jun 2020 06:22:22 -0700 (PDT)
-Message-ID: <159309134152.23359.4593972737765749741@d1fd068a5071>
-Subject: Re: [PATCH 00/19] block: LUKS encryption slot management + iotest
- tweaks
-In-Reply-To: <20200625125548.870061-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1joRqq-0002ky-6o
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:23:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18934
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1joRqo-0002yX-6s
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:23:35 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05PD371m191220; Thu, 25 Jun 2020 09:23:31 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31uwyfyhyp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jun 2020 09:23:31 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05PD3DZb191454;
+ Thu, 25 Jun 2020 09:23:31 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31uwyfyhy7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jun 2020 09:23:30 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05PDKC8n020943;
+ Thu, 25 Jun 2020 13:23:29 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma04wdc.us.ibm.com with ESMTP id 31uuryc7fu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jun 2020 13:23:29 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05PDNRdS30277900
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 25 Jun 2020 13:23:27 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1B2B96E050;
+ Thu, 25 Jun 2020 13:23:29 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 84C096E04C;
+ Thu, 25 Jun 2020 13:23:28 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu, 25 Jun 2020 13:23:28 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v1 2/8] tpm: Extend TPMIfClass with get_irqnum() function
+Date: Thu, 25 Jun 2020 09:23:19 -0400
+Message-Id: <20200625132325.2025245-3-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200625132325.2025245-1-stefanb@linux.vnet.ibm.com>
+References: <20200625132325.2025245-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Thu, 25 Jun 2020 06:22:22 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 09:22:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-25_08:2020-06-25,
+ 2020-06-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=1
+ impostorscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501 phishscore=0
+ malwarescore=0 cotscore=-2147483648 lowpriorityscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006250080
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 08:13:37
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,202 +113,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mlevitsk@redhat.com
+Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.ibm.com>,
+ Eric Auger <eric.auger@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNTEyNTU0OC44NzAw
-NjEtMS1tcmVpdHpAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAwLzE5XSBibG9jazogTFVLUyBlbmNyeXB0aW9u
-IHNsb3QgbWFuYWdlbWVudCArIGlvdGVzdCB0d2Vha3MKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6
-IDIwMjAwNjI1MTI1NTQ4Ljg3MDA2MS0xLW1yZWl0ekByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICAgMjdjNzdiMS4uMDI1MGM1OSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKRnJv
-bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAg
-ICAgICAgcGF0Y2hldy8yMDIwMDYyNTEyNTU0OC44NzAwNjEtMS1tcmVpdHpAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzIwMjAwNjI1MTI1NTQ4Ljg3MDA2MS0xLW1yZWl0ekByZWRoYXQuY29tClN3aXRj
-aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTExNzIxNCBpb3Rlc3RzOiBhZGQgdGVzdHMgZm9y
-IGJsb2NrZGV2LWFtZW5kCmNhZTQ3ZWUgYmxvY2svcWNvdzI6IGltcGxlbWVudCBibG9ja2Rldi1h
-bWVuZAo4ODMxMWZmIGJsb2NrL2NyeXB0bzogaW1wbGVtZW50IGJsb2NrZGV2LWFtZW5kCmEwYTNm
-MTUgYmxvY2svY29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1cmUgZm9yIHgtYmxvY2tkZXYt
-YW1lbmQgcW1wIGNvbW1hbmQKMTM4NGI0ZiBpb3Rlc3RzOiBxZW11LWltZyB0ZXN0cyBmb3IgbHVr
-cyBrZXkgbWFuYWdlbWVudAo0OWM1MGVlIGJsb2NrL3Fjb3cyOiBleHRlbmQgcWVtdS1pbWcgYW1l
-bmQgaW50ZXJmYWNlIHdpdGggY3J5cHRvIG9wdGlvbnMKZjgzYjVjMSBibG9jay9jcnlwdG86IGlt
-cGxlbWVudCB0aGUgZW5jcnlwdGlvbiBrZXkgbWFuYWdlbWVudApmZjQwZDI5IGJsb2NrL2NyeXB0
-bzogcmVuYW1lIHR3byBmdW5jdGlvbnMKNjdiMjAyOCBibG9jay9hbWVuZDogcmVmYWN0b3IgcWNv
-dzIgYW1lbmQgb3B0aW9ucwo5MGNhZWM1IGJsb2NrL2FtZW5kOiBzZXBhcmF0ZSBhbWVuZCBhbmQg
-Y3JlYXRlIG9wdGlvbnMgZm9yIHFlbXUtaW1nCjJkZjJlMDEgYmxvY2svYW1lbmQ6IGFkZCAnZm9y
-Y2UnIG9wdGlvbgozNDBiYWM4IHFjcnlwdG8vbHVrczogaW1wbGVtZW50IGVuY3J5cHRpb24ga2V5
-IG1hbmFnZW1lbnQKOWQyZDFlZCBxY3J5cHRvL2NvcmU6IGFkZCBnZW5lcmljIGluZnJhc3RydWN0
-dXJlIGZvciBjcnlwdG8gb3B0aW9ucyBhbWVuZG1lbnQKMjM1NDc4YiBpb3Rlc3RzOiBDaGVjayB3
-aGV0aGVyIGx1a3Mgd29ya3MKNWRkMTdmMCBpb3Rlc3RzLnB5OiBBZGQgKHZlcmlmeXxoYXMpX3dv
-cmtpbmdfbHVrcygpCjVkOTE4ZjcgaW90ZXN0cy5weTogQWRkIHFlbXVfaW1nX3BpcGVfYW5kX3N0
-YXR1cygpCjQzMzBlZTEgaW90ZXN0cy9jb21tb24ucmM6IEFkZCBfcmVxdWlyZV93b3JraW5nX2x1
-a3MKYzM2NTAzNSBpb3Rlc3RzOiBmaWx0ZXIgZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUg
-b3B0aW9ucwpkYWE2NWU0IGlvdGVzdHM6IE1ha2UgX2ZpbHRlcl9pbWdfY3JlYXRlIG1vcmUgYWN0
-aXZlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE5IENoZWNraW5nIGNvbW1pdCBkYWE2NWU0OWU4
-NDUgKGlvdGVzdHM6IE1ha2UgX2ZpbHRlcl9pbWdfY3JlYXRlIG1vcmUgYWN0aXZlKQoyLzE5IENo
-ZWNraW5nIGNvbW1pdCBjMzY1MDM1MmI2ZmQgKGlvdGVzdHM6IGZpbHRlciBmZXcgbW9yZSBsdWtz
-IHNwZWNpZmljIGNyZWF0ZSBvcHRpb25zKQozLzE5IENoZWNraW5nIGNvbW1pdCA0MzMwZWUxM2Q4
-MDggKGlvdGVzdHMvY29tbW9uLnJjOiBBZGQgX3JlcXVpcmVfd29ya2luZ19sdWtzKQo0LzE5IENo
-ZWNraW5nIGNvbW1pdCA1ZDkxOGY3NjMyNDEgKGlvdGVzdHMucHk6IEFkZCBxZW11X2ltZ19waXBl
-X2FuZF9zdGF0dXMoKSkKNS8xOSBDaGVja2luZyBjb21taXQgNWRkMTdmMDM1OTgwIChpb3Rlc3Rz
-LnB5OiBBZGQgKHZlcmlmeXxoYXMpX3dvcmtpbmdfbHVrcygpKQo2LzE5IENoZWNraW5nIGNvbW1p
-dCAyMzU0NzhiOWYzZDMgKGlvdGVzdHM6IENoZWNrIHdoZXRoZXIgbHVrcyB3b3JrcykKNy8xOSBD
-aGVja2luZyBjb21taXQgOWQyZDFlZDI4YWU5IChxY3J5cHRvL2NvcmU6IGFkZCBnZW5lcmljIGlu
-ZnJhc3RydWN0dXJlIGZvciBjcnlwdG8gb3B0aW9ucyBhbWVuZG1lbnQpCjgvMTkgQ2hlY2tpbmcg
-Y29tbWl0IDM0MGJhYzhhNDBhZCAocWNyeXB0by9sdWtzOiBpbXBsZW1lbnQgZW5jcnlwdGlvbiBr
-ZXkgbWFuYWdlbWVudCkKOS8xOSBDaGVja2luZyBjb21taXQgMmRmMmUwMWVmODNiIChibG9jay9h
-bWVuZDogYWRkICdmb3JjZScgb3B0aW9uKQoxMC8xOSBDaGVja2luZyBjb21taXQgOTBjYWVjNWFj
-ZmNkIChibG9jay9hbWVuZDogc2VwYXJhdGUgYW1lbmQgYW5kIGNyZWF0ZSBvcHRpb25zIGZvciBx
-ZW11LWltZykKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJl
-IGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzNDogRklMRTogYmxvY2svcWNvdzIuYzo1
-NjUyOgorI2RlZmluZSBRQ09XX0NPTU1PTl9PUFRJT05TICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19P
-UFRfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAu
-dHlwZSA9IFFFTVVfT1BUX1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcCisgICAgICAgIC5oZWxwID0gIlZpcnR1YWwgZGlzayBzaXplIiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5u
-YW1lID0gQkxPQ0tfT1BUX0NPTVBBVF9MRVZFTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJDb21wYXRpYmlsaXR5IGxldmVsICh2
-MiBbMC4xMF0gb3IgdjMgWzEuMV0pIiAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9CQUNLSU5HX0ZJTEUsICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiRmlsZSBuYW1l
-IG9mIGEgYmFzZSBpbWFnZSIgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
-CisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfQkFDS0lOR19GTVQsICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NU
-UklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxw
-ID0gIkltYWdlIGZvcm1hdCBvZiB0aGUgYmFzZSBpbWFnZSIgICAgICAgICAgICAgICAgICAgIFwK
-KyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0RB
-VEFfRklMRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUg
-PSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
-ICAgICAgICAuaGVscCA9ICJGaWxlIG5hbWUgb2YgYW4gZXh0ZXJuYWwgZGF0YSBmaWxlIiAgICAg
-ICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9
-IEJMT0NLX09QVF9EQVRBX0ZJTEVfUkFXLCAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
-ICAgICAgIC50eXBlID0gUUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiVGhlIGV4dGVybmFsIGRhdGEgZmlsZSBtdXN0
-IHN0YXkgdmFsaWQgIiAgICAgICAgICAgXAorICAgICAgICAgICAgICAgICJhcyBhIHJhdyBpbWFn
-ZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAg
-ICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9FTkNSWVBULCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfQk9PTCwg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAi
-RW5jcnlwdCB0aGUgaW1hZ2Ugd2l0aCBmb3JtYXQgJ2FlcycuIChEZXByZWNhdGVkICIgXAorICAg
-ICAgICAgICAgICAgICJpbiBmYXZvciBvZiAiIEJMT0NLX09QVF9FTkNSWVBUX0ZPUk1BVCAiPWFl
-cykiLCAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJM
-T0NLX09QVF9FTkNSWVBUX0ZPUk1BVCwgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
-ICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiRW5jcnlwdCB0aGUgaW1hZ2UsIGZvcm1hdCBjaG9p
-Y2VzOiAnYWVzJywgJ2x1a3MnIiwgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09Q
-VF9ERUZfS0VZX1NFQ1JFVCgiZW5jcnlwdC4iLCAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAg
-ICAgIklEIG9mIHNlY3JldCBwcm92aWRpbmcgcWNvdyBBRVMga2V5IG9yIExVS1MgcGFzc3BocmFz
-ZSIpLCAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX0FMRygiZW5jcnlw
-dC4iKSwgICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19DSVBI
-RVJfTU9ERSgiZW5jcnlwdC4iKSwgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BU
-X0RFRl9MVUtTX0lWR0VOX0FMRygiZW5jcnlwdC4iKSwgICAgICAgICAgICAgICAgXAorICAgIEJM
-T0NLX0NSWVBUT19PUFRfREVGX0xVS1NfSVZHRU5fSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAg
-ICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19IQVNIX0FMRygiZW5jcnlwdC4i
-KSwgICAgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtTX0lURVJf
-VElNRSgiZW5jcnlwdC4iKSwgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
-IC5uYW1lID0gQkxPQ0tfT1BUX0NMVVNURVJfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TSVpFLCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJxY293MiBjbHVzdGVyIHNpemUi
-LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3Ry
-ID0gc3RyaW5naWZ5KERFRkFVTFRfQ0xVU1RFUl9TSVpFKSAgICAgICAgICAgIFwKKyAgICB9LCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1BSRUFMTE9DLCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09Q
-VF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAu
-aGVscCA9ICJQcmVhbGxvY2F0aW9uIG1vZGUgKGFsbG93ZWQgdmFsdWVzOiBvZmYsICIgICAgICAg
-ICBcCisgICAgICAgICAgICAgICAgIm1ldGFkYXRhLCBmYWxsb2MsIGZ1bGwpIiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5u
-YW1lID0gQkxPQ0tfT1BUX0xBWllfUkVGQ09VTlRTLCAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9CT09MLCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJQb3N0cG9uZSByZWZjb3VudCB1cGRh
-dGVzIiwgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0g
-Im9mZiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1JFRkNPVU5UX0JJVFMs
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9O
-VU1CRVIsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVs
-cCA9ICJXaWR0aCBvZiBhIHJlZmVyZW5jZSBjb3VudCBlbnRyeSBpbiBiaXRzIiwgICAgICAgICBc
-CisgICAgICAgIC5kZWZfdmFsdWVfc3RyID0gIjE2IiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1l
-ID0gQkxPQ0tfT1BUX0NPTVBSRVNTSU9OX1RZUEUsICAgICAgICAgICAgICAgICAgICAgICAgIFwK
-KyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJDb21wcmVzc2lvbiBtZXRob2QgdXNlZCBm
-b3IgaW1hZ2UgY2x1c3RlciAiICAgICAgICBcCisgICAgICAgICAgICAgICAgImNvbXByZXNzaW9u
-IiwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmRlZl92
-YWx1ZV9zdHIgPSAiemxpYiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
-ICAgIH0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjQ0IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDEwLzE5IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMS8xOSBDaGVja2luZyBjb21t
-aXQgNjdiMjAyODFmYmExIChibG9jay9hbWVuZDogcmVmYWN0b3IgcWNvdzIgYW1lbmQgb3B0aW9u
-cykKMTIvMTkgQ2hlY2tpbmcgY29tbWl0IGZmNDBkMjljYWYzNyAoYmxvY2svY3J5cHRvOiByZW5h
-bWUgdHdvIGZ1bmN0aW9ucykKMTMvMTkgQ2hlY2tpbmcgY29tbWl0IGY4M2I1YzE1ZDdlMiAoYmxv
-Y2svY3J5cHRvOiBpbXBsZW1lbnQgdGhlIGVuY3J5cHRpb24ga2V5IG1hbmFnZW1lbnQpCjE0LzE5
-IENoZWNraW5nIGNvbW1pdCA0OWM1MGVlNjRiY2QgKGJsb2NrL3Fjb3cyOiBleHRlbmQgcWVtdS1p
-bWcgYW1lbmQgaW50ZXJmYWNlIHdpdGggY3J5cHRvIG9wdGlvbnMpCjE1LzE5IENoZWNraW5nIGNv
-bW1pdCAxMzg0YjRmNDkxN2QgKGlvdGVzdHM6IHFlbXUtaW1nIHRlc3RzIGZvciBsdWtzIGtleSBt
-YW5hZ2VtZW50KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxODogCm5ldyBmaWxlIG1vZGUgMTAwNzU1Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQzMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8x
-OSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNi8xOSBDaGVja2luZyBjb21taXQgYTBhM2Yx
-NTZhYmU4IChibG9jay9jb3JlOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgeC1ibG9j
-a2Rldi1hbWVuZCBxbXAgY29tbWFuZCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzM6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMjEgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTYvMTkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMTkgQ2hlY2tpbmcg
-Y29tbWl0IDg4MzExZmY1NjMzMiAoYmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1l
-bmQpCjE4LzE5IENoZWNraW5nIGNvbW1pdCBjYWU0N2VlMDM0ZjcgKGJsb2NrL3Fjb3cyOiBpbXBs
-ZW1lbnQgYmxvY2tkZXYtYW1lbmQpCjE5LzE5IENoZWNraW5nIGNvbW1pdCBlMTE3MjE0NjJhYjIg
-KGlvdGVzdHM6IGFkZCB0ZXN0cyBmb3IgYmxvY2tkZXYtYW1lbmQpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-NTkzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE5LzE5IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAw
-NjI1MTI1NTQ4Ljg3MDA2MS0xLW1yZWl0ekByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Implement get_irqnum() as part of the TPMIfClass to get the assigned IRQ
+number or TPM_IRQ_DISABLED (~0) in case IRQs cannot be used.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20200617142305.1198672-3-stefanb@linux.vnet.ibm.com
+---
+ hw/tpm/tpm_tis_isa.c    |  9 +++++++++
+ hw/tpm/tpm_tis_sysbus.c |  9 +++++++++
+ include/sysemu/tpm.h    | 12 ++++++++++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
+index 5faf6231c0..bacc4447b5 100644
+--- a/hw/tpm/tpm_tis_isa.c
++++ b/hw/tpm/tpm_tis_isa.c
+@@ -81,6 +81,14 @@ static enum TPMVersion tpm_tis_isa_get_tpm_version(TPMIf *ti)
+     return tpm_tis_get_tpm_version(s);
+ }
+ 
++static int8_t tpm_tis_isa_get_irqnum(TPMIf *ti)
++{
++    TPMStateISA *isadev = TPM_TIS_ISA(ti);
++    TPMState *s = &isadev->state;
++
++    return s->irq_num;
++}
++
+ static void tpm_tis_isa_reset(DeviceState *dev)
+ {
+     TPMStateISA *isadev = TPM_TIS_ISA(dev);
+@@ -149,6 +157,7 @@ static void tpm_tis_isa_class_init(ObjectClass *klass, void *data)
+     dc->reset = tpm_tis_isa_reset;
+     tc->request_completed = tpm_tis_isa_request_completed;
+     tc->get_version = tpm_tis_isa_get_tpm_version;
++    tc->get_irqnum = tpm_tis_isa_get_irqnum;
+ }
+ 
+ static const TypeInfo tpm_tis_isa_info = {
+diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
+index 4a3bc70625..879a5788de 100644
+--- a/hw/tpm/tpm_tis_sysbus.c
++++ b/hw/tpm/tpm_tis_sysbus.c
+@@ -81,6 +81,14 @@ static enum TPMVersion tpm_tis_sysbus_get_tpm_version(TPMIf *ti)
+     return tpm_tis_get_tpm_version(s);
+ }
+ 
++static int8_t tpm_tis_sysbus_get_irqnum(TPMIf *ti)
++{
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
++    TPMState *s = &sbdev->state;
++
++    return s->irq_num;
++}
++
+ static void tpm_tis_sysbus_reset(DeviceState *dev)
+ {
+     TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
+@@ -138,6 +146,7 @@ static void tpm_tis_sysbus_class_init(ObjectClass *klass, void *data)
+     dc->reset = tpm_tis_sysbus_reset;
+     tc->request_completed = tpm_tis_sysbus_request_completed;
+     tc->get_version = tpm_tis_sysbus_get_tpm_version;
++    tc->get_irqnum = tpm_tis_sysbus_get_irqnum;
+ }
+ 
+ static const TypeInfo tpm_tis_sysbus_info = {
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index 03fb25941c..39c3c9c0f2 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -25,6 +25,8 @@ typedef enum TPMVersion {
+     TPM_VERSION_2_0 = 2,
+ } TPMVersion;
+ 
++#define TPM_IRQ_DISABLED  (~0)
++
+ #define TYPE_TPM_IF "tpm-if"
+ #define TPM_IF_CLASS(klass)                                 \
+     OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
+@@ -41,6 +43,7 @@ typedef struct TPMIfClass {
+     enum TpmModel model;
+     void (*request_completed)(TPMIf *obj, int ret);
+     enum TPMVersion (*get_version)(TPMIf *obj);
++    int8_t (*get_irqnum)(TPMIf *obj);
+ } TPMIfClass;
+ 
+ #define TYPE_TPM_TIS_ISA            "tpm-tis"
+@@ -74,4 +77,13 @@ static inline TPMVersion tpm_get_version(TPMIf *ti)
+     return TPM_IF_GET_CLASS(ti)->get_version(ti);
+ }
+ 
++static inline int8_t tpm_get_irqnum(TPMIf *ti)
++{
++    if (!ti || !TPM_IF_GET_CLASS(ti)->get_irqnum) {
++        return TPM_IRQ_DISABLED;
++    }
++
++    return TPM_IF_GET_CLASS(ti)->get_irqnum(ti);
++}
++
+ #endif /* QEMU_TPM_H */
+-- 
+2.24.1
+
 
