@@ -2,69 +2,71 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB74C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76EEDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C980E20702
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 405CA20702
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:27:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tinZvmFT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C980E20702
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Zu+C/YMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 405CA20702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joSqo-0003hL-T3
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50558)
+	id 1joSr0-0003yi-Fk
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1joSpr-0002aj-98; Thu, 25 Jun 2020 10:26:39 -0400
-Received: from mail-eopbgr60095.outbound.protection.outlook.com
- ([40.107.6.95]:41601 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ id 1joSpy-0002mM-9y; Thu, 25 Jun 2020 10:26:46 -0400
+Received: from mail-eopbgr60138.outbound.protection.outlook.com
+ ([40.107.6.138]:2563 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1joSpo-0005wS-Fy; Thu, 25 Jun 2020 10:26:38 -0400
+ id 1joSpw-00061d-Jy; Thu, 25 Jun 2020 10:26:46 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ie49HEZvxect3q0ntpZoKamjoo3YgbEH0TElqvDGbIrt954RRT8xL0fidrey7BsO/Occ4WnyOLVNjMN0PPI7iaqS9Dfw+qyzpUpBZR81oaivWjmi20UPD8S2KD6RHvw8bmfUwNps2Q/fYik9uu4+iFlVX5TA9asLhqGg74tdohdp2URwVjy1H3kwuAdID/alWEqXeM42yYc2uyFjpbrxGQiqXqaqHRmd0x+kuebCbj5tUfl/tK9SsV/UEj8a/+91GsIQU7K5RsEZ6FebRbC+45Q4CRuKTbM/FKSTWR7w77c4Il7ZTOTwzw6m2Gl6qMTq2ZWR2Ej0es2VVsFwP5HsRQ==
+ b=OM6zha6hz6NsEFjpw1TuOG3Tarbl1EeH+0t3BsO27XIzdorOfLNKi6XMxvy3v7JGx/eLHB3hikuw3dJr5offe6dr249Db3gjbZApMy7jmQH4gkD7zIBBuvxPMgfRY4WOEQ+xnASB0kb26TMoQVW620+GFU2dhFxHfdWU1Zbo8AvynwZijWCSNJ5Q/NOgUzizim/AZzFhPSO82k5D6D5gY0smyDmuHSMzHsy9vPjmHtmvpsFf5kg6kSqhis0yIQkRw78SkngsnV9CpHks9LVmXk1qfRRPooCurcbizPulwExZLPMxSbKjmcp7NYntWFE/I72/oVpspaBSLKid4Y5bgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VjSQ7+Y3Vzfs7x1ZAuEqBLGZxGrNx9httgAGjQNo/kU=;
- b=EFSL9ezgiS3agO/23D9AVeZiQ42gD3Ig3iEfohXvq9k3r3AAHWLbCTlJavrDpGLYoFfsGZJEhZqvfdwX/a447VwuFd2J3k+S1pyDkjbZF91SwzYO3jJ4lePY9XkM6T5wXYE0iuG2/kolEQniKE/+X0BXqFcqjrbcH6yNxOVP9xnAVlJUp3tEd4O8Z6Kk3YxPtr6l6h1KJgHjHPOLMtiRu0RJsOhIoHmar4G8Z+ColYm2vwyrfHijLy040nT3zKP++hui1pYdCgDG212DzlsxLYCstjEJW6cIz65aFMkv0inJKqTEaRwtZpbJXezQszJDrbfmvNN72iklWAbIrEO1Ow==
+ bh=6gf/fm1Xuy5nNsip81jgnPQAgfaRX4h9522+LWJgoMw=;
+ b=JbnseEl3fjVDjivolutS5ymb485qj61D9OSytJpwRDr1uMaRjTI8l3s35RNTlY7P8ihfS2RXLvMOB21yjF4ZFohbQ5NUHmprFqwIifW57xIQ0vB1n29neA89yPCDGDW4DGaCtsGT/h7h2UQ5wlMOBs4MRX8nVubG5MaP0PlGpNPYszvA2iJyzF5DZWvphdmO0WH+iBG7WUwxjFhoFNlmGXhTDlvaWBStuFSEGfT+bqZ60T4u/XqKfYMMzpQTe0JF49xMcYi4PCrbPi09f+c4hO8d8EwRVHfoRcNvGANGIYjpVBct7tTlEUCjYjiJU3IxH9Y4Uk9OvVFZz7T/r2TtJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VjSQ7+Y3Vzfs7x1ZAuEqBLGZxGrNx9httgAGjQNo/kU=;
- b=tinZvmFTQqnueDL8JiEYQHgS+nQyYrlOuGeFvTCsEgMdVXf+BA9N/xM1mK/YE2rLQzGhGbcpuTmY+YTAfW5VIVlVmYYKgbE/LKD42IcVqh2TLIMk8RO7zjEP/72eATls0cKzwPX6gYig0hPVP+8Z+nsqdDp6UUR7RCQ7ntz1woo=
+ bh=6gf/fm1Xuy5nNsip81jgnPQAgfaRX4h9522+LWJgoMw=;
+ b=Zu+C/YMt/KD7m/k31PK6FI8r0Z7hONrTGGrwxdqmP5XXMKxTfXIGNWhXU/r8LKbZOpJdZKHvuJQRS8wcWEfqnBxgODbYBrjvVMc79Xis+tkHJqMeMtueOq7Qj6v3v/oh4J6tyoa/sM3EasqEVv8h8Cmj1iHxjeFcksYGoG7i7jQ=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM5PR0801MB2100.eurprd08.prod.outlook.com (2603:10a6:203:50::8)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20; Thu, 25 Jun
- 2020 14:26:34 +0000
+ 2020 14:26:36 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.020; Thu, 25 Jun 2020
- 14:26:33 +0000
+ 14:26:36 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 0/4] Fix crash due to NBD export leak
-Date: Thu, 25 Jun 2020 17:25:36 +0300
-Message-Id: <20200625142540.24589-1-vsementsov@virtuozzo.com>
+Subject: [PATCH 3/4] nbd: make client_close synchronous
+Date: Thu, 25 Jun 2020 17:25:39 +0300
+Message-Id: <20200625142540.24589-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200625142540.24589-1-vsementsov@virtuozzo.com>
+References: <20200625142540.24589-1-vsementsov@virtuozzo.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AM0PR05CA0089.eurprd05.prod.outlook.com
@@ -76,39 +78,39 @@ Received: from kvm.sw.ru (185.215.60.69) by
  AM0PR05CA0089.eurprd05.prod.outlook.com (2603:10a6:208:136::29) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21 via Frontend
- Transport; Thu, 25 Jun 2020 14:26:33 +0000
+ Transport; Thu, 25 Jun 2020 14:26:35 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.69]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1bdf9366-42fa-4f5e-2ece-08d81913c2cc
+X-MS-Office365-Filtering-Correlation-Id: 0a236c39-a9d0-4397-92fb-08d81913c437
 X-MS-TrafficTypeDiagnostic: AM5PR0801MB2100:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB2100676B9AA26222F5FB7BECC1920@AM5PR0801MB2100.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB21006EEA268CEBA28624523EC1920@AM5PR0801MB2100.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
 X-Forefront-PRVS: 0445A82F82
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sC8UW5g+znjVtOUsJxQ7ZpmQlHdJ2++13VRceMmY1zpTSpcH/nz1TawR9ZEE7kL/7XJ5bF9DOjqfflShl7nbK1GRGmEUpUD9IXMf65Dt1Z8XIpZDjdcNbzWM7F4bzcFVk/rQHCNFPvGMGzRybiHIWJT+8LDaILOfcDiNwHuYWfxOf3JXqBEvAuqYpIPPIy2JFcREOu33K+lH1T8IOXfGjDw+j5Xl42ltzmOM4TkaTBAgM5axMuaGy8ZYLjhEjxVF6VvM5R2AktTxZ+xrGkgJ4oR5Ac122hZSmgDzDD+q+N2UrvLPwGpl/i/8SEMRr+QunV/ROcPlnERH/W8sdNHyYg==
+X-Microsoft-Antispam-Message-Info: dF47U7O66pfirLDMqb+F2BlFR08rTOmJmE1HTQ+KVpLUIooZjQQM23gYRkQ17k3C9lLQ4JuygET3SHJpRBbFsmLZcr8kqw2PwKPLrukCEvATD8g2drgcqP3GsqYkBF87de1uaJfNcY1laMDQxvZ1V62ZO22ae3x1dfSz5A+F3oj+9sF2HPbLgjJ3LfgpRGuo6QIkkKxjtOo9GJHo+QHt7HMDzD+01TC7SjomahPrgF4GdXwyGY24HojV6QEhsEBs68dJWq52WDUjWvYPH/xDYoSuA0oNW1NxuwIhGuRFYFnUTHRtKCVanEn1KdhxjI80HnogD6A1B5afkehxmzAdXg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(346002)(39840400004)(396003)(136003)(376002)(366004)(52116002)(5660300002)(4744005)(6506007)(2616005)(86362001)(956004)(316002)(36756003)(6512007)(1076003)(6916009)(8936002)(4326008)(107886003)(8676002)(66556008)(66946007)(66476007)(478600001)(186003)(6486002)(2906002)(83380400001)(16526019)(26005);
+ SFS:(4636009)(346002)(39840400004)(396003)(136003)(376002)(366004)(52116002)(5660300002)(6506007)(2616005)(86362001)(956004)(316002)(36756003)(6512007)(1076003)(6916009)(8936002)(4326008)(107886003)(8676002)(66556008)(66946007)(66476007)(478600001)(186003)(6486002)(2906002)(83380400001)(16526019)(26005);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1+TvU0rqDxH73DFmT1gRMplFRz+AdeHL2+C5OLtU/luBFswcKFL8D76zdlHfx2SjIN9vILH4VTxIclTel/oiXT3oWAxh/DJxOu/z67bJDMuHz1uSkgD5gdk9p8vKH3q7yGAfeWI9ZWy21ferRDXjOC/fmGwGRYaF1yyJgJiYpueyKZ+agyf74BbI4AFmcWQkaRVsop5RKSl9tlQ8naOMibqcAJfP8Yo5yZiNqniu0HcCJLNz2U1GKleBgVTIu8b+BWdeRe8kS8OtqQmUmCnepnZm0+CCuTcam5L1Sqt9c9J33ufxR6LVTtBFRmpUq+CJLraU78jjPXJnOOPdEinaN/J7jEnaUDfB9AT3hGLz7N14iH3fZ8R+w44E87BXzWKPFLNNGfxqY/g+9lXJe0C9w5hkfofvWqruRnnbaINgZmebGItjJijjC7HftxcOKqbFeaNWkjVtbiFzu9jcSxWu9R51xHWk/GlQKqB3+0RcV+8=
+X-MS-Exchange-AntiSpam-MessageData: Nvk03OUJU9deoKigOtAQGdop4w1DX3BBR3J8dBNo/CDNnETr1QGv8w/jSdvpn3y7miuWp3pncx6d6Rs/Z04pv74uMfxxpzmFmttaKXZuslB84OaHhOJuJTN3ykC8aOxz8+e7XpsEx+s0OuXisKYRqiCtDC5PFGhQwT2ljFR9VeE4Cq/YHmCPS5ZPJxyClX82Rd0zrZpvdvnJYzVjhzHeUe/UAZ5IAfPZUuOlQ4rIKWQ21ZzJGmz3GkX28nj2YaHBlWDT42iTpdxc3SD8pmh+3ollTa9ELOJVMBkFpGgVnWzw/uzwfQJ4WKKlFVo1rw0eu031nOazVPO9GH9ITo+czoIAFhIoicpeWwODaaTK9EEMdlz0u9XaBK42awaOgB8X3vBmjKz1x5VBl3gaxC+iA4ncXDuUocfYuQH5x5sbkvcf1faJiyQJ/rTkmGy81pfUoDV0MRFYGrwpPC5g+Vv4IyYoH9JEM7BPA1CCSRQzSaI=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bdf9366-42fa-4f5e-2ece-08d81913c2cc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a236c39-a9d0-4397-92fb-08d81913c437
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2020 14:26:33.7453 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2020 14:26:36.1507 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 319NleFGIhQY/utt8NtH+mQqsxzHGJwUc8pqbLq63dgE+LYV43qFwtZQMcxV/zmikFp7qpUfk2ka5DUV7xupG8sSczoEAXjKiSCXzUUEwH8=
+X-MS-Exchange-CrossTenant-UserPrincipalName: mQlZBO4YYNA6vIkTmUiRPQyICva1NO05iLxpOuYCsrjBZHYG06sZVp20ccN1Rvv9pKgBKh0xwBACsR8/+wR0Qu//o3Uo3tWD1jC3wy9BHfE=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB2100
-Received-SPF: pass client-ip=40.107.6.95;
+Received-SPF: pass client-ip=40.107.6.138;
  envelope-from=vsementsov@virtuozzo.com;
  helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:26:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:26:42
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -136,27 +138,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+client_close doesn't guarantee that client is closed: nbd_trip() keeps
+reference to it. Let's wait for nbd_trip to finish.
 
-We've faced crash bug, which is reproducing on master branch as well.
-The case is described in 03, where fix is suggested.
-New iotest in 04 crashes without that fix.
+Without this fix, the following crash is possible:
 
-Vladimir Sementsov-Ogievskiy (4):
-  iotests: QemuIoInteractive: use qemu_io_args_no_fmt
-  iotests.py: QemuIoInteractive: print output on failure
-  nbd: make client_close synchronous
-  iotests: test shutdown when bitmap is exported through NBD
+- export bitmap through unternal Qemu NBD server
+- connect a client
+- shutdown Qemu
 
- nbd/server.c                  |  3 ++
- tests/qemu-iotests/299        | 65 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/299.out    | 10 ++++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py | 15 +++++---
- 5 files changed, 90 insertions(+), 4 deletions(-)
- create mode 100644 tests/qemu-iotests/299
- create mode 100644 tests/qemu-iotests/299.out
+On shutdown nbd_export_close_all is called, but it actually don't wait
+for nbd_trip() to finish and to release its references. So, export is
+not release, and exported bitmap remains busy, and on try to remove the
+bitmap (which is part of bdrv_close()) the assertion fairs:
 
+bdrv_release_dirty_bitmap_locked: Assertion `!bdrv_dirty_bitmap_busy(bitmap)' failed
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ nbd/server.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 20754e9ebc..5e27a8d31a 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1419,6 +1419,8 @@ static void client_close(NBDClient *client, bool negotiated)
+     qio_channel_shutdown(client->ioc, QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
+ 
++    AIO_WAIT_WHILE(client->exp->ctx, client->recv_coroutine);
++
+     /* Also tell the client, so that they release their reference.  */
+     if (client->close_fn) {
+         client->close_fn(client, negotiated);
+@@ -2450,6 +2452,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+ 
+     trace_nbd_trip();
+     if (client->closing) {
++        client->recv_coroutine = NULL;
+         nbd_client_put(client);
+         return;
+     }
 -- 
 2.21.0
 
