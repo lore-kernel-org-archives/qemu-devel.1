@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D1EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB205C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:31:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9126B206EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74E0E20706
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:31:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbqRA38m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9126B206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lnm+qsMT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74E0E20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joLJk-0006Jt-RX
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40998)
+	id 1joLQ0-00082Y-Nu
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:31:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLJB-0005tJ-KM
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:24:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39898
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLOb-0007Eb-23
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:30:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31434
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLJ9-0002HG-C8
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:24:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLOZ-0004tf-1X
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:30:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593066261;
+ s=mimecast20190719; t=1593066595;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zX8++hQ9u74GRWiOGtAXtw947B2p48C6Voabu2Gq4s8=;
- b=IbqRA38mKhnsnkIm/wutPPchIwh3g11FN4C/QbbVjay4vHMAa+o0oMxBWHNfSb1usEhJ+C
- t+2LmbRyJd2FyYmz+Y5oZPD/zVrc/KPOVULQZAIcxGLEbruYCqdFKRufy4JakYxZO3lV3e
- euzITxGx5sUWAzthSycJVQYbSjYMv74=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-c8DGQOSBN-KCT4VZ8r1uOQ-1; Thu, 25 Jun 2020 02:24:18 -0400
-X-MC-Unique: c8DGQOSBN-KCT4VZ8r1uOQ-1
-Received: by mail-wr1-f70.google.com with SMTP id i12so6084870wrx.11
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:24:18 -0700 (PDT)
+ bh=KIhiPt/pTnrhm63PkhpiXHAX5Y90xSMxrmAVAFqxbTQ=;
+ b=Lnm+qsMTWNGjJv/WXXbv8lOcOOJ+ZZ/JyL4CUA1PFvxyED2cXnB8YGq3FAIb7Jv2hbtseQ
+ cTlkvGm5fPldURwscbjrAxX04fyQcfviVuRA5glCwjEIAsCjZJvvMCF57YCHUl5LWEbPcF
+ vfdwDCSvpkKYm2iLC8b3XebawFM1kGQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-ilqxathuMgiu-PmFKUNrYQ-1; Thu, 25 Jun 2020 02:29:54 -0400
+X-MC-Unique: ilqxathuMgiu-PmFKUNrYQ-1
+Received: by mail-wm1-f72.google.com with SMTP id g187so6168201wme.0
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:29:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=zX8++hQ9u74GRWiOGtAXtw947B2p48C6Voabu2Gq4s8=;
- b=VHCal6/TxL4pbeVffdXqrX9HzjvS/IMMN1zWHWz0fB/azHKjIayo6ctuz8nmZkashi
- K1clz97Mr2rZzsKkGkAsHaEdBYg+ACMkitHbxIFlVP44Qg0tHIrpsGJO54yJh6fHFXKF
- xmjXvsSjHaK3b8lcuTbB4X6r7brA7paR5zgFqoaFPvkhJPVvd7oHBqoq8TpcxQ7ckpXV
- Arz9ybcDXm9Cb27CkKaIR/24LuM/OUR8It95qjqJJE0c5YpTpWm4nVnHQ31d4VOG+o/b
- msVDj4QJVKXyjLFsrQtc9oTo5fEMu5cBYfvsxMZ6x3EXyawfGg9gYAW5PDarRfEwrQ15
- pZfg==
-X-Gm-Message-State: AOAM531W4HFCg2D0TWlzPQKhl1XLPCW5TTYgYq7ZxZjRZbgPl0y2As3e
- YFyNf0Ft7ZRn5NpfyTiAUYS9TO+8ngyrsasHyIzERcA0A93E50ak64+YsjROgXwNn0oq+67tRIa
- 2I548yfQuTwcx0Es=
-X-Received: by 2002:a1c:3dc3:: with SMTP id k186mr1693645wma.66.1593066257076; 
- Wed, 24 Jun 2020 23:24:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1lERYBxNpWe1WsEwsfCvzmvDJPAQTq+hq+SeZeMHJYWnvgJjg89pwGVcIYM8NVSP6tzj9Nw==
-X-Received: by 2002:a1c:3dc3:: with SMTP id k186mr1693636wma.66.1593066256886; 
- Wed, 24 Jun 2020 23:24:16 -0700 (PDT)
+ bh=KIhiPt/pTnrhm63PkhpiXHAX5Y90xSMxrmAVAFqxbTQ=;
+ b=WG1V+c4102Q3Q7oybsQHf0LzZCVL7Ho28SV5nqTB9ipSDjodk2ccixyGl4yFhCuyV+
+ hCdxa7nn+gETdU1SU1tXPtRHiy1pbvE5LzRsUuE2cOErRWYXgWcmGIPoqufO9ayS1paj
+ KADbEPQ6XNFFflb2Tn9T1yY02FtQenuRLSDCXcklMoIJl9NF2nQ5w+jWxwy2+f4QX4Ez
+ O1I4zftvHM/TkFrN4Bu5+aEytU9I06Z/qp2WXuZIvk7l6wyyZV/ez13NsLG1itrCt99B
+ r+kMG0AiMfIqvTsvkaBMOgnnuKDyEczhx3ROLLoxYJPhmbPgv7ZHg0y+Gi33ArRTqXgY
+ NFUg==
+X-Gm-Message-State: AOAM532JalvYhZ9VSEuf8ZLQHocCIfPjUMAw9TZblp0JgQwLbMGknX4v
+ BO1Ew53C735uVqut63rCdjFlU2J/xKAPpFUtB4Il5YQlQ5Ld/fewyHbW376YrwBQ4ny66oH5qOH
+ PntscBMHJ/Ad9Dk0=
+X-Received: by 2002:a1c:f60d:: with SMTP id w13mr1689344wmc.51.1593066592931; 
+ Wed, 24 Jun 2020 23:29:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTKh0B9f8d4xX5wbNYfn0WeZyx002Yc/waKZWqVXLsbDf/izvD3noEfegR6bz21Bv3dOe/ew==
+X-Received: by 2002:a1c:f60d:: with SMTP id w13mr1689324wmc.51.1593066592743; 
+ Wed, 24 Jun 2020 23:29:52 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id g16sm25958718wrh.91.2020.06.24.23.24.15
+ by smtp.gmail.com with ESMTPSA id l17sm11336872wmh.14.2020.06.24.23.29.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Jun 2020 23:24:16 -0700 (PDT)
-Subject: Re: [PATCH v2 4/9] prep: add ppc-parity write method
-To: P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ Wed, 24 Jun 2020 23:29:52 -0700 (PDT)
+Subject: Re: [PATCH v2 7/9] tz-ppc: add dummy read/write methods
+To: P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 References: <20200624185523.762240-1-ppandit@redhat.com>
- <20200624185523.762240-5-ppandit@redhat.com>
+ <20200624185523.762240-8-ppandit@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,20 +103,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <08047620-c347-f0a6-9719-48500e9f1214@redhat.com>
-Date: Thu, 25 Jun 2020 08:24:15 +0200
+Message-ID: <7ffe6cd9-fc23-3fdf-6c57-7bb0af0dd030@redhat.com>
+Date: Thu, 25 Jun 2020 08:29:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200624185523.762240-5-ppandit@redhat.com>
+In-Reply-To: <20200624185523.762240-8-ppandit@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -136,8 +137,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
  QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
  Alex Williamson <alex.williamson@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
@@ -149,49 +149,55 @@ Sender: "Qemu-devel"
 On 6/24/20 8:55 PM, P J P wrote:
 > From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> Add ppc-parity mmio write method to avoid NULL pointer dereference
-> issue.
+> Add tz-ppc-dummy mmio read/write methods to avoid assert failure
+> during initialisation.
 > 
-> Reported-by: Lei Sun <slei.casper@gmail.com>
 > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->  hw/ppc/prep_systemio.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  hw/misc/tz-ppc.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
-> Update v2: use LOG_GUEST_ERROR
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg04975.html
-> 
-> diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
-> index bbc51b6e9a..03a2f8af6e 100644
-> --- a/hw/ppc/prep_systemio.c
-> +++ b/hw/ppc/prep_systemio.c
-> @@ -23,6 +23,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "hw/irq.h"
->  #include "hw/isa/isa.h"
->  #include "hw/qdev-properties.h"
-> @@ -235,8 +236,15 @@ static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
->      return val;
+> diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+> index 6431257b52..dc8892f61f 100644
+> --- a/hw/misc/tz-ppc.c
+> +++ b/hw/misc/tz-ppc.c
+> @@ -196,7 +196,22 @@ static bool tz_ppc_dummy_accepts(void *opaque, hwaddr addr,
+>      g_assert_not_reached();
+
+This is a shame we now have to fill the read/write handlers for
+unreachable code :(
+
 >  }
 >  
-> +static void ppc_parity_error_writel(void *opaque, hwaddr addr,
-> +                                    uint64_t data, unsigned size)
+> +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigned size)
 > +{
+
+I'd instead use a clearer:
+
+       g_assert_not_reached();
+
 > +    qemu_log_mask(LOG_GUEST_ERROR, "%s not implemented\n", __func__);
-
-What I meant was an error message about illegal/invalid write access.
-
+> +    return 0;
 > +}
 > +
->  static const MemoryRegionOps ppc_parity_error_ops = {
->      .read = ppc_parity_error_readl,
-> +    .write = ppc_parity_error_writel,
->      .valid = {
->          .min_access_size = 4,
->          .max_access_size = 4,
+> +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
+> +                                        uint64_t data, unsigned size)
+> +{
+
+Ditto:
+
+       g_assert_not_reached();
+
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s not implemented\n", __func__);
+> +}
+> +
+>  static const MemoryRegionOps tz_ppc_dummy_ops = {
+> +    /* define r/w methods to avoid assert failure in memory_region_init_io */
+> +    .read = tz_ppc_dummy_read,
+> +    .write = tz_ppc_dummy_write,
+>      .valid.accepts = tz_ppc_dummy_accepts,
+>  };
+>  
 > 
 
 
