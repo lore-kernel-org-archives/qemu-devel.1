@@ -2,88 +2,83 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74ADC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E959C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EE0C2089D
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1676B2089D
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rvFo55sm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EE0C2089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLw9HlQg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1676B2089D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUEF-0005eZ-AW
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:55:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46446)
+	id 1joUF3-0006x7-CY
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:56:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joUCC-0001q9-NW
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:53:48 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41579)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joUCA-0004Zq-Oz
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:53:48 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k15so5688574otp.8
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:53:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=lCqacN0oNjCIot3IKwSzhdFjBZMB9QoxP2p6lBtvsY0=;
- b=rvFo55smgGP6XJ06p9QvUNZMtMZIOjJ/lKRiW+5I00HvfncCSFVfPPjJlMzLnktDlB
- Hp6c9xulhfHs0porL0IBLRy9+GSXbhdUzpUzgjkzPUdVHbEc9ozR9mGKTtWWfsaM6aAb
- 4+Y62Y2mcgo3vmbrXozEX2S6+QBddvPLvhhNuGw3/6QvPlx4XUKGmGhaQ9lYRtbzl2Ao
- Uf9JXrNLm7QXVpoP7avbRfIdDjYzjzGvyJVtKIOxaae2AUvBRrtgOvkJh4mXAODwJRCu
- p3qGjQe3hkmZkJMPS6Ad//6Zzh0R7kkAApsvZe71xNSwjYKYE+YYzy2NjzMUCJz3eY/g
- qDiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=lCqacN0oNjCIot3IKwSzhdFjBZMB9QoxP2p6lBtvsY0=;
- b=MspyuzY+JqDJ610XA99cA7WLPTXwrkYeNKwWVYwPYmht5dv0hPQ/TLOJ2w8HhhPUjJ
- l/O2luIzbTKUj3Krmkhp23Tz8cXUw4urVJVg0Pm5oX47nhC501MGldgwf9vnPM7SDGFK
- vMf+7dJseUgUJHh2usXVj30H5y4dOMIqskxtGL+z6Z7aY2pyvDUlW9/qiR8CIWVSH2jt
- bfzwguGY+kNMLOztlhLvZX1OHLN9hLp1evZrgAq6m0MGQ7UxaVe9I6oqNoH3m8uH37Zz
- rw4efHL70gkrrfcDAwg3NjVj/EbAQczMGbqwvLFWfGXdZ7zRILFZ+/WPq0TDYahvPqty
- KqYA==
-X-Gm-Message-State: AOAM533G8YABfAfWE5WinrwTAB7r2gP7SD1tlxPneWWMGoKfTzfLYBd1
- 7Vb3tupYxWUtInvkswHeUw0ccjWLs7jONtg7jNyazg==
-X-Google-Smtp-Source: ABdhPJyPCJyFkIaU8/5UqvpiHGVd/aUo9CTrajsOwwGQgusjuTqFoIAbdWY4FSS8n/2X2gy8sXDypibNS64Md25IaBk=
-X-Received: by 2002:a9d:5786:: with SMTP id q6mr13542693oth.135.1593100425638; 
- Thu, 25 Jun 2020 08:53:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTj3-0006UB-FA
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59835
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTj1-0001MA-Hp
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593098618;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qU6f31lDyHMBZh0c3uwIiBtG/8pYMX9RJW67yj7Fn20=;
+ b=WLw9HlQgkMIWAdYqWxMJ6Jz3+ldTX7fuxP2Bd3CRRCGsfsBvF3LgtrJUrAEsHCM98cmxhi
+ Jrb3r+HMCfSToqcmZy7HbUanCC0MECGwLsy77lYrxR0hUl2pJgQ6kgtdB0uFWPnXbzcq2z
+ 2BKX1KrYRNe2hdQWbLmpDztMbFdwZUU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-nurc67ZTPu6wAtYgyI-7bQ-1; Thu, 25 Jun 2020 11:23:34 -0400
+X-MC-Unique: nurc67ZTPu6wAtYgyI-7bQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8E70107ACF2;
+ Thu, 25 Jun 2020 15:23:33 +0000 (UTC)
+Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D1FD7CCC0;
+ Thu, 25 Jun 2020 15:23:33 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v7 34/47] backup: Deal with filters
+Date: Thu, 25 Jun 2020 17:22:02 +0200
+Message-Id: <20200625152215.941773-35-mreitz@redhat.com>
+In-Reply-To: <20200625152215.941773-1-mreitz@redhat.com>
+References: <20200625152215.941773-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <20200623072723.6324-1-f4bug@amsat.org>
- <ff9aec64-419c-330c-bbd3-3b04be70eadd@kaod.org>
- <a1013609-914c-3843-4aba-a5eaa911e59f@amsat.org>
-In-Reply-To: <a1013609-914c-3843-4aba-a5eaa911e59f@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 16:53:34 +0100
-Message-ID: <CAFEAcA95D6Xek_sL1tX2k6LWSRPShcW9CvsutS3kj2muoxJNkg@mail.gmail.com>
-Subject: Re: [PATCH v6 0/9] hw/misc/pca9552: Trace GPIO change events
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,36 +91,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 23 Jun 2020 at 12:09, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->
-> On 6/23/20 10:14 AM, C=C3=A9dric Le Goater wrote:
-> > On 6/23/20 9:27 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >> This series add trace events to better display GPIO changes.
-> >> We'll continue in the following series by connecting LEDs to
-> >> these GPIOs.
-> >>
-> >> This helps me to work on a generic LED device, see:
-> >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg711917.html
-> >
-> >
-> > Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
->
-> Thanks :)
->
-> Note to the maintainer, this series is now fully reviewed/tested.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/backup-top.c |  2 +-
+ block/backup.c     |  9 +++++----
+ blockdev.c         | 19 +++++++++++++++----
+ 3 files changed, 21 insertions(+), 9 deletions(-)
 
+diff --git a/block/backup-top.c b/block/backup-top.c
+index f304df8f26..89bd3937d0 100644
+--- a/block/backup-top.c
++++ b/block/backup-top.c
+@@ -291,7 +291,7 @@ void bdrv_backup_top_drop(BlockDriverState *bs)
+ 
+     s->active = false;
+     bdrv_child_refresh_perms(bs, bs->backing, &error_abort);
+-    bdrv_replace_node(bs, backing_bs(bs), &error_abort);
++    bdrv_replace_node(bs, bs->backing->bs, &error_abort);
+     bdrv_set_backing_hd(bs, NULL, &error_abort);
+ 
+     bdrv_drained_end(bs);
+diff --git a/block/backup.c b/block/backup.c
+index 4f13bb20a5..9afa0bf3b4 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -297,6 +297,7 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+ {
+     int ret;
+     BlockDriverInfo bdi;
++    bool target_does_cow = bdrv_backing_chain_next(target);
+ 
+     /*
+      * If there is no backing file on the target, we cannot rely on COW if our
+@@ -304,7 +305,7 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+      * targets with a backing file, try to avoid COW if possible.
+      */
+     ret = bdrv_get_info(target, &bdi);
+-    if (ret == -ENOTSUP && !target->backing) {
++    if (ret == -ENOTSUP && !target_does_cow) {
+         /* Cluster size is not defined */
+         warn_report("The target block device doesn't provide "
+                     "information about the block size and it doesn't have a "
+@@ -313,14 +314,14 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+                     "this default, the backup may be unusable",
+                     BACKUP_CLUSTER_SIZE_DEFAULT);
+         return BACKUP_CLUSTER_SIZE_DEFAULT;
+-    } else if (ret < 0 && !target->backing) {
++    } else if (ret < 0 && !target_does_cow) {
+         error_setg_errno(errp, -ret,
+             "Couldn't determine the cluster size of the target image, "
+             "which has no backing file");
+         error_append_hint(errp,
+             "Aborting, since this may create an unusable destination image\n");
+         return ret;
+-    } else if (ret < 0 && target->backing) {
++    } else if (ret < 0 && target_does_cow) {
+         /* Not fatal; just trudge on ahead. */
+         return BACKUP_CLUSTER_SIZE_DEFAULT;
+     }
+@@ -371,7 +372,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         return NULL;
+     }
+ 
+-    if (compress && !block_driver_can_compress(target->drv)) {
++    if (compress && !bdrv_supports_compressed_writes(target)) {
+         error_setg(errp, "Compression is not supported for this drive %s",
+                    bdrv_get_device_name(target));
+         return NULL;
+diff --git a/blockdev.c b/blockdev.c
+index 6ca9b19779..9ce99b9cbc 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1728,7 +1728,13 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+      * on top of.
+      */
+     if (backup->sync == MIRROR_SYNC_MODE_TOP) {
+-        source = backing_bs(bs);
++        /*
++         * Backup will not replace the source by the target, so none
++         * of the filters skipped here will be removed (in contrast to
++         * mirror).  Therefore, we can skip all of them when looking
++         * for the first COW relationship.
++         */
++        source = bdrv_cow_bs(bdrv_skip_filters(bs));
+         if (!source) {
+             backup->sync = MIRROR_SYNC_MODE_FULL;
+         }
+@@ -1748,9 +1754,14 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+     if (backup->mode != NEW_IMAGE_MODE_EXISTING) {
+         assert(backup->format);
+         if (source) {
+-            bdrv_refresh_filename(source);
+-            bdrv_img_create(backup->target, backup->format, source->filename,
+-                            source->drv->format_name, NULL,
++            /* Implicit filters should not appear in the filename */
++            BlockDriverState *explicit_backing =
++                bdrv_skip_implicit_filters(source);
++
++            bdrv_refresh_filename(explicit_backing);
++            bdrv_img_create(backup->target, backup->format,
++                            explicit_backing->filename,
++                            explicit_backing->drv->format_name, NULL,
+                             size, flags, false, &local_err);
+         } else {
+             bdrv_img_create(backup->target, backup->format, NULL, NULL, NULL,
+-- 
+2.26.2
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
 
