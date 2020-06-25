@@ -2,62 +2,67 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E883C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5225C433E1
 	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08F3120709
+	by mail.kernel.org (Postfix) with ESMTPS id 6A47520709
 	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 05:51:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hFF+QDfX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F3120709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CN+c/bIa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A47520709
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joKnG-0006Sh-8m
+	id 1joKnG-0006S3-LY
 	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 01:51:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33656)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joKkI-0001oU-Je; Thu, 25 Jun 2020 01:48:22 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52493)
+ id 1joKjc-0000cP-3j; Thu, 25 Jun 2020 01:47:40 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37111 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joKkG-0004hD-NR; Thu, 25 Jun 2020 01:48:22 -0400
+ id 1joKjX-0004Qd-FJ; Thu, 25 Jun 2020 01:47:39 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49spw14jNRz9sSt; Thu, 25 Jun 2020 15:48:17 +1000 (AEST)
+ id 49spv45Mw1z9sSt; Thu, 25 Jun 2020 15:47:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1593064097;
- bh=NJ28wOH7hosAT259+yC/BIdJrW+PJTn7qShwkkuzS4U=;
+ d=gibson.dropbear.id.au; s=201602; t=1593064048;
+ bh=l9AL0ieEC3RcSjWyXheDAYT81J7kRiLAV823iK7iJVc=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hFF+QDfXJgw5xoEaDG9aH69IFgyYnxCRTdA+4yJdqkfUcwyq+xg+0EURZgQYn9EV/
- +nL9bSiET9vcwRJVZGtWBoug8XO4LlmzKiBQ/ogZNxe5kt+uNGiL/p8GN73JluUrNo
- 1nBhxPGNm7zXXW5p/bFPET1VdHID88IMmKvDaqkA=
-Date: Thu, 25 Jun 2020 15:48:09 +1000
+ b=CN+c/bIaCTTrJ15e4Ix3jqW1dQDjBgGOryZoGXZRKOKV4UOPqoSDwgwPHxhug+UBb
+ UxR80oge1/qYrwO40hbGmCCVfHh3yr3eOTCvkux3+vHU4qK1xXIxkQ9aEc36bVnY5P
+ +Ts40c6I54sKjDaKf5PPdMOglrUhaRHZfxMI9dCY=
+Date: Thu, 25 Jun 2020 15:06:00 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-Message-ID: <20200625054809.GH172395@umbus.fritz.box>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
+ properties for protected guests
+Message-ID: <20200625050600.GC172395@umbus.fritz.box>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
- <20200624090648.6bdf82bd.cohuck@redhat.com>
- <20200625054723.GG172395@umbus.fritz.box>
+ <20200619020602.118306-10-david@gibson.dropbear.id.au>
+ <20200619101245.GC700896@redhat.com>
+ <20200619144541.GM17085@umbus.fritz.box>
+ <20200619150556.GW700896@redhat.com>
+ <20200620082427.GP17085@umbus.fritz.box>
+ <20200622090930.GB736373@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Hlh2aiwFLCZwGcpw"
+ protocol="application/pgp-signature"; boundary="z4+8/lEcDcG5Ke9S"
 Content-Disposition: inline
-In-Reply-To: <20200625054723.GG172395@umbus.fritz.box>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200622090930.GB736373@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/24 22:09:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -78,104 +83,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, mst@redhat.com, david@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, pasic@linux.ibm.com,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
+ kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Hlh2aiwFLCZwGcpw
-Content-Type: text/plain; charset=us-ascii
+--z4+8/lEcDcG5Ke9S
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 25, 2020 at 03:47:23PM +1000, David Gibson wrote:
-> On Wed, Jun 24, 2020 at 09:06:48AM +0200, Cornelia Huck wrote:
-> > On Mon, 22 Jun 2020 16:27:28 +0200
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Mon, Jun 22, 2020 at 10:09:30AM +0100, Daniel P. Berrang=E9 wrote:
+> On Sat, Jun 20, 2020 at 06:24:27PM +1000, David Gibson wrote:
+> > On Fri, Jun 19, 2020 at 04:05:56PM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Sat, Jun 20, 2020 at 12:45:41AM +1000, David Gibson wrote:
+> > > > On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrang=E9 wrot=
+e:
+> > > > > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
+> > > > > > The default behaviour for virtio devices is not to use the plat=
+forms normal
+> > > > > > DMA paths, but instead to use the fact that it's running in a h=
+ypervisor
+> > > > > > to directly access guest memory.  That doesn't work if the gues=
+t's memory
+> > > > > > is protected from hypervisor access, such as with AMD's SEV or =
+POWER's PEF.
+> > > > > >=20
+> > > > > > So, if a host trust limitation mechanism is enabled, then apply=
+ the
+> > > > > > iommu_platform=3Don option so it will go through normal DMA mec=
+hanisms.
+> > > > > > Those will presumably have some way of marking memory as shared=
+ with the
+> > > > > > hypervisor or hardware so that DMA will work.
+> > > > > >=20
+> > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > > ---
+> > > > > >  hw/core/machine.c | 11 +++++++++++
+> > > > > >  1 file changed, 11 insertions(+)
+> > > > > >=20
+> > > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > > > index a71792bc16..8dfc1bb3f8 100644
+> > > > > > --- a/hw/core/machine.c
+> > > > > > +++ b/hw/core/machine.c
+> > > > > > @@ -28,6 +28,8 @@
+> > > > > >  #include "hw/mem/nvdimm.h"
+> > > > > >  #include "migration/vmstate.h"
+> > > > > >  #include "exec/host-trust-limitation.h"
+> > > > > > +#include "hw/virtio/virtio.h"
+> > > > > > +#include "hw/virtio/virtio-pci.h"
+> > > > > > =20
+> > > > > >  GlobalProperty hw_compat_5_0[] =3D {
+> > > > > >      { "virtio-balloon-device", "page-poison", "false" },
+> > > > > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState=
+ *machine)
+> > > > > >           * areas.
+> > > > > >           */
+> > > > > >          machine_set_mem_merge(OBJECT(machine), false, &error_a=
+bort);
+> > > > > > +
+> > > > > > +        /*
+> > > > > > +         * Virtio devices can't count on directly accessing gu=
+est
+> > > > > > +         * memory, so they need iommu_platform=3Don to use nor=
+mal DMA
+> > > > > > +         * mechanisms.  That requires disabling legacy virtio =
+support
+> > > > > > +         * for virtio pci devices
+> > > > > > +         */
+> > > > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-l=
+egacy", "on");
+> > > > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_=
+platform", "on");
+> > > > > >      }
+> > > > >=20
+> > > > > Silently changing the user's request configuration like this
+> > > >=20
+> > > > It doesn't, though.  register_sugar_prop() effectively registers a
+> > > > default, so if the user has explicitly specified something, that wi=
+ll
+> > > > take precedence.
+> > >=20
+> > > Don't assume that the user has set "disable-legacy=3Doff". People who=
+ want to
+> > > have a transtional device are almost certainly pasing "-device virtio=
+-blk-pci",
+> > > because historical behaviour is that this is sufficient to give you a
+> > > transitional device. Changing the default of disable-legacy=3Don has =
+not
+> > > honoured the users' requested config.
 > >=20
-> > > On 19.06.20 04:05, David Gibson wrote:
-> > > > A number of hardware platforms are implementing mechanisms whereby =
-the
-> > > > hypervisor does not have unfettered access to guest memory, in order
-> > > > to mitigate the security impact of a compromised hypervisor.
-> > > >=20
-> > > > AMD's SEV implements this with in-cpu memory encryption, and Intel =
-has
-> > > > its own memory encryption mechanism.  POWER has an upcoming mechani=
-sm
-> > > > to accomplish this in a different way, using a new memory protection
-> > > > level plus a small trusted ultravisor.  s390 also has a protected
-> > > > execution environment.
-> > > >=20
-> > > > The current code (committed or draft) for these features has each
-> > > > platform's version configured entirely differently.  That doesn't s=
-eem
-> > > > ideal for users, or particularly for management layers.
-> > > >=20
-> > > > AMD SEV introduces a notionally generic machine option
-> > > > "machine-encryption", but it doesn't actually cover any cases other
-> > > > than SEV.
-> > > >=20
-> > > > This series is a proposal to at least partially unify configuration
-> > > > for these mechanisms, by renaming and generalizing AMD's
-> > > > "memory-encryption" property.  It is replaced by a
-> > > > "host-trust-limitation" property pointing to a platform specific
-> > > > object which configures and manages the specific details.
-> > > >=20
-> > > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping =
-it
-> > > > can be extended to cover the Intel and s390 mechanisms as well,
-> > > > though. =20
-> > >=20
-> > > Let me try to summarize what I understand what you try to achieve:
-> > > one command line parameter for all platforms that=20
-> > >=20
-> > > common across all platforms:
-> > > - disable KSM
-> > > - by default enables iommu_platform
-> > >=20
-> > >=20
-> > > per platform:
-> > > - setup the necessary encryption scheme when appropriate
-> > > - block migration
-> > > -....
-> > >=20
-> > >=20
-> > > The tricky part is certainly the per platform thing. For example on
-> > > s390 we just have a cpumodel flag that provides interfaces to the gue=
-st
-> > > to switch into protected mode via the ultravisor. This works perfectly
-> > > fine with the host model, so no need to configure anything.  The plat=
-form
-> > > code then disables KSM _on_switchover_ and not in general. Because th=
-e=20
-> > > guest CAN switch into protected, but it does not have to.
-> > >=20
-> > > So this feels really hard to do right. Would a virtual BoF on KVM for=
-um
-> > > be too late? We had a BoF on protected guests last year and that was
-> > > valuable.
-> >=20
-> > Maybe we can do some kind of call to discuss this earlier? (Maybe in
-> > the KVM call slot on Tuesdays?) I think it would be really helpful if
-> > everybody would have at least a general understanding about how
-> > encryption/protection works on the different architectures.
+> > Umm.. by this argument we can never change any default, ever.  But we
+> > do that routinely with new machine versions.  How is changing based on
+> > a machine option different from that?
 >=20
-> Yes, I think this would be a good idea.  KVM Forum is probably later
-> than we want, plus since it is virtual, I probably won't be shifting
-> into the right timezone to attend much of it.
->=20
-> I don't know when that Tuesday KVM call is.  Generally the best
-> available time for Australia/Europe meetings this time of year is 9am
-> CET / 5pm AEST.  As a once off I could go somewhat later into my
-> evening, though.
+> It isn't really different. Most of the time we get away with it and no one
+> sees a problem. Some of the changes made though, do indeed break things,
+> and libvirt tries to override QEMU's changes in defaults where they are
+> especially at risk of causing breakage. The virtio device model is one su=
+ch
+> change I'd consider especially risky as there are clear guest OS driver
+> support compatibility issues there, with it being a completely different
+> PCI device ID & impl.
 
-Oh.. plus I'm on holiday next week and the one after (27 Jun - 12 Jul).
+If it were possible to drop an existing supported guest into secure VM
+mode, that would make sense.  But AFAICT, a guest always need to be
+aware of the secure mode - it certainly does on POWER.  Plus, support
+for secure guest mode is way newer than support for modern virtio
+devices.
+
+Even then, I don't see that this is really anything new.  Updating
+machine type version can absolutely change system devices in a way
+which could break guests (though it mostly won't).  If you really want
+stable support for a given guest, use a versioned machine type.  Doing
+that will work just as well for the secure VM stuff as for anything
+else.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -183,25 +210,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Hlh2aiwFLCZwGcpw
+--z4+8/lEcDcG5Ke9S
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70OpkACgkQbDjKyiDZ
-s5IeyRAAwVEArjMO0O/eMYFSBMS46vT0Xspoz5OiR9m897fYy5ZzN2MNjgzSSCU4
-IUDAgStKS/X2GkToNDl9nyn3VHZB7X6zuS9wfbCrdBg4ZY1snVcPZlT/QIFvTV2g
-keNXzW7Qb40nWFFxI+4tWglwPmXv8+npvbtPXxZhTaukbX+P+FDEdUAWz9mqjDN7
-IW0uk2EqE6ZwjxVLcKhGAqVQktrduQTzqjmqFBoDraLxM8OQwaH96XPd+cnFvQKL
-h13g6sX1olxGHx2HYCpuCrCjORmSMBkn5HeteqmA16XxsLZgetDg7xvK1GZvj10R
-DXaWsjjif72PUhxpItzv/C4+uk2UC29ZVajKPZig09oHaUUROS2+BYCYzTtcBs0n
-06p0uDpJKHfDgXEBK44o5yS6Fr5Pk3jBOPnZaMrkzwVIJhuGoh2yV/tOmjm5kGay
-ElHFWuNqnX+Fm/H1usCPs2xIHjN5lOuggPwNdt1a94EginlLy4K7aHU7n7zvUu2G
-hZ7vFalOUt50ELWiiEPpvr/lJoqivX6cOuEU1SQCAbfEjkVhD6d6++DBm1snw/WQ
-DmU6XoturVHY1xQzog34NHTfUym7nQ7g1v1JsGFGS66cAxXW/4TMcVGTu8I16Q/W
-sFcXSZQCfcZIWpE+g14e8ngEMxSUSL3MqwezCJe339EQemVmocY=
-=pFq4
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70MLgACgkQbDjKyiDZ
+s5Iw2RAAzFgLklXkpGJ4bIgfOhUu7p7MmaRh+W7RcBuUkjtLstIv+7Vjxc+IUcBt
+IrOZsvXF/fniaLCPIu2Pa9bPbVae3hZqaQqv2N4tBnFUJb/5DbADwQ0Geb91I6AS
+otRcAksdD7zqbXItgaMErgdWzIDM4tHJgPClDMSUYCrnHWPa0MzP66AdVf6HGcNA
+FX0kHW3G5CQ/hIDqGrKEXU2912KeDI1zVak6n0Gyuuzdjtrn4uVrLLVx1a5vV89+
+nE+qmtsuT+iWVJqAq80LnsrJISUcCq6zrTzr0klq6Y7HhNxYbIT23C/RboYFtXjn
+UzrIEL4SVOntcxP6kuHMl5DpFsvOWK/18mvWu7+i+pYvfh8awKuIyGz+3jtywRl0
+0uT9sIDVBLYz1zHfrI9JLsrSiHy5aptc8d9zCTw+UALc6g8QDYp+OHjxZcMOEwRB
+ohf4TIY0srbUx+FR7TzG+tx5tHudHvSivO1AF0oGS9WPoueoW3af4/tfCLmwc6jo
+Q2rM5sVTcPMaCFh+BG5842Y+h8gzLxBSyVArMc3sW6c/QaIJu+wNrSzUWBh4FtpC
+rBHw9R6d8KP78kX343duXPy4MOrMFU6OiybaSkE2Lsp0CL6zwYBREDGypKm+n+eE
+q56ClWBJhhG77uGGav0T+GavIzXkWwWraS3y2v76Na1NNeHrLss=
+=hMmK
 -----END PGP SIGNATURE-----
 
---Hlh2aiwFLCZwGcpw--
+--z4+8/lEcDcG5Ke9S--
 
