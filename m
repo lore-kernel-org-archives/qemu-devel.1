@@ -2,92 +2,69 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3CDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:45:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A293206C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:45:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="WU1G7KtB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A293206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 125B420775
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:45:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 125B420775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joT7j-0007FI-CB
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:45:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
+	id 1joT8U-00007U-6e
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:45:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joT6i-0006Ja-9M
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:44:04 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4117)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1joT75-0006o7-Ab
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:44:27 -0400
+Received: from 1.mo1.mail-out.ovh.net ([178.32.127.22]:38102)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joT6f-0004wc-RH
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:44:03 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ef4b7d20000>; Thu, 25 Jun 2020 07:42:26 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 25 Jun 2020 07:43:59 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 25 Jun 2020 07:43:59 -0700
-Received: from [10.40.100.228] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 25 Jun
- 2020 14:43:43 +0000
-Subject: Re: [PATCH QEMU v25 14/17] vfio: Add vfio_listener_log_sync to mark
- dirty pages
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-15-git-send-email-kwankhede@nvidia.com>
- <20200624125537.649527b3@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <33d35c69-437a-b7b8-821f-6356d559e2ef@nvidia.com>
-Date: Thu, 25 Jun 2020 20:13:39 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1joT6y-0004yj-UC
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:44:23 -0400
+Received: from player770.ha.ovh.net (unknown [10.110.103.168])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 1EAE01CCE3B
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:44:09 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player770.ha.ovh.net (Postfix) with ESMTPSA id 1B09C13D64279;
+ Thu, 25 Jun 2020 14:44:02 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R002dd72e5f9-0eaf-4382-9416-e24206c09db1,A235D761C50461097149B413D00F49C422530979)
+ smtp.auth=groug@kaod.org
+Date: Thu, 25 Jun 2020 16:44:00 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 01/46] error: Improve examples in error.h's big comment
+Message-ID: <20200625164400.5f63e74d@bahia.lan>
+In-Reply-To: <20200624164344.3778251-2-armbru@redhat.com>
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-2-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200624125537.649527b3@x1.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1593096146; bh=UqZWrcdHWebeyon8NdYY2wcPIgDc42DCDxwXmJT1voM=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=WU1G7KtBXi0BFqB3+jG39bes2Okib5OWCG63lhzbrrOg8HrNNaW5bmof21snI8a5p
- nX0CkAj6ZpgndopAaove/4X1LFZWQpEL+luC0gv+0+BuH9lgbKbhcfnhHACHBMDoc1
- BzmgW8iE8MaqsqwD2HOvL7XfgBobG0LRSafsCmtRM/x8rHbsup8niz/HO7XNNnI4XM
- CcODTtfzd0qZBiScsN4aUCT67FkhDVp5XiThp8Zph/LFR4auY34cRhLW8czYP1Q8X0
- onTK3vL4YuCaDs0YC8EYPlroACVO4/NX1q5Ya+3rF4X9cekdbEJwjkTaRo1qR3Vf2V
- afxUlve0wzLxA==
-Received-SPF: pass client-ip=216.228.121.143;
- envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:44:00
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Ovh-Tracer-Id: 13274641379156859278
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekledgkeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.32.127.22; envelope-from=groug@kaod.org;
+ helo=1.mo1.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:44:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,212 +77,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 24 Jun 2020 18:42:59 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
+> Show errp instead of &err where &err is actually unusual.  Add a
+> missing declaration.  Add a second error pileup example.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/error.h | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index ad5b6e896d..1a5ea25e12 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -16,15 +16,15 @@
+>   * Error reporting system loosely patterned after Glib's GError.
+>   *
+>   * Create an error:
+> - *     error_setg(&err, "situation normal, all fouled up");
+> + *     error_setg(errp, "situation normal, all fouled up");
+>   *
+>   * Create an error and add additional explanation:
+> - *     error_setg(&err, "invalid quark");
+> - *     error_append_hint(&err, "Valid quarks are up, down, strange, "
+> + *     error_setg(errp, "invalid quark");
+> + *     error_append_hint(errp, "Valid quarks are up, down, strange, "
+>   *                       "charm, top, bottom.\n");
+>   *
+>   * Do *not* contract this to
+> - *     error_setg(&err, "invalid quark\n"
+> + *     error_setg(errp, "invalid quark\n" // WRONG!
+>   *                "Valid quarks are up, down, strange, charm, top, bottom.");
+>   *
+>   * Report an error to the current monitor if we have one, else stderr:
+> @@ -108,12 +108,23 @@
+>   *     }
+>   *
+>   * Do *not* "optimize" this to
+> + *     Error *err = NULL;
+>   *     foo(arg, &err);
+>   *     bar(arg, &err); // WRONG!
+>   *     if (err) {
+>   *         handle the error...
+>   *     }
+>   * because this may pass a non-null err to bar().
+> + *
+> + * Likewise, do *not*
+> + *     Error *err = NULL;
+> + *     if (cond1) {
+> + *         error_setg(err, ...);
 
-On 6/25/2020 12:25 AM, Alex Williamson wrote:
-> On Sun, 21 Jun 2020 01:51:23 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> vfio_listener_log_sync gets list of dirty pages from container using
->> VFIO_IOMMU_GET_DIRTY_BITMAP ioctl and mark those pages dirty when all
->> devices are stopped and saving state.
->> Return early for the RAM block section of mapped MMIO region.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   hw/vfio/common.c     | 130 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>   hw/vfio/trace-events |   1 +
->>   2 files changed, 131 insertions(+)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 6921a78e9ba5..0518cf228ed5 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -29,6 +29,7 @@
->>   #include "hw/vfio/vfio.h"
->>   #include "exec/address-spaces.h"
->>   #include "exec/memory.h"
->> +#include "exec/ram_addr.h"
->>   #include "hw/hw.h"
->>   #include "qemu/error-report.h"
->>   #include "qemu/main-loop.h"
->> @@ -38,6 +39,7 @@
->>   #include "sysemu/reset.h"
->>   #include "trace.h"
->>   #include "qapi/error.h"
->> +#include "migration/migration.h"
->>   
->>   VFIOGroupList vfio_group_list =
->>       QLIST_HEAD_INITIALIZER(vfio_group_list);
->> @@ -288,6 +290,28 @@ const MemoryRegionOps vfio_region_ops = {
->>   };
->>   
->>   /*
->> + * Device state interfaces
->> + */
->> +
->> +static bool vfio_devices_are_stopped_and_saving(void)
->> +{
->> +    VFIOGroup *group;
->> +    VFIODevice *vbasedev;
->> +
->> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> 
-> Should this be passed the container in order to iterate
-> container->group_list?
-> 
->> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
->> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
->> +                !(vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
->> +                continue;
->> +            } else {
->> +                return false;
->> +            }
->> +        }
->> +    }
->> +    return true;
->> +}
->> +
->> +/*
->>    * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
->>    */
->>   static int vfio_dma_unmap(VFIOContainer *container,
->> @@ -852,9 +876,115 @@ static void vfio_listener_region_del(MemoryListener *listener,
->>       }
->>   }
->>   
->> +static int vfio_get_dirty_bitmap(VFIOContainer *container, uint64_t iova,
->> +                                 uint64_t size, ram_addr_t ram_addr)
->> +{
->> +    struct vfio_iommu_type1_dirty_bitmap *dbitmap;
->> +    struct vfio_iommu_type1_dirty_bitmap_get *range;
->> +    uint64_t pages;
->> +    int ret;
->> +
->> +    dbitmap = g_malloc0(sizeof(*dbitmap) + sizeof(*range));
->> +
->> +    dbitmap->argsz = sizeof(*dbitmap) + sizeof(*range);
->> +    dbitmap->flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
->> +    range = (struct vfio_iommu_type1_dirty_bitmap_get *)&dbitmap->data;
->> +    range->iova = iova;
->> +    range->size = size;
->> +
->> +    /*
->> +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
->> +     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap's pgsize to
->> +     * TARGET_PAGE_SIZE.
->> +     */
->> +    range->bitmap.pgsize = TARGET_PAGE_SIZE;
->> +
->> +    pages = TARGET_PAGE_ALIGN(range->size) >> TARGET_PAGE_BITS;
->> +    range->bitmap.size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
->> +                                         BITS_PER_BYTE;
->> +    range->bitmap.data = g_try_malloc0(range->bitmap.size);
->> +    if (!range->bitmap.data) {
->> +        ret = -ENOMEM;
->> +        goto err_out;
->> +    }
->> +
->> +    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, dbitmap);
->> +    if (ret) {
->> +        error_report("Failed to get dirty bitmap for iova: 0x%llx "
->> +                "size: 0x%llx err: %d",
->> +                range->iova, range->size, errno);
->> +        goto err_out;
->> +    }
->> +
->> +    cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range->bitmap.data,
->> +                                            ram_addr, pages);
->> +
->> +    trace_vfio_get_dirty_bitmap(container->fd, range->iova, range->size,
->> +                                range->bitmap.size, ram_addr);
->> +err_out:
->> +    g_free(range->bitmap.data);
->> +    g_free(dbitmap);
->> +
->> +    return ret;
->> +}
->> +
->> +static int vfio_sync_dirty_bitmap(MemoryListener *listener,
->> +                                 MemoryRegionSection *section)
->> +{
->> +    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
->> +    VFIOGuestIOMMU *giommu = NULL;
->> +    ram_addr_t ram_addr;
->> +    uint64_t iova, size;
->> +    int ret = 0;
->> +
->> +    if (memory_region_is_iommu(section->mr)) {
->> +
->> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
->> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
->> +                giommu->n.start == section->offset_within_region) {
->> +                VFIOIovaRange *iova_range;
->> +
->> +                QLIST_FOREACH(iova_range, &giommu->iova_list, next) {
->> +                    ret = vfio_get_dirty_bitmap(container, iova_range->iova,
->> +                                        iova_range->size, iova_range->ram_addr);
->> +                    if (ret) {
->> +                        break;
->> +                    }
->> +                }
->> +                break;
->> +            }
->> +        }
->> +
->> +    } else {
->> +        iova = TARGET_PAGE_ALIGN(section->offset_within_address_space);
->> +        size = int128_get64(section->size);
->> +
->> +        ram_addr = memory_region_get_ram_addr(section->mr) +
->> +                   section->offset_within_region + iova -
->> +                   TARGET_PAGE_ALIGN(section->offset_within_address_space);
->> +
->> +        ret = vfio_get_dirty_bitmap(container, iova, size, ram_addr);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void vfio_listerner_log_sync(MemoryListener *listener,
->> +        MemoryRegionSection *section)
->> +{
->> +    if (vfio_listener_skipped_section(section)) {
->> +        return;
->> +    }
->> +
->> +    if (vfio_devices_are_stopped_and_saving()) {
->> +        vfio_sync_dirty_bitmap(listener, section);
->> +    }
-> 
-> 
-> How do we decide that this is the best policy for all devices?  For
-> example if a device does not support page pinning or some future means
-> of marking dirtied pages, this is clearly the right choice, but when
-> these are supported, aren't we deferring all dirty logging info until
-> the final stage?  Thanks,
-> 
+s/err/&err
 
-Yes, for now we are deferring all dirty logging to stop-and-copy phase. 
-In future, whenever hardware support for dirty page tracking get added, 
-we will have flag added in migration capability in VFIO_IOMMU_GET_INFO 
-capability list. Based on that we can decide to get dirty pages in 
-earlier phase of migration.
+> + *     }
+> + *     if (cond2) {
+> + *         error_setg(err, ...); // WRONG!
 
-Thanks,
-Kirti
+ditto
+
+With that fixed:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> + *     }
+> + * because this may pass a non-null err to error_setg().
+>   */
+>  
+>  #ifndef ERROR_H
+
 
