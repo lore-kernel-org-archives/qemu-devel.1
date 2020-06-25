@@ -2,92 +2,89 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFDAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D39EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:03:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25F12207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:02:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 655E9207E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:03:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="q7fSDIip"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F12207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="We/CYXSD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655E9207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTOg-0001CH-9q
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:02:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59088)
+	id 1joTPZ-0002AD-Mq
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:03:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joTNj-0000g5-OW
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:01:39 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4640)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1joTOZ-0001GW-8D
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:02:31 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:42592 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1joTNh-0007rw-85
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:01:39 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ef4bc420002>; Thu, 25 Jun 2020 08:01:22 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 25 Jun 2020 08:01:35 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 25 Jun 2020 08:01:35 -0700
-Received: from [10.40.100.228] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 25 Jun
- 2020 15:01:16 +0000
-Subject: Re: [PATCH QEMU v25 15/17] vfio: Add ioctl to get dirty pages bitmap
- during dma unmap.
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-16-git-send-email-kwankhede@nvidia.com>
- <20200624125614.5e742574@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <8cf7ffdf-8ba4-d42d-cf8d-4af08686841a@nvidia.com>
-Date: Thu, 25 Jun 2020 20:31:12 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1joTOX-0008Fy-9O
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:02:30 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id D70E14C8B7;
+ Thu, 25 Jun 2020 15:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1593097344;
+ x=1594911745; bh=oThQCtlFTIagl9wbYElNC61m9nqZMW5iRBPlY3X6ybs=; b=
+ We/CYXSD4+mGFTrKzHBOs0I8tV8Et+PZ0VKYgXENErczJXUN+5/L7EpXdiM4pqka
+ IqChhuu1l8lsKvlyuw8jWziaar6BOo+nGwmZlvSTdr7uVXl7hxBnTB6yG7Of7Xo0
+ Vi1zeeu9zsSdjQbSw4QXrElpi1p2zorHDVSPqsBBBGs=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 73Tg2a8X_EDr; Thu, 25 Jun 2020 18:02:24 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 9F4484C8AD;
+ Thu, 25 Jun 2020 18:02:24 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 25
+ Jun 2020 18:02:24 +0300
+Date: Thu, 25 Jun 2020 18:02:23 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 6/8] i386: hvf: Drop hvf_reset_vcpu()
+Message-ID: <20200625150223.GH25104@SPB-NB-133.local>
+References: <20200624225850.16982-1-r.bolshakov@yadro.com>
+ <20200624225850.16982-7-r.bolshakov@yadro.com>
+ <ac800efc-c51d-e44c-de5c-cdef81d24dec@redhat.com>
+ <20200625123637.GG25104@SPB-NB-133.local>
+ <34821aae-e8f5-adc6-eab5-0a6f6b2835e8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200624125614.5e742574@x1.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1593097282; bh=AveRosUOB9EBRLnR+jM6+lA1ALzsFCfCT1Fihe1EQSA=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=q7fSDIip0+CmP0aic2uG+GV6xPjDb7LGoRv9Su7mS+2vx42lDh6rGLxdZ3nmPr2OL
- m/u7UCR0kK7GSIKoWCpmTcKnUm4N4u4Y4rm9ctFtV9sM/k+zPWVCvbHczEdbHLnVfS
- dG3a5nrmYXjUoB+Mbojk0Ez+4m+eoTUYmQDKDkV34x3MZQqdbU47jnrf0khDBD6Drv
- +asEVdWBoys8kBvyeBMUvicx2EFKx3FoHljzsJyRCdcazBMSf/lFsrS0Hr2kkl7q1h
- E5dRdZNrf+yjakGd4N2InXINbuEfzcYPozKfoyIJsiL4OvMwa4CHhXknnDpgw1Hkqd
- zzK1Rk4UwMaiQ==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:34:30
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <34821aae-e8f5-adc6-eab5-0a6f6b2835e8@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 11:02:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,198 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 6/25/2020 12:26 AM, Alex Williamson wrote:
-> On Sun, 21 Jun 2020 01:51:24 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Thu, Jun 25, 2020 at 03:30:38PM +0200, Paolo Bonzini wrote:
+> On 25/06/20 14:36, Roman Bolshakov wrote:
+> > 
+> > Yes, there's such a place. post-init and post-reset invoke
+> > hvf_put_registers() and the latter one calls hvf_put_segments().
+> > hvf_put_segments() sets CR4 and CR0 via macvm_set_cr0/macvm_set_cr4
+> > using the CR0/CR4 from env. So, the reset is relying on generic QEMU
+> > CPUX86State now. LMA in EFER is reset there as well.
 > 
->> With vIOMMU, IO virtual address range can get unmapped while in pre-copy
->> phase of migration. In that case, unmap ioctl should return pages pinned
->> in that range and QEMU should find its correcponding guest physical
->> addresses and report those dirty.
->>
->> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   hw/vfio/common.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
->>   1 file changed, 81 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 0518cf228ed5..a06b8f2f66e2 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -311,11 +311,83 @@ static bool vfio_devices_are_stopped_and_saving(void)
->>       return true;
->>   }
->>   
->> +static bool vfio_devices_are_running_and_saving(void)
->> +{
->> +    VFIOGroup *group;
->> +    VFIODevice *vbasedev;
->> +
->> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> 
-> Same as previous, I'm curious if we should instead be looking at
-> container granularity.  It especially seems to make sense here where
-> we're unmapping from a container, so iterating every device in every
-> group seems excessive.
+> Ok, do you want to send a follow-up or a v2 of this?
 > 
 
-changing it with container argument.
+I'm still trying to understand what I should do :)
 
->> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
->> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
->> +                (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
->> +                continue;
->> +            } else {
->> +                return false;
->> +            }
+> > I don't know any alternative for PDPTE and VMCS Entry Controls in
+> > CPUX86State, that's why I left explicit reset of the VMCS fields in
+> > post-reset.
 > 
-> I'm also not sure about the polarity of this function, should it be if
-> any device is _SAVING we should report the dirty bitmap?  For example,
-> what if we have a set of paried failover NICs where we intend to unplug
-> one just prior to stopping the devices, aren't we going to lose dirtied
-> pages with this logic that they all must be running and saving?  Thanks,
+> VMCS entry controls should be handled by macvm_set_cr0 as well, because
+> QEMU does not use any except for the LMA bit.  They are initialized zero
+> 
+>     wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS,
+> 	  cap2ctrl(hvf_state->hvf_caps->vmx_cap_entry, 0));
+> 
+> but in practice the last argument ends up being zero all the time.
 > 
 
-If migration is initiated, is device unplug allowed? Ideally it 
-shouldn't. If it is, then how QEMU handles data stream of device which 
-doesn't exist at destination?
+macvm_set_cr0() sets/clears LMA in entry controls only in case of
+transitions into/out of long mode in enter_long_mode() in
+exit_long_mode(), respectively. But macvm_set_cr0() doesn't load
+EFER.LMA from CPUX86State into VMCS entry controls during reset and
+that's where hvf_put_registers() might not behave properly.
 
-_SAVING flag is set during pre-copy and stop-and-copy phase. Here we 
-only want to track pages which are unmapped during pre-copy phase, i.e. 
-when vCPU are running. In case of VM suspend /saveVM, there is no 
-pre-copy phase, but ideally we shouldn't see unmaps when vCPUs are 
-stopped, right? But still for safer side, since we know exact phase, I 
-would prefer to check for _SAVING and _RUNNING flags.
+As far as I understand you propose to drop explicit LMA reset in
+post-reset and rather impove synchronization between efer and entry
+controls in macvm_set_cr0(), right? In that case I don't see a
+regression in the series, and if possible I'd prefer a follow up patch
+for the issue.
+
+> PDPTEs are not a problem, because they are not used after reset (only if
+> CR4.PAE=CR4.PG=1 and EFER.LME=0).
+> 
+
+Ok, good, then we're leaving PDPTE initialization as is in post-reset.
 
 Thanks,
-Kirti
+Roman
 
-
-> Alex
-> 
->> +        }
->> +    }
->> +    return true;
->> +}
->> +
->> +static int vfio_dma_unmap_bitmap(VFIOContainer *container,
->> +                                 hwaddr iova, ram_addr_t size,
->> +                                 IOMMUTLBEntry *iotlb)
->> +{
->> +    struct vfio_iommu_type1_dma_unmap *unmap;
->> +    struct vfio_bitmap *bitmap;
->> +    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
->> +    int ret;
->> +
->> +    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
->> +
->> +    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
->> +    unmap->iova = iova;
->> +    unmap->size = size;
->> +    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
->> +    bitmap = (struct vfio_bitmap *)&unmap->data;
->> +
->> +    /*
->> +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
->> +     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
->> +     * TARGET_PAGE_SIZE.
->> +     */
->> +
->> +    bitmap->pgsize = TARGET_PAGE_SIZE;
->> +    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
->> +                   BITS_PER_BYTE;
->> +
->> +    if (bitmap->size > container->max_dirty_bitmap_size) {
->> +        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
->> +        ret = -E2BIG;
->> +        goto unmap_exit;
->> +    }
->> +
->> +    bitmap->data = g_try_malloc0(bitmap->size);
->> +    if (!bitmap->data) {
->> +        ret = -ENOMEM;
->> +        goto unmap_exit;
->> +    }
->> +
->> +    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
->> +    if (!ret) {
->> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
->> +                iotlb->translated_addr, pages);
->> +    } else {
->> +        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
->> +    }
->> +
->> +    g_free(bitmap->data);
->> +unmap_exit:
->> +    g_free(unmap);
->> +    return ret;
->> +}
->> +
->>   /*
->>    * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
->>    */
->>   static int vfio_dma_unmap(VFIOContainer *container,
->> -                          hwaddr iova, ram_addr_t size)
->> +                          hwaddr iova, ram_addr_t size,
->> +                          IOMMUTLBEntry *iotlb)
->>   {
->>       struct vfio_iommu_type1_dma_unmap unmap = {
->>           .argsz = sizeof(unmap),
->> @@ -324,6 +396,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
->>           .size = size,
->>       };
->>   
->> +    if (iotlb && container->dirty_pages_supported &&
->> +        vfio_devices_are_running_and_saving()) {
->> +        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
->> +    }
->> +
->>       while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
->>           /*
->>            * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
->> @@ -371,7 +448,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
->>        * the VGA ROM space.
->>        */
->>       if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
->> -        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
->> +        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
->>            ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
->>           return 0;
->>       }
->> @@ -542,7 +619,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
->>               }
->>           }
->>   
->> -        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
->> +        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
->>           if (ret) {
->>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
->>                            "0x%"HWADDR_PRIx") = %d (%m)",
->> @@ -853,7 +930,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
->>       }
->>   
->>       if (try_unmap) {
->> -        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
->> +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
->>           if (ret) {
->>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
->>                            "0x%"HWADDR_PRIx") = %d (%m)",
-> 
 
