@@ -2,85 +2,88 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21EFDC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E017C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DECCA20781
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:34:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC72620781
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:34:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cmjGwirc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DECCA20781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1bVThBu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC72620781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joS0w-00032f-0h
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:34:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33904)
+	id 1joS17-0003Kp-Lj
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:34:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joRyV-0008Er-35
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:31:32 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:35403)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joRyR-0005jF-Mn
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:31:30 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id k4so4959662oik.2
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 06:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=T83L/jp7T1UPrpVDDi8J3X93DTN0mhpJd5lvMULeVNk=;
- b=cmjGwircUiBde2KHaqRzsLtXCSMrBk8+kMSq/bZJwb7LyvzmKZAtEJcr5ab+CY5BYP
- KEF0gTYDCSxx1gTCLfZHvj3+hkafvcupzgNuE2a6RXas3Gf9dqHjJOkkGaDbrdDZ9heB
- mkc+7uvON5DAqvkVdhPdCq7q75c5mdCulqwmEV3qO2k9DPPm+vyKC4TRuNlnhYEZq/0f
- MENch9VTW4zmUPHrf0anhQ36fPwNtZ0NJTi8XySaj6oYMsdLYFknulqk59L8lAyFOg3V
- 9OorFSp/Gni5AnD32ZI92wbZp6IyLefLTP5ma+7yYgRsnoFzHXLQpcEi+d9y0BnU/AbM
- VTNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=T83L/jp7T1UPrpVDDi8J3X93DTN0mhpJd5lvMULeVNk=;
- b=lCusHqHk+9B6kGoN0TJAs20kXslzrPGI1kqQoImwfubLKynbWEuaJFVwyvHscZfchl
- j0VJWhL3eL2Mjm1O7lEjvT3r3jEg/1NN1RrEnQYSHQtBFHqvNc3mVTcMwgZ/K3fEbv/e
- DQlWqYBI4z1QOd3UrOUWkz8CczxREJ2s1YwDeRzx21+5NBe7NW1DgQ372LA789N+vc5x
- DrMLEvPfoMoPAMdh7nmtNvQBs3WKZjaw0ufmxAhtD+CGl0ejEJmjwK+8Fasz8ZITt1L2
- x81E0ctN6SeAZM4TxUwdYCyNTzuHbsYagWkqrdHoXGHJgFZqfa1/eznvTwXNg81n135J
- PeOA==
-X-Gm-Message-State: AOAM53215yQZszGIGFFN2LBBDg3h4zEKqmxMeU0bGqQ5Sekl5WBZYI75
- TEypvp8RmxR9CiXCsC+QceQCMBAYLTonG0eH4159UQ==
-X-Google-Smtp-Source: ABdhPJyxXKa3QcnGOR30K/q/fYKxXdWN9PA+M9nvcztuyQWjLyhCuQQrXNgbrfDYFBZlNwQZDRONHt+YqZSuZfUYQZE=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr2014596oib.48.1593091886277; 
- Thu, 25 Jun 2020 06:31:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joS0K-0002CB-Ct
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:33:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20664
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joS0H-0006Ra-PS
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:33:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593092000;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mMaWU1Px2aB/Oh7iKuIJIoAnjinhd2rmpLtHXP+b5co=;
+ b=a1bVThBupA4UYc2N12/KxLDdXfs1NyXQxUMjraoRKIxupHNwjbu2hLNJVaNq40Go7nPqr4
+ cL0N9CseSJ/MFgoOs0l8idLXw7+hyc2zFxgc92esJrGkTdsBVOjzYxaifo8sHkjs2ZBpy0
+ ZwKHbkhNvo9YfHw7pRTyI+v6zQFwbRg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-VkGy_UjpNK-x3ZwfNUX4DQ-1; Thu, 25 Jun 2020 09:33:19 -0400
+X-MC-Unique: VkGy_UjpNK-x3ZwfNUX4DQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D747D1005512;
+ Thu, 25 Jun 2020 13:33:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 785655D9C5;
+ Thu, 25 Jun 2020 13:33:17 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id F2EFF11384D4; Thu, 25 Jun 2020 15:33:15 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 17/46] qemu-option: Smooth error checking with Coccinelle
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-18-armbru@redhat.com>
+ <7368e632-8cdb-f6cd-65b5-5d1e14c61459@redhat.com>
+Date: Thu, 25 Jun 2020 15:33:15 +0200
+In-Reply-To: <7368e632-8cdb-f6cd-65b5-5d1e14c61459@redhat.com> (Eric Blake's
+ message of "Wed, 24 Jun 2020 15:08:11 -0500")
+Message-ID: <87ftajz2w4.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200624100210.59975-1-stefanha@redhat.com>
-In-Reply-To: <20200624100210.59975-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 14:31:14 +0100
-Message-ID: <CAFEAcA_K7MtnEjRMZCbmYrJCm6qD4N7ZMHvGuAzXL9gD2zQNuA@mail.gmail.com>
-Subject: Re: [PULL 00/12] Block patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,85 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 24 Jun 2020 at 11:02, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit 171199f56f5f9bdf1e5d670d09ef1351d8f01bae:
->
->   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-apply-20200619-3' into staging (2020-06-22 14:45:25 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 7838c67f22a81fcf669785cd6c0876438422071a:
->
->   block/nvme: support nested aio_poll() (2020-06-23 15:46:08 +0100)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
+Eric Blake <eblake@redhat.com> writes:
 
-Failure on iotest 030, x86-64 Linux:
+> On 6/24/20 11:43 AM, Markus Armbruster wrote:
+>> The previous commit enables conversion of
+>>
+>>      foo(..., &err);
+>>      if (err) {
+>>          ...
+>>      }
+>>
+>> to
+>>
+>>      if (!foo(..., &err)) {
+>>          ...
+>>      }
+>>
+>> for QemuOpts functions that now return true / false on success /
+>> error.  Coccinelle script:
+>>
+>
+>>
+>> Eliminate error_propagate() that are now unnecessary.  Delete @err
+>> that are now unused.  Tidy up line breaks and whitespace.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>>   32 files changed, 70 insertions(+), 192 deletions(-)
+>
+> Another decent chunk of cleanups.
+>
+>>
+>> diff --git a/block.c b/block.c
+>> index 30a72bc4c2..77e85f13db 100644
+>> --- a/block.c
+>> +++ b/block.c
+>
+>> @@ -6091,8 +6086,8 @@ void bdrv_img_create(const char *filename, const char *fmt,
+>>       }
+>>         if (base_filename) {
+>> -        qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename, &local_err);
+>> -        if (local_err) {
+>> +        if (!qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename,
+>> +                          &local_err)) {
+>>               error_setg(errp, "Backing file not supported for file format '%s'",
+>>                          fmt);
+>
+> Pre-existing - it is odd that we collect a message into local_err,
+> then write something else into errp; the out: label does
+> error_propagate(errp, local_err) which ensures there is no leak but
+> discards the original err.  You could pass NULL instead.  But as it is
+> pre-existing, passing NULL should be a separate patch.
 
-  TEST    iotest-qcow2: 030 [fail]
-QEMU          --
-"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
--nodefaults -display none -accel qtest
-QEMU_IMG      --
-"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-io"
- --cache writeback --aio threads -f qcow2
-QEMU_NBD      --
-"/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/x86_64 e104462 4.15.0-76-generic
-TEST_DIR      --
-/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.8tgdDjoZcO
-SOCKET_SCM_HELPER --
-/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotest/socket_scm_helper
+PATCH 20.
 
---- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/030.out
- 2019-07-15 17:18:35.251364738 +0100
-+++ /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/030.out.bad
-  2020-06-25 14:04:28.500534007 +0100
-@@ -1,5 +1,17 @@
--...........................
-+.............F.............
-+======================================================================
-+FAIL: test_stream_parallel (__main__.TestParallelOps)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "030", line 246, in test_stream_parallel
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
-line 848, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
-line 822, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
-found"}}"
-+
- ----------------------------------------------------------------------
- Ran 27 tests
+>>               goto out;
+>> @@ -6100,8 +6095,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+>>       }
+>>         if (base_fmt) {
+>> -        qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, &local_err);
+>> -        if (local_err) {
+>> +        if (!qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, &local_err)) {
+>>               error_setg(errp, "Backing file format not supported for file "
+>>                                "format '%s'", fmt);
+>
+> Ditto.
 
--OK
-+FAILED (failures=1)
+Likewise.
 
+>> +++ b/qemu-img.c
+>> @@ -467,8 +467,8 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+>>       Error *err = NULL;
+>>         if (base_filename) {
+>> -        qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename, &err);
+>> -        if (err) {
+>> +        if (!qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename,
+>> +                          &err)) {
+>>               error_report("Backing file not supported for file format '%s'",
+>>                            fmt);
+>>               error_free(err);
+>> @@ -476,8 +476,7 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+>>           }
+>>       }
+>>       if (base_fmt) {
+>> -        qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, &err);
+>> -        if (err) {
+>> +        if (!qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, &err)) {
+>>               error_report("Backing file format not supported for file "
+>>                            "format '%s'", fmt);
+>>               error_free(err);
+>
+> Ditto.
 
-thanks
--- PMM
+PATCH 44.
+
+> But the conversion here is sane.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
 
