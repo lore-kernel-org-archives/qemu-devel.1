@@ -2,74 +2,77 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C47C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 23:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D859C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 23:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9C220707
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 23:00:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9C220707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 394B320767
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 23:08:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="kibJPPa7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394B320767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joaqg-0007Ug-9q
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 19:00:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43122)
+	id 1joaz0-0000t9-Gw
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 19:08:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1joaoD-0005S5-Vs; Thu, 25 Jun 2020 18:57:30 -0400
-Received: from mga06.intel.com ([134.134.136.31]:64060)
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
+ id 1joayQ-0000N7-4J; Thu, 25 Jun 2020 19:08:02 -0400
+Received: from home.keithp.com ([63.227.221.253]:39444 helo=elaine.keithp.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1joaoB-0006sm-8G; Thu, 25 Jun 2020 18:57:29 -0400
-IronPort-SDR: TH3w3AZqSJwC2xDqCwmFtjKVr57kF76s/VimaNeLartwC8NWiGnP0TJLKPS+vEc+AD5MSu54uG
- w9qtCnLgr9Ug==
-X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="206629276"
-X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; d="scan'208";a="206629276"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Jun 2020 15:57:22 -0700
-IronPort-SDR: JxSSmFZvi7mfj+fuJbQtqkNnMs5nLRzKZOfzdUtIiBeGw5mSybVwxXN7u4QG4P6eN5QMKRJ1kx
- uI/kZc2WmqcQ==
-X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; d="scan'208";a="264061057"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.212.45.116])
- by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Jun 2020 15:57:21 -0700
-Subject: Re: [PATCH v3 2/2] nvme: allow cmb and pmr to be enabled on same
- device
-To: Klaus Jensen <its@irrelevant.dk>
-References: <20200622182511.17252-1-andrzej.jakowski@linux.intel.com>
- <20200622182511.17252-3-andrzej.jakowski@linux.intel.com>
- <20200625111308.42473x7wfzukp4ve@apples.localdomain>
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Message-ID: <f9ea530c-06fd-1773-b036-5b00b9c80d4f@linux.intel.com>
-Date: Thu, 25 Jun 2020 15:57:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
+ id 1joayN-0007Gf-Hi; Thu, 25 Jun 2020 19:08:01 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by elaine.keithp.com (Postfix) with ESMTP id 9C59A3F2CB6C;
+ Thu, 25 Jun 2020 16:07:54 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at keithp.com
+Received: from elaine.keithp.com ([127.0.0.1])
+ by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
+ with LMTP id pSeNJChwUhd4; Thu, 25 Jun 2020 16:07:53 -0700 (PDT)
+Received: from keithp.com (168-103-152-72.tukw.qwest.net [168.103.152.72])
+ by elaine.keithp.com (Postfix) with ESMTPSA id 676063F2CB6A;
+ Thu, 25 Jun 2020 16:07:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+ t=1593126473; bh=B3D6iPyP1jH0LIZnd+CMsCai+RzYgkvxsG4oF0ueQG4=;
+ h=From:To:Cc:Subject:Date:From;
+ b=kibJPPa7u0FAux5UhvOQG0Hnpcb7xk5P0TzQXlAvZcS6PKDFWOAAz8Alf3xP8VUVD
+ JWqWPp8MJh+nPTO4ts4Q3Yero2R797rOUp6YsFbt6zEep3RvFqYEKUBuEF/dTMo1z5
+ kCR5jvdFwmrrPZiTo/jWQuXLVDVCpFNnPN0ItbZE5jjOrzyWBaHJK3gokwKi+Aj9Vs
+ m/WZtbKzemytEMV/WseZBFVda4d5HOOjSFgsZeBv0gQ87ytb4T+XR1cOeW1HPvVJJm
+ xkaHCNfdnAITkEu7S/e53q80oYcJDEiFRGXOInBpnebK4ifHFnqMYE7w/cRdckCoEt
+ iHn4hrkb3ZFag==
+Received: by keithp.com (Postfix, from userid 1000)
+ id 633851582167; Thu, 25 Jun 2020 16:07:51 -0700 (PDT)
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Keith Packard <keithp@keithp.com>, qemu-arm@nongnu.org
+Subject: [PATCH] hw/arm: Add 'virtm' hardware
+Date: Thu, 25 Jun 2020 16:07:40 -0700
+Message-Id: <20200625230740.549114-1-keithp@keithp.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <20200625111308.42473x7wfzukp4ve@apples.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=134.134.136.31;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga06.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 18:57:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
+ helo=elaine.keithp.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 19:07:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,345 +85,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Keith Packard <keithp@keithp.com>
+From: Keith Packard via <qemu-devel@nongnu.org>
 
-On 6/25/20 4:13 AM, Klaus Jensen wrote:
-> On Jun 22 11:25, Andrzej Jakowski wrote:
->> So far it was not possible to have CMB and PMR emulated on the same
->> device, because BAR2 was used exclusively either of PMR or CMB. This
->> patch places CMB at BAR4 offset so it not conflicts with MSI-X vectors.
->>
->> Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
->> ---
->>  hw/block/nvme.c      | 119 +++++++++++++++++++++++++++----------------
->>  hw/block/nvme.h      |   3 +-
->>  include/block/nvme.h |   4 +-
->>  3 files changed, 80 insertions(+), 46 deletions(-)
->>
->> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
->> index 9f11f3e9da..ec97b7af3c 100644
->> --- a/hw/block/nvme.c
->> +++ b/hw/block/nvme.c
->> @@ -22,12 +22,12 @@
->>   *              [pmrdev=<mem_backend_file_id>,] \
->>   *              max_ioqpairs=<N[optional]>
->>   *
->> - * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
->> - * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
->> + * Note cmb_size_mb denotes size of CMB in MB. CMB when configured is assumed
->> + * to be resident in BAR4 at certain offset - this is because BAR4 is also
->> + * used for storing MSI-X table that is available at offset 0 in BAR4.
->>   *
->> - * cmb_size_mb= and pmrdev= options are mutually exclusive due to limitation
->> - * in available BAR's. cmb_size_mb= will take precedence over pmrdev= when
->> - * both provided.
->> + * pmrdev is assumed to be resident in BAR2/BAR3. When configured it consumes
->> + * whole BAR2/BAR3 exclusively.
->>   * Enabling pmr emulation can be achieved by pointing to memory-backend-file.
->>   * For example:
->>   * -object memory-backend-file,id=<mem_id>,share=on,mem-path=<file_path>, \
->> @@ -57,8 +57,8 @@
->>  #define NVME_MAX_IOQPAIRS 0xffff
->>  #define NVME_REG_SIZE 0x1000
->>  #define NVME_DB_SIZE  4
->> -#define NVME_CMB_BIR 2
->>  #define NVME_PMR_BIR 2
->> +#define NVME_MSIX_BIR 4
->>  
->>  #define NVME_GUEST_ERR(trace, fmt, ...) \
->>      do { \
->> @@ -69,18 +69,19 @@
->>  
->>  static void nvme_process_sq(void *opaque);
->>  
->> -static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
->> +static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr, int size)
->>  {
->> -    hwaddr low = n->ctrl_mem.addr;
->> -    hwaddr hi  = n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size);
->> +    hwaddr low = n->bar4.addr + n->cmb_offset;
->> +    hwaddr hi  = low + NVME_CMBSZ_GETSIZE(n->bar.cmbsz);
->>  
->> -    return addr >= low && addr < hi;
->> +    return addr >= low && (addr + size) < hi;
-> 
-> I think the hi check is off by one? Should be `(addr + size + 1) < hi`
-> or `<=`) right? Otherwise we reject a valid read against the last
-> address in the CMB.
-> 
-> Also, a check for wrap-around is missing (`hi < addr` post-addition).
-> 
-> Anyway, I would really prefer that we do not change nvme_addr_is_cmb
-> since it is a useful function on its own. I use it a lot in my PRP
-> mapping refactor and SGL patches, so I would need to re-add another
-> function that does what nvme_addr_is_cmb used to do.
-> 
-> But, see my next comment.
+'virtm' is a hardware target that is designed to be used for compiler
+and library testing on Cortex-M processors. It supports all cortex-m
+processors and includes sufficient memory to run even large test
+cases.
 
-Hi Klaus,
-Thx for your review. Yep I confirm this problem.
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ MAINTAINERS          |   9 +++-
+ hw/arm/Makefile.objs |   2 +-
+ hw/arm/virtm.c       | 112 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 121 insertions(+), 2 deletions(-)
+ create mode 100644 hw/arm/virtm.c
 
-> 
->>  }
->>  
->>  static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
->>  {
->> -    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
->> -        memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
->> +    hwaddr cmb_addr = n->bar4.addr + n->cmb_offset;
->> +    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr, size)) {
->> +        memcpy(buf, (void *)&n->cmbuf[addr - cmb_addr], size);
->>          return;
->>      }
-> 
-> I would prefer that we do the range check here (nvme_addr_read already has the
-> size parameter) and have nvme_addr_read return a success/fail value. E.g.
-> 
->      static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
->      {
->     -    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
->     +    hwaddr hi = addr + size - 1;
->     +    if (hi < addr) {
->     +        return 1;
->     +    }
->     +
->     +    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr) && nvme_addr_is_cmb(n, hi)) {
->              memcpy(buf, nvme_addr_to_cmb(n, addr), size);
->              return 0;
->          }
-> 
-> Actually, since the controller only support PRPs at this stage, it is
-> not required to check the ending address (addr + len - 1) of the CMB access for
-> validity since it is guaranteed to be in range of the CMB (nvme_addr_read is
-> only used for reading PRPs and they never cross a page boundary so size is
-> always <= page_size and the CMB is always at least 4k aligned).
-> 
-> This change is really only needed when the controller adds support for SGLs,
-> which is why I have the above in my tree that supports SGLs.
-> 
-> Come to think of it, the above might not even be sufficient since if just one
-> of the nvme_addr_is_cmb checks fails, we end up issuing an invalid
-> pci_dma_read. But I think that it will error out gracefully on that. But
-> this needs to be checked.
-> 
-> I suggest that you just drop the size check from this patch since it's not
-> needed and might need more work to be safe in the context of SGLs anyway.
-> 
-
-How about just MMIO access to CMB region? It can be done to any address.
-What guarantees that this will not go outside of CMB region?
-
->>  
->> @@ -167,17 +168,18 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->>                               uint64_t prp2, uint32_t len, NvmeCtrl *n)
->>  {
->>      hwaddr trans_len = n->page_size - (prp1 % n->page_size);
->> +    hwaddr cmb_addr = n->bar4.addr + n->cmb_offset;
->>      trans_len = MIN(len, trans_len);
->>      int num_prps = (len >> n->page_bits) + 1;
->>  
->>      if (unlikely(!prp1)) {
->>          trace_pci_nvme_err_invalid_prp();
->>          return NVME_INVALID_FIELD | NVME_DNR;
->> -    } else if (n->bar.cmbsz && prp1 >= n->ctrl_mem.addr &&
->> -               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
->> +    } else if (n->bar.cmbsz && prp1 >= cmb_addr &&
->> +               prp1 < cmb_addr + int128_get64(n->bar4.size)) {
->>          qsg->nsg = 0;
->>          qemu_iovec_init(iov, num_prps);
->> -        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
->> +        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - cmb_addr], trans_len);
->>      } else {
->>          pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
->>          qemu_sglist_add(qsg, prp1, trans_len);
->> @@ -222,7 +224,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->>                  if (qsg->nsg){
->>                      qemu_sglist_add(qsg, prp_ent, trans_len);
->>                  } else {
->> -                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->ctrl_mem.addr], trans_len);
->> +                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - cmb_addr],
->> +                                   trans_len);
->>                  }
->>                  len -= trans_len;
->>                  i++;
->> @@ -235,7 +238,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->>              if (qsg->nsg) {
->>                  qemu_sglist_add(qsg, prp2, len);
->>              } else {
->> -                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem.addr], trans_len);
->> +                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - cmb_addr],
->> +                               trans_len);
->>              }
->>          }
->>      }
->> @@ -1395,7 +1399,7 @@ static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
->>          return;
->>      }
->>  
->> -    if (!n->params.cmb_size_mb && n->pmrdev) {
->> +    if (n->pmrdev) {
->>          if (host_memory_backend_is_mapped(n->pmrdev)) {
->>              char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
->>              error_setg(errp, "can't use already busy memdev: %s", path);
->> @@ -1453,33 +1457,62 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
->>      id_ns->nuse = id_ns->ncap;
->>  }
->>  
->> -static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
->> +static void nvme_bar4_init(PCIDevice *pci_dev, Error **errp)
->>  {
->> -    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_CMB_BIR);
->> -    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
->> -
->> -    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
->> -    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
->> -    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
->> -    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
->> -    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
->> -    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
->> -    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
->> -
->> -    n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
->> -    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
->> -                          "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
->> -    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
->> +    NvmeCtrl *n = NVME(pci_dev);
->> +    int status;
->> +    uint64_t bar_size;
->> +    uint32_t msix_vectors;
->> +    uint32_t nvme_pba_offset;
->> +    uint32_t cmb_size_units;
->> +
->> +    msix_vectors = n->params.max_ioqpairs + 1;
->> +    nvme_pba_offset = PCI_MSIX_ENTRY_SIZE * msix_vectors;
->> +    bar_size = nvme_pba_offset + QEMU_ALIGN_UP(msix_vectors, 64) / 8;
->> +
->> +    if (n->params.cmb_size_mb) {
->> +        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
->> +        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
->> +        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
->> +        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
->> +        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
->> +        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
->> +        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
->> +
->> +        cmb_size_units = NVME_CMBSZ_GETSIZEUNITS(n->bar.cmbsz);
->> +        n->cmb_offset = QEMU_ALIGN_UP(bar_size, cmb_size_units);
->> +
->> +        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_MSIX_BIR);
->> +        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, n->cmb_offset / cmb_size_units);
->> +
->> +        n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
->> +
->> +        bar_size += n->cmb_offset;
->> +        bar_size += NVME_CMBSZ_GETSIZE(n->bar.cmbsz);
->> +    }
->> +
->> +    bar_size = pow2ceil(bar_size);
->> +
->> +    memory_region_init_io(&n->bar4, OBJECT(n), &nvme_cmb_ops, n,
->> +                          "nvme-bar4", bar_size);
->> +
->> +    status = msix_init(pci_dev, n->params.max_ioqpairs + 1,
->> +                       &n->bar4, NVME_MSIX_BIR, 0,
->> +                       &n->bar4, NVME_MSIX_BIR, nvme_pba_offset,
->> +                       0, errp);
-> 
-> This needs to use n->params.msix_qsize instead of
-> n->params.max_ioqpairs.
-
-Makese sense.
-> 
->> +
->> +    if (status) {
->> +        return;
->> +    }
->> +
->> +    pci_register_bar(pci_dev, NVME_MSIX_BIR,
->>                       PCI_BASE_ADDRESS_SPACE_MEMORY |
->>                       PCI_BASE_ADDRESS_MEM_TYPE_64 |
->> -                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
->> +                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->bar4);
->>  }
->>  
->>  static void nvme_init_pmr(NvmeCtrl *n, PCIDevice *pci_dev)
->>  {
->> -    /* Controller Capabilities register */
->> -    NVME_CAP_SET_PMRS(n->bar.cap, 1);
->> -
->>      /* PMR Capabities register */
->>      n->bar.pmrcap = 0;
->>      NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
->> @@ -1537,13 +1570,10 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev, Error **errp)
->>                            n->reg_size);
->>      pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->>                       PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
->> -    if (msix_init_exclusive_bar(pci_dev, n->params.msix_qsize, 4, errp)) {
->> -        return;
->> -    }
->>  
->> -    if (n->params.cmb_size_mb) {
->> -        nvme_init_cmb(n, pci_dev);
->> -    } else if (n->pmrdev) {
->> +    nvme_bar4_init(pci_dev, errp);
->> +
->> +    if (n->pmrdev) {
->>          nvme_init_pmr(n, pci_dev);
->>      }
->>  }
->> @@ -1583,6 +1613,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
->>      NVME_CAP_SET_CSS(n->bar.cap, 1);
->>      NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
->>      NVME_CAP_SET_CMBS(n->bar.cap, n->params.cmb_size_mb ? 1 : 0);
->> +    NVME_CAP_SET_PMRS(n->bar.cap, n->pmrdev ? 1 : 0);
->>  
->>      n->bar.vs = 0x00010200;
->>      n->bar.intmc = n->bar.intms = 0;
->> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
->> index 1d30c0bca2..0ea8cf32a3 100644
->> --- a/hw/block/nvme.h
->> +++ b/hw/block/nvme.h
->> @@ -80,7 +80,7 @@ static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
->>  typedef struct NvmeCtrl {
->>      PCIDevice    parent_obj;
->>      MemoryRegion iomem;
->> -    MemoryRegion ctrl_mem;
->> +    MemoryRegion bar4;
->>      NvmeBar      bar;
->>      BlockConf    conf;
->>      NvmeParams   params;
->> @@ -94,6 +94,7 @@ typedef struct NvmeCtrl {
->>      uint32_t    num_namespaces;
->>      uint32_t    max_q_ents;
->>      uint64_t    ns_size;
->> +    uint32_t    cmb_offset;
->>      uint8_t     *cmbuf;
->>      uint32_t    irq_status;
->>      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
->> diff --git a/include/block/nvme.h b/include/block/nvme.h
->> index 14cf398dfa..76d15bdf9f 100644
->> --- a/include/block/nvme.h
->> +++ b/include/block/nvme.h
->> @@ -216,9 +216,11 @@ enum NvmeCmbszMask {
->>      (cmbsz |= (uint64_t)(val & CMBSZ_SZU_MASK) << CMBSZ_SZU_SHIFT)
->>  #define NVME_CMBSZ_SET_SZ(cmbsz, val)    \
->>      (cmbsz |= (uint64_t)(val & CMBSZ_SZ_MASK) << CMBSZ_SZ_SHIFT)
->> +#define NVME_CMBSZ_GETSIZEUNITS(cmbsz) \
->> +    (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz)))
->>  
->>  #define NVME_CMBSZ_GETSIZE(cmbsz) \
->> -    (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
->> +    (NVME_CMBSZ_SZ(cmbsz) * NVME_CMBSZ_GETSIZEUNITS(cmbsz))
->>  
->>  enum NvmePmrcapShift {
->>      PMRCAP_RDS_SHIFT      = 3,
->> -- 
->> 2.21.1
->>
->>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1b40446c73..4c7e394dd6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -850,9 +850,16 @@ Virt
+ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+-F: hw/arm/virt*
++F: hw/arm/virt.c
++F: hw/arm/virt-acpi-build.c
+ F: include/hw/arm/virt.h
+ 
++Virt M
++M: Keith Packard <keithp@keithp.com>
++L: qemu-arm@nongnu.org
++S: Maintained
++F: hw/arm/virtm.c
++
+ Xilinx Zynq
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ M: Alistair Francis <alistair@alistair23.me>
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 534a6a119e..54be15b40a 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -1,6 +1,6 @@
+ obj-y += boot.o
+ obj-$(CONFIG_PLATFORM_BUS) += sysbus-fdt.o
+-obj-$(CONFIG_ARM_VIRT) += virt.o
++obj-$(CONFIG_ARM_VIRT) += virt.o virtm.o
+ obj-$(CONFIG_ACPI) += virt-acpi-build.o
+ obj-$(CONFIG_DIGIC) += digic_boards.o
+ obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
+diff --git a/hw/arm/virtm.c b/hw/arm/virtm.c
+new file mode 100644
+index 0000000000..beda3644f5
+--- /dev/null
++++ b/hw/arm/virtm.c
+@@ -0,0 +1,112 @@
++/*
++ * Virtual ARM Cortex M
++ *
++ * Copyright © 2020, Keith Packard <keithp@keithp.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/arm/boot.h"
++#include "hw/boards.h"
++#include "exec/address-spaces.h"
++#include "hw/arm/armv7m.h"
++#include "hw/misc/unimp.h"
++#include "cpu.h"
++
++#define NUM_IRQ_LINES 32
++#define ROM_BASE  0x00000000
++#define ROM_SIZE  0x20000000
++#define RAM_BASE    0x20000000
++#define RAM_SIZE    0x20000000
++
++static const char *valid_cpus[] = {
++    ARM_CPU_TYPE_NAME("cortex-m0"),
++    ARM_CPU_TYPE_NAME("cortex-m3"),
++    ARM_CPU_TYPE_NAME("cortex-m33"),
++    ARM_CPU_TYPE_NAME("cortex-m4"),
++    ARM_CPU_TYPE_NAME("cortex-m7"),
++};
++
++static bool cpu_type_valid(const char *cpu)
++{
++    int i;
++
++    return true;
++    for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
++        if (strcmp(cpu, valid_cpus[i]) == 0) {
++            return true;
++        }
++    }
++    return false;
++}
++
++static void machvirtm_init(MachineState *ms)
++{
++    DeviceState *nvic;
++
++    if (!cpu_type_valid(ms->cpu_type)) {
++        error_report("virtm: CPU type %s not supported", ms->cpu_type);
++        exit(1);
++    }
++
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    MemoryRegion *rom = g_new(MemoryRegion, 1);
++    MemoryRegion *system_memory = get_system_memory();
++
++    /* Flash programming is done via the SCU, so pretend it is ROM.  */
++    memory_region_init_rom(rom, NULL, "virtm.rom", ROM_SIZE,
++                           &error_fatal);
++    memory_region_add_subregion(system_memory, ROM_BASE, rom);
++
++    memory_region_init_ram(ram, NULL, "virtm.ram", RAM_SIZE,
++                           &error_fatal);
++    memory_region_add_subregion(system_memory, RAM_BASE, ram);
++
++    nvic = qdev_new(TYPE_ARMV7M);
++    qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
++    qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
++    qdev_prop_set_bit(nvic, "enable-bitband", true);
++    object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
++                                     "memory", &error_abort);
++    /* This will exit with an error if the user passed us a bad cpu_type */
++    sysbus_realize_and_unref(SYS_BUS_DEVICE(nvic), &error_fatal);
++
++    armv7m_load_kernel(ARM_CPU(first_cpu), ms->kernel_filename, ROM_SIZE);
++}
++
++static void virtm_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "Virtual Cortex-M";
++    mc->init = machvirtm_init;
++    mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
++}
++
++static const TypeInfo virtm_type = {
++    .name = MACHINE_TYPE_NAME("virtm"),
++    .parent = TYPE_MACHINE,
++    .class_init = virtm_class_init,
++};
++
++static void virtm_machine_init(void)
++{
++    type_register_static(&virtm_type);
++}
++
++type_init(virtm_machine_init)
+-- 
+2.27.0
 
 
