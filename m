@@ -4,76 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F402C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3524C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6617120857
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D3E120857
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:49:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fEs0Sqoz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6617120857
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nrrav72j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3E120857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joU7A-0008M5-Ju
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:48:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37500)
+	id 1joU7a-0000ot-Ji
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTic-00065V-DB
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60680
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjJ-0006sq-Tk
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46506
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTia-00018v-Vm
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:14 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1joTjF-0001Rr-KX
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:23:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098592;
+ s=mimecast20190719; t=1593098630;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=COIIgdm+cG+aFY3vcWT6Kff8jAuy0uDhItEPKwtBJ9A=;
- b=fEs0SqozpVzmNeuCDd2EuWdkCXPRZkpJa3bugqNyYKXmQnQRMpiYhb5tsePj5AXLkbt+Fu
- t6hfU18SWbJZ+5iXwOZndWzXYLsamceaDBROGIdYIhFv+qWmQka6FOb0AMLwJaxfsKl0gE
- eghzH0kbMDIrEc8a9oJzDUVygrXfpD0=
+ bh=2JioenUdI+5OpAM119kCaxHuOngeUa/Dn7gYWfjNr8I=;
+ b=Nrrav72jjFjzVWLLdDdt9qyCL1ao8g9+phBKfSC9Wkw98YQuxzZGAONANOHH/LpvZl4Oyr
+ plc4LTbhnR/IEFMmuW/f3pa5FJlHL0s6yAgsxxLioRaAtZEf0PgA7+dvgvfk6tJj4/tjrD
+ fA1HMIH2StScBgVxtZFTm1wXdAu872Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-ifVUW_C6MzOzhPg9mLaHjg-1; Thu, 25 Jun 2020 11:23:08 -0400
-X-MC-Unique: ifVUW_C6MzOzhPg9mLaHjg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-238-y8TOBTMcNHOsiT4S7L5t7g-1; Thu, 25 Jun 2020 11:23:48 -0400
+X-MC-Unique: y8TOBTMcNHOsiT4S7L5t7g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C9F3800C60;
- Thu, 25 Jun 2020 15:23:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 492951005513;
+ Thu, 25 Jun 2020 15:23:47 +0000 (UTC)
 Received: from localhost (ovpn-113-182.ams2.redhat.com [10.36.113.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E70E5DAA0;
- Thu, 25 Jun 2020 15:23:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B03562B4A8;
+ Thu, 25 Jun 2020 15:23:46 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 22/47] block: Use CAF in bdrv_co_rw_vmstate()
-Date: Thu, 25 Jun 2020 17:21:50 +0200
-Message-Id: <20200625152215.941773-23-mreitz@redhat.com>
+Subject: [PATCH v7 40/47] block: Inline bdrv_co_block_status_from_*()
+Date: Thu, 25 Jun 2020 17:22:08 +0200
+Message-Id: <20200625152215.941773-41-mreitz@redhat.com>
 In-Reply-To: <20200625152215.941773-1-mreitz@redhat.com>
 References: <20200625152215.941773-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -101,40 +98,250 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a node whose driver does not provide VM state functions has a
-metadata child, the VM state should probably go there; if it is a
-filter, the VM state should probably go there.  It follows that we
-should generally go down to the primary child.
+With bdrv_filter_bs(), we can easily handle this default filter behavior
+in bdrv_co_block_status().
 
+blkdebug wants to have an additional assertion, so it keeps its own
+implementation, except bdrv_co_block_status_from_file() needs to be
+inlined there.
+
+Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/io.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ include/block/block_int.h | 23 ------------------
+ block/backup-top.c        |  2 --
+ block/blkdebug.c          |  7 ++++--
+ block/blklogwrites.c      |  1 -
+ block/commit.c            |  1 -
+ block/copy-on-read.c      |  2 --
+ block/filter-compress.c   |  2 --
+ block/io.c                | 51 +++++++++++++--------------------------
+ block/mirror.c            |  1 -
+ block/throttle.c          |  1 -
+ 10 files changed, 22 insertions(+), 69 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 37057f13e0..9e802804bb 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2646,6 +2646,7 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read)
- {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *child_bs = bdrv_primary_bs(bs);
-     int ret = -ENOTSUP;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6e09e15ed4..e5a328c389 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1291,29 +1291,6 @@ void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
+                         uint64_t perm, uint64_t shared,
+                         uint64_t *nperm, uint64_t *nshared);
  
-     bdrv_inc_in_flight(bs);
-@@ -2658,8 +2659,8 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-         } else {
-             ret = drv->bdrv_save_vmstate(bs, qiov, pos);
-         }
--    } else if (bs->file) {
--        ret = bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
-+    } else if (child_bs) {
-+        ret = bdrv_co_rw_vmstate(child_bs, qiov, pos, is_read);
+-/*
+- * Default implementation for drivers to pass bdrv_co_block_status() to
+- * their file.
+- */
+-int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+-                                                bool want_zero,
+-                                                int64_t offset,
+-                                                int64_t bytes,
+-                                                int64_t *pnum,
+-                                                int64_t *map,
+-                                                BlockDriverState **file);
+-/*
+- * Default implementation for drivers to pass bdrv_co_block_status() to
+- * their backing file.
+- */
+-int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+-                                                   bool want_zero,
+-                                                   int64_t offset,
+-                                                   int64_t bytes,
+-                                                   int64_t *pnum,
+-                                                   int64_t *map,
+-                                                   BlockDriverState **file);
+-
+ int64_t bdrv_sum_allocated_file_size(BlockDriverState *bs);
+ int64_t bdrv_primary_allocated_file_size(BlockDriverState *bs);
+ int64_t bdrv_notsup_allocated_file_size(BlockDriverState *bs);
+diff --git a/block/backup-top.c b/block/backup-top.c
+index 89bd3937d0..bf5fc22fc7 100644
+--- a/block/backup-top.c
++++ b/block/backup-top.c
+@@ -185,8 +185,6 @@ BlockDriver bdrv_backup_top_filter = {
+     .bdrv_co_pwritev_compressed = backup_top_co_pwritev_compressed,
+     .bdrv_co_flush              = backup_top_co_flush,
+ 
+-    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+-
+     .bdrv_refresh_filename      = backup_top_refresh_filename,
+ 
+     .bdrv_child_perm            = backup_top_child_perm,
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 7194bc7f06..cf78d8809e 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -757,8 +757,11 @@ static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
+         return err;
      }
  
-     bdrv_dec_in_flight(bs);
+-    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
+-                                          pnum, map, file);
++    assert(bs->file && bs->file->bs);
++    *pnum = bytes;
++    *map = offset;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+ }
+ 
+ static void blkdebug_close(BlockDriverState *bs)
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index 6753bd9a3e..c6b2711fe5 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -517,7 +517,6 @@ static BlockDriver bdrv_blk_log_writes = {
+     .bdrv_co_pwrite_zeroes  = blk_log_writes_co_pwrite_zeroes,
+     .bdrv_co_flush_to_disk  = blk_log_writes_co_flush_to_disk,
+     .bdrv_co_pdiscard       = blk_log_writes_co_pdiscard,
+-    .bdrv_co_block_status   = bdrv_co_block_status_from_file,
+ 
+     .is_filter              = true,
+     .strong_runtime_opts    = blk_log_writes_strong_runtime_opts,
+diff --git a/block/commit.c b/block/commit.c
+index 4122b6736d..ea9282daea 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -238,7 +238,6 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+ static BlockDriver bdrv_commit_top = {
+     .format_name                = "commit_top",
+     .bdrv_co_preadv             = bdrv_commit_top_preadv,
+-    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
+     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+ 
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index a6a864f147..2816e61afe 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -146,8 +146,6 @@ static BlockDriver bdrv_copy_on_read = {
+     .bdrv_eject                         = cor_eject,
+     .bdrv_lock_medium                   = cor_lock_medium,
+ 
+-    .bdrv_co_block_status               = bdrv_co_block_status_from_file,
+-
+     .has_variable_length                = true,
+     .is_filter                          = true,
+ };
+diff --git a/block/filter-compress.c b/block/filter-compress.c
+index 8ec1991c1f..5136371bf8 100644
+--- a/block/filter-compress.c
++++ b/block/filter-compress.c
+@@ -146,8 +146,6 @@ static BlockDriver bdrv_compress = {
+     .bdrv_eject                         = compress_eject,
+     .bdrv_lock_medium                   = compress_lock_medium,
+ 
+-    .bdrv_co_block_status               = bdrv_co_block_status_from_file,
+-
+     .has_variable_length                = true,
+     .is_filter                          = true,
+ };
+diff --git a/block/io.c b/block/io.c
+index 9e802804bb..e2196d438c 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2253,36 +2253,6 @@ typedef struct BdrvCoBlockStatusData {
+     BlockDriverState **file;
+ } BdrvCoBlockStatusData;
+ 
+-int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
+-                                                bool want_zero,
+-                                                int64_t offset,
+-                                                int64_t bytes,
+-                                                int64_t *pnum,
+-                                                int64_t *map,
+-                                                BlockDriverState **file)
+-{
+-    assert(bs->file && bs->file->bs);
+-    *pnum = bytes;
+-    *map = offset;
+-    *file = bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+-}
+-
+-int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
+-                                                   bool want_zero,
+-                                                   int64_t offset,
+-                                                   int64_t bytes,
+-                                                   int64_t *pnum,
+-                                                   int64_t *map,
+-                                                   BlockDriverState **file)
+-{
+-    assert(bs->backing && bs->backing->bs);
+-    *pnum = bytes;
+-    *map = offset;
+-    *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+-}
+-
+ /*
+  * Returns the allocation status of the specified sectors.
+  * Drivers not implementing the functionality are assumed to not support
+@@ -2323,6 +2293,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     BlockDriverState *local_file = NULL;
+     int64_t aligned_offset, aligned_bytes;
+     uint32_t align;
++    bool has_filtered_child;
+ 
+     assert(pnum);
+     *pnum = 0;
+@@ -2348,7 +2319,8 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+ 
+     /* Must be non-NULL or bdrv_getlength() would have failed */
+     assert(bs->drv);
+-    if (!bs->drv->bdrv_co_block_status) {
++    has_filtered_child = bdrv_filter_child(bs);
++    if (!bs->drv->bdrv_co_block_status && !has_filtered_child) {
+         *pnum = bytes;
+         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+         if (offset + bytes == total_size) {
+@@ -2369,9 +2341,20 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
+     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+ 
+-    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
+-                                        aligned_bytes, pnum, &local_map,
+-                                        &local_file);
++    if (bs->drv->bdrv_co_block_status) {
++        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
++                                            aligned_bytes, pnum, &local_map,
++                                            &local_file);
++    } else {
++        /* Default code for filters */
++
++        local_file = bdrv_filter_bs(bs);
++        assert(local_file);
++
++        *pnum = aligned_bytes;
++        local_map = aligned_offset;
++        ret = BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
++    }
+     if (ret < 0) {
+         *pnum = 0;
+         goto out;
+diff --git a/block/mirror.c b/block/mirror.c
+index 770de3b34e..5a9e42e488 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1541,7 +1541,6 @@ static BlockDriver bdrv_mirror_top = {
+     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
+     .bdrv_co_pwritev_compressed = bdrv_mirror_top_pwritev_compressed,
+     .bdrv_co_flush              = bdrv_mirror_top_flush,
+-    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
+     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
+ 
+diff --git a/block/throttle.c b/block/throttle.c
+index f6e619aca2..473ea758df 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -263,7 +263,6 @@ static BlockDriver bdrv_throttle = {
+     .bdrv_reopen_prepare                =   throttle_reopen_prepare,
+     .bdrv_reopen_commit                 =   throttle_reopen_commit,
+     .bdrv_reopen_abort                  =   throttle_reopen_abort,
+-    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
+ 
+     .bdrv_co_drain_begin                =   throttle_co_drain_begin,
+     .bdrv_co_drain_end                  =   throttle_co_drain_end,
 -- 
 2.26.2
 
