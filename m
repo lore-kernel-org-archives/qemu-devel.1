@@ -2,86 +2,89 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D37C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80A1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:40:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC324206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5F05206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EhJ/3n6H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC324206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VFbhNEUE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F05206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRAZ-0000LD-0s
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44454)
+	id 1joRBB-00014R-Vb
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:40:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joR9f-0007fn-Eg
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:39:00 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45447)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joR9e-0004YS-2V
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:38:59 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j11so2131501oiw.12
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 05:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ctlRjVAFYwCY6pTqUKZJ3/d99UBemWYSFar5HyCixx4=;
- b=EhJ/3n6HyeAIeV/GQ1IqXcu90fbpKaWW+v4v03tPlNTWJPUiaFUzUuq1r1Yjw93EbV
- 1UxJAW1pDOVlyQdllWQgu/OVKATDp9DhgUL0Q1SvjC4vOgeqg+wPRFV733bwmrN7OW6C
- V1YbWlE7/b13eHsWKMLVKZ3iZPZni40iErmtZj3WSoutcbWG0MN0EcvjIyq5cLTYtCGW
- Qth7JPhnVzo0Bz7hy2DrWCRjtzFf2RPcCbQcyFhrI3B4JqKHNNyoxFhCbqy3rGGtt0tT
- n+jUlYh4ubJOPtSqsxDXVTG4WzQk7uKkUWrLjpp6joK+XTd3qabv6UVzIjfz3X41HqKW
- g5gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ctlRjVAFYwCY6pTqUKZJ3/d99UBemWYSFar5HyCixx4=;
- b=hEaDlvJHGPkZAJdDL2jB5OW1/ZO0/JxJsiSY2gJGaRPLHNvZJX8Smi2LbTZfmuxz2g
- OoF6ln9wYaDMfHp226Ny0NSBFTkzjiw/AnIlXsNjDKSMd81wmc87/qkDNUl0nwMdqxms
- PRSNM2t5Kroja4EzjAm0fpu+B35IUv6Bc12yVl0KHupa0IkC+JhGhl4vIjNaSMTllRIK
- aoEBmipm+hAbn2kxnDAEr0OBu/cPH7TNsx8F+73enapekYKBFBUPPDcsYywtypb/V/1Y
- IvyMi83JZL/kvGU6ttv+FJ72CxVN9lvrlGUEwxaIsu8lFQz7qqXhfrxtGYYgBdPjGyHD
- KCAg==
-X-Gm-Message-State: AOAM531HeqZNVtvxtqhyQD2SDb8DI9Deeo4E5H0+rAoAzCMcCZvBAAjq
- kVl9Vi12vWTOfvkhTRPg+MZWlA1jl4E/q2i6EvFvvrpR1s8=
-X-Google-Smtp-Source: ABdhPJx0Vyg1x94Gp10JN9s4+xSxpKiMGGyZzjb5hix6UeoWzFoyIuOd6JhQQhjT69Yd8/2qVuw/gfiNRt3qaYkBXUQ=
-X-Received: by 2002:a54:4694:: with SMTP id k20mr1902820oic.146.1593088736912; 
- Thu, 25 Jun 2020 05:38:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joR9r-0007mG-1H
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:39:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59687
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joR9o-0004dp-OA
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:39:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593088747;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=d9BAQc5dYbqe98OTUnXfgXPkwj7KNo1Txuaf7qWZklY=;
+ b=VFbhNEUEsmDDH4aqz2G9Ry9O1yCX6iQq3OUYQ8VRYxRReppugJjpjkjQwfZrCOHbef1o1A
+ wNNKYL86OBKA0jHsz5XFXXLfG7H2NcSW9032zx890xk+g6f2cxZpq71OMyebj8xwueQc4U
+ Op7uncmeg4vF1YhCgsXWMZtnXBEXs1M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-GIDxmNXgN9CuICrjVoAFXA-1; Thu, 25 Jun 2020 08:39:05 -0400
+X-MC-Unique: GIDxmNXgN9CuICrjVoAFXA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A280B107ACCA;
+ Thu, 25 Jun 2020 12:39:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 18DE87FE8B;
+ Thu, 25 Jun 2020 12:39:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 96E2611384D4; Thu, 25 Jun 2020 14:39:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 06/46] error: Avoid error_propagate() when error is not
+ used here
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-7-armbru@redhat.com>
+ <415efae8-9624-7d7d-b4af-f6a019e345f9@redhat.com>
+Date: Thu, 25 Jun 2020 14:39:02 +0200
+In-Reply-To: <415efae8-9624-7d7d-b4af-f6a019e345f9@redhat.com> (Eric Blake's
+ message of "Wed, 24 Jun 2020 13:17:08 -0500")
+Message-ID: <87pn9n1frt.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200623193658.623279-1-richard.henderson@linaro.org>
- <20200623193658.623279-36-richard.henderson@linaro.org>
-In-Reply-To: <20200623193658.623279-36-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 13:38:46 +0100
-Message-ID: <CAFEAcA-mYKrRBRRMFPBrHX6=AJ0vdXNdP0AUQnueZ31OcoP1Ew@mail.gmail.com>
-Subject: Re: [PATCH v8 35/45] target/arm: Add mte helpers for sve scalar + int
- ff/nf loads
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,27 +97,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.spickett@linaro.org, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 23 Jun 2020 at 20:37, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Because the elements are sequential, we can eliminate many tests all
-> at once when the tag hits TCMA, or if the page(s) are not Tagged.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    |  98 ++++++++++++++++
->  target/arm/sve_helper.c    |  99 ++++++++++++++--
->  target/arm/translate-sve.c | 232 +++++++++++++++++++++++++------------
->  3 files changed, 343 insertions(+), 86 deletions(-)
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> On 6/24/20 11:43 AM, Markus Armbruster wrote:
+>> When all we do with an Error we receive into a local variable is
+>> propagating to somewhere else, we can just as well receive it there
+>> right away.  Coccinelle script:
+>
+> This seems to be a recurring cleanup (witness commit 06592d7e,
+> c0e90679, 6b62d961).  In fact, shouldn't you just update that script
+> with your enhancements here, and then run it directly, instead of
+> embedding your tweaks in the commit message?
 
-thanks
--- PMM
+I didn't remember scripts/coccinelle/remove_local_err.cocci.
+
+remove_local_err.cocci transforms
+
+    fun(..., &err);
+    error_propagate(errp, err);
+
+to
+
+    fun(..., errp);
+
+when the context permits that, using a conservative approximation of
+"context permits".  In other words, the script is sound.
+
+My script matches more, but is unsound: it *can* mess up things.  For
+instance
+
+    Error err = NULL;
+
+    foo(1, 2, 3, &err);
+    error_propagate(errp, err);
+    return !err;
+
+would become
+
+    Error err = NULL;
+
+    foo(1, 2, 3, errp);
+    return !err;
+
+Oops.  See "manually double-check" below.  For a one-shot cleanup,
+manual checking is much, much easier for me than making the Coccinelle
+script sound without sacrificing (too much) matching power.
+
+>
+>>
+>>      @@
+>>      identifier fun, err, errp;
+>>      expression list args;
+>>      @@
+>>      -    fun(args, &err);
+>>      +    fun(args, errp);
+>>           ... when != err
+>>               when strict
+>>      -    error_propagate(errp, err);
+>
+> What does the 'when strict' accomplish?  The existing coccinelle
+> script uses 'when != errp', which may be enough to address...
+
+Magic!  Without it, I get
+
+   diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+   index 8310c77ec0..2355999171 100644
+   --- a/hw/vfio/pci.c
+   +++ b/hw/vfio/pci.c
+   @@ -1511,16 +1511,14 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+        ret = msix_init(&vdev->pdev, vdev->msix->entries,
+                        vdev->bars[vdev->msix->table_bar].mr,
+                        vdev->msix->table_bar, vdev->msix->table_offset,
+   -                    vdev->bars[vdev->msix->pba_bar].mr,
+   -                    vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+   -                    &err);
+   +                    vdev->bars[vdev->msix->pba_bar].mr, vdev->msix->pba_bar,
+   +                    vdev->msix->pba_offset, pos, errp);
+        if (ret < 0) {
+            if (ret == -ENOTSUP) {
+WTF!?! --->     warn_report_err(err);
+                return 0;
+            }
+
+   -        error_propagate(errp, err);
+            return ret;
+        }
+
+Since Coccinelle's documentation is of no help whatsoever (again), I
+went looking for possibly applicable ideas in existing scripts.  I found
+"when strict" in the kernel's scripts/coccinelle/ directory.  I couldn't
+find it in Coccinelle docs.  So I gave it a try, and here we are.
+
+Did I mention Coccinelle is terrible?
+
+>> The first two rules are prone to fail with "error_propagate(...)
+>> ... reachable by inconsistent control-flow paths".  Script without
+>> them re-run where that happens.
+>
+> ...the control-flow failures you hit?
+
+This one I can actually explain, I think.  Consider this code snippet
+from net.c:
+
+ 1      visit_type_Netdev(v, NULL, &object, &err);
+
+ 2      if (!err) {
+ 3          ret = net_client_init1(object, is_netdev, &err);
+ 4      }
+
+ 5      qapi_free_Netdev(object);
+
+ 6  out:
+ 7      error_propagate(errp, err);
+
+There are two overlapping matches of rule 1: either line 1 and 7, or
+line 3 and 7.  Which one is right?  Coccinelle can't decide, and
+implodes:
+
+    rule starting on line 10: node 96: error_propagate(...)[1,2,41,42] in net_client_init reachable by inconsistent control-flow paths
+
+>>
+>> Manually double-check @err is not used afterwards.  Dereferencing it
+>> would be use after free, but checking whether it's null would be
+>> legitimate.  One such change to qbus_realize() backed out.
+>>
+>> Suboptimal line breaks tweaked manually.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>>   22 files changed, 31 insertions(+), 73 deletions(-)
+>
+> At any rate, it's small enough to ensure all the changes remaining are
+> still valid.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
 
