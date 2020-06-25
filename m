@@ -2,81 +2,94 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F589C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0DCC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:50:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D8EF20789
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:43:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47D8520789
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 18:50:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqDxctZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D8EF20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsFPvuKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D8520789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joWqK-00062s-IP
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 14:43:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38010)
+	id 1joWwt-0000ll-BI
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 14:50:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1joWmw-00024b-SX
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:39:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27780
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joWvb-0007df-73
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:48:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49124
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1joWmu-0006rF-PK
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:39:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joWvY-0000tD-QH
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 14:48:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593110391;
+ s=mimecast20190719; t=1593110927;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iHXZAcPLyGO6RwqDeW2mO0R9wZpTLXIsv0lSSnrTa+4=;
- b=TqDxctZ6ktVHMPqhNu8xVW6fQ9zWTdOgVhsQ+lVyRIqCxa07qF4IRWHgHkysYHVybd9RpS
- bmr5YDU6KNT80Iwt7wTVIguFUOjbzp0FtqvKbjXTb3FJCMqtO4Sh7Gdm4xb9RdlDZ04+ey
- CANLT5jqSp9ZXWiKfQX9iXIjLFb38E4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-RMpWnEZsOcC1ZvfqwkvLVQ-1; Thu, 25 Jun 2020 14:39:47 -0400
-X-MC-Unique: RMpWnEZsOcC1ZvfqwkvLVQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A12518585A2;
- Thu, 25 Jun 2020 18:39:46 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9BBD7CADB;
- Thu, 25 Jun 2020 18:39:43 +0000 (UTC)
-Date: Thu, 25 Jun 2020 20:39:40 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Jon Doron <arilou@gmail.com>
-Subject: Re: [PATCH v3 3/3] acpi: i386: Move VMBus DSDT entry to SB
-Message-ID: <20200625203940.1075ce5a@redhat.com>
-In-Reply-To: <20200625022526.GB5487@jondnuc>
-References: <20200618030027.759594-1-arilou@gmail.com>
- <20200618030027.759594-4-arilou@gmail.com>
- <20200623170955.0a4f3ae7@redhat.com>
- <20200625022526.GB5487@jondnuc>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Cn/BtvxMkNXmbHqa5rKXoH5P08BLfhrfSDBAMmkSsss=;
+ b=RsFPvuKwXcZf3CUzIgnjEVQ/48h2Hhp68sb8SyS+FjNDYWMCk7dMvfv0mHmnWHopAWP9zX
+ F7iTMWMXsFaHSynYgyeHwCU7J3kUso0jtqPvx8DYB8Bu3xIWuD07PEXGe0QRi50+63JRzJ
+ WEwBCvkCBjs5cBh4Orjg+lmCYZnVyRQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-Ma0PgyGAMQSmtewQvJeL6g-1; Thu, 25 Jun 2020 14:48:42 -0400
+X-MC-Unique: Ma0PgyGAMQSmtewQvJeL6g-1
+Received: by mail-wm1-f71.google.com with SMTP id b13so5754289wme.9
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 11:48:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Cn/BtvxMkNXmbHqa5rKXoH5P08BLfhrfSDBAMmkSsss=;
+ b=PZNbv9I262REa5OFSgkHghIzip/3lMV97UZ/xvI6boMbWR24hWht/K6Pc4jYENVBmX
+ S0CAXvUVNIbhfjin+r8cTAiUjh8zSCTy5pS345VkVs9JWsWm/FNiV7qmeL3m1EQ+kmYl
+ Cnu98/QmByzrtWmS8TG8Lz8ejII2pDUO91YtB14mKkrD5gsWwp0BKrdU6dEioa7Y9O1L
+ Qsnc2t/MRNUe753EJ7HNt14JUc31Uby8Q8IoeVWwOsOwT/NszGoRQvIrVflP1iZdJ08Z
+ r14RSnXSTPoNrjtIAN66aZrceGLKiWQhX+04OVt6O9yqIBprSnbCDXHg9m2elMsfDwuO
+ 1Yog==
+X-Gm-Message-State: AOAM533z2jpY5WZltEoGJ0AhUTRDD8QGG4A8OfbTXVw0okHQYC9kCGm0
+ fGR9zNaX/Hm5sjhZh1JGtSrBpkC9qttfLWvwxxZJu9SLZKU8xOzc+bd1g8fCC9R/E7mnRhFAv0n
+ I9oyX8IRVqlGqdYk=
+X-Received: by 2002:a05:6000:1006:: with SMTP id
+ a6mr19314314wrx.332.1593110920749; 
+ Thu, 25 Jun 2020 11:48:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJznoPY4gx9S5aAg/JDt6THrW6BMuXQ1eGDndMVk43nt7goEMrsls3lfwQm7OlgxAyhRl3n67w==
+X-Received: by 2002:a05:6000:1006:: with SMTP id
+ a6mr19314294wrx.332.1593110920504; 
+ Thu, 25 Jun 2020 11:48:40 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id f12sm2890763wrj.48.2020.06.25.11.48.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 25 Jun 2020 11:48:39 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH 00/17] block/nvme: Various cleanups required to use multiple
+ queues
+Date: Thu, 25 Jun 2020 20:48:21 +0200
+Message-Id: <20200625184838.28172-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,109 +110,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rvkagan@yandex-team.ru, pbonzini@redhat.com, mail@maciej.szmigiero.name,
- qemu-devel@nongnu.org, vkuznets@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jun 2020 05:25:26 +0300
-Jon Doron <arilou@gmail.com> wrote:
+Hi,
 
-> On 23/06/2020, Igor Mammedov wrote:
-> >On Thu, 18 Jun 2020 06:00:27 +0300
-> >Jon Doron <arilou@gmail.com> wrote:
-> >  
-> >> Signed-off-by: Jon Doron <arilou@gmail.com>
-> >> ---
-> >>  hw/i386/acpi-build.c | 12 +++++++-----
-> >>  1 file changed, 7 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >> index 6d9df38e31..38be9e5a58 100644
-> >> --- a/hw/i386/acpi-build.c
-> >> +++ b/hw/i386/acpi-build.c
-> >> @@ -1092,7 +1092,6 @@ static Aml *build_vmbus_device_aml(VMBusBridge *vmbus_bridge)
-> >>  static void build_isa_devices_aml(Aml *table)
-> >>  {
-> >>      ISADevice *fdc = pc_find_fdc0();
-> >> -    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
-> >>      bool ambiguous;
-> >>
-> >>      Aml *scope = aml_scope("_SB.PCI0.ISA");
-> >> @@ -1113,10 +1112,6 @@ static void build_isa_devices_aml(Aml *table)
-> >>          isa_build_aml(ISA_BUS(obj), scope);
-> >>      }
-> >>
-> >> -    if (vmbus_bridge) {
-> >> -        aml_append(scope, build_vmbus_device_aml(vmbus_bridge));
-> >> -    }
-> >> -
-> >>      aml_append(table, scope);
-> >>  }
-> >>
-> >> @@ -1661,6 +1656,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >>      PCIBus *bus = NULL;
-> >>      TPMIf *tpm = tpm_find();
-> >>      int i;
-> >> +    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
-> >>
-> >>      dsdt = init_aml_allocator();
-> >>
-> >> @@ -1675,6 +1671,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >>          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> >>          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> >>          aml_append(sb_scope, dev);
-> >> +        if (vmbus_bridge) {
-> >> +            aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
-> >> +        }
-> >>          aml_append(dsdt, sb_scope);
-> >>
-> >>          build_hpet_aml(dsdt);
-> >> @@ -1692,6 +1691,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >>          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> >>          aml_append(dev, build_q35_osc_method());
-> >>          aml_append(sb_scope, dev);
-> >> +        if (vmbus_bridge) {
-> >> +            aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
-> >> +        }
-> >>          aml_append(dsdt, sb_scope);
-> >>
-> >>          build_hpet_aml(dsdt);  
-> >why are you duplicating instead of putting one if () block after
-> >
-> >if (misc->is_piix4) {
-> >} else {
-> >}
-> >
-> >?
-> >  
-> 
-> Well it seems like Windows is very "picky" about where you declare the 
-> VMBS not sure why if i had moved it to the suggested location as such
-> 
-> if (misc->is_piix4) {
-> } else {
-> }
-> 
-> if (vmbus_bridge) {
->      aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
->      aml_append(dsdt, sb_scope);
-> }
-> 
-> Windows would BSOD right away with ACPI error.
-> 
-> Same goes for declaring it before PCI0 device...
+This series is mostly code rearrangement (cleanups) to be
+able to split the hardware code from the block driver code,
+to be able to use multiple queues on the same hardware, or
+multiple block drivers on the same hardware.
 
-just FYI, Windows has ACPI debugger, so if you attach wingdb at early boot
-you can set acpi breakpoint and after that enable all kind of debug info (see MSDN)
-that usually say why exactly it doesn't like something in AML.
+Flushing my current patch queue.
 
-It used to require checked build and it is tricky to enable but once
-you figured how, it works like charm.
+Regards,
 
-> 
-> -- Jon.
-> 
+Phil.
+
+Based-on: <20200625162602.700741-1-eblake@redhat.com>
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08384.html
+
+Philippe Mathieu-Daudé (17):
+  block/nvme: Avoid further processing if trace event not enabled
+  block/nvme: Let nvme_create_queue_pair() fail gracefully
+  block/nvme: Define QUEUE_INDEX macros to ease code review
+  block/nvme: Be explicit we share NvmeIdCtrl / NvmeIdNs structures
+  block/nvme: Replace qemu_try_blockalign0 by qemu_try_blockalign/memset
+  block/nvme: Replace qemu_try_blockalign(bs) by
+    qemu_try_memalign(pg_sz)
+  block/nvme: Move code around
+  block/nvme: Use correct type void*
+  block/nvme: Remove unused argument from nvme_free_queue_pair()
+  block/nvme: Simplify nvme_init_queue() arguments
+  block/nvme: Simplify nvme_create_queue_pair() arguments
+  block/nvme: Simplify nvme_kick trace event
+  block/nvme: Simplify completion trace events
+  block/nvme: Replace BDRV_POLL_WHILE by AIO_WAIT_WHILE
+  block/nvme: Use per-queue AIO context
+  block/nvme: Check BDRVNVMeState::plugged out of nvme_kick()
+  block/nvme: Check BDRVNVMeState::plugged out of
+    nvme_process_completion
+
+ block/nvme.c       | 160 ++++++++++++++++++++++++++-------------------
+ block/trace-events |   8 +--
+ 2 files changed, 96 insertions(+), 72 deletions(-)
+
+-- 
+2.21.3
 
 
