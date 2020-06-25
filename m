@@ -2,81 +2,71 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9F8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFA0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:19:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4673820767
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 874D120767
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:19:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EL9k5BpK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4673820767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfIGlkLf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 874D120767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTcn-0007SI-IV
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:17:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34518)
+	id 1joTeg-0001fD-Gy
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:19:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTZs-0003ox-Hz
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:14:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56392
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1joTcG-00074k-L1
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:16:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21998
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joTZp-0005NK-HH
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:14:11 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1joTcC-0006Oh-Pl
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:16:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593098047;
+ s=mimecast20190719; t=1593098193;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ajmwRvokm0ZQiHFQBkbakBAvZEz97+mdB+U7N7RqWlk=;
- b=EL9k5BpK1GVKoLnUp3laolJ3oi5W92HMYCAecC+plenozALuddqdBJk05HeE28tJ9GOJwq
- +mfBSI1ouVIS6Yx6sPkl9TJhpxJZvEymJNERxvvtMpwDaaRPWcR/OJWJE0Dd8/Qt/RnHNS
- IRKTIhNyEUiz82Dg0mAnq8oZnfT6ldo=
+ to:to:cc:cc:content-type:content-type;
+ bh=syqm2M4y5q2+wosijyi1Cm1fm3WR6dOUGfKSTnd+a6E=;
+ b=RfIGlkLfxoVEwfsYcJYwQHR5GiVFEyCzLI7nLdU2bjV5tFq/FiYsWWZ/KbK8OaQ0PAodh/
+ m4Lz2RvUd1dTuC5H5+iIaxlvrRXMiZpRS9kuzS82UqAQBdiGzHWoRcs/7SqlS+5LW13oCE
+ mPnyCIoFQcaAOo0oI+U3P+ZULP5COgA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-wW0KUlhGOA-e_1DPD54LDw-1; Thu, 25 Jun 2020 11:14:05 -0400
-X-MC-Unique: wW0KUlhGOA-e_1DPD54LDw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-28-CqfY1pFuN5uQRFbPstuVPw-1; Thu, 25 Jun 2020 11:16:32 -0400
+X-MC-Unique: CqfY1pFuN5uQRFbPstuVPw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D2761005512;
- Thu, 25 Jun 2020 15:14:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9738B1A913;
- Thu, 25 Jun 2020 15:14:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2162011384D4; Thu, 25 Jun 2020 17:14:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 36/46] qom: Put name parameter before value / visitor
- parameter
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-37-armbru@redhat.com>
- <c0d8ea3d-440a-4e4e-f77a-c31448aecb3b@redhat.com>
-Date: Thu, 25 Jun 2020 17:14:01 +0200
-In-Reply-To: <c0d8ea3d-440a-4e4e-f77a-c31448aecb3b@redhat.com> (Eric Blake's
- message of "Wed, 24 Jun 2020 16:27:36 -0500")
-Message-ID: <878sgbxjnq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 175B0107ACCA;
+ Thu, 25 Jun 2020 15:16:31 +0000 (UTC)
+Received: from thuth.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CED8A7FEA0;
+ Thu, 25 Jun 2020 15:16:29 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] gitlab-ci: Fix the change rules after moving the YML files
+Date: Thu, 25 Jun 2020 17:16:27 +0200
+Message-Id: <20200625151627.24986-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 02:30:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,68 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+The edk2.yml and opensbi.yml files have recently been moved/renamed,
+but the change has not been reflected in the rules in the YML files
+yet.
 
-> On 6/24/20 11:43 AM, Markus Armbruster wrote:
->> The object_property_set_FOO() setters take property name and value in
->> an unusual order:
->>
->>      void object_property_set_FOO(Object *obj, FOO_TYPE value,
->>                                   const char *name, Error **errp)
->>
->> Having to pass value before name feels grating.  Swap them.
->>
->> Same for object_property_set(), object_property_get(), and
->> object_property_parse().
->>
->> Convert callers with this Coccinelle script:
->>
->>      @@
->>      identifier fun = {object_property_get, object_property_parse, object_property_set_str, object_property_set_link, object_property_set_bool, object_property_set_int, object_property_set_uint, object_property_set, object_property_set_qobject};
->>      expression obj, v, name, errp;
->>      @@
->>      -    fun(obj, v, name, errp)
->>      +    fun(obj, name, v, errp)
->>
->> Chokes on hw/arm/musicpal.c's lcd_refresh() with the unhelpful error
->> message "no position information".  Convert that one manually.
->>
->> Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
->> ARMSSE being used both as typedef and function-like macro there.
->> Convert manually.
->>
->> Fails to convert hw/rx/rx-gdbsim.c, because Coccinelle gets confused
->> by RXCPU being used both as typedef and function-like macro there.
->> Convert manually.  Convert that one manually.  The other files using
->> RXCPU that way don't need conversion.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->>   136 files changed, 702 insertions(+), 729 deletions(-)
->
-> Big but mechanical.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-> This one might be a semantic conflict magnet with patches written in
-> the meantime;
+Fixes: 922febe2af ("Move edk2 and opensbi YAML files to .gitlab-ci.d folder")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .gitlab-ci.d/edk2.yml    | 2 +-
+ .gitlab-ci.d/opensbi.yml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-You bet!
-
->               I guess the trick is to check that 'git grep' finds as
-> many calls to any of the functions listed as conversions.
-
-I throw away the old patch and rerun Coccinelle.  Works except when I
-rebase onto changes to the files containing the functions that change,
-because my Coccinelle script only updates calls, not definitions.
-Hasn't been an issue so far.
+diff --git a/.gitlab-ci.d/edk2.yml b/.gitlab-ci.d/edk2.yml
+index 088ba4b43a..a9990b7147 100644
+--- a/.gitlab-ci.d/edk2.yml
++++ b/.gitlab-ci.d/edk2.yml
+@@ -2,7 +2,7 @@ docker-edk2:
+  stage: build
+  rules: # Only run this job when the Dockerfile is modified
+  - changes:
+-   - .gitlab-ci-edk2.yml
++   - .gitlab-ci.d/edk2.yml
+    - .gitlab-ci.d/edk2/Dockerfile
+    when: always
+  image: docker:19.03.1
+diff --git a/.gitlab-ci.d/opensbi.yml b/.gitlab-ci.d/opensbi.yml
+index dd051c0124..6a1750784a 100644
+--- a/.gitlab-ci.d/opensbi.yml
++++ b/.gitlab-ci.d/opensbi.yml
+@@ -2,7 +2,7 @@ docker-opensbi:
+  stage: build
+  rules: # Only run this job when the Dockerfile is modified
+  - changes:
+-   - .gitlab-ci-opensbi.yml
++   - .gitlab-ci.d/opensbi.yml
+    - .gitlab-ci.d/opensbi/Dockerfile
+    when: always
+  image: docker:19.03.1
+-- 
+2.18.1
 
 
