@@ -2,73 +2,73 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1037EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 20:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BE9C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 20:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2DC3206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 20:15:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75B3120709
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 20:21:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y7p6LH4N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2DC3206FA
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zOTTd5BX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B3120709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joYHn-0003N3-15
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 16:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33412)
+	id 1joYN0-0004p0-NC
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 16:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joYH4-0002lG-Vy
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 16:15:07 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40647)
+ id 1joYMO-0004L7-OL
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 16:20:36 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46376)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joYH2-0000nl-DH
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 16:15:06 -0400
-Received: by mail-ot1-x342.google.com with SMTP id k4so3339223otr.7
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 13:15:03 -0700 (PDT)
+ id 1joYMM-0003eY-NG
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 16:20:36 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n24so4273129otr.13
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 13:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=M3sfa9UB0nyQvlAY8Xm9cS8h6o6s1/TOY4XM/KOtTZM=;
- b=y7p6LH4NaZlX2U96oBq+Bqj2OGZIGLZMuyIQAfNDKjlSWF97Wd5A3OOipQBXnZQEdN
- eN6Uh7/7OdJ3TCvmoNotKWE6edZTdtKrLOKteEIbNQ2y+byWYeaC3CZjOCyv96JHtYB/
- pcvSCyFpeSDQccWxlrsukqFPilYnesGDTnFHuS2HnVWau6MMhmQh9ulow4WSladt2AqS
- +K2ccCCoLfV31kXhy4UtJdQynBA+fMNNx45JfNdFdlh7+7FK4nBrrqwhE1KdpduTXynA
- Dtg+iJgd7JYI1V8gfWX6c5MilQNrjIkn/4vtJ3IRvGSu97c6yatGE4ISz57RgHzIFlZn
- mYdg==
+ :cc; bh=iPBsHWmL1uvlRs2k2QY6hU3D66Fjw3PDp54nrLhq66M=;
+ b=zOTTd5BXIPO+PkrEVWQIQdsL0vUTCCNeqjVW9RFjK9TP0m/f0vlW8STsDLsnFlkwYP
+ zyAweKF4xrwYFOIZXxXoleVuvLrGU9Z4B3RcVyYrcC6yrg1LDLrN1F9y/l6kDLqibGDI
+ QM73aP2l6P0tE0H7abgKnoLmsMTFU95qnIGTiFheRZ9aY69yvw01LfLaZZiYWcFjuuUb
+ Vi+mDxrnMVvsv1aDLx6RRh/eNcYXnfBA/SDTFYoQQi8xUr9RfU3VPXcJ6qFY258n+qev
+ /VpvRP29tIafXXhri1pTrD+1gZCEp7jZSd7BoVKuDsyDOZfVUETyDYxMEPot6Ho/Ftww
+ HLrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=M3sfa9UB0nyQvlAY8Xm9cS8h6o6s1/TOY4XM/KOtTZM=;
- b=hQ1zH68ExGPOvmqvYghiocykOoNeUgoSxOIl+PhkPr0VKL6miSy48S+vsVLwPF5INc
- N/ADUwZMFalAqtXa5pJeD1mcNOM0RbAGjZNCFPWDUvWAMFXvWZa1zJ7cbtv7P4z8oi7R
- M4Y+PKPitY+Z6ZkRyBuR5tiNXfvvUYsXTFFHkDvMe/o0OsXlmIhf3lFDM6b6ngvod/Jk
- xVZ9JeoeShOUb9QUiXuk06ARVl6iCmWKn10JTOAZF7x7aR6/oJkLtvScPzNZ1FquIXEB
- 8sDpYxivt8WtYLYx7UKUe1poLIVnIQaWROOKSod1u8qflFSH/hIm9X3qi834FfJGbInd
- JUIg==
-X-Gm-Message-State: AOAM530hIVUyX4SgUcG86OBjMVPPTABaSCRwGRph0GoBeDHdwxLsiJaU
- FPPKF/d1fns2IXccH6IdO4cCcD4xy2HhOa5UkOuRRw==
-X-Google-Smtp-Source: ABdhPJz7V5h+G9SoUAAB2XjWzkw9nfhMNM25o+8yqpSXglJ3/ZXmgsFkfuizGfPz4lo7EdAVxypIMPP1emJhaQZn28U=
-X-Received: by 2002:a9d:67d6:: with SMTP id c22mr27111673otn.221.1593116102477; 
- Thu, 25 Jun 2020 13:15:02 -0700 (PDT)
+ bh=iPBsHWmL1uvlRs2k2QY6hU3D66Fjw3PDp54nrLhq66M=;
+ b=DIypiRFEgYl1NginkQN20+iIY0jwe7He5rBSwdou48nOFFzDr66wK2jrTfM3VLgSWW
+ QSb0Sit7cAMIVKJ37tb8ndfwL7oJ9RnZLBprBIW5lfs+hCYICtHwRQidHeNKoSG4/Prk
+ VBMpvQnT3lD/JS+l5jMpHCS8gYuUR2yniSQFvCDbN7WAoeoGjaOEkrBUHXMI5kS/qpaX
+ QNDrd4FyGD+hY/8Ey+vgToWp6LzstF58kOHJ8fcCFjDe8rEO2nJj5B1yKuFGa3/q2UHg
+ cNtVHu+MVxII7p4MVyntZnf6ryR88APuU6BYyGNQN3bGfjl70OGzdCys7HvKFrko65mp
+ zmFg==
+X-Gm-Message-State: AOAM530ML5RYUe1U0i05yW2PKxfZiAA2FW7padwn4t/lf/zkOLikQ0uA
+ Kms0uUMRS9CdnBXP2QTqF+Vo7qsn5EXwmZhTTWoHDg==
+X-Google-Smtp-Source: ABdhPJyoINNKDZW8f7zMPvPx7srAGUuM26xRLMNN6l7vgyKYQsDgNEtllVtSPbbne9zW6UEKSwG4lpiTGjBBVrFdnIQ=
+X-Received: by 2002:a9d:67d6:: with SMTP id c22mr27130065otn.221.1593116433368; 
+ Thu, 25 Jun 2020 13:20:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+XhMqyTLP5_Jf=t8OCsMifrme0DgimM8-D=Y0RRR+779052Bg@mail.gmail.com>
-In-Reply-To: <CA+XhMqyTLP5_Jf=t8OCsMifrme0DgimM8-D=Y0RRR+779052Bg@mail.gmail.com>
+References: <20200624230609.703104-1-mst@redhat.com>
+In-Reply-To: <20200624230609.703104-1-mst@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 21:14:50 +0100
-Message-ID: <CAFEAcA_hSMxAFj5yNcmBKicgmbE-rSr8ih0j-z8KbjnxDmby4A@mail.gmail.com>
-Subject: Re: build: haiky system build fix
-To: David CARLIER <devnexen@gmail.com>
+Date: Thu, 25 Jun 2020 21:20:22 +0100
+Message-ID: <CAFEAcA-+L7kD4F5d58LLexmLKU5_5o0064cpcg4HWg-Z66NN=A@mail.gmail.com>
+Subject: Re: [PULL 00/19] virtio,acpi,pci: fixes, cleanups, tools.
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
  envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
@@ -93,192 +93,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jun 2020 at 19:37, David CARLIER <devnexen@gmail.com> wrote:
+On Thu, 25 Jun 2020 at 00:06, Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> From 25adbdcdc17ef51a41759f16576901338ed8a469 Mon Sep 17 00:00:00 2001
-> From: David Carlier <devnexen@gmail.com>
-> Date: Thu, 25 Jun 2020 19:32:42 +0000
-> Subject: [PATCH] build: haiku system build fix
+> The following changes since commit d4b78317b7cf8c0c635b70086503813f79ff21ec:
 >
-> Most of missing features resides in the bsd library.
-> Also defining constant equivalence.
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200623' into staging (2020-06-23 18:57:05 +0100)
 >
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> --
-
-Hi; thanks for this patch. I have some review comments
-below, mostly relating to better ways to implement
-the compatibility fixes.
-
-> diff --git a/os-posix.c b/os-posix.c
-> index 3cd52e1e70..ca07b7702d 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -42,6 +42,8 @@
->  #include <sys/prctl.h>
->  #endif
+> are available in the Git repository at:
 >
-> +#include <sys/mman.h>
-
-I think this either should not be necessary, or if it's
-fixing something the fix should be elsewhere. For
-POSIX-compatible host OSes, sys/mman.h is included
-via include/sysemu/os-posix.h which in turn is pulled in
-by include/qemu/osdep.h, which is always included by every
-C file in QEMU. I think looking at configure that Haiku
-host builds should set CONFIG_POSIX, so I would expect
-that sys/mman.h has already been included here.
-
-> +
->  /*
->   * Must set all three of these at once.
->   * Legal combinations are              unset   by name   by uid
-> @@ -339,10 +341,12 @@ int os_mlock(void)
->  {
->      int ret = 0;
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 >
-> +#if !defined(__HAIKU__)
->      ret = mlockall(MCL_CURRENT | MCL_FUTURE);
->      if (ret < 0) {
->          error_report("mlockall: %s", strerror(errno));
->      }
+> for you to fetch changes up to f6f746db6bae1ba74967fd7bea2bb5e169502948:
 >
-> +#endif
-
-If Haiku doesn't support an mlockall() equivalent, then the
-correct implementation of os_mlock() for it is to return
--ENOSYS -- compare the Win32 stub version in
-include/sysemu/os-win32.h.
-
-Also, in general we prefer configure to do feature tests,
-rather than for the source code to have OS-specific ifdefs.
-So here you'd want a configure test for "does the system
-provide mlockall()?", and then the implementation would
-be guarded with CONFIG_MLOCKALL.
-
->      return ret;
->  }
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index c296f55d14..ee47dd8089 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -16,7 +16,9 @@
->  #include "qemu/osdep.h"
->  #include "qemu/thread.h"
+>   tests: disassemble-asm.sh: generate AML in readable format (2020-06-24 19:03:57 -0400)
 >
-> +#if defined(CONFIG_SIGNALFD)
->  #include <sys/syscall.h>
-> +#endif
+> ----------------------------------------------------------------
+> virtio,acpi,pci: fixes, cleanups, tools.
 >
->  struct sigfd_compat_info
->  {
-> diff --git a/util/drm.c b/util/drm.c
-> index a23ff24538..8540578c09 100644
-> --- a/util/drm.c
-> +++ b/util/drm.c
-> @@ -38,9 +38,11 @@ int qemu_drm_rendernode_open(const char *rendernode)
+> Fixes, cleanups in ACPI, PCI, virtio.
+> A handy script for testing ACPI.
 >
->      fd = -1;
->      while ((e = readdir(dir))) {
-> +#if !defined(__HAIKU__)
->          if (e->d_type != DT_CHR) {
->              continue;
->          }
-> +#endif
-
-Does Haiku really provide /dev/dri ? If not then rather than
-making this code which can't be used on this host OS compile
-it would probably be better to just arrange that it doesn't
-get compiled. I suspect that the answer here is that the
-$(CONFIG_POSIX) guard on compiling drm.o in util/Makefile.objs
-should really be a $(CONFIG_LINUX).
-
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >
->          if (strncmp(e->d_name, "renderD", 7)) {
->              continue;
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index eda63fe4e0..1ce3081ced 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -85,6 +85,9 @@ static int qemu_signal_init(Error **errp)
->       * by sigwait() in the signal thread. Otherwise, the cpu thread will
->       * not catch it reliably.
->       */
-> +#ifndef SIGIO
-> +#define SIGIO SIGPOLL
-> +#endif
 
-If Haiku's SIGPOLL really behaves like Linux's SIGIO then
-include/qemu/osdep.h is the best place to put this kind
-of fixup, so that all files get the benefit of it.
 
->      sigemptyset(&set);
->      sigaddset(&set, SIG_IPI);
->      sigaddset(&set, SIGIO);
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 39ddc77c85..a18d90a68a 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -38,7 +38,12 @@
->  #include "qemu/sockets.h"
->  #include "qemu/thread.h"
->  #include <libgen.h>
-> +#if !defined(__HAIKU__)
->  #include <sys/signal.h>
-> +#else
-> +#include <kernel/image.h>
-> +#include <signal.h>
-> +#endif
->  #include "qemu/cutils.h"
->
->  #ifdef CONFIG_LINUX
-> @@ -390,6 +395,21 @@ void qemu_init_exec_dir(const char *argv0)
->              }
->          }
->      }
-> +#elif defined(__HAIKU__)
-> +    {
-> +        image_info ii;
-> +        int32_t c = 0;
-> +
-> +    *buf = '\0';
-> +    while (get_next_image_info(0, &c, &ii) == B_OK) {
-> +            if (ii.type == B_APP_IMAGE) {
-> +                strncpy(buf, ii.name, sizeof(buf));
-> +            buf[sizeof(buf) - 1] = '\0';
-> +        p = buf;
-> +                break;
-> +            }
-> +        }
 
-Your indentation here has got messed up.
+Applied, thanks.
 
-> +    }
->  #endif
->      /* If we don't have any way of figuring out the actual executable
->         location then try argv[0].  */
-> diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
-> index 2e8b43bdf5..c29fc2cbf9 100644
-> --- a/util/qemu-openpty.c
-> +++ b/util/qemu-openpty.c
-> @@ -35,7 +35,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->
-> -#if defined(__GLIBC__)
-> +#if defined(__GLIBC__) || defined(__HAIKU__)
->  # include <pty.h>
->  #elif defined CONFIG_BSD
->  # include <termios.h>
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-This would be neater if we dropped the GLIBC/HAIKU check
-in favour of a configure "is openpty() in pty.h?" test.
-
-thanks
 -- PMM
 
