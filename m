@@ -4,86 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3844AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B207420702
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:13:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04F4F20702
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 13:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MP0LSBXQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B207420702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z/CSKS13"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F4F20702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joRhB-0004KI-Us
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:13:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55546)
+	id 1joRhR-0004sg-9m
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 09:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joRg0-0002vG-Dg
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:12:24 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22375
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joRfv-0008Ik-9v
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:12:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593090738;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=qn+NKDbtb0x91EJN0M/j+TgPZb5vx1ZSUL2nlnc9Gjw=;
- b=MP0LSBXQoVzeIDYSfXq1s53BgLDPhtxKzNyUp40jFNl03tboJ482PByWmTU/DFkdhaxQ+/
- a/LwDwqcsshVo1Jsc5amWXe/qWIDdYLyRzvsjkpLHgyagORpJEoElVyUDlZufbLNy4v0bC
- 4Y0GIYQwu9dS4eVcykqcQCdNpPutjGM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-Z9wRKpigOWme_rZOQERVFA-1; Thu, 25 Jun 2020 09:12:16 -0400
-X-MC-Unique: Z9wRKpigOWme_rZOQERVFA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24EC3805EE6;
- Thu, 25 Jun 2020 13:12:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB03A1A90F;
- Thu, 25 Jun 2020 13:12:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 558ED11384D4; Thu, 25 Jun 2020 15:12:13 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 13/46] qemu-option: Simplify around find_default_by_name()
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-14-armbru@redhat.com>
- <13665429-b6ae-351b-0b96-7810da94f0db@redhat.com>
-Date: Thu, 25 Jun 2020 15:12:13 +0200
-In-Reply-To: <13665429-b6ae-351b-0b96-7810da94f0db@redhat.com> (Eric Blake's
- message of "Wed, 24 Jun 2020 14:46:57 -0500")
-Message-ID: <87k0zvz3v6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joRaU-0003Fa-DR
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:06:42 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joRaS-0006oc-EV
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 09:06:42 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 72so5168187otc.3
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 06:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/W2L9pXJYclFws7rjK9bXIcS7kFKPWtf3pvQGjGXRUs=;
+ b=Z/CSKS13BtbykJvBL5i89Cv/AJ3jphQiw8jYZUJoFNOlzrPb9vvzBf7ukVXn1MmIcH
+ 8EKr1YRLDfC53s4JD6J5D6+cRZt3aMR6ZvMms8VPRaqgTGz+xDskHmeUhbh1xe4pW4c5
+ tXVwteJ8fthmE5p4vd1FFC+Yq4ijiQgcAkPd5W0OL/n8P/ECphOiZl4wL4N9YCl8rI0D
+ jZfTGIo7Vb1nF3ThmhP1ujVte39+yjdcbCgxUPPMxu/YPLkASzVYXccGkLNsDHarQWLr
+ QuAFm6H8G2fCoW1rJZQD2sNduXBaT6OERjrMSsQeeQoZ7qH8EeTXVY97m7cWOjLDSj7b
+ ZrRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/W2L9pXJYclFws7rjK9bXIcS7kFKPWtf3pvQGjGXRUs=;
+ b=RnEucW/oeHTWZayETfDrXTiGTUH8U0Ex2ik+k7mK5lA0uJPyFO1kWDlHrSb1B2vHw6
+ KNRKiAYvRNah0YxDTA5QwQnQPyO86M3pOZ47toVJkmQY+5nGtNix8E06AQmkA93GSZfI
+ Uvq901bu3cJtgBr4WPzmxT2GgB+qw2jj/irfPMDAzhmzLIswqLTupWN6BxaAlgb174XT
+ QixroQ0r6x8v8LhB+QFaETVtXZD48mbuCvfThB2zHa9wA0ynRTEh04eghnLD+uXLt9U/
+ RhVNBIUXeGiVo06NBCwUzurhdTHMT2QR4ysj94pvu4VEh6D7ymAl8revRIBTle6ACl1l
+ 1b1g==
+X-Gm-Message-State: AOAM530eygEb3mIwAo/peLDSPaaRQ757SJJgYbHWOv20nLctmha6L7CH
+ pkJ7KDEJdxsh6DglcXcIkRHtyv0lgbN0Qepzvk3lxg==
+X-Google-Smtp-Source: ABdhPJwFaug5lzuRB7YZH5U9fHfPEcTPXByyy5hvbuduCcygbie9F29zglwcLMinUsGsNiK8HhTXLbFiP8AK5ajTFRE=
+X-Received: by 2002:a9d:67d6:: with SMTP id c22mr25424166otn.221.1593090398997; 
+ Thu, 25 Jun 2020 06:06:38 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200623193658.623279-1-richard.henderson@linaro.org>
+ <20200623193658.623279-46-richard.henderson@linaro.org>
+In-Reply-To: <20200623193658.623279-46-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 14:06:28 +0100
+Message-ID: <CAFEAcA9CZUH302_yy=HSX7J3XD=Voj1JvhC-AhL-+o4aDHCkgw@mail.gmail.com>
+Subject: Re: [PATCH v8 45/45] target/arm: Enable MTE
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,75 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: david.spickett@linaro.org, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 6/24/20 11:43 AM, Markus Armbruster wrote:
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   util/qemu-option.c | 13 ++++---------
->>   1 file changed, 4 insertions(+), 9 deletions(-)
->>
->> diff --git a/util/qemu-option.c b/util/qemu-option.c
->> index ddcf3072c5..d9293814b4 100644
->> --- a/util/qemu-option.c
->> +++ b/util/qemu-option.c
->> @@ -286,11 +286,9 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
->>       opt = qemu_opt_find(opts, name);
->>       if (!opt) {
->>           def_val = find_default_by_name(opts, name);
->> -        if (def_val) {
->> -            return def_val;
->> -        }
->> +        return def_val;
->>       }
->> -    return opt ? opt->str : NULL;
->> +    return opt->str;
->>   }
+On Tue, 23 Jun 2020 at 20:38, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> You could go with even fewer lines and variables by inverting the logic:
+> We now implement all of the components of MTE, without actually
+> supporting any tagged memory.  All MTE instructions will work,
+> trivially, so we can enable support.
 >
-> if (opt) {
->     return opt->str;
-> }
-> return find_default_by_name(opts, name);
-
-Yes, that's better.
-
->>     void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts,
->> const char *name)
->> @@ -320,7 +318,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
->>   {
->>       QemuOpt *opt;
->>       const char *def_val;
->> -    char *str = NULL;
->> +    char *str;
->>         if (opts == NULL) {
->>           return NULL;
->> @@ -329,10 +327,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
->>       opt = qemu_opt_find(opts, name);
->>       if (!opt) {
->>           def_val = find_default_by_name(opts, name);
->> -        if (def_val) {
->> -            str = g_strdup(def_val);
->> -        }
->> -        return str;
->> +        return g_strdup(def_val);
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v6: Delay user-only cpu reset bits to the user-only patch set.
+> ---
+>  target/arm/cpu64.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> Similarly, you could drop def_val with:
->  return g_strdup(find_default_by_name(opts, name));
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 778cecc2e6..45b0ca7188 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -654,6 +654,7 @@ static void aarch64_max_initfn(Object *obj)
+>
+>          t = cpu->isar.id_aa64pfr1;
+>          t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
+> +        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
+>          cpu->isar.id_aa64pfr1 = t;
 
-Your contracted version is still readable; sold.
+Worth a brief comment
+   /* Will be downgraded to 1 if board provides no tag memory */
 
-> Either way,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+?
 
-Thanks!
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
+thanks
+-- PMM
 
