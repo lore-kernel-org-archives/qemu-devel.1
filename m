@@ -2,106 +2,88 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DB9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6F6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F542206EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F542206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2951D206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 12:23:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XDUPaD8t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2951D206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joQtf-0007fD-Mo
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39680)
+	id 1joQuU-00005M-GO
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 08:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1joQst-00075g-Bs
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:21:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8240)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1joQsr-0002Ql-DZ
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:21:39 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05PC2gmv013606
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:21:36 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31uwynqqw4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:21:36 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05PC34uY015839
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:21:35 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.72])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31uwynqqv8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 25 Jun 2020 08:21:35 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
- by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05PCCCqa003389;
- Thu, 25 Jun 2020 12:21:32 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma06fra.de.ibm.com with ESMTP id 31uuspruk7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 25 Jun 2020 12:21:32 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05PCLU5D66322598
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 25 Jun 2020 12:21:30 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3C27042041;
- Thu, 25 Jun 2020 12:21:30 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BAC044203F;
- Thu, 25 Jun 2020 12:21:29 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.188.218])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 25 Jun 2020 12:21:29 +0000 (GMT)
-Date: Thu, 25 Jun 2020 14:21:02 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [RFC 0/4] Enable virtio-fs on s390x
-Message-ID: <20200625142102.1f82ae4d.pasic@linux.ibm.com>
-In-Reply-To: <20200625101935.GF1009994@redhat.com>
-References: <20200625100430.22407-1-mhartmay@linux.ibm.com>
- <20200625101935.GF1009994@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joQtn-0007w8-6k
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:22:35 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36299)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joQtl-000302-2y
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 08:22:34 -0400
+Received: by mail-oi1-x241.google.com with SMTP id h17so4772646oie.3
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 05:22:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=J5E8Yz7WdHtNNchaXGGg1yzfOWfV4cXol1nPpRLd3zE=;
+ b=XDUPaD8t+3OXTVfderIp3Ai/g9/Pe2rkHE5dKnFmDi4wXfKFvSHfmaLZxZ37NRZ2Gy
+ WrU+b4N2G4ZXKq34QV/HEYBYxYPeqH/R6J3Nv/3lHlF9Y1yOaXtVT8P7vofbpWOs1vIJ
+ uGgGjC5JWWtQfjDjVzbrppVCwZV0lGu3q8FfHlgThajtgzamaIt0IBer8Y93cGRKiuad
+ 8PwMqKOAy0Jw8Po5BhsWRcrMiThRN14wJYCZ+F0XSbvWIAzgIYYefu1MQhE+C/69Z3Ai
+ YXJ6+hlePm7JOF7QaTjrdb3As6O0qKQgRvyjsbVwueBW/nviO5cDCBFd9faYgwcCD/ur
+ ASCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=J5E8Yz7WdHtNNchaXGGg1yzfOWfV4cXol1nPpRLd3zE=;
+ b=UoGBP8suIFXdN+Q9YDkhFNW/SFc3DXJI9DkLdnSbikW5WThTuwl9ivXSMlVFehU5lQ
+ L43pnWIX3ma+YY1Lde9LodFVyi/YChju1QFk8IrkHJ9/70+hdTR5XgWxOzU0mL+vC1J6
+ wIrw3YqDp5l551tIhNB3+eCvT6YrqpBurme4dzG2aYWCrkbHXk1icd7kSLwfiOtI3ATp
+ wyyuPG6+yt40MSRzjWqghFHrDr3F1Fj75DUkKZa6cJ7aLpQuSttZDO5ADhVn1Ma3hbLt
+ ABylIJkMVIWHBBc1Azm/eTpBMYAtaiL0rgc6qglfHT2RE4172KqJ1+1iE5fQVjnAlItR
+ RH8A==
+X-Gm-Message-State: AOAM533NM7BZJyTBQsfK2Mc4ki3XqLkNirW9kotSkFHM313GHybguXE4
+ BOJrscjVxOViNPiSyoItyt4bF3aVEg2lWe3R/NM2jQ==
+X-Google-Smtp-Source: ABdhPJw94FUb1M0+PXVFNFsxuGgl7/L6vqmYexS54QsOxBqv0prCOYSWgFhgOyV9fsKLJeNqo9VWv2MTaFup6Bf7+Ro=
+X-Received: by 2002:a54:4694:: with SMTP id k20mr1857507oic.146.1593087751777; 
+ Thu, 25 Jun 2020 05:22:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-25_05:2020-06-25,
- 2020-06-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999
- malwarescore=0 priorityscore=1501 impostorscore=0 spamscore=0 bulkscore=0
- cotscore=-2147483648 mlxscore=0 clxscore=1015 lowpriorityscore=0
- suspectscore=0 phishscore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006250078
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 08:13:37
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-8-ppandit@redhat.com>
+ <7ffe6cd9-fc23-3fdf-6c57-7bb0af0dd030@redhat.com>
+ <nycvar.YSQ.7.77.849.2006251427210.92950@xnncv>
+In-Reply-To: <nycvar.YSQ.7.77.849.2006251427210.92950@xnncv>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 13:22:20 +0100
+Message-ID: <CAFEAcA9yP=y9nzvqs_GZF=n9EXz7SPY4kiR6ZqHF+T+f7mnV5g@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] tz-ppc: add dummy read/write methods
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,61 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Marc Hartmayer <mhartmay@linux.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jun 2020 11:19:35 +0100
-Daniel P. Berrangé <berrange@redhat.com> wrote:
+On Thu, 25 Jun 2020 at 10:18, P J P <ppandit@redhat.com> wrote:
+>
+> +-- On Thu, 25 Jun 2020, Philippe Mathieu-Daud=C3=A9 wrote --+
+> | > @@ -196,7 +196,22 @@ static bool tz_ppc_dummy_accepts(void *opaque, h=
+waddr addr,
+> | >      g_assert_not_reached();
+> |
+> | This is a shame we now have to fill the read/write handlers for
+> | unreachable code :(
+> |
+> | > +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigne=
+d size)
+> |
+> | I'd instead use a clearer:
+> |        g_assert_not_reached();
+> |
+> | > +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
+> |
+> | Ditto:
+> |        g_assert_not_reached();
+>
+> This will likely be called in tz_ppc_dummy_accepts() above. Do we still w=
+ant
+> to revise this patch? considering read/write callbacks are unreachable.
 
-> On Thu, Jun 25, 2020 at 12:04:26PM +0200, Marc Hartmayer wrote:
-> > This RFC is about enabling virtio-fs on s390x. For that we need
-> >  + some shim code (first patch), and we need
-> >  + libvhost-user to deal with virtio endiannes as mandated by the spec.
-> >  
-> > The second part is trickier, because unlike QEMU we are not certain
-> > about the guest's native endianness, which is needed to handle the
-> > legacy-interface appropriately. In fact, this is the reason why just
-> > RFC.
-> > 
-> > One of the open questions is whether to build separate versions, one
-> > for guest little endian and one for guest big endian, or do we want
-> > something like a command line option? (Digression on the libvirt
-> > modeling)
-> 
-> When you talk about  big vs little endian, are you referring to TCG
-> scenarios with mixed host/guest arch, or arches which can support
-> either endianess, or both ? i guess it doesn't matter actually, as
-> I think the latter forces a specific answer.
-> 
+The point of g_assert_not_reached() is that it documents and
+asserts that the code is not reachable. If the read and write
+callbacks are unreachable (which they are) then having their
+bodies just be a call to g_assert_not_reached() is the best
+way to document that.
 
-Our primary concern is big endian cpu and little endian virtio because
-virto 1.0 or better. But since we talk about a lib here, everything is
-possible.
-
-> Considering that some architectures allow the guest OS to flip between
-> big & little endian as they boot, libvirt cannot know what endianess
-> the guest is using when it launches virtiofsd. It thus cannot pick
-> between two different endianness builds of virtiofsd automatically.
-> This would force the user to tell libvirt what arch the guest is using
-> at the time they define the guest. This is an undesirable restriction
-> for use cases where the admin of the guest OS has no direct control
-> over the host config.
-> 
-> IOW, I think the only practical answer is to have a single binary that
-> automagically does the right thing at runtime according to guest
-> endianess that currently is in use.
-> 
-
-The problem is that AFAIK there is no way to figure out what is the right
-thing at the moment. I guess QEMU should now, but not virtiofsd or
-whatever userspace virtio device. But I will double check if there is
-something in the protocol addressing this.
-
-Regards,
-Halil
+thanks
+-- PMM
 
