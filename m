@@ -2,83 +2,87 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE76C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF2CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D8520706
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45375207E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 10:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QU7eNz2n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D8520706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGnpVYBL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45375207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joPJf-0004lq-4O
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40384)
+	id 1joPLb-0006lY-ET
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 06:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joPIP-0003OR-7O
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:39:53 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42059)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1joPKn-00062I-RU
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:42:21 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53806)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joPIM-0003xj-M5
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:39:52 -0400
-Received: by mail-ot1-x341.google.com with SMTP id t6so4778901otk.9
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 03:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1joPKk-0004yW-Jd
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 06:42:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j18so5056860wmi.3
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 03:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=y0tl/LRYmxKEARCyKj8ORv9XyuR7fStN6OqdSH4iSXE=;
- b=QU7eNz2nPOTt/qp2wSppObKa90nGSzNeafrQrlhlunwEe67du3H4831Fss8a8G1uCn
- XRnaRCZmAtFcREyY+9lqbtwakX+Yc6lVmkCR1u6ptmNenCeiY6tfvr5bvA8xVxmuF87Z
- F7Hq3s5J2ezFLGJ7M2UiN+7xXRHQ5GdZPvfPdYMiF6qxZVw7998rcKRC0CN56Hn2R4uj
- YoOTEEFIGY6INHLuG45kZL1iYpal/A3H4/dPJa3+BvLAUgkE/H6GK+Nm7cVicZqATPt8
- 6dyLDQ34PAK3Nbu+SfgQxstsApI5LFOXEMD5vNUT5rsIXObQ3Mll+Pz3UmBxkmpdxXGy
- NcWA==
+ :cc:content-transfer-encoding;
+ bh=4iPg8GiypV4DefkuqhuhE5qLtP/WdgjSeB7qheprsnw=;
+ b=mGnpVYBLEb6NIHq/uY9ofX7raN4N2S4gFvgtxDmaSYHlegEcJJ01DHOCCciHsIwmTN
+ K6SD7ilpU75Pk0r02J6xfESUu/3Gb2UFVbOMzRpE4wApdzWIrLCQCHTgB2TF6pOuifXJ
+ dgKPref6asVmX7IjqWdumjPfwXVQ85uyoOqTokPYnF86mr6nqJqiYjCo7yvMuvCc3FVG
+ ichOn9LdCUF/TZsyWIT4+6M+W2R0llj60pBEnlYMJMxzbUgP28Z8qj3bGrGbLv+nqlmC
+ dH821dHMF/dag8s47fGPatZSWltZ83GZnkjsl3D3UvlnpuqkKAe+vr0OrwFHcMXLdMDI
+ 9bKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=y0tl/LRYmxKEARCyKj8ORv9XyuR7fStN6OqdSH4iSXE=;
- b=WRyGBQ1tpnqdb0cpd/pre1uc2ckgEDvsSCnzLOUuUKmb+8gFhd8T0ySk5vaHlneP+a
- tBHTEtUz66dQ9o0Fw54CliZKTj1TIWBE4bO4XkR+rOKs6DlWj3knPJhsphoMf1YH+bZt
- stom/YWi+DfSzMfQAE7QGyBGSfx0Tukvi7e68/LBa55vDt/Da+IpnQYqSyhmUw/WSHM+
- TmSIEb5uBCO+biqDJ/MBMBCtzh/iG4X5bcwg9YDN4QjlubDACcpzpINcAevf4JL1OL5A
- WCL8HZ8JeO4Paukx5zlEKIQa2Vx2YVGmO5NRRLlOOWpxbF9VSHHhAtkqYrzn1xQdrfm5
- lkEQ==
-X-Gm-Message-State: AOAM5300fUUcgfAK2Z6D3NXpCKsCYFDSNS0RumP/3mZ9qla6j8A6NKXv
- uXMZIMakX2/XcrcWBh4dQbSYs8Oy184b1+8swiEtVQ==
-X-Google-Smtp-Source: ABdhPJxiUi3EiWToydRRGXtu6M12FfIRzh1DT0Yvj4YdcufUNvmnVdTDiIBavIBywPGcByJ2Zvp696sLXqKt+JNWmL8=
-X-Received: by 2002:a4a:2f15:: with SMTP id p21mr15838587oop.20.1593081588979; 
- Thu, 25 Jun 2020 03:39:48 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=4iPg8GiypV4DefkuqhuhE5qLtP/WdgjSeB7qheprsnw=;
+ b=bBfORt8jYJ/nZiDeGbF1au+uTKyZsy36Avvb0G5fqKUej9G+WUzFPGno3O+YN2WPV7
+ q9yKW+xi17BiaQb86pFEDtnDPoF9/QSyMbZKbL7N1Rk1ePtypoEbaE9Jj2uky7cyDmfq
+ 37DqF5EbqZ75PPhPkWSxBdKXin7fyj7IbQZGEc45jcaEXZc2RvPC2aws+QNVGXpb208N
+ n6bMjhYKrWsHypVv7pti3Rh1xbDbWL8lpG+ghJsN0aCdU2bjH91/aU/Rbi7Ox4zKYD+z
+ juYwNm4hvgirqfs/Y2uytfa8X03E83x6fk277uDJPWTXn7JVsv67C+FYAZFR+UFrrttB
+ 7DXQ==
+X-Gm-Message-State: AOAM533RND9Op2+aqT0HX6MYSHVKsqfLoaFUgcTv21BW+muTYJrAq+vf
+ tCe47OrO+L+KVdCBWCOq/S6R0jB6ZOz/T+qcvvk=
+X-Google-Smtp-Source: ABdhPJzQ+9zY9+vb6icFRa7XRXO6CBcV6piJwDo/r1BIFnXfhBkrBzP9ZKtApDJeKfN1MKDhzg6bIL8w4STZUNHxuf0=
+X-Received: by 2002:a1c:2602:: with SMTP id m2mr2807137wmm.50.1593081737032;
+ Thu, 25 Jun 2020 03:42:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200623193658.623279-1-richard.henderson@linaro.org>
- <20200623193658.623279-12-richard.henderson@linaro.org>
-In-Reply-To: <20200623193658.623279-12-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jun 2020 11:39:37 +0100
-Message-ID: <CAFEAcA88cAAd0o9MON6ioyxy471GVzv4Y4y57=1-2NnENb=EaQ@mail.gmail.com>
-Subject: Re: [PATCH v8 11/45] target/arm: Implement the ADDG, SUBG instructions
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <1592995531-32600-1-git-send-email-chenhc@lemote.com>
+ <1592995531-32600-5-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1592995531-32600-5-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 25 Jun 2020 12:41:50 +0200
+Message-ID: <CAHiYmc4NvnzdBscD_JBcnFSbBcvf=9BCENvr5-VJ+nbAw4vFHg@mail.gmail.com>
+Subject: Re: [PATCH V6 4/4] MAINTAINERS: Add Loongson-3 maintainer and reviewer
+To: Huacai Chen <zltjiangshi@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -93,111 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.spickett@linaro.org, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stephen Long <steplong@quicinc.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 23 Jun 2020 at 20:37, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+=D1=81=D1=80=D0=B5, 24. =D1=98=D1=83=D0=BD 2020. =D1=83 12:45 Huacai Chen <=
+zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> +/*
-> + * Add/subtract (immediate, with tags)
-> + *
-> + *  31 30 29 28         23 22 21     16 14      10 9   5 4   0
-> + * +--+--+--+-------------+--+---------+--+-------+-----+-----+
-> + * |sf|op| S| 1 0 0 0 1 0 |o2|  uimm6  |o3| uimm4 |  Rn | Rd  |
-> + * +--+--+--+-------------+--+---------+--+-------+-----+-----+
+> Add myself as a maintainer of Loongson-3 virtual platform, and also add
+> Jiaxun Yang as a reviewer.
+>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
 
-Bit 23 should be '1'.
+I am inclined to select LIOINTC patch for the next MIPS queue, even if
+other patches from this series still await clarification.
 
-> + *
-> + *    op: 0 -> add, 1 -> sub
-> + */
-> +static void disas_add_sub_imm_with_tags(DisasContext *s, uint32_t insn)
-> +{
-> +    int rd = extract32(insn, 0, 5);
-> +    int rn = extract32(insn, 5, 5);
-> +    int uimm4 = extract32(insn, 10, 4);
-> +    int uimm6 = extract32(insn, 16, 6);
-> +    bool sub_op = extract32(insn, 30, 1);
-> +    TCGv_i64 tcg_rn, tcg_rd;
-> +    int imm;
+If this happens, I will also accept this patch, in a a slightly
+modified form, to reflect that only LIOINTC part is accepted.
+
+I will also add this note in the commit message: "All changes related
+to Loongson-3 virtual platforms will still be integrated via main MIPS
+pull requests."
+
+With these changes:
+
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+
+>  MAINTAINERS | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 51a4570..0226a74 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1095,6 +1095,13 @@ F: hw/isa/vt82c686.c
+>  F: hw/pci-host/bonito.c
+>  F: include/hw/isa/vt82c686.h
+>
+> +Loongson-3 Virtual Platform
+> +M: Huacai Chen <chenhc@lemote.com>
+> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> +S: Maintained
+> +F: hw/mips/loongson3_virt.c
+> +F: hw/intc/loongson_liointc.c
 > +
-> +    /* Test all of sf=1, S=0, o2=0, o3=0.  */
-> +    if ((insn & 0xc040e000u) != 0x80000000u ||
-
-This bit pattern doesn't seem to match the comment:
-0xc is 0b1100 so that's sf and op, not sf and S;
-0xe is 0b1110 so that's testing the top bit of uimm4
-as well as op3. I think it should be 0xa040c000.
-Though the existence of this bug suggests that it would
-be clearer to test the individual fields :-)
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-
-Interestingly clang (6.0.0) gets pretty close to optimizing
-the field test version:
-
-bool foo(uint32_t insn) {
-   return (insn & 0xa040c000) != 0x80000000u;
-}
-
-bool bar(uint32_t insn) {
-   bool sf = extract32(insn, 31, 1);
-   bool s = extract32(insn, 29, 1);
-   bool o2 = extract32(insn, 22, 1);
-   int op2 = extract32(insn, 14, 2);
-
-   return sf != 1 || s != 0 || o2 != 0 || op2 != 0;
-}
-
-gives
-0000000000000000 <foo>:
-   0:   81 e7 00 c0 40 a0       and    $0xa040c000,%edi
-   6:   81 ff 00 00 00 80       cmp    $0x80000000,%edi
-   c:   0f 95 c0                setne  %al
-   f:   c3                      retq
-
-0000000000000010 <bar>:
-  10:   89 f8                   mov    %edi,%eax
-  12:   25 00 00 00 a0          and    $0xa0000000,%eax
-  17:   3d 00 00 00 80          cmp    $0x80000000,%eax
-  1c:   75 0a                   jne    28 <bar+0x18>
-  1e:   f7 c7 00 c0 40 00       test   $0x40c000,%edi
-  24:   0f 95 c0                setne  %al
-  27:   c3                      retq
-  28:   b0 01                   mov    $0x1,%al
-  2a:   c3                      retq
-
-(I don't know why it's split it into two tests: it's
-not that it's testing "must be 1" in one part and "must
-be 0" in the other because it has checked both sf and s
-in the first comparison.)
-
-gcc (7.4.0) makes more of a hash of it though:
-
-  10:   89 f8                   mov    %edi,%eax
-  12:   89 fa                   mov    %edi,%edx
-  14:   c1 e8 1f                shr    $0x1f,%eax
-  17:   c1 ea 1d                shr    $0x1d,%edx
-  1a:   83 f0 01                xor    $0x1,%eax
-  1d:   09 d0                   or     %edx,%eax
-  1f:   83 e0 01                and    $0x1,%eax
-  22:   75 13                   jne    37 <bar+0x27>
-  24:   89 f8                   mov    %edi,%eax
-  26:   c1 ef 16                shr    $0x16,%edi
-  29:   c1 e8 0e                shr    $0xe,%eax
-  2c:   83 e7 01                and    $0x1,%edi
-  2f:   83 e0 03                and    $0x3,%eax
-  32:   09 f8                   or     %edi,%eax
-  34:   0f 95 c0                setne  %al
-  37:   f3 c3                   repz retq
-
-thanks
--- PMM
+>  Boston
+>  M: Paul Burton <pburton@wavecomp.com>
+>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> --
+> 2.7.0
+>
 
