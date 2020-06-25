@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52258C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7531FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 103CF20706
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B9DB20773
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:37:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MemzwgjU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103CF20706
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQmUoxOV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B9DB20773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joLTG-0001XX-3p
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42628)
+	id 1joLWB-0002xW-HL
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLRm-0000m7-26
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:33:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56534
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLV9-0002PX-Of
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:36:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49760
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLRc-0006on-TO
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:33:16 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLV7-0007df-HJ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:36:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593066787;
+ s=mimecast20190719; t=1593067004;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=UnIfmBlF3xcBuUxzi0YvyM2YzbPh/A7xvWaU2zcAZFs=;
- b=MemzwgjUfRd+AUVPFDpOo91Y5qrtNf4TzU6a3dDfoz7df7TR2OPmAZkwjlWEtRQN3m9385
- xGWQPoRVYjwoEJ2GCDmPa6Qqlr85/qQo9ldvpBMCn2CP45v+SPhGnEhuGtq0/T0WzM5RkY
- LklQYWPdGrYD7bYGdhWsqNV/lhFP2vY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-nQiNazggMRafQamY05Xa_Q-1; Thu, 25 Jun 2020 02:33:06 -0400
-X-MC-Unique: nQiNazggMRafQamY05Xa_Q-1
-Received: by mail-wr1-f69.google.com with SMTP id y16so6080496wrr.20
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:33:06 -0700 (PDT)
+ bh=QmH+NW8J4Q/k869yyAgGEAX9RLYu7D/XEt84UnQ7PR0=;
+ b=ZQmUoxOVH32iRQ+Y1lFKPNChSgY6gbSgafFiIuTl0Baq11m63iEfMf0KCm22ccE6yPkKro
+ fSfHU0yBS9Eqz8klPKq+tyOlRDCMW0UaXDog1MQmk618i3TdFMGY8cBYLucurpWMe7pXj+
+ V9oQC41SCxc+laL193J0Q230ii3O4jc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-rZ2BjViiNQC7ImspGAa1JA-1; Thu, 25 Jun 2020 02:36:42 -0400
+X-MC-Unique: rZ2BjViiNQC7ImspGAa1JA-1
+Received: by mail-wm1-f69.google.com with SMTP id b13so4171163wme.9
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:36:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=UnIfmBlF3xcBuUxzi0YvyM2YzbPh/A7xvWaU2zcAZFs=;
- b=T3jA+lBHtnPrXjnVb6TuhMVfv6hG82BWc/jnkrAJPCesLUQmfiFsiw6iHXNv9wZTJc
- hf/UmRL/1IrlVs8GU+UFe9h+Aoq4tVCOMbyVVsYf6xD/tittjV7f7SaQfHWZdLCjPo61
- ZLNKKwYfEVH0lxD7zVA1iNombg0F2XV37Z/HLoYwvpqn6yY7TV79pBFWJaeUcAsRlkIY
- nb0NnyxOc7EcBjgHu9rypUL0ndfUf6Z39fQ/8UuPEDUyB5SUgfJ2xD5UVTMl41XQurMG
- 6JIbT6lI+lsYzsjvRx+z14eq6YNAXpiPKUFK4LodhOWmlTvOq+phvV1ECJaI5YgKHSB9
- rRjQ==
-X-Gm-Message-State: AOAM530hYml4bGjQNJlObhdTxFENU8oJ46D/T2JgDL3bKUg12Q3B7c38
- 7YurbsxvED4yWworrAIs3b80yFQmj2STv1+iwtOWZr0g3VXMJBy4w3nWXIT0Es26TMjYJdyZDkC
- XmXIklup171PK/YU=
-X-Received: by 2002:adf:9205:: with SMTP id 5mr33259143wrj.232.1593066785271; 
- Wed, 24 Jun 2020 23:33:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyeH7BwiT8wPQ3xvkFbgCQd0AOO9bZgzS2e6x+lHnXuNQoaf/sBcetfqSqqm+oUdR9+hvLhiA==
-X-Received: by 2002:adf:9205:: with SMTP id 5mr33259111wrj.232.1593066785029; 
- Wed, 24 Jun 2020 23:33:05 -0700 (PDT)
+ bh=QmH+NW8J4Q/k869yyAgGEAX9RLYu7D/XEt84UnQ7PR0=;
+ b=F3iCTywzSvMJJzwIZfkexr8kocniFHP7rdOZos/pUbKw+3vH1L3GOfFuNCFy1Li8z3
+ zH+1JNzNIL3J4brZ1VuLZe+ovf1t265cIUkNCyf8Q9dY/Bl0lukHGejRWHEI6FGhDc4c
+ GgDWaH8bIxq/nMLMEGrLao7GesCXUTLFno9/lgFySo5rXPNk1ZJgmMCgWmO27p8fYcy+
+ tXg8kVnWAXgeZ7B37tHf1PAHA4O6DKHiSNRJhcIE62QOXEzykC9ViUfbjRIUvGTZJz+n
+ fL3ATu1xEP/gS3lWrzaJV+7yfoHmefwYm0RxqftC/Rue+UHUKZBGpQ1vpBrpD9jQEsyZ
+ oerg==
+X-Gm-Message-State: AOAM531BoCSVofRYeCEKmzqVbjfYgaN+5za+l7s6hRwTYI8ih5obeo3I
+ Fg58AgeE/G4n9sSEF3/bhX2/rptAJNYoxjFqElAI9Wd6yk8R/alYwhIj6GooTNxqeQEf1P6sWXK
+ wENdvyijSusSh6Fo=
+X-Received: by 2002:a1c:9acf:: with SMTP id c198mr1655082wme.172.1593067001500; 
+ Wed, 24 Jun 2020 23:36:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmsAk9FwrMArRZ7sHdBWAMyko7/dtW3E6W1l0vAR8dQaZaWv96RqNpgdSve6ej3v7TFmMC+g==
+X-Received: by 2002:a1c:9acf:: with SMTP id c198mr1655058wme.172.1593067001301; 
+ Wed, 24 Jun 2020 23:36:41 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id a16sm29373330wrx.8.2020.06.24.23.33.03
+ by smtp.gmail.com with ESMTPSA id y196sm12055130wmd.11.2020.06.24.23.36.39
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Jun 2020 23:33:04 -0700 (PDT)
-Subject: Re: [PATCH 32/46] qom: Rename qdev_get_type() to object_get_type()
+ Wed, 24 Jun 2020 23:36:40 -0700 (PDT)
+Subject: Re: [PATCH 34/46] qom: Don't handle impossible
+ object_property_get_link() failure
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-33-armbru@redhat.com>
+ <20200624164344.3778251-35-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <a9ec4d45-7bcf-0381-829f-c1ab5c618e65@redhat.com>
-Date: Thu, 25 Jun 2020 08:33:03 +0200
+Message-ID: <4c1644b4-4d30-9831-9484-dc32081f41db@redhat.com>
+Date: Thu, 25 Jun 2020 08:36:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200624164344.3778251-33-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-35-armbru@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -115,9 +116,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -145,37 +146,42 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/24/20 6:43 PM, Markus Armbruster wrote:
-> Commit 2f262e06f0 lifted qdev_get_type() from qdev to object without
-> renaming it accordingly.  Do that now.
+> Don't handle object_property_get_link() failure that can't happen
+> unless the programmer screwed up, pass &error_abort.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qom/object.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/arm/bcm2835_peripherals.c |  7 +------
+>  hw/arm/bcm2836.c             |  7 +------
+>  hw/display/bcm2835_fb.c      |  8 +-------
+>  hw/dma/bcm2835_dma.c         |  9 +--------
+>  hw/gpio/bcm2835_gpio.c       | 15 ++-------------
+>  hw/intc/nios2_iic.c          |  8 +-------
+>  hw/misc/bcm2835_mbox.c       |  9 +--------
+>  hw/misc/bcm2835_property.c   | 17 ++---------------
+>  hw/usb/hcd-dwc2.c            |  9 +--------
+>  9 files changed, 11 insertions(+), 78 deletions(-)
 > 
-> diff --git a/qom/object.c b/qom/object.c
-> index b8aac074c2..f6e9f0e413 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -2359,7 +2359,7 @@ object_class_property_add_tm(ObjectClass *klass, const char *name,
->                                       NULL, NULL, prop);
->  }
+> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+> index 8313410ffe..3c40bda91e 100644
+> --- a/hw/arm/bcm2835_peripherals.c
+> +++ b/hw/arm/bcm2835_peripherals.c
+> @@ -134,12 +134,7 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+>      uint64_t ram_size, vcram_size;
+>      int n;
 >  
-> -static char *qdev_get_type(Object *obj, Error **errp)
-> +static char *object_get_type(Object *obj, Error **errp)
->  {
->      return g_strdup(object_get_typename(obj));
->  }
-> @@ -2702,7 +2702,7 @@ void object_class_property_set_description(ObjectClass *klass,
->  
->  static void object_class_init(ObjectClass *klass, void *data)
->  {
-> -    object_class_property_add_str(klass, "type", qdev_get_type,
-> +    object_class_property_add_str(klass, "type", object_get_type,
->                                    NULL);
->  }
->  
-> 
+> -    obj = object_property_get_link(OBJECT(dev), "ram", &err);
+> -    if (obj == NULL) {
+> -        error_setg(errp, "%s: required ram link not found: %s",
+> -                   __func__, error_get_pretty(err));
+> -        return;
+> -    }
+> +    obj = object_property_get_link(OBJECT(dev), "ram", &error_abort);
+[...]
+
+Should we now add an assert(errp) in object_property_get_link()?
+Basically this would force forks to adapt their code when
+rebasing.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
