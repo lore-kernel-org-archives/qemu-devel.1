@@ -2,79 +2,82 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE09C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD16DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:05:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 921D020781
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7B5620781
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 22:05:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4iyBakk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921D020781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jfo/beSc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B5620781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joZTL-0003iY-O2
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 17:31:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52686)
+	id 1joZzu-0002Po-VN
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 18:05:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1joZSG-00039K-3q; Thu, 25 Jun 2020 17:30:44 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36362)
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1joZyh-0001W6-HL
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:04:15 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46009)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1joZSE-0006H2-5Z; Thu, 25 Jun 2020 17:30:43 -0400
-Received: by mail-ej1-x642.google.com with SMTP id dr13so7403472ejc.3;
- Thu, 25 Jun 2020 14:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=+ZFbEwlAIA6kBj7wm15rN7EemhHUgfzi3rT9PcF5DCg=;
- b=p4iyBakknJ8mFgY/Ll1bIVzq/MUfNiHvCzNjiROdgNTPE1n/xgeLutqW15JuriQDdi
- MMPrg5B190UkyC6y7PfN7PP+3ekagcilwTkFBsa4PZfX06m0WW0EgdklYBAejlsa+MAb
- QTfwlFSOwvZNgG8o8spvDxwl/gBr1IAF/FB5sAI2QadHLtOShBPLbTs+/N5wnyDbPiRk
- 2N8nsk2w8q3Mwv6SBnx5KZ6E1/BiCBDbIwO0XECp6YMGGsiOf3XJxlWjQOznZOJPrMbZ
- T3maI9LwxeMy8uwFugOeRi1imlgpeQlG4H5gW8RQ8TaLqx17BMdyJF7j/P7Zh9cvF1pk
- lxFQ==
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1joZyf-0001Pg-QJ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 18:04:15 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s10so7419524wrw.12
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 15:04:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=dhNRoBg5bwpJi8jqJOz5Pclx/wgnmMVQ4FYzgXqH1GI=;
+ b=Jfo/beScBb8NqlCqTrzCtVVwcAgNebsFj272lm3s4ysDEL1egJNxtbzpSuyzodo8av
+ ZlVnNZ/ASn2AYqRFq/5BEpyxX8WA1gsrFosUzgi2axcQGNKdMCuMDJxYvUXqhvbpXfNm
+ keRJJo6cuI8bRnSAvWCtSOr9Vu7ZgQ+RCvQazVW/b6klF+hns/aN5oT18ZbkyQFNsH6K
+ 6AJp8W0UltKwzahDTzRZv64AMRumcopvNT46k7MkY+HQ7YK/oDy4cJj8slraNlNN8uyJ
+ TdJebyu/t3Vvhw00vwvrD2Ud09pUnX1maE3Hp265bvPppOSgSNW3R5Ij+wRwE5njy+w3
+ uO/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=+ZFbEwlAIA6kBj7wm15rN7EemhHUgfzi3rT9PcF5DCg=;
- b=ofTl28WG9Pd6/LX/4K0rHX6rixfn2ijI7KXw/EDtCOmccqTHs80a4MQcEhAivyHdKh
- T0nWRB+ssPpinNAB6XpCxRn/qTBT8gqEhxVcoj4Jcvor2NXROMgL0TsLtIEn/gE9BA83
- alN2x5wd/ouANnCGOaBlNPeej632fkvOIUkk/yK+4CJ8zUoWLqgTaOeSf/4qAlsnDy/q
- xuQsxX770XhDp3VFBO/IIReG7shA3e4ghZfUmqb2YvjSdIDBa3t5FbtH7me8+r0+44nd
- H0unw5FZYQQHLQy+ceycKpgiH+/ePtSi7BwUobjhM+kpoQRpH8Wc+qp6MaywrS7F4KDf
- yurQ==
-X-Gm-Message-State: AOAM530abuJ/XrF+exYKPm0fRIFqJ14cp4N4I4dFw8+UF3uxTQzyzRLL
- mKFr5kxYsFXMt0sAGrkkaT0zcnGAUFlzrM2LzHJ1ifyE0AM=
-X-Google-Smtp-Source: ABdhPJw2EAJDy5hCEofFKQhATr49I3fiLE9SJTM3pB7vIXcILWkWiUoZtQga0nbdq/5/uwyYHalHS4KsIEAsBpEeTuQ=
-X-Received: by 2002:a17:906:a156:: with SMTP id
- bu22mr139948ejb.322.1593120639888; 
- Thu, 25 Jun 2020 14:30:39 -0700 (PDT)
-MIME-Version: 1.0
-From: David CARLIER <devnexen@gmail.com>
-Date: Thu, 25 Jun 2020 22:30:29 +0100
-Message-ID: <CA+XhMqzX=OaRgxQbHKU82K2WhTBwL44sr+wpGKSjZWqaehLyJQ@mail.gmail.com>
-Subject: [PATCH v3] build: Haiku build fix
-To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=devnexen@gmail.com; helo=mail-ej1-x642.google.com
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=dhNRoBg5bwpJi8jqJOz5Pclx/wgnmMVQ4FYzgXqH1GI=;
+ b=iefvtm3D0QWmX0sviUf0BsrlhayIdP5RnPiNZ5t2m+gQuIWNjDDVW/vdYpty+raz67
+ +89o7kSi4uiMygKv3cISGX4G8bRH3yM9448Qy1yE6zI9jtTmIjT4I4vFPJwSH+yAqA0L
+ 3nTboC1DCHPGm4j/VS78YHMSqAJxXnbQsll+YL5eGgWxQ9Dznbm2YkCUlsEVWsoQDNa8
+ flQo2VYXNGbfRh6P2zqO3dlab6fb+69jOMDan75l90U1R2rjidmXbLjtfAB2pXvZ6Aya
+ sUEitA9ns9B1R0ZHu4FlAvH8/XQdVP/hi+sJBbWu7hpWiHiwkUusU9VuZl6NMbW6Hwmj
+ XaKQ==
+X-Gm-Message-State: AOAM533VeAWVPpl060wbv1oYJv2Viv61RGRuLl1B0ty2fvB8bqK2X8UW
+ nKNYlUfzz6TpPudkr9DDhXSYlwD3ik2HWw==
+X-Google-Smtp-Source: ABdhPJwN9ZxjCAPTWtPaqGgrXRGKRNkBtDO5dO+NJw8LppNkrhsPp7c9+atcKtMRzy6oKj2upYJDZw==
+X-Received: by 2002:a5d:4a01:: with SMTP id m1mr348715wrq.250.1593122651573;
+ Thu, 25 Jun 2020 15:04:11 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-139-146-71.range86-139.btcentralplus.com. [86.139.146.71])
+ by smtp.gmail.com with ESMTPSA id l190sm13939277wml.12.2020.06.25.15.04.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 25 Jun 2020 15:04:11 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Thu, 25 Jun 2020 23:03:34 +0100
+Message-Id: <20200625220336.10186-1-beata.michalska@linaro.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=beata.michalska@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -89,229 +92,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, Christoffer.Dall@arm.com,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 78706a28c6aa8b5e522b5781588b38961d79d6f6 Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Thu, 25 Jun 2020 19:32:42 +0000
-Subject: [PATCH] build: haiku system build fix
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-Most of missing features resides in the bsd library.
-Also defining constant equivalence.
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- configure            | 34 ++++++++++++++++++++++++++++++++--
- include/qemu/bswap.h |  2 ++
- include/qemu/osdep.h |  4 ++++
- os-posix.c           |  4 ++++
- util/Makefile.objs   |  2 +-
- util/compatfd.c      |  2 ++
- util/main-loop.c     |  1 +
- util/oslib-posix.c   | 20 ++++++++++++++++++++
- util/qemu-openpty.c  |  2 +-
- 9 files changed, 67 insertions(+), 4 deletions(-)
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
 
-diff --git a/configure b/configure
-index ba88fd1824..43baeadf31 100755
---- a/configure
-+++ b/configure
-@@ -901,8 +901,8 @@ SunOS)
- ;;
- Haiku)
-   haiku="yes"
--  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
--  LIBS="-lposix_error_mapper -lnetwork $LIBS"
-+  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -D_BSD_SOURCE $QEMU_CFLAGS"
-+  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
- ;;
- Linux)
-   audio_drv_list="try-pa oss"
-@@ -2373,6 +2373,30 @@ else
-   l2tpv3=no
- fi
+This patchset relies on KVM to insert the external data abort into the guest.
 
-+cat > $TMPC <<EOF
-+#include <pty.h>
-+int main(int argc, char *argv[]) {
-+    return 0;
-+}
-+EOF
-+if compile_prog "" "" ; then
-+  pty_h=yes
-+else
-+  pty_h=no
-+fi
-+
-+cat > $TMPC <<EOF
-+#include <sys/mman.h>
-+int main(int argc, char *argv[]) {
-+    return mlockall(MCL_FUTURE);
-+}
-+EOF
-+if compile_prog "" "" ; then
-+  have_mlockall=yes
-+else
-+  have_mlockall=no
-+fi
-+
- #########################################
- # vhost interdependencies and host support
 
-@@ -7758,6 +7782,12 @@ fi
- if test "$sheepdog" = "yes" ; then
-   echo "CONFIG_SHEEPDOG=y" >> $config_host_mak
- fi
-+if test "$pty_h" = "yes" ; then
-+  echo "CONFIG_PTY=y" >> $config_host_mak
-+fi
-+if test "$have_mlockall" = "yes" ; then
-+  echo "CONFIG_MLOCKALL=y" >> $config_host_mak
-+fi
- if test "$fuzzing" = "yes" ; then
-   if test "$have_fuzzer" = "yes"; then
-     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
-diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
-index 2a9f3fe783..1d3e4c24e4 100644
---- a/include/qemu/bswap.h
-+++ b/include/qemu/bswap.h
-@@ -8,6 +8,8 @@
- # include <machine/bswap.h>
- #elif defined(__FreeBSD__)
- # include <sys/endian.h>
-+#elif defined(__HAIKU__)
-+# include <endian.h>
- #elif defined(CONFIG_BYTESWAP_H)
- # include <byteswap.h>
+----------------------
+v6:
+ - replacing calling kvm_put_vcpu_events with an actual ioctl call
+ - making the handler function static
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index ff7c17b857..da970cf654 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -388,6 +388,10 @@ void qemu_anon_ram_free(void *ptr, size_t size);
- #define HAVE_CHARDEV_PARPORT 1
- #endif
+v5:
+ - Drop syncing vcpu regs in favour of calling kvm_put_vcpu_events directly
+ - Fix decoding DFSC for LPAE case
+ - Add/clarify comments
+ - Switch to reporting error case failure when enabling the cap
 
-+#if defined(__HAIKU__)
-+#define SIGIO SIGPOLL
-+#endif
-+
- #if defined(CONFIG_LINUX)
- #ifndef BUS_MCEERR_AR
- #define BUS_MCEERR_AR 4
-diff --git a/os-posix.c b/os-posix.c
-index 3cd52e1e70..53c770d2cf 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -337,6 +337,7 @@ bool is_daemonized(void)
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
 
- int os_mlock(void)
- {
-+#if defined(CONFIG_MLOCKALL)
-     int ret = 0;
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
 
-     ret = mlockall(MCL_CURRENT | MCL_FUTURE);
-@@ -345,4 +346,7 @@ int os_mlock(void)
-     }
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
 
-     return ret;
-+#else
-+    return -ENOSYS;
-+#endif
- }
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index cc5e37177a..faebc13fac 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -39,7 +39,7 @@ util-obj-y += qsp.o
- util-obj-y += range.o
- util-obj-y += stats64.o
- util-obj-y += systemd.o
--util-obj-$(CONFIG_POSIX) += drm.o
-+util-obj-$(CONFIG_LINUX) += drm.o
- util-obj-y += guest-random.o
- util-obj-$(CONFIG_GIO) += dbus.o
- dbus.o-cflags = $(GIO_CFLAGS)
-diff --git a/util/compatfd.c b/util/compatfd.c
-index c296f55d14..ee47dd8089 100644
---- a/util/compatfd.c
-+++ b/util/compatfd.c
-@@ -16,7 +16,9 @@
- #include "qemu/osdep.h"
- #include "qemu/thread.h"
 
-+#if defined(CONFIG_SIGNALFD)
- #include <sys/syscall.h>
-+#endif
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle misconfigured dabt injection
 
- struct sigfd_compat_info
- {
-diff --git a/util/main-loop.c b/util/main-loop.c
-index eda63fe4e0..43a4bd30c1 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -85,6 +85,7 @@ static int qemu_signal_init(Error **errp)
-      * by sigwait() in the signal thread. Otherwise, the cpu thread will
-      * not catch it reliably.
-      */
-+
-     sigemptyset(&set);
-     sigaddset(&set, SIG_IPI);
-     sigaddset(&set, SIGIO);
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 39ddc77c85..fdb5907a31 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -38,7 +38,12 @@
- #include "qemu/sockets.h"
- #include "qemu/thread.h"
- #include <libgen.h>
-+#if !defined(__HAIKU__)
- #include <sys/signal.h>
-+#else
-+#include <kernel/image.h>
-+#include <signal.h>
-+#endif
- #include "qemu/cutils.h"
+ target/arm/cpu.h     |  2 ++
+ target/arm/kvm.c     | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/kvm32.c   | 34 ++++++++++++++++++++
+ target/arm/kvm64.c   | 49 +++++++++++++++++++++++++++++
+ target/arm/kvm_arm.h | 10 ++++++
+ 5 files changed, 181 insertions(+), 1 deletion(-)
 
- #ifdef CONFIG_LINUX
-@@ -390,6 +395,21 @@ void qemu_init_exec_dir(const char *argv0)
-             }
-         }
-     }
-+#elif defined(__HAIKU__)
-+    {
-+        image_info ii;
-+        int32_t c = 0;
-+
-+        *buf = '\0';
-+        while (get_next_image_info(0, &c, &ii) == B_OK) {
-+            if (ii.type == B_APP_IMAGE) {
-+                strncpy(buf, ii.name, sizeof(buf));
-+                buf[sizeof(buf) - 1] = '\0';
-+                p = buf;
-+                break;
-+            }
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
-diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
-index 2e8b43bdf5..9d8ad6905e 100644
---- a/util/qemu-openpty.c
-+++ b/util/qemu-openpty.c
-@@ -35,7 +35,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-
--#if defined(__GLIBC__)
-+#if defined CONFIG_PTY
- # include <pty.h>
- #elif defined CONFIG_BSD
- # include <termios.h>
 -- 
-2.26.0
+2.7.4
+
 
