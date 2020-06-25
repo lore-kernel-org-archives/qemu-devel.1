@@ -2,92 +2,85 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 129C3C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6490DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE4FF20775
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C67E2082F
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:05:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUbzUzmf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE4FF20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DXdVeJdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C67E2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUMn-0002eV-46
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:04:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47546)
+	id 1joUNf-0003PU-Dl
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:05:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1joUGA-0001Bg-7o
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:57:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27383
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1joUG7-0005nf-IH
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:57:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593100669;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7yHZYru1HRN3hSsXroTWy8Yr+dsJ9Xb5/fy92Lg0Uo4=;
- b=DUbzUzmfjr6MKQq3NPIHIZzr2JuWaBJXFH//mx0TZBh447L74/0SBwu8I319GC+9CPdU6t
- PqmlPkFgNqJC03W1wSRR5mgS7Ap8TdzplAVipe27JWr1/bJhWnmC4j9Ap3Ho36afVxayGA
- LUy1v1ikgR+fDQ1EmGIjAr8ocbkDKKI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-3Uf8hHlOO2aTc8B9ST51ug-1; Thu, 25 Jun 2020 11:57:45 -0400
-X-MC-Unique: 3Uf8hHlOO2aTc8B9ST51ug-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADD89800C60;
- Thu, 25 Jun 2020 15:57:44 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-16.ams2.redhat.com
- [10.36.115.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81F0A1001B07;
- Thu, 25 Jun 2020 15:57:40 +0000 (UTC)
-Subject: Re: [PATCH RFC 2/3] gitlab: build all container images during CI
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20200622153318.751107-1-berrange@redhat.com>
- <20200622153318.751107-3-berrange@redhat.com>
- <b9da6d29-0615-d96d-5fb7-ba4dc2d5f3d8@redhat.com>
- <20200625095041.GD1009994@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ad2d15bc-81ed-c7e3-092b-77dfd2da62ef@redhat.com>
-Date: Thu, 25 Jun 2020 17:57:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joTq2-0007in-Cl
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:30:56 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37846)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joTps-0001oG-12
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:30:48 -0400
+Received: by mail-oi1-x244.google.com with SMTP id a3so5328521oid.4
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 08:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Hdm/Nd7h1S6To48RIP0gmlLEp+EWkwiRjc1SbDsj7Pg=;
+ b=DXdVeJdSPF1BQEZHoKiP9HEBerfaz/7fiC4m7l8meo/XOx0qk/cYXNNRf3RXAaBFOH
+ EMFygDR1cioYesZl2mFnGfadZoWOfffQZpRg7/MkYd0s7EjVhUxFkrKRxfroi3fF4/sl
+ 5NF+uifRITt9sqmfQjVcPv94m45E2oB3bmqKCEXJvtfbVv/KyyLAvLfoEa1FCSk3sBDe
+ hDZZyvmaaDLw5kkWusAuPWQwGHPQ8F/u0TSQILabDA3kJUONnBcfz9ZVc9bFM7V9jJaA
+ iMquvDxsBDnoPr3kd1e+kSjUoKLEptqtPJl4WZnUqX8df9vhIvDjzD8s4Llt49FfDyv9
+ MenQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Hdm/Nd7h1S6To48RIP0gmlLEp+EWkwiRjc1SbDsj7Pg=;
+ b=Zd+scx3C0Cp+ttaeZIsduPVHq2sro1zp4mUMCTNIadibVLVKHrB+KZEVDweMbvGBjX
+ OweJyE4sBN1D7TGx1guSfOE0X5m+ZUsXyCuzlrBXl9GVG3QcPj/fIvUWlZM3lUM4xT9v
+ Euayczdy3G7mpl1rvBsrrr/ir3QKirA1vbqWmEz0PH/syUmNOJvIE/OR/oV29SAgCr5T
+ HJsT/sM4b3LGMBEa3Jk8dXCeEWlOeNGWX/sNZLMjukdwIWp4rGPiwy3lvcVVSlUiEM5t
+ IUYeFWLMzr0bQ44CsU7jgAZppFMRvmivfHok1iSFXcjpKzTZJZkV07pHR196TvDKHQ17
+ tlpg==
+X-Gm-Message-State: AOAM532MjZq4xI51xkuGWNcs4kQDT3wm8GR1hbxGxDIhviQunqlfLLPg
+ 7+eqkF+cgBNpGlTidW4rwUFcJ9TBXAIbZfI+Q0qLkg==
+X-Google-Smtp-Source: ABdhPJxWjpYDRDVGMXNkLq3WryuNn2/9KciN4wzsXsiBb6ZLj5exSLq754WKnKu3jJIpx0yYUCLXzNm1Y4HCka2YidI=
+X-Received: by 2002:aca:568c:: with SMTP id k134mr2516852oib.48.1593099041976; 
+ Thu, 25 Jun 2020 08:30:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200625095041.GD1009994@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200611161500.23580-1-eric.auger@redhat.com>
+ <20200611161500.23580-7-eric.auger@redhat.com>
+In-Reply-To: <20200611161500.23580-7-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jun 2020 16:30:30 +0100
+Message-ID: <CAFEAcA9FZV=jSk_9aJ_tHy=KLy+YrTFNoiqvCv7BMs0dWrHWFA@mail.gmail.com>
+Subject: Re: [PATCH RESEND 6/9] hw/arm/smmu-common: Manage IOTLB block entries
+To: Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,88 +93,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ zhangfei.gao@foxmail.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Will Deacon <will@kernel.org>, Rob Herring <robh@kernel.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/25/20 11:50, Daniel P. Berrangé wrote:
-> On Thu, Jun 25, 2020 at 11:35:54AM +0200, Thomas Huth wrote:
->> On 22/06/2020 17.33, Daniel P. Berrangé wrote:
->>> We have a number of container images in tests/docker/dockerfiles
->>> that are intended to provide well defined environments for doing
->>> test builds. We want our CI system to use these containers too.
->>>
->>> This introduces builds of all of them as the first stage in the
->>> CI, so that the built containers are available for later build
->>> jobs. The containers are setup to use the GitLab container
->>> registry as the cache, so we only pay the penalty of the full
->>> build when the dockerfiles change. The main qemu-project/qemu
->>> repo is used as a second cache, so that users forking QEMU will
->>> see a fast turnaround time on their CI jobs.
->>>
->>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
->>> ---
->>>   .gitlab-ci.d/containers.yml | 248 ++++++++++++++++++++++++++++++++++++
->>>   .gitlab-ci.yml              |   3 +
->>>   2 files changed, 251 insertions(+)
->>>   create mode 100644 .gitlab-ci.d/containers.yml
->>>
->>> diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
->>> new file mode 100644
->>> index 0000000000..ea1edbb196
->>> --- /dev/null
->>> +++ b/.gitlab-ci.d/containers.yml
->>> @@ -0,0 +1,248 @@
->>> +
->>> +
->>> +.container_job_template: &container_job_definition
->>> +  image: docker:stable
->>> +  stage: containers
->>> +  services:
->>> +    - docker:dind
->>> +  before_script:
->>> +    - export TAG="$CI_REGISTRY_IMAGE/ci-$NAME:latest"
->>> +    - export COMMON_TAG="$CI_REGISTRY/qemu-project/qemu/ci-$NAME:latest"
->>> +    - docker info
->>> +    - docker login registry.gitlab.com -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
->>
->> I can see this in the output:
->>
->> WARNING! Using --password via the CLI is insecure. Use --password-stdin.
->>
->> I have to admit that I have only little knowledge about docker ... but could
->> there be an issue here? Should this be done in a different way?
-> 
-> In general the warning is correct, because other users on the same
-> host can see the process CLI args, and thus the password is susceptible
-> to snooping.
-> 
-> In this case, however, it is a non-issue. This is running inside a docker
-> container already which has a PID namespace. Thus the only things that
-> can see our password on the CLI are things inside our own container
-> which already all have the env variable, and processes running in host
-> OS context which are only things GitLab admins control. So there's no
-> data leakage to anyone who doesn't already have access to the password
-> 
-> This particular docker login command is the documented solution:
-> 
->   https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+On Thu, 11 Jun 2020 at 17:16, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> At the moment each entry in the IOTLB corresponds to a page sized
+> mapping (4K, 16K or 64K), even if the page belongs to a mapped
+> block. In case of block mapping this unefficiently consume IOTLB
+> entries.
+>
+> Change the value of the entry so that it reflects the actual
+> mapping it belongs to (block or page start address and size).
+>
+> Also the level/tg of the entry is encoded in the key. In subsequent
+> patches we will enable range invalidation. This latter is able
+> to provide the level/tg of the entry.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-(
 
-Purely theoretically, we could use a "here string":
+> -uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
+> +uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova,
+> +                            uint8_t tg, uint8_t level)
+>  {
+> -    return iova >> 12 | (uint64_t)(asid) << SMMU_IOTLB_ASID_SHIFT;
+> +    return iova >> 12 | (uint64_t)(asid) << SMMU_IOTLB_ASID_SHIFT |
+> +           (uint64_t)(level) << SMMU_IOTLB_LEVEL_SHIFT |
+> +           (uint64_t)(tg) << SMMU_IOTLB_TG_SHIFT;
+>  }
 
-docker [...] --password-stdin <<< "$CI_REGISTRY_PASSWORD"
+>  SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+> -                                 hwaddr iova)
+> +                                SMMUTransTableInfo *tt, hwaddr iova)
+>  {
+> -    uint64_t key = smmu_get_iotlb_key(cfg->asid, iova);
+> -    SMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
+> +    uint8_t tg = (tt->granule_sz - 10) / 2;
+> +    int level = tt->starting_level;
+> +    SMMUTLBEntry *entry = NULL;
+> +
+> +    while (level <= 3) {
+> +        uint64_t subpage_size = 1ULL << level_shift(level, tt->granule_sz);
+> +        uint64_t mask = subpage_size - 1;
+> +        uint64_t key;
+> +
+> +        key = smmu_get_iotlb_key(cfg->asid, iova & ~mask, tg, level);
+> +        entry = g_hash_table_lookup(bs->iotlb, &key);
+> +        if (entry) {
+> +            break;
+> +        }
+> +        level++;
 
-The password is then not exposed on any process's command line; it's a
-(bash) shell redirection. (It's not in POSIX.)
+Rather than looping around doing multiple hash table lookups like
+this, why not just avoid including the tg and level in the
+key equality test?
 
-)
+If I understand the range-based-invalidation feature correctly,
+the only time we care about the TG/LVL is if we're processing
+an invalidate-range command that specifies them. But in that
+case there should never be multiple entries in the bs->iotlb
+with the same iova, so we can just check whether the entry
+matches the requested TG/LVL once we've pulled it out of the
+hash table. (Or we could architecturally validly just blow
+it away regardless of requested TG/LVL -- they are only hints,
+not required-to-match.)
 
-Thanks
-Laszlo
-
+thanks
+-- PMM
 
