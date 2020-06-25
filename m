@@ -2,90 +2,92 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E3EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFDAC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAC6920768
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 14:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25F12207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 15:02:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8vluRn3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC6920768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="q7fSDIip"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F12207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joTLr-0008GU-1d
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 10:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
+	id 1joTOg-0001CH-9q
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 11:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1joTKp-0007O6-D9
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:58:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50284
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1joTKn-0006dH-BV
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 10:58:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593097116;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tle+TkX4DNf0GNesfJCGHU4713BXzPl+2oPXHOpjej4=;
- b=L8vluRn30Nu/i+cyPknsI+BA6yvvyMoq1f9ncd7YiX8uiB8bUvKJeGDSFJ1LYlBR5L7lkW
- +jKbauSeqoNc9l8synzTfdJ7Un/O453zv9u02BSf6WziJmphYEJPJzg4bYJu3R9KVGJ3DV
- hez74xZKhYn4MTYcgqnXU3PeYA9sC+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-X4PIV-mXM0G9f1AxQslBQQ-1; Thu, 25 Jun 2020 10:58:17 -0400
-X-MC-Unique: X4PIV-mXM0G9f1AxQslBQQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68479108BD09;
- Thu, 25 Jun 2020 14:58:15 +0000 (UTC)
-Received: from w520.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E274575550;
- Thu, 25 Jun 2020 14:57:52 +0000 (UTC)
-Date: Thu, 25 Jun 2020 08:57:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH QEMU v25 09/17] vfio: Add load state functions to
- SaveVMHandlers
-Message-ID: <20200625085752.185db479@w520.home>
-In-Reply-To: <1cb6dc9d-53b6-b978-9cb8-b4d7daaca400@nvidia.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1joTNj-0000g5-OW
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:01:39 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4640)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1joTNh-0007rw-85
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 11:01:39 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ef4bc420002>; Thu, 25 Jun 2020 08:01:22 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 25 Jun 2020 08:01:35 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 25 Jun 2020 08:01:35 -0700
+Received: from [10.40.100.228] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 25 Jun
+ 2020 15:01:16 +0000
+Subject: Re: [PATCH QEMU v25 15/17] vfio: Add ioctl to get dirty pages bitmap
+ during dma unmap.
+To: Alex Williamson <alex.williamson@redhat.com>
 References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-10-git-send-email-kwankhede@nvidia.com>
- <20200624125437.664869ce@x1.home>
- <1cb6dc9d-53b6-b978-9cb8-b4d7daaca400@nvidia.com>
+ <1592684486-18511-16-git-send-email-kwankhede@nvidia.com>
+ <20200624125614.5e742574@x1.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <8cf7ffdf-8ba4-d42d-cf8d-4af08686841a@nvidia.com>
+Date: Thu, 25 Jun 2020 20:31:12 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200624125614.5e742574@x1.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1593097282; bh=AveRosUOB9EBRLnR+jM6+lA1ALzsFCfCT1Fihe1EQSA=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=q7fSDIip0+CmP0aic2uG+GV6xPjDb7LGoRv9Su7mS+2vx42lDh6rGLxdZ3nmPr2OL
+ m/u7UCR0kK7GSIKoWCpmTcKnUm4N4u4Y4rm9ctFtV9sM/k+zPWVCvbHczEdbHLnVfS
+ dG3a5nrmYXjUoB+Mbojk0Ez+4m+eoTUYmQDKDkV34x3MZQqdbU47jnrf0khDBD6Drv
+ +asEVdWBoys8kBvyeBMUvicx2EFKx3FoHljzsJyRCdcazBMSf/lFsrS0Hr2kkl7q1h
+ E5dRdZNrf+yjakGd4N2InXINbuEfzcYPozKfoyIJsiL4OvMwa4CHhXknnDpgw1Hkqd
+ zzK1Rk4UwMaiQ==
+Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate26.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 10:34:30
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -80
+X-Spam_score: -8.1
+X-Spam_bar: --------
+X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,272 +113,185 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jun 2020 19:46:22 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 6/25/2020 12:24 AM, Alex Williamson wrote:
-> > On Sun, 21 Jun 2020 01:51:18 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> Sequence  during _RESUMING device state:
-> >> While data for this device is available, repeat below steps:
-> >> a. read data_offset from where user application should write data.
-> >> b. write data of data_size to migration region from data_offset.
-> >> c. write data_size which indicates vendor driver that data is written in
-> >>     staging buffer.
-> >>
-> >> For user, data is opaque. User should write data in the same order as
-> >> received.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> ---
-> >>   hw/vfio/migration.c  | 177 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   hw/vfio/trace-events |   3 +
-> >>   2 files changed, 180 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index ef1150c1ff02..faacea5327cb 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -302,6 +302,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
-> >>       return qemu_file_get_error(f);
-> >>   }
-> >>   
-> >> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    uint64_t data;
-> >> +
-> >> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> >> +        int ret;
-> >> +
-> >> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
-> >> +        if (ret) {
-> >> +            error_report("%s: Failed to load device config space",
-> >> +                         vbasedev->name);
-> >> +            return ret;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    data = qemu_get_be64(f);
-> >> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +        error_report("%s: Failed loading device config space, "
-> >> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
-> >> +        return -EINVAL;
-> >> +    }
-> >> +
-> >> +    trace_vfio_load_device_config_state(vbasedev->name);
-> >> +    return qemu_file_get_error(f);
-> >> +}
-> >> +
-> >>   /* ---------------------------------------------------------------------- */
-> >>   
-> >>   static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >> @@ -472,12 +499,162 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> >>       return ret;
-> >>   }
-> >>   
-> >> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret = 0;
-> >> +
-> >> +    if (migration->region.mmaps) {
-> >> +        ret = vfio_region_mmap(&migration->region);
-> >> +        if (ret) {
-> >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
-> >> +                         vbasedev->name, migration->region.nr,
-> >> +                         strerror(-ret));
-> >> +            return ret;  
-> > 
-> > 
-> > Not fatal.
-> >  
+
+On 6/25/2020 12:26 AM, Alex Williamson wrote:
+> On Sun, 21 Jun 2020 01:51:24 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> As discussed on 07/17 patch of this series, it should fall back to 
-> read/write, right?
+>> With vIOMMU, IO virtual address range can get unmapped while in pre-copy
+>> phase of migration. In that case, unmap ioctl should return pages pinned
+>> in that range and QEMU should find its correcponding guest physical
+>> addresses and report those dirty.
+>>
+>> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   hw/vfio/common.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>>   1 file changed, 81 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 0518cf228ed5..a06b8f2f66e2 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -311,11 +311,83 @@ static bool vfio_devices_are_stopped_and_saving(void)
+>>       return true;
+>>   }
+>>   
+>> +static bool vfio_devices_are_running_and_saving(void)
+>> +{
+>> +    VFIOGroup *group;
+>> +    VFIODevice *vbasedev;
+>> +
+>> +    QLIST_FOREACH(group, &vfio_group_list, next) {
+> 
+> Same as previous, I'm curious if we should instead be looking at
+> container granularity.  It especially seems to make sense here where
+> we're unmapping from a container, so iterating every device in every
+> group seems excessive.
+> 
 
-Yes, it's worth an error_report() but not a migration abort imo.
+changing it with container argument.
+
+>> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
+>> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
+>> +                (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
+>> +                continue;
+>> +            } else {
+>> +                return false;
+>> +            }
+> 
+> I'm also not sure about the polarity of this function, should it be if
+> any device is _SAVING we should report the dirty bitmap?  For example,
+> what if we have a set of paried failover NICs where we intend to unplug
+> one just prior to stopping the devices, aren't we going to lose dirtied
+> pages with this logic that they all must be running and saving?  Thanks,
+> 
+
+If migration is initiated, is device unplug allowed? Ideally it 
+shouldn't. If it is, then how QEMU handles data stream of device which 
+doesn't exist at destination?
+
+_SAVING flag is set during pre-copy and stop-and-copy phase. Here we 
+only want to track pages which are unmapped during pre-copy phase, i.e. 
+when vCPU are running. In case of VM suspend /saveVM, there is no 
+pre-copy phase, but ideally we shouldn't see unmaps when vCPUs are 
+stopped, right? But still for safer side, since we know exact phase, I 
+would prefer to check for _SAVING and _RUNNING flags.
+
 Thanks,
+Kirti
 
-Alex
 
-> >> +        }
-> >> +    }
-> >> +
-> >> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK,
-> >> +                                   VFIO_DEVICE_STATE_RESUMING);
-> >> +    if (ret) {
-> >> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
-> >> +    }
-> >> +    return ret;
-> >> +}
-> >> +
-> >> +static int vfio_load_cleanup(void *opaque)
-> >> +{
-> >> +    vfio_save_cleanup(opaque);
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret = 0;
-> >> +    uint64_t data, data_size;
-> >> +
-> >> +    data = qemu_get_be64(f);
-> >> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +
-> >> +        trace_vfio_load_state(vbasedev->name, data);
-> >> +
-> >> +        switch (data) {
-> >> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
-> >> +        {
-> >> +            ret = vfio_load_device_config_state(f, opaque);
-> >> +            if (ret) {
-> >> +                return ret;
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
-> >> +        {
-> >> +            data = qemu_get_be64(f);
-> >> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +                return ret;
-> >> +            } else {
-> >> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
-> >> +                             vbasedev->name, data);
-> >> +                return -EINVAL;  
-> > 
-> > This is essentially just a compatibility failure, right?  For instance
-> > some future version of QEMU might include additional data between these
-> > markers that we don't understand and therefore we fail the migration.
-> >   
+> Alex
 > 
-> Yes.
+>> +        }
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>> +static int vfio_dma_unmap_bitmap(VFIOContainer *container,
+>> +                                 hwaddr iova, ram_addr_t size,
+>> +                                 IOMMUTLBEntry *iotlb)
+>> +{
+>> +    struct vfio_iommu_type1_dma_unmap *unmap;
+>> +    struct vfio_bitmap *bitmap;
+>> +    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
+>> +    int ret;
+>> +
+>> +    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
+>> +
+>> +    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
+>> +    unmap->iova = iova;
+>> +    unmap->size = size;
+>> +    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
+>> +    bitmap = (struct vfio_bitmap *)&unmap->data;
+>> +
+>> +    /*
+>> +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
+>> +     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
+>> +     * TARGET_PAGE_SIZE.
+>> +     */
+>> +
+>> +    bitmap->pgsize = TARGET_PAGE_SIZE;
+>> +    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
+>> +                   BITS_PER_BYTE;
+>> +
+>> +    if (bitmap->size > container->max_dirty_bitmap_size) {
+>> +        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
+>> +        ret = -E2BIG;
+>> +        goto unmap_exit;
+>> +    }
+>> +
+>> +    bitmap->data = g_try_malloc0(bitmap->size);
+>> +    if (!bitmap->data) {
+>> +        ret = -ENOMEM;
+>> +        goto unmap_exit;
+>> +    }
+>> +
+>> +    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
+>> +    if (!ret) {
+>> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
+>> +                iotlb->translated_addr, pages);
+>> +    } else {
+>> +        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
+>> +    }
+>> +
+>> +    g_free(bitmap->data);
+>> +unmap_exit:
+>> +    g_free(unmap);
+>> +    return ret;
+>> +}
+>> +
+>>   /*
+>>    * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
+>>    */
+>>   static int vfio_dma_unmap(VFIOContainer *container,
+>> -                          hwaddr iova, ram_addr_t size)
+>> +                          hwaddr iova, ram_addr_t size,
+>> +                          IOMMUTLBEntry *iotlb)
+>>   {
+>>       struct vfio_iommu_type1_dma_unmap unmap = {
+>>           .argsz = sizeof(unmap),
+>> @@ -324,6 +396,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
+>>           .size = size,
+>>       };
+>>   
+>> +    if (iotlb && container->dirty_pages_supported &&
+>> +        vfio_devices_are_running_and_saving()) {
+>> +        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
+>> +    }
+>> +
+>>       while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
+>>           /*
+>>            * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
+>> @@ -371,7 +448,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
+>>        * the VGA ROM space.
+>>        */
+>>       if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
+>> -        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
+>> +        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
+>>            ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
+>>           return 0;
+>>       }
+>> @@ -542,7 +619,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>>               }
+>>           }
+>>   
+>> -        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
+>> +        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
+>>           if (ret) {
+>>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+>>                            "0x%"HWADDR_PRIx") = %d (%m)",
+>> @@ -853,7 +930,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>>       }
+>>   
+>>       if (try_unmap) {
+>> -        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
+>> +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
+>>           if (ret) {
+>>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+>>                            "0x%"HWADDR_PRIx") = %d (%m)",
 > 
-> Thanks,
-> Kirti
-> 
-> Thanks,
-> > 
-> > Alex
-> >   
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
-> >> +        {
-> >> +            VFIORegion *region = &migration->region;
-> >> +            uint64_t data_offset = 0, size;
-> >> +
-> >> +            data_size = size = qemu_get_be64(f);
-> >> +            if (data_size == 0) {
-> >> +                break;
-> >> +            }
-> >> +
-> >> +            ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
-> >> +                        region->fd_offset +
-> >> +                        offsetof(struct vfio_device_migration_info,
-> >> +                        data_offset));
-> >> +            if (ret != sizeof(data_offset)) {
-> >> +                error_report("%s:Failed to get migration buffer data offset %d",
-> >> +                             vbasedev->name, ret);
-> >> +                return -EINVAL;
-> >> +            }
-> >> +
-> >> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
-> >> +                                              data_size);
-> >> +
-> >> +            while (size) {
-> >> +                void *buf = NULL;
-> >> +                uint64_t sec_size;
-> >> +                bool buffer_mmaped;
-> >> +
-> >> +                buf = get_data_section_size(region, data_offset, size,
-> >> +                                            &sec_size);
-> >> +
-> >> +                buffer_mmaped = (buf != NULL);
-> >> +
-> >> +                if (!buffer_mmaped) {
-> >> +                    buf = g_try_malloc(sec_size);
-> >> +                    if (!buf) {
-> >> +                        error_report("%s: Error allocating buffer ", __func__);
-> >> +                        return -ENOMEM;
-> >> +                    }
-> >> +                }
-> >> +
-> >> +                qemu_get_buffer(f, buf, sec_size);
-> >> +
-> >> +                if (!buffer_mmaped) {
-> >> +                    ret = pwrite(vbasedev->fd, buf, sec_size,
-> >> +                                 region->fd_offset + data_offset);
-> >> +                    g_free(buf);
-> >> +
-> >> +                    if (ret != sec_size) {
-> >> +                        error_report("%s: Failed to set migration buffer %d",
-> >> +                                vbasedev->name, ret);
-> >> +                        return -EINVAL;
-> >> +                    }
-> >> +                }
-> >> +                size -= sec_size;
-> >> +                data_offset += sec_size;
-> >> +            }
-> >> +
-> >> +            ret = pwrite(vbasedev->fd, &data_size, sizeof(data_size),
-> >> +                         region->fd_offset +
-> >> +                       offsetof(struct vfio_device_migration_info, data_size));
-> >> +            if (ret != sizeof(data_size)) {
-> >> +                error_report("%s: Failed to set migration buffer data size %d",
-> >> +                             vbasedev->name, ret);
-> >> +                return -EINVAL;
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +
-> >> +        default:
-> >> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
-> >> +            return -EINVAL;
-> >> +        }
-> >> +
-> >> +        data = qemu_get_be64(f);
-> >> +        ret = qemu_file_get_error(f);
-> >> +        if (ret) {
-> >> +            return ret;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    return ret;
-> >> +}
-> >> +
-> >>   static SaveVMHandlers savevm_vfio_handlers = {
-> >>       .save_setup = vfio_save_setup,
-> >>       .save_cleanup = vfio_save_cleanup,
-> >>       .save_live_pending = vfio_save_pending,
-> >>       .save_live_iterate = vfio_save_iterate,
-> >>       .save_live_complete_precopy = vfio_save_complete_precopy,
-> >> +    .load_setup = vfio_load_setup,
-> >> +    .load_cleanup = vfio_load_cleanup,
-> >> +    .load_state = vfio_load_state,
-> >>   };
-> >>   
-> >>   /* ---------------------------------------------------------------------- */
-> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> >> index 9a1c5e17d97f..4a4bd3ba9a2a 100644
-> >> --- a/hw/vfio/trace-events
-> >> +++ b/hw/vfio/trace-events
-> >> @@ -157,3 +157,6 @@ vfio_save_device_config_state(const char *name) " (%s)"
-> >>   vfio_save_pending(const char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible 0x%"PRIx64
-> >>   vfio_save_iterate(const char *name, int data_size) " (%s) data_size %d"
-> >>   vfio_save_complete_precopy(const char *name) " (%s)"
-> >> +vfio_load_device_config_state(const char *name) " (%s)"
-> >> +vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
-> >> +vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64  
-> >   
-> 
-
 
