@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC6AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77F0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B797206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3F6D206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 16:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZApb+5R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B797206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtsMCa1/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F6D206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joUnY-0005Tu-BI
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:32:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57336)
+	id 1joUoq-0007qo-W3
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 12:33:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUl1-0002jL-LM
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55551
+ id 1joUl2-0002kF-8B
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38085
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1joUkz-0002Tz-Pg
+ id 1joUl0-0002UA-Mq
  for qemu-devel@nongnu.org; Thu, 25 Jun 2020 12:29:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593102584;
+ s=mimecast20190719; t=1593102586;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q9U7MZpedfnTjTu3sSF+WyTG3/6YQv3VnFsF74dLz3s=;
- b=aZApb+5R1fhSIfT+HnWIH7sokPj//Q36HzOHw8vQJAqOIyfXZlUrrZdtZN4THKollMd3QE
- 1a1BkliyveUX7HcnXFNvfXlydflFwoZvxp1M4K2N4slRXprhUQykmd8Sgg8ycXZYCn1xPZ
- lO4h114pa4yvzJy/SjkuRU96rLaJHP8=
+ bh=9ayP1mCWFsPpODHDVmnJ8Vsl+6aR2uTSK1foOO3oEjo=;
+ b=EtsMCa1/3qi0ZV4TRuqA53JIU6H6OqEphkAKCObB8es5HpRpSfJYKFYMO9Z8PWCN51JX2P
+ UfIOjPD08IlpXWCts1mru14Zgt12uDnvD09IShefYaaaaTinNY9YsrtqS/fi7i5M5qguxF
+ aSV3+5ZLQ1Jkq4MMczBzOcNOmBRTcEQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-O0udD3FNO3-Bc5L49pYJlw-1; Thu, 25 Jun 2020 12:29:42 -0400
-X-MC-Unique: O0udD3FNO3-Bc5L49pYJlw-1
+ us-mta-375-2Us3fmHPOVanKMugvYThCw-1; Thu, 25 Jun 2020 12:29:41 -0400
+X-MC-Unique: 2Us3fmHPOVanKMugvYThCw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E47DF107ACCA
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:29:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0674107ACCD
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 16:29:40 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-254.ams2.redhat.com
  [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9E0CA09BF;
- Thu, 25 Jun 2020 16:29:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A542BD01E7;
+ Thu, 25 Jun 2020 16:29:39 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, virtio-fs@redhat.com, stefanha@redhat.com,
  vgoyal@redhat.com
-Subject: [PATCH 3/3] virtiofsd: Allow addition or removal of capabilities
-Date: Thu, 25 Jun 2020 17:29:29 +0100
-Message-Id: <20200625162929.46672-4-dgilbert@redhat.com>
+Subject: [PATCH 2/3] virtiofsd: Check capability calls
+Date: Thu, 25 Jun 2020 17:29:28 +0100
+Message-Id: <20200625162929.46672-3-dgilbert@redhat.com>
 In-Reply-To: <20200625162929.46672-1-dgilbert@redhat.com>
 References: <20200625162929.46672-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -102,148 +102,50 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Allow capabilities to be added or removed from the allowed set for the
-daemon; e.g.
-
-default:
-CapPrm: 00000000880000df
-CapEff: 00000000880000df
-
--o modcaps=+sys_admin
-
-CapPrm: 00000000882000df
-CapEff: 00000000882000df
-
--o modcaps=+sys_admin:-chown
-
-CapPrm: 00000000882000de
-CapEff: 00000000882000de
+Check the capability calls worked.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/tools/virtiofsd.rst         |  5 ++++
- tools/virtiofsd/helper.c         |  2 ++
- tools/virtiofsd/passthrough_ll.c | 50 ++++++++++++++++++++++++++++++--
- 3 files changed, 55 insertions(+), 2 deletions(-)
+ tools/virtiofsd/passthrough_ll.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-index 378594c422..824e713491 100644
---- a/docs/tools/virtiofsd.rst
-+++ b/docs/tools/virtiofsd.rst
-@@ -54,6 +54,11 @@ Options
-   * flock|no_flock -
-     Enable/disable flock.  The default is ``no_flock``.
- 
-+  * modcaps=CAPLIST
-+    Modify the list of capabilities allowed; CAPLIST is a colon separated
-+    list of capabilities, each preceded by either + or -, e.g.
-+    ''+sys_admin:-chown''.
-+
-   * log_level=LEVEL -
-     Print only log messages matching LEVEL or more severe.  LEVEL is one of
-     ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index 00a1ef666a..3105b6c23a 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -174,6 +174,8 @@ void fuse_cmdline_help(void)
-            "                               default: no_writeback\n"
-            "    -o xattr|no_xattr          enable/disable xattr\n"
-            "                               default: no_xattr\n"
-+           "    -o modcaps=CAPLIST         Modify the list of capabilities\n"
-+           "                               e.g. -o modcaps=+sys_admin:-chown\n"
-            "    --rlimit-nofile=<num>      set maximum number of file descriptors\n"
-            "                               (0 leaves rlimit unchanged)\n"
-            "                               default: min(1000000, fs.file-max - 16384)\n"
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 99d562046a..9d2cbc70ca 100644
+index e373e3b36e..99d562046a 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -145,6 +145,7 @@ struct lo_data {
-     int posix_lock;
-     int xattr;
-     char *source;
-+    char *modcaps;
-     double timeout;
-     int cache;
-     int timeout_set;
-@@ -170,6 +171,7 @@ static const struct fuse_opt lo_opts[] = {
-     { "no_posix_lock", offsetof(struct lo_data, posix_lock), 0 },
-     { "xattr", offsetof(struct lo_data, xattr), 1 },
-     { "no_xattr", offsetof(struct lo_data, xattr), 0 },
-+    { "modcaps=%s", offsetof(struct lo_data, modcaps), 0 },
-     { "timeout=%lf", offsetof(struct lo_data, timeout), 0 },
-     { "timeout=", offsetof(struct lo_data, timeout_set), 1 },
-     { "cache=none", offsetof(struct lo_data, cache), CACHE_NONE },
-@@ -2571,7 +2573,7 @@ static void setup_mounts(const char *source)
- /*
-  * Only keep whitelisted capabilities that are needed for file system operation
-  */
--static void setup_capabilities(void)
-+static void setup_capabilities(struct lo_data *lo)
- {
-     pthread_mutex_lock(&cap.mutex);
-     capng_restore_state(&cap.saved);
-@@ -2604,6 +2606,50 @@ static void setup_capabilities(void)
-         exit(1);
-     }
- 
-+    /*
-+     * The modcaps option is a colon separated list of caps,
-+     * each preceded by either + or -.
-+     */
-+    while (lo->modcaps) {
-+        capng_act_t action;
-+        int cap;
-+
-+        char *next = strchr(lo->modcaps, ':');
-+        if (next) {
-+            *next = '\0';
-+            next++;
-+        }
-+
-+        switch (lo->modcaps[0]) {
-+        case '+':
-+            action = CAPNG_ADD;
-+            break;
-+
-+        case '-':
-+            action = CAPNG_DROP;
-+            break;
-+
-+        default:
-+            fuse_log(FUSE_LOG_ERR,
-+                     "%s: Expecting '+'/'-' in modcaps but found '%c'\n",
-+                     __func__, lo->modcaps[0]);
-+            exit(1);
-+        }
-+        cap = capng_name_to_capability(lo->modcaps + 1);
-+        if (cap < 0) {
-+            fuse_log(FUSE_LOG_ERR, "%s: Unknown capability '%s'\n", __func__,
-+                     lo->modcaps);
-+            exit(1);
-+        }
-+        if (capng_update(action, CAPNG_PERMITTED | CAPNG_EFFECTIVE, cap)) {
-+            fuse_log(FUSE_LOG_ERR, "%s: capng_update failed for '%s'\n",
-+                     __func__, lo->modcaps);
-+            exit(1);
-+        }
-+
-+        lo->modcaps = next;
+@@ -2589,7 +2589,7 @@ static void setup_capabilities(void)
+      */
+     capng_setpid(syscall(SYS_gettid));
+     capng_clear(CAPNG_SELECT_BOTH);
+-    capng_updatev(CAPNG_ADD, CAPNG_PERMITTED | CAPNG_EFFECTIVE,
++    if (capng_updatev(CAPNG_ADD, CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+             CAP_CHOWN,
+             CAP_DAC_OVERRIDE,
+             CAP_DAC_READ_SEARCH,
+@@ -2599,11 +2599,21 @@ static void setup_capabilities(void)
+             CAP_SETUID,
+             CAP_MKNOD,
+             CAP_SETFCAP,
+-            -1);
++            -1)) {
++        fuse_log(FUSE_LOG_ERR, "%s: capng_updatev failed\n", __func__);
++        exit(1);
 +    }
-+
-     if (capng_apply(CAPNG_SELECT_BOTH)) {
-         fuse_log(FUSE_LOG_ERR, "%s: capng_apply failed\n", __func__);
-         exit(1);
-@@ -2627,7 +2673,7 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
-     setup_namespaces(lo, se);
-     setup_mounts(lo->source);
-     setup_seccomp(enable_syslog);
--    setup_capabilities();
-+    setup_capabilities(lo);
+ 
+-    capng_apply(CAPNG_SELECT_BOTH);
++    if (capng_apply(CAPNG_SELECT_BOTH)) {
++        fuse_log(FUSE_LOG_ERR, "%s: capng_apply failed\n", __func__);
++        exit(1);
++    }
+ 
+     cap.saved = capng_save_state();
++    if (!cap.saved) {
++        fuse_log(FUSE_LOG_ERR, "%s: capng_save_state failed\n", __func__);
++        exit(1);
++    }
+     pthread_mutex_unlock(&cap.mutex);
  }
  
- /* Set the maximum number of open file descriptors */
 -- 
 2.26.2
 
