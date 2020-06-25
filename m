@@ -2,96 +2,90 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC4BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0F0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:58:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC8BE20707
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 151332076E
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 17:58:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pd6EMUlE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC8BE20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sb58HKBM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 151332076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joW4M-0007dR-O2
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 13:53:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53776)
+	id 1joW8T-0001yp-CB
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 13:58:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joW3V-00077D-P5
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:52:57 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39425)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joW3T-0003gu-OP
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:52:57 -0400
-Received: by mail-pf1-x441.google.com with SMTP id d66so3366688pfd.6
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 10:52:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7d8lpNyJAczEDB+ASs4mSRPCaqTqmMeH0HiqSGcYvkA=;
- b=pd6EMUlEncAamgvRJ+GcHaRhkQAhh+Ju+EkW2ZW1OMjxSa2iVVF8heT3FGbqxNM2XI
- 9eyPgKiAZFQImtsPFVAF+77HN/X/se5eDqHqyT6ECqDbfN1P19+wBC2AFlwNhIWKp1y1
- jT8+tSO9H3aDDATAEIlRgvRTiq8IXe8LFcStij5qGNSbykthZiL5nOrc/cd9U5uGQB7q
- U1VVFSFRjC5VwtklEWA4RhjdVev/mL48QkNX76LZnhVdi2WsN8oQUG8yeY7LzwiHsabF
- o4HU1LHwO9bXyLG9bVvHBDMEx8Nh55nxJMZh+QUJrjF/529Si9LRrbnLPdYWxcfDSNPu
- kPiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7d8lpNyJAczEDB+ASs4mSRPCaqTqmMeH0HiqSGcYvkA=;
- b=ii3cykodCbrB3jnokDaMOq/KIED4l23LsNXKRTZh64jCMRn64MS7nqPA9QNt+ukt+1
- zC/6Nzh1kkz6i/Mw97y+6/Ymch0zxM0UZnmoe5RZ+m/OtTrE/oNP01+CA4Zc5PEZCYgY
- Co7hoObilwLgWLGmk33T64gRrRyVOL3kXQpxVE8WEWoW1JNYkcQW/aJHm2xr2J/npXwy
- Xk1twcnqA8vKi3LVFvkdG84Mq8Jl7TByRoSpZRPaLJa4hNSa6PMYwXPorq6VUs7XEQ3C
- kuUxYG+pSMC4lWJjXYpXCIAvqZqeqLzdc7Lw1NQjZX+GQrLUlKas5H45jP5pksLBAw/f
- BeXA==
-X-Gm-Message-State: AOAM530JoTtaByv6ZbLqnhpPz4BEUG221nEpOQuqBmljr68tvDtT+Jgo
- TYJBipcBx5knIhV+FODoApem6w==
-X-Google-Smtp-Source: ABdhPJx/vBJv6rYyXZH377UJ/OEpH3A75WXw2v3pceNBnvNg9Fxwt7xHS0uEkeUQ72U5wQcrbC852w==
-X-Received: by 2002:a63:dd09:: with SMTP id t9mr2177877pgg.41.1593107574066;
- Thu, 25 Jun 2020 10:52:54 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a29sm23492595pfg.201.2020.06.25.10.52.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 10:52:53 -0700 (PDT)
-Subject: Re: [PATCH v3 3/8] target/ppc: convert vmuluwm to tcg_gen_gvec_mul
-To: Lijun Pan <ljp@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-References: <20200625170018.64265-1-ljp@linux.ibm.com>
- <20200625170018.64265-4-ljp@linux.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f4fdedcf-987e-b72b-6bb5-8056f858fc6e@linaro.org>
-Date: Thu, 25 Jun 2020 10:52:50 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joW7s-0001Yg-9R
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:57:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59309
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1joW7p-0006C3-5M
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 13:57:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593107843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Yn37wFe4sKlcqp6lW6OTGfPoZpss+Ok+L+NEc5ZsVxU=;
+ b=Sb58HKBMzjsHP2msJw8Gu/bKDhHkWxU/oScNEl7aGcUa+IPrP/YB+J6wNonY42IwAd1XhY
+ nHRGcDrqTrYx32D9Ct1EfIPJpwagSdjgXWFGTRAbuhD/uKHKRaiKqEgSk9R3Wy4vroq1k2
+ xIfIF8GBJCedEIPT1KGIufxMqsmVwaA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-t5n6xU1HO2Ofnr5FaEOSWw-1; Thu, 25 Jun 2020 13:57:19 -0400
+X-MC-Unique: t5n6xU1HO2Ofnr5FaEOSWw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 446E518585A3;
+ Thu, 25 Jun 2020 17:57:17 +0000 (UTC)
+Received: from x1.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF2AC5DA27;
+ Thu, 25 Jun 2020 17:57:12 +0000 (UTC)
+Date: Thu, 25 Jun 2020 11:57:12 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH QEMU v25 14/17] vfio: Add vfio_listener_log_sync to mark
+ dirty pages
+Message-ID: <20200625115712.630a592f@x1.home>
+In-Reply-To: <33d35c69-437a-b7b8-821f-6356d559e2ef@nvidia.com>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-15-git-send-email-kwankhede@nvidia.com>
+ <20200624125537.649527b3@x1.home>
+ <33d35c69-437a-b7b8-821f-6356d559e2ef@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200625170018.64265-4-ljp@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,26 +98,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@gibson.dropbear.id.au
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 10:00 AM, Lijun Pan wrote:
-> Convert the original implementation of vmuluwm to the more generic
-> tcg_gen_gvec_mul.
+On Thu, 25 Jun 2020 20:13:39 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> On 6/25/2020 12:25 AM, Alex Williamson wrote:
+> > On Sun, 21 Jun 2020 01:51:23 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> vfio_listener_log_sync gets list of dirty pages from container using
+> >> VFIO_IOMMU_GET_DIRTY_BITMAP ioctl and mark those pages dirty when all
+> >> devices are stopped and saving state.
+> >> Return early for the RAM block section of mapped MMIO region.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>   hw/vfio/common.c     | 130 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>   hw/vfio/trace-events |   1 +
+> >>   2 files changed, 131 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> >> index 6921a78e9ba5..0518cf228ed5 100644
+> >> --- a/hw/vfio/common.c
+> >> +++ b/hw/vfio/common.c
+> >> @@ -29,6 +29,7 @@
+> >>   #include "hw/vfio/vfio.h"
+> >>   #include "exec/address-spaces.h"
+> >>   #include "exec/memory.h"
+> >> +#include "exec/ram_addr.h"
+> >>   #include "hw/hw.h"
+> >>   #include "qemu/error-report.h"
+> >>   #include "qemu/main-loop.h"
+> >> @@ -38,6 +39,7 @@
+> >>   #include "sysemu/reset.h"
+> >>   #include "trace.h"
+> >>   #include "qapi/error.h"
+> >> +#include "migration/migration.h"
+> >>   
+> >>   VFIOGroupList vfio_group_list =
+> >>       QLIST_HEAD_INITIALIZER(vfio_group_list);
+> >> @@ -288,6 +290,28 @@ const MemoryRegionOps vfio_region_ops = {
+> >>   };
+> >>   
+> >>   /*
+> >> + * Device state interfaces
+> >> + */
+> >> +
+> >> +static bool vfio_devices_are_stopped_and_saving(void)
+> >> +{
+> >> +    VFIOGroup *group;
+> >> +    VFIODevice *vbasedev;
+> >> +
+> >> +    QLIST_FOREACH(group, &vfio_group_list, next) {  
+> > 
+> > Should this be passed the container in order to iterate
+> > container->group_list?
+> >   
+> >> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> >> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
+> >> +                !(vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
+> >> +                continue;
+> >> +            } else {
+> >> +                return false;
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +    return true;
+> >> +}
+> >> +
+> >> +/*
+> >>    * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
+> >>    */
+> >>   static int vfio_dma_unmap(VFIOContainer *container,
+> >> @@ -852,9 +876,115 @@ static void vfio_listener_region_del(MemoryListener *listener,
+> >>       }
+> >>   }
+> >>   
+> >> +static int vfio_get_dirty_bitmap(VFIOContainer *container, uint64_t iova,
+> >> +                                 uint64_t size, ram_addr_t ram_addr)
+> >> +{
+> >> +    struct vfio_iommu_type1_dirty_bitmap *dbitmap;
+> >> +    struct vfio_iommu_type1_dirty_bitmap_get *range;
+> >> +    uint64_t pages;
+> >> +    int ret;
+> >> +
+> >> +    dbitmap = g_malloc0(sizeof(*dbitmap) + sizeof(*range));
+> >> +
+> >> +    dbitmap->argsz = sizeof(*dbitmap) + sizeof(*range);
+> >> +    dbitmap->flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> >> +    range = (struct vfio_iommu_type1_dirty_bitmap_get *)&dbitmap->data;
+> >> +    range->iova = iova;
+> >> +    range->size = size;
+> >> +
+> >> +    /*
+> >> +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
+> >> +     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap's pgsize to
+> >> +     * TARGET_PAGE_SIZE.
+> >> +     */
+> >> +    range->bitmap.pgsize = TARGET_PAGE_SIZE;
+> >> +
+> >> +    pages = TARGET_PAGE_ALIGN(range->size) >> TARGET_PAGE_BITS;
+> >> +    range->bitmap.size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
+> >> +                                         BITS_PER_BYTE;
+> >> +    range->bitmap.data = g_try_malloc0(range->bitmap.size);
+> >> +    if (!range->bitmap.data) {
+> >> +        ret = -ENOMEM;
+> >> +        goto err_out;
+> >> +    }
+> >> +
+> >> +    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, dbitmap);
+> >> +    if (ret) {
+> >> +        error_report("Failed to get dirty bitmap for iova: 0x%llx "
+> >> +                "size: 0x%llx err: %d",
+> >> +                range->iova, range->size, errno);
+> >> +        goto err_out;
+> >> +    }
+> >> +
+> >> +    cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range->bitmap.data,
+> >> +                                            ram_addr, pages);
+> >> +
+> >> +    trace_vfio_get_dirty_bitmap(container->fd, range->iova, range->size,
+> >> +                                range->bitmap.size, ram_addr);
+> >> +err_out:
+> >> +    g_free(range->bitmap.data);
+> >> +    g_free(dbitmap);
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static int vfio_sync_dirty_bitmap(MemoryListener *listener,
+> >> +                                 MemoryRegionSection *section)
+> >> +{
+> >> +    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
+> >> +    VFIOGuestIOMMU *giommu = NULL;
+> >> +    ram_addr_t ram_addr;
+> >> +    uint64_t iova, size;
+> >> +    int ret = 0;
+> >> +
+> >> +    if (memory_region_is_iommu(section->mr)) {
+> >> +
+> >> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> >> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
+> >> +                giommu->n.start == section->offset_within_region) {
+> >> +                VFIOIovaRange *iova_range;
+> >> +
+> >> +                QLIST_FOREACH(iova_range, &giommu->iova_list, next) {
+> >> +                    ret = vfio_get_dirty_bitmap(container, iova_range->iova,
+> >> +                                        iova_range->size, iova_range->ram_addr);
+> >> +                    if (ret) {
+> >> +                        break;
+> >> +                    }
+> >> +                }
+> >> +                break;
+> >> +            }
+> >> +        }
+> >> +
+> >> +    } else {
+> >> +        iova = TARGET_PAGE_ALIGN(section->offset_within_address_space);
+> >> +        size = int128_get64(section->size);
+> >> +
+> >> +        ram_addr = memory_region_get_ram_addr(section->mr) +
+> >> +                   section->offset_within_region + iova -
+> >> +                   TARGET_PAGE_ALIGN(section->offset_within_address_space);
+> >> +
+> >> +        ret = vfio_get_dirty_bitmap(container, iova, size, ram_addr);
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >> +static void vfio_listerner_log_sync(MemoryListener *listener,
+> >> +        MemoryRegionSection *section)
+> >> +{
+> >> +    if (vfio_listener_skipped_section(section)) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (vfio_devices_are_stopped_and_saving()) {
+> >> +        vfio_sync_dirty_bitmap(listener, section);
+> >> +    }  
+> > 
+> > 
+> > How do we decide that this is the best policy for all devices?  For
+> > example if a device does not support page pinning or some future means
+> > of marking dirtied pages, this is clearly the right choice, but when
+> > these are supported, aren't we deferring all dirty logging info until
+> > the final stage?  Thanks,
+> >   
 > 
-> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-> ---
-> v3: newly introduced.
-> 
->  target/ppc/helper.h                 |  1 -
->  target/ppc/int_helper.c             | 13 -------------
->  target/ppc/translate/vmx-impl.inc.c |  2 +-
->  3 files changed, 1 insertion(+), 15 deletions(-)
+> Yes, for now we are deferring all dirty logging to stop-and-copy phase. 
+> In future, whenever hardware support for dirty page tracking get added, 
+> we will have flag added in migration capability in VFIO_IOMMU_GET_INFO 
+> capability list. Based on that we can decide to get dirty pages in 
+> earlier phase of migration.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+So the flag that you're expecting to add would indicate that the IOMMU
+is reporting actual page dirtying, not just assuming pinned pages are
+dirty, as we have now.  It's too bad we can't collect the
+previously-but-not-currently-pinned pages during the iterative phase.
+Thanks,
 
+Alex
 
-r~
 
