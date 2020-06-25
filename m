@@ -2,71 +2,81 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D30C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE09C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:31:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9071204EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:23:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9071204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 921D020781
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 21:31:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4iyBakk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921D020781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joZL7-0001JK-7p
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 17:23:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50680)
+	id 1joZTL-0003iY-O2
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 17:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1joZKP-0000gU-7l; Thu, 25 Jun 2020 17:22:37 -0400
-Resent-Date: Thu, 25 Jun 2020 17:22:37 -0400
-Resent-Message-Id: <E1joZKP-0000gU-7l@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21310)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1joZKM-0003Fm-KU; Thu, 25 Jun 2020 17:22:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593120146; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=b0nnHNge/WQvmk8+9MeQ4NbgjuYu9/TTLaWdFGCb3GZ4bV+OTh0nPK5v5ZC/N9foTmM6s6YHtJFUKf/M3Tvif4IhWMzsrtW0QtjQaFg0iBzftFM1jZRnha5FiZKS2/MLW2tDvJ5QkpUW8cHlx53wR9qyV8uwHnf2YjV5I4tbPu4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593120146;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6qoZIOOitOJl56z84ZVbSBxC3QoL3PX2x8VkX7NACj4=; 
- b=eODfYOouinePP2hxZ+wWVhCvUTuLBVDXpSsTBWaJpUM0YKeCoaUDQBJ//ER/7+XZYRettKT/EPGCsLwbwsa7WcdEwoAq3KLqqsGIcrLfexooXjGxZGxQW/+ry6Po9vBskzbBoNoryL3v9UsoxGrVHg+5A3LKNQtLGE18sWckvAo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593120144657693.9685306877296;
- Thu, 25 Jun 2020 14:22:24 -0700 (PDT)
-Message-ID: <159312014357.25974.16788442518938857222@d1fd068a5071>
-Subject: Re: [PATCH v2] build: Haiku build fix
-In-Reply-To: <CA+XhMqy_bAnWm3cByobn+4LkVoAEZk3DU2=kWBcdB4m1b2Cd0g@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1joZSG-00039K-3q; Thu, 25 Jun 2020 17:30:44 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36362)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1joZSE-0006H2-5Z; Thu, 25 Jun 2020 17:30:43 -0400
+Received: by mail-ej1-x642.google.com with SMTP id dr13so7403472ejc.3;
+ Thu, 25 Jun 2020 14:30:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=+ZFbEwlAIA6kBj7wm15rN7EemhHUgfzi3rT9PcF5DCg=;
+ b=p4iyBakknJ8mFgY/Ll1bIVzq/MUfNiHvCzNjiROdgNTPE1n/xgeLutqW15JuriQDdi
+ MMPrg5B190UkyC6y7PfN7PP+3ekagcilwTkFBsa4PZfX06m0WW0EgdklYBAejlsa+MAb
+ QTfwlFSOwvZNgG8o8spvDxwl/gBr1IAF/FB5sAI2QadHLtOShBPLbTs+/N5wnyDbPiRk
+ 2N8nsk2w8q3Mwv6SBnx5KZ6E1/BiCBDbIwO0XECp6YMGGsiOf3XJxlWjQOznZOJPrMbZ
+ T3maI9LwxeMy8uwFugOeRi1imlgpeQlG4H5gW8RQ8TaLqx17BMdyJF7j/P7Zh9cvF1pk
+ lxFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=+ZFbEwlAIA6kBj7wm15rN7EemhHUgfzi3rT9PcF5DCg=;
+ b=ofTl28WG9Pd6/LX/4K0rHX6rixfn2ijI7KXw/EDtCOmccqTHs80a4MQcEhAivyHdKh
+ T0nWRB+ssPpinNAB6XpCxRn/qTBT8gqEhxVcoj4Jcvor2NXROMgL0TsLtIEn/gE9BA83
+ alN2x5wd/ouANnCGOaBlNPeej632fkvOIUkk/yK+4CJ8zUoWLqgTaOeSf/4qAlsnDy/q
+ xuQsxX770XhDp3VFBO/IIReG7shA3e4ghZfUmqb2YvjSdIDBa3t5FbtH7me8+r0+44nd
+ H0unw5FZYQQHLQy+ceycKpgiH+/ePtSi7BwUobjhM+kpoQRpH8Wc+qp6MaywrS7F4KDf
+ yurQ==
+X-Gm-Message-State: AOAM530abuJ/XrF+exYKPm0fRIFqJ14cp4N4I4dFw8+UF3uxTQzyzRLL
+ mKFr5kxYsFXMt0sAGrkkaT0zcnGAUFlzrM2LzHJ1ifyE0AM=
+X-Google-Smtp-Source: ABdhPJw2EAJDy5hCEofFKQhATr49I3fiLE9SJTM3pB7vIXcILWkWiUoZtQga0nbdq/5/uwyYHalHS4KsIEAsBpEeTuQ=
+X-Received: by 2002:a17:906:a156:: with SMTP id
+ bu22mr139948ejb.322.1593120639888; 
+ Thu, 25 Jun 2020 14:30:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: devnexen@gmail.com
-Date: Thu, 25 Jun 2020 14:22:24 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 17:22:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+From: David CARLIER <devnexen@gmail.com>
+Date: Thu, 25 Jun 2020 22:30:29 +0100
+Message-ID: <CA+XhMqzX=OaRgxQbHKU82K2WhTBwL44sr+wpGKSjZWqaehLyJQ@mail.gmail.com>
+Subject: [PATCH v3] build: Haiku build fix
+To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=devnexen@gmail.com; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,44 +89,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9DQStYaE1xeV9iQW5XbTNjQnlv
-Ym4rNExrVm9BRVprM0RVMj1rV0JjZEI0bTFiMkNkMGdAbWFpbC5nbWFpbC5jb20vCgoKCkhpLAoK
-VGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2Vl
-IG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2Ml0g
-YnVpbGQ6IEhhaWt1IGJ1aWxkIGZpeApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogQ0ErWGhNcXlf
-YkFuV20zY0J5b2JuKzRMa1ZvQUVaazNEVTI9a1dCY2RCNG0xYjJDZDBnQG1haWwuZ21haWwuY29t
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
-ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgYmVhZmFiOC4uNjNkMjExOSAgbWFzdGVyICAg
-ICAtPiBtYXN0ZXIKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy9DQStYaE1xeV9iQW5XbTNjQnlvYm4rNExrVm9B
-RVprM0RVMj1rV0JjZEI0bTFiMkNkMGdAbWFpbC5nbWFpbC5jb20gLT4gcGF0Y2hldy9DQStYaE1x
-eV9iQW5XbTNjQnlvYm4rNExrVm9BRVprM0RVMj1rV0JjZEI0bTFiMkNkMGdAbWFpbC5nbWFpbC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2NWFjOTNhIGJ1aWxkOiBIYWlrdSBi
-dWlsZCBmaXgKCj09PSBPVVRQVVQgQkVHSU4gPT09CldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVj
-aWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM5ODogRklMRTogaW5jbHVkZS9xZW11L29z
-ZGVwLmg6MzkxOgorI2lmIGRlZmluZWQoX19IQUlLVV9fKQoKRVJST1I6IHJldHVybiBvZiBhbiBl
-cnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FTk9TWVMpCiMxMjI6IEZJTEU6
-IG9zLXBvc2l4LmM6MzUwOgorICAgIHJldHVybiBFTk9TWVM7CgpXQVJOSU5HOiBhcmNoaXRlY3R1
-cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTcyOiBGSUxFOiB1dGlsL29z
-bGliLXBvc2l4LmM6NDE6CisjaWYgIWRlZmluZWQoX19IQUlLVV9fKQoKdG90YWw6IDEgZXJyb3Jz
-LCAyIHdhcm5pbmdzLCAxNDkgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDY1YWM5M2E2YmZlMiAoYnVp
-bGQ6IEhhaWt1IGJ1aWxkIGZpeCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvQ0ErWGhNcXlfYkFuV20z
-Y0J5b2JuKzRMa1ZvQUVaazNEVTI9a1dCY2RCNG0xYjJDZDBnQG1haWwuZ21haWwuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+From 78706a28c6aa8b5e522b5781588b38961d79d6f6 Mon Sep 17 00:00:00 2001
+From: David Carlier <devnexen@gmail.com>
+Date: Thu, 25 Jun 2020 19:32:42 +0000
+Subject: [PATCH] build: haiku system build fix
+
+Most of missing features resides in the bsd library.
+Also defining constant equivalence.
+
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ configure            | 34 ++++++++++++++++++++++++++++++++--
+ include/qemu/bswap.h |  2 ++
+ include/qemu/osdep.h |  4 ++++
+ os-posix.c           |  4 ++++
+ util/Makefile.objs   |  2 +-
+ util/compatfd.c      |  2 ++
+ util/main-loop.c     |  1 +
+ util/oslib-posix.c   | 20 ++++++++++++++++++++
+ util/qemu-openpty.c  |  2 +-
+ 9 files changed, 67 insertions(+), 4 deletions(-)
+
+diff --git a/configure b/configure
+index ba88fd1824..43baeadf31 100755
+--- a/configure
++++ b/configure
+@@ -901,8 +901,8 @@ SunOS)
+ ;;
+ Haiku)
+   haiku="yes"
+-  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
+-  LIBS="-lposix_error_mapper -lnetwork $LIBS"
++  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -D_BSD_SOURCE $QEMU_CFLAGS"
++  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
+ ;;
+ Linux)
+   audio_drv_list="try-pa oss"
+@@ -2373,6 +2373,30 @@ else
+   l2tpv3=no
+ fi
+
++cat > $TMPC <<EOF
++#include <pty.h>
++int main(int argc, char *argv[]) {
++    return 0;
++}
++EOF
++if compile_prog "" "" ; then
++  pty_h=yes
++else
++  pty_h=no
++fi
++
++cat > $TMPC <<EOF
++#include <sys/mman.h>
++int main(int argc, char *argv[]) {
++    return mlockall(MCL_FUTURE);
++}
++EOF
++if compile_prog "" "" ; then
++  have_mlockall=yes
++else
++  have_mlockall=no
++fi
++
+ #########################################
+ # vhost interdependencies and host support
+
+@@ -7758,6 +7782,12 @@ fi
+ if test "$sheepdog" = "yes" ; then
+   echo "CONFIG_SHEEPDOG=y" >> $config_host_mak
+ fi
++if test "$pty_h" = "yes" ; then
++  echo "CONFIG_PTY=y" >> $config_host_mak
++fi
++if test "$have_mlockall" = "yes" ; then
++  echo "CONFIG_MLOCKALL=y" >> $config_host_mak
++fi
+ if test "$fuzzing" = "yes" ; then
+   if test "$have_fuzzer" = "yes"; then
+     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 2a9f3fe783..1d3e4c24e4 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -8,6 +8,8 @@
+ # include <machine/bswap.h>
+ #elif defined(__FreeBSD__)
+ # include <sys/endian.h>
++#elif defined(__HAIKU__)
++# include <endian.h>
+ #elif defined(CONFIG_BYTESWAP_H)
+ # include <byteswap.h>
+
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index ff7c17b857..da970cf654 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -388,6 +388,10 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+ #define HAVE_CHARDEV_PARPORT 1
+ #endif
+
++#if defined(__HAIKU__)
++#define SIGIO SIGPOLL
++#endif
++
+ #if defined(CONFIG_LINUX)
+ #ifndef BUS_MCEERR_AR
+ #define BUS_MCEERR_AR 4
+diff --git a/os-posix.c b/os-posix.c
+index 3cd52e1e70..53c770d2cf 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -337,6 +337,7 @@ bool is_daemonized(void)
+
+ int os_mlock(void)
+ {
++#if defined(CONFIG_MLOCKALL)
+     int ret = 0;
+
+     ret = mlockall(MCL_CURRENT | MCL_FUTURE);
+@@ -345,4 +346,7 @@ int os_mlock(void)
+     }
+
+     return ret;
++#else
++    return -ENOSYS;
++#endif
+ }
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index cc5e37177a..faebc13fac 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -39,7 +39,7 @@ util-obj-y += qsp.o
+ util-obj-y += range.o
+ util-obj-y += stats64.o
+ util-obj-y += systemd.o
+-util-obj-$(CONFIG_POSIX) += drm.o
++util-obj-$(CONFIG_LINUX) += drm.o
+ util-obj-y += guest-random.o
+ util-obj-$(CONFIG_GIO) += dbus.o
+ dbus.o-cflags = $(GIO_CFLAGS)
+diff --git a/util/compatfd.c b/util/compatfd.c
+index c296f55d14..ee47dd8089 100644
+--- a/util/compatfd.c
++++ b/util/compatfd.c
+@@ -16,7 +16,9 @@
+ #include "qemu/osdep.h"
+ #include "qemu/thread.h"
+
++#if defined(CONFIG_SIGNALFD)
+ #include <sys/syscall.h>
++#endif
+
+ struct sigfd_compat_info
+ {
+diff --git a/util/main-loop.c b/util/main-loop.c
+index eda63fe4e0..43a4bd30c1 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -85,6 +85,7 @@ static int qemu_signal_init(Error **errp)
+      * by sigwait() in the signal thread. Otherwise, the cpu thread will
+      * not catch it reliably.
+      */
++
+     sigemptyset(&set);
+     sigaddset(&set, SIG_IPI);
+     sigaddset(&set, SIGIO);
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 39ddc77c85..fdb5907a31 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -38,7 +38,12 @@
+ #include "qemu/sockets.h"
+ #include "qemu/thread.h"
+ #include <libgen.h>
++#if !defined(__HAIKU__)
+ #include <sys/signal.h>
++#else
++#include <kernel/image.h>
++#include <signal.h>
++#endif
+ #include "qemu/cutils.h"
+
+ #ifdef CONFIG_LINUX
+@@ -390,6 +395,21 @@ void qemu_init_exec_dir(const char *argv0)
+             }
+         }
+     }
++#elif defined(__HAIKU__)
++    {
++        image_info ii;
++        int32_t c = 0;
++
++        *buf = '\0';
++        while (get_next_image_info(0, &c, &ii) == B_OK) {
++            if (ii.type == B_APP_IMAGE) {
++                strncpy(buf, ii.name, sizeof(buf));
++                buf[sizeof(buf) - 1] = '\0';
++                p = buf;
++                break;
++            }
++        }
++    }
+ #endif
+     /* If we don't have any way of figuring out the actual executable
+        location then try argv[0].  */
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..9d8ad6905e 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -35,7 +35,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+
+-#if defined(__GLIBC__)
++#if defined CONFIG_PTY
+ # include <pty.h>
+ #elif defined CONFIG_BSD
+ # include <termios.h>
+-- 
+2.26.0
 
