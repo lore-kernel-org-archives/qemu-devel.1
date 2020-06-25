@@ -2,86 +2,99 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4CCC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 08:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 08:13:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECCA92067D
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 08:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9D982067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 08:13:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IRXAHB+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECCA92067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUV3eBax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D982067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joMzk-0004zs-9A
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 04:12:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35480)
+	id 1joN0i-0006HT-5u
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 04:13:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joMz6-0004I0-Lr
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 04:11:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51195
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1joMz4-0004sz-7g
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 04:11:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593072704;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=pw2R4DLW1UyO5Jn0952A7LpZ2C0YFk/L56ot0pVvlpg=;
- b=IRXAHB+79jzN8pcmOJYwl2iKWhe58NnkMCgnE+UE6O3l98l+EYI7Qn1jedy2GsqzJ0KU+2
- soQYdpg0byK+CVk7dcLahRr0huk0e4pI1P4+kiucbdLl/wt373eH2Jd3nFURP5YkngaRRR
- Qfq5N1d0/nHLzqUH0Mvfgh0hbiIlmZY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-uSPZ3pBANkaA38qNNDwasQ-1; Thu, 25 Jun 2020 04:11:41 -0400
-X-MC-Unique: uSPZ3pBANkaA38qNNDwasQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A48571005512;
- Thu, 25 Jun 2020 08:11:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F1D6778FD9;
- Thu, 25 Jun 2020 08:11:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7CB4211384D4; Thu, 25 Jun 2020 10:11:31 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Subject: Re: [PATCH v2 3/3] usb/hcd-xhci: Split pci wrapper for xhci base model
-References: <1593008176-9629-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1593008176-9629-4-git-send-email-sai.pavan.boddu@xilinx.com>
-Date: Thu, 25 Jun 2020 10:11:31 +0200
-In-Reply-To: <1593008176-9629-4-git-send-email-sai.pavan.boddu@xilinx.com>
- (Sai Pavan Boddu's message of "Wed, 24 Jun 2020 19:46:16 +0530")
-Message-ID: <87y2obzhsc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1joMzv-0005LL-N9; Thu, 25 Jun 2020 04:12:39 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36744)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1joMzu-00050S-7d; Thu, 25 Jun 2020 04:12:39 -0400
+Received: by mail-wr1-x444.google.com with SMTP id k6so4860268wrn.3;
+ Thu, 25 Jun 2020 01:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2nrmsGqfm7tqQzXIna5sGzQu8wm/8SJKvn06MtkbL1s=;
+ b=VUV3eBaxNv0ZFjl654/ZxTDFbQt/gDmm1BLA1US7al64ZXFiT1B61I/CjM3EmZ9MxM
+ jSvf7ikUG9B+BhjaZkIjgh/TED4rhWCpYF4Pm/i5jpvnnXpcPXWNw6G1jiUmfvO40oag
+ qCpsZAZQbQgu2sRTcYZqxE1BGQ77VwPgY3T7FOAgiCs63WbvHp3VeQQxHaMXtouRVsbd
+ xK4H3ApF2KdMQ6tyWUodw3SvbUkzDeqtLcKwGpyM0Ay+rT+AmqWbS9jEuwdTPaOvApxN
+ kuwIYAzqP0AqO3YjAsI7mgv0bx4x2AMKydPu5nu92wDNyUYQ0e/rAlc6hx+XQxSScyK/
+ k7OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2nrmsGqfm7tqQzXIna5sGzQu8wm/8SJKvn06MtkbL1s=;
+ b=GyPj9DIPo7lGvqNd9WvPlFqN/3D+3yOOJs50i8FrXy7AyaLd+WcL1PdgMvedMVSdMF
+ EuM/f9PSUqKFjEAbtJLlP5NApj9z9Tb5O/9coj1l6Fc2feiqKM4+B8X4fux2efEthq0N
+ NDTXaFRdwJeMSlyMKJBVN7QHTqcnyVBYv7ibgxuy+ZiZJTQu5hz2MG/3j2cbnl/6DgT+
+ k7CDD7pQVqMEKalq29c4qEO+HQeFg1KPfaPLYIzCVD/ATQHkbSl/aA+1YXspjtIdSFTR
+ VbxHg8Rv7dnoAXQ0yFiPOMPHSey5lPsZPqxXaAeYGzdrrMZs8YaHTrMis3t/2EWspGQT
+ vNXg==
+X-Gm-Message-State: AOAM530Kotsg/KLIWtbMBYXcdyR4Z1V+z3I3+2b3gDIv/JDjSZReswen
+ 5wITSUkgGEP7/nzNZ1nGNoQ=
+X-Google-Smtp-Source: ABdhPJyhQIWU/SENaAbxirpuT16EQrWaDNJ988mzPdnGLTaOd3eMxfRK8E7LLMBZSVQWWOHH+fNILA==
+X-Received: by 2002:adf:f14c:: with SMTP id y12mr34969431wro.30.1593072756071; 
+ Thu, 25 Jun 2020 01:12:36 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id h14sm14607344wrt.36.2020.06.25.01.12.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 25 Jun 2020 01:12:35 -0700 (PDT)
+Subject: Re: [PATCH v4 4/8] hw/misc/pca9552: Add a 'description' property for
+ debugging purpose
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?=
+ <clg@kaod.org>
+References: <20200620225854.31160-1-f4bug@amsat.org>
+ <20200620225854.31160-5-f4bug@amsat.org>
+ <4d335933-9669-43e1-0966-5f0255142012@kaod.org>
+ <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
+ <deccf836-48ef-7112-d66e-a8d3cc4a9681@kaod.org>
+ <877dvv4pmg.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2d1b8b24-3b2c-d84e-8026-e369f6531247@amsat.org>
+Date: Thu, 25 Jun 2020 10:12:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+In-Reply-To: <877dvv4pmg.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,38 +108,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
- =?utf-8?Q?'Marc-Andr=C3=A9?= Lureau' <marcandre.lureau@redhat.com>,
- 'Philippe =?utf-8?Q?Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sai Pavan Boddu <sai.pavan.boddu@xilinx.com> writes:
+On 6/25/20 8:37 AM, Markus Armbruster wrote:
+> Cédric Le Goater <clg@kaod.org> writes:
+> 
+>> On 6/22/20 10:31 AM, Philippe Mathieu-Daudé wrote:
+>>> On 6/22/20 8:27 AM, Cédric Le Goater wrote:
+>>>> On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
+>>>>> Add a description field to distinguish between multiple devices.
+> 
+> Pardon my lack of imagination: how does this help you with debugging?
 
-> This patch sets the base to use xhci as sysbus model, for which pci
-> specific hooks are moved to hcd-xhci-pci.c. As a part of this requirment
-> msi/msix interrupts handling is moved under XHCIPCIState, and XHCIState
-> is  non qom object, make use of 'container_of' calls to retrive
-> XHCIPciState. Made required changes for qemu-xhci-nec.
->
-> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Ah, the patch subject is indeed incorrect, this should be:
+"... for *tracing* purpose" (I use tracing when debugging).
 
-I can't see a "sysbus model".  What I can see is
+In the next patch, we use the 'description' property:
 
-         TYPE_DEVICE
-              |
-       TYPE_PCI_DEVICE
-              |
-        TYPE_XHCI_PCI (renamed from TYPE_XHCI)
-          /       \
-TYPE_QEMU_XHCI TYPE_NEC_XHCI
++# pca9552.c
++pca9552_gpio_status(const char *description, const char *buf) "%s GPIOs
+0-15 [%s]"
 
-All but the two leaves are abstract.
+So when the machine has multiple PCA9552 and guest accesses both,
+we can distinct which one is used. For me having "pca1" / "pca0"
+is easier to follow than the address of the QOM object.
 
-Do you intend to add a "sysbus model" in a future patch?
+> 
+>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>>>
+>>>> Could it be a QOM attribute ? 
+>>>
+>>> What do you call a 'QOM attribute'?
+>>> Is it what qdev properties implement?
+>>> (in this case via DEFINE_PROP_STRING).
+>>
+>> I meant a default Object property, which would apply to all Objects. 
+> 
+> Good point.  Many devices have multiple component objects of the same
+> type.
+> 
+>> What you did is fine, so :
+>>
+>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>
+>> but, may be, a well defined child name is enough for the purpose.
+> 
+> object_get_canonical_path() returns a distinct path for each (component)
+> object.  The path components are the child property names.
+> 
+> Properties can have descriptions: object_property_set_description().
 
+TIL object_property_set_description :>
+
+Ah, there is no equivalent object_property_get_description(),
+we have to use object_get_canonical_path(). Hmm, not obvious.
+
+> 
+> Sufficient?
+
+I don't know... This seems a complex way to do something simple...
+This is already a QDEV. Having to use QOM API seems going
+backward, since we have the DEFINE_PROP_STRING() macros available
+in "hw/qdev-properties.h".
+
+Maybe I'm not seeing the advantages clearly. I'll try later.
+
+Thanks for your review,
+
+Phil.
 
