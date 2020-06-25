@@ -2,82 +2,82 @@ Return-Path: <SRS0=KdPs=AG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3808BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D1EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81665206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9126B206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jun 2020 06:25:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N1ykyiID"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81665206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbqRA38m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9126B206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joLFJ-00054s-Ou
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40160)
+	id 1joLJk-0006Jt-RX
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 02:25:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLEQ-0004dV-5a
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:19:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50335
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLJB-0005tJ-KM
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:24:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39898
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLEN-0000Gy-2n
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:19:29 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joLJ9-0002HG-C8
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 02:24:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593065965;
+ s=mimecast20190719; t=1593066261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XV/e0haN4wqQMSd3aj7LVyxrFsRsoycv4IQLEItdz7Y=;
- b=N1ykyiIDmPCj+4eh5c4qLjsfahIRWYOcdfmpU2icviC5+UOK0C7GkCQvB+tPVtoREkjuc7
- sxyh2KHTPgEPyxYrYFq6EjmXeCxbOMecob5YPotcFN4qDjUBgKk391hGcWbqxWDrOfXCOv
- 3+KnrnZNp7nidJDT3v5k6kRpEQPu6SU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-gxy02EudOXGCfoAlg8GwbQ-1; Thu, 25 Jun 2020 02:19:23 -0400
-X-MC-Unique: gxy02EudOXGCfoAlg8GwbQ-1
-Received: by mail-wm1-f70.google.com with SMTP id v24so6363409wmh.3
- for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:19:23 -0700 (PDT)
+ bh=zX8++hQ9u74GRWiOGtAXtw947B2p48C6Voabu2Gq4s8=;
+ b=IbqRA38mKhnsnkIm/wutPPchIwh3g11FN4C/QbbVjay4vHMAa+o0oMxBWHNfSb1usEhJ+C
+ t+2LmbRyJd2FyYmz+Y5oZPD/zVrc/KPOVULQZAIcxGLEbruYCqdFKRufy4JakYxZO3lV3e
+ euzITxGx5sUWAzthSycJVQYbSjYMv74=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-c8DGQOSBN-KCT4VZ8r1uOQ-1; Thu, 25 Jun 2020 02:24:18 -0400
+X-MC-Unique: c8DGQOSBN-KCT4VZ8r1uOQ-1
+Received: by mail-wr1-f70.google.com with SMTP id i12so6084870wrx.11
+ for <qemu-devel@nongnu.org>; Wed, 24 Jun 2020 23:24:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=XV/e0haN4wqQMSd3aj7LVyxrFsRsoycv4IQLEItdz7Y=;
- b=J1bCkHCW0DTBbi+u6+u73cRrM7AEnXkc8Ms/paHXa+XmVD6goVuN8NPo3mVK1nSLhE
- kQYheq4iyTAQSSHm5TwRpjd9guUWa0d2zTmEq99bwonA+4OKFrt8a5ypNfjh7/4uKQHy
- SyBiIydO9W8syDyAXDU+l9nvRDy80+ZXxA/F4u9ssZ4hoau9mICgdi445rw7llXUJiZq
- 7qGNXlaSXT3sFiDZ/vH5HGVl3qf9qKUrqTDfDwiQARdOqYpb4W4+SGC65z7ijvHC/LVM
- Zldw4RyLO3UeUCWbHpSHNt0afsbARfDSYmg6sPyyRxR2CvlI/j2ingMFt0DcuV8aGn8I
- mQMw==
-X-Gm-Message-State: AOAM531A4COGAKZJpbi035C+pz+EQlArOxPKl0KNucBtp9NW5jcObYw6
- 35tUSFSZlfqa+HQxwf6Mn+rdxvTSFEtCHqs6zobZHGfHASpGJFEs/7n9k545OGxy1DfAtc1Pe2U
- L3uwSxcCIUQdj8aw=
-X-Received: by 2002:a1c:e18a:: with SMTP id y132mr1561899wmg.27.1593065962574; 
- Wed, 24 Jun 2020 23:19:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzhBnbXKok3vSPUI7gzwdMeLDYdfoO8s60jXibuZBEHHcZ5HKrJzv3q8H5hrS+QdBOZA9YKkA==
-X-Received: by 2002:a1c:e18a:: with SMTP id y132mr1561880wmg.27.1593065962259; 
- Wed, 24 Jun 2020 23:19:22 -0700 (PDT)
+ bh=zX8++hQ9u74GRWiOGtAXtw947B2p48C6Voabu2Gq4s8=;
+ b=VHCal6/TxL4pbeVffdXqrX9HzjvS/IMMN1zWHWz0fB/azHKjIayo6ctuz8nmZkashi
+ K1clz97Mr2rZzsKkGkAsHaEdBYg+ACMkitHbxIFlVP44Qg0tHIrpsGJO54yJh6fHFXKF
+ xmjXvsSjHaK3b8lcuTbB4X6r7brA7paR5zgFqoaFPvkhJPVvd7oHBqoq8TpcxQ7ckpXV
+ Arz9ybcDXm9Cb27CkKaIR/24LuM/OUR8It95qjqJJE0c5YpTpWm4nVnHQ31d4VOG+o/b
+ msVDj4QJVKXyjLFsrQtc9oTo5fEMu5cBYfvsxMZ6x3EXyawfGg9gYAW5PDarRfEwrQ15
+ pZfg==
+X-Gm-Message-State: AOAM531W4HFCg2D0TWlzPQKhl1XLPCW5TTYgYq7ZxZjRZbgPl0y2As3e
+ YFyNf0Ft7ZRn5NpfyTiAUYS9TO+8ngyrsasHyIzERcA0A93E50ak64+YsjROgXwNn0oq+67tRIa
+ 2I548yfQuTwcx0Es=
+X-Received: by 2002:a1c:3dc3:: with SMTP id k186mr1693645wma.66.1593066257076; 
+ Wed, 24 Jun 2020 23:24:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1lERYBxNpWe1WsEwsfCvzmvDJPAQTq+hq+SeZeMHJYWnvgJjg89pwGVcIYM8NVSP6tzj9Nw==
+X-Received: by 2002:a1c:3dc3:: with SMTP id k186mr1693636wma.66.1593066256886; 
+ Wed, 24 Jun 2020 23:24:16 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id 185sm10980612wmz.22.2020.06.24.23.19.21
+ by smtp.gmail.com with ESMTPSA id g16sm25958718wrh.91.2020.06.24.23.24.15
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Jun 2020 23:19:21 -0700 (PDT)
-Subject: Re: [PATCH] net: tap: check if the file descriptor is valid before
- using it
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200624190009.300069-1-lvivier@redhat.com>
+ Wed, 24 Jun 2020 23:24:16 -0700 (PDT)
+Subject: Re: [PATCH v2 4/9] prep: add ppc-parity write method
+To: P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-5-ppandit@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,22 +102,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <b64d114d-061e-268d-cc48-1680e6188404@redhat.com>
-Date: Thu, 25 Jun 2020 08:19:20 +0200
+Message-ID: <08047620-c347-f0a6-9719-48500e9f1214@redhat.com>
+Date: Thu, 25 Jun 2020 08:24:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200624190009.300069-1-lvivier@redhat.com>
+In-Reply-To: <20200624185523.762240-5-ppandit@redhat.com>
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 01:47:53
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 00:45:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -138,139 +136,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 9:00 PM, Laurent Vivier wrote:
-> qemu_set_nonblock() checks that the file descriptor can be used and, if
-> not, crashes QEMU. An assert() is used for that. The use of assert() is
-> used to detect programming error and the coredump will allow to debug
-> the problem.
+On 6/24/20 8:55 PM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> But in the case of the tap device, this assert() can be triggered by
-> a misconfiguration by the user. At startup, it's not a real problem, but it
-> can also happen during the hot-plug of a new device, and here it's a
-> problem because we can crash a perfectly healthy system.
+> Add ppc-parity mmio write method to avoid NULL pointer dereference
+> issue.
 > 
-> For instance:
->  # ip link add link virbr0 name macvtap0 type macvtap mode bridge
->  # ip link set macvtap0 up
->  # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
->  # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
->  (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
->  (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
->  (qemu) device_del net0
->  (qemu) netdev_del hostnet0
->  (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
->  qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
->  Aborted (core dumped)
-> 
-> To avoid that, check the file descriptor is valid before passing it to qemu_set_non_block() for
-> "fd=" and "fds=" parameters.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Reported-by: Lei Sun <slei.casper@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->  include/qemu/sockets.h |  1 +
->  net/tap.c              | 13 +++++++++++++
->  util/oslib-posix.c     |  5 +++++
->  util/oslib-win32.c     |  6 ++++++
->  4 files changed, 25 insertions(+)
+>  hw/ppc/prep_systemio.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index 57cd049d6edd..5b0c2d77ddad 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -17,6 +17,7 @@ int qemu_socket(int domain, int type, int protocol);
->  int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
->  int socket_set_cork(int fd, int v);
->  int socket_set_nodelay(int fd);
-> +bool qemu_fd_is_valid(int fd);
->  void qemu_set_block(int fd);
->  void qemu_set_nonblock(int fd);
->  int socket_set_fast_reuse(int fd);
-> diff --git a/net/tap.c b/net/tap.c
-> index 6207f61f84ab..f65966aaccd8 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -795,6 +795,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
->              return -1;
->          }
+> Update v2: use LOG_GUEST_ERROR
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg04975.html
+> 
+> diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
+> index bbc51b6e9a..03a2f8af6e 100644
+> --- a/hw/ppc/prep_systemio.c
+> +++ b/hw/ppc/prep_systemio.c
+> @@ -23,6 +23,7 @@
+>   */
 >  
-> +        /* Check if fd is valid */
-> +        if (!qemu_fd_is_valid(fd)) {
-> +            error_setg(errp, "Invalid file descriptor %d", fd);
-> +            return -1;
-> +        }
-> +
->          qemu_set_nonblock(fd);
->  
->          vnet_hdr = tap_probe_vnet_hdr(fd);
-> @@ -843,6 +849,13 @@ int net_init_tap(const Netdev *netdev, const char *name,
->                  goto free_fail;
->              }
->  
-> +            /* Check if fd is valid */
-> +            if (!qemu_fd_is_valid(fd)) {
-> +                error_setg(errp, "Invalid file descriptor %d", fd);
-> +                ret = -1;
-> +                goto free_fail;
-> +            }
-> +
->              qemu_set_nonblock(fd);
->  
->              if (i == 0) {
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 916f1be2243a..8d5705f598d3 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -244,6 +244,11 @@ void qemu_anon_ram_free(void *ptr, size_t size)
->      qemu_ram_munmap(-1, ptr, size);
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "hw/irq.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/qdev-properties.h"
+> @@ -235,8 +236,15 @@ static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
+>      return val;
 >  }
 >  
-> +bool qemu_fd_is_valid(int fd)
+> +static void ppc_parity_error_writel(void *opaque, hwaddr addr,
+> +                                    uint64_t data, unsigned size)
 > +{
-> +    return fcntl(fd, F_GETFL) != -1;
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s not implemented\n", __func__);
+
+What I meant was an error message about illegal/invalid write access.
+
 > +}
 > +
->  void qemu_set_block(int fd)
->  {
->      int f;
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index e9b14ab17847..a6be9445cfdb 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -132,6 +132,12 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
->  }
->  #endif /* CONFIG_LOCALTIME_R */
->  
-> +bool qemu_fd_is_valid(int fd)
-> +{
-> +    /* FIXME: how to check if fd is valid? */
-> +    return true;
-> +}
-
-Maybe:
-
-  bool qemu_fd_is_valid(int fd)
-  {
-      unsigned long res; /* ignored */
-
-      return ioctlsocket(fd, FIONREAD, &res) == NO_ERROR;
-  }
-
-See:
-
-https://docs.microsoft.com/en-us/windows/win32/winsock/winsock-ioctls
-
-> +
->  void qemu_set_block(int fd)
->  {
->      unsigned long opt = 0;
+>  static const MemoryRegionOps ppc_parity_error_ops = {
+>      .read = ppc_parity_error_readl,
+> +    .write = ppc_parity_error_writel,
+>      .valid = {
+>          .min_access_size = 4,
+>          .max_access_size = 4,
 > 
 
 
