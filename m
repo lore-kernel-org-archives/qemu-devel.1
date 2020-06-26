@@ -2,93 +2,91 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7219C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6224C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7871920768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:51:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7871920768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 7006520768
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rnCmcQBh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7006520768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joj8o-0003Lc-O7
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:51:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35820)
+	id 1jojEe-0004ub-Nr
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1joj80-0002kN-V6; Fri, 26 Jun 2020 03:50:28 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:33966
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1joj7y-0000MN-I8; Fri, 26 Jun 2020 03:50:28 -0400
-Received: from host86-158-109-79.range86-158.btcentralplus.com
- ([86.158.109.79] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1joj7u-00079U-AK; Fri, 26 Jun 2020 08:50:27 +0100
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, fthain@telegraphics.com.au
-References: <20200623204936.24064-1-mark.cave-ayland@ilande.co.uk>
- <bca1d4a8-de1c-89f6-3958-61a6f6aec77c@vivier.eu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <7384413a-e596-df0f-09fa-6b7fac5d004b@ilande.co.uk>
-Date: Fri, 26 Jun 2020 08:50:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1jojDv-0004Mx-8W
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:56:35 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:32806)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1jojDs-0002y2-KX
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:56:34 -0400
+Received: by mail-ed1-x544.google.com with SMTP id h28so6222388edz.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 00:56:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=5u38E07NF7bGvPjr2vXllrKTrw+iDRsVFyrwFK7ZHfU=;
+ b=rnCmcQBhVXmVjtSg3Ol6m05Ay4NgC77nXEUFVFrBudysDaL+3hjFO5X2aDSnoLCIfh
+ JA0sETdJLDkpPGqvB1Nq4M25ztBBjgQwWrKVtnkNrkZ4MbqGhz3XUtqAJXdNAza9x3/a
+ vSkZS8ZCenUR0Wx8+qDC7hf9PkCRh5de/ne1/ftpVkQ8crYonp3nAbkj/zwtzn1Z95Et
+ Tbf3UGWmw9zssQmdIonQoWFQ5GbwNsPJAEopRmTj6nt+TZacFrCV4oUxEEyhVAZVV1HH
+ PywqS+q06O5cx5cK590K3+mNqe4LWnEsSB0gTZNK+0y3n/Y17MgsUMMy0fIGYMfz8T39
+ l+lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=5u38E07NF7bGvPjr2vXllrKTrw+iDRsVFyrwFK7ZHfU=;
+ b=uhLxerJx08joL81bULaqiWbPhDqdg1a+wCAF0uj53FpkcixZDQ6llLG1+EdqDFDIhy
+ nZG4hwEvu8EhM6b0YUYClhH+arYi8Q/HCjCtLxhRVSHLTelaSGPVoyJ1Iw/wZgv0+dme
+ +l9+GYH52JyuTs9GHv3i/ABXWA9hbMFGSlA2pZaAtwOMpcQabWXwvusWuAMkvXOK/tdh
+ bmvcUeDKbQsH0Z+6twFyu4Sx9i6aiViWEw4m+jS/gZLxxTcKtz4+VM0qzwu3m5QCAA4E
+ jfr8XEphyxSQ1my1gttFZVpIEEVf/sU8jFqOvwgTN9MrokQ6/Z3vMOyeAxDnN1vOOqzJ
+ /tqQ==
+X-Gm-Message-State: AOAM533W0UVIiv5KZdAjwvI3lS5mDYZBT4e/xxfsHdv9fXLZA1y69V4w
+ ZXrKhriv7oMaCLK4HXaJPS/XPQ==
+X-Google-Smtp-Source: ABdhPJz8vffmO0SGchMV5l1EW9+sNS1BxWRc9+GP9cOdicoRSXPU9H89VJTq/jt2t2HCT7fE694XBA==
+X-Received: by 2002:a50:ee84:: with SMTP id f4mr2016506edr.183.1593158190313; 
+ Fri, 26 Jun 2020 00:56:30 -0700 (PDT)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id n16sm9714204ejo.54.2020.06.26.00.56.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 00:56:29 -0700 (PDT)
+Date: Fri, 26 Jun 2020 09:56:17 +0200
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v5 0/5] VIRTIO-IOMMU probe request support and MSI bypass
+ on ARM
+Message-ID: <20200626075617.GB2107508@myrica>
+References: <20200624132625.27453-1-eric.auger@redhat.com>
+ <20200624094510-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <bca1d4a8-de1c-89f6-3958-61a6f6aec77c@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.158.109.79
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 00/22] ADB: fix autopoll issues and rework mac_via
- state machine
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200624094510-mutt-send-email-mst@kernel.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=jean-philippe@linaro.org; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,137 +100,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, peterx@redhat.com,
+ armbru@redhat.com, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/06/2020 08:14, Laurent Vivier wrote:
-
-> Le 23/06/2020 à 22:49, Mark Cave-Ayland a écrit :
->> This patchset is something I have been chipping away at for a while since
->> spending some time over the Christmas holidays trying to boot the MacOS
->> toolbox ROM on the new q800 machine.
->>
->> Initially I discovered that there were some problems when the MacOS ROM was
->> enumerating ADB devices due to multiple meanings of the vADBInt bit. After
->> fixing this there were still issues with keys being dropped during autopoll
->> which were eventually traced back to the autopoll timer re-firing before
->> the host had managed to read back the previous response.
->>
->> At this point I noticed that CUDA/PMU/mac_via all had their own implementations
->> of ADB autopoll, and that it would make sense to consolidate the autopoll timer,
->> mask, interval and locking into the ADB bus. This would allow the logic to be
->> removed from each separate device and managed in just one place.
->>
->> Finally I updated the trace-events to allow separate tracing of bus requests
->> and device responses which makes it easier to follow the ADB enumeration process.
->>
->> The breakdown of the patchset is as follows:
->>
->> - Patch 1 keeps checkpatch happy for the remainder of the patchset whilst patch
->>   2 is the proper fix for a spurious ADB register 3 write during enumeration
->>   caused by ignoring the request length which I had tried to work around earlier.
->>
->> - Patches 3 to 10 are part of the autopoll consolidation process which moves the
->>   separate autopoll implementations into a single implementation within
->>   ADBBusState.
->>
->> - Patches 11 to 13 update the ADB implementation to hold a status variable
->>   indicating the result of the last request and allow devices to indicate
->>   whether they have data to send. This extra information is required by the
->>   upcoming mac_via state machine changes.
->>
->> - Patches 14 to 17 add a variable and functions to block and unblock ADB
->>   autopoll at bus level, adding the functions at the correct places within
->>   CUDA and PMU.
->>
->> - Patches 18 and 19 rework the mac_via ADB state machine so that the bus
->>   can be enumerated correctly, and both explicit and autopoll requests work
->>   under both MacOS and Linux.
->>
->> - Patch 20 enforces the blocking and unblocking of autopoll at the ADB
->>   level, including adding an assert() to prevent developers from trying to
->>   make an ADB request whilst autopoll is in progress.
->>   
->> - Patches 21 and 22 update the trace-events to separate out ADB device and
->>   ADB bus events.
->>
->> The patch has been tested by myself and a couple of others during the development
->> process across the PPC g3beige/mac99 and 68K q800 machine so it should be quite
->> solid.
->>
->> One thing to indicate is that the patchset bumps the VMState versions for the
->> affected devices but does not allow older versions to load. This is a conscious
->> decision given that for the mac_via device used in the q800 machine it would be
->> just about impossible to map this in a way that would work for all cases. Similarly
->> for the Mac PPC machines migration is already hit/miss due to timebase issues so
->> I don't see this as being a big loss.
->>
->> To finish off I'd also like to say a big thank-you to both Laurent Vivier and
->> Finn Thain who both took time to answer my questions, dump information from a
->> real q800, and analyse it in very fine detail. Without them this patchset would
->> still be several months away.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>
->>
->> v2:
->> - Rebased onto master
->> - Added R-B tags from Philippe
->> - Fixed byte discrepency at end of bus timeout spotted by Finn
->> - Added Tested-by tag from Finn
->>
->>
->> Mark Cave-Ayland (22):
->>   adb: coding style update to fix checkpatch errors
->>   adb: fix adb-mouse read length and revert disable-reg3-direct-writes
->>     workaround
->>   cuda: convert ADB autopoll timer from ns to ms
->>   pmu: fix duplicate autopoll mask variable
->>   pmu: honour autopoll_rate_ms when rearming the ADB autopoll timer
->>   adb: introduce realize/unrealize and VMStateDescription for ADB bus
->>   adb: create autopoll variables directly within ADBBusState
->>   cuda: convert to use ADBBusState internal autopoll variables
->>   pmu: convert to use ADBBusState internal autopoll variables
->>   mac_via: convert to use ADBBusState internal autopoll variables
->>   adb: introduce new ADBDeviceHasData method to ADBDeviceClass
->>   adb: keep track of devices with pending data
->>   adb: add status field for holding information about the last ADB
->>     request
->>   adb: use adb_request() only for explicit requests
->>   adb: add autopoll_blocked variable to block autopoll
->>   cuda: add adb_autopoll_block() and adb_autopoll_unblock() functions
->>   pmu: add adb_autopoll_block() and adb_autopoll_unblock() functions
->>   mac_via: move VIA1 portB write logic into mos6522_q800_via1_write()
->>   mac_via: rework ADB state machine to be compatible with both MacOS and
->>     Linux
->>   adb: only call autopoll callbacks when autopoll is not blocked
->>   adb: use adb_device prefix for ADB device trace events
->>   adb: add ADB bus trace events
->>
->>  hw/input/adb-kbd.c           |  42 ++--
->>  hw/input/adb-mouse.c         |  65 ++++--
->>  hw/input/adb.c               | 210 ++++++++++++++++--
->>  hw/input/trace-events        |  27 ++-
->>  hw/misc/mac_via.c            | 411 +++++++++++++++++++++++------------
->>  hw/misc/macio/cuda.c         |  60 +++--
->>  hw/misc/macio/pmu.c          |  47 ++--
->>  hw/misc/trace-events         |   3 +
->>  hw/ppc/mac_newworld.c        |   2 -
->>  include/hw/input/adb.h       |  26 ++-
->>  include/hw/misc/mac_via.h    |   2 +-
->>  include/hw/misc/macio/cuda.h |   4 -
->>  include/hw/misc/macio/pmu.h  |   4 -
->>  13 files changed, 620 insertions(+), 283 deletions(-)
->>
+On Wed, Jun 24, 2020 at 09:47:59AM -0400, Michael S. Tsirkin wrote:
+> On Wed, Jun 24, 2020 at 03:26:20PM +0200, Eric Auger wrote:
+> > By default the virtio-iommu translates MSI transactions. This
+> > behavior is inherited from ARM SMMU. However the virt machine
+> > code knows where the MSI doorbells are, so we can easily
+> > declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
+> > setting the guest iommu subsystem will not need to map MSIs.
+> > This setup will simplify the VFIO integration.
+> > 
+> > In this series, the ITS or GICV2M doorbells are declared as
+> > HW MSI regions to be bypassed by the VIRTIO-IOMMU.
 > 
-> Acked-by: Laurent Vivier <laurent@vivier.eu>
+> 
+> > This also paves the way to the x86 integration where the MSI
+> > region, [0xFEE00000,0xFEEFFFFF], will be exposed by the q35
+> > machine.  However this will be handled in a separate series
+> > when not-DT support gets resolved.
+> 
+> What's going on with that btw?
+> I think the next step is to put the spec up for virtio tc vote,
+> then we can merge that, right? acpi parts will need to be
+> ratified by the acpi sig.
 
-Thanks Laurent! I know David is busy at the moment, but he's fine with the Mac PPC
-changes so I'll add your A-B tag and send a PR shortly.
+Yes I'm being unreasonably slow on this. I'll look at both the virtio spec
+and ACPI after coming back from Holiday in July. I'm afraid the situation
+for the built-in description will be the same on the Linux side (asked to
+use ACPI instead), but it's worth retrying as we have some progress on
+ACPI support.
 
+Thanks,
+Jean
 
-ATB,
-
-Mark.
+> 
+> > Best Regards
+> > 
+> > Eric
+> > 
+> > This series can be found at:
+> > https://github.com/eauger/qemu/tree/v5.0.0-virtio-iommu-msi-bypass-v5
+> > 
+> > History:
+> > 
+> > v4 -> v5:
+> > - Take into account some additional comments from Markus:
+> >   - reserved region type becomes an unsigned + some comment/desc
+> >     rewording
+> >   - assert if the type is not RESERVED or MSI
+> > 
+> > v3 -> v4:
+> > - collected Jean and markus's R-bs
+> > - tool into account all Markus' comments in [1/5] (except removal of
+> >   goto)
+> > - use ':' as delimitor instead of commas
+> > - add example in 4/5 commit message as suggested by Markus
+> > 
+> > v2 -> v3:
+> > - Introduce VIRT_MSI_CTRL_NONE in VirtMSIControllerType
+> > - do not fill the remainder of the probe buffer
+> > 
+> > v1 -> v2:
+> > - check which MSI controller is in use and advertise the
+> >   corresponding MSI doorbell
+> > - managed for both ITS and GICv2M
+> > - various fixes spotted by Peter and Jean-Philippe, see
+> >   individual logs
+> > 
+> > v1: Most of those patches were respinned from
+> >   [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
+> >   except the last one which is new
+> > 
+> > 
+> > Eric Auger (5):
+> >   qdev: Introduce DEFINE_PROP_RESERVED_REGION
+> >   virtio-iommu: Implement RESV_MEM probe request
+> >   virtio-iommu: Handle reserved regions in the translation process
+> >   virtio-iommu-pci: Add array of Interval properties
+> >   hw/arm/virt: Let the virtio-iommu bypass MSIs
+> > 
+> >  include/exec/memory.h            |   6 ++
+> >  include/hw/arm/virt.h            |   7 ++
+> >  include/hw/qdev-properties.h     |   3 +
+> >  include/hw/virtio/virtio-iommu.h |   2 +
+> >  include/qemu/typedefs.h          |   1 +
+> >  hw/arm/virt.c                    |  18 +++++
+> >  hw/core/qdev-properties.c        |  89 ++++++++++++++++++++++++
+> >  hw/virtio/virtio-iommu-pci.c     |   3 +
+> >  hw/virtio/virtio-iommu.c         | 112 +++++++++++++++++++++++++++++--
+> >  hw/virtio/trace-events           |   1 +
+> >  10 files changed, 238 insertions(+), 4 deletions(-)
+> > 
+> > -- 
+> > 2.20.1
+> 
 
