@@ -2,75 +2,74 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEEDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F57C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59D95207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2813207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:26:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYWNYdgF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59D95207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1Mre4VK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2813207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jonQk-0006UW-8C
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43698)
+	id 1jonRb-0007mc-3k
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jonPO-0005Y4-EP
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:24:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53484
+ id 1jonQ0-00066t-U8
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:25:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34151
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jonPL-0002b2-Vh
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:24:41 -0400
+ id 1jonPz-0002q3-8q
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:25:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593174278;
+ s=mimecast20190719; t=1593174318;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=CVrYblkIZQxVa97CNTiuaDjPW/y4eRlG3ZPryB1YObI=;
- b=eYWNYdgFPtIN/I4omXkeMpfywT//x1wy9lZgd+x+S08rrj3re0q5N0WBrDiSGtFdlSqbIu
- k9Qr3sH38YHD48nYqu/SR1HtvlqjMLwpOoyR7KwGjB7CbVvvwjNqCQsGDAzcLwC6gxX7hP
- 07ElggPz9VwFDDCH6FZhqywccZTRBMU=
+ bh=OKx9YDxFSvv4MX4Wgi16pbhIgguVxJY4MNPIwl7aSCo=;
+ b=M1Mre4VKVnR6Qc+Ck7+/OCkDs7VYSzQ+1fwF4IsmWafd8N4Po91f9t3pldE9yjYe+3v/Yf
+ gWBIyd9Au+eELjXiGTH8ROZiBZ6yThlw5wHBGqWVWISNos1yrvDO53d/EWlOqF4jPvmumO
+ F5CRL10cPx+jnYwkTbHEHqS77K/zBNA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-sCNsyTI5O3CB3nLPwdVo2A-1; Fri, 26 Jun 2020 08:24:36 -0400
-X-MC-Unique: sCNsyTI5O3CB3nLPwdVo2A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-314-PjzPyOmfNSeyx70FESaeKg-1; Fri, 26 Jun 2020 08:25:14 -0400
+X-MC-Unique: PjzPyOmfNSeyx70FESaeKg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 617AA804001;
- Fri, 26 Jun 2020 12:24:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA17B107ACF5;
+ Fri, 26 Jun 2020 12:25:13 +0000 (UTC)
 Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB93560BF4;
- Fri, 26 Jun 2020 12:24:34 +0000 (UTC)
-Date: Fri, 26 Jun 2020 13:24:33 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40ACA7F0B0;
+ Fri, 26 Jun 2020 12:25:13 +0000 (UTC)
+Date: Fri, 26 Jun 2020 13:25:12 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 06/17] block/nvme: Replace qemu_try_blockalign(bs) by
- qemu_try_memalign(pg_sz)
-Message-ID: <20200626122433.GM281902@stefanha-x1.localdomain>
+Subject: Re: [PATCH 07/17] block/nvme: Move code around
+Message-ID: <20200626122512.GN281902@stefanha-x1.localdomain>
 References: <20200625184838.28172-1-philmd@redhat.com>
- <20200625184838.28172-7-philmd@redhat.com>
+ <20200625184838.28172-8-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625184838.28172-7-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200625184838.28172-8-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="P9KQiUGMzYCFwWCN"
+ protocol="application/pgp-signature"; boundary="H7cT1SUwsqXggVRO"
 Content-Disposition: inline
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -102,40 +101,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---P9KQiUGMzYCFwWCN
+--H7cT1SUwsqXggVRO
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 25, 2020 at 08:48:27PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> qemu_try_blockalign() is a generic API that call back to the
-> block driver to return its page alignment. As we call from
-> within the very same driver, we already know to page alignment
-> stored in our state. Remove indirections and use the value from
-> BDRVNVMeState.
+On Thu, Jun 25, 2020 at 08:48:28PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Move assignments previous to where the assigned variable is used,
+> to make the nvme_identify() body easier to review. No logical change.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  block/nvme.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 
-The higher-level qemu_try_blockalign() API does not require all callers
-to be aware of the memory alignment details. It seems like a
-disadvantage to duplicate that knowledge throughout the code, even if
-it's in the same driver source code.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Is there an advantage to this patch that I've missed?
-
---P9KQiUGMzYCFwWCN
+--H7cT1SUwsqXggVRO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl716QEACgkQnKSrs4Gr
-c8i49Af/VNrVe9/a87o+iEER3EzaPbA4MVCXjxSc2dtd59hxLzHrmamk7CbEbQlF
-AFOodKa5P8EF2BZ1beN7YBKGc7StQ+aGbXFWjCzxaYM0TOV11qy+bL2UV3zfBxbO
-3o0Bmnz8HVrg2t5bjBWL3ffLHTcFPvoJ4P54YyjMPG0GdZC3IqKctR/d7Cw1rDof
-z0XDpfNPfyG42vbRQCDjJLS5HewHV1pffgA4KdM52cEMs/oh+nPkXQKLk2Jgdm25
-0ZtuEt1unLYLaeMU0znSH7QYnF6giwMLsh4D8pS81KJVYeVtANAxkLIKsT1yBWc/
-6QiOxAjGpQyBDck0gPf5vqFCNmxe5w==
-=ktED
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl716ScACgkQnKSrs4Gr
+c8jfMAgAquMeqV7V19/5l0VtGS82iRLRmTp1TIz6Y0UFJ0ofCcU1LRrYjo+SsZrJ
+WjQpq1jhzWt5CXzmUMu3VDKdjLB4UDGoUytHlCmHYzAyatZ44Pf2rp4JEJ6qj9Xf
+MRSvlsLafTgrILruxxAYpQ35shgxYzjWASv15LjFv0i04R1u7R6We35lN8Y/yvzp
+dBooo/ija7XZEHLnO20DKkLeAvaL/OqL3ou+K38lAnxiTq6+9S0b2VhnNCHVe5t4
+OQuvg/UFLcsHtIxTXMdGTXIphUZ3jdcRjf2n79IgpLcwcR+OPYJgFwrlLbeoSCY5
+yoUAETJnLaJg68PaE1HEMnzHG8I/dg==
+=Cn2l
 -----END PGP SIGNATURE-----
 
---P9KQiUGMzYCFwWCN--
+--H7cT1SUwsqXggVRO--
 
 
