@@ -2,87 +2,81 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9216BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 19:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C811C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B12A206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 19:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 421C6206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z03JrDm2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B12A206C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lhgwBHnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 421C6206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jouBV-0005pn-K1
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 15:38:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47402)
+	id 1jougV-0005aQ-Fv
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:10:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jouAj-0005PJ-8Y
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 15:38:01 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36001)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joufd-0004Lw-W8
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:58 -0400
+Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:50711)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jouAh-000763-MT
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 15:38:00 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k6so10565801wrn.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 12:37:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joufb-00041h-Tb
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:57 -0400
+Received: by mail-pj1-x102a.google.com with SMTP id k71so1916291pje.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 13:09:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ZsSAEPLp4bw5RvaNyy7ruh1AxdqurEP2BqKjR4xwilw=;
- b=z03JrDm2HimK5At9qJqIeMsINmvxm6NsRA3nZohP1H7bXq4jB3DIKPkcE90Ti+ELsK
- Nl/XEsCC96kSG43arnZl49yjqVDzO+PrJW31UnYmS5B9ZYdm/UNO9hbZajNO+393pqN8
- OXFRYzIUDyV2Kwm++JoEcwGB8bOMQOZydtPvnQk+PzlA/ZyOr3jqw6jnDmtHqbn0mT+G
- tIy341kndwHxFowpGGteMTefehnixhdJ93I7QrIgUqyjuuccaZBdKoOCwxLX+DbLD8Yi
- 2ExHghj834lQlx5/8K4MvRYVaCTp/YUXD51Eci5FFzF77pEMfotl4xP842fah+Gj0zQH
- 6wDQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lasQjN5LXj5UcP1e4KoJ+A1gauTll/nfuzKb2yFFZeI=;
+ b=lhgwBHnnHJ3mJ7DE7e3s/Di9Z7Nj9HJ1HXiIlz+24NQQXPnYY/ntyEplO2r0kozAfL
+ 5xkkdQqcihGWiRDxvjBPgtl1d59qpUm4akVLPc9g+2EIy5thl5gc6MAm5HfD9fctnUsG
+ EPwObOfueatGM2WrDe3yKcUF4GgfyTpfb65EczMde2Hx5WIVs/VhV/zx6HbOdo+FMSEl
+ 1yvtS4LnpcXdeZEu+adCj0xp+bGFKeJ3Mq4MtH927JEZ0qC4ofmRohCWvIqVLPCFd0M9
+ gBB1qU1c9cmg6aFjKTGaJtpR95Lnd9T9yN3PhiGVBE1k7wI4I9SIgqhR20DeKQ7qCSAy
+ aQyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ZsSAEPLp4bw5RvaNyy7ruh1AxdqurEP2BqKjR4xwilw=;
- b=YJXbywYZjbMtuB0OOzkmZ5TL4k8rN95v/MVUcWXRLVKi6RhMKQZCd0f7F9VlxJMUmq
- egMQsHGvhHPFJWwvA0ApupQRAOafYvkztGKXpGWVWclq1FGhQA0xTnp8HttxmYl4xyvG
- /nMDuL6BZTyt2l8DngWeW8J8SHTTPDjZzphJ47kj1AUS63h1B/Nf9B0YcvIqOOPIkjkE
- bLgMRa1E1iFvQlvtvtUpIJcwd+gmkHC3+bQxMs4G9GIYXWH7caLktmLk1RhK8p2xquvE
- 1TS6/hvhGUbMcH/5MGZUkVwGwkiSXEEpXY4I4ZySlHMADSi/vMBIHZom2/iEY1xh2vb7
- DphA==
-X-Gm-Message-State: AOAM5308Tdktesjos+hh97kRo3JqDefbqY+G83V6GYEwpTm4qCFv3cMS
- uz6Lfgi6xDveCheibTPvcY9xwg==
-X-Google-Smtp-Source: ABdhPJwPs1yQucwDe/bd7nvS4lU3d/hQDzg9pGI9mn9faSKujz4N9yqVSAxncxbIbRRnzUoD17ClLA==
-X-Received: by 2002:adf:ee05:: with SMTP id y5mr5462673wrn.185.1593200277854; 
- Fri, 26 Jun 2020 12:37:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x5sm19075587wmg.2.2020.06.26.12.37.56
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lasQjN5LXj5UcP1e4KoJ+A1gauTll/nfuzKb2yFFZeI=;
+ b=qsNYXw4yLEaLEKxDHREJ3JOKdefcLlbJkq8lxM5HqvtCkTNrsjnlOIGUJdnXPW2pFL
+ C5WnXtdEBJLVCqbgS/DTOpZF2Fdc7f/36zCVRes3Q7AbjLpwW9emKMGrcSiQlvw84+6W
+ yRHBWFGsOV1DBCDCUk4IDzOSXyY3B9S4YDJsZJjtY1RXBdqIdwqEHR1alWDLbDLR3vkw
+ H5nbD0Wo3m6MzwFLG2khEXWRGplWoiKEQohbAknUUCrg0qgVz6vxd5eFCJWIx6+R9bzO
+ ft/OQC1PGCtw6JRMWncyG56u1MeSgtEPgvSeqtYcQ0Bs7P/2W5UqKK+8wFqBCyq0yfB2
+ Wbsg==
+X-Gm-Message-State: AOAM533dUlUiRmzNbIWIAJrkoSUGQkEr+2WTjiMJiTpluy6COdFzTCg9
+ Fo5lQz1HjHvE5Vr97AidaxY5B+7ZQyM=
+X-Google-Smtp-Source: ABdhPJzRGo9Z+haAvSeSRLRlnL5esKpMhNsYQ1kkqw/sHSM7+WgLVnaITzzD4mHhMu6Q8qF+MBM2qg==
+X-Received: by 2002:a17:90a:f309:: with SMTP id
+ ca9mr4880084pjb.113.1593202193858; 
+ Fri, 26 Jun 2020 13:09:53 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id n8sm23879405pgi.18.2020.06.26.13.09.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 12:37:56 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E1F4F1FF7E;
- Fri, 26 Jun 2020 20:37:55 +0100 (BST)
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-13-alex.bennee@linaro.org>
- <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v1 12/18] tests/vm: allow us to take advantage of MTTCG
-In-reply-to: <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
-Date: Fri, 26 Jun 2020 20:37:55 +0100
-Message-ID: <87pn9l62jw.fsf@linaro.org>
+ Fri, 26 Jun 2020 13:09:52 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] tests/qht-bench: Adjust rate/threshold computation
+Date: Fri, 26 Jun 2020 13:09:48 -0700
+Message-Id: <20200626200950.1015121-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102a;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,40 +98,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
+Cc: cota@braap.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Supercedes: <20200620214551.447392-1-richard.henderson@linaro.org>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 6/22/20 7:31 AM, Alex Benn=C3=A9e wrote:
->>          if kvm_available(vmcls.arch):
->>              return multiprocessing.cpu_count() // 2
->> +        elif os.uname().machine =3D=3D "x86_64" and \
->> +             vmcls.arch in ["aarch64", "x86_64", "i386"]:
->> +            # MTTCG is available on these arches and we can allow more =
-cores.
->> +            # But only up to a reasonable limit. User can always overri=
-de
->> +            # these limits with --jobs.
->> +            return min(multiprocessing.cpu_count() // 2, 8)
->>          else:
->
-> And if multiprocessing.cpu_count() =3D=3D 1?
-> Seems like we should add max(count, 1) as well.
-
-Or maybe?
-
-   min(math.ceil(multiprocessing.cpu_count() / 2), 8)
->
->
-> r~
+Thanks for Emilio's review of v1.  I've split "seed" from "rate"
+as suggested, left the comparisons alone, and expanded the comment
+in do_threshold.
 
 
---=20
-Alex Benn=C3=A9e
+r~
+
+
+Richard Henderson (2):
+  tests/qht-bench: Adjust testing rate by -1
+  tests/qht-bench: Adjust threshold computation
+
+ tests/qht-bench.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
+
+-- 
+2.25.1
+
 
