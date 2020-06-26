@@ -2,85 +2,83 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1140CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDBBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:19:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0F8420702
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:19:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B4B420702
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:19:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sZg3zG2E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F8420702
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nMaaip0N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4B420702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joq8l-0001OD-3z
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:19:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35534)
+	id 1joq8o-0001Vq-KF
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3z-00025r-Kb
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:47 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:34914)
+ id 1joq41-0002Au-T8
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:49 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43778)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3q-0006G7-Lg
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:47 -0400
-Received: by mail-wm1-x332.google.com with SMTP id l2so8225944wmf.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:37 -0700 (PDT)
+ id 1joq3y-0006KP-3o
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:49 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j4so7404011wrp.10
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Q8Ef3HWA8rNM9aTbA2EQAMf+hEg1mxxGyImAVLJmAIk=;
- b=sZg3zG2ErKaNOpVPZrMhqJcUjKJC77ZU+jmPSW2KgjOQ4tOEnJiT2Zu5jnQ+SIjjW7
- H2JFwjL2MiAKYKjDHw/gMuB96cmNceiWZGZ3co6eNvyocEDXmIUheXwvbMnpry9fkDZc
- dYQrJsJSNjoGQR7diwv1p1/EjzI2mVFfM7PzajphkljC8tqRII6gw6dT4YB0TpsbeV7s
- AmU92bfkBF0OOw7GIi4w9Qb6V5xLhgDgPYZKLQHUIOoKr0g6NvOrVgBu6DaW9onGGvQ4
- hZGVT1yXmNQqVNAHSz/DUz7Ky3ZN3l2LbnrYPJhcSmZaz951elvakB0ckgBNFcJDV5l9
- NyMA==
+ bh=9pMs3LEbOiq50D52Qgdo7AAYpmJBtOiQsJyttNTt1Gw=;
+ b=nMaaip0NLvOoecvmqwY1FB62j5Q2DqpLUIUcrnibC9h2ZynG7JK1QfJBsc2HiLOJEB
+ 4A2NOBDxA7HsZ2NO2RfoMMLjMU/rGlI/PRJRbiGS+VqCOzMDBQuK0W3xAzAjj0imrMz4
+ 2b1ysRQnzDgAT3TZM9FfYK3a5Ti9VPRlMbp32d+HW36fDIG79V9rpqSdnEwkQztTLDty
+ Z2FETzqFOoIyCh1LaR5Cnbim0c2oiCOSf2Vf4Ck1v3n97GqpSExqsNw8gSD1VLvt+nqH
+ 606qlBMac8FZOkCe4U5wtTtFS8LGZFuBXirDvLbQi1l3O8TG1lS6QImUXDJuAwbfzVKh
+ jwlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Q8Ef3HWA8rNM9aTbA2EQAMf+hEg1mxxGyImAVLJmAIk=;
- b=PxFx8+t6V+lANn9EI9YByLsXPQUyDhWFSWK+n47m2EFO53F+Ax1weE6TcSf009VaJl
- 31yd7iS+sHLQnHGV9NmhBd+LS3VLlY688wmNfI2a0yvBh5Hd40NDwEO/0Xnto5iT3bPP
- 4XrIGkY0cvGsWHC9zTclkUehnVLMGNH/XvbId+JmUnPO3UqUwaqhllGuhwDypSGwb4kR
- 9Hmi/hv9oy51ijgdrD+kfEkF87A1Abq+H3QvCM+aYHd3BkbJgHrJWDlxJzKv/M8Lxyhg
- 9i70jG3vqlD4mWxvvjIoAFA4auGgs3s5LEFlACY3jCKdswwanww5+KCoyjsuXTUMVGH3
- FZVQ==
-X-Gm-Message-State: AOAM530YS2yCnuIn9VxIQS5/TD8xFDJtYNMR+e1HQS4uBKR+Ou9BqqCX
- lKVhGcq19fFbyyTcL1lmOVL68ntteTUX0Q==
-X-Google-Smtp-Source: ABdhPJwRYMVOauEYyWDMd6dL1z0UwW/sprD3rPfVgbjzawwk/whZ6CliGGJWD6V6RadziUekliIc2w==
-X-Received: by 2002:a1c:e143:: with SMTP id y64mr3910481wmg.90.1593184475946; 
- Fri, 26 Jun 2020 08:14:35 -0700 (PDT)
+ bh=9pMs3LEbOiq50D52Qgdo7AAYpmJBtOiQsJyttNTt1Gw=;
+ b=NpvVfxMmXtSXswX8qCsHIAiUyZNg9M8GU5OA+9XfxgmUmzDbJp84/AhR6BZEkhq4gW
+ w81eLzG2EuyoUkfrYtZ5LZVn/pn1if8QOvcWnOwOdidL+/iOyNVlMkPifAyRAclb8LWr
+ z02Be7f25P7/f/uE5Q19sbBELgxAKFlqknmDaZ6BejUSqmBb0FeNnyBtwOQWmUQkf0zw
+ mKNd8XARfXYAJnXSi1ppOa6a0jem328GB2Q8qvaQ2DDT/V3F6vFFBJ6pn8j/CISl2g1u
+ AK9GDWQQ7zogIq8Vba1X0+dwleMwfTu1nj/ngLNxnbBRT/paXocPMzSzdWlCIdqHeV9S
+ zvlw==
+X-Gm-Message-State: AOAM531ZaxT6eDYeHjF7lvSf9aDoCwNuAyp/07Hpl5UwdB6xOSfa6U5j
+ gzSq2+mRtc8p35D45s8hb+BSR/pmL2PF5A==
+X-Google-Smtp-Source: ABdhPJxMNd8uNVQ7P5xw0ouvPSOT7C3sYY6kPzEX6rP3EzyyBlER2nPlCEBgv9w+O+UqFk0bZb+7Pg==
+X-Received: by 2002:a5d:6a04:: with SMTP id m4mr4216479wru.418.1593184484148; 
+ Fri, 26 Jun 2020 08:14:44 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.34
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.43
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:35 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:43 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/57] hw/misc/pca9552: Add a 'description' property for
- debugging purpose
-Date: Fri, 26 Jun 2020 16:13:35 +0100
-Message-Id: <20200626151424.30117-9-peter.maydell@linaro.org>
+Subject: [PULL 16/57] target/arm: Add support for MTE to HCR_EL2 and SCR_EL3
+Date: Fri, 26 Jun 2020 16:13:43 +0100
+Message-Id: <20200626151424.30117-17-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x332.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,75 +104,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add a description field to distinguish between multiple devices.
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20200623072723.6324-6-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200626033144.790098-5-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/pca9552.h |  1 +
- hw/misc/pca9552.c         | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
+ target/arm/helper.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
-index 90843b03b8a..bf1a5891378 100644
---- a/include/hw/misc/pca9552.h
-+++ b/include/hw/misc/pca9552.h
-@@ -27,6 +27,7 @@ typedef struct PCA955xState {
-     uint8_t pointer;
- 
-     uint8_t regs[PCA955X_NR_REGS];
-+    char *description; /* For debugging purpose only */
- } PCA955xState;
- 
- #endif
-diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-index 4de57dbe2e2..2cc52b02057 100644
---- a/hw/misc/pca9552.c
-+++ b/hw/misc/pca9552.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "hw/qdev-properties.h"
- #include "hw/misc/pca9552.h"
- #include "hw/misc/pca9552_regs.h"
- #include "migration/vmstate.h"
-@@ -317,13 +318,30 @@ static void pca955x_initfn(Object *obj)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 8a0fb015819..d6c326b58e8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2021,6 +2021,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+         if (cpu_isar_feature(aa64_pauth, cpu)) {
+             valid_mask |= SCR_API | SCR_APK;
+         }
++        if (cpu_isar_feature(aa64_mte, cpu)) {
++            valid_mask |= SCR_ATA;
++        }
+     } else {
+         valid_mask &= ~(SCR_RW | SCR_ST);
      }
- }
+@@ -5248,17 +5251,22 @@ static void do_hcr_write(CPUARMState *env, uint64_t value, uint64_t valid_mask)
+         if (cpu_isar_feature(aa64_pauth, cpu)) {
+             valid_mask |= HCR_API | HCR_APK;
+         }
++        if (cpu_isar_feature(aa64_mte, cpu)) {
++            valid_mask |= HCR_ATA | HCR_DCT | HCR_TID5;
++        }
+     }
  
-+static void pca955x_realize(DeviceState *dev, Error **errp)
-+{
-+    PCA955xState *s = PCA955X(dev);
-+
-+    if (!s->description) {
-+        s->description = g_strdup("pca-unspecified");
-+    }
-+}
-+
-+static Property pca955x_properties[] = {
-+    DEFINE_PROP_STRING("description", PCA955xState, description),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pca955x_class_init(ObjectClass *klass, void *data)
- {
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
+     /* Clear RES0 bits.  */
+     value &= valid_mask;
  
-     k->event = pca955x_event;
-     k->recv = pca955x_recv;
-     k->send = pca955x_send;
-+    dc->realize = pca955x_realize;
-+    device_class_set_props(dc, pca955x_properties);
- }
- 
- static const TypeInfo pca955x_info = {
+-    /* These bits change the MMU setup:
++    /*
++     * These bits change the MMU setup:
+      * HCR_VM enables stage 2 translation
+      * HCR_PTW forbids certain page-table setups
+-     * HCR_DC Disables stage1 and enables stage2 translation
++     * HCR_DC disables stage1 and enables stage2 translation
++     * HCR_DCT enables tagging on (disabled) stage1 translation
+      */
+-    if ((env->cp15.hcr_el2 ^ value) & (HCR_VM | HCR_PTW | HCR_DC)) {
++    if ((env->cp15.hcr_el2 ^ value) & (HCR_VM | HCR_PTW | HCR_DC | HCR_DCT)) {
+         tlb_flush(CPU(cpu));
+     }
+     env->cp15.hcr_el2 = value;
 -- 
 2.20.1
 
