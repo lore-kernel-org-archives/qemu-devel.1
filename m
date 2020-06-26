@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1E9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4709F206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35E3A206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:59:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ymYrsVav"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4709F206DD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="beZLCNj0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E3A206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jom4K-0004L4-GM
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47110)
+	id 1jom4o-00058A-HC
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jom3W-0003j2-5d
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:58:02 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46236)
+ id 1jom3z-0004Bd-MN
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:58:31 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41777)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jom3Q-0005ML-Vm
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:58:01 -0400
-Received: by mail-oi1-x242.google.com with SMTP id l63so7662971oih.13
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 03:57:56 -0700 (PDT)
+ id 1jom3y-0005Ql-AF
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:58:31 -0400
+Received: by mail-oi1-x241.google.com with SMTP id a21so7687484oic.8
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 03:58:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=anOpxB80ATNlOQn3eLckhfrVMdcal6uh7okRHELTG2g=;
- b=ymYrsVav+jGuiIHBSBLgrOzlV1pWfxJZibWGtv1SDYTROumJxJw8TIjwTq9D+LhuiB
- ZbolJQR188Ju9H6mOdj+qQM79Idutnh9KxuBXpS0mdCSEsEXGKkrlHAn3RsOYqHoUq2j
- YQKpYA+Ybzys1F3q07OIXP4abmXs4vjx1i9maZHVzXRk9b5lmz0mem/PYjtO3jB014Aq
- PfiyAFfH79VNXqBR5oWJE3dz2WDgExfybBrVpmUMXz9gm5KvCA24/LIvVpv1LiRPp3nw
- enmv06J32l9Xl1fVLInKad68/EqowRK3fOvqeHm0ZTRj02z3bWkJ+0GB5Dj3EVo3USEV
- HWyw==
+ :cc; bh=/5Z5SdaTsCaKDtDfyJe4e2nj6mxnbAhmjCKC/915jtI=;
+ b=beZLCNj0HJ+v6LJ04dDsCVrW2bnCGzQJRMOssnVz20YtOcdaG1DR37ImC4lv0TATXd
+ oDcU9cA3Nrn+5kNt7qU/ei1zXaSnfcWlYNMYcSaiK16pHN4mEElefj0VdJkkQJkzFPqM
+ 1+pZibKUvomUMyNIGIAlaPWKWVsL/v9R2Ufw+TLgrST6o9D9kfqCHOFQTtD/+lK3z7mr
+ wgh8sjpDXy+lnK5l8EVQ/qftexKkOgsbmh7CkF4s4PJLyw1D/idf9QfyhvYz6q4phDct
+ mjUXHOc0DN7Dj9TJLuBQ0ZbwvlD8sIqPt2r5IU8fyrP3/sZGlSGAfRhf4Gbs2dMQzeJM
+ X/aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=anOpxB80ATNlOQn3eLckhfrVMdcal6uh7okRHELTG2g=;
- b=mW//86QuWUD6t+TuMxRu05h6ezMhIsrCuP157jVU/N2iaoDh92WsPRf8KUsFXlUXX7
- tWqbL6CVvyiBzh8wfko4deioVkrginiUV1crtixxImoA/u8RhxQ2UCfZiW+fvqO08v/b
- cvGV7GUswF/d0zEXK5dtFWgcnXpblykQMmfXXuJmHWyxmHSOCKiqpv7KNDLAKxRtKmtz
- 3qTvMbjlHBR4MRiqBuK9qjlaS6ISLj1+DmXqQKKwd/I+6qSAXe44W5g08NSTg/h9wx5J
- m8D+rBoCWhglMqh1Lhy89OTQuffFdofXmyfVghDX75EAOF8MH/8q9eq5fYm3dPBQhcH2
- UU3A==
-X-Gm-Message-State: AOAM533m+PE6IJ5w4WXp2DaOwAQqjO7kXe3glhmNkPBmVaJAhTBme7jd
- yqbPu1BICpIPCkHwJMBPFOtDExkMzUPaJ2m5G6m7NbNo5RQ=
-X-Google-Smtp-Source: ABdhPJxlK2t/VzKwI1Pr7uzLCoGzhCW1C/qhZ1UFrDiYE0LyIa3ea4/pgJbJzo11IrHYbxntfSfPYgSI9937gmOoDeI=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr1792595oib.48.1593169075815; 
- Fri, 26 Jun 2020 03:57:55 -0700 (PDT)
+ bh=/5Z5SdaTsCaKDtDfyJe4e2nj6mxnbAhmjCKC/915jtI=;
+ b=YZaiXsiW3Gy2nBWIDvxjFFTFQjSce4OxrTR3qSECK9yVrWkgO0SNx3JMByzt0dzfk6
+ 0hd1zIjBLa+MhcyZz2y4JPq28nOpoWbQHcPRFsPtP+U/Y3S0LncGbmS32PpfgkON3Fdz
+ 9CNdMRET/qFBb9IxLr0i8VYtB1dEsDasqrpTYd55aOvhBavYoQGAepU/Sc7VqEHgtD6V
+ tZOq/Voil/qVeguCPz7bCadov1yH62RwmtmFyAZo5CPGL5IUMvSmn9bbBnoD6mzjDWqq
+ grAAVXrCg9EbSaM9EbyszpXsod08OJ0jscAMWDv/CbHxKxEEQKpcfl/SzcF/bIJzW1+W
+ jodA==
+X-Gm-Message-State: AOAM5309Auq/1It6u2xkmsqmuzlIGiBfcF5fnNC2cLNyzpDA0SHC/mZc
+ yw+sING88iskjXXGzA8M88AClMLAW4iFnwrQsYy9GL/xKQ0=
+X-Google-Smtp-Source: ABdhPJzB4Vl5GTl6F4C/KBux7jIKmk4Gwainz5s6WHAwdhiywendX5f9dOtzdnHUzFv6RdoE6uQ6fL42UbIImlhBEQI=
+X-Received: by 2002:aca:568c:: with SMTP id k134mr1793487oib.48.1593169109139; 
+ Fri, 26 Jun 2020 03:58:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+XhMqxRDPotkG6ioYipzZNMLj-w1CbFbz2cd6BPet8GQ4r8oA@mail.gmail.com>
-In-Reply-To: <CA+XhMqxRDPotkG6ioYipzZNMLj-w1CbFbz2cd6BPet8GQ4r8oA@mail.gmail.com>
+References: <CA+XhMqzxVaM2UHMjpOiwL-bM2GZb8KwSrXf1=+LTUy53mZGRWw@mail.gmail.com>
+In-Reply-To: <CA+XhMqzxVaM2UHMjpOiwL-bM2GZb8KwSrXf1=+LTUy53mZGRWw@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jun 2020 11:57:44 +0100
-Message-ID: <CAFEAcA9fGG93SbNk9ASyzdy=QOt59JbeG1joTDgco=3bbZg=Qw@mail.gmail.com>
-Subject: Re: [ PATCH 2/5] haiku build fix
+Date: Fri, 26 Jun 2020 11:58:18 +0100
+Message-ID: <CAFEAcA9NheeyXgiU47nhS6t+vhH7BmzGKcsB7K+_W+S56KjGMw@mail.gmail.com>
+Subject: Re: [PATCH 3/5] haiku build fix
 To: David CARLIER <devnexen@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,18 +98,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jun 2020 at 11:10, David CARLIER <devnexen@gmail.com> wrote:
+On Fri, 26 Jun 2020 at 11:11, David CARLIER <devnexen@gmail.com> wrote:
 >
-> From 19a41d406eda976001827d248398d7fb172d140b Mon Sep 17 00:00:00 2001
+> From 56890fa5728d11c72232348b3f3273e2df31c197 Mon Sep 17 00:00:00 2001
 > From: David Carlier <devnexen@gmail.com>
-> Date: Fri, 26 Jun 2020 10:38:17 +0000
-> Subject: [PATCH 2/5] Enable *pty API.
+> Date: Fri, 26 Jun 2020 10:40:58 +0000
+> Subject: [PATCH 3/5] Checking mlockall symbol presence
 >
 > Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->  configure           | 9 +++++++++
->  util/qemu-openpty.c | 2 +-
->  2 files changed, 10 insertions(+), 1 deletion(-)
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
