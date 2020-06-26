@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F73C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1448C433DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D7892089D
+	by mail.kernel.org (Postfix) with ESMTPS id AF45620B80
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:04:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nF5uDrvJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D7892089D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Rytv47dj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF45620B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jowS0-0001v4-OW
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:04:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52858)
+	id 1jowS0-0001sl-VT
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:04:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowI9-0002zW-P6
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:49 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39460)
+ id 1jowI7-0002ud-Gh
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:47 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:3632)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowI6-00030Y-1b
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:49 -0400
+ id 1jowI5-0002ze-3P
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593208427; x=1624744427;
+ t=1593208425; x=1624744425;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=C1qKTCKJcCY5Q7ovLUR1GlsfNuM3cb2zWgcXN2kfEt8=;
- b=nF5uDrvJVsHls893yv+kRheCXnOEQh+CRgAatI4VCujSiaM35MqY6vCI
- UU13dUD9NAomYZdIdOEcpYUcWDw31IJw/hqIM6f08e6ZaChpyXjwuWXTQ
- oWHD+UsBZxIYZ07j9AYcgcLbmTp65qnq3fT6RTWcjylWjgHQ2t+PHcYuI
- pTJgqU/duFBtUKefjsK+8dBN96vwYLdxJgVSRbfD1c3q8WRoqKBEXALpT
- tTqR7Ya1sOEUaPEPBDrLeq+dL0ReaLpJLxiwMEMqQ9A1hHFi+iCqUBmLz
- LiGgeOtI8FU02KpZFeXYBZjPrgD0VRsKUVLAvTaSbu3bpfK2018Kauqtr g==;
-IronPort-SDR: 9rTOptvXR9gcKVcrmc1l2usiJ+Lv/IIqjGVq+dkxcPr01dgRseIWkKcpqxI1vVtxZ90u5Iw+C1
- LJ1thuDntAeOzTb5jASmwAoS5IqVMqshjEcM1BOopkj491SLo6lOe16Bj3q23LjMhflmetDYsA
- o1qmu6iuZXl0mStBiNeSBnwFeujjmR7H7dx5ZSuYEXa6XZrK8lOVfxzYGAmptfJu8i9CxAspKk
- iZBBLeInLTEnJZe3l2ssLY93MFU5WeFPHv30hUkq2Omayepziq9AJbLlFLZo78s1icgEhJoaTZ
- iIw=
-X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="244048389"
+ bh=9uaUutrtG+MaZu7P045+fq6m/NNUnkrLUU0/Ugj3nGI=;
+ b=Rytv47dj1dO/zQCWa4yCBcXX+4ctJaghGV6BlvfyFvy1/Kc2CVFSFuoB
+ BoLbXaSquqHJBNJAqYZqbpq4BiIIEOD4vLH06zalR5TXBJ6gmsFNhzUX8
+ NcT2FH8pctkOWuJCCNcssiHsF8SZr67tMZ0nF7DJuM/veStH84AYrK3nC
+ insGAeY7r8BMzfVZyUzCGn7kYEyLeRAqB8k7VkMVtnL3Himx5mUPfga69
+ ElJIO3ScPXOFMaQr+Q/gcen8qFZatt2dT0mrs3Ip2/PjMgD9W+VPKeUEe
+ 75BuzP8U0sM6jGkjaZiU26kHFWNKlfLF1ProplmlA1fCA7stOmJp4lCz4 g==;
+IronPort-SDR: zr6er1zSHHkwmmnmN7XV3JdJ78Nf3KKk1gBCYFGuagmIrfMX++L8fQVcIlF1D3OKaOtXES28Ge
+ spUZi1jWlnBpDyoEELzo3xo8hjwRS5Jxq7NcrCSbhDqYYUH6nQ95kWahL4aRrn+MhvCmwC0+5i
+ cbbJJnPiTUIeVNAwapXfsI2TcCNI/2g6rjDGSWN7mU0WnF8xmqziErQZUNulNAAQYju0tJn0hb
+ Bvcm/q7e+qGfbLvjzbkKd8I9cBspIo8ydh2do8Adrn+q1Qc1N3sabCsxJUP+cI6xzrbD7tzv6I
+ ZMU=
+X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="250261253"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:45 +0800
-IronPort-SDR: G+jHbwvzAE8R3TxkguBT2jmxJuUwbvzFvVT2wxCis0AN8h/iqCLC68JfS3tw07Nq/hmgoBAWvb
- HNqaLIZjbBu5ANKoCWTcV24zZ1qNRjE70=
+ by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:38 +0800
+IronPort-SDR: sxAiqP1OzU6/fX/VUQyGaTkuXBKtz66xrz+AGxiwPD61/C8I18QwjkXnvo2iiqyGKQ8XD94+/6
+ XjKL5CWottr+2vgL2v4qU4wUey50+mwyo=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2020 14:42:42 -0700
-IronPort-SDR: b3XiOrbv/XsMYoQn0qW4c+YuQiFZzsAbsQTz7ZKo0LTrvilBWOPFbCb0CAJKacB9nsMpgPzE0n
- 4MVL097Jl+KA==
+ 26 Jun 2020 14:42:37 -0700
+IronPort-SDR: xp8/XcRhRKJYG3x2Q8GiB951LEtEzzOnPUVotKuQDKaqsTHoCdb8VUm8wx1OMF0m7kd6BsiObO
+ 2MrQc1hDQRjQ==
 WDCIronportException: Internal
 Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.206])
- by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:44 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:39 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 34/63] target/riscv: vector single-width floating-point
- multiply/divide instructions
-Date: Fri, 26 Jun 2020 14:43:41 -0700
-Message-Id: <20200626214410.3613258-35-alistair.francis@wdc.com>
+Subject: [PULL 16/63] target/riscv: vector single-width bit shift instructions
+Date: Fri, 26 Jun 2020 14:43:23 -0700
+Message-Id: <20200626214410.3613258-17-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200626214410.3613258-1-alistair.francis@wdc.com>
 References: <20200626214410.3613258-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
+Received-SPF: pass client-ip=68.232.141.245;
  envelope-from=prvs=439617756=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:44
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:37
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -116,127 +115,215 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200623215920.2594-33-zhiwei_liu@c-sky.com
+Message-id: 20200623215920.2594-15-zhiwei_liu@c-sky.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   | 16 ++++++++
- target/riscv/insn32.decode              |  5 +++
- target/riscv/insn_trans/trans_rvv.inc.c |  7 ++++
- target/riscv/vector_helper.c            | 49 +++++++++++++++++++++++++
- 4 files changed, 77 insertions(+)
+ target/riscv/helper.h                   | 25 ++++++++
+ target/riscv/insn32.decode              |  9 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 52 ++++++++++++++++
+ target/riscv/vector_helper.c            | 79 +++++++++++++++++++++++++
+ 4 files changed, 165 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 828b145150..94305bd870 100644
+index f8b1c8a800..6805bf7dbd 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -836,3 +836,19 @@ DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
+@@ -407,3 +407,28 @@ DEF_HELPER_6(vxor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 +
-+DEF_HELPER_6(vfmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 42d8a967d0..5db02f0c0a 100644
+index 34d05a5917..e5334230df 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -458,6 +458,11 @@ vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
- vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
- vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
- vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
-+vfmul_vv        100100 . ..... ..... 001 ..... 1010111 @r_vm
-+vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
-+vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
+@@ -322,6 +322,15 @@ vor_vi          001010 . ..... ..... 011 ..... 1010111 @r_vm
+ vxor_vv         001011 . ..... ..... 000 ..... 1010111 @r_vm
+ vxor_vx         001011 . ..... ..... 100 ..... 1010111 @r_vm
+ vxor_vi         001011 . ..... ..... 011 ..... 1010111 @r_vm
++vsll_vv         100101 . ..... ..... 000 ..... 1010111 @r_vm
++vsll_vx         100101 . ..... ..... 100 ..... 1010111 @r_vm
++vsll_vi         100101 . ..... ..... 011 ..... 1010111 @r_vm
++vsrl_vv         101000 . ..... ..... 000 ..... 1010111 @r_vm
++vsrl_vx         101000 . ..... ..... 100 ..... 1010111 @r_vm
++vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
++vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
++vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
++vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 0224b66962..be9a9a8295 100644
+index 1552534796..d2dbf701c8 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2050,3 +2050,10 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
- 
- GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
- GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
+@@ -1373,3 +1373,55 @@ GEN_OPIVX_GVEC_TRANS(vxor_vx, xors)
+ GEN_OPIVI_GVEC_TRANS(vand_vi, 0, vand_vx, andi)
+ GEN_OPIVI_GVEC_TRANS(vor_vi, 0, vor_vx,  ori)
+ GEN_OPIVI_GVEC_TRANS(vxor_vi, 0, vxor_vx, xori)
 +
-+/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
-+GEN_OPFVV_TRANS(vfmul_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
-+GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
++/* Vector Single-Width Bit Shift Instructions */
++GEN_OPIVV_GVEC_TRANS(vsll_vv,  shlv)
++GEN_OPIVV_GVEC_TRANS(vsrl_vv,  shrv)
++GEN_OPIVV_GVEC_TRANS(vsra_vv,  sarv)
++
++typedef void GVecGen2sFn32(unsigned, uint32_t, uint32_t, TCGv_i32,
++                           uint32_t, uint32_t);
++
++static inline bool
++do_opivx_gvec_shift(DisasContext *s, arg_rmrr *a, GVecGen2sFn32 *gvec_fn,
++                    gen_helper_opivx *fn)
++{
++    if (!opivx_check(s, a)) {
++        return false;
++    }
++
++    if (a->vm && s->vl_eq_vlmax) {
++        TCGv_i32 src1 = tcg_temp_new_i32();
++        TCGv tmp = tcg_temp_new();
++
++        gen_get_gpr(tmp, a->rs1);
++        tcg_gen_trunc_tl_i32(src1, tmp);
++        tcg_gen_extract_i32(src1, src1, 0, s->sew + 3);
++        gvec_fn(s->sew, vreg_ofs(s, a->rd), vreg_ofs(s, a->rs2),
++                src1, MAXSZ(s), MAXSZ(s));
++
++        tcg_temp_free_i32(src1);
++        tcg_temp_free(tmp);
++        return true;
++    }
++    return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fn, s);
++}
++
++#define GEN_OPIVX_GVEC_SHIFT_TRANS(NAME, SUF) \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                    \
++{                                                                         \
++    static gen_helper_opivx * const fns[4] = {                            \
++        gen_helper_##NAME##_b, gen_helper_##NAME##_h,                     \
++        gen_helper_##NAME##_w, gen_helper_##NAME##_d,                     \
++    };                                                                    \
++                                                                          \
++    return do_opivx_gvec_shift(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);    \
++}
++
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsll_vx,  shls)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsrl_vx,  shrs)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
++
++GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
++GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
++GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 85d1f08bd0..8538a63419 100644
+index 6c53dc5796..f63f06bd37 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -3361,3 +3361,52 @@ RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
- RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
- GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
- GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
+@@ -1316,3 +1316,82 @@ GEN_VEXT_VX(vxor_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vxor_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vxor_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vxor_vx_d, 8, 8, clearq)
 +
-+/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
-+RVVCALL(OPFVV2, vfmul_vv_h, OP_UUU_H, H2, H2, H2, float16_mul)
-+RVVCALL(OPFVV2, vfmul_vv_w, OP_UUU_W, H4, H4, H4, float32_mul)
-+RVVCALL(OPFVV2, vfmul_vv_d, OP_UUU_D, H8, H8, H8, float64_mul)
-+GEN_VEXT_VV_ENV(vfmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfmul_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfmul_vf_h, OP_UUU_H, H2, H2, float16_mul)
-+RVVCALL(OPFVF2, vfmul_vf_w, OP_UUU_W, H4, H4, float32_mul)
-+RVVCALL(OPFVF2, vfmul_vf_d, OP_UUU_D, H8, H8, float64_mul)
-+GEN_VEXT_VF(vfmul_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfmul_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfmul_vf_d, 8, 8, clearq)
++/* Vector Single-Width Bit Shift Instructions */
++#define DO_SLL(N, M)  (N << (M))
++#define DO_SRL(N, M)  (N >> (M))
 +
-+RVVCALL(OPFVV2, vfdiv_vv_h, OP_UUU_H, H2, H2, H2, float16_div)
-+RVVCALL(OPFVV2, vfdiv_vv_w, OP_UUU_W, H4, H4, H4, float32_div)
-+RVVCALL(OPFVV2, vfdiv_vv_d, OP_UUU_D, H8, H8, H8, float64_div)
-+GEN_VEXT_VV_ENV(vfdiv_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfdiv_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfdiv_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfdiv_vf_h, OP_UUU_H, H2, H2, float16_div)
-+RVVCALL(OPFVF2, vfdiv_vf_w, OP_UUU_W, H4, H4, float32_div)
-+RVVCALL(OPFVF2, vfdiv_vf_d, OP_UUU_D, H8, H8, float64_div)
-+GEN_VEXT_VF(vfdiv_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfdiv_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfdiv_vf_d, 8, 8, clearq)
-+
-+static uint16_t float16_rdiv(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return float16_div(b, a, s);
++/* generate the helpers for shift instructions with two vector operators */
++#define GEN_VEXT_SHIFT_VV(NAME, TS1, TS2, HS1, HS2, OP, MASK, CLEAR_FN)   \
++void HELPER(NAME)(void *vd, void *v0, void *vs1,                          \
++                  void *vs2, CPURISCVState *env, uint32_t desc)           \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t esz = sizeof(TS1);                                           \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                              \
++    uint32_t i;                                                           \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        TS1 s1 = *((TS1 *)vs1 + HS1(i));                                  \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                                  \
++        *((TS1 *)vd + HS1(i)) = OP(s2, s1 & MASK);                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                              \
 +}
 +
-+static uint32_t float32_rdiv(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return float32_div(b, a, s);
++GEN_VEXT_SHIFT_VV(vsll_vv_b, uint8_t,  uint8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsll_vv_h, uint16_t, uint16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsll_vv_w, uint32_t, uint32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsll_vv_d, uint64_t, uint64_t, H8, H8, DO_SLL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsrl_vv_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsrl_vv_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsrl_vv_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsrl_vv_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsra_vv_b, uint8_t,  int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsra_vv_h, uint16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsra_vv_w, uint32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsra_vv_d, uint64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++/* generate the helpers for shift instructions with one vector and one scalar */
++#define GEN_VEXT_SHIFT_VX(NAME, TD, TS2, HD, HS2, OP, MASK, CLEAR_FN) \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1,                \
++        void *vs2, CPURISCVState *env, uint32_t desc)                 \
++{                                                                     \
++    uint32_t mlen = vext_mlen(desc);                                  \
++    uint32_t vm = vext_vm(desc);                                      \
++    uint32_t vl = env->vl;                                            \
++    uint32_t esz = sizeof(TD);                                        \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                          \
++    uint32_t i;                                                       \
++                                                                      \
++    for (i = 0; i < vl; i++) {                                        \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                    \
++            continue;                                                 \
++        }                                                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                              \
++        *((TD *)vd + HD(i)) = OP(s2, s1 & MASK);                      \
++    }                                                                 \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                          \
 +}
 +
-+static uint64_t float64_rdiv(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return float64_div(b, a, s);
-+}
++GEN_VEXT_SHIFT_VX(vsll_vx_b, uint8_t, int8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsll_vx_h, uint16_t, int16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsll_vx_w, uint32_t, int32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsll_vx_d, uint64_t, int64_t, H8, H8, DO_SLL, 0x3f, clearq)
 +
-+RVVCALL(OPFVF2, vfrdiv_vf_h, OP_UUU_H, H2, H2, float16_rdiv)
-+RVVCALL(OPFVF2, vfrdiv_vf_w, OP_UUU_W, H4, H4, float32_rdiv)
-+RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
-+GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
++GEN_VEXT_SHIFT_VX(vsrl_vx_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsrl_vx_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsrl_vx_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsrl_vx_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
 -- 
 2.27.0
 
