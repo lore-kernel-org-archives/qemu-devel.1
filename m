@@ -2,80 +2,93 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DB9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 23:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B85CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 23:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB6BD2073E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 23:11:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB6BD2073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E3BC42075A
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 23:56:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fjlIBnl8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BC42075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joxVV-0001N4-6k
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 19:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42876)
+	id 1joyD4-0000ip-V8
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 19:56:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joxUt-0000xn-Ge
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:11:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56440)
+ (Exim 4.90_1) (envelope-from
+ <3-4r2XgsKCugRcUSXXOWYOXQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--hskinnemoen.bounces.google.com>)
+ id 1joyC8-0007Vl-IG
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:55:44 -0400
+Received: from mail-pg1-x54a.google.com ([2607:f8b0:4864:20::54a]:47269)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joxUr-0004Pj-BL
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:11:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1joxUo-0005wF-QS
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 23:10:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C18C02E810A
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 23:10:58 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Jun 2020 23:05:38 -0000
-From: Langston <1885332@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: langston0
-X-Launchpad-Bug-Reporter: Langston (langston0)
-X-Launchpad-Bug-Modifier: Langston (langston0)
-References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
-Message-Id: <159321273905.5604.12632550783033858318.malone@soybean.canonical.com>
-Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
- AT_PHDR
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a4820312beeb3086a424bf3916597ba13c802adf
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 19:10:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from
+ <3-4r2XgsKCugRcUSXXOWYOXQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--hskinnemoen.bounces.google.com>)
+ id 1joyC6-0001yd-CK
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:55:44 -0400
+Received: by mail-pg1-x54a.google.com with SMTP id p8so7723905pgj.14
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 16:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=Q+/Fo0D+pxJKA5+TZNMoGiD22/K5gQwLGBVbCjcYL+Q=;
+ b=fjlIBnl8w2CIpN9/B2364+9OiOk7jPO2BqCDSXr2338Z6ZuerBaNl8U321zYYn47jr
+ wbmYdIJSLjP2Mpef0IAEHeH7onNswX2J5Y+MU1JZo/CtTP+1a7fyWwK6Hv17fRUt/a6w
+ 0VZD2IcOYSgcDCXXLDNnJdY5nGEWWzBjbw92gD2ngMsCJRbGStwxJfOMvLQJbH6kUkkr
+ 07NbSatJA3DxNIiSHpzmTIHZpkhbHPaZ5OvYWtOZGNUtu/tF81XAmeQtEy8yTGKhid9e
+ fgQVVUFhdlqWrxmSBFI5cA+iDamcBP4q/uLHH31oDtpLIuid68UCYKaoU4vBta05pTWG
+ uegQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=Q+/Fo0D+pxJKA5+TZNMoGiD22/K5gQwLGBVbCjcYL+Q=;
+ b=jw8gNz2bDB96OdEasCN975N5yXASXLPkwwmmhwCPzQllvjPhH0Rc6tG8hP9zOpa8Kc
+ AG8YJkpDbIbJb7tRtLwbio3ifrX9j7ucR/E6HSILxAI1wBJPaFLFTaAi0V1VZuzZlxxm
+ YXUAV6FjZji/aDkxZ7Wqsk5LMiUmAvky+mkchynILNCboZUisQZkodtlxPT4kiaNTJTU
+ c0jhYoqRlVCrr3Fz2jP6kJP+PAcrTcIl7jxxfTqefmA8Uj1wDq898G1EWaXpd+Dwqbul
+ WuxnJLIDenIDmacVt/mcdsAwKhYH5HeLQXQB+Q5yUlG5/CZ3e4GWZsKX8XBk7SdafB+N
+ i4dA==
+X-Gm-Message-State: AOAM531T9EVd1xa7jh9axyEHOxsCFPLmtJzjS/7/JbYmAMViCuPG0YgS
+ HMj8Ix4smrBLkR8Q8EbWGYwpxnZkv+hD1k+jKg==
+X-Google-Smtp-Source: ABdhPJw05aL+Ga/hNCaAu9T5fXj4ofF39NukNhGuyGYFRcdm4OaTTdV+ACzMgXyvI6TJt2VihlAcYttbQIz31VpDiA==
+X-Received: by 2002:a17:90b:19c4:: with SMTP id
+ nm4mr6244865pjb.66.1593215739732; 
+ Fri, 26 Jun 2020 16:55:39 -0700 (PDT)
+Date: Fri, 26 Jun 2020 16:55:07 -0700
+Message-Id: <20200626235519.591734-1-hskinnemoen@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+Subject: [PATCH v3 00/12] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
+From: Havard Skinnemoen <hskinnemoen@google.com>
+To: peter.maydell@linaro.org, clg@kaod.org, joel@jms.id.au
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
+ kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::54a;
+ envelope-from=3-4r2XgsKCugRcUSXXOWYOXQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--hskinnemoen.bounces.google.com;
+ helo=mail-pg1-x54a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,159 +97,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just confirmed that this is still a problem on git tag v5.0.0, where I
-applied the following:
+Time for another refresh of this patchset. Sorry it took so long -- I've been
+trying to figure out why the Winbond flash model isn't working with
+npcm750-evb, and I'm fairly convinced the number of dummy cycles in DIO mode
+should be 4, not 1. Unfortunately, I don't see any other machines using Winbond
+flash in DIO mode, so it's hard to prove that it's correct. I'm planning to
+post a libqos-based test suite separately.
 
-  diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-  index 619c054cc4..093656d059 100644
-  --- a/linux-user/elfload.c
-  +++ b/linux-user/elfload.c
-  @@ -2016,6 +2016,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int=
- argc, int envc,
-      /* There must be exactly DLINFO_ITEMS entries here, or the assert
-        * on info->auxv_len will trigger.
-        */
-  +    printf("PHDR: %x\n", (abi_ulong)(info->load_addr + exec->e_phoff));
-      NEW_AUX_ENT(AT_PHDR, (abi_ulong)(info->load_addr + exec->e_phoff));
-      NEW_AUX_ENT(AT_PHENT, (abi_ulong)(sizeof (struct elf_phdr)));
-      NEW_AUX_ENT(AT_PHNUM, (abi_ulong)(exec->e_phnum));
+I'm also planning to add the vbootrom to qemu as a submodule, similar to the
+other roms, but not in this pathset (let me know if you do want me to include
+this in the series).
 
-and saw:
+I also pushed this and the previous two patchsets to my qemu fork on github.
+The branches are named npcm7xx-v[1-3].
 
-  PHDR: ae000
+  https://github.com/hskinnemoen/qemu
 
--- =
+This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to boot
+an OpenBMC image built for quanta-gsj. This includes device models for:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885332
+  - Global Configuration Registers
+  - Clock Control
+  - Timers
+  - Fuses
+  - Memory Controller
+  - Flash Controller
 
-Title:
-  Error in user-mode calculation of ELF aux vector's AT_PHDR
+These modules, along with the existing Cortex A9 CPU cores and built-in
+peripherals, are integrated into a NPCM730 or NPCM750 SoC, which in turn form
+the foundation for the quanta-gsj and npcm750-evb machines, respectively. The
+two SoCs are very similar; the only difference is that NPCM730 is missing some
+peripherals that NPCM750 has, and which are not considered essential for
+datacenter use (e.g. graphics controllers). For more information, see
 
-Status in QEMU:
-  New
+https://www.nuvoton.com/products/cloud-computing/ibmc/
 
-Bug description:
-  =
+Both quanta-gsj and npcm750-evb correspond to real boards supported by OpenBMC.
+At the end of the series, qemu can boot an OpenBMC image built for one of these
+boards with some minor modifications.
 
-  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
-t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
-but crashes before main in user-mode emulation. Specifically, it crashes wh=
-en initializing thread-local storage in glibc's _dl_aux_init, because it re=
-ads out a strange value from the AT_PHDR entry of the ELF aux vector.
+The patches in this series were developed by Google and reviewed by Nuvoton. We
+will be maintaining the machine and peripheral support together.
 
-  The binary has these program headers:
+The data sheet for these SoCs is not generally available. Please let me know if
+more comments are needed to understand the device behavior.
 
-    Program Headers:
-      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
-gn
-      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
-      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
-0000
-      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
-0000
-      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
-      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
-      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
-      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
-      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
-000
-      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
-000
+Changes since v2:
 
-  If I build the Linux kernel with the following patch to the very end
-  of create_elf_tables in fs/binfmt_elf.c
+  - Simplified the MAINTAINERS entry.
+  - Added link to OpenPOWER jenkins for gsj BMC images.
+  - Reverted the smpboot change, back to byte swapping.
+  - Adapted to upstream API changes:
+      - sysbus_init_child_obj -> object_initialize_child
+      - object_property_set_bool -> qdev_realize / sysbus_realize
+      - ssi_create_slave_no_init -> qdev_new
+      - qdev_init_nofail -> qdev_realize_and_unref
+      - ssi_auto_connect_slaves removed
+  - Moved Boot ROM loading from soc to machine init.
+  - Plumbed power-on-straps property from GCR to the machine init code so it
+    can be properly initialized. Turns out npcm750 memory init doesn't work
+    without this. npcm730 is fine either way, though I'm not sure why.
+  - Reworked the flash init code so it looks more like aspeed (i.e. the flash
+    device gets added even if there's no drive).
 
-    /* Put the elf_info on the stack in the right place.  */
-    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
-    int i;
-    for (i =3D 0; i < 15; i++) {
-      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
-    }
-    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
-        return -EFAULT;
-    return 0;
+Changes since v1 (requested by reviewers):
 
-  and run it like this:
+  - Clarify the source of CLK reset values.
+  - Made smpboot a constant byte array, eliinated byte swapping.
+  - NPCM7xxState now stores an array of ARMCPUs, not pointers to ARMCPUs.
+  - Clarify why EL3 is disabled.
+  - Introduce NPCM7XX_NUM_IRQ constant.
+  - Set the number of CPUs according to SoC variant, and disallow command line
+    overrides (i.e. you can no longer override the number of CPUs with the -smp
+    parameter). This is trying to follow the spirit of
+    https://patchwork.kernel.org/patch/11595407/.
+  - Switch register operations to DEVICE_LITTLE_ENDIAN throughout.
+  - Machine documentation added (new patch).
 
-    qemu-system-arm \
-      -M versatilepb \
-      -nographic \
-      -dtb ./dts/versatile-pb.dtb \
-      -kernel zImage \
-      -M versatilepb \
-      -m 128M \
-      -append "earlyprintk=3Dvga,keep" \
-      -initrd initramfs
+Changes since v1 to support flash booting:
 
-  after I've built the kernel initramfs like this (where "init" is the
-  binary in question):
+  - GCR reset value changes to get past memory initialization when booting
+    from flash (patches 2 and 5):
+      - INTCR2 now indicates that the DDR controller is initialized.
+      - INTCR3 is initialized according to DDR memory size. A realize()
+	method was implemented to achieve this.
+  - Refactor the machine initialization a bit to make it easier to drop in
+    machine-specific flash initialization (patch 6).
+  - Extend the series with additional patches to enable booting from flash:
+      - Boot ROM (through the -bios option).
+      - OTP (fuse) controller.
+      - Memory Controller stub (just enough to skip memory training).
+      - Flash controller.
+      - Board-specific flash initialization.
 
-    make ARCH=3Darm versatile_defconfig
-    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
-    cp "$1" arch/arm/boot/init
-    cd arch/arm/boot
-    echo init | cpio -o --format=3Dnewc > initramfs
+Thanks for reviewing,
 
-  then I get the following output. This is the kernel's view of the aux
-  vector for this binary:
+Havard
 
-    0x10 =3D 0x1d7
-    0x6 =3D 0x1000
-    0x11 =3D 0x64
-    0x3 =3D 0x900000
-    0x4 =3D 0x20
-    0x5 =3D 0xb
-    0x7 =3D 0x0
-    0x8 =3D 0x0
-    0x9 =3D 0x101b8
-    0xb =3D 0x0
-    0xc =3D 0x0
-    0xd =3D 0x0
-    0xe =3D 0x0
-    0x17 =3D 0x0
-    0x19 =3D 0xbec62fb5
+Havard Skinnemoen (12):
+  npcm7xx: Add config symbol
+  hw/misc: Add NPCM7xx System Global Control Registers device model
+  hw/misc: Add NPCM7xx Clock Controller device model
+  hw/timer: Add NPCM7xx Timer device model
+  hw/arm: Add NPCM730 and NPCM750 SoC models
+  hw/arm: Add two NPCM7xx-based machines
+  hw/arm: Load -bios image as a boot ROM for npcm7xx
+  hw/nvram: NPCM7xx OTP device model
+  hw/mem: Stubbed out NPCM7xx Memory Controller model
+  hw/ssi: NPCM7xx Flash Interface Unit device model
+  hw/arm: Wire up BMC boot flash for npcm750-evb and quanta-gsj
+  docs/system: Add Nuvoton machine documentation
 
-  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
-  the aux vector at the beginning of __libc_start_init (for example,
-  using this Python GDB API script: https://gist.github.com/langston-
-  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
-  values:
+ MAINTAINERS                      |   8 +
+ default-configs/arm-softmmu.mak  |   1 +
+ docs/system/arm/nuvoton.rst      |  92 ++++++
+ docs/system/target-arm.rst       |   1 +
+ hw/arm/Kconfig                   |   9 +
+ hw/arm/Makefile.objs             |   1 +
+ hw/arm/npcm7xx.c                 | 429 ++++++++++++++++++++++++++
+ hw/arm/npcm7xx_boards.c          | 188 ++++++++++++
+ hw/mem/Makefile.objs             |   1 +
+ hw/mem/npcm7xx_mc.c              |  83 ++++++
+ hw/misc/Makefile.objs            |   2 +
+ hw/misc/npcm7xx_clk.c            | 216 ++++++++++++++
+ hw/misc/npcm7xx_gcr.c            | 211 +++++++++++++
+ hw/misc/trace-events             |   8 +
+ hw/nvram/Makefile.objs           |   1 +
+ hw/nvram/npcm7xx_otp.c           | 391 ++++++++++++++++++++++++
+ hw/ssi/Makefile.objs             |   1 +
+ hw/ssi/npcm7xx_fiu.c             | 496 +++++++++++++++++++++++++++++++
+ hw/ssi/trace-events              |   9 +
+ hw/timer/Makefile.objs           |   1 +
+ hw/timer/npcm7xx_timer.c         | 437 +++++++++++++++++++++++++++
+ hw/timer/trace-events            |   5 +
+ include/hw/arm/npcm7xx.h         | 106 +++++++
+ include/hw/mem/npcm7xx_mc.h      |  35 +++
+ include/hw/misc/npcm7xx_clk.h    |  65 ++++
+ include/hw/misc/npcm7xx_gcr.h    |  76 +++++
+ include/hw/nvram/npcm7xx_otp.h   |  93 ++++++
+ include/hw/ssi/npcm7xx_fiu.h     |  99 ++++++
+ include/hw/timer/npcm7xx_timer.h |  95 ++++++
+ 29 files changed, 3160 insertions(+)
+ create mode 100644 docs/system/arm/nuvoton.rst
+ create mode 100644 hw/arm/npcm7xx.c
+ create mode 100644 hw/arm/npcm7xx_boards.c
+ create mode 100644 hw/mem/npcm7xx_mc.c
+ create mode 100644 hw/misc/npcm7xx_clk.c
+ create mode 100644 hw/misc/npcm7xx_gcr.c
+ create mode 100644 hw/nvram/npcm7xx_otp.c
+ create mode 100644 hw/ssi/npcm7xx_fiu.c
+ create mode 100644 hw/timer/npcm7xx_timer.c
+ create mode 100644 include/hw/arm/npcm7xx.h
+ create mode 100644 include/hw/mem/npcm7xx_mc.h
+ create mode 100644 include/hw/misc/npcm7xx_clk.h
+ create mode 100644 include/hw/misc/npcm7xx_gcr.h
+ create mode 100644 include/hw/nvram/npcm7xx_otp.h
+ create mode 100644 include/hw/ssi/npcm7xx_fiu.h
+ create mode 100644 include/hw/timer/npcm7xx_timer.h
 
-    AT_PHDR =3D 0xae000
-    AT_PHENT =3D 0x20
-    AT_PHNUM =3D 0xb
-    AT_PAGESZ =3D 0x1000
-    AT_BASE =3D 0x0
-    AT_FLAGS =3D 0x0
-    AT_ENTRY =3D 0x10230
-    AT_UID =3D 0x3e9
-    AT_EUID =3D 0x3e9
-    AT_GID =3D 0x3e9
-    AT_EGID =3D 0x3e9
-    AT_HWCAP =3D 0x1fb8d7
-    AT_CLKTCK =3D 0x64
-    AT_RANDOM =3D -0x103c0
-    AT_HWCAP2 =3D 0x1f
-    AT_NULL =3D 0x0
+-- 
+2.27.0.212.ge8ba1cc988-goog
 
-  The crucial difference is in AT_PHDR (0x3), which is indeed the
-  virtual address of the PHDR segment when the kernel calculates it, but
-  is not when QEMU calculates it.
-
-  qemu-arm --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
 
