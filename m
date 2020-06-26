@@ -2,87 +2,84 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7455AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D30C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4522020781
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3316520656
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:41:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q/XYeiaO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4522020781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KLt3w1Z7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3316520656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jooV7-0006iE-Eo
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:34:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33516)
+	id 1joobe-0002E2-FY
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:41:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jooUK-0006HU-GF
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:33:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44312
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jooUI-0006iv-9Z
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:33:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593178428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BtUVAqIxIupxJnwhfNB1fGCULR4yN3fTIoyIX58ndc4=;
- b=Q/XYeiaO/aZmmN3mmHiVqSNFEwIDb3vaQ9YSMe+CBssIYKZaUSPv9GE1WuzjmbDTguB7wL
- A4u8GiF4kSyO4PlZH18hcpu9/SWv/a4xVorS/yf93zzCKCA4WT9ePXcLQeRMQv2onT9gkc
- qIDhWnTM8k/NDL5GPBgSDa178yKf5F8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-KIITxVngNxGWLzk5W3dAbg-1; Fri, 26 Jun 2020 09:33:44 -0400
-X-MC-Unique: KIITxVngNxGWLzk5W3dAbg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6C77805EE2;
- Fri, 26 Jun 2020 13:33:43 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-125.ams2.redhat.com [10.36.112.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B3B470915;
- Fri, 26 Jun 2020 13:33:42 +0000 (UTC)
-Subject: Re: [PATCH 5/5] haiku build fix
-To: David CARLIER <devnexen@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
-References: <CA+XhMqwft10MnY5nOc7L+q59kOY3BAejjrOS09R5QD2H7AH-Cg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <609f7eda-9036-9b39-8380-e126d0f7d81e@redhat.com>
-Date: Fri, 26 Jun 2020 15:33:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jooZL-0008PQ-Ev
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:39:03 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39219)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jooZJ-0008S8-Ma
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:39:03 -0400
+Received: by mail-oi1-x242.google.com with SMTP id w17so7374955oie.6
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 06:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=g6rP+I7OcxR0JAnDkJ0llpNmylekoaWGwlpiJZqQuGQ=;
+ b=KLt3w1Z7TIZW6DU3B7B+0BTVY7GMOmt1Mgf0R2bJ2NgjQ9aTnIK8w6QrItrVuzboVJ
+ rfdLIllUXEi+CZRujO/g51Vmv4HC/I2NDgYghnZ9RzJzYFs/2uP2LB7yGFW50J7oIoJx
+ FmOH95VjD0SNUjEF7hj6JoQcFms2aLZO8oGrcQB5Fyu3vKHa82/qgDM2oihoRuU11HLe
+ zJ7550tlJ+tM64ddUeRizGze7khJG3Sy7bkodwdGYH7QSBNDrYhWU390rA5LEMYZJjhH
+ 0NvDHj9A1b/PX8vRGdyBfrqqcGV9I2VppVM0VPKcwoIqVudYvlSmstOPFFUPMk5nzwto
+ WGQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=g6rP+I7OcxR0JAnDkJ0llpNmylekoaWGwlpiJZqQuGQ=;
+ b=WFWuA5HMKjUKJTC/LIuulm8igsRVMQahpsiCLjDH5OsU1LwbB6ownX2ErJngTCiepz
+ WUX/7wDKJOuYSLGq+XN4NGScK7Cl6TcdM06P1UejZ4ywmQ1xlzgCULfR3B+PC9Vas4MV
+ Obo+NtXVjjrWyi6vHGDxebpUCkR802qGUtKhEqG1i7zBMJP/cMKJIPRaraas/kROF0IL
+ Rit5xo5FMHJeAofuxbJKEvSR0LzlDmdaA2w7so+LVjkg+5n5e1HOd37g/8dnRIjS72AA
+ bLbpjD75ide9K8kpmB58oyYavb5pNRF1FWTLX7IcH3516ZlYMYUxuwr4pwigR5oRCYB6
+ qU0g==
+X-Gm-Message-State: AOAM530Bmtu60+3clwzWlXluZk3Eap+Vlg+U+Gopdin3vexVkKEItL1u
+ tnkJ2VgibRPqJfRVO+Rx7vqaJfh/zzuuMHzEfyJGCy08S8WwyQ==
+X-Google-Smtp-Source: ABdhPJwFVbeelNmlR/2iQBDQq4UYCMbXhBak0Vw3g5umyciLpQeZBmjN0hSMWSaxUE0JFNTHO4fz1cfqzSzUDzrsNYA=
+X-Received: by 2002:aca:1a07:: with SMTP id a7mr2442216oia.163.1593178740487; 
+ Fri, 26 Jun 2020 06:39:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA+XhMqwft10MnY5nOc7L+q59kOY3BAejjrOS09R5QD2H7AH-Cg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CA+XhMqwDLw2BJ9Cf0kEyUW+J+rTPOOvebRPPkBSiWdD50wct5Q@mail.gmail.com>
+In-Reply-To: <CA+XhMqwDLw2BJ9Cf0kEyUW+J+rTPOOvebRPPkBSiWdD50wct5Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jun 2020 14:38:49 +0100
+Message-ID: <CAFEAcA8mpiPcwgz9-7c0GgSWz2hujzegOBvHn5qasCBtuyG8ww@mail.gmail.com>
+Subject: Re: [PATCH 1/3] haiku build fix second batch
+To: David CARLIER <devnexen@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,33 +92,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/06/2020 12.07, David CARLIER wrote:
->  From 68d4d4312eccd212b4d2484e09425816ebd2346a Mon Sep 17 00:00:00 2001
+On Fri, 26 Jun 2020 at 14:02, David CARLIER <devnexen@gmail.com> wrote:
+>
+> From 95ef79ddff73eebd1f1bec6673c2c68209fab107 Mon Sep 17 00:00:00 2001
 > From: David Carlier <devnexen@gmail.com>
-> Date: Fri, 26 Jun 2020 11:01:54 +0000
-> Subject: [PATCH 5/5] Last chunk of build fix
-> 
+> Date: Fri, 26 Jun 2020 13:56:14 +0000
+> Subject: [PATCH 1/3] Include endian.h for Haiku to solve bswap* macros build
+>  failure.
+>
 > Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->   include/qemu/bswap.h | 2 ++
->   util/Makefile.objs   | 2 +-
->   util/compatfd.c      | 2 ++
->   3 files changed, 5 insertions(+), 1 deletion(-)
 
-  Hi David,
+I'm afraid I'm now confused about which is the right version
+of the various patches you've sent to the list. Our
+https://wiki.qemu.org/Contribute/SubmitAPatch
+documentation asks:
+ * Include a meaningful cover letter
+ * When resending patches add a version tag
+ * even if you only change one patch, you resend the entire series
+   and mark it as "v2"
 
-not directly related to this patch, but: do you know whether Haiku can 
-also be installed non-interactively? We've got a set of VM-based 
-compilation tests for FreeBSD, NetBSD and OpenBSD, see tests/vm/ in the 
-QEMU sources (or run "make vm-help" for more information about the make 
-targets) ... if something similar would be possible for Haiku, that 
-would certainly help to prevent that the Haiku port bitrots so easily 
-again...
+Please could you send the whole set of patches you'd like
+applied, with the subject header including "[PATCH v2]" and
+with a cover letter email that describes the whole series?
 
-  Thomas
-
+thanks
+-- PMM
 
