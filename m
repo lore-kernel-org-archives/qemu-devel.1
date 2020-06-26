@@ -2,70 +2,73 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C45C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CE4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3D5020768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31DEA20768
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWPjRok9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D5020768
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="azdGvDOI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DEA20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolgV-00067K-4j
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:34:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40968)
+	id 1jolhB-00070c-F4
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:34:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldi-0001wK-3B
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56027
+ id 1joldp-00026p-Ed
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50429
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldg-0003C1-D4
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:21 -0400
+ id 1joldn-0003G7-N4
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593167479;
+ s=mimecast20190719; t=1593167487;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=SAWCETpNMNDNW0YqCfxZ+bcsIqoAL6Ek43Ufn11Nj4g=;
- b=LWPjRok9z+L066qkBJDbi4oPG1Ruauk4Ck+hn20LXA5eOYTlTkUNoxbJz7+0Mr83NbyvuW
- trGxLcTVmeiQfRfGLgyiXvI5NsAkxhK2orrp18slAXEUUUUo6Bar4VBxCOop3bokQORIU/
- QOkpDIBzdoaKWCuPTjd+vrV3Xbukxz8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oYVFAVqYGf5neJ3Wr0VtiQUIg29jzhHrC/alVMqoehE=;
+ b=azdGvDOIKHwCKt9lTyc6CILGls8H09AXU4IbRJhUtI+l6N3fjogVWuCg4gMe7nb0GpAAXY
+ 7hPvXVCRahTlGE9u9ccqdg4/mQIaCgSoPARm39UnfM6gJGN3gH3esZKHCnXA2k77zyW9hk
+ NY/99vGB4HGR7P56g5FlTbMqwGS8Tns=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-kpQKq4NpMwmqE4hT4M5IOQ-1; Fri, 26 Jun 2020 06:31:16 -0400
-X-MC-Unique: kpQKq4NpMwmqE4hT4M5IOQ-1
+ us-mta-76-fd_208t-M4WH4m7eLJ7wsA-1; Fri, 26 Jun 2020 06:31:25 -0400
+X-MC-Unique: fd_208t-M4WH4m7eLJ7wsA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7BF0107ACCA;
- Fri, 26 Jun 2020 10:31:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46DB010059A0;
+ Fri, 26 Jun 2020 10:31:24 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4407560C87;
- Fri, 26 Jun 2020 10:31:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2482610F3;
+ Fri, 26 Jun 2020 10:31:20 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
  armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
  bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v6 0/5] VIRTIO-IOMMU probe request support and MSI bypass on
- ARM
-Date: Fri, 26 Jun 2020 12:30:52 +0200
-Message-Id: <20200626103057.11263-1-eric.auger@redhat.com>
+Subject: [PATCH v6 3/5] virtio-iommu: Handle reserved regions in the
+ translation process
+Date: Fri, 26 Jun 2020 12:30:55 +0200
+Message-Id: <20200626103057.11263-4-eric.auger@redhat.com>
+In-Reply-To: <20200626103057.11263-1-eric.auger@redhat.com>
+References: <20200626103057.11263-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
@@ -101,81 +104,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By default the virtio-iommu translates MSI transactions. This
-behavior is inherited from ARM SMMU. However the virt machine
-code knows where the MSI doorbells are, so we can easily
-declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
-setting the guest iommu subsystem will not need to map MSIs.
-This setup will simplify the VFIO integration.
+When translating an address we need to check if it belongs to
+a reserved virtual address range. If it does, there are 2 cases:
 
-In this series, the ITS or GICV2M doorbells are declared as
-HW MSI regions to be bypassed by the VIRTIO-IOMMU.
+- it belongs to a RESERVED region: the guest should neither use
+  this address in a MAP not instruct the end-point to DMA on
+  them. We report an error
 
-This also paves the way to the x86 integration where the MSI
-region, [0xFEE00000,0xFEEFFFFF], will be exposed by the q35
-machine.  However this will be handled in a separate series
-when not-DT support gets resolved.
+- It belongs to an MSI region: we bypass the translation.
 
-Best Regards
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Eric
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v5.0.0-virtio-iommu-msi-bypass-v6
-
-History:
-
-v5 -> v6:
-- do not hardcode start/end addresses of doorbells
-- check reserved region type on realize()
-
-v4 -> v5:
-- Take into account some additional comments from Markus:
-  - reserved region type becomes an unsigned + some comment/desc
-    rewording
-  - assert if the type is not RESERVED or MSI
-
-v3 -> v4:
-- collected Jean and markus's R-bs
-- tool into account all Markus' comments in [1/5] (except removal of
-  goto)
-- use ':' as delimitor instead of commas
-- add example in 4/5 commit message as suggested by Markus
-
-v2 -> v3:
-- Introduce VIRT_MSI_CTRL_NONE in VirtMSIControllerType
-- do not fill the remainder of the probe buffer
+---
 
 v1 -> v2:
-- check which MSI controller is in use and advertise the
-  corresponding MSI doorbell
-- managed for both ITS and GICv2M
-- various fixes spotted by Peter and Jean-Philippe, see
-  individual logs
+- use addr when testing addr belongs to the reserved region
+  and use a block local variable
+---
+ hw/virtio/virtio-iommu.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-v1: Most of those patches were respinned from
-  [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
-  except the last one which is new
-
-Eric Auger (5):
-  qdev: Introduce DEFINE_PROP_RESERVED_REGION
-  virtio-iommu: Implement RESV_MEM probe request
-  virtio-iommu: Handle reserved regions in the translation process
-  virtio-iommu-pci: Add array of Interval properties
-  hw/arm/virt: Let the virtio-iommu bypass MSIs
-
- include/exec/memory.h            |   6 ++
- include/hw/arm/virt.h            |   7 ++
- include/hw/qdev-properties.h     |   3 +
- include/hw/virtio/virtio-iommu.h |   2 +
- include/qemu/typedefs.h          |   1 +
- hw/arm/virt.c                    |  30 +++++++++
- hw/core/qdev-properties.c        |  89 +++++++++++++++++++++++++
- hw/virtio/virtio-iommu-pci.c     |  13 ++++
- hw/virtio/virtio-iommu.c         | 110 +++++++++++++++++++++++++++++--
- hw/virtio/trace-events           |   1 +
- 10 files changed, 258 insertions(+), 4 deletions(-)
-
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 5e72fd53a1..4a50e24d21 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -603,6 +603,7 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     uint32_t sid, flags;
+     bool bypass_allowed;
+     bool found;
++    int i;
+ 
+     interval.low = addr;
+     interval.high = addr + 1;
+@@ -636,6 +637,25 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto unlock;
+     }
+ 
++    for (i = 0; i < s->nb_reserved_regions; i++) {
++        ReservedRegion *reg = &s->reserved_regions[i];
++
++        if (addr >= reg->low && addr <= reg->high) {
++            switch (reg->type) {
++            case VIRTIO_IOMMU_RESV_MEM_T_MSI:
++                entry.perm = flag;
++                break;
++            case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
++            default:
++                virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
++                                          VIRTIO_IOMMU_FAULT_F_ADDRESS,
++                                          sid, addr);
++                break;
++            }
++            goto unlock;
++        }
++    }
++
+     if (!ep->domain) {
+         if (!bypass_allowed) {
+             error_report_once("%s %02x:%02x.%01x not attached to any domain",
 -- 
 2.20.1
 
