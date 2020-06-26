@@ -2,80 +2,108 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF70C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A244A21531
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:37:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A244A21531
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E6A1221532
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:44:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vDmo5m+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A1221532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joknt-0003ba-TE
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:37:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57856)
+	id 1jokuQ-0006CX-7J
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1joklg-0000bP-Hw
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:35:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60846)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1joktp-0005fL-HG; Fri, 26 Jun 2020 05:43:57 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jokle-0003Gx-7W
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:35:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1joklc-0001I2-Bf
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:35:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 34DB82E80E7
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:35:28 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1joktn-0007ZR-Sl; Fri, 26 Jun 2020 05:43:57 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h5so8837162wrc.7;
+ Fri, 26 Jun 2020 02:43:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=epw7Ya6mrSaGCZp6nWlwRKSneX+jRfVGp7MULgc8HsY=;
+ b=vDmo5m+w1Mca2MdXfsczqoN8j7EfGlJY3KNbkhXGS8Q344cVp5EewVfJoTJMG27GBz
+ P5u+8nlabbc8Al7OuGrTO8vdC7RKl4sTqQCTLMZIL0QucovmUlBgId5GalrfrMyO5h0Z
+ q6zmoD679/N0xyr5EoPqjSCu/SE7k1XJncxhVIua8mqC6jAVl3Zkjq11GHfL04UdzjIb
+ Yptq2omhMeuSfMqdd6MCbOKrH0F7scYhq0GJ5wFzMzZt2nZozwUpFT9tXMDzEK83meYH
+ zSvtX2nkMW59VLswJNpBgY7Soia8tMsaqS/JGqoihCKdzkIFwCLu+y0XrxWJx7Qb3yB8
+ dz+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=epw7Ya6mrSaGCZp6nWlwRKSneX+jRfVGp7MULgc8HsY=;
+ b=RcxiKyKSqVBTIq0tuBpgQmyK6Jx/trKCb0Be3I3rj6IG48eBaRGPJFZzEpFORw2Q/I
+ P0bu0/s/4D3uBnVhb7CtASiKXSQ7QY5wyzoC6tLF9w0HXwgADJaxVVkLSmrHfrOUrVWL
+ FgjVglUN/tExYRxewCioqxYW1O26+c/7WF/cSOSlkgHQER0L/OBriNo+8/P7vpoOolgQ
+ lppCwDs/HuMaywrrGB1qmQWWnW2id06qKuts22GkEKw9iXHpAchhk+G4aleOsfrjfDWQ
+ VYXAkbSp6CPGQtIMYhPhzPSMxny6dry08y8FoiRMw8T7GvVCXkciYgDohI8Yn80lugbx
+ 690w==
+X-Gm-Message-State: AOAM530ukfs8oZmoUemCLGGcllMT99VA1ZAXHuy+WXOKF9MiC1JGrFc9
+ 3k8dBT8OWvZaqyE4B6q8iqI=
+X-Google-Smtp-Source: ABdhPJzjM2AzaeEiDe0zng5wWHeoVzBkrH97so/vWkTc+AsXOtVJ7OsYWoNKY2Wf35P5nQBYxQHcLA==
+X-Received: by 2002:a05:6000:128e:: with SMTP id
+ f14mr3020663wrx.276.1593164633724; 
+ Fri, 26 Jun 2020 02:43:53 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id p17sm16020070wma.47.2020.06.26.02.43.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 26 Jun 2020 02:43:52 -0700 (PDT)
+Subject: Re: [PATCH v4 4/8] hw/misc/pca9552: Add a 'description' property for
+ debugging purpose
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200620225854.31160-1-f4bug@amsat.org>
+ <20200620225854.31160-5-f4bug@amsat.org>
+ <4d335933-9669-43e1-0966-5f0255142012@kaod.org>
+ <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
+ <deccf836-48ef-7112-d66e-a8d3cc4a9681@kaod.org>
+ <877dvv4pmg.fsf@dusky.pond.sub.org>
+ <2d1b8b24-3b2c-d84e-8026-e369f6531247@amsat.org>
+ <03da95ed-399d-53e2-c946-a45f1a771701@amsat.org>
+ <87bll6tlzl.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <61d1f904-0d4f-4ae6-2d4e-3d8e87a9b77c@amsat.org>
+Date: Fri, 26 Jun 2020 11:43:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Jun 2020 09:27:36 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1885247@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aleksandar-markovic philmd pmaydell
-X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159315507826.13901.17398620572438937429.malonedeb@wampee.canonical.com>
-Message-ID: <32aa7cf6-5f4d-eb79-2ebe-ee463f4389b8@redhat.com>
-Subject: Re: [Bug 1885247] [NEW] Build error in Intel 32-bit hosts
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1e0fd5c0279a7d0880c65a07c19195d0f7f6de98
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:10:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87bll6tlzl.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,114 +112,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885247 <1885247@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200626092736.1ixxQbtLoMArGfRtgJBmX_-7_XbYofr0DkXf8xxYjSY@z>
 
-On 6/26/20 11:20 AM, Thomas Huth wrote:
-> On 26/06/2020 11.13, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 6/26/20 9:37 AM, Aleksandar Markovic wrote:
->>> =D0=BF=D0=B5=D1=82, 26. =D1=98=D1=83=D0=BD 2020. =D1=83 09:11 Aleksanda=
-r Markovic
->>> <1885247@bugs.launchpad.net> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+On 6/26/20 7:49 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> On 6/25/20 10:12 AM, Philippe Mathieu-Daudé wrote:
+>>> On 6/25/20 8:37 AM, Markus Armbruster wrote:
+>>>> Cédric Le Goater <clg@kaod.org> writes:
 >>>>
->>>> Public bug reported:
+>>>>> On 6/22/20 10:31 AM, Philippe Mathieu-Daudé wrote:
+>>>>>> On 6/22/20 8:27 AM, Cédric Le Goater wrote:
+>>>>>>> On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
+>>>>>>>> Add a description field to distinguish between multiple devices.
 >>>>
->>>> The code base is on master, checked out on Thursday June25th 2020,
->>>> 0250c595c9d. The build procedure:
+>>>> Pardon my lack of imagination: how does this help you with debugging?
+>>>
+>>> Ah, the patch subject is indeed incorrect, this should be:
+>>> "... for *tracing* purpose" (I use tracing when debugging).
+>>>
+>>> In the next patch, we use the 'description' property:
+>>>
+>>> +# pca9552.c
+>>> +pca9552_gpio_status(const char *description, const char *buf) "%s GPIOs
+>>> 0-15 [%s]"
+>>>
+>>> So when the machine has multiple PCA9552 and guest accesses both,
+>>> we can distinct which one is used. For me having "pca1" / "pca0"
+>>> is easier to follow than the address of the QOM object.
+>>>
 >>>>
->>>> $ mkdir build-gcc
->>>> $ cd build-gcc
->>>> $ ../configure
->>>> $ make
+>>>>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>>>>>>
+>>>>>>> Could it be a QOM attribute ? 
+>>>>>>
+>>>>>> What do you call a 'QOM attribute'?
+>>>>>> Is it what qdev properties implement?
+>>>>>> (in this case via DEFINE_PROP_STRING).
+>>>>>
+>>>>> I meant a default Object property, which would apply to all Objects. 
 >>>>
->>>> The build error message is:
+>>>> Good point.  Many devices have multiple component objects of the same
+>>>> type.
 >>>>
->>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
-/hyperv.o
->>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
-/hyperv_testdev.o
->>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
-/vmbus.o
->>>> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function
->>>> =E2=80=98gpadl_iter_io=E2=80=99:
->>>> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast
->>>> to pointer from integer of different size [-Werror=3Dint-to-pointer-ca=
-st]
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p =3D (void *)(=
-((uintptr_t)iter->map & TARGET_PAGE_MASK) |
->>>> off_in_page);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>> cc1: all warnings being treated as errors
->>>> make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69:
->>>> hw/hyperv/vmbus.o] Error 1
->>>> make: *** [Makefile:527: x86_64-softmmu/all] Error 2
+>>>>> What you did is fine, so :
+>>>>>
+>>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>>>>
+>>>>> but, may be, a well defined child name is enough for the purpose.
+>>>>
+>>>> object_get_canonical_path() returns a distinct path for each (component)
+>>>> object.  The path components are the child property names.
+>>>>
+>>>> Properties can have descriptions: object_property_set_description().
+>>>
+>>> TIL object_property_set_description :>
+>>>
+>>> Ah, there is no equivalent object_property_get_description(),
+>>> we have to use object_get_canonical_path(). Hmm, not obvious.
+>>>
+>>>>
+>>>> Sufficient?
+>>>
+>>> I don't know... This seems a complex way to do something simple...
+>>> This is already a QDEV. Having to use QOM API seems going
+>>> backward, since we have the DEFINE_PROP_STRING() macros available
+>>> in "hw/qdev-properties.h".
+>>>
+>>> Maybe I'm not seeing the advantages clearly. I'll try later.
 >>
->> FWIW there is no CI job covering x86 KVM on 32-bit host build.
->> Should this be covered? I guess the problem is no CI services
->> provide 32-bit x86...
-> =
+>> The canonical path is not very helpful in trace log...
+> 
+> Why?
+> 
+> Okay, I checked the code.  Since the devices in question don't get a
+> composition tree parent assigned, realize puts them in the
+> /machine/unattached orphanage.  The canonical path is something like
+> "/machine/unattached/device[6]", which is less than clear.
+> 
+> The components of the canonical path are the names of the QOM child
+> properties.  object_get_canonical_path_component() returns the last one,
+> in this case "device[6]".
+> 
+> If we made the devices QOM children of some other device, we could name
+> the child properties "pca0" and "pca1".
+> object_get_canonical_path_component() would then return the strings you
+> want to see.
+> 
+> We make a device a QOM child of some QOM parent device only if the child
+> is a component device of the parent (hence the name "composition
+> tree").
+> 
+> Are these devices integral components of something else, or are they
+> separate chips?
 
-> You can certainly provide either a container, or install the 32-bit
-> libraries in a 64-bit environment. Then run
-> =
+Separate chips in the machine (actually not even on the machine mother
+board where is the CPU, but on a daughter board card).
 
-> PKG_CONFIG_LIBDIR=3D... ./configure --extra-cflags=3D-m32
-> =
+So in the composition tree I expect to see them as
 
-> and it should be possible to build 32-bit binaries, too.
-> =
+  /machine/pca0
+  /machine/pca1
 
-> Alternatively, we could add a cross-compilation job that builds with
-> i686-w64-mingw32 in 32-bit.
+>> The description I set matches the hardware definitions
+>> and is easier to follow, see patch #6 (where it is set)
+>> where the description comes from:
+>>
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg714658.html
+>>
+>>   Description name taken from:
+>>   https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
+>>
+>> So in this particular case I don't find the canonical pathname
+>> practical (from an hardware debugging perspective).
+> 
+> Personally, I'd be content with i2c bus and address for debugging
+> purposes.
+> 
+> The i2c buses *are* components: canonical paths look like
+> "/machine/soc/i2c/aspeed.i2c.3".  The combination of
+> object_get_canonical_path_component(dev) and
+> object_property_get_uint(dev, "address", &error_abort) identifies any
+> i2c device on this machine, not just the two you decorate with a
+> description string.
 
-Oh, this case is covered:
-https://app.shippable.com/github/qemu/qemu/runs/2437/2/console
+The I2C busses is provided by Aspeed peripherals. I counted 19 different
+I2C busses on this machine.
 
-But this doesn't use KVM ;)
+"pca0" is connected to i2c bus #11, "pca1" to bus #3.
 
--- =
+I still don't think this will be practical, but I'll try your
+suggestion.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885247
+Regards,
 
-Title:
-  Build error in Intel 32-bit hosts
-
-Status in QEMU:
-  New
-
-Bug description:
-  The code base is on master, checked out on Thursday June25th 2020,
-  0250c595c9d. The build procedure:
-
-  $ mkdir build-gcc
-  $ cd build-gcc
-  $ ../configure
-  $ make
-
-  The build error message is:
-
-    CC      x86_64-softmmu/hw/hyperv/hyperv.o
-    CC      x86_64-softmmu/hw/hyperv/hyperv_testdev.o
-    CC      x86_64-softmmu/hw/hyperv/vmbus.o
-  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function =E2=80=98gpad=
-l_iter_io=E2=80=99:
-  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast to poi=
-nter from integer of different size [-Werror=3Dint-to-pointer-cast]
-           p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_i=
-n_page);
-               ^
-  cc1: all warnings being treated as errors
-  make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69: hw/hyperv/vmbus.=
-o] Error 1
-  make: *** [Makefile:527: x86_64-softmmu/all] Error 2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885247/+subscriptions
+Phil.
 
