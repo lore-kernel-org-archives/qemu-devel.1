@@ -2,89 +2,92 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B7BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 575CFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BD8A20706
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E60420773
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0NsNSoY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD8A20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K0WC6DK9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E60420773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqYO-0007DQ-9V
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:46:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43310)
+	id 1joqYx-00081q-92
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:46:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joqX7-0005hD-M4
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:44:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36191
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joqX5-0005R6-Uv
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:44:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593186290;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ApeWwpVLFNQe8Iic/qyyIhLUyYMG+sllIleIM1iPLQw=;
- b=i0NsNSoY0Qmq6Pa4DKa5cD47BCpu37sobc5ZJTD2LtbLxOZb2+j8HW3YOE3G+hwu5X23qM
- VNfwT/aWd7mhhC/DlgwWgmyf9h4bBs2ThAbqbSDE3eAz0LUYnVVXP96TDFoSy4uSwue632
- HslafrpW+En7DR3YYvvTGJWg7hIa/HA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-FMoU3uCpN8uDOeFBUo2Ghw-1; Fri, 26 Jun 2020 11:44:47 -0400
-X-MC-Unique: FMoU3uCpN8uDOeFBUo2Ghw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72B10100A624;
- Fri, 26 Jun 2020 15:44:46 +0000 (UTC)
-Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3940660CD1;
- Fri, 26 Jun 2020 15:44:42 +0000 (UTC)
-Date: Fri, 26 Jun 2020 16:44:41 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [RFC PATCH 3/3] fuzz: Add callbacks for dma-access functions
-Message-ID: <20200626154441.GB316372@stefanha-x1.localdomain>
-References: <20200611055651.13784-1-alxndr@bu.edu>
- <20200611055651.13784-4-alxndr@bu.edu>
- <20200623141456.GK36568@stefanha-x1.localdomain>
- <20200623145500.jtdb5skwj5htgfcz@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joq4m-0003aZ-CF
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:36 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50452)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1joq4k-0006kx-B0
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:35 -0400
+Received: by mail-wm1-x334.google.com with SMTP id l17so9183057wmj.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=zJG4LmoTNrjoY6KmdBOWs3FmVPzTalAXaLQDaG1a0is=;
+ b=K0WC6DK9FR2Clq5Z7yvawTFy7Do1bKY9arCV+YRnIt9a7unvfPu81MPqtPZrJRYckL
+ 0EsXRIhWb2ng2cgFMDhDWVIizTYZ/QCT4s7Ji9xhNvLgxdlTOs8nWXwcJ5/LAQ7DLu6k
+ iGitiOei0e3HIUp58VVeBSDOZxgGH2n33If8M1EveOuZvD7Wg8wimOpHhkWxzW1DTUk4
+ 71Sag+7TN+pEmRERymwCaF9wsAgW8LYNjuTg3bdrC0ZvQfzOaiytvx5mhK7tQA7YvENa
+ 71RUguTXyDkevuB1UDiQtH8lv6rXOz7dsEcRAwPl9Q3frNf9QpjApNgGhCnU60+6KnTU
+ BFyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=zJG4LmoTNrjoY6KmdBOWs3FmVPzTalAXaLQDaG1a0is=;
+ b=UrTEFrnUNTtt9arjlJkNTLH/FCRT3NcBeqykkeAexgKd/eFzuD6EdYp/xyjJZqOtPb
+ tum70GFfpS/v92771swQ0MheTLvpiWOww5xo5xUnCoYKzjgpp8vFUI5sS6TmLHXPLg32
+ ZjmWPjt2ijpUYvozyh0SnjsSKFkJj6XeJFsWb5xPf/7OogUdP707tFx4vxAp/UJkq1Um
+ mn3iHyQh7itwsAHyYQp0OpjDMEQH1JfsXJoh5yqTGDs1LvxBPpxkzc0ciA4fkUHuhFcv
+ iaMypaXa6sKV22VLRE6eP9bqQTpOomocqVFw/cNkWYGbrRpOz2jCjLWKUGmQPmXAk+wy
+ 2H3g==
+X-Gm-Message-State: AOAM5306VptUJTOPjYNGI4fQMBHJddvG4gFflQVRWl0DRV8AbWsZrQb4
+ YTu8/OSMIHLjQcdtyvt9XySiaJEZqGc91g==
+X-Google-Smtp-Source: ABdhPJzimoKSWS5nS8mFe4VsOngGit6HAgK60v0xf2ttpVFkLjAl54rteXLQfRELPIu2dJAQ7Bql5Q==
+X-Received: by 2002:a1c:6887:: with SMTP id d129mr3890265wmc.179.1593184532466; 
+ Fri, 26 Jun 2020 08:15:32 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.31
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 08:15:31 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 54/57] target/arm: Cache the Tagged bit for a page in MemTxAttrs
+Date: Fri, 26 Jun 2020 16:14:21 +0100
+Message-Id: <20200626151424.30117-55-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
+References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200623145500.jtdb5skwj5htgfcz@mozz.bu.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::334;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,106 +100,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---+g7M9IMkV8truYOl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, Jun 23, 2020 at 10:55:00AM -0400, Alexander Bulekov wrote:
-> On 200623 1514, Stefan Hajnoczi wrote:
-> > On Thu, Jun 11, 2020 at 01:56:51AM -0400, Alexander Bulekov wrote:
-> > > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> > > ---
-> > >  exec.c                                | 17 ++++++++++++++++-
-> > >  include/exec/memory.h                 |  8 ++++++++
-> > >  include/exec/memory_ldst_cached.inc.h |  9 +++++++++
-> > >  include/sysemu/dma.h                  |  5 ++++-
-> > >  memory_ldst.inc.c                     | 12 ++++++++++++
-> > >  5 files changed, 49 insertions(+), 2 deletions(-)
-> >=20
-> > Please rename dma_read_cb() to fuzz_dma_read_cb() so the purpose of the
-> > function is clear.
-> >=20
-> > The ifdefs can be avoided by defining an empty function when CONFIG_FUZ=
-Z
-> > is undefined. In a header file:
-> >=20
-> >   #ifdef CONFIG_FUZZ
-> >   void fuzz_dma_read_cb(size_t addr, size_t len);
-> >   #else
-> >   static inline void fuzz_dma_read_cb(size_t addr, size_t len)
-> >   {
-> >       /* Do nothing */
-> >   }
-> >   #endif
-> >=20
-> > Now the compiler should eliminate the deadcode:
-> >=20
-> >   #ifdef CONFIG_FUZZ
-> >   if (as->root =3D=3D get_system_memory()) {
-> >       dma_read_cb(addr, len);
-> >   }
-> >   #endif
-> >=20
-> > becomes:
-> >=20
-> >   if (as->root =3D=3D get_system_memory()) {
-> >       fuzz_dma_read_cb(addr, len);
-> >   }
-> >=20
-> > Hopefully gcc and clang will eliminate this and emit no instructions
-> > when CONFIG_FUZZ is undefined. If not, you can simply pass in 'as' and
-> > 'is_write' too:
-> >=20
-> >   void fuzz_dma_read_cb(AddressSpace *as, bool is_write, size_t addr, s=
-ize_t len)
-> >=20
-> > This way the conditional is moved inside fuzz_dma_read_cb() and deadcod=
-e
-> > elimination becomes trivial for the compiler:
-> >=20
-> >   fuzz_read_cb(as, is_write, addr, len);
->=20
-> Do you think it would be better to have a "trace_dma_read" or
-> "trace_device_read_from_guest_memory"? I haven't looked under the hood
-> too much for the tracepoint api, but these would just be standard
-> tracepoints(disabled for the majority of builds). When we build the
-> fuzzer, we could compile with --wrap=3D"trace_dma_read" and implement
-> a __wrap_trace_dma_read in the generic fuzzer. I looked at the symbols
-> for a qemu build and it looks like trace_* are actual functions, rather
-> than preprocessor magic, so maybe this could work?
+This "bit" is a particular value of the page's MemAttr.
 
-I think plain old functions are fine for what you are doing.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200626033144.790098-43-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c     | 48 ++++++++++++++++++++++++++++++++++++++---
+ target/arm/tlb_helper.c |  5 +++++
+ 2 files changed, 50 insertions(+), 3 deletions(-)
 
-QEMU's tracing does not provide callbacks that are invoked when a trace
-event is emitted. The fuzzing code wouldn't be able to hook
-trace_device_read_from_guest_memory, you could only analyze a trace
-after the fact.
-
-Stefan
-
---+g7M9IMkV8truYOl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl72F+kACgkQnKSrs4Gr
-c8jXmQf/VyMnAsIWlN7URKEJuILuHA6ZVPnHahzSM7ZFOw3dDDfc7CYYDrjkh8+2
-1UpXMRMlzKa8wS9HgaNJQi3MpHmMmzRPiV+RAogyTiLL0jph0/eVHt4cGORIUq2+
-/wmWGx9QcQkcBGbEE4eaKaWH9oj3uqCUf0OjAe4JIh6sjLC2Ib1DYB3/wlhzQ9FB
-iUzdL2mDrRXms9r6iTlDlr/TnvHQFUFStASxiqARg+xrZ2+HhyJGHPgyncq6dZUJ
-lRVOALtFdBHTHxCuoKV099eUtXH5PZPskfV0v7sVgBjpNTjZGser7dVhZNC8nKcE
-ztxdETCIpfiD0Hyn6ADeE/gAYZRPmA==
-=48ik
------END PGP SIGNATURE-----
-
---+g7M9IMkV8truYOl--
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 2072db2f92d..dc9c29f998f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11834,9 +11834,19 @@ static uint8_t combine_cacheattr_nibble(uint8_t s1, uint8_t s2)
+  */
+ static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
+ {
+-    uint8_t s1lo = extract32(s1.attrs, 0, 4), s2lo = extract32(s2.attrs, 0, 4);
+-    uint8_t s1hi = extract32(s1.attrs, 4, 4), s2hi = extract32(s2.attrs, 4, 4);
++    uint8_t s1lo, s2lo, s1hi, s2hi;
+     ARMCacheAttrs ret;
++    bool tagged = false;
++
++    if (s1.attrs == 0xf0) {
++        tagged = true;
++        s1.attrs = 0xff;
++    }
++
++    s1lo = extract32(s1.attrs, 0, 4);
++    s2lo = extract32(s2.attrs, 0, 4);
++    s1hi = extract32(s1.attrs, 4, 4);
++    s2hi = extract32(s2.attrs, 4, 4);
+ 
+     /* Combine shareability attributes (table D4-43) */
+     if (s1.shareability == 2 || s2.shareability == 2) {
+@@ -11884,6 +11894,11 @@ static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
+         }
+     }
+ 
++    /* TODO: CombineS1S2Desc does not consider transient, only WB, RWA. */
++    if (tagged && ret.attrs == 0xff) {
++        ret.attrs = 0xf0;
++    }
++
+     return ret;
+ }
+ 
+@@ -11963,8 +11978,11 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+                  *  Normal Non-Shareable,
+                  *  Inner Write-Back Read-Allocate Write-Allocate,
+                  *  Outer Write-Back Read-Allocate Write-Allocate.
++                 * Do not overwrite Tagged within attrs.
+                  */
+-                cacheattrs->attrs = 0xff;
++                if (cacheattrs->attrs != 0xf0) {
++                    cacheattrs->attrs = 0xff;
++                }
+                 cacheattrs->shareability = 0;
+             }
+             *cacheattrs = combine_cacheattrs(*cacheattrs, cacheattrs2);
+@@ -12029,6 +12047,9 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+     /* Definitely a real MMU, not an MPU */
+ 
+     if (regime_translation_disabled(env, mmu_idx)) {
++        uint64_t hcr;
++        uint8_t memattr;
++
+         /*
+          * MMU disabled.  S1 addresses within aa64 translation regimes are
+          * still checked for bounds -- see AArch64.TranslateAddressS1Off.
+@@ -12066,6 +12087,27 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+         *phys_ptr = address;
+         *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+         *page_size = TARGET_PAGE_SIZE;
++
++        /* Fill in cacheattr a-la AArch64.TranslateAddressS1Off. */
++        hcr = arm_hcr_el2_eff(env);
++        cacheattrs->shareability = 0;
++        if (hcr & HCR_DC) {
++            if (hcr & HCR_DCT) {
++                memattr = 0xf0;  /* Tagged, Normal, WB, RWA */
++            } else {
++                memattr = 0xff;  /* Normal, WB, RWA */
++            }
++        } else if (access_type == MMU_INST_FETCH) {
++            if (regime_sctlr(env, mmu_idx) & SCTLR_I) {
++                memattr = 0xee;  /* Normal, WT, RA, NT */
++            } else {
++                memattr = 0x44;  /* Normal, NC, No */
++            }
++            cacheattrs->shareability = 2; /* outer sharable */
++        } else {
++            memattr = 0x00;      /* Device, nGnRnE */
++        }
++        cacheattrs->attrs = memattr;
+         return 0;
+     }
+ 
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+index 89d90465a32..b35dc8a0118 100644
+--- a/target/arm/tlb_helper.c
++++ b/target/arm/tlb_helper.c
+@@ -188,6 +188,11 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+             phys_addr &= TARGET_PAGE_MASK;
+             address &= TARGET_PAGE_MASK;
+         }
++        /* Notice and record tagged memory. */
++        if (cpu_isar_feature(aa64_mte, cpu) && cacheattrs.attrs == 0xf0) {
++            arm_tlb_mte_tagged(&attrs) = true;
++        }
++
+         tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
+                                 prot, mmu_idx, page_size);
+         return true;
+-- 
+2.20.1
 
 
