@@ -2,76 +2,84 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2ABC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D635C433E0
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB15E20768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F163F21473
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:32:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJc1jhJd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB15E20768
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alFhA4sG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F163F21473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolfH-0003pV-Et
+	id 1jolfH-0003pJ-4r
 	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41044)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joldn-00024Y-Pq
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38860
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jolbo-000055-M4
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:29:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50817
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joldm-0003F1-7z
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jolbm-0002Jx-J9
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:29:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593167485;
+ s=mimecast20190719; t=1593167361;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ucis0h5PRWD9uffGXWYAjZ2udEIvXSj5tEihR7WFgX0=;
- b=GJc1jhJdedWfy0klwkrVCF8JYinJaGpMQjvwp7PoxdLX/CY4AtUxxkpUz+O1vdis5haFmZ
- a6fKSNp99OHtHVGaPSGlvlCDuIcsFrl1k9TdgHEoNoAlVM8tsy3dLsMTLGyDPn9DOTcbkB
- ZZ6em8+FvWrO4eoMVLNNxZi9F3KaQVg=
+ bh=RBx707CdmAgay4vce399hRXkN2PbyvoFrb5PW9jYTBg=;
+ b=alFhA4sGqbj4sqo5spNWtKtam/vmy5An7RxzmZZbnwTF/FpQ/dozPtZx2qPdkYse6ewKkr
+ xmYjSSdB7PibRon/qz/Q2Gg/bpyaJiss1pUCYeLpUSjhMBsBAv/Wxdwxwey5CnOph8FkT2
+ s6NxOJ656ahG2TOtAux/0+cVTGt31d4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-373-yWalPltzOiiQANiIlM_Tww-1; Fri, 26 Jun 2020 06:31:22 -0400
-X-MC-Unique: yWalPltzOiiQANiIlM_Tww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-499-pTBMeto0P223TqazOVy8sA-1; Fri, 26 Jun 2020 06:29:17 -0400
+X-MC-Unique: pTBMeto0P223TqazOVy8sA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1733010059A4
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 10:31:22 +0000 (UTC)
-Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C2BCD5D9C5;
- Fri, 26 Jun 2020 10:31:18 +0000 (UTC)
-Date: Fri, 26 Jun 2020 11:31:17 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 3/3] virtiofsd: Allow addition or removal of capabilities
-Message-ID: <20200626103117.GE281902@stefanha-x1.localdomain>
-References: <20200625162929.46672-1-dgilbert@redhat.com>
- <20200625162929.46672-4-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2810B804003;
+ Fri, 26 Jun 2020 10:29:15 +0000 (UTC)
+Received: from work-vm (ovpn-113-27.ams2.redhat.com [10.36.113.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C585210023A2;
+ Fri, 26 Jun 2020 10:29:05 +0000 (UTC)
+Date: Fri, 26 Jun 2020 11:29:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200626102903.GD3087@work-vm>
+References: <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ <20200626044259.GK172395@umbus.fritz.box>
+ <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
+ <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+ <20200626093257.GC1028934@redhat.com>
+ <558e8978-01ba-d8e8-9986-15efbbcbca96@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625162929.46672-4-dgilbert@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5oH/S/bF6lOfqCQb"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <558e8978-01ba-d8e8-9986-15efbbcbca96@linux.ibm.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,80 +102,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, vgoyal@redhat.com
+Cc: pair@us.ibm.com, Cornelia Huck <cohuck@redhat.com>, brijesh.singh@amd.com,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---5oH/S/bF6lOfqCQb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+* Janosch Frank (frankja@linux.ibm.com) wrote:
+> On 6/26/20 11:32 AM, Daniel P. Berrangé wrote:
+> > On Fri, Jun 26, 2020 at 11:01:58AM +0200, Janosch Frank wrote:
+> >> On 6/26/20 8:53 AM, David Hildenbrand wrote:
+> >>>>>>> Does this have any implications when probing with the 'none' machine?
+> >>>>>>
+> >>>>>> I'm not sure.  In your case, I guess the cpu bit would still show up
+> >>>>>> as before, so it would tell you base feature availability, but not
+> >>>>>> whether you can use the new configuration option.
+> >>>>>>
+> >>>>>> Since the HTL option is generic, you could still set it on the "none"
+> >>>>>> machine, though it wouldn't really have any effect.  That is, if you
+> >>>>>> could create a suitable object to point it at, which would depend on
+> >>>>>> ... details.
+> >>>>>>
+> >>>>>
+> >>>>> The important point is that we never want the (expanded) host cpu model
+> >>>>> look different when either specifying or not specifying the HTL
+> >>>>> property.
+> >>>>
+> >>>> Ah, yes, I see your point.  So my current suggestion will satisfy
+> >>>> that, basically it is:
+> >>>>
+> >>>> cpu has unpack (inc. by default) && htl specified
+> >>>> 	=> works (allowing secure), as expected
+> >>>
+> >>> ack
+> >>>
+> >>>>
+> >>>> !cpu has unpack && htl specified
+> >>>> 	=> bails out with an error
+> >>>
+> >>> ack
+> >>>
+> >>>>
+> >>>> !cpu has unpack && !htl specified
+> >>>> 	=> works for a non-secure guest, as expected
+> >>>> 	=> guest will fail if it attempts to go secure
+> >>>
+> >>> ack, behavior just like running on older hw without unpack
+> >>>
+> >>>>
+> >>>> cpu has unpack && !htl specified
+> >>>> 	=> works as expected for a non-secure guest (unpack feature is
+> >>>> 	   present, but unused)
+> >>>> 	=> secure guest may work "by accident", but only if all virtio
+> >>>> 	   properties have the right values, which is the user's
+> >>>> 	   problem
+> >>>>
+> >>>> That last case is kinda ugly, but I think it's tolerable.
+> >>>
+> >>> Right, we must not affect non-secure guests, and existing secure setups
+> >>> (e.g., older qemu machines). Will have to think about this some more,
+> >>> but does not sound too crazy.
+> >>
+> >> I severely dislike having to specify things to make PV work.
+> >> The IOMMU is already a thorn in our side and we're working on making the
+> >> whole ordeal completely transparent so the only requirement to make this
+> >> work is the right machine, kernel, qemu and kernel cmd line option
+> >> "prot_virt=1". That's why we do the reboot into PV mode in the first place.
+> >>
+> >> I.e. the goal is that if customers convert compatible guests into
+> >> protected ones and start them up on a z15 on a distro with PV support
+> >> they can just use the guest without having to change XML or command line
+> >> parameters.
+> > 
+> > If you're exposing new features to the guest machine, then it is usually
+> > to be expected that XML and QEMU command line will change. Some simple
+> > things might be hidable behind a new QEMU machine type or CPU model, but
+> > there's a limit to how much should be hidden that way while staying sane.
+> > 
+> > I'd really expect the configuration to change when switching a guest to
+> > a new hardware platform and wanting major new functionality to be enabled.
+> > The XML / QEMU config is a low level instantiation of a particular feature
+> > set, optimized for a specific machine, rather than a high level description
+> > of ideal "best" config independent of host machine.
+> 
+> You still have to set the host command line and make sure that unpack is
+> available. Currently you also have to specify the IOMMU which we like to
+> drop as a requirement. Everything else is dependent on runtime
+> information which tells us if we need to take a PV or non-PV branch.
+> Having the unpack facility should be enough to use the unpack facility.
+> 
+> Keep in mind that we have no real concept of a special protected VM to
+> begin with. If the VM never boots into a protected kernel it will never
+> be protected. On a reboot it drops from protected into unprotected mode
+> to execute the bios and boot loader and then may or may not move back
+> into a protected state.
 
-On Thu, Jun 25, 2020 at 05:29:29PM +0100, Dr. David Alan Gilbert (git) wrote:
-> +    /*
-> +     * The modcaps option is a colon separated list of caps,
-> +     * each preceded by either + or -.
-> +     */
-> +    while (lo->modcaps) {
-> +        capng_act_t action;
-> +        int cap;
-> +
-> +        char *next = strchr(lo->modcaps, ':');
-> +        if (next) {
-> +            *next = '\0';
-> +            next++;
-> +        }
-> +
-> +        switch (lo->modcaps[0]) {
-> +        case '+':
-> +            action = CAPNG_ADD;
-> +            break;
-> +
-> +        case '-':
-> +            action = CAPNG_DROP;
-> +            break;
-> +
-> +        default:
-> +            fuse_log(FUSE_LOG_ERR,
-> +                     "%s: Expecting '+'/'-' in modcaps but found '%c'\n",
-> +                     __func__, lo->modcaps[0]);
-> +            exit(1);
-> +        }
-> +        cap = capng_name_to_capability(lo->modcaps + 1);
-> +        if (cap < 0) {
-> +            fuse_log(FUSE_LOG_ERR, "%s: Unknown capability '%s'\n", __func__,
-> +                     lo->modcaps);
-> +            exit(1);
-> +        }
-> +        if (capng_update(action, CAPNG_PERMITTED | CAPNG_EFFECTIVE, cap)) {
-> +            fuse_log(FUSE_LOG_ERR, "%s: capng_update failed for '%s'\n",
-> +                     __func__, lo->modcaps);
-> +            exit(1);
-> +        }
-> +
-> +        lo->modcaps = next;
+My worry isn't actually how painful adding all the iommu glue is, but
+what happens when users forget; especially if they forget for one
+device.
 
-How about passing char *modcaps into this function so that lo->modcaps
-isn't modified by the parsing loop? That seems a bit cleaner and if we
-ever decide to free lo->modcaps it will work as expected.
+I could appreciate having a machine option to cause iommu to then get
+turned on with all other devices; but I think also we could do with
+something that failed with a nice error if an iommu flag was missing.
+For SEV this could be done pretty early, but for power/s390 I guess
+you'd have to do this when someone tried to enable secure mode, but
+I'm not sure you can tell.
 
-Stefan
+Dave
 
---5oH/S/bF6lOfqCQb
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> > 
+> > Regards,
+> > Daniel
+> > 
+> 
+> 
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl71znUACgkQnKSrs4Gr
-c8j0/Af/YwHgpiz4d/bv1YWIa/3z3/uXi46uYPop/57woEuGGAXbj2yjw4Umn+nQ
-oZxBzRjfzb1A2TBLMp9KkN5QYR06ZiH7r6+M0erhQB8Jls6rJBRhCONxTFvHm+ju
-LrYHliNi0+UNsP7T4MFHbpDpWcS1SNgNlY4rGTIcgB5gYUr6bg7NJYv00O1qDxhm
-/Q7yE9KN75B/K6IsMBusrgEJeC+opa1016uchr+pp3nWGxsXf56n1D1wisRwuUtW
-CNA77KI/D6eykjNtcm7BrgbSDLIi5t7Y8+z1EqMFIdMoMHs5nkmlD3K6Pw6WdUJf
-FtNOyXG4DfIoFy2xb53xXjJO7Uv5Mw==
-=xKFP
------END PGP SIGNATURE-----
 
---5oH/S/bF6lOfqCQb--
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
