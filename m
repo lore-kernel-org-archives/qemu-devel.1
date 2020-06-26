@@ -2,84 +2,91 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678D1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95479C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:28:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34A6D2070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FA112070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:28:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKm+I3KN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34A6D2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oiHVLx0a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FA112070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolZF-0004m5-Gt
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:26:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39592)
+	id 1jolbL-0007A1-Jw
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:28:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jolYQ-0003w9-54; Fri, 26 Jun 2020 06:25:54 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:32936)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jolaI-0005rM-Fs; Fri, 26 Jun 2020 06:27:50 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jolYO-0001eq-JP; Fri, 26 Jun 2020 06:25:53 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id o4so4256301ybp.0;
- Fri, 26 Jun 2020 03:25:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jolaG-0001w6-UY; Fri, 26 Jun 2020 06:27:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id o2so8883079wmh.2;
+ Fri, 26 Jun 2020 03:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TAGDyapLgvqUb1jwBBzGWav8wwRbeRMTnggiJBSyH1U=;
- b=ZKm+I3KNiBSyHki4QCmY5Cf0SHCYTon/dNPszQ4Uq+hhMLicImtFfC7WKxcBwDelwG
- VbZ3n4djS8QHJlZZJy/OaSPZ2+QQtXAP/4FNCWm2AK2uLei4DSu119cAb+8czuhEBKUy
- 1mR+YfHcVIiLjeQY7PfNGEe2Q7Bqbpit3wSfbd/habDb4D+0yX6O808pgs6WjwVCWlUN
- XnAbMAVFW8aPh3PGMF2tBsL9h9k60egW+T9rtvsXTxWcMMKbRQObzWKZpT6MeXjEbt66
- Qk6P4HH1/Pdht3ILQfNf0S5Y87+2u11BQXh0e/hTBUhrawfpdLlEO4yhCwcXWz8m4zSB
- uXFw==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yMKB4/6egIXel+cyR6i/+SHKrBewfwc91aLTHBCpyyk=;
+ b=oiHVLx0aZFKBCJeyX1+KNfQeLTy8dZz9gblBn+IJV54iohvrvemVmZm5VIEwDXmoTd
+ GgJKxBh/tPhcLUY1OPCyC7u2xBtkuzWmcQ9BjuzgIP6tkINVZK+TU3H4MObk/D9X04py
+ Tllb5pTvhP5z1IOtEmK+DTvxT8q+gY9d4Hmh8IHYx1jgkcwbVcARXZwsbgvCHX4wQKUV
+ BpA9N2hdJml7b8Bz6MF+juPWPJTEHNvsun3zaRMdIp6S5D5VKqkVd4q+NbqODS1hXh2O
+ yWMBWL8QcyxUf8weoPXMqtw/8mlxRuOBUCkXWDBBNtahcbxFOWjSeHMK6RMNxNflFSEn
+ LQ+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TAGDyapLgvqUb1jwBBzGWav8wwRbeRMTnggiJBSyH1U=;
- b=uZMdqTvk4SGxT/eKX4M1++u9qWbOJny+laTfPsEBDylegL2uZ0zGMph3eA0jG3MdUH
- tj49rBtcOZCskD9TbnT8NFI7orGeCutQT7ZXSBN7U2k9l2fZC11CGHEE2rXgVUv+o2Em
- A1pmiAbeWzBCBtNPeceYiX2ZCVY/WEvw4d8oyPf1SRPgbsG58j2/lgjEa1MO0fKkn8Ci
- siGmuUe1N+5XNoDfwKPwxDj5UVu6oFW7bG31eOfWTdro882aJRuF9z7nqMNUcWeGG2mZ
- eoceVrMkwwMsZ//0y3vieT4TCx1t7htiPiztcYWnm00L69RqdZ7B0kfQXFMXeKmij0gD
- xyJQ==
-X-Gm-Message-State: AOAM530zCtm9FDZ8c4LLfNR0sQ+ImADRq/jOhRs9BlasgGnP4/WdfrMC
- OTFAgZwFXRQnlN5GqlEcR4Nz2Fw84M95QvIcr4I=
-X-Google-Smtp-Source: ABdhPJxr4/rOcWKJROlVfROsEgiZp3qSZ0KB35Z8aRDJ5AXCUtERagKYI24ftG3rRIl5gBI1FDqwLOrIvEVcyxi2wWg=
-X-Received: by 2002:a25:fc26:: with SMTP id v38mr2263408ybd.314.1593167150877; 
- Fri, 26 Jun 2020 03:25:50 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=yMKB4/6egIXel+cyR6i/+SHKrBewfwc91aLTHBCpyyk=;
+ b=OKugNU1NqwBx3M74lpnnuhFO5rtmcuzoFXo9vWdPDV4q5dfes8I99BUL/vnneBJVDm
+ Ar1D2mU9n2q0SV196OdFN2KAPiBzJsy5Hb8YdKUo76JHO4/5in2W4HdcDUKU4KHVtP8q
+ gwLZUhLHiYpCgxjWMffXh/CuuMjdVkUQmdfQ1ztkhe8sbxGkp+VC9DVDmDXIER0CMyJv
+ SfYDMyxIHzo3UcwJUeaJe2moKXOnIMu2mTVhziaEFGRv6hNj/dTD53bP0Yp7GI+oGU1X
+ 23+pXWM+y35gbL+BLvAUjTsUkskflArolrmhPEbwTKU7JKwjosXHKMLIWVTkklUQQhMb
+ lkhg==
+X-Gm-Message-State: AOAM533L+kCM97nOG5laQUdJ2LO5hXJ8KQtxyvJ+l/5NguQ1pkX0mSB8
+ mrbkSFey5EBPxy1t9/dZ/B0=
+X-Google-Smtp-Source: ABdhPJznYoIg9DmNEsWlCv3Jb4AWCfVU0kQa7g5WkVrWxZ4O4n63umcLWAkduUdLl3JKqOUlD1YSpw==
+X-Received: by 2002:a1c:7d55:: with SMTP id y82mr408518wmc.72.1593167267030;
+ Fri, 26 Jun 2020 03:27:47 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id f13sm15598194wmb.33.2020.06.26.03.27.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 03:27:46 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [RFC PATCH 0/3] Use object_get_canonical_path_component to get child
+ description
+Date: Fri, 26 Jun 2020 12:27:41 +0200
+Message-Id: <20200626102744.15053-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200626003313.715355-1-atish.patra@wdc.com>
- <20200626003313.715355-2-atish.patra@wdc.com>
-In-Reply-To: <20200626003313.715355-2-atish.patra@wdc.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 26 Jun 2020 18:25:39 +0800
-Message-ID: <CAEUhbmVQmS0v4WGEZAqeKpD0WwMUfdmLGqH6QQLo-_MS0AtZ7w@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] riscv: Unify Qemu's reset vector code path
-To: Atish Patra <atish.patra@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,36 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 8:33 AM Atish Patra <atish.patra@wdc.com> wrote:
->
-> Currently, all riscv machines except sifive_u have identical reset vector
-> code implementations with memory addresses being different for all machines.
-> They can be easily combined into a single function in common code.
->
-> Move it to common function and let all the machines use the common function.
->
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  hw/riscv/boot.c         | 45 +++++++++++++++++++++++++++++++++++++++++
->  hw/riscv/sifive_u.c     |  1 -
->  hw/riscv/spike.c        | 41 +++----------------------------------
->  hw/riscv/virt.c         | 40 +++---------------------------------
->  include/hw/riscv/boot.h |  2 ++
->  5 files changed, 53 insertions(+), 76 deletions(-)
->
+This RFC is simply a proof-of-concept to see if I correctly
+understood Markus' suggestion, see the thread around:
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08652.html
 
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Tested-by: Bin Meng <bin.meng@windriver.com>
+Philippe Mathieu-Daudé (3):
+  hw/i2c/smbus_eeprom: Set QOM parent
+  hw/i2c/smbus_eeprom: Add description based on child name
+  hw/i2c/smbus_eeprom: Trace reset() event
+
+ include/hw/i2c/smbus_eeprom.h |  9 ++++++---
+ hw/i2c/smbus_eeprom.c         | 18 +++++++++++++++---
+ hw/mips/fuloong2e.c           |  2 +-
+ hw/ppc/sam460ex.c             |  2 +-
+ hw/i2c/trace-events           |  3 +++
+ 5 files changed, 26 insertions(+), 8 deletions(-)
+
+-- 
+2.21.3
+
 
