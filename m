@@ -2,94 +2,121 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C138C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 353D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F5D320885
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:27:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F12A62088E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="C8gLsqUA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5D320885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="Myui79pt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F12A62088E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jowom-0007lQ-8Z
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:27:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53752)
+	id 1jowpp-0001De-9M
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:28:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowJJ-00053g-Rm
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:55:01 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39465)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jowJP-0005Fc-8d
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:55:07 -0400
+Received: from mail-eopbgr70117.outbound.protection.outlook.com
+ ([40.107.7.117]:45314 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowJH-00031d-Vo
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:55:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593208505; x=1624744505;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=FsRgePvLj/4v9beSBTvqtUqY2I8z+eAU6GenEENxbwA=;
- b=C8gLsqUAC/yIYGUPVkH5/SiG+Qxc7LTBHUS9RJ6OvmQNwy1uQJL3C8yy
- Kwcr+i7fDdlokZWX9zPpnarlwMPNT+y9OpL7IZKTZBg81WuteyXFl4p0w
- bdfIyI+na3KQJtWyDelJ0kYGQ6wI+9bVT3nlXcRD8XnC7ddau0NxBzUt+
- irsBbpCJtjcrnJU5ZjfcEzDvqIUwGbVH70I7WR4Jl0NMJwK4ZszBz9lN6
- lxZLKYXAEpvOJ3HrK0RuAc56GQc5U21IYV/iNKdopL/BuzvEibRNfyVib
- sDKUVG2AIug9CJlUz84kS6elWgbM1cyfnNUX6r1AyqAiuNUY4EEu5bYRC g==;
-IronPort-SDR: OZDx8GPADYJw67LFbT195UuYUC7nRUkP4jI74meQOEqTZZZiMpDBU8wwSy+VRjWHuNB4a/ouaD
- D2JZBcRg9K8qhdD2nWnM+rg7WhtoHCYKBpDCRLQ7AOmDSZG6DjC8fJxVyHM7E8o6GmU24229nB
- oaMa0BWbcP9vj6m/NZTOJgwHPQ6xHETXuRr6cXwhYAYrHN9Chpo53DgJU6owuVPmmKgxCoH+E8
- hVZjqwrFZBD9sEpv5kmgWKFa4ZirZ0VGgAG1MW7oVkLdm9qmz7JnVqeyM6q7ECJD4GAa9Ss7YD
- Kng=
-X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="244048417"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:53 +0800
-IronPort-SDR: f0xgBgNxHwXPJFh+WJBqVUu/luO2DON2syrit3iiVy7glCyaafoMXCijtXVA2p73L4vNN9cCxn
- XdDSnzEKBGW7g+bWMW6rvQbB2QngLbOms=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2020 14:42:49 -0700
-IronPort-SDR: 6k8IWD4zRCRRsVUpOWlbv+A/Di2XyaPBHJvbfPtTrQPWcFVlPW2dml5DBNCsXKjES7yKvwad0m
- sC7QbKicpi2Q==
-WDCIronportException: Internal
-Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.58.206])
- by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:51 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 58/63] target/riscv: integer scalar move instruction
-Date: Fri, 26 Jun 2020 14:44:05 -0700
-Message-Id: <20200626214410.3613258-59-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200626214410.3613258-1-alistair.francis@wdc.com>
-References: <20200626214410.3613258-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jowJM-0003Qp-KA
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:55:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VMVkYMPvpAvqgvbIZ7mQ00Uec/aKbFhUXuruksJvH/CXjD3/O7UYw9WsFQw+spRNDiojW5DgG+KFscnZWkTyH6zAEFHe3D8rxrq8XZfYMNF7D1MmCwg2aPKHyEF9TKgdZtkOZfb0I20rt4xAHukqtGGOzjc5XPjiof1TDI1SpixW3/WEXibW5HnJ5No5s2AGLJbXDw0x3wRRrWRlCqXCOp/027DNx5r0Wq7D2a1zsDxPP03Ep3Mu9Rtvqmmhd1GHtDiTcrj0H7vxwvsnhrA8xvmd0Q2lKVbn/BzgxpI3Jwy5y3jWdCrR2+npY8ZLGl50loqzJrz+XaVhU97nlV5bOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BeClS313fQX2xiMB+SSe1EDnN+prePPy513pqv7JGwg=;
+ b=Ge7rz35Dx93DGdNQejKqun2o7XjKfo5Lxm8xfb+B3TeL11Qjily8OE9BeKl662cBBk763teLT9jWimA1oTX1KFtVuYaXdhpQ2GQFBvbuDaYPvXLBPET1spuEmNuY56TGfjcIzS214wiAEdCy69mSyOSFNt09zJkCfT7l2hynO8dm+KA1qTsOQL8/6qZDsIfy6IPnArCU0j1gBy8K/OrSxtGo7u2Mv1xt+HEtrdxR6GE3CC1AZEsTO316Oz22SKBVd3OkgveYvo6FjTaC4rvf+eo6w6nPQelxl5+VgzikT4GuKajuHPDjrpoRT6qYM8/5djzhPeYiH+mZgeS1WN+mbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BeClS313fQX2xiMB+SSe1EDnN+prePPy513pqv7JGwg=;
+ b=Myui79ptX6uM2INc0+Jr6GmEbE76b2BqzshOhz8gHiAbvorcbe0cGTYuQXwlxv2pHKOZdQOsyVvAwrhfBU95/ybzsBueLoBCpo8kq9lOIcTolTKrUDuDfWWlkAqjrIRlkPLKz+pC8Or/qttpxU8wehunfW8Nb3qy96O9lq4u+ms=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
+ by AM6PR03MB5234.eurprd03.prod.outlook.com (2603:10a6:20b:c3::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20; Fri, 26 Jun
+ 2020 21:39:57 +0000
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3131.021; Fri, 26 Jun 2020
+ 21:39:57 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] Add strace support for printing arguments for a group of
+ selected syscalls
+Date: Fri, 26 Jun 2020 23:39:34 +0200
+Message-Id: <20200626213937.20333-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: ZR0P278CA0044.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:1d::13) To AM6PR03MB5233.eurprd03.prod.outlook.com
+ (2603:10a6:20b:d1::19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=439617756=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:44
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.240) by
+ ZR0P278CA0044.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1d::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3131.20 via Frontend Transport; Fri, 26 Jun 2020 21:39:57 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [147.91.217.240]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3d96bb8f-a0bf-4a99-a248-08d81a1978af
+X-MS-TrafficTypeDiagnostic: AM6PR03MB5234:
+X-Microsoft-Antispam-PRVS: <AM6PR03MB52347EA8EF5E6B5B13C83253EB930@AM6PR03MB5234.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
+X-Forefront-PRVS: 0446F0FCE1
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XgkGxSQ3ywa/xAuuVtruflyCRKudM3leR7Ulgp/EZy0wNc8k4+l2J9MS+gGEYAJuo9DjCuBxNCPV6MDUTExpkKpvY7JCZaXpUi3JiO7YUaA+lV4ffc/oTi05wf09nOHa40E0hkRlsmI2uwaIAC36nHISLVsAC6b7z33hZkfJiiKOauISEN6MaPfXXCFQBWI8ly+keiYKEYzGkLQe7b746MhmN1g902aXkA2lAw3aQKPe4EdBE+VKepZNR1mXF2xpVp/byAsKj16bNI6sbjyyn53wryJOzCjA49Zr2rVVeGmCrowESuLiYkbR3re1X2TCnIf0k4wvlvuwzleJhCnOI5VS2X0zeAdZBr81Yvr8JJ68hcUFUkTA/dSuY4XKhSgn
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39830400003)(376002)(346002)(396003)(136003)(366004)(4326008)(6666004)(6506007)(1076003)(508600001)(83380400001)(4744005)(86362001)(6512007)(16526019)(186003)(6486002)(52116002)(316002)(6916009)(36756003)(2906002)(66476007)(66946007)(69590400007)(66556008)(8936002)(26005)(5660300002)(8676002)(2616005)(956004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1/2FqEvWHoQI9VyJ5seZmDwNidBTOBnm+NsNO5W8Vv5/6z5NISfBKwrC+UnI7i1bwLWH0xmuRH/KReTjqs1lXibAR0k2rNoDsWfJQJlhDqSl4vS9edpwWhImAhHUG/ijHh8jUNXkJcdEXdroxP3EWF4IMY0NZjgffpgO3iBsDctIxpt6BRH14zY6lBMMCPWKPacrbEtbFlfoaiPi3wRtqp6wVdC3nvZ2Gb7xV/kB3ryyIU471ATvE6xuLFrQ3T1x8AZkDSobVEe5zcOFB4eVqSKU7Yt4UPZDzvChdUvsRgMewRxDUisEETnV8u11/GMXaD4Yb4zJIljOtT15L9gXm2NS2do/t6ujeraAtcJR1IwZqpXyl1ND0yxXfA4OQSvjyIfIDPsw9SHK0QJHQf7BWoQFY9+CwWnwz1rbEVtcZI/rPyAuwx1uzWEwGLO2G7OQjxm6rnTwr8Ye7glYtCFJfZMw7mFCmWzMnMw1txwTjm8=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d96bb8f-a0bf-4a99-a248-08d81a1978af
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2020 21:39:57.6294 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 708NPcVM8+7Be7ZpY4UtCHdd6FXlSJhLxFnlHfJf8JnF9LrLKo2grctFCOySUfTJLyLOVgzmpihVvCsokbxYjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB5234
+Received-SPF: pass client-ip=40.107.7.117;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:55:02
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -4
+X-Spam_score: -0.5
+X-Spam_bar: /
+X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ RCVD_IN_SBL_CSS=3.335, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,121 +130,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: riku.voipio@iki.fi, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+This series covers strace support for following syscalls:
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200623215920.2594-57-zhiwei_liu@c-sky.com
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/internals.h                |  6 +++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 60 +++++++++++++++++++++++++
- 3 files changed, 67 insertions(+)
+   *truncate()     *munlock()          *clock_gettimeofday()
+   *ftruncate()    *munlockall()       *clock_getitimer()
+   *getsid()       *clock_getres()     *clock_setitimer()
+   *mlock()        *clock_gettime()
+   *mlockall()     *clock_settime()
 
-diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-index f3cea478f7..37d33820ad 100644
---- a/target/riscv/internals.h
-+++ b/target/riscv/internals.h
-@@ -32,4 +32,10 @@ FIELD(VDATA, WD, 11, 1)
- target_ulong fclass_h(uint64_t frs1);
- target_ulong fclass_s(uint64_t frs1);
- target_ulong fclass_d(uint64_t frs1);
-+
-+#define SEW8  0
-+#define SEW16 1
-+#define SEW32 2
-+#define SEW64 3
-+
- #endif
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c4496cd010..e06c0ffc22 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -564,6 +564,7 @@ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
-+vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index cfbbd88dbf..b10b89daa9 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2649,3 +2649,63 @@ static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-     tcg_temp_free_i64(tmp);
-     return true;
- }
-+
-+/* Integer Scalar Move Instruction */
-+
-+static void store_element(TCGv_i64 val, TCGv_ptr base,
-+                          int ofs, int sew)
-+{
-+    switch (sew) {
-+    case MO_8:
-+        tcg_gen_st8_i64(val, base, ofs);
-+        break;
-+    case MO_16:
-+        tcg_gen_st16_i64(val, base, ofs);
-+        break;
-+    case MO_32:
-+        tcg_gen_st32_i64(val, base, ofs);
-+        break;
-+    case MO_64:
-+        tcg_gen_st_i64(val, base, ofs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+        break;
-+    }
-+}
-+
-+/*
-+ * Store vreg[idx] = val.
-+ * The index must be in range of VLMAX.
-+ */
-+static void vec_element_storei(DisasContext *s, int vreg,
-+                               int idx, TCGv_i64 val)
-+{
-+    store_element(val, cpu_env, endian_ofs(s, vreg, idx), s->sew);
-+}
-+
-+/* vmv.s.x vd, rs1 # vd[0] = rs1 */
-+static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
-+{
-+    if (vext_check_isa_ill(s)) {
-+        /* This instruction ignores LMUL and vector register groups */
-+        int maxsz = s->vlen >> 3;
-+        TCGv_i64 t1;
-+        TCGLabel *over = gen_new_label();
-+
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), maxsz, maxsz, 0);
-+        if (a->rs1 == 0) {
-+            goto done;
-+        }
-+
-+        t1 = tcg_temp_new_i64();
-+        tcg_gen_extu_tl_i64(t1, cpu_gpr[a->rs1]);
-+        vec_element_storei(s, a->rd, 0, t1);
-+        tcg_temp_free_i64(t1);
-+    done:
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
+
+Filip Bozuta (3):
+  linux-user: Add strace support for printing arguments of
+    truncate()/ftruncate() and getsid()
+  linux-user: Add strace support for printing arguments of syscalls used
+    to lock and unlock memory
+  linux-user: Add strace support for printing arguments of some clock
+    and time functions
+
+ linux-user/strace.c    | 221 ++++++++++++++++++++++++++++++++++++++++-
+ linux-user/strace.list |  34 ++++---
+ 2 files changed, 238 insertions(+), 17 deletions(-)
+
 -- 
-2.27.0
+2.17.1
 
 
