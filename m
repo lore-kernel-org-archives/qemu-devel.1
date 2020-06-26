@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A109BC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F8EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E72D2076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:26:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F8F42076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:28:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b8IVell0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E72D2076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BGDt8GyO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8F42076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joilF-0005Eo-L0
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57958)
+	id 1joimL-0007QJ-No
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joiiL-0008NF-9F
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26543
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joiiZ-0000Jb-0K
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:11 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29996
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joiiI-0003QG-By
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:56 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joiiV-0003Sc-30
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593156233;
+ s=mimecast20190719; t=1593156246;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YGtscYE02ovFEJQV2k/q0RnteybdWD0PleR2p3WwxKg=;
- b=b8IVell0robaHUnmY2gGtGtHLLOfOwFvSem6hGDW2X9Uo8xnt2Pls2PoCBEHZUjiDy9iXs
- emFo0B1eIlrjz6Df1a751DEW4Hma/CKJ3H8Ob3DlE6e1y2AicMd90APAP6vw1iXoZC46Mn
- EA11ozl8RabDWDxOS1QmdmsOu8GcTsk=
+ bh=NYlfhj1OTPEaIzcBYdA05uMy9bmVrgsPwAVJjLsnp5k=;
+ b=BGDt8GyOmwlqM63xhOoI5GUaMBy1eJeHNZqj6/+TTSnqy9haN6/kI2QH0D+trsUds8YcCz
+ Wn9meynsTxyDjSN4OSyzILwhSyAwlRGqX8VOBr6iM+y4cPQ7rWN8IwZTIMJJwdgmUWJP72
+ 7Sh1wpnyVj7GlAXlVnuA0BtTcFXdlTc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-P8CVEg5XP92mgBqIAWbjQA-1; Fri, 26 Jun 2020 03:23:50 -0400
-X-MC-Unique: P8CVEg5XP92mgBqIAWbjQA-1
+ us-mta-120-7Jh82G8aOGGxlw28373TdA-1; Fri, 26 Jun 2020 03:24:04 -0400
+X-MC-Unique: 7Jh82G8aOGGxlw28373TdA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0A94804001;
- Fri, 26 Jun 2020 07:23:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37D9E1005512;
+ Fri, 26 Jun 2020 07:24:03 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-35.ams2.redhat.com [10.36.113.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C92AB70915;
- Fri, 26 Jun 2020 07:23:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 310241C8;
+ Fri, 26 Jun 2020 07:23:58 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 04/21] accel/kvm: Convert to ram_block_discard_disable()
-Date: Fri, 26 Jun 2020 09:22:31 +0200
-Message-Id: <20200626072248.78761-5-david@redhat.com>
+Subject: [PATCH v5 07/21] target/i386: sev: Use ram_block_discard_disable()
+Date: Fri, 26 Jun 2020 09:22:34 +0200
+Message-Id: <20200626072248.78761-8-david@redhat.com>
 In-Reply-To: <20200626072248.78761-1-david@redhat.com>
 References: <20200626072248.78761-1-david@redhat.com>
 MIME-Version: 1.0
@@ -96,38 +96,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Discarding memory does not work as expected. At the time this is called,
-we cannot have anyone active that relies on discards to work properly.
+AMD SEV will pin all guest memory, mark discarding of RAM broken. At the
+time this is called, we cannot have anyone active that relies on discards
+to work properly - let's still implement error handling.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/sev.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f24d7da783..4751ce67a9 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -40,7 +40,6 @@
- #include "trace.h"
- #include "hw/irq.h"
- #include "sysemu/sev.h"
--#include "sysemu/balloon.h"
- #include "qapi/visitor.h"
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
-@@ -2222,7 +2221,8 @@ static int kvm_init(MachineState *ms)
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index d273174ad3..f100a53231 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -680,6 +680,12 @@ sev_guest_init(const char *id)
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
  
-     s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
-     if (!s->sync_mmu) {
--        qemu_balloon_inhibit(true);
-+        ret = ram_block_discard_disable(true);
-+        assert(!ret);
-     }
++    ret = ram_block_discard_disable(true);
++    if (ret) {
++        error_report("%s: cannot disable RAM discard", __func__);
++        return NULL;
++    }
++
+     sev = lookup_sev_guest_info(id);
+     if (!sev) {
+         error_report("%s: '%s' is not a valid '%s' object",
+@@ -751,6 +757,7 @@ sev_guest_init(const char *id)
+     return sev;
+ err:
+     sev_guest = NULL;
++    ram_block_discard_disable(false);
+     return NULL;
+ }
  
-     return 0;
 -- 
 2.26.2
 
