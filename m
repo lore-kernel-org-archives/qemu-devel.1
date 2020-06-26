@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BE6C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C601C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE8C2080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:31:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 448402080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b/5+kgSz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE8C2080C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HASE1GBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448402080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqKB-0006DW-KC
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:31:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35784)
+	id 1joqL4-00081Q-BT
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:32:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4A-0002Yx-Jl
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:58 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45068)
+ id 1joq42-0002CQ-Cm
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:50 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:33991)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq48-0006S9-Rr
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:58 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id s10so9823089wrw.12
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:56 -0700 (PDT)
+ id 1joq3x-0006JC-99
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:50 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id u26so9095741wmn.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=a0syJ1sIv8i3fVj+GdrHNB0e6D/PFUBhQOSTOV0RdwE=;
- b=b/5+kgSzMRMIlYczvyM8xG6L84sLT371oYCvxYNunM+65D4D+aP4hwdF99kU9oTyMK
- n19roWgs/G5K53rDjtMELB4VzTonGYCCyzjYLyCcCPfhcQQqFjBmo9iaIkNzxQQ4hrXP
- xw1nht7obIj44bCV1EIPj68uVZqg2RYQMbWthKw96WICATxh24k3MMrxUFJI3+yd6P2V
- x6ygnz8JcA7/0pMDu14W3a770VTl7ASC50vqjKS1RvZ1C0ouQvdelpZn8PRNwHmfkIQU
- /LlM6RGYAFd9L+9dvsKWmDoWK7lYBAXnvsJF5UFmBtACuzYyyrkbIwgyb9oXfejQbHSt
- ve7w==
+ bh=0jclhN1iI8Ils0M7tH4L8prj0mKxUP8gosaZhHheF7I=;
+ b=HASE1GBTZmsW0//eemhsZdvHpYvDq7eTQhv0Pxnxuz2yMkdcE7TajImcK5b5ng01ZY
+ 858zW3VEdnaz/iWkxeRKTYN617GAYSeTfGbUPTYFpCOh7wwlnUPLJQTtdA4djQbj4zoY
+ JvMbpELmCVw7N2jLYuY+RzJfZ394ig41hNSYLWexSu1lVtBg2BjYQ03vXXONGs6TAZCu
+ qZ/57pvNSFy+AKMdi/im9DFMQrBc2gx2aLPHY4YYkqWfsziLTkedKAIba1icFRL4AxTH
+ Ww/8cVNRPMBceS7nhhDAsRVsC8u1+35p6jBtExMtgyMZxUZvdNOTj51//AWvQKjyOKE4
+ z3jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=a0syJ1sIv8i3fVj+GdrHNB0e6D/PFUBhQOSTOV0RdwE=;
- b=jAFHBX9CLY1e3LVwgEHx7ENun8FJy5tTxIWnYYBM/PiLe+VRzO/x5wykzyWJJ0S/yc
- VztJZyhzbp9HBfIm04VmXnN9iLJHWD7xQxpUdRsGnyW252JKV7im+4amd5TpUX33TL/t
- SycXfFvrRlOoVWcG93qVwPdZnO/NugFgItLgeM2nfGR/P27Z1uc5CauIXjPv7PhDYhoX
- ooZ7KTA7N5DTMQ7M0TrXn7tyc6CYXJfe7EFKlSw7n8FytZu1m7DLvp8E9nhTmbhnFYTh
- vH4P5Ot4xPruHwkSvXQkOpXUaOIltk9VZvPx4PLR70h2rrsPm1cAOIZNBc3wRCMFxZBO
- Nr2Q==
-X-Gm-Message-State: AOAM530qV4wEqFse+HEVTJpBmvj8AnRNnFpbsBF659SmXhHoWMnsEWHI
- UZGru24xFgOwU+jMFRrr36AJJI8TfcSRTQ==
-X-Google-Smtp-Source: ABdhPJwp/l7QtIW51GzCO2pFfqC8U3YlCZwoadq8RwduGWXvcyn53F9LxzBLaf9Zq+dekFsnhid7Cg==
-X-Received: by 2002:a5d:670d:: with SMTP id o13mr921948wru.307.1593184494956; 
- Fri, 26 Jun 2020 08:14:54 -0700 (PDT)
+ bh=0jclhN1iI8Ils0M7tH4L8prj0mKxUP8gosaZhHheF7I=;
+ b=gP4s8PuQ2YEoc6A5ibUsBPoFtwEtKN4TJ6v3gIh3wp9oYBekDt6GVbVakhLbkQGHSv
+ Vtpno3xtjcYZOD8v5w18u/QlkEHf5bN/fYvUtNwbkF7zt16xzZzajxesDg47C6LTsstT
+ fRuFRR0Tz53ZEfyry/S7/0bM5vDwGG4YZvurJr1x+HMdIMfYhBZ0kYKSe1qOsqU1Zwfz
+ tzq6ah98t7UIgzYty4AZetAWsd/ntSn+5HqKqtLXvkf1dSZV4krcpLovb8buMHCrwkwK
+ FC2HTLuC/RR1ZIYmoKd8CO0XSrBRo5rGZ5wP8btItp0EA7k+s/vPCc+LkXXYoP1f1pT0
+ 7XEQ==
+X-Gm-Message-State: AOAM530xNf+gyxk2RUSCLygzeNqE5mPlaAl0KC4FkUP4+Hv+dpPmWh6k
+ B8OSk4A83ET/tQzDKolFRntrfHjJ5e/1Dw==
+X-Google-Smtp-Source: ABdhPJwT97GDmfQwclQl0bbdVr5si7nN4+0sRWTxSvxHzuQEEE0J7YWNIEQNhVMabh2l7Dmn9HIPbA==
+X-Received: by 2002:a7b:ca52:: with SMTP id m18mr3919302wml.92.1593184481073; 
+ Fri, 26 Jun 2020 08:14:41 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.53
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.40
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:54 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:40 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/57] target/arm: Implement the SUBP instruction
-Date: Fri, 26 Jun 2020 16:13:52 +0100
-Message-Id: <20200626151424.30117-26-peter.maydell@linaro.org>
+Subject: [PULL 13/57] target/arm: Add isar tests for mte
+Date: Fri, 26 Jun 2020 16:13:40 +0100
+Message-Id: <20200626151424.30117-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,58 +108,33 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-14-richard.henderson@linaro.org
+Message-id: 20200626033144.790098-2-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ target/arm/cpu.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index ee9dfa8e439..abbcdbb53ae 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5315,19 +5315,39 @@ static void handle_crc32(DisasContext *s,
-  */
- static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index cf66b8c7fb0..ff70115801f 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3814,6 +3814,16 @@ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_mte_insn_reg(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) != 0;
++}
++
++static inline bool isar_feature_aa64_mte(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) >= 2;
++}
++
+ static inline bool isar_feature_aa64_pmu_8_1(const ARMISARegisters *id)
  {
--    unsigned int sf, rm, opcode, rn, rd;
-+    unsigned int sf, rm, opcode, rn, rd, setflag;
-     sf = extract32(insn, 31, 1);
-+    setflag = extract32(insn, 29, 1);
-     rm = extract32(insn, 16, 5);
-     opcode = extract32(insn, 10, 6);
-     rn = extract32(insn, 5, 5);
-     rd = extract32(insn, 0, 5);
- 
--    if (extract32(insn, 29, 1)) {
-+    if (setflag && opcode != 0) {
-         unallocated_encoding(s);
-         return;
-     }
- 
-     switch (opcode) {
-+    case 0: /* SUBP(S) */
-+        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
-+            goto do_unallocated;
-+        } else {
-+            TCGv_i64 tcg_n, tcg_m, tcg_d;
-+
-+            tcg_n = read_cpu_reg_sp(s, rn, true);
-+            tcg_m = read_cpu_reg_sp(s, rm, true);
-+            tcg_gen_sextract_i64(tcg_n, tcg_n, 0, 56);
-+            tcg_gen_sextract_i64(tcg_m, tcg_m, 0, 56);
-+            tcg_d = cpu_reg(s, rd);
-+
-+            if (setflag) {
-+                gen_sub_CC(true, tcg_d, tcg_n, tcg_m);
-+            } else {
-+                tcg_gen_sub_i64(tcg_d, tcg_n, tcg_m);
-+            }
-+        }
-+        break;
-     case 2: /* UDIV */
-         handle_div(s, false, sf, rm, rn, rd);
-         break;
+     return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 4 &&
 -- 
 2.20.1
 
