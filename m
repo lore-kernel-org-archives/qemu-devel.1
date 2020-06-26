@@ -2,78 +2,80 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CB1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E997C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:58:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23BA220663
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B0302080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLaDHP9Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23BA220663
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yv9D3CMM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B0302080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joor1-00067H-Cs
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:57:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40776)
+	id 1joort-0007PD-DO
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:58:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jooq3-0005DI-Ui
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:56:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24747
+ id 1jooq1-0005At-TK
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:56:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25604
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jooq1-0000PO-MT
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:56:19 -0400
+ id 1jooq0-0000Ow-4D
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:56:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593179777;
+ s=mimecast20190719; t=1593179775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UXCnoSJUZPWBKaPnhvdC4/ncLWbp3uY/oWLo3qnbZGg=;
- b=aLaDHP9Y4lVIrc+97nRmTk/NuVmbsSmGcSAupizWQ/KQTrG1W+F/4cPLZXrzE6gNCl5liL
- n1QSJkwmhdqMKDmT2kaQR1xNgv77iOREfw4EW2hyfT+Y4sf7kE/UII3FivnpXBuZJ41KaD
- LCkbBx9Sp+huvx7Ckg83F8d/i/BBQh0=
+ bh=27FBSLD97IXkacBHsHNfuY1T6+kmG/JdRKJFQzspjU0=;
+ b=Yv9D3CMMhCNSkG6Oz0GUdnkoyywIZ0DEaioyjm4J4kc2TpJj/3XdjQa/EHYEByOQ8Eu51/
+ VQl4idjBkqPeq5eCtT/zTdXkwoj87SMQeXa7AEOs62K7TbaCVGlMssCKuf08bbvjx1D+Zh
+ ZCRNfGZW3EhVBCFz8Lo9pL6hnS5LgU4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-wjy4E__wOIOss8PLca5wrw-1; Fri, 26 Jun 2020 09:56:11 -0400
-X-MC-Unique: wjy4E__wOIOss8PLca5wrw-1
+ us-mta-394-fHJF7iUtPQKCqisaae9sSQ-1; Fri, 26 Jun 2020 09:56:11 -0400
+X-MC-Unique: fHJF7iUtPQKCqisaae9sSQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87AE310059A8
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 13:56:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 008F287950D;
+ Fri, 26 Jun 2020 13:56:10 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2311F10016E8;
- Fri, 26 Jun 2020 13:56:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B08410016E8;
+ Fri, 26 Jun 2020 13:56:09 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 25/31] osdep: Make MIN/MAX evaluate arguments only once
-Date: Fri, 26 Jun 2020 09:56:08 -0400
-Message-Id: <20200626135608.6920-3-pbonzini@redhat.com>
+Subject: [PULL v2 09/31] exec: fetch the alignment of Linux devdax pmem
+ character device nodes
+Date: Fri, 26 Jun 2020 09:56:07 -0400
+Message-Id: <20200626135608.6920-2-pbonzini@redhat.com>
 In-Reply-To: <20200626135608.6920-1-pbonzini@redhat.com>
 References: <20200626135608.6920-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,263 +96,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Dan Williams <dan.j.williams@intel.com>,
+ Joao Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Jingqi Liu <jingqi.liu@intel.com>
 
-I'm not aware of any immediate bugs in qemu where a second runtime
-evaluation of the arguments to MIN() or MAX() causes a problem, but
-proactively preventing such abuse is easier than falling prey to an
-unintended case down the road.  At any rate, here's the conversation
-that sparked the current patch:
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
+If the backend file is devdax pmem character device, the alignment
+specified by the option 'align=NUM' in the '-object memory-backend-file'
+needs to match the alignment requirement of the devdax pmem character device.
 
-Update the MIN/MAX macros to only evaluate their argument once at
-runtime; this uses typeof(1 ? (a) : (b)) to ensure that we are
-promoting the temporaries to the same type as the final comparison (we
-have to trigger type promotion, as typeof(bitfield) won't compile; and
-we can't use typeof((a) + (b)) or even typeof((a) + 0), as some of our
-uses of MAX are on void* pointers where such addition is undefined).
+This patch uses the interfaces of libdaxctl to fetch the devdax pmem file
+'align', so that we can compare it with the NUM of 'align=NUM'.
+The NUM needs to be larger than or equal to the devdax pmem file 'align'.
 
-However, we are unable to work around gcc refusing to compile ({}) in
-a constant context (such as the array length of a static variable),
-even when only used in the dead branch of a __builtin_choose_expr(),
-so we have to provide a second macro pair MIN_CONST and MAX_CONST for
-use when both arguments are known to be compile-time constants and
-where the result must also be usable as a constant; this second form
-evaluates arguments multiple times but that doesn't matter for
-constants.  By using a void expression as the expansion if a
-non-constant is presented to this second form, we can enlist the
-compiler to ensure the double evaluation is not attempted on
-non-constants.
+It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
 
-Alas, as both macros now rely on compiler intrinsics, they are no
-longer usable in preprocessor #if conditions; those will just have to
-be open-coded or the logic rewritten into #define or runtime 'if'
-conditions (but where the compiler dead-code-elimination will probably
-still apply).
-
-I tested that both gcc 10.1.1 and clang 10.0.0 produce errors for all
-forms of macro mis-use.  As the errors can sometimes be cryptic, I'm
-demonstrating the gcc output:
-
-Use of MIN when MIN_CONST is needed:
-
-In file included from /home/eblake/qemu/qemu-img.c:25:
-/home/eblake/qemu/include/qemu/osdep.h:249:5: error: braced-group within expression allowed only inside a function
-  249 |     ({                                                  \
-      |     ^
-/home/eblake/qemu/qemu-img.c:92:12: note: in expansion of macro ‘MIN’
-   92 | char array[MIN(1, 2)] = "";
-      |            ^~~
-
-Use of MIN_CONST when MIN is needed:
-
-/home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
-/home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as it ought to be
- 1225 |             i = MIN_CONST(i, n);
-      |               ^
-
-Use of MIN in the preprocessor:
-
-In file included from /home/eblake/qemu/accel/tcg/translate-all.c:20:
-/home/eblake/qemu/accel/tcg/translate-all.c: In function ‘page_check_range’:
-/home/eblake/qemu/include/qemu/osdep.h:249:6: error: token "{" is not valid in preprocessor expressions
-  249 |     ({                                                  \
-      |      ^
-
-Fix the resulting callsites that used #if or computed a compile-time
-constant min or max to use the new macros.  cpu-defs.h is interesting,
-as CPU_TLB_DYN_MAX_BITS is sometimes used as a constant and sometimes
-dynamic.
-
-It may be worth improving glib's MIN/MAX definitions to be saner, but
-that is a task for another day.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200625162602.700741-1-eblake@redhat.com>
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Message-Id: <20200429085011.63752-2-jingqi.liu@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/translate-all.c |  6 ++---
- hw/usb/hcd-xhci.h         |  2 +-
- include/block/block.h     |  4 +--
- include/exec/cpu-all.h    |  8 +++---
- include/exec/cpu-defs.h   |  7 ++++-
- include/qemu/osdep.h      | 57 ++++++++++++++++++++++++++++++++-------
- migration/qemu-file.c     |  2 +-
- 7 files changed, 63 insertions(+), 23 deletions(-)
+ exec.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index c3d37058a1..2afa46bd2b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2582,9 +2582,9 @@ int page_check_range(target_ulong start, target_ulong len, int flags)
-     /* This function should never be called with addresses outside the
-        guest address space.  If this assert fires, it probably indicates
-        a missing call to h2g_valid.  */
--#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
--    assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
--#endif
-+    if (TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS) {
-+        assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
+diff --git a/exec.c b/exec.c
+index d6712fba7e..21926dc9c7 100644
+--- a/exec.c
++++ b/exec.c
+@@ -77,6 +77,10 @@
+ 
+ #include "monitor/monitor.h"
+ 
++#ifdef CONFIG_LIBDAXCTL
++#include <daxctl/libdaxctl.h>
++#endif
++
+ //#define DEBUG_SUBPAGE
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1745,6 +1749,46 @@ static int64_t get_file_size(int fd)
+     return size;
+ }
+ 
++static int64_t get_file_align(int fd)
++{
++    int64_t align = -1;
++#if defined(__linux__) && defined(CONFIG_LIBDAXCTL)
++    struct stat st;
++
++    if (fstat(fd, &st) < 0) {
++        return -errno;
 +    }
++
++    /* Special handling for devdax character devices */
++    if (S_ISCHR(st.st_mode)) {
++        g_autofree char *path = NULL;
++        g_autofree char *rpath = NULL;
++        struct daxctl_ctx *ctx;
++        struct daxctl_region *region;
++        int rc = 0;
++
++        path = g_strdup_printf("/sys/dev/char/%d:%d",
++                    major(st.st_rdev), minor(st.st_rdev));
++        rpath = realpath(path, NULL);
++
++        rc = daxctl_new(&ctx);
++        if (rc) {
++            return -1;
++        }
++
++        daxctl_region_foreach(ctx, region) {
++            if (strstr(rpath, daxctl_region_get_path(region))) {
++                align = daxctl_region_get_align(region);
++                break;
++            }
++        }
++        daxctl_unref(ctx);
++    }
++#endif /* defined(__linux__) && defined(CONFIG_LIBDAXCTL) */
++
++    return align;
++}
++
+ static int file_ram_open(const char *path,
+                          const char *region_name,
+                          bool *created,
+@@ -2296,7 +2340,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+ {
+     RAMBlock *new_block;
+     Error *local_err = NULL;
+-    int64_t file_size;
++    int64_t file_size, file_align;
  
-     if (len == 0) {
-         return 0;
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index 2fad4df2a7..946af51fc2 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -214,7 +214,7 @@ struct XHCIState {
-     uint32_t dcbaap_high;
-     uint32_t config;
+     /* Just support these ram flags by now. */
+     assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+@@ -2332,6 +2376,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
+     }
  
--    USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
-+    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
-     XHCIPort ports[MAXPORTS];
-     XHCISlot slots[MAXSLOTS];
-     uint32_t numports;
-diff --git a/include/block/block.h b/include/block/block.h
-index 25e299605e..e8fc814996 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -133,8 +133,8 @@ typedef struct HDGeometry {
- #define BDRV_SECTOR_BITS   9
- #define BDRV_SECTOR_SIZE   (1ULL << BDRV_SECTOR_BITS)
- 
--#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
--                                     INT_MAX >> BDRV_SECTOR_BITS)
-+#define BDRV_REQUEST_MAX_SECTORS MIN_CONST(SIZE_MAX >> BDRV_SECTOR_BITS, \
-+                                           INT_MAX >> BDRV_SECTOR_BITS)
- #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
- 
- /*
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index fb4e8a8e29..fc403d456b 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -176,11 +176,9 @@ extern unsigned long reserved_va;
-  * avoid setting bits at the top of guest addresses that might need
-  * to be used for tags.
-  */
--#if MIN(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32
--# define GUEST_ADDR_MAX_  UINT32_MAX
--#else
--# define GUEST_ADDR_MAX_  (~0ul)
--#endif
-+#define GUEST_ADDR_MAX_                                                 \
-+    ((MIN_CONST(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32) ?  \
-+     UINT32_MAX : ~0ul)
- #define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
- 
- #else
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 8c44abefa2..9185632337 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -102,8 +102,13 @@ typedef uint64_t target_ulong;
-  * Skylake's Level-2 STLB has 16 1G entries.
-  * Also, make sure we do not size the TLB past the guest's address space.
-  */
--#  define CPU_TLB_DYN_MAX_BITS                                  \
-+#  ifdef TARGET_PAGE_BITS_VARY
-+#   define CPU_TLB_DYN_MAX_BITS                                  \
-     MIN(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
-+#  else
-+#   define CPU_TLB_DYN_MAX_BITS                                  \
-+    MIN_CONST(22, TARGET_VIRT_ADDR_SPACE_BITS - TARGET_PAGE_BITS)
-+#  endif
- # endif
- 
- typedef struct CPUTLBEntry {
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index ff7c17b857..0d26a1b9bd 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -236,18 +236,55 @@ extern int daemon(int, int);
- #define SIZE_MAX ((size_t)-1)
- #endif
- 
--#ifndef MIN
--#define MIN(a, b) (((a) < (b)) ? (a) : (b))
--#endif
--#ifndef MAX
--#define MAX(a, b) (((a) > (b)) ? (a) : (b))
--#endif
-+/*
-+ * Two variations of MIN/MAX macros. The first is for runtime use, and
-+ * evaluates arguments only once (so it is safe even with side
-+ * effects), but will not work in constant contexts (such as array
-+ * size declarations) because of the '{}'.  The second is for constant
-+ * expression use, where evaluating arguments twice is safe because
-+ * the result is going to be constant anyway, but will not work in a
-+ * runtime context because of a void expression where a value is
-+ * expected.  Thus, both gcc and clang will fail to compile if you use
-+ * the wrong macro (even if the error may seem a bit cryptic).
-+ *
-+ * Note that neither form is usable as an #if condition; if you truly
-+ * need to write conditional code that depends on a minimum or maximum
-+ * determined by the pre-processor instead of the compiler, you'll
-+ * have to open-code it.
-+ */
-+#undef MIN
-+#define MIN(a, b)                                       \
-+    ({                                                  \
-+        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-+        _a < _b ? _a : _b;                              \
-+    })
-+#define MIN_CONST(a, b)                                         \
-+    __builtin_choose_expr(                                      \
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-+        (a) < (b) ? (a) : (b),                                  \
-+        ((void)0))
-+#undef MAX
-+#define MAX(a, b)                                       \
-+    ({                                                  \
-+        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-+        _a > _b ? _a : _b;                              \
-+    })
-+#define MAX_CONST(a, b)                                         \
-+    __builtin_choose_expr(                                      \
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-+        (a) > (b) ? (a) : (b),                                  \
-+        ((void)0))
- 
--/* Minimum function that returns zero only iff both values are zero.
-- * Intended for use with unsigned values only. */
-+/*
-+ * Minimum function that returns zero only if both values are zero.
-+ * Intended for use with unsigned values only.
-+ */
- #ifndef MIN_NON_ZERO
--#define MIN_NON_ZERO(a, b) ((a) == 0 ? (b) : \
--                                ((b) == 0 ? (a) : (MIN(a, b))))
-+#define MIN_NON_ZERO(a, b)                              \
-+    ({                                                  \
-+        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-+        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
-+    })
- #endif
- 
- /* Round number down to multiple */
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 1c3a358a14..be21518c57 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -31,7 +31,7 @@
- #include "qapi/error.h"
- 
- #define IO_BUF_SIZE 32768
--#define MAX_IOV_SIZE MIN(IOV_MAX, 64)
-+#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
- 
- struct QEMUFile {
-     const QEMUFileOps *ops;
++    file_align = get_file_align(fd);
++    if (file_align > 0 && mr && file_align > mr->align) {
++        error_setg(errp, "backing store align 0x%" PRIx64
++                   " is larger than 'align' option 0x%" PRIx64,
++                   file_align, mr->align);
++        return NULL;
++    }
++
+     new_block = g_malloc0(sizeof(*new_block));
+     new_block->mr = mr;
+     new_block->used_length = size;
 -- 
 2.26.2
 
