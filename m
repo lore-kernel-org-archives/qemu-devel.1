@@ -6,61 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8612CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1849C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:34:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43C292076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAEBE2076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:34:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiLVQb7Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C292076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DeT0dYpo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAEBE2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joiqZ-00063E-Gk
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:32:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58372)
+	id 1jois7-000861-25
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:34:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joijD-0001dH-8Q
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44552
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joij2-0001Wk-VI
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51506
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joijB-0003qM-El
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:50 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joij0-0003lv-60
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:24:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593156288;
+ s=mimecast20190719; t=1593156277;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WT2MQcvCiIRK06ehjaDXhdCDjT5gnyaryGIf1QwZi8o=;
- b=NiLVQb7ZUW9zja2l0Xc14MWjzWRI4oUveAxz5/GaLlkwzKB2BhjuYQtbP+gIq7/LSLfgnK
- zFJEhwRV9U9F2VgE7Ji6yy9jvtq0+dA9aFDN2D6TI+LqqK3hCm+TJ2hzlJ+0tyWNCoAoBq
- OWsDwqbvx5oLMbYH31/YXuqgz7zzVps=
+ bh=y5mY3LP9AHhqRx8iwuJVVbuunKfV44N7emFnc2DrY3E=;
+ b=DeT0dYpoMzjiy/M/aYzBtDBJP/+NPxsToAayUKyCAPnM/V39cqUi6QoJf2RMt11+RyB0LF
+ 5Wtpe2Skn61puRlaYOOnxenPagMpCbY8VJ26yyef812rNY05m20YbDvE5vQ6UMUR7jky8B
+ D8sxfDkCd8JSQLvmEEG8oMGGyQBatZY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-3dUxo9kDNyqOKdln5j_R8w-1; Fri, 26 Jun 2020 03:24:47 -0400
-X-MC-Unique: 3dUxo9kDNyqOKdln5j_R8w-1
+ us-mta-190-Qile2Tv0P4qpu1Kt2z6Ahw-1; Fri, 26 Jun 2020 03:24:33 -0400
+X-MC-Unique: Qile2Tv0P4qpu1Kt2z6Ahw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4861005512;
- Fri, 26 Jun 2020 07:24:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B9801800D4A;
+ Fri, 26 Jun 2020 07:24:32 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-35.ams2.redhat.com [10.36.113.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5EB91C8;
- Fri, 26 Jun 2020 07:24:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58EF17C1FB;
+ Fri, 26 Jun 2020 07:24:27 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 17/21] virtio-pci: Send qapi events when the virtio-mem
- size changes
-Date: Fri, 26 Jun 2020 09:22:44 +0200
-Message-Id: <20200626072248.78761-18-david@redhat.com>
+Subject: [PATCH v5 15/21] pc: Support for virtio-mem-pci
+Date: Fri, 26 Jun 2020 09:22:42 +0200
+Message-Id: <20200626072248.78761-16-david@redhat.com>
 In-Reply-To: <20200626072248.78761-1-david@redhat.com>
 References: <20200626072248.78761-1-david@redhat.com>
 MIME-Version: 1.0
@@ -89,155 +88,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's register the notifier and trigger the qapi event with the right
-device id.
+Let's wire it up similar to virtio-pmem. Also disallow unplug, so it's
+harder for users to shoot themselves into the foot.
 
-MEMORY_DEVICE_SIZE_CHANGE is similar to BALLOON_CHANGE, however on a
-memory device level.
-
-Don't unregister the notifier (we neither have finalize() nor unrealize()
-for VirtIOPCIProxy, so it's not that simple to do it) - both devices are
-expected to vanish at the same time.
-
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Eric Blake <eblake@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-mem-pci.c | 28 ++++++++++++++++++++++++++++
- hw/virtio/virtio-mem-pci.h |  1 +
- monitor/monitor.c          |  1 +
- qapi/misc.json             | 25 +++++++++++++++++++++++++
- 4 files changed, 55 insertions(+)
+ hw/i386/Kconfig |  1 +
+ hw/i386/pc.c    | 49 ++++++++++++++++++++++++++++---------------------
+ 2 files changed, 29 insertions(+), 21 deletions(-)
 
-diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
-index b325303b32..1a8e854123 100644
---- a/hw/virtio/virtio-mem-pci.c
-+++ b/hw/virtio/virtio-mem-pci.c
-@@ -14,6 +14,7 @@
- #include "virtio-mem-pci.h"
- #include "hw/mem/memory-device.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-events-misc.h"
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index c93f32f657..03e347b207 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -35,6 +35,7 @@ config PC
+     select ACPI_PCI
+     select ACPI_VMGENID
+     select VIRTIO_PMEM_SUPPORTED
++    select VIRTIO_MEM_SUPPORTED
  
- static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- {
-@@ -74,6 +75,21 @@ static void virtio_mem_pci_fill_device_info(const MemoryDeviceState *md,
-     info->type = MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM;
+ config PC_PCI
+     bool
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2dfd69b973..f2a18a3276 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -88,6 +88,7 @@
+ #include "hw/net/ne2000-isa.h"
+ #include "standard-headers/asm-x86/bootparam.h"
+ #include "hw/virtio/virtio-pmem-pci.h"
++#include "hw/virtio/virtio-mem-pci.h"
+ #include "hw/mem/memory-device.h"
+ #include "sysemu/replay.h"
+ #include "qapi/qmp/qerror.h"
+@@ -1637,8 +1638,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     numa_cpu_pre_plug(cpu_slot, dev, errp);
  }
  
-+static void virtio_mem_pci_size_change_notify(Notifier *notifier, void *data)
-+{
-+    VirtIOMEMPCI *pci_mem = container_of(notifier, VirtIOMEMPCI,
-+                                         size_change_notifier);
-+    DeviceState *dev = DEVICE(pci_mem);
-+    const uint64_t * const size_p = data;
-+    const char *id = NULL;
-+
-+    if (dev->id) {
-+        id = g_strdup(dev->id);
-+    }
-+
-+    qapi_event_send_memory_device_size_change(!!id, id, *size_p);
-+}
-+
- static void virtio_mem_pci_class_init(ObjectClass *klass, void *data)
+-static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+-                                        DeviceState *dev, Error **errp)
++static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
++                                      DeviceState *dev, Error **errp)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -98,9 +114,21 @@ static void virtio_mem_pci_class_init(ObjectClass *klass, void *data)
- static void virtio_mem_pci_instance_init(Object *obj)
+     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+     Error *local_err = NULL;
+@@ -1649,7 +1650,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+          * order. We should never reach this point when hotplugging on x86,
+          * however, better add a safety net.
+          */
+-        error_setg(errp, "virtio-pmem-pci hotplug not supported on this bus.");
++        error_setg(errp, "hotplug of virtio based memory devices not supported"
++                   " on this bus.");
+         return;
+     }
+     /*
+@@ -1664,8 +1666,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+     error_propagate(errp, local_err);
+ }
+ 
+-static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+-                                    DeviceState *dev, Error **errp)
++static void pc_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
++                                  DeviceState *dev, Error **errp)
  {
-     VirtIOMEMPCI *dev = VIRTIO_MEM_PCI(obj);
-+    VirtIOMEMClass *vmc;
-+    VirtIOMEM *vmem;
+     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+     Error *local_err = NULL;
+@@ -1685,17 +1687,17 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+     error_propagate(errp, local_err);
+ }
  
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_MEM);
-+
-+    dev->size_change_notifier.notify = virtio_mem_pci_size_change_notify;
-+    vmem = VIRTIO_MEM(&dev->vdev);
-+    vmc = VIRTIO_MEM_GET_CLASS(vmem);
-+    /*
-+     * We never remove the notifier again, as we expect both devices to
-+     * disappear at the same time.
-+     */
-+    vmc->add_size_change_notifier(vmem, &dev->size_change_notifier);
-+
-     object_property_add_alias(obj, VIRTIO_MEM_BLOCK_SIZE_PROP,
-                               OBJECT(&dev->vdev), VIRTIO_MEM_BLOCK_SIZE_PROP);
-     object_property_add_alias(obj, VIRTIO_MEM_SIZE_PROP, OBJECT(&dev->vdev),
-diff --git a/hw/virtio/virtio-mem-pci.h b/hw/virtio/virtio-mem-pci.h
-index 8820cd6628..b51a28b275 100644
---- a/hw/virtio/virtio-mem-pci.h
-+++ b/hw/virtio/virtio-mem-pci.h
-@@ -28,6 +28,7 @@ typedef struct VirtIOMEMPCI VirtIOMEMPCI;
- struct VirtIOMEMPCI {
-     VirtIOPCIProxy parent_obj;
-     VirtIOMEM vdev;
-+    Notifier size_change_notifier;
- };
+-static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_dev,
+-                                              DeviceState *dev, Error **errp)
++static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
++                                            DeviceState *dev, Error **errp)
+ {
+-    /* We don't support virtio pmem hot unplug */
+-    error_setg(errp, "virtio pmem device unplug not supported.");
++    /* We don't support hot unplug of virtio based memory devices */
++    error_setg(errp, "virtio based memory devices cannot be unplugged.");
+ }
  
- #endif /* QEMU_VIRTIO_MEM_PCI_H */
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index 125494410a..19dcb8fbe3 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -235,6 +235,7 @@ static MonitorQAPIEventConf monitor_qapi_event_conf[QAPI_EVENT__MAX] = {
-     [QAPI_EVENT_QUORUM_REPORT_BAD] = { 1000 * SCALE_MS },
-     [QAPI_EVENT_QUORUM_FAILURE]    = { 1000 * SCALE_MS },
-     [QAPI_EVENT_VSERPORT_CHANGE]   = { 1000 * SCALE_MS },
-+    [QAPI_EVENT_MEMORY_DEVICE_SIZE_CHANGE] = { 1000 * SCALE_MS },
- };
+-static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
+-                                      DeviceState *dev, Error **errp)
++static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
++                                    DeviceState *dev, Error **errp)
+ {
+-    /* We don't support virtio pmem hot unplug */
++    /* We don't support hot unplug of virtio based memory devices */
+ }
  
- /*
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 65ca3edf32..149c925246 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1434,6 +1434,31 @@
- ##
- { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
+ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+@@ -1705,8 +1707,9 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+         pc_memory_pre_plug(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         pc_cpu_pre_plug(hotplug_dev, dev, errp);
+-    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+-        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
++               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);
+     }
+ }
  
-+##
-+# @MEMORY_DEVICE_SIZE_CHANGE:
-+#
-+# Emitted when the size of a memory device changes. Only emitted for memory
-+# devices that can actually change the size (e.g., virtio-mem due to guest
-+# action).
-+#
-+# @id: device's ID
-+# @size: the new size of memory that the device provides
-+#
-+# Note: this event is rate-limited.
-+#
-+# Since: 5.1
-+#
-+# Example:
-+#
-+# <- { "event": "MEMORY_DEVICE_SIZE_CHANGE",
-+#      "data": { "id": "vm0", "size": 1073741824},
-+#      "timestamp": { "seconds": 1588168529, "microseconds": 201316 } }
-+#
-+##
-+{ 'event': 'MEMORY_DEVICE_SIZE_CHANGE',
-+  'data': { '*id': 'str', 'size': 'size' } }
-+
-+
- ##
- # @MEM_UNPLUG_ERROR:
- #
+@@ -1717,8 +1720,9 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+         pc_memory_plug(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         pc_cpu_plug(hotplug_dev, dev, errp);
+-    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+-        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
++               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        pc_virtio_md_pci_plug(hotplug_dev, dev, errp);
+     }
+ }
+ 
+@@ -1729,8 +1733,9 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+         pc_memory_unplug_request(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+-    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+-        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
++               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
+     } else {
+         error_setg(errp, "acpi: device unplug request for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -1744,8 +1749,9 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+         pc_memory_unplug(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+-    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+-        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
++               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        pc_virtio_md_pci_unplug(hotplug_dev, dev, errp);
+     } else {
+         error_setg(errp, "acpi: device unplug for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -1757,7 +1763,8 @@ static HotplugHandler *pc_get_hotplug_handler(MachineState *machine,
+ {
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+         object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
+-        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
++        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
++        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+         return HOTPLUG_HANDLER(machine);
+     }
+ 
 -- 
 2.26.2
 
