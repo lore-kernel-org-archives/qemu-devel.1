@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42262C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87B7C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EAE020781
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:45:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9529020781
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:46:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpsxxqL4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EAE020781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sFpqFS17"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9529020781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jorU0-0001OJ-6c
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:45:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57232)
+	id 1jorUX-0002jm-Nt
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:46:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorP8-0000GY-WA; Fri, 26 Jun 2020 12:40:43 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37756)
+ id 1jorP5-0000EJ-5Z; Fri, 26 Jun 2020 12:40:39 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32822)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorP7-00067m-Aj; Fri, 26 Jun 2020 12:40:42 -0400
-Received: by mail-wm1-x343.google.com with SMTP id o2so9975894wmh.2;
- Fri, 26 Jun 2020 09:40:40 -0700 (PDT)
+ id 1jorP2-00064P-Sv; Fri, 26 Jun 2020 12:40:38 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f18so2051158wrs.0;
+ Fri, 26 Jun 2020 09:40:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GvHez0pE6D3D72aVrb08Q8wyh4pB4x9TJg2DukSgMrU=;
- b=UpsxxqL4tceQIFxKNT74gHGiNesv+WvURhNEvFvLDfW75f/xa2YMvUH9y8WaruPn2T
- Tpm8ZW1z4AFQct2CSRt7aD8R3AV0OF+zg0JaBozeqmzLDAHWu3iOmpHdDZ7LENVxX+jP
- vw393zxdqCtOw1RfiW0LroBXwQIgPdnyyZ4EE2s0HTqC1/SMot6gEtG6WbAeHhOmculz
- C4jK31V7XKccf998xuECro5fo7Y4iN3I1mdcvPoZU9/KSjoewkANNehBG8RI8iBxI+N9
- QXP8mUdnNqu3rC3eoioymPHTdIU5lGurvku4WBxLiKRLzp6SY2izjs7OLEwFnwodHAc0
- kaOA==
+ bh=0q3fvINBMewfm4ouk0ChZ+kON+bgL7uzrdyA1Uly1X8=;
+ b=sFpqFS17yQY79QZJMC3kh2U9izuekgcjP82dQoSZ/wCDhEqUPF0ztyG4JEgyv/pKDy
+ WLKTt/AUhN2GzIQuXJNtY1XWDpbblALFqJu7rN32OXinwFZE9gD6VxpCbuTszk9tFE/f
+ NdZlNS/pwQBAD7ss+VTdu6dT38xXiBW1ysO4VPEqw46WNgl3dE4VqkJYQZWw7LWHAnjG
+ D11CriLzCs05Xh0+gXIhZn3EnV0PiEi14wrTJLEnCYY5Ki8XmtPS3dnSI3y0Rq4sWUba
+ +Oa52s3Jsv2OyARs66W8XCIRXLz3MNJkDYNpHhlkMzWMcG1MPvl3Ge7NUJ6c2B35c1VU
+ j51g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GvHez0pE6D3D72aVrb08Q8wyh4pB4x9TJg2DukSgMrU=;
- b=lU4P7imQT9745N/dc01tp2dKdnI+0zeTiUg3SyIIXgweXYw7i5fW1hf3mJTAxVV4Zk
- 17rMZNXUZ5IA0YDgSe+E+/yuDxTkj/J+6PAFSP+RGntaP7eTTtSB2wSOdAu82AT3whZo
- qChwZa5Q/HyI6hOKN4xyboSdhpqVWW9ALmtbtY70w/872F1ARneQLx6DD4FM0Vrm6mAA
- eMiDh1iLTJ1Vae4N30jy4BYtorIjL731wYKMO4DAsjsI6fZf9S9237XBRkIYIKfrJI29
- yzPe3IgMo1ou/trK/7VeBiO6hpqEblVaEPkBaKHRmeTxJA+7L3NFbdCmGWjZez9R9RUT
- 417A==
-X-Gm-Message-State: AOAM533Gc6+bnnC1TEvMyQCHlrs+teEEWo4YPxa+rbM6DZnTezB6DQN9
- tF1L9UUtOFnzYbiZaloFbPfXNq7L
-X-Google-Smtp-Source: ABdhPJxZMEZDsTRcqCKoBgc6AVGSJpjDhrOGbvXoTkJB4DDVpe5hl/060sUHSdmbycHagw32M5wzJA==
-X-Received: by 2002:a7b:c38c:: with SMTP id s12mr4327392wmj.136.1593189639596; 
- Fri, 26 Jun 2020 09:40:39 -0700 (PDT)
+ bh=0q3fvINBMewfm4ouk0ChZ+kON+bgL7uzrdyA1Uly1X8=;
+ b=VZ/hrtGN01/+cp4N1goitstJR3GiaTCtPwh4ZBRKWjigbHmlg8fxKhi4dguT5T34dk
+ l11sBEjtZH9tcG1/G63AngawF/AvvQMYynml8miBicMUtUdzRZi+abimLvJADAnbg8rN
+ yb0VgCn17re6pQw5BTk/+cPuLNzF5EC/BCDgrLCKH+veFBMWha1v0Aco+lVxOjrfWvVj
+ c+yBRIB7TbpQuVo5ZeuXPiNv27TYRb3D1Czn8m/HrdhFbxgrTyelWaFFIBsItTd+/7O4
+ k6K4/R1c6r2ShOz5qXEWHl4va5URhVo6uGCmLV1fx0V073T8J8gG+6+m+fDCfZ+GvwUV
+ u80g==
+X-Gm-Message-State: AOAM531GGBmnZr3b++IZ/zZKBBBlJOs6RJpI/9afQWXIlGrskyTVPqkT
+ p1mcY6n5JaalW3rtdlwUm/v4VG38
+X-Google-Smtp-Source: ABdhPJx0C6QgEFKTkcI8cBFl7F6ZZ9L4w1OVnliVkgzuQ97DLvG/cn1Xn592mb0DKG/1fzf7y36dhQ==
+X-Received: by 2002:a5d:6b08:: with SMTP id v8mr4885683wrw.2.1593189634749;
+ Fri, 26 Jun 2020 09:40:34 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id f12sm24623646wrw.53.2020.06.26.09.40.38
+ by smtp.gmail.com with ESMTPSA id f12sm24623646wrw.53.2020.06.26.09.40.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 09:40:38 -0700 (PDT)
+ Fri, 26 Jun 2020 09:40:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 09/15] hw/sd/sdcard: Update the SDState documentation
-Date: Fri, 26 Jun 2020 18:40:20 +0200
-Message-Id: <20200626164026.766-10-f4bug@amsat.org>
+Subject: [PATCH v5 05/15] hw/sd/sdcard: Do not switch to ReceivingData if
+ address is invalid
+Date: Fri, 26 Jun 2020 18:40:16 +0200
+Message-Id: <20200626164026.766-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200626164026.766-1-f4bug@amsat.org>
 References: <20200626164026.766-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -101,43 +102,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, qemu-block@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+ Alexander Bulekov <alxndr@bu.edu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add more descriptive comments to keep a clear separation
-between static property vs runtime changeable.
+Only move the state machine to ReceivingData if there is no
+pending error. This avoids later OOB access while processing
+commands queued.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+
+  4.3.3 Data Read
+
+  Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+  occurred and no data transfer is performed.
+
+  4.3.4 Data Write
+
+  Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+  occurred and no data transfer is performed.
+
+WP_VIOLATION errors are not modified: the error bit is set, we
+stay in receive-data state, wait for a stop command. All further
+data transfer is ignored. See the check on sd->card_status at the
+beginning of sd_read_data() and sd_write_data().
+
+Fixes: CVE-2020-13253
+Cc: Prasad J Pandit <pjp@fedoraproject.org>
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+v4: Only modify ADDRESS_ERROR, not WP_VIOLATION (pm215)
+---
+ hw/sd/sd.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 2689a27b49..d9ae4090fb 100644
+index 04451fdad2..7e0d684aca 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -103,11 +103,14 @@ struct SDState {
-     uint32_t card_status;
-     uint8_t sd_status[64];
+@@ -1167,13 +1167,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+     case 17:	/* CMD17:  READ_SINGLE_BLOCK */
+         switch (sd->state) {
+         case sd_transfer_state:
+-            sd->state = sd_sendingdata_state;
+-            sd->data_start = addr;
+-            sd->data_offset = 0;
  
--    /* Configurable properties */
-+    /* Static properties */
+             if (sd->data_start + sd->blk_len > sd->size) {
+                 sd->card_status |= ADDRESS_ERROR;
++                return sd_r1;
+             }
 +
-     uint8_t spec_version;
-     BlockBackend *blk;
-     bool spi;
++            sd->state = sd_sendingdata_state;
++            sd->data_start = addr;
++            sd->data_offset = 0;
+             return sd_r1;
  
-+    /* Runtime changeables */
+         default:
+@@ -1184,13 +1186,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+     case 18:	/* CMD18:  READ_MULTIPLE_BLOCK */
+         switch (sd->state) {
+         case sd_transfer_state:
+-            sd->state = sd_sendingdata_state;
+-            sd->data_start = addr;
+-            sd->data_offset = 0;
+ 
+             if (sd->data_start + sd->blk_len > sd->size) {
+                 sd->card_status |= ADDRESS_ERROR;
++                return sd_r1;
+             }
 +
-     uint32_t mode;    /* current card mode, one of SDCardModes */
-     int32_t state;    /* current card state, one of SDCardStates */
-     uint32_t vhs;
++            sd->state = sd_sendingdata_state;
++            sd->data_start = addr;
++            sd->data_offset = 0;
+             return sd_r1;
+ 
+         default:
+@@ -1230,14 +1234,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+             /* Writing in SPI mode not implemented.  */
+             if (sd->spi)
+                 break;
++
++            if (sd->data_start + sd->blk_len > sd->size) {
++                sd->card_status |= ADDRESS_ERROR;
++                return sd_r1;
++            }
++
+             sd->state = sd_receivingdata_state;
+             sd->data_start = addr;
+             sd->data_offset = 0;
+             sd->blk_written = 0;
+ 
+-            if (sd->data_start + sd->blk_len > sd->size) {
+-                sd->card_status |= ADDRESS_ERROR;
+-            }
+             if (sd_wp_addr(sd, sd->data_start)) {
+                 sd->card_status |= WP_VIOLATION;
+             }
+@@ -1257,14 +1264,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+             /* Writing in SPI mode not implemented.  */
+             if (sd->spi)
+                 break;
++
++            if (sd->data_start + sd->blk_len > sd->size) {
++                sd->card_status |= ADDRESS_ERROR;
++                return sd_r1;
++            }
++
+             sd->state = sd_receivingdata_state;
+             sd->data_start = addr;
+             sd->data_offset = 0;
+             sd->blk_written = 0;
+ 
+-            if (sd->data_start + sd->blk_len > sd->size) {
+-                sd->card_status |= ADDRESS_ERROR;
+-            }
+             if (sd_wp_addr(sd, sd->data_start)) {
+                 sd->card_status |= WP_VIOLATION;
+             }
 -- 
 2.21.3
 
