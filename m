@@ -2,84 +2,92 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D34C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C38BC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:01:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD2A207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BF7F206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:01:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="Afp2eRIJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD2A207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oKsNACpT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF7F206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joriY-0001x2-MZ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:00:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34458)
+	id 1jorjU-0003Nc-Hz
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:01:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
- id 1jorgR-0008G5-NM
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:58:35 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39994)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jorUe-0003Xz-RR
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:46:24 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:38566)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
- id 1jorgO-0003wk-H1
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:58:35 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f139so10006186wmf.5
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:58:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=atishpatra.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=foVkWIJLYjD4FD1rBPY1IYhpzC2IBIcxouLRn6FuaR4=;
- b=Afp2eRIJo6hRf0XYOmtmlyAJpz39bLc2aUQ5+Dw/rWt/212HZydc17PpxqfsLU5UNu
- pEYMz7nf4BE5pXGGINLmKXKnJ0OmPt0+dwqdmJWtXDMQfCiPwHhne7YFpEREebtNXnGV
- iWrYsUsAyfV91deH60N09CTTZOVVVzLkUQfxI=
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jorUc-0007vc-1f
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:46:23 -0400
+Received: by mail-ej1-x641.google.com with SMTP id w16so10015043ejj.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:46:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=FOm8YrybOtDDejE60XwrFoPvrKYk5DnDAfmjdi7H7yU=;
+ b=oKsNACpTyj1RUkdHDpDIjv0gvsVfxbsddHKKp7KmYiFyS8AxGdGRFSU7JYkxj4V74x
+ mVGWFBbnS2mG7gOdumdJ1X83qwb4YZJZHzaV1UYXzsI7yXXZm1RuPX1ZtQkQiDxF942s
+ 5N1/JYdfAMa8s7wOP5hU7wXCMODjJ0snS1pzWii7eihl1HeLBp6F4IjHQnOipm4qw5Za
+ iYZK0QYZFAI/V1fjLy6Kfke8AUqdHnTi4mJhT3yrVzi7oe6TfCr/XckUXJTJm3in3qr6
+ YHX625f5hLhFfi5l5RqQgeehnD+YGWmel8rv3eUbGOAtWlQrhFg3hpULOWE0QW/fF30H
+ uqwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=foVkWIJLYjD4FD1rBPY1IYhpzC2IBIcxouLRn6FuaR4=;
- b=l0BzGfsWEo8D3/IJSUQjFl/pbWNgZUi1Qv0tcsJRIlN8DmeAtM8qQk9VkH4xNAy+ts
- uhIP7sDXfAK+F1GAWlGBEcmVZhH2l0SIUkNyvPjgebSsRQdB/QaQHuDGi+Dpu0ZX1V5+
- al/ZaIu3IO8VagfH6cnSNrNp+RmHfs+TJL3fNq5IvGBnvtKhj9gwKKpG0autmH1xmWxN
- 0UsQC+iBsNYKgb4SX1FUlCSRPPlpEPBPaayE2rJ5qH2MZClxU5HQ6AxJzd8UZvipD0Pj
- CwTCKqpX0PT4kbCwm12UpXKgU1FkQPVm4S46vGsjLAiA2w8gpiTFEwDp30jl11XtGYHL
- k16g==
-X-Gm-Message-State: AOAM533nze4tXJvhPVvIDFO5gmC1qbXkdSc95pY+xn6g0yilvsnRClsv
- R4v0M0QcfXHhF/S5zA66YgnpuRRi8tCuKu3j2gme
-X-Google-Smtp-Source: ABdhPJxGozJoQflwj4tvInjvZPLYVWiwfl38aY4gPf1mfqAg7NArU8hfw2vLolTY3gKzAOsA2h1JNhBn4Pv5jAHOaBs=
-X-Received: by 2002:a1c:9d09:: with SMTP id g9mr4290988wme.31.1593190710569;
- Fri, 26 Jun 2020 09:58:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200626003313.715355-1-atish.patra@wdc.com>
- <20200626003313.715355-3-atish.patra@wdc.com>
- <CAEUhbmUCJcosvYd44qPMXdkE+Bj2MUcFBvz1VWSZL2w-6Z3d6g@mail.gmail.com>
-In-Reply-To: <CAEUhbmUCJcosvYd44qPMXdkE+Bj2MUcFBvz1VWSZL2w-6Z3d6g@mail.gmail.com>
-From: Atish Patra <atishp@atishpatra.org>
-Date: Fri, 26 Jun 2020 09:58:19 -0700
-Message-ID: <CAOnJCUKr5XXga5B02WDOeiyvEjgpAfcqp_VN-y2AAD0vXsn2Uw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] RISC-V: Copy the fdt in dram instead of ROM
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=atishp@atishpatra.org; helo=mail-wm1-x343.google.com
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=FOm8YrybOtDDejE60XwrFoPvrKYk5DnDAfmjdi7H7yU=;
+ b=o8PHkLxe3y0zDHwF17pmBbb03QcTM/74ZvFkRhP+FaqK8/yxk1iZ7rjhR3lKBq5KvQ
+ XjJVd7+qiULq3xToP9ispjnLwwSaEEzhut8YQH97XAkPAvzDte5h0PYEEk5jq4yUA95T
+ HDtZz+PzMi/3iLfW2KleMwPxOlPocXWcs6fZOewAE+w780xhzoiWYGrrtEUK4K3/jWDm
+ 2UO85aiqegPxIzSw+ZRpIdDDDjivLOG64aG9aWBqFYEal11u+bplBVkta/g801kPZ0MP
+ Dlug0on5dLrrBDODWITfsbyLLQ8VIuWIEsz/oA+srAwu3Xm+VxrggI6geH35wvpQq1GZ
+ SRCA==
+X-Gm-Message-State: AOAM531D4w2tvx/lyy/49tAQxSQLZaT42Eji8i9dP3Kmn1olCBvSnoL3
+ HhVB0cE8WluwqIA3+9ukbL0vsaWx
+X-Google-Smtp-Source: ABdhPJwpNMogwrKPvBm1yDzQy0llG1gAFdablzCNVgkV5T6wglhRxsqZosaoFozrC9E3ToVsJwDv7w==
+X-Received: by 2002:a17:906:2287:: with SMTP id
+ p7mr3415128eja.537.1593189980257; 
+ Fri, 26 Jun 2020 09:46:20 -0700 (PDT)
+Received: from AK-L.domain.name ([197.58.224.183])
+ by smtp.gmail.com with ESMTPSA id rv16sm10894889ejb.60.2020.06.26.09.46.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 09:46:19 -0700 (PDT)
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com,
+ alex.bennee@linaro.org, rth@twiddle.net, eblake@redhat.com,
+ ldoktor@redhat.com, ehabkost@redhat.com, crosa@redhat.com
+Subject: [PATCH v4 1/3] scripts/performance: Add topN_perf.py script
+Date: Fri, 26 Jun 2020 18:45:44 +0200
+Message-Id: <20200626164546.22102-2-ahmedkhaledkaraman@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200626164546.22102-1-ahmedkhaledkaraman@gmail.com>
+References: <20200626164546.22102-1-ahmedkhaledkaraman@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,308 +100,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 4:50 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Atish,
->
-> On Fri, Jun 26, 2020 at 8:33 AM Atish Patra <atish.patra@wdc.com> wrote:
-> >
-> > Currently, the fdt is copied to the ROM after the reset vector. The firmware
-> > has to copy it to DRAM. Instead of this, directly copy the device tree to a
-> > pre-computed dram address. The device tree load address should be as far as
-> > possible from kernel and initrd images. That's why it is kept at the end of
-> > the DRAM or 4GB whichever is lesser.
-> >
-> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  hw/riscv/boot.c         | 57 +++++++++++++++++++++++++++++------------
-> >  hw/riscv/sifive_u.c     | 32 +++++++++++------------
-> >  hw/riscv/spike.c        |  7 ++++-
-> >  hw/riscv/virt.c         |  7 ++++-
-> >  include/hw/riscv/boot.h |  5 +++-
-> >  5 files changed, 71 insertions(+), 37 deletions(-)
-> >
-> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-> > index 482b78147993..02c4018a8105 100644
-> > --- a/hw/riscv/boot.c
-> > +++ b/hw/riscv/boot.c
-> > @@ -159,44 +159,67 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-> >      return *start + size;
-> >  }
-> >
-> > +hwaddr riscv_load_fdt(hwaddr dram_base, uint64_t mem_size, void *fdt)
->
-> I think we should use uint32_t for the return value type, since it is
-> always below 4GiB
->
+Syntax:
+topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
+                 <qemu executable> [<qemu executable options>] \
+                 <target executable> [<target execurable options>]
 
-You are correct. I will update it. Thanks.
-> > +{
-> > +    hwaddr temp, fdt_addr;
-> > +    hwaddr dram_end = dram_base + mem_size;
-> > +    int fdtsize = fdt_totalsize(fdt);
-> > +
-> > +    if (fdtsize <= 0) {
-> > +        error_report("invalid device-tree");
-> > +        exit(1);
-> > +    }
-> > +
-> > +    /*
-> > +     * We should put fdt as far as possible to avoid kernel/initrd overwriting
-> > +     * its content. But it should be addressable by 32 bit system as well.
-> > +     * Thus, put it at an aligned address that less than fdt size from end of
-> > +     * dram or 4GB whichever is lesser.
-> > +     */
-> > +    temp = MIN(dram_end, 4096 * MiB);
-> > +    fdt_addr = QEMU_ALIGN_DOWN(temp - fdtsize, 2 * MiB);
-> > +
-> > +    fdt_pack(fdt);
-> > +    /* copy in the device tree */
-> > +    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
->
-> Use fdtsize
->
+[-h] - Print the script arguments help message.
+[-n] - Specify the number of top functions to print.
+     - If this flag is not specified, the tool defaults to 25.
 
-Sure.
-> > +
-> > +    rom_add_blob_fixed_as("fdt", fdt, fdtsize, fdt_addr,
-> > +                          &address_space_memory);
-> > +
-> > +    return fdt_addr;
-> > +}
-> > +
-> >  void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
-> > -                               hwaddr rom_size, void *fdt)
-> > +                               hwaddr rom_size,
-> > +                               hwaddr fdt_load_addr, void *fdt)
-> >  {
-> >      int i;
-> >      /* reset vector */
-> > -    uint32_t reset_vec[8] = {
-> > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
-> > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
-> > +    uint32_t reset_vec[10] = {
-> > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
->
-> fw_dync should be introduced in the next patch, so this line should be
-> kept unchanged in this patch
->
-As we have fdt_laddr, keeping it unchanged may create confusion with
-another dtb label.
-I will change the label to "end" in the next version.
+Example of usage:
+topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
 
-> >          0xf1402573,                  /*     csrr   a0, mhartid  */
-> >  #if defined(TARGET_RISCV32)
-> > +        0x0202a583,                  /*     lw     a1, 32(t0) */
-> >          0x0182a283,                  /*     lw     t0, 24(t0) */
-> >  #elif defined(TARGET_RISCV64)
-> > +        0x0202b583,                  /*     ld     a1, 32(t0) */
-> >          0x0182b283,                  /*     ld     t0, 24(t0) */
-> >  #endif
-> >          0x00028067,                  /*     jr     t0 */
-> >          0x00000000,
-> >          start_addr,                  /* start: .dword */
-> >          0x00000000,
-> > -                                     /* dtb: */
-> > +        fdt_load_addr,               /* fdt_laddr: .dword */
-> > +        0x00000000,
-> > +                                     /* fw_dyn: */
-> >      };
-> >
-> >      /* copy in the reset vector in little_endian byte order */
-> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
-> > +    for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
-> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
-> >      }
-> >      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-> >                            rom_base, &address_space_memory);
-> >
-> > -    /* copy in the device tree */
-> > -    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
-> > -        rom_size - sizeof(reset_vec)) {
-> > -        error_report("not enough space to store device-tree");
-> > -        exit(1);
-> > -    }
-> > -    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
-> > -    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
-> > -                           rom_base + sizeof(reset_vec),
-> > -                           &address_space_memory);
-> > -
-> >      return;
-> >  }
-> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> > index 395b21703ab4..7d39a4e4ec6d 100644
-> > --- a/hw/riscv/sifive_u.c
-> > +++ b/hw/riscv/sifive_u.c
-> > @@ -379,6 +379,7 @@ static void sifive_u_machine_init(MachineState *machine)
-> >      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
-> >      target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
-> >      int i;
-> > +    hwaddr fdt_load_addr;
-> >
-> >      /* Initialize SoC */
-> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
-> > @@ -450,40 +451,37 @@ static void sifive_u_machine_init(MachineState *machine)
-> >          }
-> >      }
-> >
-> > +    /* Compute the fdt load address in dram */
-> > +    fdt_load_addr = riscv_load_fdt(memmap[SIFIVE_U_DRAM].base,
-> > +                                   machine->ram_size, s->fdt);
-> > +
-> >      /* reset vector */
-> > -    uint32_t reset_vec[8] = {
-> > +    uint32_t reset_vec[11] = {
-> >          s->msel,                       /* MSEL pin state */
-> > -        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
-> > -        0x01c28593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
-> > +        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
-> >          0xf1402573,                    /*     csrr   a0, mhartid  */
-> >  #if defined(TARGET_RISCV32)
-> > +        0x0202a583,                    /*     lw     a1, 32(t0) */
-> >          0x0182a283,                    /*     lw     t0, 24(t0) */
-> >  #elif defined(TARGET_RISCV64)
-> > -        0x0182e283,                    /*     lwu    t0, 24(t0) */
-> > +        0x0202b583,                    /*     ld     a1, 32(t0) */
-> > +        0x0182b283,                    /*     ld     t0, 24(t0) */
->
-> This change (lwu => ld) is unnecessary.
->
-start_addr is a dword. Currently, the start address is within 32 bits.
-But it can be changed to more than 32 bits. No ?
+Example Output:
+ No.  Percentage  Name                       Invoked by
+----  ----------  -------------------------  -------------------------
+   1      16.25%  float64_mul                qemu-x86_64
+   2      12.01%  float64_sub                qemu-x86_64
+   3      11.99%  float64_add                qemu-x86_64
+   4       5.69%  helper_mulsd               qemu-x86_64
+   5       4.68%  helper_addsd               qemu-x86_64
+   6       4.43%  helper_lookup_tb_ptr       qemu-x86_64
+   7       4.28%  helper_subsd               qemu-x86_64
+   8       2.71%  f64_compare                qemu-x86_64
+   9       2.71%  helper_ucomisd             qemu-x86_64
+  10       1.04%  helper_pand_xmm            qemu-x86_64
+  11       0.71%  float64_div                qemu-x86_64
+  12       0.63%  helper_pxor_xmm            qemu-x86_64
+  13       0.50%  0x00007f7b7004ef95         [JIT] tid 491
+  14       0.50%  0x00007f7b70044e83         [JIT] tid 491
+  15       0.36%  helper_por_xmm             qemu-x86_64
+  16       0.32%  helper_cc_compute_all      qemu-x86_64
+  17       0.30%  0x00007f7b700433f0         [JIT] tid 491
+  18       0.30%  float64_compare_quiet      qemu-x86_64
+  19       0.27%  soft_f64_addsub            qemu-x86_64
+  20       0.26%  round_to_int               qemu-x86_64
 
-> >  #endif
-> >          0x00028067,                    /*     jr     t0 */
-> >          0x00000000,
-> >          start_addr,                    /* start: .dword */
-> > -                                       /* dtb: */
-> > +        0x00000000,
->
-> unnecessary change. Above lwu can be kept unchanged
->
-> > +        fdt_load_addr,                 /* fdt_laddr: .dword */
-> > +        0x00000000,
-> > +                                       /* fw_dyn: */
->
-> should be in next patch
->
-Will do.
+Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+---
+ scripts/performance/topN_perf.py | 149 +++++++++++++++++++++++++++++++
+ 1 file changed, 149 insertions(+)
+ create mode 100755 scripts/performance/topN_perf.py
 
-> >      };
-> >
-> >      /* copy in the reset vector in little_endian byte order */
-> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
-> > +    for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
-> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
-> >      }
-> >      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-> >                            memmap[SIFIVE_U_MROM].base, &address_space_memory);
-> > -
-> > -    /* copy in the device tree */
-> > -    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
-> > -            memmap[SIFIVE_U_MROM].size - sizeof(reset_vec)) {
-> > -        error_report("not enough space to store device-tree");
-> > -        exit(1);
-> > -    }
-> > -    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
-> > -    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
-> > -                          memmap[SIFIVE_U_MROM].base + sizeof(reset_vec),
-> > -                          &address_space_memory);
-> >  }
-> >
-> >  static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
-> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> > index c696077cbc16..69f050c07e5a 100644
-> > --- a/hw/riscv/spike.c
-> > +++ b/hw/riscv/spike.c
-> > @@ -163,6 +163,7 @@ static void spike_board_init(MachineState *machine)
-> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-> >      unsigned int smp_cpus = machine->smp.cpus;
-> > +    hwaddr fdt_load_addr;
-> >
-> >      /* Initialize SOC */
-> >      object_initialize_child(OBJECT(machine), "soc", &s->soc,
-> > @@ -208,9 +209,13 @@ static void spike_board_init(MachineState *machine)
-> >          }
-> >      }
-> >
-> > +    /* Compute the fdt load address in dram */
-> > +    fdt_load_addr = riscv_load_fdt(memmap[SPIKE_DRAM].base,
-> > +                                   machine->ram_size, s->fdt);
-> >      /* load the reset vector */
-> >      riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
-> > -                              memmap[SPIKE_MROM].size, s->fdt);
-> > +                              memmap[SPIKE_MROM].size,
-> > +                              fdt_load_addr, s->fdt);
-> >
-> >      /* initialize HTIF using symbols found in load_kernel */
-> >      htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
-> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > index 8ec77e43de26..639e284fc2e3 100644
-> > --- a/hw/riscv/virt.c
-> > +++ b/hw/riscv/virt.c
-> > @@ -478,6 +478,7 @@ static void virt_machine_init(MachineState *machine)
-> >      char *plic_hart_config;
-> >      size_t plic_hart_config_len;
-> >      target_ulong start_addr = memmap[VIRT_DRAM].base;
-> > +    hwaddr fdt_load_addr;
-> >      int i;
-> >      unsigned int smp_cpus = machine->smp.cpus;
-> >
-> > @@ -532,9 +533,13 @@ static void virt_machine_init(MachineState *machine)
-> >          start_addr = virt_memmap[VIRT_FLASH].base;
-> >      }
-> >
-> > +    /* Compute the fdt load address in dram */
-> > +    fdt_load_addr = riscv_load_fdt(memmap[VIRT_DRAM].base,
-> > +                                   machine->ram_size, s->fdt);
-> >      /* load the reset vector */
-> >      riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
-> > -                              virt_memmap[VIRT_MROM].size, s->fdt);
-> > +                              virt_memmap[VIRT_MROM].size,
-> > +                              fdt_load_addr, s->fdt);
-> >
-> >      /* create PLIC hart topology configuration string */
-> >      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
-> > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-> > index 3e9759c89aa2..f64fcadd2390 100644
-> > --- a/include/hw/riscv/boot.h
-> > +++ b/include/hw/riscv/boot.h
-> > @@ -35,7 +35,10 @@ target_ulong riscv_load_kernel(const char *kernel_filename,
-> >                                 symbol_fn_t sym_cb);
-> >  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-> >                           uint64_t kernel_entry, hwaddr *start);
-> > +hwaddr riscv_load_fdt(hwaddr dram_start, uint64_t dram_size,
-> > +                                void *fdt);
->
-> nits: not indented to (
->
-> >  void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
-> > -                               hwaddr rom_size, void *fdt);
-> > +                               hwaddr rom_size,
-> > +                               hwaddr fdt_load_addr, void *fdt);
-> >
-> >  #endif /* RISCV_BOOT_H */
->
-> Regards,
-> Bin
->
-
-
+diff --git a/scripts/performance/topN_perf.py b/scripts/performance/topN_perf.py
+new file mode 100755
+index 0000000000..07be195fc8
+--- /dev/null
++++ b/scripts/performance/topN_perf.py
+@@ -0,0 +1,149 @@
++#!/usr/bin/env python3
++
++#  Print the top N most executed functions in QEMU using perf.
++#  Syntax:
++#  topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
++#           <qemu executable> [<qemu executable options>] \
++#           <target executable> [<target execurable options>]
++#
++#  [-h] - Print the script arguments help message.
++#  [-n] - Specify the number of top functions to print.
++#       - If this flag is not specified, the tool defaults to 25.
++#
++#  Example of usage:
++#  topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
++#
++#  This file is a part of the project "TCG Continuous Benchmarking".
++#
++#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
++#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
++#
++#  This program is free software: you can redistribute it and/or modify
++#  it under the terms of the GNU General Public License as published by
++#  the Free Software Foundation, either version 2 of the License, or
++#  (at your option) any later version.
++#
++#  This program is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++#  GNU General Public License for more details.
++#
++#  You should have received a copy of the GNU General Public License
++#  along with this program. If not, see <https://www.gnu.org/licenses/>.
++
++import argparse
++import os
++import subprocess
++import sys
++
++
++# Parse the command line arguments
++parser = argparse.ArgumentParser(
++    usage='topN_perf.py [-h] [-n] <number of displayed top functions >  -- '
++          '<qemu executable> [<qemu executable options>] '
++          '<target executable> [<target executable options>]')
++
++parser.add_argument('-n', dest='top', type=int, default=25,
++                    help='Specify the number of top functions to print.')
++
++parser.add_argument('command', type=str, nargs='+', help=argparse.SUPPRESS)
++
++args = parser.parse_args()
++
++# Extract the needed variables from the args
++command = args.command
++top = args.top
++
++# Insure that perf is installed
++check_perf_presence = subprocess.run(["which", "perf"],
++                                     stdout=subprocess.DEVNULL)
++if check_perf_presence.returncode:
++    sys.exit("Please install perf before running the script!")
++
++# Insure user has previllage to run perf
++check_perf_executability = subprocess.run(["perf", "stat", "ls", "/"],
++                                          stdout=subprocess.DEVNULL,
++                                          stderr=subprocess.DEVNULL)
++if check_perf_executability.returncode:
++    sys.exit(
++"""
++Error:
++You may not have permission to collect stats.
++
++Consider tweaking /proc/sys/kernel/perf_event_paranoid,
++which controls use of the performance events system by
++unprivileged users (without CAP_SYS_ADMIN).
++
++  -1: Allow use of (almost) all events by all users
++      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK
++   0: Disallow ftrace function tracepoint by users without CAP_SYS_ADMIN
++      Disallow raw tracepoint access by users without CAP_SYS_ADMIN
++   1: Disallow CPU event access by users without CAP_SYS_ADMIN
++   2: Disallow kernel profiling by users without CAP_SYS_ADMIN
++
++To make this setting permanent, edit /etc/sysctl.conf too, e.g.:
++   kernel.perf_event_paranoid = -1
++
++* Alternatively, you can run this script under sudo privileges.
++"""
++)
++
++# Run perf record
++perf_record = subprocess.run((["perf", "record", "--output=/tmp/perf.data"] +
++                              command),
++                             stdout=subprocess.DEVNULL,
++                             stderr=subprocess.PIPE)
++if perf_record.returncode:
++    os.unlink('/tmp/perf.data')
++    sys.exit(perf_record.stderr.decode("utf-8"))
++
++# Save perf report output to /tmp/perf_report.out
++with open("/tmp/perf_report.out", "w") as output:
++    perf_report = subprocess.run(
++        ["perf", "report", "--input=/tmp/perf.data", "--stdio"],
++        stdout=output,
++        stderr=subprocess.PIPE)
++    if perf_report.returncode:
++        os.unlink('/tmp/perf.data')
++        output.close()
++        os.unlink('/tmp/perf_report.out')
++        sys.exit(perf_report.stderr.decode("utf-8"))
++
++# Read the reported data to functions[]
++functions = []
++with open("/tmp/perf_report.out", "r") as data:
++    # Only read lines that are not comments (comments start with #)
++    # Only read lines that are not empty
++    functions = [line for line in data.readlines() if line and line[0]
++                 != '#' and line[0] != "\n"]
++
++# Limit the number of top functions to "top"
++number_of_top_functions = top if len(functions) > top else len(functions)
++
++# Store the data of the top functions in top_functions[]
++top_functions = functions[:number_of_top_functions]
++
++# Print table header
++print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
++                                                         'Percentage',
++                                                         'Name',
++                                                         'Invoked by',
++                                                         '-' * 4,
++                                                         '-' * 10,
++                                                         '-' * 30,
++                                                         '-' * 25))
++
++# Print top N functions
++for (index, function) in enumerate(top_functions, start=1):
++    function_data = function.split()
++    function_percentage = function_data[0]
++    function_name = function_data[-1]
++    function_invoker = ' '.join(function_data[2:-2])
++    print('{:>4}  {:>10}  {:<30}  {}'.format(index,
++                                             function_percentage,
++                                             function_name,
++                                             function_invoker))
++
++# Remove intermediate files
++os.unlink('/tmp/perf.data')
++os.unlink('/tmp/perf_report.out')
 -- 
-Regards,
-Atish
+2.17.1
+
 
