@@ -2,87 +2,99 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB05DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B70B2C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3E44207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87054206C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:07:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K47v1R0d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E44207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=adacore-com.20150623.gappssmtp.com header.i=@adacore-com.20150623.gappssmtp.com header.b="dps9uidQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87054206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolDU-00066o-UR
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:04:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
+	id 1jolGn-00009x-RF
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:07:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jolCe-0005dv-CR
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:03:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44891
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jolCc-0004gg-Ni
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:03:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593165801;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ooqtieOB+GfgpWYDOCEk6heDOq9I5DTOJBh1Zhj0SyI=;
- b=K47v1R0djonBA+GNNklNJospoIgrFvTDybEbeUsORRsa2FNYhp3nc5HOgfsYYB6ZjvMQbz
- I2rO0J/8U5mTKQD7W6DR4NvLYvuDpjd4lg4wMKz34uHTdrmtIOFowFJcFvljg90wyCAuxH
- Qyqh3No+P6FIVSzjMtms23zRPRGVlWg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-6lqQGMn3PpisrpcxJCq5UA-1; Fri, 26 Jun 2020 06:03:20 -0400
-X-MC-Unique: 6lqQGMn3PpisrpcxJCq5UA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69AC118A8221;
- Fri, 26 Jun 2020 10:03:18 +0000 (UTC)
-Received: from gondolin (ovpn-112-215.ams2.redhat.com [10.36.112.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9C50F1974A;
- Fri, 26 Jun 2020 10:03:10 +0000 (UTC)
-Date: Fri, 26 Jun 2020 12:03:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Subject: Re: [PATCH v4 8/8] s390: guest support for diagnose 0x318
-Message-ID: <20200626120308.7aae13ec.cohuck@redhat.com>
-In-Reply-To: <20200624202312.28349-9-walling@linux.ibm.com>
-References: <20200624202312.28349-1-walling@linux.ibm.com>
- <20200624202312.28349-9-walling@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <konrad@adacore.com>)
+ id 1jolFz-0007nD-Tv
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:06:51 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38080)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <konrad@adacore.com>)
+ id 1jolFx-0005jp-NZ
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:06:51 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z13so8919290wrw.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 03:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=adacore-com.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2OxCbBgFU9PvvF0xecYaaPPPsto/wU1BWDxi2oul6RE=;
+ b=dps9uidQx33WhZUjYcoYMHk9CxGHZtzJamSqBVUgqnhEarAhtivjmir0/hs2SEN/gj
+ RM9vSMkuFUjwRQfPYUQA5swghQqefacRkPxi6Uikf/rFXr9PwaYRqbL8xhYj9sMddoHo
+ MEYtPpBUD7GbAMyKkUk8nLDepAf4tf5nmUerkEMVxCdg64NZPbwKNVTxTdOMPz0+rstE
+ hxVjj6exAehFkz9Fe6MgPA7c42xc3SOjsZLVC15/xLM4i3JPicM5DhnwfGbJ9h2jy+3J
+ bWieiJyVQX2RcSI0GaLCggdrvP4ox7sg5ug/MKpYUem5uD7GyrI1ghSVFFJMTqblZQga
+ 4oHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2OxCbBgFU9PvvF0xecYaaPPPsto/wU1BWDxi2oul6RE=;
+ b=KFnLR60gNHiKcul4YWcV4tKHXMTQlNwuRhjj4nGc82jetTWl7Dc3y65FMSiCYJcAXp
+ 91KsiFbKr+GLdBU1gCxBu2+JJDx1WYt9nJpMA5AL65YhK0HDqnH60e/dnxiO+kcA7Qrb
+ mCNPS2/88xPqt2CVbsyxKnKstJHougtusw6iGHd9T121/1FDpZubxedchLtMpJYp9xBk
+ EKhhTZevY66BlQQ3CtjsPxt+k6HPRZId+CBi9GPxZksUB0l6k8JiK1EfpcGtW9BPHc5K
+ BIaGEWxrKz+cM8ZeX+3GbIa9jH2FGF+nREqZNXuTNO5J8eBQokC1h2IPSP+6ddlj/xPW
+ wuQA==
+X-Gm-Message-State: AOAM531Lu7WkXPsIEivhZf7DpFLuifr6axO8fnU91td/RRTmXBwbgpPG
+ UC0WQql54wdWY4UwIo5GNc9FPg==
+X-Google-Smtp-Source: ABdhPJxr2Emqx/eNxCSAB/Kkn5jjxJB3eBlNcgp8VGSxk5ubWjNgay/Q0NPiRK/ZtFq6NKE8iMtZ+g==
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr2769056wrx.219.1593166007416; 
+ Fri, 26 Jun 2020 03:06:47 -0700 (PDT)
+Received: from localhost.localdomain
+ (lfbn-tou-1-1325-88.w90-89.abo.wanadoo.fr. [90.89.138.88])
+ by smtp.gmail.com with ESMTPSA id v20sm36970780wrb.51.2020.06.26.03.06.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 26 Jun 2020 03:06:46 -0700 (PDT)
+Subject: Re: [PATCH v1 1/2] semihosting: defer connect_chardevs a little more
+ to use serialx
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <1592215252-26742-1-git-send-email-frederic.konrad@adacore.com>
+ <87tuzbyseo.fsf@linaro.org>
+From: Fred Konrad <konrad@adacore.com>
+Message-ID: <d8e0a351-7136-4630-f65d-2d7b9603eb8d@adacore.com>
+Date: Fri, 26 Jun 2020 12:06:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87tuzbyseo.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=konrad@adacore.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,53 +107,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
- mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 24 Jun 2020 16:23:12 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
 
-> DIAGNOSE 0x318 (diag318) is an s390 instruction that allows the storage
-> of diagnostic information that is collected by the firmware in the case
-> of hardware/firmware service events.
-> 
-> QEMU handles the instruction by storing the info in the CPU state. A
-> subsequent register sync will communicate the data to the hypervisor.
-> 
-> QEMU handles the migration via a VM State Description.
-> 
-> This feature depends on the Extended-Length SCCB (els) feature. If
-> els is not present, then a warning will be printed and the SCLP bit
-> that allows the Linux kernel to execute the instruction will not be
-> set.
-> 
-> Availability of this instruction is determined by byte 134 (aka fac134)
-> bit 0 of the SCLP Read Info block. This coincidentally expands into the
-> space used for CPU entries, which means VMs running with the diag318
-> capability may not be able to read information regarding all CPUs
-> unless the guest kernel supports an extended-length SCCB.
-> 
-> This feature is not supported in protected virtualization mode.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  hw/s390x/sclp.c                     |  5 +++++
->  include/hw/s390x/sclp.h             |  3 +++
->  target/s390x/cpu.h                  |  2 ++
->  target/s390x/cpu_features.h         |  1 +
->  target/s390x/cpu_features_def.inc.h |  3 +++
->  target/s390x/cpu_models.c           |  1 +
->  target/s390x/gen-features.c         |  1 +
->  target/s390x/kvm.c                  | 31 +++++++++++++++++++++++++++++
->  target/s390x/machine.c              | 17 ++++++++++++++++
->  9 files changed, 64 insertions(+)
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Le 6/16/20 à 4:52 PM, Alex Bennée a écrit :
+> 
+> konrad@adacore.com writes:
+> 
+>> From: KONRAD Frederic <frederic.konrad@adacore.com>
+>>
+>> With that we can just use chardev=serial0.
+> 
+> I don't quite follow what this means.
+> 
+> ./aarch64-softmmu/qemu-system-aarch64 -cpu max -monitor none -chardev=serial0 -M virt -display none -semihosting -kernel ./tests/tcg/aarch64-softmmu/memory
+> qemu-system-aarch64: -chardev=serial0: invalid option
+> 
+> ./aarch64-softmmu/qemu-system-aarch64 -cpu max -monitor none -chardev id=serial0 -M virt -display none -semihosting -kernel ./tests/tcg/aarch64-softmmu/memory
+> qemu-system-aarch64: -chardev id=serial0: chardev: "serial0" missing backend
+> 
+> The run:
+> 
+> ./aarch64-softmmu/qemu-system-aarch64 -cpu max -serial mon:stdio -M virt -display none -semihosting -kernel ./tests/tcg/aarch64-softmmu/memory
+> 
+> works fine without this patch.
 
+Hi Alex, and sorry for the delay,
+
+I meant `-semihosting-config chardev=serial0`.  I suspect your last command-line
+will print any string sent to semihosting to stderr by default.
+
+> 
+>>
+>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>> ---
+>>   softmmu/vl.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/softmmu/vl.c b/softmmu/vl.c
+>> index f669c06..9b8b48a 100644
+>> --- a/softmmu/vl.c
+>> +++ b/softmmu/vl.c
+>> @@ -4123,8 +4123,6 @@ void qemu_init(int argc, char **argv, char **envp)
+>>   
+>>       qemu_opts_foreach(qemu_find_opts("chardev"),
+>>                         chardev_init_func, NULL, &error_fatal);
+>> -    /* now chardevs have been created we may have semihosting to connect */
+>> -    qemu_semihosting_connect_chardevs();
+>>   
+>>   #ifdef CONFIG_VIRTFS
+>>       qemu_opts_foreach(qemu_find_opts("fsdev"),
+>> @@ -4271,6 +4269,9 @@ void qemu_init(int argc, char **argv, char **envp)
+>>       if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+>>           exit(1);
+>>   
+>> +    /* now chardevs have been created we may have semihosting to connect */
+>> +    qemu_semihosting_connect_chardevs();
+>> +
+>>       /* If no default VGA is requested, the default is "none".  */
+>>       if (default_vga) {
+>>           vga_model = get_default_vga_model(machine_class);
+> 
+> 
 
