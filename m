@@ -7,71 +7,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98431C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FBBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:51:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FE4F20720
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:50:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1064720720
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:51:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2HfqQqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE4F20720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+Gs9oGA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1064720720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jovJ4-0002sw-Fx
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:50:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34006)
+	id 1jovK6-0004Qz-A5
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:51:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAl-0007Bl-0P
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:07 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27441
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAq-0007GA-KT
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52852
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAf-0005t3-Mv
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:05 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAf-0005t0-MI
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593204121;
+ s=mimecast20190719; t=1593204120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eVtsA0DHrcqkkn68fiQz+xgrExE5tHtuRy1db8hnKnQ=;
- b=B2HfqQqJD4ohNjJSXThF3AR3XkW5MUovcdYrSq0NjqRrNaJ48JnGTBG6YW1n1U7t43CPX5
- d+fhnAkJd7BzM1zU1QVteUpOE66uskEQih6bvBF2YpsAfd/QRwa2K4WnooSAETvXDKyWSy
- aJA3rQHsYaVJhLXj0pQDEFSH9szx+Ro=
+ bh=HqqNxG5KpI0efHrqCewjCVxiWjh+EBq81VttRszc3tE=;
+ b=U+Gs9oGAjIoKhqbO0a3/iI5HJJNmrjq1YZIq9n+ZqXqOi+9NAgw2vbY7ZBzm4yUZnSMBk0
+ 1+3ZdruNOIpzLCyALQco0R2qDvQe5SSKjEtI2TipQ66MBz073Ie6uFyCrfqIsHROIZkWFK
+ CFgcvh2nQzN6k5H7EjWCF+mdIMk02DI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-LL7J-eVNP4mhOPpLwlI1OA-1; Fri, 26 Jun 2020 16:41:59 -0400
-X-MC-Unique: LL7J-eVNP4mhOPpLwlI1OA-1
+ us-mta-26-02R0kKfAMTyZ1Ma_FDn7ug-1; Fri, 26 Jun 2020 16:41:57 -0400
+X-MC-Unique: 02R0kKfAMTyZ1Ma_FDn7ug-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74C8C107ACCD;
- Fri, 26 Jun 2020 20:41:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8080B107ACCD;
+ Fri, 26 Jun 2020 20:41:56 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 998A019724;
- Fri, 26 Jun 2020 20:41:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A690B19C58;
+ Fri, 26 Jun 2020 20:41:55 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 14/16] python/qemu: make 'args' style arguments immutable
-Date: Fri, 26 Jun 2020 16:41:31 -0400
-Message-Id: <20200626204133.14500-15-jsnow@redhat.com>
+Subject: [PATCH v4 12/16] python/machine.py: Add _qmp access shim
+Date: Fri, 26 Jun 2020 16:41:29 -0400
+Message-Id: <20200626204133.14500-13-jsnow@redhat.com>
 In-Reply-To: <20200626204133.14500-1-jsnow@redhat.com>
 References: <20200626204133.14500-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 16:23:57
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,147 +102,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These arguments don't need to be mutable and aren't really used as
-such. Clarify their types as immutable and adjust code to match where
-necessary.
-
-In general, It's probably best not to accept a user-defined mutable
-object and store it as internal object state unless there's a strong
-justification for doing so. Instead, try to use generic types as input
-with empty tuples as the default, and coerce to list where necessary.
+Like many other Optional[] types, it's not always a given that this
+object will be set. Wrap it in a type-shim that raises a meaningful
+error and will always return a concrete type.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- python/qemu/machine.py | 30 +++++++++++++++++-------------
- python/qemu/qtest.py   | 16 ++++++++++++----
- 2 files changed, 29 insertions(+), 17 deletions(-)
+ python/qemu/machine.py | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index c189fa4e28..15e854e04f 100644
+index 9bb5d26407..cb3db1f66a 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -18,6 +18,7 @@
- #
- 
- import errno
-+from itertools import chain
- import logging
- import os
- import subprocess
-@@ -30,6 +31,8 @@
-     Dict,
-     List,
-     Optional,
-+    Sequence,
-+    Tuple,
-     Type,
- )
- from types import TracebackType
-@@ -68,8 +71,12 @@ class QEMUMachine:
-         # vm is guaranteed to be shut down here
-     """
- 
--    def __init__(self, binary, args=None, wrapper=None, name=None,
--                 test_dir="/var/tmp",
-+    def __init__(self,
-+                 binary: str,
-+                 args: Sequence[str] = (),
-+                 wrapper: Sequence[str] = (),
-+                 name: Optional[str] = None,
-+                 test_dir: str = "/var/tmp",
-                  monitor_address: Optional[SocketAddrT] = None,
-                  socket_scm_helper=None, sock_dir=None):
-         '''
-@@ -87,14 +94,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         # Direct user configuration
- 
-         self._binary = binary
--
--        if args is None:
--            args = []
--        # Copy mutable input: we will be modifying our copy
-         self._args = list(args)
--
--        if wrapper is None:
--            wrapper = []
-         self._wrapper = wrapper
- 
-         self._name = name or "qemu-%d" % os.getpid()
-@@ -119,7 +119,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+@@ -118,7 +118,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+         self._events = []
          self._iolog = None
          self._qmp_set = True   # Enable QMP monitor by default.
-         self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
--        self._qemu_full_args = None
-+        self._qemu_full_args: Tuple[str, ...] = ()
+-        self._qmp = None
++        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
+         self._qemu_full_args = None
          self._temp_dir = None
          self._launched = False
-         self._machine = None
-@@ -340,7 +340,7 @@ def launch(self):
-             raise QEMUMachineError('VM already launched')
+@@ -285,14 +285,14 @@ def _pre_launch(self):
+             if self._remove_monitor_sockfile:
+                 assert isinstance(self._monitor_address, str)
+                 self._remove_files.append(self._monitor_address)
+-            self._qmp = qmp.QEMUMonitorProtocol(
++            self._qmp_connection = qmp.QEMUMonitorProtocol(
+                 self._monitor_address,
+                 server=True,
+                 nickname=self._name
+             )
  
-         self._iolog = None
--        self._qemu_full_args = None
-+        self._qemu_full_args = ()
-         try:
-             self._launch()
-             self._launched = True
-@@ -360,8 +360,12 @@ def _launch(self):
+     def _post_launch(self):
+-        if self._qmp:
++        if self._qmp_connection:
+             self._qmp.accept()
+ 
+     def _post_shutdown(self) -> None:
+@@ -370,7 +370,7 @@ def wait(self):
+         Wait for the VM to power off
          """
-         devnull = open(os.path.devnull, 'rb')
-         self._pre_launch()
--        self._qemu_full_args = (self._wrapper + [self._binary] +
--                                self._base_args + self._args)
-+        self._qemu_full_args = tuple(
-+            chain(self._wrapper,
-+                  [self._binary],
-+                  self._base_args,
-+                  self._args)
-+        )
-         LOG.debug('VM launch command: %r', ' '.join(self._qemu_full_args))
-         self._popen = subprocess.Popen(self._qemu_full_args,
-                                        stdin=devnull,
-diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index 05c63a1d58..ae4661d4d3 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/qtest.py
-@@ -22,6 +22,7 @@
- from typing import (
-     List,
-     Optional,
-+    Sequence,
-     TextIO,
- )
+         self._popen.wait()
+-        if self._qmp:
++        if self._qmp_connection:
+             self._qmp.close()
+         self._post_shutdown()
  
-@@ -103,8 +104,13 @@ class QEMUQtestMachine(QEMUMachine):
-     A QEMU VM, with a qtest socket available.
-     """
+@@ -459,11 +459,13 @@ def set_qmp_monitor(self, enabled=True):
+                         line. Default is True.
+         @note: call this function before launch().
+         """
+-        if enabled:
+-            self._qmp_set = True
+-        else:
+-            self._qmp_set = False
+-            self._qmp = None
++        self._qmp_set = enabled
++
++    @property
++    def _qmp(self) -> qmp.QEMUMonitorProtocol:
++        if self._qmp_connection is None:
++            raise QEMUMachineError("Attempt to access QMP with no connection")
++        return self._qmp_connection
  
--    def __init__(self, binary, args=None, name=None, test_dir="/var/tmp",
--                 socket_scm_helper=None, sock_dir=None):
-+    def __init__(self,
-+                 binary: str,
-+                 args: Sequence[str] = (),
-+                 name: Optional[str] = None,
-+                 test_dir: str = "/var/tmp",
-+                 socket_scm_helper: Optional[str] = None,
-+                 sock_dir: Optional[str] = None):
-         if name is None:
-             name = "qemu-%d" % os.getpid()
-         if sock_dir is None:
-@@ -118,8 +124,10 @@ def __init__(self, binary, args=None, name=None, test_dir="/var/tmp",
-     @property
-     def _base_args(self) -> List[str]:
-         args = super()._base_args
--        args.extend(['-qtest', 'unix:path=' + self._qtest_path,
--                     '-accel', 'qtest'])
-+        args.extend([
-+            '-qtest', f"unix:path={self._qtest_path}",
-+            '-accel', 'qtest'
-+        ])
-         return args
- 
-     def _pre_launch(self):
+     @classmethod
+     def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
 -- 
 2.21.3
 
