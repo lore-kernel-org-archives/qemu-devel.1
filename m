@@ -2,68 +2,68 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE363C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C41C0C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAC7F2089D
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93C382089D
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UeInn0Eu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC7F2089D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CFcvKgym"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C382089D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jowNB-0003By-Uw
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:59:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
+	id 1jowND-0003Do-TP
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowI8-0002vx-2g
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:48 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:52691)
+ id 1jowI5-0002qa-GI
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:45 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:52693)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowI5-0002yi-BV
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:47 -0400
+ id 1jowI2-0002yn-W5
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593208426; x=1624744426;
+ t=1593208424; x=1624744424;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=iMV0ou7nWYetcaL+zBf6ztDkQkcJPf0PQeTCcbE+MoM=;
- b=UeInn0EuIOhSwcw4o9/6aQc1YGN5sE0HM9icSy5WwGVKEyHH1++5PdQy
- qNLA+1yFfesdqRn9dZWHKCdWNYHdSYHjNFtNRFw7rAL89Upr1kHYL0FuW
- 2lgAOWjRKEEHtOJpeIYj96z0h82CyFa9pZ0EWlgyyeYuoZAXab1RV7aml
- P6qcFwGekqLI5xPnfrzeTTtgnlOCP4Zu86HCMiKJlW4vPlZytaOcEHut1
- pIlu/pZKz8+JTqw/0vJUzCqZIU7L+QZSy8/x2b+ZyBAd2NlQv5rinHUTn
- sINvf/LjS/omZ75StahIsVAUAXxc/l+zMd4w7FqPUp4ktYMq4wc8vJzQF A==;
-IronPort-SDR: EZ5iN57LTmuf7V3HxYC1kK16vVXMSijZX3T04/kvhhmlzB4A7rr+vdlx3m5yLo1jyBQMk99nWy
- 5R1jXJY7wuXzdKFIuKCuSbvKJ2lHmlMB/kDjD5KcZ54NBHG8akwVJDPAhtl7FOyo4/SB10wclP
- BXdGXfKBZL2gKZhi3Do8MfHlJa2iiZjZBAQaURVuKPiT9na7H1CA7YfM6K2M18dgqrMuEVOS4/
- NdppWJro7Y8c/udnm06UOIpmOoHLgiI7r2bUucDF/QU/oHHmvCEghW7cfoWwoJAT1yHeVra5uw
- jaM=
-X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="145360022"
+ bh=gfH3RYltiup+leB4/paBXRYbSi3EmWWxrrk+QaFhK7g=;
+ b=CFcvKgymGnKThy0/PgnbsxSYIcpRnCriCWHlJbaVmpHwBPP43W4uPTqB
+ x3cxmbOylinpK9FVx1CcK4fI3TYsQ/JTFX1r89IMI3pxVNbvBkU6Fg0sp
+ MuMVwrLwP7ooWauC079gVx8deD8uYjpjIAQlWWJlsdYbbaGs0PKXYtveD
+ enqNIRaYbeq9i+ozMFgd5WDyB3QfEwuXabJv1sCSSiuN+J+8HN1LaKeJ0
+ 55a+G+d8GxIeywuZs1lUEhHiRiMawQBemOpQ0ypnfHUvnPMIJa/rYKCSy
+ p0BjgtlnB8f0Wh0D92jFUforTPg9rPp8bDXVvk36fX5BRyFLWDzMhGiei g==;
+IronPort-SDR: 2NLXPqKK1E6uQ1TPU3tLjvPn2jlUapCkey1fvYCCgW/4fcpFEI0x8lUDesR0l4Gd2/yPZdVj7O
+ 8/XjFm5KJS1pEf81gFp5zcsRjL/LKfUQJVZ9jveru5HDUDXXthcJ3BjWP5fbYDczSRhbtbzPe+
+ raYsRGkENdnBOjQ1Wle3+Cbegc9+zPNQJiIL+j5OeuJONQ6Wi8Vhlufz/hrnsBtqgv1j7NNrRa
+ 9uLZ+cDOa1Bv8IP6R2XzlOs4Mf+UF/cMpGwbELV59SmCi3VNxL0HndlRIeaNK8UjYpn+EH5f19
+ xPk=
+X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="145360021"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:36 +0800
-IronPort-SDR: JtL2yxQgyCTffPTcvlEf3ohr2VF1NucA7ym3yxzC1BYkMtQPxt345TZANVDIiQFAu36TCXDv6d
- Cjez/FxXLeGot5y/W0ta1QZj1xcrSSpXs=
+IronPort-SDR: 2q+3g4eOvS/kfxAOEmL/Tn2KqC48sT40yrq+r+GCEWfeRYx2dgCryFDc9w+piCDlSxoqqjwxQt
+ 042BTso0cebuenEqpXDiPrJUVZ4Ty32DM=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2020 14:42:34 -0700
-IronPort-SDR: L0EyFJvkEYImUeN2F9GmGekmXs3zPDTIsFULVtJ+mlJyShERNe/7y27WZQqQ7A+oJP4Yj4FWJt
- 8+K2WdxgxRUg==
+ 26 Jun 2020 14:42:33 -0700
+IronPort-SDR: v6vrZszJGpqOQRH9Ngq+dzNNQfzdM31YoOawmL81G6/UvMFdJ3hpqLSyyMCuT5L7avjZrHjA9J
+ 7fnOnh8V7yMA==
 WDCIronportException: Internal
 Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.206])
@@ -71,9 +71,9 @@ Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 05/63] target/riscv: support vector extension csr
-Date: Fri, 26 Jun 2020 14:43:12 -0700
-Message-Id: <20200626214410.3613258-6-alistair.francis@wdc.com>
+Subject: [PULL 04/63] target/riscv: implementation-defined constant parameters
+Date: Fri, 26 Jun 2020 14:43:11 -0700
+Message-Id: <20200626214410.3613258-5-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200626214410.3613258-1-alistair.francis@wdc.com>
 References: <20200626214410.3613258-1-alistair.francis@wdc.com>
@@ -111,170 +111,82 @@ Sender: "Qemu-devel"
 
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-The v0.7.1 specification does not define vector status within mstatus.
-A future revision will define the privileged portion of the vector status.
+vlen is the vector register length in bits.
+elen is the max element size in bits.
+vext_spec is the vector specification version, default value is v0.7.1.
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200623215920.2594-4-zhiwei_liu@c-sky.com
+Message-id: 20200623215920.2594-3-zhiwei_liu@c-sky.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_bits.h | 15 +++++++++
- target/riscv/csr.c      | 75 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 89 insertions(+), 1 deletion(-)
+ target/riscv/cpu.h | 5 +++++
+ target/riscv/cpu.c | 7 +++++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 7f64ee1174..8117e8b5a7 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -29,6 +29,14 @@
- #define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
- #define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 0018a79fa3..302e0859a0 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -78,6 +78,8 @@ enum {
+ #define PRIV_VERSION_1_10_0 0x00011000
+ #define PRIV_VERSION_1_11_0 0x00011100
  
-+/* Vector Fixed-Point round model */
-+#define FSR_VXRM_SHIFT      9
-+#define FSR_VXRM            (0x3 << FSR_VXRM_SHIFT)
++#define VEXT_VERSION_0_07_1 0x00000701
 +
-+/* Vector Fixed-Point saturation flag */
-+#define FSR_VXSAT_SHIFT     8
-+#define FSR_VXSAT           (0x1 << FSR_VXSAT_SHIFT)
-+
- /* Control and Status Registers */
+ #define TRANSLATE_PMP_FAIL 2
+ #define TRANSLATE_FAIL 1
+ #define TRANSLATE_SUCCESS 0
+@@ -113,6 +115,7 @@ struct CPURISCVState {
+     target_ulong guest_phys_fault_addr;
  
- /* User Trap Setup */
-@@ -48,6 +56,13 @@
- #define CSR_FRM             0x002
- #define CSR_FCSR            0x003
+     target_ulong priv_ver;
++    target_ulong vext_ver;
+     target_ulong misa;
+     target_ulong misa_mask;
  
-+/* User Vector CSRs */
-+#define CSR_VSTART          0x008
-+#define CSR_VXSAT           0x009
-+#define CSR_VXRM            0x00a
-+#define CSR_VL              0xc20
-+#define CSR_VTYPE           0xc21
+@@ -275,6 +278,8 @@ typedef struct RISCVCPU {
+ 
+         char *priv_spec;
+         char *user_spec;
++        uint16_t vlen;
++        uint16_t elen;
+         bool mmu;
+         bool pmp;
+     } cfg;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 391a0b9eec..d525cfb687 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -106,6 +106,11 @@ static void set_priv_version(CPURISCVState *env, int priv_ver)
+     env->priv_ver = priv_ver;
+ }
+ 
++static void set_vext_version(CPURISCVState *env, int vext_ver)
++{
++    env->vext_ver = vext_ver;
++}
 +
- /* User Timers and Counters */
- #define CSR_CYCLE           0xc00
- #define CSR_TIME            0xc01
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 383be0a955..ac01c835e1 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -46,6 +46,10 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
- static int fs(CPURISCVState *env, int csrno)
+ static void set_feature(CPURISCVState *env, int feature)
  {
- #if !defined(CONFIG_USER_ONLY)
-+    /* loose check condition for fcsr in vector extension */
-+    if ((csrno == CSR_FCSR) && (env->misa & RVV)) {
-+        return 0;
-+    }
-     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
-         return -1;
+     env->features |= (1ULL << feature);
+@@ -334,6 +339,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+     CPURISCVState *env = &cpu->env;
+     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+     int priv_version = PRIV_VERSION_1_11_0;
++    int vext_version = VEXT_VERSION_0_07_1;
+     target_ulong target_misa = 0;
+     Error *local_err = NULL;
+ 
+@@ -357,6 +363,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
      }
-@@ -53,6 +57,14 @@ static int fs(CPURISCVState *env, int csrno)
-     return 0;
- }
  
-+static int vs(CPURISCVState *env, int csrno)
-+{
-+    if (env->misa & RVV) {
-+        return 0;
-+    }
-+    return -1;
-+}
-+
- static int ctr(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
-@@ -154,6 +166,10 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
- #endif
-     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
-         | (env->frm << FSR_RD_SHIFT);
-+    if (vs(env, csrno) >= 0) {
-+        *val |= (env->vxrm << FSR_VXRM_SHIFT)
-+                | (env->vxsat << FSR_VXSAT_SHIFT);
-+    }
-     return 0;
- }
+     set_priv_version(env, priv_version);
++    set_vext_version(env, vext_version);
  
-@@ -166,10 +182,62 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
-     env->mstatus |= MSTATUS_FS;
- #endif
-     env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
-+    if (vs(env, csrno) >= 0) {
-+        env->vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
-+        env->vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
-+    }
-     riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
-     return 0;
- }
- 
-+static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vtype;
-+    return 0;
-+}
-+
-+static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vl;
-+    return 0;
-+}
-+
-+static int read_vxrm(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vxrm;
-+    return 0;
-+}
-+
-+static int write_vxrm(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vxrm = val;
-+    return 0;
-+}
-+
-+static int read_vxsat(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vxsat;
-+    return 0;
-+}
-+
-+static int write_vxsat(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vxsat = val;
-+    return 0;
-+}
-+
-+static int read_vstart(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vstart;
-+    return 0;
-+}
-+
-+static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vstart = val;
-+    return 0;
-+}
-+
- /* User Timers and Counters */
- static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
- {
-@@ -1183,7 +1251,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_FFLAGS] =              { fs,   read_fflags,      write_fflags      },
-     [CSR_FRM] =                 { fs,   read_frm,         write_frm         },
-     [CSR_FCSR] =                { fs,   read_fcsr,        write_fcsr        },
--
-+    /* Vector CSRs */
-+    [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
-+    [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
-+    [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
-+    [CSR_VL] =                  { vs,   read_vl                             },
-+    [CSR_VTYPE] =               { vs,   read_vtype                          },
-     /* User Timers and Counters */
-     [CSR_CYCLE] =               { ctr,  read_instret                        },
-     [CSR_INSTRET] =             { ctr,  read_instret                        },
+     if (cpu->cfg.mmu) {
+         set_feature(env, RISCV_FEATURE_MMU);
 -- 
 2.27.0
 
