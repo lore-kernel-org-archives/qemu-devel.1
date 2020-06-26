@@ -7,73 +7,71 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFD0C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE3DC433E1
 	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2382208C7
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC47A204EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:43:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyOdzYYK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2382208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEe/F850"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC47A204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jovBh-00006l-4E
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:43:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33718)
+	id 1jovBh-0000Az-W1
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:43:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAQ-0006dz-S9
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:41:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33949
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAR-0006ek-5i
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:41:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42796
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAN-0005oc-Rp
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAK-0005nf-Ll
  for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:41:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593204103;
+ s=mimecast20190719; t=1593204099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=24hiEmEd4SvyGTS9rVJLtikp6NjBMGoDox6DBs1NjrA=;
- b=fyOdzYYK9bDtkXSUMa6INFn7S2jllp2yRfqtP9LmlqXtYenA/eJufVO1kABSfLFWvAYoUd
- 9ulqTPqOtxmEtvn0xRhvfvA8eUnUIk6Uw/ygZEhlauGypkkGRt93sVFoq/5w/wA9DRMtUS
- xx1crXQnj84S2FU8O/nWRSLUev9U1uU=
+ bh=sStIApWiVtCBKiexrQL7OTQwVFLoTBgkZqfp2zgj6T8=;
+ b=ZEe/F850x2tROtX9E8/A1cYTW1NA8RWY8nmU288GHpW0NldTy0XUGSZh1ycE4JiKypGa9w
+ rrrqnTKTu0MfxTMuVhnkE+pSCj296Wg8NebEc95mujaPaf7l+BP7q8tfrqVxOF3dCX2mje
+ xT8EqKH/+1QmdhrPEly3MRXAon8HjoM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-l5fUZFhFMySHakQNS8ka1g-1; Fri, 26 Jun 2020 16:41:38 -0400
-X-MC-Unique: l5fUZFhFMySHakQNS8ka1g-1
+ us-mta-151-tiQYQdTEMMCL4YgZb1qRhw-1; Fri, 26 Jun 2020 16:41:37 -0400
+X-MC-Unique: tiQYQdTEMMCL4YgZb1qRhw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE189464;
- Fri, 26 Jun 2020 20:41:37 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F01FC19C58;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEAD7BFC1;
  Fri, 26 Jun 2020 20:41:36 +0000 (UTC)
+Received: from probe.redhat.com (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B9B6F19C58;
+ Fri, 26 Jun 2020 20:41:35 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 02/16] iotests.py: use qemu.qmp type aliases
-Date: Fri, 26 Jun 2020 16:41:19 -0400
-Message-Id: <20200626204133.14500-3-jsnow@redhat.com>
+Subject: [PATCH v4 01/16] python/qmp.py: Define common types
+Date: Fri, 26 Jun 2020 16:41:18 -0400
+Message-Id: <20200626204133.14500-2-jsnow@redhat.com>
 In-Reply-To: <20200626204133.14500-1-jsnow@redhat.com>
 References: <20200626204133.14500-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,52 +100,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-iotests.py should use the type definitions from qmp.py instead of its
-own.
+Define some common types that we'll need to annotate a lot of other
+functions going forward.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ python/qemu/qmp.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 5ea4c4df8b..a8576f811b 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -35,13 +35,10 @@
- # pylint: disable=import-error, wrong-import-position
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
- from qemu import qtest
-+from qemu.qmp import QMPMessage
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index e64b6b5faa..8388c7b603 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -12,13 +12,31 @@
+ import socket
+ import logging
+ from typing import (
++    Any,
++    Dict,
+     Optional,
+     TextIO,
+     Type,
++    Tuple,
++    Union,
+ )
+ from types import TracebackType
  
- assert sys.version_info >= (3, 6)
  
--# Type Aliases
--QMPResponse = Dict[str, Any]
--
--
- # Use this logger for logging messages directly from the iotests module
- logger = logging.getLogger('qemu.iotests')
- logger.addHandler(logging.NullHandler())
-@@ -554,7 +551,7 @@ def add_incoming(self, addr):
-         self._args.append(addr)
-         return self
- 
--    def hmp(self, command_line: str, use_log: bool = False) -> QMPResponse:
-+    def hmp(self, command_line: str, use_log: bool = False) -> QMPMessage:
-         cmd = 'human-monitor-command'
-         kwargs = {'command-line': command_line}
-         if use_log:
-@@ -575,7 +572,7 @@ def resume_drive(self, drive: str) -> None:
-         self.hmp(f'qemu-io {drive} "remove_break bp_{drive}"')
- 
-     def hmp_qemu_io(self, drive: str, cmd: str,
--                    use_log: bool = False) -> QMPResponse:
-+                    use_log: bool = False) -> QMPMessage:
-         """Write to a given drive using an HMP command"""
-         return self.hmp(f'qemu-io {drive} "{cmd}"', use_log=use_log)
- 
++# QMPMessage is a QMP Message of any kind.
++# e.g. {'yee': 'haw'}
++#
++# QMPReturnValue is the inner value of return values only.
++# {'return': {}} is the QMPMessage,
++# {} is the QMPReturnValue.
++QMPMessage = Dict[str, Any]
++QMPReturnValue = Dict[str, Any]
++
++InternetAddrT = Tuple[str, str]
++UnixAddrT = str
++SocketAddrT = Union[InternetAddrT, UnixAddrT]
++
++
+ class QMPError(Exception):
+     """
+     QMP base exception
 -- 
 2.21.3
 
