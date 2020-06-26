@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3CBC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F083CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 940D5212CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:32:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940D5212CC
+	by mail.kernel.org (Postfix) with ESMTPS id C1974214D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:33:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1974214D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokj5-0003jl-QQ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:32:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55264)
+	id 1jokjb-0004Sr-Vd
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:33:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokbJ-0005hI-3Y; Fri, 26 Jun 2020 05:24:49 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34320
+ id 1jokbW-00065K-5u; Fri, 26 Jun 2020 05:25:02 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34350
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokbE-00059c-V2; Fri, 26 Jun 2020 05:24:48 -0400
+ id 1jokbR-0005NR-LQ; Fri, 26 Jun 2020 05:25:01 -0400
 Received: from host86-158-109-79.range86-158.btcentralplus.com
  ([86.158.109.79] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokbB-0007bz-N9; Fri, 26 Jun 2020 10:24:46 +0100
+ id 1jokbQ-0007bz-2q; Fri, 26 Jun 2020 10:25:00 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: peter.maydell@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au,
  qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Fri, 26 Jun 2020 10:23:09 +0100
-Message-Id: <20200626092317.3875-15-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 26 Jun 2020 10:23:12 +0100
+Message-Id: <20200626092317.3875-18-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
 References: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
@@ -49,7 +49,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.158.109.79
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 14/22] adb: use adb_request() only for explicit requests
+Subject: [PULL 17/22] pmu: add adb_autopoll_block() and adb_autopoll_unblock()
+ functions
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -78,55 +79,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently adb_request() is called both for explicit ADB requests and internal
-autopoll requests via adb_poll().
-
-Move the current functionality into do_adb_request() to be used internally and
-add a simple adb_request() wrapper for explicit requests.
+Ensure that the PMU buffer is protected from autopoll requests overwriting
+its contents whilst existing PMU requests are in progress.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Tested-by: Finn Thain <fthain@telegraphics.com.au>
 Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200623204936.24064-15-mark.cave-ayland@ilande.co.uk>
+Message-Id: <20200623204936.24064-18-mark.cave-ayland@ilande.co.uk>
 ---
- hw/input/adb.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/misc/macio/pmu.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index a7a482fdfa..b3ad7c5fca 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -38,7 +38,8 @@ static void adb_device_reset(ADBDevice *d)
-     qdev_reset_all(DEVICE(d));
- }
- 
--int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
-+static int do_adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf,
-+                          int len)
+diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
+index 01d49e6695..598d8e7517 100644
+--- a/hw/misc/macio/pmu.c
++++ b/hw/misc/macio/pmu.c
+@@ -517,6 +517,7 @@ static void pmu_update(PMUState *s)
  {
-     ADBDevice *d;
-     ADBDeviceClass *adc;
-@@ -83,6 +84,11 @@ int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
-     return ADB_RET_NOTPRESENT;
- }
+     MOS6522PMUState *mps = &s->mos6522_pmu;
+     MOS6522State *ms = MOS6522(mps);
++    ADBBusState *adb_bus = &s->adb_bus;
  
-+int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
-+{
-+    return do_adb_request(s, obuf, buf, len);
-+}
-+
- /* XXX: move that to cuda ? */
- int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
- {
-@@ -98,7 +104,7 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
-         d = s->devices[s->poll_index];
-         if ((1 << d->devaddr) & poll_mask) {
-             buf[0] = ADB_READREG | (d->devaddr << 4);
--            olen = adb_request(s, obuf + 1, buf, 1);
-+            olen = do_adb_request(s, obuf + 1, buf, 1);
-             /* if there is data, we poll again the same device */
-             if (olen > 0) {
-                 s->status |= ADB_STATUS_POLLREPLY;
+     /* Only react to changes in reg B */
+     if (ms->b == s->last_b) {
+@@ -578,6 +579,7 @@ static void pmu_update(PMUState *s)
+         s->cmd_rsp_pos = 0;
+         s->cmd_state = pmu_state_cmd;
+ 
++        adb_autopoll_block(adb_bus);
+         trace_pmu_debug_protocol_cmd(s->cmd, s->cmdlen, s->rsplen);
+         break;
+ 
+@@ -636,6 +638,7 @@ static void pmu_update(PMUState *s)
+     if (s->cmd_state == pmu_state_rsp && s->rsplen == s->cmd_rsp_pos) {
+         trace_pmu_debug_protocol_cmd_resp_complete(ms->ier);
+ 
++        adb_autopoll_unblock(adb_bus);
+         s->cmd_state = pmu_state_idle;
+     }
+ }
 -- 
 2.20.1
 
