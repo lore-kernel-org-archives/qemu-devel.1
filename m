@@ -2,94 +2,76 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E53E7C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:29:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F7E3206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:24:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G9QUEBKI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7E3206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BA84D20B1F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:29:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA84D20B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jovpk-0002sr-BO
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:24:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45236)
+	id 1jovuD-0004KC-1e
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:29:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jovoo-0002SV-EI
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:23:30 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36793)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jovtY-0003ni-Id; Fri, 26 Jun 2020 17:28:24 -0400
+Received: from mail-ej1-f66.google.com ([209.85.218.66]:36482)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jovom-0008Up-Rd
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:23:30 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 207so4970027pfu.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 14:23:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7+3OY6QgjftmxXcfTjujCm0Gk7gfdKL3ohq7mPqxulE=;
- b=G9QUEBKINJ5oPQUnfKDWOT8GQ+SG61jT4wG+1ec2qBWsq4pk4oqToodat02zSgtQti
- j0kIFTv3Y2YWXhpTdoFQlUvQISglGaUa50EjdXHUZ2kryo+bEFjK+VI2xRlw8+sN8JUK
- sFHaHrpZpdu6IvVLJUfUZUxY7/aKBFa/IRDAVsfTOhbAp2w2vL+s/z61zaF05JlHQ82j
- QRE580ECTIR/45/miGVYOb28RpvRPu3cWChxrrgqtmSAxvvELn0vOSGR4su0ZTz6Chm0
- nESVTYQf/0Z0ZLBJoZWOMKTvdrvBKlr/XzXtsf9fAyAZSc+gggQ4Huml1JlX6q6w6iUN
- bPtQ==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jovtX-00016D-0a; Fri, 26 Jun 2020 17:28:24 -0400
+Received: by mail-ej1-f66.google.com with SMTP id dr13so10696105ejc.3;
+ Fri, 26 Jun 2020 14:28:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7+3OY6QgjftmxXcfTjujCm0Gk7gfdKL3ohq7mPqxulE=;
- b=A9qhU9IRshXzdt3wqGCIYsWBuPV9TovH31nnElnN4NSL38Xg/zeCnMnSa/VnFBQaUt
- TMk2y2pu8hHkINE/0e6SO+0JVRGRns7OZrGWP48R/RSfA2JPdDWaNf5p7s42NuBQkF/r
- 1c+VNvn8mFZ01gaZ5CC7SyxR7m6h1UeWhLSZHCNWCWZiiXfgYLnRRtUi07f2FZExliWt
- AKHURgqvOyYl8lUOIoAQx4uPCUEKgukAsk7aSeZOvYZLFJQ6d09UBMeG0x9ekt0vHz6Q
- SL71rgBMwujWAhtU9iacuHW05r+PIWCdPDjwHYOepR68YJ3e4U2qM9Hc+SxPEEcKLTpB
- Bmiw==
-X-Gm-Message-State: AOAM533Z4v81o0qzC+ZHqZWvcSr/hHdUapSKGZN2Ia0hulL3x0N+bT8o
- zgWJYL4S8xUEnD/PVhBwO+y3BA==
-X-Google-Smtp-Source: ABdhPJyVaUsHP6cHWCCqkW7ZjXYZSkFUmI6WHwLRjVRKjKKoGAmDLOjHoQqC5luZ8I7HgRyof5VE2w==
-X-Received: by 2002:a63:f814:: with SMTP id n20mr638484pgh.92.1593206607254;
- Fri, 26 Jun 2020 14:23:27 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id d18sm11292394pjz.11.2020.06.26.14.23.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 14:23:26 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] linux-user/sparc64: Translate flushw opcode
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200625091204.3186186-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <789f369b-a1ad-9416-4a1c-7806cd19a955@linaro.org>
-Date: Fri, 26 Jun 2020 14:23:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0YBLVGKVflLEOwLhiklGG4a/eSP0ykqicWEX2Ka3r48=;
+ b=gOfydeb4Piv/fG57QgLQkSVW5MUmM8lOoVsBuJiJB9XgCBG0QmQ/3ootySjE1aMgRH
+ ZDBwWL/6lIbG10PaAjsvT1kHcdjoRAidikD1d54mUraacy6ifDMR6gwjLS6XRr2gmpMN
+ 8bRP+lfijdbS6gxeIxNrigtoC49rIehHYiM/NLrJBToc2CagQFIhrG0UPQeaTCfQnC0e
+ Rf1ErucfUpI0ocesw3yTn7EyLJ2NoLDjEGRms0/gJB896yp2TW5IHsIgOv6vBzUKTMr8
+ NgrP18BWmeQA3vRhqVc5W0br0uINHW9lpbJSuOsKt6gMBbvO2sXSbpZv2Y+okIHnL7qr
+ njUA==
+X-Gm-Message-State: AOAM532RhZCgSBSxjpWjrsBEwRNECDBOIZVUHxEGzMXgFkW8eSx3QgDY
+ vvmy14N0D37NLJLiBd3JnubhWtrH2Z/NJfzpDMA=
+X-Google-Smtp-Source: ABdhPJyPN+yDw1b5gGocfKq5L/ID5QSj/wm430bRA+JBDclBYWFB5e9FY6dTsqpedvgzbaYJxMi5IAIH6SIjmG4eK9I=
+X-Received: by 2002:a17:906:f155:: with SMTP id
+ gw21mr4270582ejb.388.1593206901256; 
+ Fri, 26 Jun 2020 14:28:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200625091204.3186186-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200623072723.6324-1-f4bug@amsat.org>
+ <20200623072723.6324-2-f4bug@amsat.org>
+ <CAFEAcA9-Vjh-hkB9i9fvp9yEHuKW7cGeEDQ-kKmiiao2WogQDQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9-Vjh-hkB9i9fvp9yEHuKW7cGeEDQ-kKmiiao2WogQDQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 26 Jun 2020 23:28:09 +0200
+Message-ID: <CAAdtpL4zXbwZuTPVQUbXyDftMCpw+Yx_cZXU3yZvB+EUXZBrhg@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] hw/i2c/core: Add i2c_try_create_slave() and
+ i2c_realize_and_unref()
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=209.85.218.66;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f66.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:28:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: 1
+X-Spam_score: 0.1
+X-Spam_bar: /
+X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,34 +84,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 2:12 AM, Laurent Vivier wrote:
-> I send a modified version according to Richard's comments of the original
-> series sent by Giuseppe Musacchio <thatlemon@gmail.com> (aka LemonBoy).
-> 
-> v2: split patch in two patches
->     update comment style
-> 
-> I didn't really test the new patches (except a build and "make check").
-> But there is no code modification so I don't think I can introduce bugs in
-> this process. Any "Tested-by:" is welcome.
-> 
-> LemonBoy (2):
->   target/sparc: Translate flushw opcode
->   linux-user/sparc64: Fix the handling of window spill trap
-> 
+On Fri, Jun 26, 2020 at 8:27 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> On Tue, 23 Jun 2020 at 08:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> > Extract i2c_try_create_slave() and i2c_realize_and_unref()
+> > from i2c_create_slave().
+> > We can now set properties on a I2CSlave before it is realized.
+> >
+> > This is in line with the recent qdev/QOM changes merged
+> > in commit 6675a653d2e.
+> >
+> > Reviewed-by: Corey Minyard <cminyard@mvista.com>
+> > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Couple of things I belatedly noticed on this patch, which I don't
+> think are important enough for me to drop it from my pullreq,
+> but which I think it would be nice to address in a followup:
+>
+> > diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+> > index 4117211565..d6e3d85faf 100644
+> > --- a/include/hw/i2c/i2c.h
+> > +++ b/include/hw/i2c/i2c.h
+> > @@ -80,6 +80,8 @@ int i2c_send(I2CBus *bus, uint8_t data);
+> >  uint8_t i2c_recv(I2CBus *bus);
+> >
+> >  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t a=
+ddr);
+> > +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
+> > +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp=
+);
+>
+> Can we have doc-comments for new global-scope functions, please ?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Sure.
 
-You might want to reset the Author to match the Signed-off-by.
+>
+> > --- a/hw/i2c/core.c
+> > +++ b/hw/i2c/core.c
+> > @@ -267,13 +267,27 @@ const VMStateDescription vmstate_i2c_slave =3D {
+> >      }
+> >  };
+> >
+> > -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t a=
+ddr)
+> > +DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
+> >  {
+> >      DeviceState *dev;
+> >
+> >      dev =3D qdev_new(name);
+> >      qdev_prop_set_uint8(dev, "address", addr);
+> > -    qdev_realize_and_unref(dev, &bus->qbus, &error_fatal);
+> > +    return dev;
+> > +}
+> > +
+> > +bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp=
+)
+> > +{
+> > +    return qdev_realize_and_unref(dev, &bus->qbus, errp);
+> > +}
+> > +
+> > +DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t a=
+ddr)
+> > +{
+> > +    DeviceState *dev;
+> > +
+> > +    dev =3D i2c_try_create_slave(name, addr);
+> > +    i2c_realize_and_unref(dev, bus, &error_fatal);
+> > +
+>
+> We now have a _try_ function which isn't "same behaviour as
+> the non-try function, but give me back an error status rather
+> than just killing QEMU". That seems confusing -- is there a
+> better name we can use ?
 
+Yes, Markus asked me to change that, but as it could be done on top,
+he didn't block the series.
 
-r~
+I'll address that next week.
+
+> thanks
+> -- PMM
 
