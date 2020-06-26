@@ -2,97 +2,115 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E24CCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153EBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8C4320767
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDA0020775
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:55:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zuaj2/fn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C4320767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hzIocXDX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA0020775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jofSf-0007Dt-Qj
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 23:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46632)
+	id 1jofSx-0007wB-2A
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 23:55:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jofPZ-0001nw-5E
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:52:21 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:40154)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jofPW-00058O-Gk
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:52:20 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id cm23so4376695pjb.5
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 20:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4mFwf/JqqmC2jbvLacbyB+u7kIIaLwrBcw4P6fOKxd4=;
- b=Zuaj2/fnPxZgWulq6vDZ7xVVoutHF9kk/kl3hQ+HwMc4dtyKF2Y7MeXNN9Y/iqWGP1
- wYa3AFMJlOIth2FXvMcgWl8AkOZdMPALFVNd+AttTGlcWbkdYF8bjsZANMwQ9Yur/4s0
- vSzGCb3mNG2XtpwbFYsMN2kD9xcvrlAameMVLrldehqWF3C5av0ijwj96O6lc7P2UJup
- Ddc0i7rRrGzGKeKyeXxxtOi32dR7jNtYGJY7Zsl7ogeHxz6XpBt4ogsQ+nXavGp2xU/s
- 8aqXBQCgdDWSvZoiLYLeagHwnk7Ar6Iii1QpN7iwM2F9Hdu44iylFFuzckBYRgkKtFD2
- swMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4mFwf/JqqmC2jbvLacbyB+u7kIIaLwrBcw4P6fOKxd4=;
- b=bDC0uI/THdJjY490uVMFEHAEdEQyZDP5NqCbcYHEEteCB3CFWeuQu94PRlAPD54uje
- PZp0/5AlkPrYxetEzzL9T/RIFZTgOTTbvnHCSku+V7+NegTzLzICDak6oAA71OZnJp/x
- z1wDmlC/bZdwfcBKTgWUCFgXbKkXu0l+GlB3qQFgXHrM6La6iyIjtOKHT1C2iCw/wbkE
- egfTIbaX3BOwfzu8NbmjffUyT/ytO5+h47udDTHRUX/tWi+OuDVu6OMa8L7sdc/x+PF0
- aPbJyDuHp7RpPIYf59hsHoyFVgGdd5bi0G5AJTH47y2dw5WXpvcjHLYVxGOpS3ZgaJA5
- LdYw==
-X-Gm-Message-State: AOAM533rO2CTFbltRXJHzxAZkK+aJbz+yuyysfLGL3z89rP5Q7fNa25M
- V3hOQzbrdmHvshNPJzcSzE2tjw==
-X-Google-Smtp-Source: ABdhPJzWU/bZVjEE1WvmS9tPfxJ/pHn11ZxQQVZtl1KxgPznUtPDN7+BiSjPW5xiuT8BIQwOHXPR/w==
-X-Received: by 2002:a17:90a:7185:: with SMTP id
- i5mr1229885pjk.175.1593143536702; 
- Thu, 25 Jun 2020 20:52:16 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s23sm20102195pfs.157.2020.06.25.20.52.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 20:52:15 -0700 (PDT)
-Subject: Re: [PATCH v3 4/8] target/ppc: add vmulld instruction
-To: Lijun Pan <ljp@linux.vnet.ibm.com>
-References: <20200625170018.64265-1-ljp@linux.ibm.com>
- <20200625170018.64265-5-ljp@linux.ibm.com>
- <b97971e5-43ea-26e4-bd75-7af8d5ae992b@linaro.org>
- <A788F4B0-3E48-4F55-9816-0387A7C5A24B@linux.vnet.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a3ad445a-616c-d9af-18b6-cfb94f126bfd@linaro.org>
-Date: Thu, 25 Jun 2020 20:52:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <A788F4B0-3E48-4F55-9816-0387A7C5A24B@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <john.g.johnson@oracle.com>)
+ id 1jofRo-0006Da-PN
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:54:40 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:46166)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <john.g.johnson@oracle.com>)
+ id 1jofRm-0005lC-LJ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:54:40 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05Q3ptsJ077686;
+ Fri, 26 Jun 2020 03:54:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=77ACAzk9WutKtZyM6KLHPxOZ4Brvg7PmGi/0yhGp6lA=;
+ b=hzIocXDX4IgIn0w45Vn0p7e3KnkIusogsLuu9B+K+cG2kpcbLUJskWgaFDkgpzFAO313
+ KEdn1BBAF0U1MWCWCmwRfzcJOU6FH6xmU5ffdAw8PWPYi/d9tMzF8leFzcDtGv7Nq/OI
+ h6cZ3VXIa1HwCQP4gJg5Txab3L5SpaxWeEOUV6OG9ReT6V84lyvetExUN/hYWvwjhDZy
+ hH8TLln8GpXsdrZZ9xTTYzQCpIWqIsICVo0rzp7T2cU9AO6DT/prJvqX8zkpdJHa9P1A
+ imO+YeI/BmWVZDJkSDIvVA76RfOs7HIIyufNGvCDP4xTqHVfKBG6Ngg5mbMJAU9k/CMm nA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 31uustuuu0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Fri, 26 Jun 2020 03:54:31 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05Q3nSmn124376;
+ Fri, 26 Jun 2020 03:54:31 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 31uurthyex-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jun 2020 03:54:31 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05Q3sRZi025780;
+ Fri, 26 Jun 2020 03:54:27 GMT
+Received: from [192.168.10.3] (/24.5.35.151)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 26 Jun 2020 03:54:27 +0000
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.14\))
+Subject: Re: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+From: John G Johnson <john.g.johnson@oracle.com>
+In-Reply-To: <20200623122715.GF36568@stefanha-x1.localdomain>
+Date: Thu, 25 Jun 2020 20:54:25 -0700
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7B305CB0-0D5F-4FF8-ACDC-828AF37687B1@oracle.com>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+ <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
+ <8101D131-3B95-4CF5-8D46-8755593AA97D@oracle.com>
+ <A0E4C51F-B41C-486B-A5CE-3C4C2C9C1A40@oracle.com>
+ <20200602090629.66f9e3f7@x1.home>
+ <E78F4C2E-4382-4C98-9606-F1ABD9753699@oracle.com>
+ <20200615104929.GD1491454@stefanha-x1.localdomain>
+ <DE330A27-2343-459F-9EA0-D3C5F20EE87D@oracle.com>
+ <20200623122715.GF36568@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.14)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9663
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ phishscore=0 mlxscore=0
+ spamscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006260025
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9663
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ mlxlogscore=999
+ cotscore=-2147483648 adultscore=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006260025
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=john.g.johnson@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/25 23:54:35
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,70 +124,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ "Harris, James R" <james.r.harris@intel.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>, "Zhang,
+ Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 2:13 PM, Lijun Pan wrote:
->>>     case INDEX_op_mul_vec:
->>> -        tcg_debug_assert(vece == MO_32 && have_isa_2_07);
->>> -        insn = VMULUWM;
->>> +        tcg_debug_assert((vece == MO_32 && have_isa_2_07) ||
->>> +                         (vece == MO_64 && have_isa_3_10));
->>> +        insn = mul_op[vece];
->>
->> I think it would be ok to just index mul_op here, since the real isa check is
->> to be done elsewhere.
-> 
-> Just keep "insn = mul_op[vece];"
-> and remove"        tcg_debug_assert((vece == MO_32 && have_isa_2_07) ||
->                          (vece == MO_64 && have_isa_3_10));“?
-
-Yes.
-
-> @@ -3016,6 +3016,8 @@int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type,
-> unsigned vece)
->              return -1;
->          case MO_32:
->              return have_isa_2_07 ? 1 : -1;
-> +        case MO_64:
-> +            return have_isa_3_10 ? 1 : -1;
->          }
-
-Actually, just "return have_isa_3_10".
-
-Returning 1 means that the opcode is supported directly.  Returning -1 means
-that the opcode can be expanded by tcg_expand_vec_op.  Returning 0 means that
-the tcg backend does not support the opcode at all.
-
-> something like below?
-> @@ -3712,6 +3712,11 @@static void tcg_target_init(TCGContext *s)
->          have_isa = tcg_isa_3_00;
->      }
->  #endif
-> +#ifdef PPC_FEATURE2_ARCH_3_10
-> +    if (hwcap2 & PPC_FEATURE2_ARCH_3_10) {
-> +        have_isa = tcg_isa_3_10;
-> +    }
-> +#endif
-
-Certainly this.
-
-> @@ -554,6 +554,7 @@typedef struct {
->  #define PPC_FEATURE2_HTM_NOSC           0x01000000
->  #define PPC_FEATURE2_ARCH_3_00          0x00800000
->  #define PPC_FEATURE2_HAS_IEEE128        0x00400000
-> +#define PPC_FEATURE2_ARCH_3_10          0x00200000
-
-Of this I'm not sure.  I didn't even realize these defines were here in
-include/elf.h.  For other tcg backends we get the defines from <sys/auxv.h>.
-
-If we do want to update include/elf.h, it should be a separate patch.  CC'ing
-Laurent for this.
 
 
-r~
+> On Jun 23, 2020, at 5:27 AM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
+>=20
+> On Thu, Jun 18, 2020 at 02:38:04PM -0700, John G Johnson wrote:
+>>> On Jun 15, 2020, at 3:49 AM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
+>>> An issue with file descriptor passing is that it's hard to revoke =
+access
+>>> once the file descriptor has been passed. memfd supports sealing =
+with
+>>> fnctl(F_ADD_SEALS) it doesn't revoke mmap(MAP_WRITE) on other =
+processes.
+>>>=20
+>>> Memory Protection Keys don't seem to be useful here either and their
+>>> availability is limited (see pkeys(7)).
+>>>=20
+>>> One crazy idea is to use KVM as a sandbox for running the device and =
+let
+>>> the vIOMMU control the page tables instead of the device (guest). =
+That
+>>> way the hardware MMU provides memory translation, but I think this =
+is
+>>> impractical because the guest environment is too different from the
+>>> Linux userspace environment.
+>>>=20
+>>> As a starting point adding DMA_READ/DMA_WRITE messages would provide =
+the
+>>> functionality and security. Unfortunately it makes DMA expensive and
+>>> performance will suffer.
+>>>=20
+>>=20
+>> 	Are you advocating for only using VFIO_USER_DMA_READ/WRITE and
+>> not passing FDs at all?  The performance penalty would be large for =
+the
+>> cases where the client and server are equally trusted.  Or are you
+>> advocating for an option where the slower methods are used for cases
+>> where the server is less trusted?
+>=20
+> I think the enforcing IOMMU should be optional (due to the performance
+> overhead) but part of the spec from the start.
+>=20
+
+
+	With this in mind, we will collapse the current memory region
+messages (VFIO_USER_ADD_MEMORY_REGION and VFIO_USER_SUB_MEMORY_REGION)
+and the IOMMU messages (VFIO_USER_IOMMU_MAP and VFIO_USER_IOMMU_UNMAP)
+into new messages (VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP).  Their
+contents will be the same as the memory region messages.
+
+	On a system without an IOMMU, the new messages will be used to
+export the system physical address space as DMA addresses.  On a system
+with an IOMMU they will be used to export the valid device DMA ranges
+programmed into the IOMMU by the guest.  This behavior matches how the
+existing QEMU VFIO object programs the host IOMMU.  The server will not
+be aware of whether the client is using an IOMMU.
+
+	In the QEMU VFIO implementation, will will add a =
+=E2=80=98secure-dma=E2=80=99
+option that suppresses exporting mmap()able FDs to the server.  All
+DMA will use the slow path to be validated by the client before =
+accessing
+guest memory.
+
+	Is this acceptable to you (and Alex, of course)?
+
+								JJ
+
 
