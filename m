@@ -2,60 +2,89 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8496EC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 997C4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57EE72070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:22:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57EE72070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 626382070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:26:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAjRygAp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626382070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolVM-0002Bn-MH
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:22:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38852)
+	id 1jolYi-0003uB-Mc
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jolUh-0001eX-HU; Fri, 26 Jun 2020 06:22:03 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:61262)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jolUf-0000m8-2j; Fri, 26 Jun 2020 06:22:02 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E0A4D7482CD;
- Fri, 26 Jun 2020 12:21:49 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id C43367475FA; Fri, 26 Jun 2020 12:21:49 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id C298E74633D;
- Fri, 26 Jun 2020 12:21:49 +0200 (CEST)
-Date: Fri, 26 Jun 2020 12:21:49 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Subject: Re: [PATCH v5 00/11] Mac Old World ROM experiment
-In-Reply-To: <cover.1592315226.git.balaton@eik.bme.hu>
-Message-ID: <alpine.BSF.2.22.395.2006261218180.94870@zero.eik.bme.hu>
-References: <cover.1592315226.git.balaton@eik.bme.hu>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jolXp-0003IV-Rq
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:25:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53454
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jolXn-0001Jj-KG
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:25:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593167114;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=t1RoBaSPs+TD4VwL50CYZEX8XIKOKS1U7Xfk+1PBURM=;
+ b=hAjRygApPgdX8cctGAnHkU/1gD7/BMeWQv5tBUUGjh0rRL+dtD+114DP2ZySqO53vD+QEt
+ CDgM5sHygzzHtSme9t/yBLh0lJCQTPtMNaDWUk+9MxF9wOW/CXN10MKKcAw8ynz3T3VD/m
+ N9t0QRg+ouno1NzwMYOltn8kGsyxcnE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-6s-msAWOMEmB2uFss6TwHg-1; Fri, 26 Jun 2020 06:25:09 -0400
+X-MC-Unique: 6s-msAWOMEmB2uFss6TwHg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DC90800C60;
+ Fri, 26 Jun 2020 10:25:08 +0000 (UTC)
+Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D5E085C1BB;
+ Fri, 26 Jun 2020 10:25:07 +0000 (UTC)
+Date: Fri, 26 Jun 2020 11:25:06 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/12] Block patches
+Message-ID: <20200626102506.GD281902@stefanha-x1.localdomain>
+References: <20200624100210.59975-1-stefanha@redhat.com>
+ <CAFEAcA_K7MtnEjRMZCbmYrJCm6qD4N7ZMHvGuAzXL9gD2zQNuA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 06:21:50
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAFEAcA_K7MtnEjRMZCbmYrJCm6qD4N7ZMHvGuAzXL9gD2zQNuA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="q9KOos5vDmpwPx9o"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,49 +97,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Mark,
+--q9KOos5vDmpwPx9o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 16 Jun 2020, BALATON Zoltan wrote:
-> v5: Rebased on master, added some more clean ups, CUDA i2c is still to
-> be sorted out, help with that is welcome.
+On Thu, Jun 25, 2020 at 02:31:14PM +0100, Peter Maydell wrote:
+> On Wed, 24 Jun 2020 at 11:02, Stefan Hajnoczi <stefanha@redhat.com> wrote=
+:
+> >
+> > The following changes since commit 171199f56f5f9bdf1e5d670d09ef1351d8f0=
+1bae:
+> >
+> >   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-app=
+ly-20200619-3' into staging (2020-06-22 14:45:25 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/stefanha/qemu.git tags/block-pull-request
+> >
+> > for you to fetch changes up to 7838c67f22a81fcf669785cd6c0876438422071a=
+:
+> >
+> >   block/nvme: support nested aio_poll() (2020-06-23 15:46:08 +0100)
+> >
+> > ----------------------------------------------------------------
+> > Pull request
+> >
+> > ----------------------------------------------------------------
+>=20
+> Failure on iotest 030, x86-64 Linux:
+>=20
+>   TEST    iotest-qcow2: 030 [fail]
+> QEMU          --
+> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/..=
+/../x86_64-softmmu/qemu-system-x86_64"
+> -nodefaults -display none -accel qtest
+> QEMU_IMG      --
+> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/..=
+/../qemu-img"
+> QEMU_IO       --
+> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/..=
+/../qemu-io"
+>  --cache writeback --aio threads -f qcow2
+> QEMU_NBD      --
+> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/..=
+/../qemu-nbd"
+> IMGFMT        -- qcow2 (compat=3D1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/x86_64 e104462 4.15.0-76-generic
+> TEST_DIR      --
+> /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/scr=
+atch
+> SOCK_DIR      -- /tmp/tmp.8tgdDjoZcO
+> SOCKET_SCM_HELPER --
+> /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotest/sock=
+et_scm_helper
+>=20
+> --- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/030.out
+>  2019-07-15 17:18:35.251364738 +0100
+> +++ /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests=
+/030.out.bad
+>   2020-06-25 14:04:28.500534007 +0100
+> @@ -1,5 +1,17 @@
+> -...........................
+> +.............F.............
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +FAIL: test_stream_parallel (__main__.TestParallelOps)
+> +----------------------------------------------------------------------
+> +Traceback (most recent call last):
+> +  File "030", line 246, in test_stream_parallel
+> +    self.assert_qmp(result, 'return', {})
+> +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests=
+.py",
+> line 848, in assert_qmp
+> +    result =3D self.dictpath(d, path)
+> +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests=
+.py",
+> line 822, in dictpath
+> +    self.fail(f'failed path traversal for "{path}" in "{d}"')
+> +AssertionError: failed path traversal for "return" in "{'error':
+> {'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
+> found"}}"
+> +
+>  ----------------------------------------------------------------------
+>  Ran 27 tests
+>=20
+> -OK
+> +FAILED (failures=3D1)
 
-What about these patches? At least those that are finished (up to patch 9) 
-could be merged. I've seen you sent a pull request but not including any 
-of these. Will this need another rebase after your patches? If I rebase 
-them will you consider merging them? (Otherwise I won't spend time with 
-it.)
+Strange, I can't reproduce this failure on my pull request branch or on
+qemu.git/master.
 
-Thanks,
-BALATON Zoltan
+Is this failure deterministic? Are you sure it is introduced by this
+pull request?
 
-> BALATON Zoltan (11):
->  mac_oldworld: Allow loading binary ROM image
->  mac_newworld: Allow loading binary ROM image
->  mac_oldworld: Drop a variable, use get_system_memory() directly
->  mac_oldworld: Drop some variables
->  grackle: Set revision in PCI config to match hardware
->  mac_oldworld: Rename ppc_heathrow_reset to ppc_heathrow_cpu_reset
->  mac_oldworld: Map macio to expected address at reset
->  mac_oldworld: Add machine ID register
->  macio: Add dummy screamer register area
->  WIP macio/cuda: Attempt to add i2c support
->  mac_oldworld: Add SPD data to cover RAM
->
-> hw/misc/macio/cuda.c         |  62 ++++++++++++++++-
-> hw/misc/macio/macio.c        |  34 ++++++++++
-> hw/pci-host/grackle.c        |   2 +-
-> hw/ppc/mac.h                 |  15 ++++-
-> hw/ppc/mac_newworld.c        |  22 +++---
-> hw/ppc/mac_oldworld.c        | 127 ++++++++++++++++++++++++++---------
-> include/hw/misc/macio/cuda.h |   1 +
-> 7 files changed, 219 insertions(+), 44 deletions(-)
->
->
+Stefan
+
+--q9KOos5vDmpwPx9o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl71zQIACgkQnKSrs4Gr
+c8hMGgf/RmAuXh6t+tWHN562QtST23xndCCtYiXMSzk0kwe04kIbbarpXWgXWJbp
++fx7xiKFL2/rq7Ry3dqzNjeFQbG5h8h6YsB7XemeNjDFrMYsHTgVlZ9jpazwRWzs
+onNXQ/WmEFLioFhTGJXSZbIrTgmr0h+SPGjc85oQLt5T8kGcfd1MXrEPsNvNqGJO
+3REJnHWwIBfOsskYoJ56fZQZBia5QiJcRonhaomKm6q/lHuVnG8XRUbKBIkO72bm
+TyKic0v3AkcR8VjcvGP1PxnZjXthSH7NwRaTXpm636g8ImmK8bNm5naVd8IotBBc
+Q4NYSLB+7l0zJiSgvS5Ws5gANzSRrw==
+=z/qP
+-----END PGP SIGNATURE-----
+
+--q9KOos5vDmpwPx9o--
+
 
