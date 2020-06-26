@@ -2,91 +2,90 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21121C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A46C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:20:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E06A1208C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:17:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C33F3208C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:20:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFpoANoH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E06A1208C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ma+hnIeL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33F3208C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jopAF-0002vt-7p
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:17:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46972)
+	id 1jopD2-0004q1-2e
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:20:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jop9J-00021x-6i
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:16:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40736
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jop9G-0005J8-BO
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:16:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593180969;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wBO9G9aCaRODxxor/KqzabPijpMlcFAKKWrn9HsbE48=;
- b=PFpoANoHPTLPrFXdD0aVV1jce9wt2qmrZTZkmf6leJ1g55aa7SXFh5kf8tdJWvt3NdCMfu
- e5zG+nJWoFbWlXX6r3aD2+sDuvBg97bVX0JjeD/JmVXFxN2iLEAEqjDAI4QW3VZWML60Xq
- JMxl/7EYGb6YiKZOWFWsnk6yty6vvDA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-sEgyfmfkOheSlinp4fNYsA-1; Fri, 26 Jun 2020 10:16:07 -0400
-X-MC-Unique: sEgyfmfkOheSlinp4fNYsA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84EE318FE860;
- Fri, 26 Jun 2020 14:16:04 +0000 (UTC)
-Received: from work-vm (ovpn-113-27.ams2.redhat.com [10.36.113.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 078847F4F1;
- Fri, 26 Jun 2020 14:15:31 +0000 (UTC)
-Date: Fri, 26 Jun 2020 15:15:28 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH QEMU v25 15/17] vfio: Add ioctl to get dirty pages bitmap
- during dma unmap.
-Message-ID: <20200626141528.GI3087@work-vm>
-References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
- <1592684486-18511-16-git-send-email-kwankhede@nvidia.com>
- <20200624125614.5e742574@x1.home>
- <8cf7ffdf-8ba4-d42d-cf8d-4af08686841a@nvidia.com>
- <20200625131843.1a511078@x1.home>
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jopCK-0004L7-0N
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:19:20 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34206)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jopCH-0006QA-FT
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:19:19 -0400
+Received: by mail-lj1-x242.google.com with SMTP id x18so10553017lji.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 07:19:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=uw8v9cgjcz1o9NYQ3JDUINFfCN2ao/eHHaaJCDt/2So=;
+ b=ma+hnIeLm+lPoYA5kNCd8jmxQ5kgTuS8DS96lj26kpXCWmEnrH4gZQhtLsiowxO/Rq
+ TIXLlfBeJSBnXpxbo80yYV84slRq/iqWO3c1aIAIrkP2/xNKmAQXKKgXtIO6GJDWSdRH
+ X2zz3YXTNo84IZNokCbiALASAqnGCZZejU7ZkxDZTeZEB595+gW+mSM4VommY6gwUUp5
+ EmnIY0KViKCBngpugg77pletvDSaw+giUzK/bYfa/5ytOf3B8TGjQ80a0Z2lHXFD+aW7
+ PZsZHsQ6Rlk0N5WvJjtx68aY6x5LOkMyhHdUpuBLIfe3HRp35GSZRfsvlgBHLhjEFOcH
+ zGYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=uw8v9cgjcz1o9NYQ3JDUINFfCN2ao/eHHaaJCDt/2So=;
+ b=ojjOsb9fZIfNTNZDxc2N14pE4kkzEnIoNgvRhDkMM/ryF1Bi+NaG7DQzYyJ66rF27h
+ tEEEBy5UFaV1nJLRfHexfiArADwZm7VYbl/tK99GCkFlGjth1MFD2BAj1HGom3Bx42ok
+ vFlQK87wXYOM4NTv6PR1/ecABo3kWnEsKCWABjHV0B5baUb7wvb34hiLGaBzFt0vm68i
+ pa9dGE8lj+Qx7jst4UMZpfn3+8Ag+u5nRupEhrfPoeJwa6l9kCtffCdmSeclpgkqQKx7
+ u6lRt3p/occuacx2VjwLScHUXIYvYvoBxZECJVfMa73f4kTy4rdiRhTKTGAo5W6HamJs
+ td5Q==
+X-Gm-Message-State: AOAM532Btr6SupDFvrfMjr0GhzTSu5dL+jka8s6fYMBTbin/Waucdstz
+ xrI0aX6PEMNFIf3YxCAmDLiFwt/IYRXmIADEEqg=
+X-Google-Smtp-Source: ABdhPJxiQaIO36FXMK/3tLXiscDvnZHLIHqIh3U469n58ezHMzH3Gxi0mTpYXL6rr/3zGt/XHRg8pTAQLlv7gqRp93o=
+X-Received: by 2002:a2e:850b:: with SMTP id j11mr1153422lji.30.1593181151074; 
+ Fri, 26 Jun 2020 07:19:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200625131843.1a511078@x1.home>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200624153142.13247-1-ahmedkhaledkaraman@gmail.com>
+ <20200624153142.13247-2-ahmedkhaledkaraman@gmail.com>
+ <CAHiYmc6vtE7VmQ-GSLqbCQxM7dEyc-e1TGBDGWYSV6CNV0wgGA@mail.gmail.com>
+In-Reply-To: <CAHiYmc6vtE7VmQ-GSLqbCQxM7dEyc-e1TGBDGWYSV6CNV0wgGA@mail.gmail.com>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Fri, 26 Jun 2020 16:18:35 +0200
+Message-ID: <CALTWKrX7PmFZot+uL3MB8hML0o1oMYAr66AEFu-b_vCsJi5J2Q@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] scripts/performance: Add topN_perf.py script
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,225 +98,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> On Thu, 25 Jun 2020 20:31:12 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > On 6/25/2020 12:26 AM, Alex Williamson wrote:
-> > > On Sun, 21 Jun 2020 01:51:24 +0530
-> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >   
-> > >> With vIOMMU, IO virtual address range can get unmapped while in pre-copy
-> > >> phase of migration. In that case, unmap ioctl should return pages pinned
-> > >> in that range and QEMU should find its correcponding guest physical
-> > >> addresses and report those dirty.
-> > >>
-> > >> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> > >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > >> ---
-> > >>   hw/vfio/common.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
-> > >>   1 file changed, 81 insertions(+), 4 deletions(-)
-> > >>
-> > >> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > >> index 0518cf228ed5..a06b8f2f66e2 100644
-> > >> --- a/hw/vfio/common.c
-> > >> +++ b/hw/vfio/common.c
-> > >> @@ -311,11 +311,83 @@ static bool vfio_devices_are_stopped_and_saving(void)
-> > >>       return true;
-> > >>   }
-> > >>   
-> > >> +static bool vfio_devices_are_running_and_saving(void)
-> > >> +{
-> > >> +    VFIOGroup *group;
-> > >> +    VFIODevice *vbasedev;
-> > >> +
-> > >> +    QLIST_FOREACH(group, &vfio_group_list, next) {  
-> > > 
-> > > Same as previous, I'm curious if we should instead be looking at
-> > > container granularity.  It especially seems to make sense here where
-> > > we're unmapping from a container, so iterating every device in every
-> > > group seems excessive.
-> > >   
-> > 
-> > changing it with container argument.
-> > 
-> > >> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> > >> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
-> > >> +                (vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-> > >> +                continue;
-> > >> +            } else {
-> > >> +                return false;
-> > >> +            }  
-> > > 
-> > > I'm also not sure about the polarity of this function, should it be if
-> > > any device is _SAVING we should report the dirty bitmap?  For example,
-> > > what if we have a set of paried failover NICs where we intend to unplug
-> > > one just prior to stopping the devices, aren't we going to lose dirtied
-> > > pages with this logic that they all must be running and saving?  Thanks,
-> > >   
-> > 
-> > If migration is initiated, is device unplug allowed? Ideally it 
-> > shouldn't. If it is, then how QEMU handles data stream of device which 
-> > doesn't exist at destination?
-> 
-> include/hw/qdev-core.h
-> struct DeviceState {
->     ...
->     bool allow_unplug_during_migration;
-> 
-> AIUI, the failover_pair_id device is likely to be a vfio-pci NIC,
-> otherwise they'd simply migrate the primary NIC, so there's a very good
-> chance that a user would configure a VM with a migratable mdev device
-> and an failover NIC so that they have high speed networking on either
-> end of the migration.
+On Thu, Jun 25, 2020 at 11:45 AM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+> =D1=81=D1=80=D0=B5, 24. =D1=98=D1=83=D0=BD 2020. =D1=83 17:32 Ahmed Karam=
+an
+> <ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > Syntax:
+> > topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
+> >                  <qemu executable> [<qemu executable options>] \
+> >                  <target executable> [<target execurable options>]
+> >
+> > [-h] - Print the script arguments help message.
+> > [-n] - Specify the number of top functions to print.
+> >      - If this flag is not specified, the tool defaults to 25.
+> >
+> > Example of usage:
+> > topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
+> >
+> > Example Output:
+> >  No.  Percentage  Name                       Caller
+> > ----  ----------  -------------------------  -------------------------
+> >    1      16.25%  float64_mul                qemu-x86_64
+> >    2      12.01%  float64_sub                qemu-x86_64
+> >    3      11.99%  float64_add                qemu-x86_64
+> >    4       5.69%  helper_mulsd               qemu-x86_64
+> >    5       4.68%  helper_addsd               qemu-x86_64
+> >    6       4.43%  helper_lookup_tb_ptr       qemu-x86_64
+> >    7       4.28%  helper_subsd               qemu-x86_64
+> >    8       2.71%  f64_compare                qemu-x86_64
+> >    9       2.71%  helper_ucomisd             qemu-x86_64
+> >   10       1.04%  helper_pand_xmm            qemu-x86_64
+> >   11       0.71%  float64_div                qemu-x86_64
+> >   12       0.63%  helper_pxor_xmm            qemu-x86_64
+> >   13       0.50%  0x00007f7b7004ef95         [JIT] tid 491
+> >   14       0.50%  0x00007f7b70044e83         [JIT] tid 491
+> >   15       0.36%  helper_por_xmm             qemu-x86_64
+> >   16       0.32%  helper_cc_compute_all      qemu-x86_64
+> >   17       0.30%  0x00007f7b700433f0         [JIT] tid 491
+> >   18       0.30%  float64_compare_quiet      qemu-x86_64
+> >   19       0.27%  soft_f64_addsub            qemu-x86_64
+> >   20       0.26%  round_to_int               qemu-x86_64
+> >
+> > Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+> > ---
+> >  scripts/performance/topN_perf.py | 142 +++++++++++++++++++++++++++++++
+> >  1 file changed, 142 insertions(+)
+> >  create mode 100755 scripts/performance/topN_perf.py
+> >
+> > diff --git a/scripts/performance/topN_perf.py b/scripts/performance/top=
+N_perf.py
+> > new file mode 100755
+> > index 0000000000..d2b939c375
+> > --- /dev/null
+> > +++ b/scripts/performance/topN_perf.py
+> > @@ -0,0 +1,142 @@
+> > +#!/usr/bin/env python3
+> > +
+> > +#  Print the top N most executed functions in QEMU using perf.
+> > +#  Syntax:
+> > +#  topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
+> > +#           <qemu executable> [<qemu executable options>] \
+> > +#           <target executable> [<target execurable options>]
+> > +#
+> > +#  [-h] - Print the script arguments help message.
+> > +#  [-n] - Specify the number of top functions to print.
+> > +#       - If this flag is not specified, the tool defaults to 25.
+> > +#
+> > +#  Example of usage:
+> > +#  topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
+> > +#
+> > +#  This file is a part of the project "TCG Continuous Benchmarking".
+> > +#
+> > +#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+> > +#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmai=
+l.com>
+> > +#
+> > +#  This program is free software: you can redistribute it and/or modif=
+y
+> > +#  it under the terms of the GNU General Public License as published b=
+y
+> > +#  the Free Software Foundation, either version 2 of the License, or
+> > +#  (at your option) any later version.
+> > +#
+> > +#  This program is distributed in the hope that it will be useful,
+> > +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> > +#  GNU General Public License for more details.
+> > +#
+> > +#  You should have received a copy of the GNU General Public License
+> > +#  along with this program. If not, see <https://www.gnu.org/licenses/=
+>.
+> > +
+> > +import argparse
+> > +import os
+> > +import subprocess
+> > +import sys
+> > +
+> > +
+> > +# Parse the command line arguments
+> > +parser =3D argparse.ArgumentParser(
+> > +    usage=3D'topN_perf.py [-h] [-n] <number of displayed top functions=
+ >  -- '
+> > +          '<qemu executable> [<qemu executable options>] '
+> > +          '<target executable> [<target executable options>]')
+> > +
+> > +parser.add_argument('-n', dest=3D'top', type=3Dint, default=3D25,
+> > +                    help=3D'Specify the number of top functions to pri=
+nt.')
+> > +
+> > +parser.add_argument('command', type=3Dstr, nargs=3D'+', help=3Dargpars=
+e.SUPPRESS)
+> > +
+> > +args =3D parser.parse_args()
+> > +
+> > +# Extract the needed variables from the args
+> > +command =3D args.command
+> > +top =3D args.top
+> > +
+> > +# Insure that perf is installed
+> > +check_perf =3D subprocess.run(["which", "perf"], stdout=3Dsubprocess.D=
+EVNULL)
+> > +if check_perf.returncode:
+> > +    sys.exit("Please install perf before running the script!")
+>
+> I would rename "chech_perf" to "check_perf_presence". It is more
+> specific, clearer.
+>
+> > +
+> > +# Insure user has previllage to run perf
+> > +check_perf_executability =3D subprocess.run(["perf", "stat", "ls", "/"=
+],
+> > +                           stdout=3Dsubprocess.DEVNULL, stderr=3Dsubpr=
+ocess.DEVNULL)
+> > +if check_perf_executability.returncode:
+> > +    sys.exit(
+> > +"""
+> > +Error:
+> > +You may not have permission to collect stats.
+> > +
+> > +Consider tweaking /proc/sys/kernel/perf_event_paranoid,
+> > +which controls use of the performance events system by
+> > +unprivileged users (without CAP_SYS_ADMIN).
+> > +
+> > +  -1: Allow use of (almost) all events by all users
+> > +      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOC=
+K
+> > +   0: Disallow ftrace function tracepoint by users without CAP_SYS_ADM=
+IN
+> > +      Disallow raw tracepoint access by users without CAP_SYS_ADMIN
+> > +   1: Disallow CPU event access by users without CAP_SYS_ADMIN
+> > +   2: Disallow kernel profiling by users without CAP_SYS_ADMIN
+> > +
+> > +To make this setting permanent, edit /etc/sysctl.conf too, e.g.:
+> > +   kernel.perf_event_paranoid =3D -1
+> > +"""
+> > +)
+>
+> Very good.
+>
+> > +
+> > +# Run perf record
+> > +perf_record =3D subprocess.run((["perf", "record"] + command),
+> > +                             stdout=3Dsubprocess.DEVNULL, stderr=3Dsub=
+process.PIPE)
+> > +if perf_record.returncode:
+> > +    os.unlink('perf.data')
+> > +    sys.exit(perf_record.stderr.decode("utf-8"))
+>
+> Here, the file "perf.data" will be created in the current working
+> directory. If one existed prior to script execution, it will be
+> overwritten.
+>
+> I think such "corruption" of current working directory is not optimal.
+> It would be better that the script doesn't touch current working
+> directory at all (perhaps user wants to keep perf.data he obtained
+> from some experiment in the past.
+>
+> Therefore, I think it would be better if you specify output of "perf
+> report" to be "/tmp/perf.data", not "perf.data", which is the default.
+> There is an option of "perf record" to specify the output file:
+>
+>        -o, --output=3D
+>            Output file name.
+>
+> > +
+> > +# Save perf report output to perf_report.out
+> > +with open("perf_report.out", "w") as output:
+> > +    perf_report =3D subprocess.run(
+> > +        ["perf", "report", "--stdio"], stdout=3Doutput, stderr=3Dsubpr=
+ocess.PIPE)
+> > +    if perf_report.returncode:
+> > +        os.unlink('perf.data')
+> > +        output.close()
+> > +        os.unlink('perf_report.out')
+> > +        sys.exit(perf_report.stderr.decode("utf-8"))
+>
+> For similar reasons described above, input file should be
+> "/tmp/perf.data". Option of "perf report" for input file:
+>
+>        -i, --input=3D
+>            Input file name.
+>
+> Output file should be "/tmp/perf_report.out", not "perf_report.out".
+>
+> > +
+> > +# Read the reported data to functions[]
+> > +functions =3D []
+> > +with open("perf_report.out", "r") as data:
+>
+> "/tmp/perf_report.out"
+>
+> > +    # Only read lines that are not comments (comments start with #)
+> > +    # Only read lines that are not empty
+> > +    functions =3D [line for line in data.readlines() if line and line[=
+0]
+> > +                 !=3D '#' and line[0] !=3D "\n"]
+> > +
+> > +# Limit the number of top functions to "top"
+> > +number_of_top_functions =3D top if len(functions) > top else len(funct=
+ions)
+> > +
+> > +# Store the data of the top functions in top_functions[]
+> > +top_functions =3D functions[:number_of_top_functions]
+> > +
+> > +# Print table header
+> > +print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
+> > +                                                         'Percentage',
+> > +                                                         'Name',
+>
+> 'Function Name' would be more ergonomic here.
+>
+> > +                                                         'Caller',
+>
+> Please replace 'Caller' with 'Invoked by'. 'Caller' implies a function
+> that directly calls the function in question. 'Invoked by' avoids such
+> confusion, and it just feels more appropriate here.
+>
+> > +                                                         '-' * 4,
+> > +                                                         '-' * 10,
+> > +                                                         '-' * 30,
+> > +                                                         '-' * 25))
+> > +
+> > +
+> > +# Print top N functions
+> > +for (index, function) in enumerate(top_functions, start=3D1):
+> > +    function_data =3D function.split()
+> > +    function_percentage =3D function_data[0]
+> > +    function_name =3D function_data[-1]
+> > +    function_caller =3D ' '.join(function_data[2:-2])
+>
+> function_invoker
+>
+> > +    print('{:>4}  {:>10}  {:<30}  {}'.format(index,
+> > +                                             function_percentage,
+> > +                                             function_name,
+> > +                                             function_caller))
+>
+> function_invoker
+>
+> > +
+> > +# Remove intermediate files
+> > +os.unlink('perf.data')
+> > +os.unlink('perf_report.out')
+>
+> os.unlink('/tmp/perf.data')
+> os.unlink('/tmp/perf_report.out')
+>
+>
+> > --
+> > 2.17.1
+> >
 
-My understanding for that failover code is that happens right at the
-beginning of migration while we're still in MIGRATION_STATUS_SETUP;
-whether there's anything that enforces that is a different matter.
-But, in that case, I don't think you'd be interested in that dirtying.
+Thanks Mr. Aleksandar. These are really valid points. I'll add these
+updates in v4 of this series.
 
-Dave
-
-> > _SAVING flag is set during pre-copy and stop-and-copy phase. Here we 
-> > only want to track pages which are unmapped during pre-copy phase, i.e. 
-> > when vCPU are running. In case of VM suspend /saveVM, there is no 
-> > pre-copy phase, but ideally we shouldn't see unmaps when vCPUs are 
-> > stopped, right? But still for safer side, since we know exact phase, I 
-> > would prefer to check for _SAVING and _RUNNING flags.
-> 
-> We can't have unmaps while vCPUs are stopped, but I think the failover
-> code allows that we can be in the pre-copy phase where not all devices
-> support migration.  As coded here, it appears that dirty tracking of any
-> unmap while in that phase is lost.  Thanks,
-> 
-> Alex
-> 
-> 
-> > >> +        }
-> > >> +    }
-> > >> +    return true;
-> > >> +}
-> > >> +
-> > >> +static int vfio_dma_unmap_bitmap(VFIOContainer *container,
-> > >> +                                 hwaddr iova, ram_addr_t size,
-> > >> +                                 IOMMUTLBEntry *iotlb)
-> > >> +{
-> > >> +    struct vfio_iommu_type1_dma_unmap *unmap;
-> > >> +    struct vfio_bitmap *bitmap;
-> > >> +    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
-> > >> +    int ret;
-> > >> +
-> > >> +    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
-> > >> +
-> > >> +    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
-> > >> +    unmap->iova = iova;
-> > >> +    unmap->size = size;
-> > >> +    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
-> > >> +    bitmap = (struct vfio_bitmap *)&unmap->data;
-> > >> +
-> > >> +    /*
-> > >> +     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-> > >> +     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
-> > >> +     * TARGET_PAGE_SIZE.
-> > >> +     */
-> > >> +
-> > >> +    bitmap->pgsize = TARGET_PAGE_SIZE;
-> > >> +    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
-> > >> +                   BITS_PER_BYTE;
-> > >> +
-> > >> +    if (bitmap->size > container->max_dirty_bitmap_size) {
-> > >> +        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
-> > >> +        ret = -E2BIG;
-> > >> +        goto unmap_exit;
-> > >> +    }
-> > >> +
-> > >> +    bitmap->data = g_try_malloc0(bitmap->size);
-> > >> +    if (!bitmap->data) {
-> > >> +        ret = -ENOMEM;
-> > >> +        goto unmap_exit;
-> > >> +    }
-> > >> +
-> > >> +    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
-> > >> +    if (!ret) {
-> > >> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
-> > >> +                iotlb->translated_addr, pages);
-> > >> +    } else {
-> > >> +        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
-> > >> +    }
-> > >> +
-> > >> +    g_free(bitmap->data);
-> > >> +unmap_exit:
-> > >> +    g_free(unmap);
-> > >> +    return ret;
-> > >> +}
-> > >> +
-> > >>   /*
-> > >>    * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
-> > >>    */
-> > >>   static int vfio_dma_unmap(VFIOContainer *container,
-> > >> -                          hwaddr iova, ram_addr_t size)
-> > >> +                          hwaddr iova, ram_addr_t size,
-> > >> +                          IOMMUTLBEntry *iotlb)
-> > >>   {
-> > >>       struct vfio_iommu_type1_dma_unmap unmap = {
-> > >>           .argsz = sizeof(unmap),
-> > >> @@ -324,6 +396,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
-> > >>           .size = size,
-> > >>       };
-> > >>   
-> > >> +    if (iotlb && container->dirty_pages_supported &&
-> > >> +        vfio_devices_are_running_and_saving()) {
-> > >> +        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
-> > >> +    }
-> > >> +
-> > >>       while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-> > >>           /*
-> > >>            * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-> > >> @@ -371,7 +448,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
-> > >>        * the VGA ROM space.
-> > >>        */
-> > >>       if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
-> > >> -        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-> > >> +        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
-> > >>            ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-> > >>           return 0;
-> > >>       }
-> > >> @@ -542,7 +619,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > >>               }
-> > >>           }
-> > >>   
-> > >> -        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
-> > >> +        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
-> > >>           if (ret) {
-> > >>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-> > >>                            "0x%"HWADDR_PRIx") = %d (%m)",
-> > >> @@ -853,7 +930,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-> > >>       }
-> > >>   
-> > >>       if (try_unmap) {
-> > >> -        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-> > >> +        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
-> > >>           if (ret) {
-> > >>               error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-> > >>                            "0x%"HWADDR_PRIx") = %d (%m)",  
-> > >   
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Best regards,
+Ahmed Karaman
 
