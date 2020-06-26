@@ -2,90 +2,91 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A46C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6438C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C33F3208C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:20:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 630302067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:23:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ma+hnIeL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33F3208C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P/PSTiTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630302067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jopD2-0004q1-2e
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:20:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47832)
+	id 1jopGe-0006Rb-Ms
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:23:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jopCK-0004L7-0N
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:19:20 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34206)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jopCH-0006QA-FT
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:19:19 -0400
-Received: by mail-lj1-x242.google.com with SMTP id x18so10553017lji.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 07:19:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=uw8v9cgjcz1o9NYQ3JDUINFfCN2ao/eHHaaJCDt/2So=;
- b=ma+hnIeLm+lPoYA5kNCd8jmxQ5kgTuS8DS96lj26kpXCWmEnrH4gZQhtLsiowxO/Rq
- TIXLlfBeJSBnXpxbo80yYV84slRq/iqWO3c1aIAIrkP2/xNKmAQXKKgXtIO6GJDWSdRH
- X2zz3YXTNo84IZNokCbiALASAqnGCZZejU7ZkxDZTeZEB595+gW+mSM4VommY6gwUUp5
- EmnIY0KViKCBngpugg77pletvDSaw+giUzK/bYfa/5ytOf3B8TGjQ80a0Z2lHXFD+aW7
- PZsZHsQ6Rlk0N5WvJjtx68aY6x5LOkMyhHdUpuBLIfe3HRp35GSZRfsvlgBHLhjEFOcH
- zGYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=uw8v9cgjcz1o9NYQ3JDUINFfCN2ao/eHHaaJCDt/2So=;
- b=ojjOsb9fZIfNTNZDxc2N14pE4kkzEnIoNgvRhDkMM/ryF1Bi+NaG7DQzYyJ66rF27h
- tEEEBy5UFaV1nJLRfHexfiArADwZm7VYbl/tK99GCkFlGjth1MFD2BAj1HGom3Bx42ok
- vFlQK87wXYOM4NTv6PR1/ecABo3kWnEsKCWABjHV0B5baUb7wvb34hiLGaBzFt0vm68i
- pa9dGE8lj+Qx7jst4UMZpfn3+8Ag+u5nRupEhrfPoeJwa6l9kCtffCdmSeclpgkqQKx7
- u6lRt3p/occuacx2VjwLScHUXIYvYvoBxZECJVfMa73f4kTy4rdiRhTKTGAo5W6HamJs
- td5Q==
-X-Gm-Message-State: AOAM532Btr6SupDFvrfMjr0GhzTSu5dL+jka8s6fYMBTbin/Waucdstz
- xrI0aX6PEMNFIf3YxCAmDLiFwt/IYRXmIADEEqg=
-X-Google-Smtp-Source: ABdhPJxiQaIO36FXMK/3tLXiscDvnZHLIHqIh3U469n58ezHMzH3Gxi0mTpYXL6rr/3zGt/XHRg8pTAQLlv7gqRp93o=
-X-Received: by 2002:a2e:850b:: with SMTP id j11mr1153422lji.30.1593181151074; 
- Fri, 26 Jun 2020 07:19:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jopG2-0005y9-OE
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:23:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26413
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jopFz-0008Et-4y
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:23:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593181385;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3ajTm2CxGiorFHKxaN8d6wTfjqF4gEnLZTq7GWgcj8Q=;
+ b=P/PSTiTID4eDL6Go8gNdtKLT5e97Tb6eBV1qt06meIbIIrWWPxb0KL5D7jLGgNYoUUdiNZ
+ hmYxpSHbbLpzcc9hkqdZ1a+g1Osz11Lhf0rwsJ9dFE0iprbFo+jMHq0F5rtyaXsoMSChr8
+ Ia9r+zPuymJqm9t3vch05bpwsSBWjX0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-l0JAmYhLMRqNvbr4Zv4sHg-1; Fri, 26 Jun 2020 10:23:02 -0400
+X-MC-Unique: l0JAmYhLMRqNvbr4Zv4sHg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A074B80058A;
+ Fri, 26 Jun 2020 14:22:59 +0000 (UTC)
+Received: from work-vm (ovpn-113-27.ams2.redhat.com [10.36.113.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 562E861981;
+ Fri, 26 Jun 2020 14:22:45 +0000 (UTC)
+Date: Fri, 26 Jun 2020 15:22:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH QEMU v25 07/17] vfio: Register SaveVMHandlers for VFIO
+ device
+Message-ID: <20200626142243.GJ3087@work-vm>
+References: <1592684486-18511-1-git-send-email-kwankhede@nvidia.com>
+ <1592684486-18511-8-git-send-email-kwankhede@nvidia.com>
+ <20200622165024.5b2eb251@x1.home>
+ <542ced5e-0380-19b9-91d2-5f40c5857719@nvidia.com>
+ <20200623135056.0c4957a3@x1.home>
 MIME-Version: 1.0
-References: <20200624153142.13247-1-ahmedkhaledkaraman@gmail.com>
- <20200624153142.13247-2-ahmedkhaledkaraman@gmail.com>
- <CAHiYmc6vtE7VmQ-GSLqbCQxM7dEyc-e1TGBDGWYSV6CNV0wgGA@mail.gmail.com>
-In-Reply-To: <CAHiYmc6vtE7VmQ-GSLqbCQxM7dEyc-e1TGBDGWYSV6CNV0wgGA@mail.gmail.com>
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Date: Fri, 26 Jun 2020 16:18:35 +0200
-Message-ID: <CALTWKrX7PmFZot+uL3MB8hML0o1oMYAr66AEFu-b_vCsJi5J2Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] scripts/performance: Add topN_perf.py script
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200623135056.0c4957a3@x1.home>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,292 +99,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
+ Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 11:45 AM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> =D1=81=D1=80=D0=B5, 24. =D1=98=D1=83=D0=BD 2020. =D1=83 17:32 Ahmed Karam=
-an
-> <ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> > Syntax:
-> > topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
-> >                  <qemu executable> [<qemu executable options>] \
-> >                  <target executable> [<target execurable options>]
-> >
-> > [-h] - Print the script arguments help message.
-> > [-n] - Specify the number of top functions to print.
-> >      - If this flag is not specified, the tool defaults to 25.
-> >
-> > Example of usage:
-> > topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
-> >
-> > Example Output:
-> >  No.  Percentage  Name                       Caller
-> > ----  ----------  -------------------------  -------------------------
-> >    1      16.25%  float64_mul                qemu-x86_64
-> >    2      12.01%  float64_sub                qemu-x86_64
-> >    3      11.99%  float64_add                qemu-x86_64
-> >    4       5.69%  helper_mulsd               qemu-x86_64
-> >    5       4.68%  helper_addsd               qemu-x86_64
-> >    6       4.43%  helper_lookup_tb_ptr       qemu-x86_64
-> >    7       4.28%  helper_subsd               qemu-x86_64
-> >    8       2.71%  f64_compare                qemu-x86_64
-> >    9       2.71%  helper_ucomisd             qemu-x86_64
-> >   10       1.04%  helper_pand_xmm            qemu-x86_64
-> >   11       0.71%  float64_div                qemu-x86_64
-> >   12       0.63%  helper_pxor_xmm            qemu-x86_64
-> >   13       0.50%  0x00007f7b7004ef95         [JIT] tid 491
-> >   14       0.50%  0x00007f7b70044e83         [JIT] tid 491
-> >   15       0.36%  helper_por_xmm             qemu-x86_64
-> >   16       0.32%  helper_cc_compute_all      qemu-x86_64
-> >   17       0.30%  0x00007f7b700433f0         [JIT] tid 491
-> >   18       0.30%  float64_compare_quiet      qemu-x86_64
-> >   19       0.27%  soft_f64_addsub            qemu-x86_64
-> >   20       0.26%  round_to_int               qemu-x86_64
-> >
-> > Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> > ---
-> >  scripts/performance/topN_perf.py | 142 +++++++++++++++++++++++++++++++
-> >  1 file changed, 142 insertions(+)
-> >  create mode 100755 scripts/performance/topN_perf.py
-> >
-> > diff --git a/scripts/performance/topN_perf.py b/scripts/performance/top=
-N_perf.py
-> > new file mode 100755
-> > index 0000000000..d2b939c375
-> > --- /dev/null
-> > +++ b/scripts/performance/topN_perf.py
-> > @@ -0,0 +1,142 @@
-> > +#!/usr/bin/env python3
-> > +
-> > +#  Print the top N most executed functions in QEMU using perf.
-> > +#  Syntax:
-> > +#  topN_perf.py [-h] [-n] <number of displayed top functions>  -- \
-> > +#           <qemu executable> [<qemu executable options>] \
-> > +#           <target executable> [<target execurable options>]
-> > +#
-> > +#  [-h] - Print the script arguments help message.
-> > +#  [-n] - Specify the number of top functions to print.
-> > +#       - If this flag is not specified, the tool defaults to 25.
-> > +#
-> > +#  Example of usage:
-> > +#  topN_perf.py -n 20 -- qemu-arm coulomb_double-arm
-> > +#
-> > +#  This file is a part of the project "TCG Continuous Benchmarking".
-> > +#
-> > +#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> > +#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmai=
-l.com>
-> > +#
-> > +#  This program is free software: you can redistribute it and/or modif=
-y
-> > +#  it under the terms of the GNU General Public License as published b=
-y
-> > +#  the Free Software Foundation, either version 2 of the License, or
-> > +#  (at your option) any later version.
-> > +#
-> > +#  This program is distributed in the hope that it will be useful,
-> > +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-> > +#  GNU General Public License for more details.
-> > +#
-> > +#  You should have received a copy of the GNU General Public License
-> > +#  along with this program. If not, see <https://www.gnu.org/licenses/=
->.
-> > +
-> > +import argparse
-> > +import os
-> > +import subprocess
-> > +import sys
-> > +
-> > +
-> > +# Parse the command line arguments
-> > +parser =3D argparse.ArgumentParser(
-> > +    usage=3D'topN_perf.py [-h] [-n] <number of displayed top functions=
- >  -- '
-> > +          '<qemu executable> [<qemu executable options>] '
-> > +          '<target executable> [<target executable options>]')
-> > +
-> > +parser.add_argument('-n', dest=3D'top', type=3Dint, default=3D25,
-> > +                    help=3D'Specify the number of top functions to pri=
-nt.')
-> > +
-> > +parser.add_argument('command', type=3Dstr, nargs=3D'+', help=3Dargpars=
-e.SUPPRESS)
-> > +
-> > +args =3D parser.parse_args()
-> > +
-> > +# Extract the needed variables from the args
-> > +command =3D args.command
-> > +top =3D args.top
-> > +
-> > +# Insure that perf is installed
-> > +check_perf =3D subprocess.run(["which", "perf"], stdout=3Dsubprocess.D=
-EVNULL)
-> > +if check_perf.returncode:
-> > +    sys.exit("Please install perf before running the script!")
->
-> I would rename "chech_perf" to "check_perf_presence". It is more
-> specific, clearer.
->
-> > +
-> > +# Insure user has previllage to run perf
-> > +check_perf_executability =3D subprocess.run(["perf", "stat", "ls", "/"=
-],
-> > +                           stdout=3Dsubprocess.DEVNULL, stderr=3Dsubpr=
-ocess.DEVNULL)
-> > +if check_perf_executability.returncode:
-> > +    sys.exit(
-> > +"""
-> > +Error:
-> > +You may not have permission to collect stats.
-> > +
-> > +Consider tweaking /proc/sys/kernel/perf_event_paranoid,
-> > +which controls use of the performance events system by
-> > +unprivileged users (without CAP_SYS_ADMIN).
-> > +
-> > +  -1: Allow use of (almost) all events by all users
-> > +      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOC=
-K
-> > +   0: Disallow ftrace function tracepoint by users without CAP_SYS_ADM=
-IN
-> > +      Disallow raw tracepoint access by users without CAP_SYS_ADMIN
-> > +   1: Disallow CPU event access by users without CAP_SYS_ADMIN
-> > +   2: Disallow kernel profiling by users without CAP_SYS_ADMIN
-> > +
-> > +To make this setting permanent, edit /etc/sysctl.conf too, e.g.:
-> > +   kernel.perf_event_paranoid =3D -1
-> > +"""
-> > +)
->
-> Very good.
->
-> > +
-> > +# Run perf record
-> > +perf_record =3D subprocess.run((["perf", "record"] + command),
-> > +                             stdout=3Dsubprocess.DEVNULL, stderr=3Dsub=
-process.PIPE)
-> > +if perf_record.returncode:
-> > +    os.unlink('perf.data')
-> > +    sys.exit(perf_record.stderr.decode("utf-8"))
->
-> Here, the file "perf.data" will be created in the current working
-> directory. If one existed prior to script execution, it will be
-> overwritten.
->
-> I think such "corruption" of current working directory is not optimal.
-> It would be better that the script doesn't touch current working
-> directory at all (perhaps user wants to keep perf.data he obtained
-> from some experiment in the past.
->
-> Therefore, I think it would be better if you specify output of "perf
-> report" to be "/tmp/perf.data", not "perf.data", which is the default.
-> There is an option of "perf record" to specify the output file:
->
->        -o, --output=3D
->            Output file name.
->
-> > +
-> > +# Save perf report output to perf_report.out
-> > +with open("perf_report.out", "w") as output:
-> > +    perf_report =3D subprocess.run(
-> > +        ["perf", "report", "--stdio"], stdout=3Doutput, stderr=3Dsubpr=
-ocess.PIPE)
-> > +    if perf_report.returncode:
-> > +        os.unlink('perf.data')
-> > +        output.close()
-> > +        os.unlink('perf_report.out')
-> > +        sys.exit(perf_report.stderr.decode("utf-8"))
->
-> For similar reasons described above, input file should be
-> "/tmp/perf.data". Option of "perf report" for input file:
->
->        -i, --input=3D
->            Input file name.
->
-> Output file should be "/tmp/perf_report.out", not "perf_report.out".
->
-> > +
-> > +# Read the reported data to functions[]
-> > +functions =3D []
-> > +with open("perf_report.out", "r") as data:
->
-> "/tmp/perf_report.out"
->
-> > +    # Only read lines that are not comments (comments start with #)
-> > +    # Only read lines that are not empty
-> > +    functions =3D [line for line in data.readlines() if line and line[=
-0]
-> > +                 !=3D '#' and line[0] !=3D "\n"]
-> > +
-> > +# Limit the number of top functions to "top"
-> > +number_of_top_functions =3D top if len(functions) > top else len(funct=
-ions)
-> > +
-> > +# Store the data of the top functions in top_functions[]
-> > +top_functions =3D functions[:number_of_top_functions]
-> > +
-> > +# Print table header
-> > +print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
-> > +                                                         'Percentage',
-> > +                                                         'Name',
->
-> 'Function Name' would be more ergonomic here.
->
-> > +                                                         'Caller',
->
-> Please replace 'Caller' with 'Invoked by'. 'Caller' implies a function
-> that directly calls the function in question. 'Invoked by' avoids such
-> confusion, and it just feels more appropriate here.
->
-> > +                                                         '-' * 4,
-> > +                                                         '-' * 10,
-> > +                                                         '-' * 30,
-> > +                                                         '-' * 25))
-> > +
-> > +
-> > +# Print top N functions
-> > +for (index, function) in enumerate(top_functions, start=3D1):
-> > +    function_data =3D function.split()
-> > +    function_percentage =3D function_data[0]
-> > +    function_name =3D function_data[-1]
-> > +    function_caller =3D ' '.join(function_data[2:-2])
->
-> function_invoker
->
-> > +    print('{:>4}  {:>10}  {:<30}  {}'.format(index,
-> > +                                             function_percentage,
-> > +                                             function_name,
-> > +                                             function_caller))
->
-> function_invoker
->
-> > +
-> > +# Remove intermediate files
-> > +os.unlink('perf.data')
-> > +os.unlink('perf_report.out')
->
-> os.unlink('/tmp/perf.data')
-> os.unlink('/tmp/perf_report.out')
->
->
-> > --
-> > 2.17.1
-> >
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> On Wed, 24 Jun 2020 00:51:06 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+> > On 6/23/2020 4:20 AM, Alex Williamson wrote:
+> > > On Sun, 21 Jun 2020 01:51:16 +0530
+> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > >   
+> > >> Define flags to be used as delimeter in migration file stream.
+> > >> Added .save_setup and .save_cleanup functions. Mapped & unmapped migration
+> > >> region from these functions at source during saving or pre-copy phase.
+> > >> Set VFIO device state depending on VM's state. During live migration, VM is
+> > >> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
+> > >> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
+> > >>
+> > >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > >> ---
+> > >>   hw/vfio/migration.c  | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >>   hw/vfio/trace-events |  2 ++
+> > >>   2 files changed, 94 insertions(+)
+> > >>
+> > >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> > >> index e30bd8768701..133bb5b1b3b2 100644
+> > >> --- a/hw/vfio/migration.c
+> > >> +++ b/hw/vfio/migration.c
+> > >> @@ -8,12 +8,15 @@
+> > >>    */
+> > >>   
+> > >>   #include "qemu/osdep.h"
+> > >> +#include "qemu/main-loop.h"
+> > >> +#include "qemu/cutils.h"
+> > >>   #include <linux/vfio.h>
+> > >>   
+> > >>   #include "sysemu/runstate.h"
+> > >>   #include "hw/vfio/vfio-common.h"
+> > >>   #include "cpu.h"
+> > >>   #include "migration/migration.h"
+> > >> +#include "migration/vmstate.h"
+> > >>   #include "migration/qemu-file.h"
+> > >>   #include "migration/register.h"
+> > >>   #include "migration/blocker.h"
+> > >> @@ -24,6 +27,17 @@
+> > >>   #include "pci.h"
+> > >>   #include "trace.h"
+> > >>   
+> > >> +/*
+> > >> + * Flags used as delimiter:
+> > >> + * 0xffffffff => MSB 32-bit all 1s
+> > >> + * 0xef10     => emulated (virtual) function IO
+> > >> + * 0x0000     => 16-bits reserved for flags
+> > >> + */
+> > >> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
+> > >> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
+> > >> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+> > >> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+> > >> +
+> > >>   static void vfio_migration_region_exit(VFIODevice *vbasedev)
+> > >>   {
+> > >>       VFIOMigration *migration = vbasedev->migration;
+> > >> @@ -126,6 +140,65 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+> > >>       return 0;
+> > >>   }
+> > >>   
+> > >> +/* ---------------------------------------------------------------------- */
+> > >> +
+> > >> +static int vfio_save_setup(QEMUFile *f, void *opaque)
+> > >> +{
+> > >> +    VFIODevice *vbasedev = opaque;
+> > >> +    VFIOMigration *migration = vbasedev->migration;
+> > >> +    int ret;
+> > >> +
+> > >> +    trace_vfio_save_setup(vbasedev->name);
+> > >> +
+> > >> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
+> > >> +
+> > >> +    if (migration->region.mmaps) {
+> > >> +        qemu_mutex_lock_iothread();
+> > >> +        ret = vfio_region_mmap(&migration->region);
+> > >> +        qemu_mutex_unlock_iothread();
+> > >> +        if (ret) {
+> > >> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
+> > >> +                         vbasedev->name, migration->region.nr,
+> > >> +                         strerror(-ret));
+> > >> +            return ret;  
+> > > 
+> > > OTOH to my previous comments, this shouldn't be fatal, right?  mmaps
+> > > are optional anyway so it should be sufficient to push an error report
+> > > to explain why this might be slower than normal, but we can still
+> > > proceed.
+> > >   
+> > 
+> > Right, defining region to be sparse mmap is optional.
+> > migration->region.mmaps is set if vendor driver defines sparse mmapable 
+> > regions and VFIO_REGION_INFO_FLAG_MMAP flag is set. If this flag is set 
+> > then error on mmap() should be fatal.
+> > 
+> > If there is not mmapable region, then migration will proceed.
+> 
+> It's both optional for the vendor to define sparse mmap support (or any
+> mmap support) and optional for the user to make use of it.  The user
+> can recover from an mmap failure by using read/write accesses.  The
+> vendor MUST support this.  It doesn't make sense to worry about
+> aborting the VM in replying to comments for 05/17, where it's not clear
+> how we proceed, yet intentionally cause a fatal error here when there
+> is a very clear path to proceed.
+> 
+> > >> +        }
+> > >> +    }
+> > >> +
+> > >> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_MASK,
+> > >> +                                   VFIO_DEVICE_STATE_SAVING);
+> > >> +    if (ret) {
+> > >> +        error_report("%s: Failed to set state SAVING", vbasedev->name);
+> > >> +        return ret;
+> > >> +    }  
+> > > 
+> > > We seem to be lacking support in the callers for detecting if the
+> > > device is in an error state.  I'm not sure what our options are
+> > > though, maybe only a hw_error().
+> > >   
+> > 
+> > Returning error here fails migration process. And if device is in error 
+> > state, any application running inside VM using this device would fail.
+> > I think, there is no need to take any special action here by detecting 
+> > device error state.
+> 
+> If QEMU knows a device has failed, it seems like it would make sense to
+> stop the VM, otherwise we risk an essentially endless assortment of
+> ways that the user might notice the guest isn't behaving normally, some
+> maybe even causing the user to lose data.  Thanks,
 
-Thanks Mr. Aleksandar. These are really valid points. I'll add these
-updates in v4 of this series.
+With GPUs especially though we can get into messy states where only the
+GPU is toast;  for example you might get this if your GUI
+starts/exits/crashes during a migration - that's a bit too common to
+kill a VM that might have useful data on it.
 
-Best regards,
-Ahmed Karaman
+Dave
+
+> Alex
+>  
+> > >> +
+> > >> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > >> +
+> > >> +    ret = qemu_file_get_error(f);
+> > >> +    if (ret) {
+> > >> +        return ret;
+> > >> +    }
+> > >> +
+> > >> +    return 0;
+> > >> +}
+> > >> +
+> > >> +static void vfio_save_cleanup(void *opaque)
+> > >> +{
+> > >> +    VFIODevice *vbasedev = opaque;
+> > >> +    VFIOMigration *migration = vbasedev->migration;
+> > >> +
+> > >> +    if (migration->region.mmaps) {
+> > >> +        vfio_region_unmap(&migration->region);
+> > >> +    }
+> > >> +    trace_vfio_save_cleanup(vbasedev->name);
+> > >> +}
+> > >> +
+> > >> +static SaveVMHandlers savevm_vfio_handlers = {
+> > >> +    .save_setup = vfio_save_setup,
+> > >> +    .save_cleanup = vfio_save_cleanup,
+> > >> +};
+> > >> +
+> > >> +/* ---------------------------------------------------------------------- */
+> > >> +
+> > >>   static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> > >>   {
+> > >>       VFIODevice *vbasedev = opaque;
+> > >> @@ -180,6 +253,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+> > >>                                  struct vfio_region_info *info)
+> > >>   {
+> > >>       int ret;
+> > >> +    char id[256] = "";
+> > >>   
+> > >>       vbasedev->migration = g_new0(VFIOMigration, 1);
+> > >>   
+> > >> @@ -192,6 +266,24 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+> > >>           return ret;
+> > >>       }
+> > >>   
+> > >> +    if (vbasedev->ops->vfio_get_object) {  
+> > > 
+> > > Nit, vfio_migration_region_init() would have failed already if this were
+> > > not available.  Perhaps do the test once at the start of this function
+> > > instead?  Thanks,
+> > >   
+> > 
+> > Ok, will do that.
+> > 
+> > Thanks,
+> > Kirti
+> > 
+> > 
+> > > Alex
+> > >   
+> > >> +        Object *obj = vbasedev->ops->vfio_get_object(vbasedev);
+> > >> +
+> > >> +        if (obj) {
+> > >> +            DeviceState *dev = DEVICE(obj);
+> > >> +            char *oid = vmstate_if_get_id(VMSTATE_IF(dev));
+> > >> +
+> > >> +            if (oid) {
+> > >> +                pstrcpy(id, sizeof(id), oid);
+> > >> +                pstrcat(id, sizeof(id), "/");
+> > >> +                g_free(oid);
+> > >> +            }
+> > >> +        }
+> > >> +    }
+> > >> +    pstrcat(id, sizeof(id), "vfio");
+> > >> +
+> > >> +    register_savevm_live(id, VMSTATE_INSTANCE_ID_ANY, 1, &savevm_vfio_handlers,
+> > >> +                         vbasedev);
+> > >>       vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> > >>                                                             vbasedev);
+> > >>       vbasedev->migration_state.notify = vfio_migration_state_notifier;
+> > >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> > >> index bd3d47b005cb..86c18def016e 100644
+> > >> --- a/hw/vfio/trace-events
+> > >> +++ b/hw/vfio/trace-events
+> > >> @@ -149,3 +149,5 @@ vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
+> > >>   vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
+> > >>   vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+> > >>   vfio_migration_state_notifier(const char *name, const char *state) " (%s) state %s"
+> > >> +vfio_save_setup(const char *name) " (%s)"
+> > >> +vfio_save_cleanup(const char *name) " (%s)"  
+> > >   
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
