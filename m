@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C44C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E175C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DECAB206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE98F206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p+RuJNwr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DECAB206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N7qHoavy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE98F206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jougX-0005cA-4N
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:10:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54578)
+	id 1jougZ-0005gb-4y
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:10:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joufe-0004M4-Rk
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:58 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37713)
+ id 1jouff-0004MH-P0
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:59 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46722)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1joufd-00042T-4n
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:58 -0400
-Received: by mail-pf1-x443.google.com with SMTP id j1so5086375pfe.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 13:09:56 -0700 (PDT)
+ id 1joufe-000443-5Q
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:09:59 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b16so5060093pfi.13
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 13:09:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hxw6BjVwQMIa1uoPxedqx8XGWOQD0NGxS2kvL4q3yy8=;
- b=p+RuJNwrhJwZzEjMil2KSK43gxw9c+9Cn27jYyvT7FTHmrnzki4Un4F4HvfliyZTfh
- zXg3MOoJ+ONJRbRqBL+3x/DlskkOFR5Pv03YSLmatXGGMw3clTstv9gJr4m/vWUkDZEF
- CBH7TvujTskzBLKxmyLPmM7vz5Oo9h3Poeiv71ZablgVXZIPmYqo777WsK6qOPK50nde
- SmUXWbP9JsnlKn74DgQeHsaZ5mjwr+9R1fj4cXkmHMS+cuZzUWSTM2wt4vIHVpHZN8o8
- ul4nASLcZ7/qGz/SGDT5xixR7NfFPCAHQfBDw6F46jXdXo7vBfac0kn3xXk3fqVLna0w
- Cvqw==
+ bh=SW802rsBjyjH3nSM8zwvWR8Kt24bL/tDHyeHn/2Y6L4=;
+ b=N7qHoavy76cIFRRnP7H8p2TP83RVrVKT4yO7yN3Hg85MvuXYyNU91RAGg4g6RJMjUq
+ 9UiS/9BG5IO2nfY4OA6Gq+5Gc9667D1p+DCxWjtCBD6Bc59Q5r+G1JU1SRjJiyZ95TW0
+ HWgIRYzhpCchKvuT/69134fepgDiQSsf8I7XkePCga8MJAMtSf/TWY5fknSG7hM1m71Q
+ Q+4PaBB6ZiWSDCBZZCeBz2/L4Axzv2pixXMqkLxyVoXbiH6WE56ZM7Ihfru49fCrIhOa
+ 1XWhH5enJkSd9NoW/AZuhQLg5TDJnNN2SvDK5k7tfsIip4+Dhd1z/wK0dGCFZQDJUzWE
+ 7TfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hxw6BjVwQMIa1uoPxedqx8XGWOQD0NGxS2kvL4q3yy8=;
- b=U4AINskNL5PbOouh5ucX2DuQVaz2cEFcoCqfXrjmlt7nYwPyuYtAfzDMSJ7Ls3fdKr
- NkMjMpJ2Vx6hsjTJI5TX2+hIo7FQ3E1NJemGbDYC78ncZfxZhG54YiL/gBd0A1FWdOPC
- Y+fLHKbvgUR46sUN5S8VnCv8wI5oo75mKcmBSdlmRtBCbAgVSlaXJfwrDeyPcChcTvn7
- htOGF44Ri0Ui1cwQcFfWO+xqmHTbUD1J6oMdhJpqD49riuna0f/65IeUMs24D6Qax9JZ
- jM2CDi9qWa6hQHftN5dcjvichU+zK7Zf2vWjEOUebczGkChcWXlAoTbivZMW3GXgkcMJ
- tXQg==
-X-Gm-Message-State: AOAM531P8h4NmKeIhb/PyiCJwL2EPtv0rDn4wSzMLtBzeTuNIoVN0GoC
- msVvXXTvu40HANHN+uau1vPkIzy2YW0=
-X-Google-Smtp-Source: ABdhPJySL9DB2KuzQm4AqOozxNZFtkP0eB09mp1/CHx78taMbXTCz5oaVyoh9Itih5DIfoAWn+ufFg==
-X-Received: by 2002:a62:ea14:: with SMTP id t20mr813019pfh.264.1593202195174; 
- Fri, 26 Jun 2020 13:09:55 -0700 (PDT)
+ bh=SW802rsBjyjH3nSM8zwvWR8Kt24bL/tDHyeHn/2Y6L4=;
+ b=Mk/2Q2Nm6oS5bQBwQAvxxJyg2LGXMBMkUHjaRbP29h9DiQs/wcaUTp9fFweI2r+k45
+ vMmyHHrulbif0LBpzLoznQmOJiCU/jJmhTGB+NzL6b6THTRxtxQIEEPNM1ee9uuXLYY3
+ Yrl9GQI5CKdh+tOlnQyQzA7ZswIfc3JZrcSjX3WuhzzAwKAWRNfrKDMhWFKE6arkivkR
+ ZOHeozVJrmxm3jzevHwTHcEZyJ8MjubVOWhNp/rTSNvjza0U5VEtValXty69YjBOsoGn
+ WxbLmW3Q3d/w0PHX8cmf07InbUbasbp7ZMeYr4IecMUEVyQ9N4D+yu7mMP5Fxa44Dz6f
+ xGOA==
+X-Gm-Message-State: AOAM531cxfLkjzSxJvrlzK5lxOwICR3NO00J9m+7rLtKYwXn49eGG/Go
+ +BOCDJSQqsFWjuQycDADzU4jlUTES0k=
+X-Google-Smtp-Source: ABdhPJxwx1bqsjUFmUaJMqD7eI0VJ6arOGJwYBAk3Vx3zJmmhqFdqSw4cvnrC+nc8BOiiBF94tMczw==
+X-Received: by 2002:aa7:9289:: with SMTP id j9mr4573050pfa.124.1593202196355; 
+ Fri, 26 Jun 2020 13:09:56 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id n8sm23879405pgi.18.2020.06.26.13.09.54
+ by smtp.gmail.com with ESMTPSA id n8sm23879405pgi.18.2020.06.26.13.09.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 13:09:54 -0700 (PDT)
+ Fri, 26 Jun 2020 13:09:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] tests/qht-bench: Adjust testing rate by -1
-Date: Fri, 26 Jun 2020 13:09:49 -0700
-Message-Id: <20200626200950.1015121-2-richard.henderson@linaro.org>
+Subject: [PATCH v2 2/2] tests/qht-bench: Adjust threshold computation
+Date: Fri, 26 Jun 2020 13:09:50 -0700
+Message-Id: <20200626200950.1015121-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200626200950.1015121-1-richard.henderson@linaro.org>
 References: <20200626200950.1015121-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,90 +105,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the seed must be non-zero, subtracting 1 means puts the
-rate in 0..UINT64_MAX-1, which allows the 0 and UINT64_MAX
-thresholds to corrspond to 0% (never) and 100% (always).
+In 06c4cc3660b3, we split the multiplication in two parts to avoid
+a clang warning.  But because double still rounds to 53 bits, this
+does not provide additional precision beyond multiplication by
+nextafter(0x1p64, 0), the largest representable value smaller
+than 2**64.
 
-Suggested-by: Emilio G. Cota <cota@braap.org>
+However, since we have eliminated 1.0, mutiplying by 2**64 produces
+a better distribution of input values to the output values.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/qht-bench.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ tests/qht-bench.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index eb88a90137..ad885d89d0 100644
+index ad885d89d0..362f03cb03 100644
 --- a/tests/qht-bench.c
 +++ b/tests/qht-bench.c
-@@ -25,7 +25,13 @@ struct thread_stats {
- struct thread_info {
-     void (*func)(struct thread_info *);
-     struct thread_stats stats;
--    uint64_t r;
+@@ -289,11 +289,25 @@ static void pr_params(void)
+ 
+ static void do_threshold(double rate, uint64_t *threshold)
+ {
 +    /*
-+     * Seed is in the range [1..UINT64_MAX], because the RNG requires
-+     * a non-zero seed.  To use, subtract 1 and compare against the
-+     * threshold with </>=.  This lets threshold = 0 never match (0% hit),
-+     * and threshold = UINT64_MAX always match (100% hit).
++     * For 0 <= rate <= 1, scale to fit in a uint64_t.
++     *
++     * Scale by 2**64, with a special case for 1.0.
++     * The remainder of the possible values are scattered between 0
++     * and 0xfffffffffffff800 (nextafter(0x1p64, 0)).
++     *
++     * Note that we cannot simply scale by UINT64_MAX, because that
++     * value is not representable as an IEEE double value.
++     *
++     * If we scale by the next largest value, nextafter(0x1p64, 0),
++     * then the remainder of the possible values are scattered between
++     * 0 and 0xfffffffffffff000.  Which leaves us with a gap between
++     * the final two inputs that is twice as large as any other.
 +     */
-+    uint64_t seed;
-     bool write_op; /* writes alternate between insertions and removals */
-     bool resize_down;
- } QEMU_ALIGNED(64); /* avoid false sharing among threads */
-@@ -131,8 +137,9 @@ static uint64_t xorshift64star(uint64_t x)
- static void do_rz(struct thread_info *info)
- {
-     struct thread_stats *stats = &info->stats;
-+    uint64_t r = info->seed - 1;
- 
--    if (info->r < resize_threshold) {
-+    if (r < resize_threshold) {
-         size_t size = info->resize_down ? resize_min : resize_max;
-         bool resized;
- 
-@@ -151,13 +158,14 @@ static void do_rz(struct thread_info *info)
- static void do_rw(struct thread_info *info)
- {
-     struct thread_stats *stats = &info->stats;
-+    uint64_t r = info->seed - 1;
-     uint32_t hash;
-     long *p;
- 
--    if (info->r >= update_threshold) {
-+    if (r >= update_threshold) {
-         bool read;
- 
--        p = &keys[info->r & (lookup_range - 1)];
-+        p = &keys[r & (lookup_range - 1)];
-         hash = hfunc(*p);
-         read = qht_lookup(&ht, p, hash);
-         if (read) {
-@@ -166,7 +174,7 @@ static void do_rw(struct thread_info *info)
-             stats->not_rd++;
-         }
+     if (rate == 1.0) {
+         *threshold = UINT64_MAX;
      } else {
--        p = &keys[info->r & (update_range - 1)];
-+        p = &keys[r & (update_range - 1)];
-         hash = hfunc(*p);
-         if (info->write_op) {
-             bool written = false;
-@@ -208,7 +216,7 @@ static void *thread_func(void *p)
- 
-     rcu_read_lock();
-     while (!atomic_read(&test_stop)) {
--        info->r = xorshift64star(info->r);
-+        info->seed = xorshift64star(info->seed);
-         info->func(info);
+-        *threshold = (rate * 0xffff000000000000ull)
+-                   + (rate * 0x0000ffffffffffffull);
++        *threshold = rate * 0x1p64;
      }
-     rcu_read_unlock();
-@@ -221,7 +229,7 @@ static void *thread_func(void *p)
- static void prepare_thread_info(struct thread_info *info, int i)
- {
-     /* seed for the RNG; each thread should have a different one */
--    info->r = (i + 1) ^ time(NULL);
-+    info->seed = (i + 1) ^ time(NULL);
-     /* the first update will be a write */
-     info->write_op = true;
-     /* the first resize will be down */
+ }
+ 
 -- 
 2.25.1
 
