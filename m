@@ -2,86 +2,71 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEB1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C15E6C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:15:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA33F204EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:10:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zDJHILnw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA33F204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9841E207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:15:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9841E207FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jors1-0001iu-2R
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:10:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37560)
+	id 1jorwU-0003So-T3
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:15:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jorrQ-0001IW-74
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:09:56 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40453)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jorrN-00084s-Sw
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:09:55 -0400
-Received: by mail-pf1-x443.google.com with SMTP id u5so4904380pfn.7
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 10:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=EvAUDqwpoFqGrtryxitUaLeigBIhi7ip9x0IrHUD61Y=;
- b=zDJHILnwduDcH6RBmJa8r6fjAIUIfHZDu47c5dmFEBPaHEL7sYlAYCdK5d0fbtFL35
- yKDKdzkgrk8r677LgeSTmJdkgfD2QHTaPyFEBWJpQIOhFlLcNkxrSBbY6Fzjxg1vTWFb
- rX0HnsJkuK4XoFvovdSobkY1HifiBWgvX6CCeOrU4GHjmZYOGQATeLEfgWm6db2dg0zT
- oA3TbevuYEvyeUp8Hef0/52zp4sdMg1rwgnRduz9fVc89j4lb+p5TmXTbqVUzUoUnKO8
- esskhyGpHTCu2weNjKnE3dSYztRk2HWRnfSLhHe8HjR7ntA3cVGIn1s/2acXcSHhJZuI
- vLLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=EvAUDqwpoFqGrtryxitUaLeigBIhi7ip9x0IrHUD61Y=;
- b=c9MMShb30Z5eeEBFwk6ScGKrfyIA9I9jc94GU0AHI01WHGH5EZeV7ywRJdLhgr+U3T
- v+9v6GVx9/19u0I6s8QD/nTogob6ucuE7fvr7i+xGcNbbRYs+difR4aOdKab7agDANrS
- 9PEt4KFUBeHIknLZ+84llFESnfmzVNBuZbC6yXWMm/qp1w88d2WK/h7wp+3+/5z5zyP1
- JevqzkR4x+AVdERdWSIlirm8q1kQuxY0TZcYdUaB8bvWMppF5A4w3yPQ9OZRLqSKlmPO
- Aoi4edZPgKCfUqvI7PUh+rhiQ/g68CUo/APibHaU2b6MxxO1w8JyAol/gwq8y1ZnUuiY
- yW/A==
-X-Gm-Message-State: AOAM530k2EDPcGpRlpTVqYj8dZbmH/m3hMI0FW/VSWeRTgIiD4lGhIKO
- 8WcIt30P4ZFkS6wyMgYL4BjLmXQ0V+lNAw==
-X-Google-Smtp-Source: ABdhPJx1lNkqHIt0Ors+/xf4eTr5kY2vEClMLQ5YEZN6ovjGLI9owQOfPGwKNEgFU1OpCK+YVCHmWA==
-X-Received: by 2002:a62:3814:: with SMTP id f20mr3706179pfa.278.1593191391031; 
- Fri, 26 Jun 2020 10:09:51 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:78b5:2b0a:b9c6:c392])
- by smtp.gmail.com with ESMTPSA id f18sm9941430pgv.84.2020.06.26.10.09.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 10:09:50 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] util/coroutine: Cleanup start_switch_fiber_ for TSAN.
-Date: Fri, 26 Jun 2020 13:00:01 -0400
-Message-Id: <20200626170001.27017-1-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=robert.foley@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jorvm-0002pl-4p; Fri, 26 Jun 2020 13:14:26 -0400
+Resent-Date: Fri, 26 Jun 2020 13:14:26 -0400
+Resent-Message-Id: <E1jorvm-0002pl-4p@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21351)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jorvj-0001RX-Lr; Fri, 26 Jun 2020 13:14:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593191649; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=bcTqcraWpPT3CSvrApE+DrEGdpvbrSBnZ52003/fs7H3nD0egupXZd7RVMZlN65K3VDXCnlFGfaVnQVGD+gUbFCiG8+6bq5TUNQLIF/bJ9DiLqYp7gTicqLTZkVdfZvLzKUo2fUQlLaWO8iHxY6Mzd7a36o/yxP/S/XiatBiwDk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593191649;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=iucCjwuOQUcOYHYNNsBtYzDrorQMb24BUVS4156G7Rk=; 
+ b=RFbDHUCq1RwluEdLmRoK/gzIwAkr8lAJdUMpMBfYQEZ179FeHQOFtmmcGQ7xluFYzLnrhUehT1Fg1A/wDQGvjcJSJu2THGkBy813g/WjzBf593PccIjayxsXQCwDY2Va1nVRZzBE+vR7W1B4q84irwF1Ikn4Y8JwTsz9YCrsZdg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593191646466537.5859599079076;
+ Fri, 26 Jun 2020 10:14:06 -0700 (PDT)
+Message-ID: <159319164524.28361.5851643086439432186@d1fd068a5071>
+Subject: Re: [PATCH v5 00/15] hw/sd/sdcard: Fix CVE-2020-13253 & cleanups
+In-Reply-To: <20200626164026.766-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: f4bug@amsat.org
+Date: Fri, 26 Jun 2020 10:14:06 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 11:53:00
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,142 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, robert.foley@linaro.org, cota@braap.org,
- Stefan Hajnoczi <stefanha@redhat.com>, peter.puhov@linaro.org,
- alex.bennee@linaro.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a cleanup patch to follow-up the patch which introduced TSAN.
-This patch makes separate start_switch_fiber_ functions for TSAN and ASAN.
-
-This does two things:
-1. Unrelated ASAN and TSAN code is separate and each function only
-   has arguments that are actually needed.
-2. The co->tsan_caller_fiber and co->tsan_co_fiber fields are only
-   access from within #ifdef CONFIG_TSAN.
-
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- util/coroutine-ucontext.c | 52 +++++++++++++++++++++++++--------------
- 1 file changed, 34 insertions(+), 18 deletions(-)
-
-diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
-index 613f4c118e..bac164d1f1 100644
---- a/util/coroutine-ucontext.c
-+++ b/util/coroutine-ucontext.c
-@@ -47,8 +47,10 @@ typedef struct {
-     size_t stack_size;
-     sigjmp_buf env;
- 
-+#ifdef CONFIG_TSAN
-     void *tsan_co_fiber;
-     void *tsan_caller_fiber;
-+#endif
- 
- #ifdef CONFIG_VALGRIND_H
-     unsigned int valgrind_stack_id;
-@@ -72,7 +74,10 @@ union cc_arg {
-     int i[2];
- };
- 
--/* QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it. */
-+/*
-+ * QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it.
-+ * always_inline is required to avoid TSan runtime fatal errors.
-+ */
- static inline __attribute__((always_inline))
- void on_new_fiber(CoroutineUContext *co)
- {
-@@ -82,6 +87,7 @@ void on_new_fiber(CoroutineUContext *co)
- #endif
- }
- 
-+/* always_inline is required to avoid TSan runtime fatal errors. */
- static inline __attribute__((always_inline))
- void finish_switch_fiber(void *fake_stack_save)
- {
-@@ -104,18 +110,29 @@ void finish_switch_fiber(void *fake_stack_save)
- #endif
- }
- 
--static inline __attribute__((always_inline)) void start_switch_fiber(
--    CoroutineAction action, void **fake_stack_save,
--    const void *bottom, size_t size, void *new_fiber)
-+/* always_inline is required to avoid TSan runtime fatal errors. */
-+static inline __attribute__((always_inline))
-+void start_switch_fiber_asan(CoroutineAction action, void **fake_stack_save,
-+                             const void *bottom, size_t size)
- {
- #ifdef CONFIG_ASAN
-     __sanitizer_start_switch_fiber(
-             action == COROUTINE_TERMINATE ? NULL : fake_stack_save,
-             bottom, size);
- #endif
-+}
-+
-+/* always_inline is required to avoid TSan runtime fatal errors. */
-+static inline __attribute__((always_inline))
-+void start_switch_fiber_tsan(void **fake_stack_save,
-+                             CoroutineUContext *co,
-+                             bool caller)
-+{
- #ifdef CONFIG_TSAN
--    void *curr_fiber =
--        __tsan_get_current_fiber();
-+    void *new_fiber = caller ?
-+                      co->tsan_caller_fiber :
-+                      co->tsan_co_fiber;
-+    void *curr_fiber = __tsan_get_current_fiber();
-     __tsan_acquire(curr_fiber);
- 
-     *fake_stack_save = curr_fiber;
-@@ -139,12 +156,9 @@ static void coroutine_trampoline(int i0, int i1)
- 
-     /* Initialize longjmp environment and switch back the caller */
-     if (!sigsetjmp(self->env, 0)) {
--        start_switch_fiber(
--            COROUTINE_YIELD,
--            &fake_stack_save,
--            leader.stack,
--            leader.stack_size,
--            self->tsan_caller_fiber);
-+        start_switch_fiber_asan(COROUTINE_YIELD, &fake_stack_save, leader.stack,
-+                                leader.stack_size);
-+        start_switch_fiber_tsan(&fake_stack_save, self, true); /* true=caller */
-         siglongjmp(*(sigjmp_buf *)co->entry_arg, 1);
-     }
- 
-@@ -199,10 +213,10 @@ Coroutine *qemu_coroutine_new(void)
- 
-     /* swapcontext() in, siglongjmp() back out */
-     if (!sigsetjmp(old_env, 0)) {
--        start_switch_fiber(
--            COROUTINE_YIELD,
--            &fake_stack_save,
--            co->stack, co->stack_size, co->tsan_co_fiber);
-+        start_switch_fiber_asan(COROUTINE_YIELD, &fake_stack_save, co->stack,
-+                                co->stack_size);
-+        start_switch_fiber_tsan(&fake_stack_save,
-+                                co, false); /* false=not caller */
-         swapcontext(&old_uc, &uc);
-     }
- 
-@@ -259,8 +273,10 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine *to_,
- 
-     ret = sigsetjmp(from->env, 0);
-     if (ret == 0) {
--        start_switch_fiber(action, &fake_stack_save,
--                           to->stack, to->stack_size, to->tsan_co_fiber);
-+        start_switch_fiber_asan(action, &fake_stack_save, to->stack,
-+                                to->stack_size);
-+        start_switch_fiber_tsan(&fake_stack_save,
-+                                to, false); /* false=not caller */
-         siglongjmp(to->env, action);
-     }
- 
--- 
-2.17.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNjE2NDAyNi43NjYt
+MS1mNGJ1Z0BhbXNhdC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXIt
+cXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
+cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
+b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRXT1JL
+PTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0IE5F
+VFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKcWVtdS1zeXN0ZW0tYWFyY2g2NDogL3Rt
+cC9xZW11LXRlc3Qvc3JjL2h3L3NkL3NkLmM6NTQ2OiBzZF9hZGRyX3RvX3dwbnVtOiBBc3NlcnRp
+b24gYGFkZHIgPCBzZC0+c2l6ZScgZmFpbGVkLgpCcm9rZW4gcGlwZQovdG1wL3FlbXUtdGVzdC9z
+cmMvdGVzdHMvcXRlc3QvbGlicXRlc3QuYzoxNzU6IGtpbGxfcWVtdSgpIGRldGVjdGVkIFFFTVUg
+ZGVhdGggZnJvbSBzaWduYWwgNiAoQWJvcnRlZCkgKGNvcmUgZHVtcGVkKQpFUlJPUiAtIHRvbyBm
+ZXcgdGVzdHMgcnVuIChleHBlY3RlZCA2NiwgZ290IDApCm1ha2U6ICoqKiBbY2hlY2stcXRlc3Qt
+YWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
+LgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwODAKICBURVNUICAgIGlvdGVzdC1xY293MjogMDg2
+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vz
+cy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAn
+cnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD00MzQ4ZWY3MDc1ZDY0ODk0
+YjRhNzI5NGRhN2EwNzYyYycsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2Nv
+bXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRS
+QV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJV
+Rz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNo
+ZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90
+bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWY1ZXQ4MDVu
+L3NyYy9kb2NrZXItc3JjLjIwMjAtMDYtMjYtMTIuNTkuMTkuMTczMzQ6L3Zhci90bXAvcWVtdTp6
+LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10n
+IHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1j
+b20ucWVtdS5pbnN0YW5jZS51dWlkPTQzNDhlZjcwNzVkNjQ4OTRiNGE3Mjk0ZGE3YTA3NjJjCm1h
+a2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9y
+eSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWY1ZXQ4MDVuL3NyYycKbWFrZTogKioqIFtk
+b2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxNG00Ni4xMzRz
+CnVzZXIgICAgMG05LjA4MHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
+YXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjI2MTY0MDI2Ljc2Ni0xLWY0YnVnQGFtc2F0Lm9yZy90ZXN0
+aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
