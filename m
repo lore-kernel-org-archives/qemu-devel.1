@@ -2,79 +2,78 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3750C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3412C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77F7F207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F7F207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 85B52207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:32:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B52207E8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jouvY-0008NU-Pa
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:26:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57848)
+	id 1jov1m-0001MQ-S6
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:32:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jouut-0007t8-Q9
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:25:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48900)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jouur-0000tS-Du
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:25:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jouun-0007dj-MB
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 20:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A2B472E80E7
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 20:25:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jov18-0000wj-2o
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:32:10 -0400
+Resent-Date: Fri, 26 Jun 2020 16:32:10 -0400
+Resent-Message-Id: <E1jov18-0000wj-2o@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jov14-0003Tf-7o
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:32:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593203511; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=hBTO2X9nGob5kYRxq4L7oLaVYMtlDPpDXlt74kyn+dabBfItByVzzwCCs3LmiZVf9XVA1kGwdyZQh5UXyqG7dMpOIMvW6zSximY7sUwBQHAOFZPB1Ia6J7v1Holqv6xl6XQRCXSHs1NvDvJi3lKSm+NAg5kmqV+bDzsJrjvzhxc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593203511;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=JPdfUwZbAQbSrIgM/WOfLWKpYZyUfkdnFiyV9/ks+gM=; 
+ b=UTemmvcDprlYkIqfHzWjPg4jynxVrfzvdfnro3jH5cmwQFoyi8l7NlEIOZV/BUbfMDjJDLQRm3gKWhFg87VhufIHCdWE3fsc1iBlWLSaAsLwHBDx9AwMPijX+BZqNCE0BL+e6s0yAUFAAOdH7QZRSke9FtWjTzc2Lw4zyDgi7Bo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593203510659887.5380285296804;
+ Fri, 26 Jun 2020 13:31:50 -0700 (PDT)
+Message-ID: <159320350941.31217.10032175224062882642@d1fd068a5071>
+Subject: Re: [PATCH] util/qemu-error: prepend guest name to error message to
+ identify affected VM owner
+In-Reply-To: <20200626201900.8876-1-msmarduch@digitalocean.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Jun 2020 20:17:09 -0000
-From: Langston <1885332@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: langston0
-X-Launchpad-Bug-Reporter: Langston (langston0)
-X-Launchpad-Bug-Modifier: Langston (langston0)
-Message-Id: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
-Subject: [Bug 1885332] [NEW] Error in user-mode calculation of ELF aux
- vector's AT_PHDR
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 04d615ba9220e18954ba3e2bd5aec8a5398e2763
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 16:25:38
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: msmarduch@digitalocean.com
+Date: Fri, 26 Jun 2020 13:31:50 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 16:21:37
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,252 +82,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, msmarduch@digitalocean.com,
+ qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-
-I have an (admittedly strange) statically-linked ELF binary for Linux that =
-runs just fine on top of the Linux kernel in QEMU full-system emulation, bu=
-t crashes before main in user-mode emulation. Specifically, it crashes when=
- initializing thread-local storage in glibc's _dl_aux_init, because it read=
-s out a strange value from the AT_PHDR entry of the ELF aux vector.
-
-The binary has these program headers:
-
-  Program Headers:
-    Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-    EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
-    PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1000
-    LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1000
-    LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x100=
-00
-    LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x100=
-00
-    NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
-    TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
-    GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
-    GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
-    LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1000
-    LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1000
-
-If I build the Linux kernel with the following patch to the very end of
-create_elf_tables in fs/binfmt_elf.c
-
-  /* Put the elf_info on the stack in the right place.  */
-  elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
-  int i;
-  for (i =3D 0; i < 15; i++) {
-    printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
-  }
-  if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
-      return -EFAULT;
-  return 0;
-
-and run it like this:
-
-  qemu-system-arm \
-    -M versatilepb \
-    -nographic \
-    -dtb ./dts/versatile-pb.dtb \
-    -kernel zImage \
-    -M versatilepb \
-    -m 128M \
-    -append "earlyprintk=3Dvga,keep" \
-    -initrd initramfs
-
-after I've built the kernel initramfs like this (where "init" is the
-binary in question):
-
-  make ARCH=3Darm versatile_defconfig
-  make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
-  cp "$1" arch/arm/boot/init
-  cd arch/arm/boot
-  echo init | cpio -o --format=3Dnewc > initramfs
-
-then I get the following output. This is the kernel's view of the aux
-vector for this binary:
-
-  0x10 =3D 0x1d7
-  0x6 =3D 0x1000
-  0x11 =3D 0x64
-  0x3 =3D 0x900000
-  0x4 =3D 0x20
-  0x5 =3D 0xb
-  0x7 =3D 0x0
-  0x8 =3D 0x0
-  0x9 =3D 0x101b8
-  0xb =3D 0x0
-  0xc =3D 0x0
-  0xd =3D 0x0
-  0xe =3D 0x0
-  0x17 =3D 0x0
-  0x19 =3D 0xbec62fb5
-
-However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at the
-aux vector at the beginning of __libc_start_init (for example, using
-this Python GDB API script: https://gist.github.com/langston-
-barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
-values:
-
-  AT_PHDR =3D 0xae000
-  AT_PHENT =3D 0x20
-  AT_PHNUM =3D 0xb
-  AT_PAGESZ =3D 0x1000
-  AT_BASE =3D 0x0
-  AT_FLAGS =3D 0x0
-  AT_ENTRY =3D 0x10230
-  AT_UID =3D 0x3e9
-  AT_EUID =3D 0x3e9
-  AT_GID =3D 0x3e9
-  AT_EGID =3D 0x3e9
-  AT_HWCAP =3D 0x1fb8d7
-  AT_CLKTCK =3D 0x64
-  AT_RANDOM =3D -0x103c0
-  AT_HWCAP2 =3D 0x1f
-  AT_NULL =3D 0x0
-
-The crucial difference is in AT_PHDR (0x3), which is indeed the virtual
-address of the PHDR segment when the kernel calculates it, but is not
-when QEMU calculates it.
-
-qemu-arm --version
-qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885332
-
-Title:
-  Error in user-mode calculation of ELF aux vector's AT_PHDR
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
-t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
-but crashes before main in user-mode emulation. Specifically, it crashes wh=
-en initializing thread-local storage in glibc's _dl_aux_init, because it re=
-ads out a strange value from the AT_PHDR entry of the ELF aux vector.
-
-  The binary has these program headers:
-
-    Program Headers:
-      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
-gn
-      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
-      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
-0000
-      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
-0000
-      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
-      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
-      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
-      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
-      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
-000
-      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
-000
-
-  If I build the Linux kernel with the following patch to the very end
-  of create_elf_tables in fs/binfmt_elf.c
-
-    /* Put the elf_info on the stack in the right place.  */
-    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
-    int i;
-    for (i =3D 0; i < 15; i++) {
-      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
-    }
-    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
-        return -EFAULT;
-    return 0;
-
-  and run it like this:
-
-    qemu-system-arm \
-      -M versatilepb \
-      -nographic \
-      -dtb ./dts/versatile-pb.dtb \
-      -kernel zImage \
-      -M versatilepb \
-      -m 128M \
-      -append "earlyprintk=3Dvga,keep" \
-      -initrd initramfs
-
-  after I've built the kernel initramfs like this (where "init" is the
-  binary in question):
-
-    make ARCH=3Darm versatile_defconfig
-    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
-    cp "$1" arch/arm/boot/init
-    cd arch/arm/boot
-    echo init | cpio -o --format=3Dnewc > initramfs
-
-  then I get the following output. This is the kernel's view of the aux
-  vector for this binary:
-
-    0x10 =3D 0x1d7
-    0x6 =3D 0x1000
-    0x11 =3D 0x64
-    0x3 =3D 0x900000
-    0x4 =3D 0x20
-    0x5 =3D 0xb
-    0x7 =3D 0x0
-    0x8 =3D 0x0
-    0x9 =3D 0x101b8
-    0xb =3D 0x0
-    0xc =3D 0x0
-    0xd =3D 0x0
-    0xe =3D 0x0
-    0x17 =3D 0x0
-    0x19 =3D 0xbec62fb5
-
-  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
-  the aux vector at the beginning of __libc_start_init (for example,
-  using this Python GDB API script: https://gist.github.com/langston-
-  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
-  values:
-
-    AT_PHDR =3D 0xae000
-    AT_PHENT =3D 0x20
-    AT_PHNUM =3D 0xb
-    AT_PAGESZ =3D 0x1000
-    AT_BASE =3D 0x0
-    AT_FLAGS =3D 0x0
-    AT_ENTRY =3D 0x10230
-    AT_UID =3D 0x3e9
-    AT_EUID =3D 0x3e9
-    AT_GID =3D 0x3e9
-    AT_EGID =3D 0x3e9
-    AT_HWCAP =3D 0x1fb8d7
-    AT_CLKTCK =3D 0x64
-    AT_RANDOM =3D -0x103c0
-    AT_HWCAP2 =3D 0x1f
-    AT_NULL =3D 0x0
-
-  The crucial difference is in AT_PHDR (0x3), which is indeed the
-  virtual address of the PHDR segment when the kernel calculates it, but
-  is not when QEMU calculates it.
-
-  qemu-arm --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNjIwMTkwMC44ODc2
+LTEtbXNtYXJkdWNoQGRpZ2l0YWxvY2Vhbi5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
+IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBk
+b2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
+bmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICAgIHJh
+aXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJv
+Y2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxh
+YmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MDIwZTdlNWQyOWI2NDAzMmEyYzRkYzgyOThj
+NzJlNzgnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmlu
+ZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJF
+X09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywg
+J1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcv
+aG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6
+JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC16d2ppd2xlYS9zcmMvZG9ja2Vy
+LXNyYy4yMDIwLTA2LTI2LTE2LjI0LjQ2LjExNTAxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11
+OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5v
+bi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0
+YW5jZS51dWlkPTAyMGU3ZTVkMjliNjQwMzJhMmM0ZGM4Mjk4YzcyZTc4Cm1ha2VbMV06ICoqKiBb
+ZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLXp3aml3bGVhL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRl
+c3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDdtNC4zODJzCnVzZXIgICAgMG04LjMz
+MHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
+LzIwMjAwNjI2MjAxOTAwLjg4NzYtMS1tc21hcmR1Y2hAZGlnaXRhbG9jZWFuLmNvbS90ZXN0aW5n
+LmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
