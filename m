@@ -2,69 +2,73 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF4AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE7CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DEC12076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA2102076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QW0c0+C5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DEC12076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNV+RQdL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2102076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joiil-0000GH-Jb
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:24:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57756)
+	id 1joiiq-0000V6-07
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:24:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joihj-0007Mu-SL
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49855
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joiho-0007T5-6v
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29543
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joihg-00034J-6k
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:19 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1joihl-0003Af-VL
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:23:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593156195;
+ s=mimecast20190719; t=1593156201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=qhGaneoHx5il05o01jW1hDOadm2bPogSKu/DKrsEmAc=;
- b=QW0c0+C5aNQWCAuvW+3M+RpERafhzTLnFPuW06mtSlT24MYXDrPGOpC6dDA7x7brs2CNdQ
- KX5CfaEfPVrkV6/X1XV7KwZOGBdBmiLuZYFEqzLDDLVOM8oS4fszIhg5mwJF03gk4JVKPN
- hIH2KQmzJaSwJXgfbSxrw27eTXSLZ4k=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k5gcxusQzyzo3jSltVar2tBWqpPktP5b6qDTjVFvjTk=;
+ b=MNV+RQdLMiMw0yn9jw0Zi+DvjEuJnKrAwXpkzDNLkmabwMIK49wi/FkDnYWkvKRsq1DMhb
+ rebU9kC16WylBojYs7ntiTkoOUOI4wUoIFH+1tOanaiB8Ygel7+ZDpRoXTOtINrIMH93C3
+ b4SSZbwhbyHrtA1LONRjE5uwud5fwBU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-rL45roI1OLesF9PxZX_jrQ-1; Fri, 26 Jun 2020 03:23:11 -0400
-X-MC-Unique: rL45roI1OLesF9PxZX_jrQ-1
+ us-mta-263-V9G5qmFIM82M1WqWRFUFRA-1; Fri, 26 Jun 2020 03:23:19 -0400
+X-MC-Unique: V9G5qmFIM82M1WqWRFUFRA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81D1E1009441;
- Fri, 26 Jun 2020 07:23:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BE368015FB;
+ Fri, 26 Jun 2020 07:23:18 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-35.ams2.redhat.com [10.36.113.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7C6C560C1D;
- Fri, 26 Jun 2020 07:22:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CEDF360C1D;
+ Fri, 26 Jun 2020 07:23:08 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/21] virtio-mem: Paravirtualized memory hot(un)plug
-Date: Fri, 26 Jun 2020 09:22:27 +0200
-Message-Id: <20200626072248.78761-1-david@redhat.com>
+Subject: [PATCH v5 01/21] pc: Support coldplugging of virtio-pmem-pci devices
+ on all buses
+Date: Fri, 26 Jun 2020 09:22:28 +0200
+Message-Id: <20200626072248.78761-2-david@redhat.com>
+In-Reply-To: <20200626072248.78761-1-david@redhat.com>
+References: <20200626072248.78761-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -85,186 +89,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, teawater <teawaterz@linux.alibaba.com>,
- Alex Shi <alex.shi@linux.alibaba.com>, Janosch Frank <frankja@linux.ibm.com>,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Richard Henderson <rth@twiddle.net>, Vivek Goyal <vgoyal@redhat.com>,
- Eric Farman <farman@linux.ibm.com>, Lukas Straub <lukasstraub2@web.de>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the very basic, initial version of virtio-mem. More info on
-virtio-mem in general can be found in the Linux kernel driver v2 posting
-[1] and in patch #10. The Linux driver is now upstream.
+E.g., with "pc-q35-4.2", trying to coldplug a virtio-pmem-pci devices
+results in
+    "virtio-pmem-pci not supported on this bus"
 
-This series now contains a resend of [3]:
-    "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
-     buses"
+Reasons is, that the bus does not support hotplug and, therefore, does
+not have a hotplug handler. Let's allow coldplugging virtio-pmem devices
+on such buses. The hotplug order is only relevant for virtio-pmem-pci
+when the guest is already alive and the device is visible before
+memory_device_plug() wired up the memory device bits.
 
-The patches can be found at:
-    https://github.com/davidhildenbrand/qemu.git virtio-mem-v5
+Hotplug attempts will still fail with:
+    "Error: Bus 'pcie.0' does not support hotplugging"
 
-"The basic idea of virtio-mem is to provide a flexible,
-cross-architecture memory hot(un)plug solution that avoids many limitations
-imposed by existing technologies, architectures, and interfaces."
+Hotunplug attempts will still fail with:
+    "Error: Bus 'pcie.0' does not support hotplugging"
 
-There are a lot of addons in the works (esp. protection of unplugged
-memory, better hugepage support (esp. when reading unplugged memory),
-resizeable memory backends, support for more architectures, ...), this is
-the very basic version to get the ball rolling.
-
-The first patch is a resend. Patches #2-#9 make sure we don't have any
-sudden surprises e.g., if somebody tries to pin all memory in RAM blocks,
-resulting in a higher memory consumption than desired. The remaining
-patches add basic virtio-mem along with support for x86-64. The last patch
-indicates to the guest OS the maximum possible PFN using ACPI SRAT, such
-that Linux can properly enable the swiotlb when booting only with DMA
-memory.
-
-[1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
-[2] https://lkml.kernel.org/r/20200507140139.17083-1-david@redhat.com
-[3] https://lkml.kernel.org/r/20200525084511.51379-1-david@redhat.com
-[3] https://lkml.kernel.org/r/20200610075153.33892-1-david@redhat.com
-
-Cc: teawater <teawaterz@linux.alibaba.com>
+Reported-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-v4 -> v5:
-- Rebased, added acks/rb's
-- "pc: Support coldplugging of virtio-pmem-pci devices on all buses"
--- Included it now, for simplicity
-- "linux-headers: update to contain virtio-mem"
--- Dropped, because header changes are already upstream now
-- "MAINTAINERS: Add myself as virtio-mem maintainer"
--- Reference status page
-
-v3 -> v4
-- Adapt to virtio-mem config layout change (block size now is 64bit)
-- Added "numa: Auto-enable NUMA when any memory devices are possible"
-
-v2 -> v3:
-- Rebased on upstream/[3]
-- "virtio-mem: Exclude unplugged memory during migration"
--- Added
-- "virtio-mem: Paravirtualized memory hot(un)plug"
--- Simplify bitmap operations, find consecutive areas
--- Tweak error messages
--- Reshuffle some checks
--- Minor cleanups
-- "accel/kvm: Convert to ram_block_discard_disable()"
-- "target/i386: sev: Use ram_block_discard_disable()"
--- Keep asserts clean of functional things
-
-v1 -> v2:
-- Rebased to object_property_*() changes
-- "exec: Introduce ram_block_discard_(disable|require)()"
--- Change the function names and rephrase/add comments
-- "virtio-balloon: Rip out qemu_balloon_inhibit()"
--- Add and use "migration_in_incoming_postcopy()"
-- "migration/rdma: Use ram_block_discard_disable()"
--- Add a comment regarding pin_all vs. !pin_all
-- "virtio-mem: Paravirtualized memory hot(un)plug"
--- Replace virtio_mem_discard_inhibited() by
-   migration_in_incoming_postcopy()
--- Drop some asserts
--- Drop virtio_mem_bad_request(), use virtio_error() directly, printing
-   more information
--- Replace "Note: Discarding should never fail ..." comments by
-   error_report()
--- Replace virtio_stw_p() by cpu_to_le16()
--- Drop migration_addr and migration_block_size
--- Minor cleanups
-- "linux-headers: update to contain virtio-mem"
--- Updated to latest v4 in Linux
-- General changes
--- Fixup the users of the renamed ram_block_discard_(disable|require)
--- Use "X: cannot disable RAM discard"-styled error messages
-- Added
--- "virtio-mem: Migration sanity checks"
--- "virtio-mem: Add trace events"
-
-David Hildenbrand (21):
-  pc: Support coldplugging of virtio-pmem-pci devices on all buses
-  exec: Introduce ram_block_discard_(disable|require)()
-  vfio: Convert to ram_block_discard_disable()
-  accel/kvm: Convert to ram_block_discard_disable()
-  s390x/pv: Convert to ram_block_discard_disable()
-  virtio-balloon: Rip out qemu_balloon_inhibit()
-  target/i386: sev: Use ram_block_discard_disable()
-  migration/rdma: Use ram_block_discard_disable()
-  migration/colo: Use ram_block_discard_disable()
-  virtio-mem: Paravirtualized memory hot(un)plug
-  virtio-pci: Proxy for virtio-mem
-  MAINTAINERS: Add myself as virtio-mem maintainer
-  hmp: Handle virtio-mem when printing memory device info
-  numa: Handle virtio-mem in NUMA stats
-  pc: Support for virtio-mem-pci
-  virtio-mem: Allow notifiers for size changes
-  virtio-pci: Send qapi events when the virtio-mem size changes
-  virtio-mem: Migration sanity checks
-  virtio-mem: Add trace events
-  virtio-mem: Exclude unplugged memory during migration
-  numa: Auto-enable NUMA when any memory devices are possible
-
- MAINTAINERS                    |   9 +
- accel/kvm/kvm-all.c            |   4 +-
- balloon.c                      |  17 -
- exec.c                         |  52 ++
- hw/arm/virt.c                  |   2 +
- hw/core/numa.c                 |  17 +-
- hw/i386/Kconfig                |   1 +
- hw/i386/microvm.c              |   1 +
- hw/i386/pc.c                   |  66 +--
- hw/i386/pc_piix.c              |   1 +
- hw/i386/pc_q35.c               |   1 +
- hw/s390x/s390-virtio-ccw.c     |  22 +-
- hw/vfio/ap.c                   |   8 +-
- hw/vfio/ccw.c                  |  11 +-
- hw/vfio/common.c               |  53 +-
- hw/vfio/pci.c                  |   6 +-
- hw/virtio/Kconfig              |  11 +
- hw/virtio/Makefile.objs        |   2 +
- hw/virtio/trace-events         |  10 +
- hw/virtio/virtio-balloon.c     |  10 +-
- hw/virtio/virtio-mem-pci.c     | 157 ++++++
- hw/virtio/virtio-mem-pci.h     |  34 ++
- hw/virtio/virtio-mem.c         | 873 +++++++++++++++++++++++++++++++++
- include/exec/memory.h          |  41 ++
- include/hw/boards.h            |   1 +
- include/hw/pci/pci.h           |   1 +
- include/hw/vfio/vfio-common.h  |   4 +-
- include/hw/virtio/virtio-mem.h |  86 ++++
- include/migration/colo.h       |   2 +-
- include/migration/misc.h       |   2 +
- include/sysemu/balloon.h       |   2 -
- migration/migration.c          |  15 +-
- migration/postcopy-ram.c       |  23 -
- migration/rdma.c               |  18 +-
- migration/savevm.c             |  11 +-
- monitor/hmp-cmds.c             |  16 +
- monitor/monitor.c              |   1 +
- qapi/misc.json                 |  64 ++-
- target/i386/sev.c              |   7 +
- 39 files changed, 1529 insertions(+), 133 deletions(-)
- create mode 100644 hw/virtio/virtio-mem-pci.c
- create mode 100644 hw/virtio/virtio-mem-pci.h
- create mode 100644 hw/virtio/virtio-mem.c
- create mode 100644 include/hw/virtio/virtio-mem.h
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 803bd52ca4..2dfd69b973 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1643,13 +1643,13 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+     Error *local_err = NULL;
+ 
+-    if (!hotplug_dev2) {
++    if (!hotplug_dev2 && dev->hotplugged) {
+         /*
+          * Without a bus hotplug handler, we cannot control the plug/unplug
+-         * order. This should never be the case on x86, however better add
+-         * a safety net.
++         * order. We should never reach this point when hotplugging on x86,
++         * however, better add a safety net.
+          */
+-        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
++        error_setg(errp, "virtio-pmem-pci hotplug not supported on this bus.");
+         return;
+     }
+     /*
+@@ -1658,7 +1658,7 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+      */
+     memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev), NULL,
+                            &local_err);
+-    if (!local_err) {
++    if (!local_err && hotplug_dev2) {
+         hotplug_handler_pre_plug(hotplug_dev2, dev, &local_err);
+     }
+     error_propagate(errp, local_err);
+@@ -1676,9 +1676,11 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+      * device bits.
+      */
+     memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+-    hotplug_handler_plug(hotplug_dev2, dev, &local_err);
+-    if (local_err) {
+-        memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++    if (hotplug_dev2) {
++        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
++        if (local_err) {
++            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++        }
+     }
+     error_propagate(errp, local_err);
+ }
 -- 
 2.26.2
 
