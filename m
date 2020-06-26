@@ -2,91 +2,152 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6224C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E5AC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 08:02:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7006520768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 07:57:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rnCmcQBh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7006520768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9131C20C09
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 08:02:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9131C20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jojEe-0004ub-Nr
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 03:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37018)
+	id 1jojK3-0006it-S1
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 04:02:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1jojDv-0004Mx-8W
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:56:35 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:32806)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1jojDs-0002y2-KX
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 03:56:34 -0400
-Received: by mail-ed1-x544.google.com with SMTP id h28so6222388edz.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 00:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=5u38E07NF7bGvPjr2vXllrKTrw+iDRsVFyrwFK7ZHfU=;
- b=rnCmcQBhVXmVjtSg3Ol6m05Ay4NgC77nXEUFVFrBudysDaL+3hjFO5X2aDSnoLCIfh
- JA0sETdJLDkpPGqvB1Nq4M25ztBBjgQwWrKVtnkNrkZ4MbqGhz3XUtqAJXdNAza9x3/a
- vSkZS8ZCenUR0Wx8+qDC7hf9PkCRh5de/ne1/ftpVkQ8crYonp3nAbkj/zwtzn1Z95Et
- Tbf3UGWmw9zssQmdIonQoWFQ5GbwNsPJAEopRmTj6nt+TZacFrCV4oUxEEyhVAZVV1HH
- PywqS+q06O5cx5cK590K3+mNqe4LWnEsSB0gTZNK+0y3n/Y17MgsUMMy0fIGYMfz8T39
- l+lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=5u38E07NF7bGvPjr2vXllrKTrw+iDRsVFyrwFK7ZHfU=;
- b=uhLxerJx08joL81bULaqiWbPhDqdg1a+wCAF0uj53FpkcixZDQ6llLG1+EdqDFDIhy
- nZG4hwEvu8EhM6b0YUYClhH+arYi8Q/HCjCtLxhRVSHLTelaSGPVoyJ1Iw/wZgv0+dme
- +l9+GYH52JyuTs9GHv3i/ABXWA9hbMFGSlA2pZaAtwOMpcQabWXwvusWuAMkvXOK/tdh
- bmvcUeDKbQsH0Z+6twFyu4Sx9i6aiViWEw4m+jS/gZLxxTcKtz4+VM0qzwu3m5QCAA4E
- jfr8XEphyxSQ1my1gttFZVpIEEVf/sU8jFqOvwgTN9MrokQ6/Z3vMOyeAxDnN1vOOqzJ
- /tqQ==
-X-Gm-Message-State: AOAM533W0UVIiv5KZdAjwvI3lS5mDYZBT4e/xxfsHdv9fXLZA1y69V4w
- ZXrKhriv7oMaCLK4HXaJPS/XPQ==
-X-Google-Smtp-Source: ABdhPJz8vffmO0SGchMV5l1EW9+sNS1BxWRc9+GP9cOdicoRSXPU9H89VJTq/jt2t2HCT7fE694XBA==
-X-Received: by 2002:a50:ee84:: with SMTP id f4mr2016506edr.183.1593158190313; 
- Fri, 26 Jun 2020 00:56:30 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id n16sm9714204ejo.54.2020.06.26.00.56.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 00:56:29 -0700 (PDT)
-Date: Fri, 26 Jun 2020 09:56:17 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v5 0/5] VIRTIO-IOMMU probe request support and MSI bypass
- on ARM
-Message-ID: <20200626075617.GB2107508@myrica>
-References: <20200624132625.27453-1-eric.auger@redhat.com>
- <20200624094510-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jojJR-0006IN-79
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 04:02:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5378)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jojJP-0005MH-4P
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 04:02:16 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05Q7XwML048434
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 04:02:12 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31waw8c8xb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 04:02:11 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q7rBXP122546
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 04:02:11 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31waw8c8w4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 04:02:11 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q80k0u020922;
+ Fri, 26 Jun 2020 08:02:09 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma03ams.nl.ibm.com with ESMTP id 31uus52s7r-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 08:02:09 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05Q827ax3997956
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jun 2020 08:02:07 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 03FDC4C046;
+ Fri, 26 Jun 2020 08:02:07 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A60954C04A;
+ Fri, 26 Jun 2020 08:02:06 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.191.93])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 26 Jun 2020 08:02:06 +0000 (GMT)
+Subject: Re: [PATCH v5 11/12] pc-bios: s390x: Fix bootmap.c passing PSWs as
+ addresses
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200624075226.92728-1-frankja@linux.ibm.com>
+ <20200624075226.92728-12-frankja@linux.ibm.com>
+ <91c99232-91a6-f2f1-d2cc-af26dbb86558@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <88959a67-b5a1-c7fc-ac3e-e4e3f254c7ef@linux.ibm.com>
+Date: Fri, 26 Jun 2020 10:02:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200624094510-mutt-send-email-mst@kernel.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=jean-philippe@linaro.org; helo=mail-ed1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <91c99232-91a6-f2f1-d2cc-af26dbb86558@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Nc9C9ud7dXy3to5GuZ8t9sVnsCwV9o9Dq"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-26_04:2020-06-26,
+ 2020-06-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ clxscore=1015 impostorscore=0 malwarescore=0 cotscore=-2147483648
+ mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006260050
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 04:02:12
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,104 +161,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, peterx@redhat.com,
- armbru@redhat.com, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 09:47:59AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jun 24, 2020 at 03:26:20PM +0200, Eric Auger wrote:
-> > By default the virtio-iommu translates MSI transactions. This
-> > behavior is inherited from ARM SMMU. However the virt machine
-> > code knows where the MSI doorbells are, so we can easily
-> > declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
-> > setting the guest iommu subsystem will not need to map MSIs.
-> > This setup will simplify the VFIO integration.
-> > 
-> > In this series, the ITS or GICV2M doorbells are declared as
-> > HW MSI regions to be bypassed by the VIRTIO-IOMMU.
-> 
-> 
-> > This also paves the way to the x86 integration where the MSI
-> > region, [0xFEE00000,0xFEEFFFFF], will be exposed by the q35
-> > machine.  However this will be handled in a separate series
-> > when not-DT support gets resolved.
-> 
-> What's going on with that btw?
-> I think the next step is to put the spec up for virtio tc vote,
-> then we can merge that, right? acpi parts will need to be
-> ratified by the acpi sig.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Nc9C9ud7dXy3to5GuZ8t9sVnsCwV9o9Dq
+Content-Type: multipart/mixed; boundary="sBRdVlJYnVn3SXodmJ3GxCqmwtP6LQr2j"
 
-Yes I'm being unreasonably slow on this. I'll look at both the virtio spec
-and ACPI after coming back from Holiday in July. I'm afraid the situation
-for the built-in description will be the same on the Linux side (asked to
-use ACPI instead), but it's worth retrying as we have some progress on
-ACPI support.
+--sBRdVlJYnVn3SXodmJ3GxCqmwtP6LQr2j
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Jean
+On 6/25/20 2:46 PM, Thomas Huth wrote:
+> On 24/06/2020 09.52, Janosch Frank wrote:
+>> The component entries written by zipl contain short PSWs, not
+>> addresses. Let's mask them and only pass the address part to
+>> jump_to_IPL_code(uint64_t address) because it expects an address as
+>> visible by the name of the argument.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/bootmap.c | 5 +++--
+>>   pc-bios/s390-ccw/bootmap.h | 2 +-
+>>   2 files changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+>> index 97205674e5..8547a140df 100644
+>> --- a/pc-bios/s390-ccw/bootmap.c
+>> +++ b/pc-bios/s390-ccw/bootmap.c
+>> @@ -10,6 +10,7 @@
+>>  =20
+>>   #include "libc.h"
+>>   #include "s390-ccw.h"
+>> +#include "s390-arch.h"
+>>   #include "bootmap.h"
+>>   #include "virtio.h"
+>>   #include "bswap.h"
+>> @@ -436,7 +437,7 @@ static void zipl_load_segment(ComponentEntry *entr=
+y)
+>>       char *blk_no =3D &err_msg[30]; /* where to print blockno in (tho=
+se ZZs) */
+>>  =20
+>>       blockno =3D entry->data.blockno;
+>> -    address =3D entry->load_address;
+>> +    address =3D entry->psw & PSW_MASK_SHORT_ADDR;
+>=20
+> Are you really sure about this one here? The address does not seem to b=
+e=20
+> used for any of the jump_to_IPL() functions. And in the zipl sources, I=
+=20
+> can also see spots like this:
 
-> 
-> > Best Regards
-> > 
-> > Eric
-> > 
-> > This series can be found at:
-> > https://github.com/eauger/qemu/tree/v5.0.0-virtio-iommu-msi-bypass-v5
-> > 
-> > History:
-> > 
-> > v4 -> v5:
-> > - Take into account some additional comments from Markus:
-> >   - reserved region type becomes an unsigned + some comment/desc
-> >     rewording
-> >   - assert if the type is not RESERVED or MSI
-> > 
-> > v3 -> v4:
-> > - collected Jean and markus's R-bs
-> > - tool into account all Markus' comments in [1/5] (except removal of
-> >   goto)
-> > - use ':' as delimitor instead of commas
-> > - add example in 4/5 commit message as suggested by Markus
-> > 
-> > v2 -> v3:
-> > - Introduce VIRT_MSI_CTRL_NONE in VirtMSIControllerType
-> > - do not fill the remainder of the probe buffer
-> > 
-> > v1 -> v2:
-> > - check which MSI controller is in use and advertise the
-> >   corresponding MSI doorbell
-> > - managed for both ITS and GICv2M
-> > - various fixes spotted by Peter and Jean-Philippe, see
-> >   individual logs
-> > 
-> > v1: Most of those patches were respinned from
-> >   [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
-> >   except the last one which is new
-> > 
-> > 
-> > Eric Auger (5):
-> >   qdev: Introduce DEFINE_PROP_RESERVED_REGION
-> >   virtio-iommu: Implement RESV_MEM probe request
-> >   virtio-iommu: Handle reserved regions in the translation process
-> >   virtio-iommu-pci: Add array of Interval properties
-> >   hw/arm/virt: Let the virtio-iommu bypass MSIs
-> > 
-> >  include/exec/memory.h            |   6 ++
-> >  include/hw/arm/virt.h            |   7 ++
-> >  include/hw/qdev-properties.h     |   3 +
-> >  include/hw/virtio/virtio-iommu.h |   2 +
-> >  include/qemu/typedefs.h          |   1 +
-> >  hw/arm/virt.c                    |  18 +++++
-> >  hw/core/qdev-properties.c        |  89 ++++++++++++++++++++++++
-> >  hw/virtio/virtio-iommu-pci.c     |   3 +
-> >  hw/virtio/virtio-iommu.c         | 112 +++++++++++++++++++++++++++++--
-> >  hw/virtio/trace-events           |   1 +
-> >  10 files changed, 238 insertions(+), 4 deletions(-)
-> > 
-> > -- 
-> > 2.20.1
-> 
+This one slipped through and is indeed wrong.
+
+>=20
+>     entry->compdat.load_address =3D data.load_address;
+>=20
+> ... without any further short mask bits. So I somehow doubt that this=20
+> change is really ok?
+>=20
+>>       debug_print_int("loading segment at block", blockno);
+>>       debug_print_int("addr", address);
+>> @@ -514,7 +515,7 @@ static void zipl_run(ScsiBlockPtr *pte)
+>>       IPL_assert(entry->component_type =3D=3D ZIPL_COMP_ENTRY_EXEC, "N=
+o EXEC entry");
+>>  =20
+>>       /* should not return */
+>> -    jump_to_IPL_code(entry->load_address);
+>> +    jump_to_IPL_code(entry->psw & PSW_MASK_SHORT_ADDR);
+>=20
+> That one should be fine, I think.
+
+Yes, as it is a execute type entry, this needs to be a PSW and therefore
+needs to be masked.
+
+>=20
+>>   }
+>>  =20
+>>   static void ipl_scsi(void)
+>> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+>> index 12a0166aae..e07f87e690 100644
+>> --- a/pc-bios/s390-ccw/bootmap.h
+>> +++ b/pc-bios/s390-ccw/bootmap.h
+>> @@ -68,7 +68,7 @@ typedef struct ComponentEntry {
+>>       ScsiBlockPtr data;
+>>       uint8_t pad[7];
+>>       uint8_t component_type;
+>> -    uint64_t load_address;
+>> +    uint64_t psw;
+>=20
+> I'd recommend to keep the load_address name. It's the same name as used=
+=20
+> in the zipl sources, and as far as I can see, the field does not always=
+=20
+> contain a PSW.
+
+The problem is that this is a union in zipl containing an address, psw
+or signature header.
+
+I guess we should also make it a union and use the proper members so it
+is clear what we retrieve from the entry. If it is a PSW we need to mask
+it if it is a component address masking might be a bad idea.
+
+But I absolutely do not want to have this named PSW and then being used
+like a normal address. It took me way too long to figure out why my
+guest wasn't booting anymore.
+
+Time for a new series of patches :)
+
+>=20
+>>   } __attribute((packed)) ComponentEntry;
+>>  =20
+>>   typedef struct ComponentHeader {
+>>
+>=20
+>   Thomas
+>=20
+
+
+
+--sBRdVlJYnVn3SXodmJ3GxCqmwtP6LQr2j--
+
+--Nc9C9ud7dXy3to5GuZ8t9sVnsCwV9o9Dq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71q34ACgkQ41TmuOI4
+ufjKiw/9FgJ7/DY06A4Ztdw4dzRwX5CKhgpV9e0osiWO7l7Vrshlu+wNxvAt5djK
+j3twclhX5jQjRW6arYTc9b6O39eVdbyiYb2Q9T1qxy2omgMOh7VkpMXXOV0to3x0
+bwtxMqp1wCHaVSB+fsF7FKLXwuSRsheoZO6T2ykNmJyaDv1J8HYaWdw23ZWT1vFo
+rvvWF7cZkdw9jdXonbMB7d/LjyNdBK46j1Tpm3KbQ1SoPfhBh4oB6wL7twPtpF1J
+KVNvCQrqwR6sHtdU/0DkeqdqUyenbjdu2tMj25xFITDr66hOz1ECxqDaPg24/84i
+md3li5E/6CBMhc9ly6V/+2pu4ASFsntjO58mHF4ik2xguvGg6Ze+DnzPDELXTKNk
+OU/WR2m6CQlQXHqTyqUjxW1UQGkhyZw8GAMXzWm8VhCm+uAIHNEC6Zc1HpdJsSNs
+abRQJ97d4F7lhb38dVCRD7PnNHw/i5HH6NqApq5yCMliH/pxd1nLNRdRLX1aSc9r
+BuUQXDJC+W/4CFRrE3geHIqoslUo5rDskZ4XRXCXR4v3HyxxrcG9hduqosbLemjK
+wM8wtjnQOLIM9h9/JZMhrsZxlOi+1Pq3XL37UF/8f3+oyDdMPRD4ypW/+44eGhe/
+VKtp/zCloYJXMleT7vHVJJTStBOpsc+V5yY73pMOFhRg8NYETF4=
+=cxmA
+-----END PGP SIGNATURE-----
+
+--Nc9C9ud7dXy3to5GuZ8t9sVnsCwV9o9Dq--
+
 
