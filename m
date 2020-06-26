@@ -2,79 +2,93 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E565CC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD274C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:57:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACA912076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:55:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlMO2GEV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA912076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 914BD2076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:57:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 914BD2076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jontP-0000mR-Tt
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50794)
+	id 1jonud-00039e-PQ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:56:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jonsZ-0007rF-GQ; Fri, 26 Jun 2020 08:54:51 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38213)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jonsX-0000dK-VC; Fri, 26 Jun 2020 08:54:51 -0400
-Received: by mail-ed1-x542.google.com with SMTP id cy7so6827406edb.5;
- Fri, 26 Jun 2020 05:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=XA6nzqvVSiJXdseQ/eelzB9rYtYWuwUACPaHWj97sq4=;
- b=YlMO2GEVHo5SmbpimH9qVDzHPlCsDUZfAIpPKVEVktiI5VlnlHfuJUCg9pQxexgzeN
- U2SDo1RWgyRS7TODv/Tp5LjgyydOmfewlV3iWAMd8gMhCQ1jzdSdsSUbJkxIF/qtGUTZ
- ApW/w5BqwmwXmRoZyWGdaCQdPPmKcUvjhuRra274ePeRcDZAV7DNMfqCbyCKM/bLCDtn
- SRooN6JzygxnnmVtNlXWF6JoYtX2puIJhymeAI+9xZfrR9MKxsHcdcSnwM+tFJZc51Xa
- t0bMh5Cl1sTgsnpDQsIJN2BvJDV0d3++/KGlc0unA3buf9u0FwoyA71AVj8AVQK9Hwhc
- Z2qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=XA6nzqvVSiJXdseQ/eelzB9rYtYWuwUACPaHWj97sq4=;
- b=tOa9/oPha9pBLS8WFxccAaVG85CHnVa2/qmDzhpaemDzZdolZyYyhx+S1qBNRGhYjN
- y0C0gbZrwvMm6r/z5kTS63vZOFtQN4fVod+mWfAhQZI6KurnxWtunoQqypAVJDSuA+NZ
- 3tHVLxE2v5rHjY16JTl0kLVzMSuih8i778gYPtmrSqGT320FzCxHneLR+dPHb4A8aL3N
- 3bRZezKfMCfkn9h5zwoxVs751q2LOXTHebzs2hSzy41YiZTIGLvFHkIEqo8NrFWgdVcD
- ERJV7TDFY6GdXzFlvdiGrooEg6F3VBT3TOVeZ2KA9k96UN798bQ+SL+tBbJnG0BiEcSi
- qRvw==
-X-Gm-Message-State: AOAM531jHPURHMqd0Sc/fOPrHVrYJcEmW1KAmVUBHtyCsZIvrJdqnAB+
- wXouWtvtC+3vt+GUvnP1wnysj5S9ctwyQYlsqY3X4gfRFG4=
-X-Google-Smtp-Source: ABdhPJx7YnjhTfBL0wd0/aWL60JvfJLs5Z4zIC8wS0IOgD8R98baEvYWqqG3f+meg5AY/TYLP6kTb9ElQDWFWFMMBw0=
-X-Received: by 2002:aa7:d792:: with SMTP id s18mr3264100edq.7.1593176087947;
- Fri, 26 Jun 2020 05:54:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jontG-0000pk-2C; Fri, 26 Jun 2020 08:55:34 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34946
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jontE-000110-9s; Fri, 26 Jun 2020 08:55:33 -0400
+Received: from host86-158-109-79.range86-158.btcentralplus.com
+ ([86.158.109.79] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jontB-0000Y3-0H; Fri, 26 Jun 2020 13:55:33 +0100
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <cover.1592315226.git.balaton@eik.bme.hu>
+ <c2f41c551f7393b5bde733cbf78a1fcb151f3e89.1592315226.git.balaton@eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <1dfc4c68-c85d-5e56-d3c2-d68ce0b2355c@ilande.co.uk>
+Date: Fri, 26 Jun 2020 13:55:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 26 Jun 2020 13:54:37 +0100
-Message-ID: <CA+XhMqxcvPwakFCC2Qy-S3FZ1NdVJ2rojsZGg5S7KK-feZ-BnA@mail.gmail.com>
-Subject: [PATCH 5/5] haiku build fix
-To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=devnexen@gmail.com; helo=mail-ed1-x542.google.com
+In-Reply-To: <c2f41c551f7393b5bde733cbf78a1fcb151f3e89.1592315226.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.158.109.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v5 06/11] mac_oldworld: Rename ppc_heathrow_reset to
+ ppc_heathrow_cpu_reset
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,57 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 6fa7a4108236f513201192654e07c7044a3d7e58 Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Fri, 26 Jun 2020 13:51:37 +0000
-Subject: [PATCH 3/3] qemu_init_exec_dir Haiku implementation
+On 16/06/2020 14:47, BALATON Zoltan wrote:
 
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- util/oslib-posix.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+> This function resets a CPU not the whole machine so reflect that in
+> its name.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/ppc/mac_oldworld.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 4200008851..f97f241e0c 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -73,7 +73,7 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+>      return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+>  }
+>  
+> -static void ppc_heathrow_reset(void *opaque)
+> +static void ppc_heathrow_cpu_reset(void *opaque)
+>  {
+>      PowerPCCPU *cpu = opaque;
+>  
+> @@ -112,7 +112,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>  
+>          /* Set time-base frequency to 16.6 Mhz */
+>          cpu_ppc_tb_init(env,  TBFREQ);
+> -        qemu_register_reset(ppc_heathrow_reset, cpu);
+> +        qemu_register_reset(ppc_heathrow_cpu_reset, cpu);
+>      }
+>  
+>      /* allocate RAM */
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 7ad9195c44..459e3f8093 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -60,6 +60,10 @@
- #include <mach-o/dyld.h>
- #endif
+As per my previous comment on your earlier version, I don't agree with this - the
+reset is being registered at board level, it just so happens that as it's only
+touching the CPU due to the opaque being passed in.
 
-+#ifdef __HAIKU__
-+#include <kernel/image.h>
-+#endif
-+
- #include "qemu/mmap-alloc.h"
+I'd be inclined to pass in a suitable HeathrowMachineState object containing a
+reference to the CPU instead.
 
- #ifdef CONFIG_DEBUG_STACK_USAGE
-@@ -389,6 +393,21 @@ void qemu_init_exec_dir(const char *argv0)
-             }
-         }
-     }
-+#elif defined(__HAIKU__)
-+    {
-+    image_info ii;
-+    int32_t c = 0;
-+
-+    *buf = '\0';
-+    while (get_next_image_info(0, &c, &ii) == B_OK) {
-+            if (ii.type == B_APP_IMAGE) {
-+                strncpy(buf, ii.name, sizeof(buf));
-+        buf[sizeof(buf) - 1] = 0;
-+        p = buf;
-+        break;
-+            }
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
--- 
-2.26.0
+
+ATB,
+
+Mark.
 
