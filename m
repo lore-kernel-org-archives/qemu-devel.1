@@ -2,72 +2,75 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD05C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 00:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322A6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 00:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E67F820767
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 00:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0008B20767
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 00:34:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bKaPLDA2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E67F820767
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nL2G/TqY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0008B20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jocKP-0000LS-88
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 20:34:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34376)
+	id 1jocKR-0000PW-8x
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 20:34:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=4399c1bdf=atish.patra@wdc.com>)
- id 1jocJ4-0007YR-2p; Thu, 25 Jun 2020 20:33:26 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7890)
+ id 1jocJ7-0007Yz-Ks; Thu, 25 Jun 2020 20:33:31 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7893)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=4399c1bdf=atish.patra@wdc.com>)
- id 1jocIz-0002rQ-9H; Thu, 25 Jun 2020 20:33:25 -0400
+ id 1jocIz-0002rW-LA; Thu, 25 Jun 2020 20:33:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
  t=1593131601; x=1624667601;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=mSJ89GBH8VHkoy9Pcszqq8B0AJx7eEZCVPN5N/o8NRM=;
- b=bKaPLDA2LSRBsJheDxp8Tm3+52G+hbR7JPBig3iHHZ8cS7VA9XTupdmU
- FIQbd9fZ7jdol6FRLf8ytqNZu3sDWItYJUavEM3NcZOyzSBwUUFkxwIdg
- syjNDRKvhnftB6PnMiWRotZuUq+Tk9ZCn/IY71U5xT6qjeP8tWMi0W6Fr
- A7tJRsLfLsxyT1g4+Z6KnP0JY5Iy3NGB8h6FuWSLwVggpJBubiKCHU+To
- fIyynHE7gSPXwTN1zOL/O3RuSd5DEmNzVT6vm6HktsSJV6KPzLs/81xIx
- QnXq55S7Jax1QA8QUSkMyqjhCK70BZfaOgiazKHASVh4PnMvHFDL5CD43 w==;
-IronPort-SDR: XIuOtbquPE8aJRY7ICVDUhTTABUxCjOBXGPcM2nod+F4LQCLCjvZ9x712vu2eNaAYV//ArJhOT
- IRCQEzXxTlyDTiBdZqOAE0M8UsmdYZjFHxKhliEq/ogMIqpA0YcFVXUYEpm0Jkur70LPkBx9k4
- 0hTeQYgyK0nZk+DylwpnuwMuwOWebO+GwNpcJC6B7JvVPw0SO7rZVkmLGJ3oyy/9okC75LFzGJ
- fA2ycMqy09bGm+ayjdAmUxtdezY30lDa0ayxJIH9jjYw+rBfV46NghdyZ4vS06A9FFp9/4UJHS
- 5kE=
-X-IronPort-AV: E=Sophos;i="5.75,281,1589212800"; d="scan'208";a="140958179"
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=cQ41sd/6SBBg3DAs/1IBrXhkpsHoMAw26KZT5KJycRU=;
+ b=nL2G/TqYfDZxREYHyyIk7ffBgRZ8GKTur4toJAGwE7aR2QjWKF6R9D4n
+ 0/LSGjACdFz1c67SoQZvp+eS5APTk5NhddNohdovDIv0k9iE9V1Uth55q
+ ZxcqTMiVW6Btiw8BOfSpg4iaXSGcnprPGevxJCJYIf5s+HqN36FjAdxBj
+ kVuh1Kv6cb30HiNZz93jYmFt8exKy+wWvJ8WnOCy7uu89Jzzxwg543zlV
+ 52sVKLaq/uTe4hvz0rRdyFaV/yOb2ckGM9TIUyq6kIGwbgMZh+JOjzVKR
+ QsKCQqW8Y77YI6jcqChh6w1yUjXlwow6XIqefiBjaeLhm1gdJcc4ERhDW Q==;
+IronPort-SDR: 2SnKp+e6tmH9xy2u9IdRF4o7J+08XqHZyNs81ux1Fv1gBRbfHP4HbtAjIB6M6CCDYQ475OlmXE
+ VploNgk84E/MPGO9OyQ+e4qGLIYKpKmFempQ87jxslDqTyTp1h58TELLUAvxw7l5+iU8glAPi9
+ /yYOmN9B2Ft19+38hoN7pornO0yjnlK79YY+XTfPx6L7dXahSpl+6JL/Iz+JIC+zC+HuFavFQU
+ Cudhlws9KD1aTqooiqx5VYeqVXRWyc3YrX9Kmh9jPrj/9ZThBOmfXy/o5RrxuPGt679sylri5l
+ yyQ=
+X-IronPort-AV: E=Sophos;i="5.75,281,1589212800"; d="scan'208";a="140958182"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2020 08:33:16 +0800
-IronPort-SDR: iBvqI77I24hSDdvgeHrrFl9Nw08eYmqitwFL62iiIrrs0/tGgJQxE8X6tOFh/j4S68rv9yEpS2
- Ca9DjrLlXYpUCcsh8ZBfXP9z+Mx+y8H+k=
+ by ob1.hgst.iphmx.com with ESMTP; 26 Jun 2020 08:33:17 +0800
+IronPort-SDR: ZTjUECTnO9o09n6xIbkwUhgChlwqKEnPUPTMlNnP4VEqDKDkrrp8tj5xnAMuCSqH16qbSpiiVR
+ enzfgxKoJkIFj9v5apECVghTwvXsmhFtc=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Jun 2020 17:21:43 -0700
-IronPort-SDR: hNsHMk8KEq/PZ8RzGIpciuc7GdmeeZzcUA+k80vr835aLkEJE9J9jQPRJVZqJqKoJzyDATVLIX
- FTAYsi2o54vA==
+ 25 Jun 2020 17:21:44 -0700
+IronPort-SDR: qQRJJ2loKD4Nn+WRm58D/S5rlnAsWb5Mqz0pv7PzNkr3JN3qtiEu6gNFViAqlE6LnbitUyfyl6
+ qBC2Go6HGIVQ==
 WDCIronportException: Internal
 Received: from usa003490.ad.shared (HELO yoda.hgst.com) ([10.86.58.205])
  by uls-op-cesaip01.wdc.com with ESMTP; 25 Jun 2020 17:33:17 -0700
 From: Atish Patra <atish.patra@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/3] Add OpenSBI dynamic firmware support
-Date: Thu, 25 Jun 2020 17:33:10 -0700
-Message-Id: <20200626003313.715355-1-atish.patra@wdc.com>
+Subject: [PATCH v3 1/3] riscv: Unify Qemu's reset vector code path
+Date: Thu, 25 Jun 2020 17:33:11 -0700
+Message-Id: <20200626003313.715355-2-atish.patra@wdc.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200626003313.715355-1-atish.patra@wdc.com>
+References: <20200626003313.715355-1-atish.patra@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.42;
@@ -102,44 +105,236 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds support OpenSBI dynamic firmware support to Qemu.
-Qemu loader passes the information about the DT and next stage (i.e. kernel
-or U-boot) via "a2" register. It allows the user to build bigger OS images
-without worrying about overwriting DT. It also unifies the reset vector code
-in rom and dt placement. Now, the DT is copied directly in DRAM instead of ROM.
+Currently, all riscv machines except sifive_u have identical reset vector
+code implementations with memory addresses being different for all machines.
+They can be easily combined into a single function in common code.
 
-The changes have been verified on following qemu machines.
+Move it to common function and let all the machines use the common function.
 
-64bit:
- - spike, sifive_u, virt
-32bit:
- - virt
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/boot.c         | 45 +++++++++++++++++++++++++++++++++++++++++
+ hw/riscv/sifive_u.c     |  1 -
+ hw/riscv/spike.c        | 41 +++----------------------------------
+ hw/riscv/virt.c         | 40 +++---------------------------------
+ include/hw/riscv/boot.h |  2 ++
+ 5 files changed, 53 insertions(+), 76 deletions(-)
 
-I have also verified fw_jump on all the above platforms to ensure that this
-series doesn't break the existing setup.
-
-Changes from v2->v3:
-1. Removed redundant header includes.
-
-Changes from v1->v2:
-1. Rebased on top of latest upstream Qemu (with MSEL changes for sifive_u).
-2. Improved the code organization
-
-Atish Patra (3):
-riscv: Unify Qemu's reset vector code path
-RISC-V: Copy the fdt in dram instead of ROM
-riscv: Add opensbi firmware dynamic support
-
-hw/riscv/boot.c                 | 103 ++++++++++++++++++++++++++++++++
-hw/riscv/sifive_u.c             |  46 ++++++++------
-hw/riscv/spike.c                |  55 +++++------------
-hw/riscv/virt.c                 |  54 +++++------------
-include/hw/riscv/boot.h         |   8 +++
-include/hw/riscv/boot_opensbi.h |  58 ++++++++++++++++++
-6 files changed, 228 insertions(+), 96 deletions(-)
-create mode 100644 include/hw/riscv/boot_opensbi.h
-
---
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index adb421b91b68..482b78147993 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -26,8 +26,11 @@
+ #include "hw/loader.h"
+ #include "hw/riscv/boot.h"
+ #include "elf.h"
++#include "sysemu/device_tree.h"
+ #include "sysemu/qtest.h"
+ 
++#include <libfdt.h>
++
+ #if defined(TARGET_RISCV32)
+ # define KERNEL_BOOT_ADDRESS 0x80400000
+ #else
+@@ -155,3 +158,45 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+ 
+     return *start + size;
+ }
++
++void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
++                               hwaddr rom_size, void *fdt)
++{
++    int i;
++    /* reset vector */
++    uint32_t reset_vec[8] = {
++        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
++        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
++        0xf1402573,                  /*     csrr   a0, mhartid  */
++#if defined(TARGET_RISCV32)
++        0x0182a283,                  /*     lw     t0, 24(t0) */
++#elif defined(TARGET_RISCV64)
++        0x0182b283,                  /*     ld     t0, 24(t0) */
++#endif
++        0x00028067,                  /*     jr     t0 */
++        0x00000000,
++        start_addr,                  /* start: .dword */
++        0x00000000,
++                                     /* dtb: */
++    };
++
++    /* copy in the reset vector in little_endian byte order */
++    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
++        reset_vec[i] = cpu_to_le32(reset_vec[i]);
++    }
++    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
++                          rom_base, &address_space_memory);
++
++    /* copy in the device tree */
++    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
++        rom_size - sizeof(reset_vec)) {
++        error_report("not enough space to store device-tree");
++        exit(1);
++    }
++    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
++    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
++                           rom_base + sizeof(reset_vec),
++                           &address_space_memory);
++
++    return;
++}
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 7d051e7c9299..395b21703ab4 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -56,7 +56,6 @@
+ #include "sysemu/device_tree.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/sysemu.h"
+-#include "exec/address-spaces.h"
+ 
+ #include <libfdt.h>
+ 
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 3c87e04fdceb..c696077cbc16 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -41,9 +41,6 @@
+ #include "sysemu/device_tree.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+-#include "exec/address-spaces.h"
+-
+-#include <libfdt.h>
+ 
+ #if defined(TARGET_RISCV32)
+ # define BIOS_FILENAME "opensbi-riscv32-spike-fw_jump.elf"
+@@ -165,7 +162,6 @@ static void spike_board_init(MachineState *machine)
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+-    int i;
+     unsigned int smp_cpus = machine->smp.cpus;
+ 
+     /* Initialize SOC */
+@@ -212,40 +208,9 @@ static void spike_board_init(MachineState *machine)
+         }
+     }
+ 
+-    /* reset vector */
+-    uint32_t reset_vec[8] = {
+-        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+-        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+-        0xf1402573,                  /*     csrr   a0, mhartid  */
+-#if defined(TARGET_RISCV32)
+-        0x0182a283,                  /*     lw     t0, 24(t0) */
+-#elif defined(TARGET_RISCV64)
+-        0x0182b283,                  /*     ld     t0, 24(t0) */
+-#endif
+-        0x00028067,                  /*     jr     t0 */
+-        0x00000000,
+-        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
+-        0x00000000,
+-                                     /* dtb: */
+-    };
+-
+-    /* copy in the reset vector in little_endian byte order */
+-    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+-        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+-    }
+-    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+-                          memmap[SPIKE_MROM].base, &address_space_memory);
+-
+-    /* copy in the device tree */
+-    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+-            memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
+-        error_report("not enough space to store device-tree");
+-        exit(1);
+-    }
+-    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+-    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+-                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
+-                          &address_space_memory);
++    /* load the reset vector */
++    riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
++                              memmap[SPIKE_MROM].size, s->fdt);
+ 
+     /* initialize HTIF using symbols found in load_kernel */
+     htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 616db6f5aced..8ec77e43de26 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -39,12 +39,9 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/sysemu.h"
+-#include "exec/address-spaces.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci-host/gpex.h"
+ 
+-#include <libfdt.h>
+-
+ #if defined(TARGET_RISCV32)
+ # define BIOS_FILENAME "opensbi-riscv32-virt-fw_jump.bin"
+ #else
+@@ -535,40 +532,9 @@ static void virt_machine_init(MachineState *machine)
+         start_addr = virt_memmap[VIRT_FLASH].base;
+     }
+ 
+-    /* reset vector */
+-    uint32_t reset_vec[8] = {
+-        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+-        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+-        0xf1402573,                  /*     csrr   a0, mhartid  */
+-#if defined(TARGET_RISCV32)
+-        0x0182a283,                  /*     lw     t0, 24(t0) */
+-#elif defined(TARGET_RISCV64)
+-        0x0182b283,                  /*     ld     t0, 24(t0) */
+-#endif
+-        0x00028067,                  /*     jr     t0 */
+-        0x00000000,
+-        start_addr,                  /* start: .dword */
+-        0x00000000,
+-                                     /* dtb: */
+-    };
+-
+-    /* copy in the reset vector in little_endian byte order */
+-    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+-        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+-    }
+-    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+-                          memmap[VIRT_MROM].base, &address_space_memory);
+-
+-    /* copy in the device tree */
+-    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+-            memmap[VIRT_MROM].size - sizeof(reset_vec)) {
+-        error_report("not enough space to store device-tree");
+-        exit(1);
+-    }
+-    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+-    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+-                          memmap[VIRT_MROM].base + sizeof(reset_vec),
+-                          &address_space_memory);
++    /* load the reset vector */
++    riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
++                              virt_memmap[VIRT_MROM].size, s->fdt);
+ 
+     /* create PLIC hart topology configuration string */
+     plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+index 9daa98da08d7..3e9759c89aa2 100644
+--- a/include/hw/riscv/boot.h
++++ b/include/hw/riscv/boot.h
+@@ -35,5 +35,7 @@ target_ulong riscv_load_kernel(const char *kernel_filename,
+                                symbol_fn_t sym_cb);
+ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+                          uint64_t kernel_entry, hwaddr *start);
++void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
++                               hwaddr rom_size, void *fdt);
+ 
+ #endif /* RISCV_BOOT_H */
+-- 
 2.26.2
 
 
