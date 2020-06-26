@@ -2,71 +2,80 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA15C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF70C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 739F920DD4
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739F920DD4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id A244A21531
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A244A21531
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokmt-00025H-OK
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:36:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55746)
+	id 1joknt-0003ba-TE
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokbf-0006LD-Gb; Fri, 26 Jun 2020 05:25:11 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34370
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokbc-0005ZK-Qx; Fri, 26 Jun 2020 05:25:11 -0400
-Received: from host86-158-109-79.range86-158.btcentralplus.com
- ([86.158.109.79] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokba-0007bz-Ft; Fri, 26 Jun 2020 10:25:11 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: peter.maydell@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Fri, 26 Jun 2020 10:23:14 +0100
-Message-Id: <20200626092317.3875-20-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
-References: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1joklg-0000bP-Hw
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:35:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60846)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jokle-0003Gx-7W
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:35:32 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1joklc-0001I2-Bf
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 34DB82E80E7
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.158.109.79
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 19/22] mac_via: rework ADB state machine to be compatible with
- both MacOS and Linux
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Jun 2020 09:27:36 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1885247@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: aleksandar-markovic philmd pmaydell
+X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159315507826.13901.17398620572438937429.malonedeb@wampee.canonical.com>
+Message-ID: <32aa7cf6-5f4d-eb79-2ebe-ee463f4389b8@redhat.com>
+Subject: Re: [Bug 1885247] [NEW] Build error in Intel 32-bit hosts
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1e0fd5c0279a7d0880c65a07c19195d0f7f6de98
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:10:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,510 +84,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1885247 <1885247@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200626092736.1ixxQbtLoMArGfRtgJBmX_-7_XbYofr0DkXf8xxYjSY@z>
 
-The existing ADB state machine is designed to work with Linux which has a different
-interpretation of the state machine detailed in "Guide to the Macintosh Family
-Hardware". In particular the current Linux implementation includes an extra change
-to IDLE state when switching the VIA between send and receive modes which does not
-occur in MacOS, and omitting this transition causes the current mac_via ADB state
-machine to fail.
+On 6/26/20 11:20 AM, Thomas Huth wrote:
+> On 26/06/2020 11.13, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 6/26/20 9:37 AM, Aleksandar Markovic wrote:
+>>> =D0=BF=D0=B5=D1=82, 26. =D1=98=D1=83=D0=BD 2020. =D1=83 09:11 Aleksanda=
+r Markovic
+>>> <1885247@bugs.launchpad.net> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>>>>
+>>>> Public bug reported:
+>>>>
+>>>> The code base is on master, checked out on Thursday June25th 2020,
+>>>> 0250c595c9d. The build procedure:
+>>>>
+>>>> $ mkdir build-gcc
+>>>> $ cd build-gcc
+>>>> $ ../configure
+>>>> $ make
+>>>>
+>>>> The build error message is:
+>>>>
+>>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
+/hyperv.o
+>>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
+/hyperv_testdev.o
+>>>> =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86_64-softmmu/hw/hyperv=
+/vmbus.o
+>>>> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function
+>>>> =E2=80=98gpadl_iter_io=E2=80=99:
+>>>> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast
+>>>> to pointer from integer of different size [-Werror=3Dint-to-pointer-ca=
+st]
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p =3D (void *)(=
+((uintptr_t)iter->map & TARGET_PAGE_MASK) |
+>>>> off_in_page);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 ^
+>>>> cc1: all warnings being treated as errors
+>>>> make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69:
+>>>> hw/hyperv/vmbus.o] Error 1
+>>>> make: *** [Makefile:527: x86_64-softmmu/all] Error 2
+>>
+>> FWIW there is no CI job covering x86 KVM on 32-bit host build.
+>> Should this be covered? I guess the problem is no CI services
+>> provide 32-bit x86...
+> =
 
-Rework the ADB state machine accordingly so that it can enumerate and autopoll the
-ADB under both Linux and MacOS, including the addition of the new adb_autopoll_block()
-and adb_autopoll_unblock() functions.
+> You can certainly provide either a container, or install the 32-bit
+> libraries in a 64-bit environment. Then run
+> =
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Tested-by: Finn Thain <fthain@telegraphics.com.au>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200623204936.24064-20-mark.cave-ayland@ilande.co.uk>
----
- hw/misc/mac_via.c         | 375 ++++++++++++++++++++++++++------------
- hw/misc/trace-events      |   3 +
- include/hw/misc/mac_via.h |   1 +
- 3 files changed, 260 insertions(+), 119 deletions(-)
+> PKG_CONFIG_LIBDIR=3D... ./configure --extra-cflags=3D-m32
+> =
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index a1dc00d9f6..71b6f92645 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -599,176 +599,312 @@ static void via1_rtc_update(MacVIAState *m)
-     m->cmd = REG_EMPTY;
- }
- 
--static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
-+static void adb_via_poll(void *opaque)
- {
--    ADBBusState *adb_bus = &s->adb_bus;
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    ADBBusState *adb_bus = &m->adb_bus;
-+    uint8_t obuf[9];
-+    uint8_t *data = &s->sr;
-+    int olen;
-+    uint16_t pending;
- 
--    if (state != ADB_STATE_IDLE) {
--        return 0;
-+    /*
-+     * Setting vADBInt below indicates that an autopoll reply has been
-+     * received, however we must block autopoll until the point where
-+     * the entire reply has been read back to the host
-+     */
-+    if (adb_bus->autopoll_blocked) {
-+        return;
-+    } else {
-+        adb_autopoll_block(adb_bus);
-     }
- 
--    if (s->adb_data_in_size < s->adb_data_in_index) {
--        return 0;
--    }
-+    m->adb_data_in_index = 0;
-+    m->adb_data_out_index = 0;
-+    olen = adb_poll(adb_bus, obuf, adb_bus->autopoll_mask);
-+
-+    if (olen > 0) {
-+        /* Autopoll response */
-+        *data = obuf[0];
-+        olen--;
-+        memcpy(m->adb_data_in, &obuf[1], olen);
-+        m->adb_data_in_size = olen;
-+
-+        s->b &= ~VIA1B_vADBInt;
-+        qemu_irq_raise(m->adb_data_ready);
-+    } else if (olen < 0) {
-+        /* Bus timeout (device does not exist) */
-+        *data = 0xff;
-+        s->b |= VIA1B_vADBInt;
-+        adb_autopoll_unblock(adb_bus);
-+    } else {
-+        pending = adb_bus->pending & ~(1 << (m->adb_autopoll_cmd >> 4));
-+
-+        if (pending) {
-+            /*
-+             * Bus timeout (device exists but another device has data). Block
-+             * autopoll so the OS can read out the first EVEN and first ODD
-+             * byte to determine bus timeout and SRQ status
-+             */
-+            *data = m->adb_autopoll_cmd;
-+            s->b &= ~VIA1B_vADBInt;
- 
--    if (s->adb_data_out_index != 0) {
--        return 0;
--    }
-+            obuf[0] = 0xff;
-+            obuf[1] = 0xff;
-+            olen = 2;
- 
--    s->adb_data_in_index = 0;
--    s->adb_data_out_index = 0;
--    s->adb_data_in_size = adb_poll(adb_bus, s->adb_data_in,
--                                   adb_bus->autopoll_mask);
-+            memcpy(m->adb_data_in, obuf, olen);
-+            m->adb_data_in_size = olen;
- 
--    if (s->adb_data_in_size) {
--        *data = s->adb_data_in[s->adb_data_in_index++];
--        qemu_irq_raise(s->adb_data_ready);
-+            qemu_irq_raise(m->adb_data_ready);
-+        } else {
-+            /* Bus timeout (device exists but no other device has data) */
-+            *data = 0;
-+            s->b |= VIA1B_vADBInt;
-+            adb_autopoll_unblock(adb_bus);
-+        }
-     }
- 
--    return s->adb_data_in_size;
-+    trace_via1_adb_poll(*data, (s->b & VIA1B_vADBInt) ? "+" : "-",
-+                        adb_bus->status, m->adb_data_in_index, olen);
- }
- 
--static int adb_via_send(MacVIAState *s, int state, uint8_t data)
-+static int adb_via_send_len(uint8_t data)
- {
--    switch (state) {
--    case ADB_STATE_NEW:
--        s->adb_data_out_index = 0;
--        break;
--    case ADB_STATE_EVEN:
--        if ((s->adb_data_out_index & 1) == 0) {
--            return 0;
--        }
--        break;
--    case ADB_STATE_ODD:
--        if (s->adb_data_out_index & 1) {
--            return 0;
-+    /* Determine the send length from the given ADB command */
-+    uint8_t cmd = data & 0xc;
-+    uint8_t reg = data & 0x3;
-+
-+    switch (cmd) {
-+    case 0x8:
-+        /* Listen command */
-+        switch (reg) {
-+        case 2:
-+            /* Register 2 is only used for the keyboard */
-+            return 3;
-+        case 3:
-+            /*
-+             * Fortunately our devices only implement writes
-+             * to register 3 which is fixed at 2 bytes
-+             */
-+            return 3;
-+        default:
-+            qemu_log_mask(LOG_UNIMP, "ADB unknown length for register %d\n",
-+                          reg);
-+            return 1;
-         }
--        break;
--    case ADB_STATE_IDLE:
--        return 0;
-+    default:
-+        /* Talk, BusReset */
-+        return 1;
-     }
--
--    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
--
--    s->adb_data_out[s->adb_data_out_index++] = data;
--    qemu_irq_raise(s->adb_data_ready);
--    return 1;
- }
- 
--static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
-+static void adb_via_send(MacVIAState *s, int state, uint8_t data)
- {
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&s->mos6522_via1);
-+    MOS6522State *ms = MOS6522(v1s);
-+    ADBBusState *adb_bus = &s->adb_bus;
-+    uint16_t autopoll_mask;
-+
-     switch (state) {
-     case ADB_STATE_NEW:
--        return 0;
--
--    case ADB_STATE_EVEN:
--        if (s->adb_data_in_size <= 0) {
--            qemu_irq_raise(s->adb_data_ready);
--            return 0;
--        }
--
--        if (s->adb_data_in_index >= s->adb_data_in_size) {
--            *data = 0;
--            qemu_irq_raise(s->adb_data_ready);
--            return 1;
--        }
--
--        if ((s->adb_data_in_index & 1) == 0) {
--            return 0;
-+        /*
-+         * Command byte: vADBInt tells host autopoll data already present
-+         * in VIA shift register and ADB transceiver
-+         */
-+        adb_autopoll_block(adb_bus);
-+
-+        if (adb_bus->status & ADB_STATUS_POLLREPLY) {
-+            /* Tell the host the existing data is from autopoll */
-+            ms->b &= ~VIA1B_vADBInt;
-+        } else {
-+            ms->b |= VIA1B_vADBInt;
-+            s->adb_data_out_index = 0;
-+            s->adb_data_out[s->adb_data_out_index++] = data;
-         }
- 
-+        trace_via1_adb_send(" NEW", data, (ms->b & VIA1B_vADBInt) ? "+" : "-");
-+        qemu_irq_raise(s->adb_data_ready);
-         break;
- 
-+    case ADB_STATE_EVEN:
-     case ADB_STATE_ODD:
--        if (s->adb_data_in_size <= 0) {
--            qemu_irq_raise(s->adb_data_ready);
--            return 0;
--        }
--
--        if (s->adb_data_in_index >= s->adb_data_in_size) {
--            *data = 0;
--            qemu_irq_raise(s->adb_data_ready);
--            return 1;
--        }
--
--        if (s->adb_data_in_index & 1) {
--            return 0;
--        }
-+        ms->b |= VIA1B_vADBInt;
-+        s->adb_data_out[s->adb_data_out_index++] = data;
- 
-+        trace_via1_adb_send(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
-+                            data, (ms->b & VIA1B_vADBInt) ? "+" : "-");
-+        qemu_irq_raise(s->adb_data_ready);
-         break;
- 
-     case ADB_STATE_IDLE:
--        if (s->adb_data_out_index == 0) {
--            return 0;
--        }
-+        return;
-+    }
- 
--        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
-+    /* If the command is complete, execute it */
-+    if (s->adb_data_out_index == adb_via_send_len(s->adb_data_out[0])) {
-+        s->adb_data_in_size = adb_request(adb_bus, s->adb_data_in,
-                                           s->adb_data_out,
-                                           s->adb_data_out_index);
--        s->adb_data_out_index = 0;
-         s->adb_data_in_index = 0;
--        if (s->adb_data_in_size < 0) {
--            *data = 0xff;
--            qemu_irq_raise(s->adb_data_ready);
--            return -1;
--        }
- 
--        if (s->adb_data_in_size == 0) {
--            return 0;
-+        if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
-+            /*
-+             * Bus timeout (but allow first EVEN and ODD byte to indicate
-+             * timeout via vADBInt and SRQ status)
-+             */
-+            s->adb_data_in[0] = 0xff;
-+            s->adb_data_in[1] = 0xff;
-+            s->adb_data_in_size = 2;
-         }
- 
--        break;
--    }
--
--    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
-+        /*
-+         * If last command is TALK, store it for use by autopoll and adjust
-+         * the autopoll mask accordingly
-+         */
-+        if ((s->adb_data_out[0] & 0xc) == 0xc) {
-+            s->adb_autopoll_cmd = s->adb_data_out[0];
- 
--    *data = s->adb_data_in[s->adb_data_in_index++];
--    qemu_irq_raise(s->adb_data_ready);
--    if (*data == 0xff || *data == 0) {
--        return 0;
-+            autopoll_mask = 1 << (s->adb_autopoll_cmd >> 4);
-+            adb_set_autopoll_mask(adb_bus, autopoll_mask);
-+        }
-     }
--    return 1;
- }
- 
--static void via1_adb_update(MacVIAState *m)
-+static void adb_via_receive(MacVIAState *s, int state, uint8_t *data)
- {
--    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
--    MOS6522State *s = MOS6522(v1s);
--    int state;
--    int ret;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&s->mos6522_via1);
-+    MOS6522State *ms = MOS6522(v1s);
-+    ADBBusState *adb_bus = &s->adb_bus;
-+    uint16_t pending;
- 
--    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        ms->b |= VIA1B_vADBInt;
-+        return;
- 
--    if (s->acr & VIA1ACR_vShiftOut) {
--        /* output mode */
--        ret = adb_via_send(m, state, s->sr);
--        if (ret > 0) {
--            s->b &= ~VIA1B_vADBInt;
-+    case ADB_STATE_IDLE:
-+        /*
-+         * Since adb_request() will have already consumed the data from the
-+         * device, we must detect this extra state change and re-inject the
-+         * reponse as either a "fake" autopoll reply or bus timeout
-+         * accordingly
-+         */
-+        if (s->adb_data_in_index == 0) {
-+            if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
-+                *data = 0xff;
-+                ms->b |= VIA1B_vADBInt;
-+                qemu_irq_raise(s->adb_data_ready);
-+            } else if (s->adb_data_in_size > 0) {
-+                adb_bus->status = ADB_STATUS_POLLREPLY;
-+                *data = s->adb_autopoll_cmd;
-+                ms->b &= ~VIA1B_vADBInt;
-+                qemu_irq_raise(s->adb_data_ready);
-+            }
-         } else {
--            s->b |= VIA1B_vADBInt;
-+            ms->b |= VIA1B_vADBInt;
-+            adb_autopoll_unblock(adb_bus);
-         }
--    } else {
--        /* input mode */
--        ret = adb_via_receive(m, state, &s->sr);
--        if (ret > 0 && s->sr != 0xff) {
--            s->b &= ~VIA1B_vADBInt;
--        } else {
--            s->b |= VIA1B_vADBInt;
-+
-+        trace_via1_adb_receive("IDLE", *data,
-+                        (ms->b & VIA1B_vADBInt) ? "+" : "-", adb_bus->status,
-+                        s->adb_data_in_index, s->adb_data_in_size);
-+
-+        break;
-+
-+    case ADB_STATE_EVEN:
-+    case ADB_STATE_ODD:
-+        switch (s->adb_data_in_index) {
-+        case 0:
-+            /* First EVEN byte: vADBInt indicates bus timeout */
-+            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
-+                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
-+                                   adb_bus->status, s->adb_data_in_index,
-+                                   s->adb_data_in_size);
-+
-+            *data = s->adb_data_in[s->adb_data_in_index++];
-+            if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
-+                ms->b &= ~VIA1B_vADBInt;
-+            } else {
-+                ms->b |= VIA1B_vADBInt;
-+            }
-+            break;
-+
-+        case 1:
-+            /* First ODD byte: vADBInt indicates SRQ */
-+            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
-+                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
-+                                   adb_bus->status, s->adb_data_in_index,
-+                                   s->adb_data_in_size);
-+
-+            *data = s->adb_data_in[s->adb_data_in_index++];
-+            pending = adb_bus->pending & ~(1 << (s->adb_autopoll_cmd >> 4));
-+            if (pending) {
-+                ms->b &= ~VIA1B_vADBInt;
-+            } else {
-+                ms->b |= VIA1B_vADBInt;
-+            }
-+            break;
-+
-+        default:
-+            /*
-+             * Otherwise vADBInt indicates end of data. Note that Linux
-+             * specifically checks for the sequence 0x0 0xff to confirm the
-+             * end of the poll reply, so provide these extra bytes below to
-+             * keep it happy
-+             */
-+            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
-+                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
-+                                   adb_bus->status, s->adb_data_in_index,
-+                                   s->adb_data_in_size);
-+
-+            if (s->adb_data_in_index < s->adb_data_in_size) {
-+                /* Next data byte */
-+                *data = s->adb_data_in[s->adb_data_in_index++];
-+                ms->b |= VIA1B_vADBInt;
-+            } else if (s->adb_data_in_index == s->adb_data_in_size) {
-+                if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
-+                    /* Bus timeout (no more data) */
-+                    *data = 0xff;
-+                } else {
-+                    /* Return 0x0 after reply */
-+                    *data = 0;
-+                }
-+                s->adb_data_in_index++;
-+                ms->b &= ~VIA1B_vADBInt;
-+            } else {
-+                /* Bus timeout (no more data) */
-+                *data = 0xff;
-+                ms->b &= ~VIA1B_vADBInt;
-+                adb_bus->status = 0;
-+                adb_autopoll_unblock(adb_bus);
-+            }
-+            break;
-         }
-+
-+        qemu_irq_raise(s->adb_data_ready);
-+        break;
-     }
- }
- 
--static void via_adb_poll(void *opaque)
-+static void via1_adb_update(MacVIAState *m)
- {
--    MacVIAState *m = opaque;
-     MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-     MOS6522State *s = MOS6522(v1s);
--    int state;
-+    int oldstate, state;
- 
--    if (s->b & VIA1B_vADBInt) {
--        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
--        if (adb_via_poll(m, state, &s->sr)) {
--            s->b &= ~VIA1B_vADBInt;
-+    oldstate = (v1s->last_b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+
-+    if (state != oldstate) {
-+        if (s->acr & VIA1ACR_vShiftOut) {
-+            /* output mode */
-+            adb_via_send(m, state, s->sr);
-+        } else {
-+            /* input mode */
-+            adb_via_receive(m, state, &s->sr);
-         }
-     }
- }
-@@ -916,7 +1052,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
-     qemu_get_timedate(&tm, 0);
-     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
- 
--    adb_register_autopoll_callback(adb_bus, via_adb_poll, m);
-+    adb_register_autopoll_callback(adb_bus, adb_via_poll, m);
-     m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
-                                                VIA1_IRQ_ADB_READY_BIT);
- 
-@@ -1019,6 +1155,7 @@ static const VMStateDescription vmstate_mac_via = {
-         VMSTATE_INT32(adb_data_out_index, MacVIAState),
-         VMSTATE_BUFFER(adb_data_in, MacVIAState),
-         VMSTATE_BUFFER(adb_data_out, MacVIAState),
-+        VMSTATE_UINT8(adb_autopoll_cmd, MacVIAState),
-         VMSTATE_END_OF_LIST()
-     }
- };
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 5561746866..68a6d9f2ab 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -202,6 +202,9 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=%u value=0x%02x"
- via1_rtc_cmd_pram_write(int addr, int value) "addr=%u value=0x%02x"
- via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
- via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
-+via1_adb_send(const char *state, uint8_t data, const char *vadbint) "state %s data=0x%02x vADBInt=%s"
-+via1_adb_receive(const char *state, uint8_t data, const char *vadbint, int status, int index, int size) "state %s data=0x%02x vADBInt=%s status=0x%x index=%d size=%d"
-+via1_adb_poll(uint8_t data, const char *vadbint, int status, int index, int size) "data=0x%02x vADBInt=%s status=0x%x index=%d size=%d"
- 
- # grlib_ahb_apb_pnp.c
- grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-index 2aaf9e27bf..0be05d649b 100644
---- a/include/hw/misc/mac_via.h
-+++ b/include/hw/misc/mac_via.h
-@@ -112,6 +112,7 @@ typedef struct MacVIAState {
-     int adb_data_out_index;
-     uint8_t adb_data_in[128];
-     uint8_t adb_data_out[16];
-+    uint8_t adb_autopoll_cmd;
- } MacVIAState;
- 
- #endif
--- 
-2.20.1
+> and it should be possible to build 32-bit binaries, too.
+> =
 
+> Alternatively, we could add a cross-compilation job that builds with
+> i686-w64-mingw32 in 32-bit.
+
+Oh, this case is covered:
+https://app.shippable.com/github/qemu/qemu/runs/2437/2/console
+
+But this doesn't use KVM ;)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885247
+
+Title:
+  Build error in Intel 32-bit hosts
+
+Status in QEMU:
+  New
+
+Bug description:
+  The code base is on master, checked out on Thursday June25th 2020,
+  0250c595c9d. The build procedure:
+
+  $ mkdir build-gcc
+  $ cd build-gcc
+  $ ../configure
+  $ make
+
+  The build error message is:
+
+    CC      x86_64-softmmu/hw/hyperv/hyperv.o
+    CC      x86_64-softmmu/hw/hyperv/hyperv_testdev.o
+    CC      x86_64-softmmu/hw/hyperv/vmbus.o
+  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function =E2=80=98gpad=
+l_iter_io=E2=80=99:
+  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast to poi=
+nter from integer of different size [-Werror=3Dint-to-pointer-cast]
+           p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_i=
+n_page);
+               ^
+  cc1: all warnings being treated as errors
+  make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69: hw/hyperv/vmbus.=
+o] Error 1
+  make: *** [Makefile:527: x86_64-softmmu/all] Error 2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885247/+subscriptions
 
