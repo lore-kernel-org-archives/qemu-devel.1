@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7A7C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56D3C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 476C3206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:09:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80132206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:10:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3hA3mas"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476C3206C0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nf7dl0Tc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80132206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolIC-0002B1-Hu
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:09:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35454)
+	id 1jolJR-0003qJ-Qy
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:10:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jolHF-0000yC-B6; Fri, 26 Jun 2020 06:08:09 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45233)
+ id 1jolH7-0000hk-Gs; Fri, 26 Jun 2020 06:08:01 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:43436)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jolHD-0005u8-Pi; Fri, 26 Jun 2020 06:08:09 -0400
-Received: by mail-ed1-x543.google.com with SMTP id t21so6451872edr.12;
- Fri, 26 Jun 2020 03:08:07 -0700 (PDT)
+ id 1jolH6-0005tR-0X; Fri, 26 Jun 2020 06:08:01 -0400
+Received: by mail-ed1-x544.google.com with SMTP id d15so6453350edm.10;
+ Fri, 26 Jun 2020 03:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:from:date:message-id:subject:to;
- bh=co7casgS8A7yMr6HsfA6ziD3K+HGB0wo6n/jnkFdF6c=;
- b=m3hA3masDltAUq+qQwZlFD/7Vhlw3KGS4KV9ATqlH7BZgfYKctzeZwrO5+pUSDNWxQ
- b8FRT3e28eLxCVdQKx9lkjI9jmVpmLG7t7RPYpkLpzh5PlSkF75nt+ovLpiOqMUfO/0o
- q+DUUBK6eXRU8Y8WCIJh5lbkUASpFXHBfiDOLGMk8pQFl6WZXmO99+zCOJd6XrK66tpG
- f6t1jVMjnD6qz11aqiBFc7SeRDq3kYgZ+DFuQdgSjXZ0A3ygGmaXrs1JdXQqvlTni3jt
- Uk6SuTZk6+Ow27wX/ewVhC6v4Cb8spnucwpDW88iAbyfUrRt6RbDZED7V0BP6pXV26d1
- 5+Og==
+ bh=MSVPMtL0U7LZeXFp6t3i8NiLBjb/HuF+SqmOMbF9Q7U=;
+ b=Nf7dl0TcPihaBgGqB9HYMl6NZafLJNyqqDZnDQ/dUHnMhC/MeGMaIYJsXfq0EfqcPw
+ OOGo9eEzDA8aIxFPWKN7ykhobCGoaiRy8BV9JmVTgVbY7gpvXThjPHBTYAJ4cI5VmAak
+ MZQ2VLhq/eZN62iWFuxtcCLyLSqLm0tZ+Hs9eCFN8z96qcXi/QfYOfjpZq0Yx//5jNqV
+ MrhBfb2Gj8h+SBsdYcXvDXusd6OuSesO2ZeQDrE8J8Csz/K/WBdh+hpPna72Jm5NMeFg
+ YfBKt5VJd7Ec65TNtJs3A3lwY6R3m4x7bV39NltY8QLNbYqC7kJ9LSy0sLxqJZn8gXGx
+ Zyag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=co7casgS8A7yMr6HsfA6ziD3K+HGB0wo6n/jnkFdF6c=;
- b=TGr/EzIYX7tUzrdDLawRj8KchkafVrqms6ofoUush5CfE+FacTmR+Orz6hAeKDdw2W
- epVrIGQfFY0LXA+907tZy7FfGyLUg2Es+MfU3xP+IICiTCj7Lw8J/G3RPWIoMsZW+j0v
- MtlniGlN0TxPpTVczlHiT9ZDFxmiD5lqIrF/KtyNk/5Zz4zYbKyXPgSGUuXlERVZFEPj
- SIZoMFy8z1OXWcRd8JGp9euYCHcjbrp+uNtog1nHfdjSDNWteA/RLVfCYb+XyrO7p8Ct
- 7oKFzMq2bt4ZDGBTIDArK9qP3bVvp0+S/7qPTiHi4SHqsHwcPAFkPL4TxIyk1KVz7WcJ
- FM3Q==
-X-Gm-Message-State: AOAM533m89j+ZRFaqPiUnEMXAL58aNzgCqJLHUzBu3eExnBI3yN4fDbT
- xgdQnDnqkxajIA47x2yCfrIEw9IqN7UMGldMDnyYBy2r
-X-Google-Smtp-Source: ABdhPJxfXhhdm4GIjPDxQJey8+P/V024MK7zV2ktEfJ3/HYD4ztfbKkSHMDwGCkLfBbj2ftRNeA1sxBLZU1iWkcSgGI=
-X-Received: by 2002:aa7:d297:: with SMTP id w23mr2438717edq.49.1593166086030; 
- Fri, 26 Jun 2020 03:08:06 -0700 (PDT)
+ bh=MSVPMtL0U7LZeXFp6t3i8NiLBjb/HuF+SqmOMbF9Q7U=;
+ b=UrmamlsyiweIUOCYkdcnvIb7QzBZ6jonsDDxq7Ymd8lUg68dq4HU3gctgp1FyPur3N
+ YKX3ecfdCZop8Ai1xFTSwKm6QpJf4m6YO+dmyeRDUAkWDyjDfP3Ed+GtPPUI5DFGNlYu
+ MLbBuSEsSxUna3NgGt2KQ20z3u30N8KyJD97C2O30QUala/jRRZDg1tl0JzwnF8aETQi
+ wJYRdw2HdvSCUwRDCe0qcjxFM8Cl7kt9jcjJNuJgHpME9zAU77QQRRKhaVexAiFv2Xp6
+ sZU3VTVAAgRRHsSXN9rVh68R3vVup28Szu9bE6W09saTJQrhUE8YvZVA2uuJk+pOOSgU
+ 6iRA==
+X-Gm-Message-State: AOAM5319l8SryHOeTesrTdE8EYplFGm4cl/M4i5u0+UoQdgEv2Pi2+18
+ CnGf/8wbKePUzbJinsjqDRVEvNBaJAQj2OEx8LlDfI8K
+X-Google-Smtp-Source: ABdhPJzs+L7vsGWBgDn5C2GwSUJM76LCixQ97aEfvj2ALWJrPp3NMZNNWGsgCEyNIEgL56pbhYsPCYqog8k7bnWqQFk=
+X-Received: by 2002:a50:cf05:: with SMTP id c5mr2678664edk.232.1593166077974; 
+ Fri, 26 Jun 2020 03:07:57 -0700 (PDT)
 MIME-Version: 1.0
 From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 26 Jun 2020 11:07:55 +0100
-Message-ID: <CA+XhMqzFX3_kNmrLeuk7TCn9MQ5wwe-wWdDdWsGPBViuiHRAAg@mail.gmail.com>
-Subject: [PATCH 4/5] haiku build fix
+Date: Fri, 26 Jun 2020 11:07:47 +0100
+Message-ID: <CA+XhMqxRDPotkG6ioYipzZNMLj-w1CbFbz2cd6BPet8GQ4r8oA@mail.gmail.com>
+Subject: [ PATCH 2/5] haiku build fix
 To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=devnexen@gmail.com; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=devnexen@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -92,71 +92,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 775173ded5657de4d4b467f2f68e747f6a9c0750 Mon Sep 17 00:00:00 2001
+From 19a41d406eda976001827d248398d7fb172d140b Mon Sep 17 00:00:00 2001
 From: David Carlier <devnexen@gmail.com>
-Date: Fri, 26 Jun 2020 10:44:36 +0000
-Subject: [PATCH 4/5] Platform specific changes qemu_exec_dir implementation
+Date: Fri, 26 Jun 2020 10:38:17 +0000
+Subject: [PATCH 2/5] Enable *pty API.
 
 Signed-off-by: David Carlier <devnexen@gmail.com>
 ---
- include/qemu/osdep.h |  4 ++++
- util/oslib-posix.c   | 20 ++++++++++++++++++++
- 2 files changed, 24 insertions(+)
+ configure           | 9 +++++++++
+ util/qemu-openpty.c | 2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index ff7c17b857..da970cf654 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -388,6 +388,10 @@ void qemu_anon_ram_free(void *ptr, size_t size);
- #define HAVE_CHARDEV_PARPORT 1
- #endif
+diff --git a/configure b/configure
+index 96ba4cf3ce..f040b07463 100755
+--- a/configure
++++ b/configure
+@@ -2373,6 +2373,12 @@ else
+   l2tpv3=no
+ fi
 
-+#if defined(__HAIKU__)
-+#define SIGIO SIGPOLL
-+#endif
++if check_include "pty.h" ; then
++  pty_h=yes
++else
++  pty_h=no
++fi
 +
- #if defined(CONFIG_LINUX)
- #ifndef BUS_MCEERR_AR
- #define BUS_MCEERR_AR 4
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 39ddc77c85..ff36fa41ff 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -38,7 +38,12 @@
- #include "qemu/sockets.h"
- #include "qemu/thread.h"
- #include <libgen.h>
-+#if !defined __HAIKU__
- #include <sys/signal.h>
-+#else
-+#include <kernel/image.h>
-+#include <signal.h>
-+#endif
- #include "qemu/cutils.h"
+ #########################################
+ # vhost interdependencies and host support
 
- #ifdef CONFIG_LINUX
-@@ -390,6 +395,21 @@ void qemu_init_exec_dir(const char *argv0)
-             }
-         }
-     }
-+#elif defined(__HAIKU__)
-+    {
-+        image_info ii;
-+        int32_t c = 0;
-+
-+        *buf = '\0';
-+        while (get_next_image_info(0, &c, &ii) == B_OK) {
-+            if (ii.type == B_APP_IMAGE) {
-+                strncpy(buf, ii.name, sizeof(buf));
-+                buf[sizeof(buf) - 1] = '\0';
-+                p = buf;
-+                break;
-+            }
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
+@@ -7758,6 +7764,9 @@ fi
+ if test "$sheepdog" = "yes" ; then
+   echo "CONFIG_SHEEPDOG=y" >> $config_host_mak
+ fi
++if test "$pty_h" = "yes" ; then
++  echo "CONFIG_PTY=y" >> $config_host_mak
++fi
+ if test "$fuzzing" = "yes" ; then
+   if test "$have_fuzzer" = "yes"; then
+     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..9d8ad6905e 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -35,7 +35,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+
+-#if defined(__GLIBC__)
++#if defined CONFIG_PTY
+ # include <pty.h>
+ #elif defined CONFIG_BSD
+ # include <termios.h>
 --
 2.26.0
 
