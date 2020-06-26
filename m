@@ -2,92 +2,84 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 107C1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D34C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFBC0206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD2A207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:00:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pCn193/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFBC0206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="Afp2eRIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD2A207E8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jorhn-0001VY-Ux
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:59:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59064)
+	id 1joriY-0001x2-MZ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:00:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jorUh-0003Zo-Gc
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:46:27 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37650)
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jorgR-0008G5-NM
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:58:35 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39994)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jorUf-0007x8-NN
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:46:27 -0400
-Received: by mail-ej1-x642.google.com with SMTP id mb16so10019050ejb.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:46:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PbfzS0czgvrzfNYUDwbovVaLiZXJYJoWggoXPaTM6Ew=;
- b=pCn193/CdT40jI8dX5Mn65yWUxQKrXiKShFayRxn4TcRXETbAMVWN0bIJnMSa0D3xY
- GFIeQSlhObthaWqDYNGmfAcPjkDUi/L2WWXKSqz5DZbpvvhKq9/E1EynR2f2dSR59quH
- lg10jszU2Oj+5qr1j+7Pa52vgHUKN7OhltCM0XNUOwGarJGqvKVkFbHCW23096oP9GPV
- K4inVN7twM8IwMHDmj8cl38g1MfHCoZ0Pw2Y96wDy3rxg6N6GdXHRL3nGN5YQwKKFP7j
- DjeZWA2hwcNUIHKtPFQ2BSh4N0JNDuTD82ODqejQwLZLOMdflvcFQyHYT1sMCa9UMU1s
- g+Cw==
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jorgO-0003wk-H1
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:58:35 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f139so10006186wmf.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=atishpatra.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=foVkWIJLYjD4FD1rBPY1IYhpzC2IBIcxouLRn6FuaR4=;
+ b=Afp2eRIJo6hRf0XYOmtmlyAJpz39bLc2aUQ5+Dw/rWt/212HZydc17PpxqfsLU5UNu
+ pEYMz7nf4BE5pXGGINLmKXKnJ0OmPt0+dwqdmJWtXDMQfCiPwHhne7YFpEREebtNXnGV
+ iWrYsUsAyfV91deH60N09CTTZOVVVzLkUQfxI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=PbfzS0czgvrzfNYUDwbovVaLiZXJYJoWggoXPaTM6Ew=;
- b=rr1C4tNImqr2CkgoojjD4FCyETZjtKKG/euLfPgPXjWvkrcWbIaM16Hmxk9YaKL1RJ
- 6CMkmPgg8Ui27S2FesP0kiFADyMZCHKBLhgrBbScWYJXaR33EPD1rizAHOLwH/qJ7eQC
- WhoGDBlRYtXh2wS2odeAj5bk9POj+EFDasLCWHl2y/P64c2H8IgSOXout3hYRLxiLG5f
- XWTkFBcnqIP9/5Ld2plrdvvsDBeRnOLwhHX4rv99mrmLqw58JmvefEk54USyMJxkcUaS
- 2chaKrSoPAjBvt5Kise3xjjhMLuA5jabI1lLcyqKOok/JulBKpoS9Yqsym76u5nfsiIb
- MbFw==
-X-Gm-Message-State: AOAM531BE2kJABLFCdRV8x9wyKRZaSsQH5Kifp06dH6BogXsqgxsoUoK
- 3gjCmG0WlWf5XL8wjAJQLW5PXiTR
-X-Google-Smtp-Source: ABdhPJxWHVT5CnZD+/wo7Ka1b0YNWiPtDnSAIW/6lnAe4bf21umD40B4w+AK5PuubzMDKXGvwLesqQ==
-X-Received: by 2002:a17:906:c451:: with SMTP id
- ck17mr3497900ejb.80.1593189983947; 
- Fri, 26 Jun 2020 09:46:23 -0700 (PDT)
-Received: from AK-L.domain.name ([197.58.224.183])
- by smtp.gmail.com with ESMTPSA id rv16sm10894889ejb.60.2020.06.26.09.46.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 09:46:23 -0700 (PDT)
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com,
- alex.bennee@linaro.org, rth@twiddle.net, eblake@redhat.com,
- ldoktor@redhat.com, ehabkost@redhat.com, crosa@redhat.com
-Subject: [PATCH v4 2/3] scripts/performance: Add topN_callgrind.py script
-Date: Fri, 26 Jun 2020 18:45:45 +0200
-Message-Id: <20200626164546.22102-3-ahmedkhaledkaraman@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200626164546.22102-1-ahmedkhaledkaraman@gmail.com>
-References: <20200626164546.22102-1-ahmedkhaledkaraman@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-ej1-x642.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=foVkWIJLYjD4FD1rBPY1IYhpzC2IBIcxouLRn6FuaR4=;
+ b=l0BzGfsWEo8D3/IJSUQjFl/pbWNgZUi1Qv0tcsJRIlN8DmeAtM8qQk9VkH4xNAy+ts
+ uhIP7sDXfAK+F1GAWlGBEcmVZhH2l0SIUkNyvPjgebSsRQdB/QaQHuDGi+Dpu0ZX1V5+
+ al/ZaIu3IO8VagfH6cnSNrNp+RmHfs+TJL3fNq5IvGBnvtKhj9gwKKpG0autmH1xmWxN
+ 0UsQC+iBsNYKgb4SX1FUlCSRPPlpEPBPaayE2rJ5qH2MZClxU5HQ6AxJzd8UZvipD0Pj
+ CwTCKqpX0PT4kbCwm12UpXKgU1FkQPVm4S46vGsjLAiA2w8gpiTFEwDp30jl11XtGYHL
+ k16g==
+X-Gm-Message-State: AOAM533nze4tXJvhPVvIDFO5gmC1qbXkdSc95pY+xn6g0yilvsnRClsv
+ R4v0M0QcfXHhF/S5zA66YgnpuRRi8tCuKu3j2gme
+X-Google-Smtp-Source: ABdhPJxGozJoQflwj4tvInjvZPLYVWiwfl38aY4gPf1mfqAg7NArU8hfw2vLolTY3gKzAOsA2h1JNhBn4Pv5jAHOaBs=
+X-Received: by 2002:a1c:9d09:: with SMTP id g9mr4290988wme.31.1593190710569;
+ Fri, 26 Jun 2020 09:58:30 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200626003313.715355-1-atish.patra@wdc.com>
+ <20200626003313.715355-3-atish.patra@wdc.com>
+ <CAEUhbmUCJcosvYd44qPMXdkE+Bj2MUcFBvz1VWSZL2w-6Z3d6g@mail.gmail.com>
+In-Reply-To: <CAEUhbmUCJcosvYd44qPMXdkE+Bj2MUcFBvz1VWSZL2w-6Z3d6g@mail.gmail.com>
+From: Atish Patra <atishp@atishpatra.org>
+Date: Fri, 26 Jun 2020 09:58:19 -0700
+Message-ID: <CAOnJCUKr5XXga5B02WDOeiyvEjgpAfcqp_VN-y2AAD0vXsn2Uw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] RISC-V: Copy the fdt in dram instead of ROM
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=atishp@atishpatra.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,203 +92,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Python script that prints the top N most executed functions in QEMU
-using callgrind.
+On Fri, Jun 26, 2020 at 4:50 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Atish,
+>
+> On Fri, Jun 26, 2020 at 8:33 AM Atish Patra <atish.patra@wdc.com> wrote:
+> >
+> > Currently, the fdt is copied to the ROM after the reset vector. The firmware
+> > has to copy it to DRAM. Instead of this, directly copy the device tree to a
+> > pre-computed dram address. The device tree load address should be as far as
+> > possible from kernel and initrd images. That's why it is kept at the end of
+> > the DRAM or 4GB whichever is lesser.
+> >
+> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/riscv/boot.c         | 57 +++++++++++++++++++++++++++++------------
+> >  hw/riscv/sifive_u.c     | 32 +++++++++++------------
+> >  hw/riscv/spike.c        |  7 ++++-
+> >  hw/riscv/virt.c         |  7 ++++-
+> >  include/hw/riscv/boot.h |  5 +++-
+> >  5 files changed, 71 insertions(+), 37 deletions(-)
+> >
+> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> > index 482b78147993..02c4018a8105 100644
+> > --- a/hw/riscv/boot.c
+> > +++ b/hw/riscv/boot.c
+> > @@ -159,44 +159,67 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >      return *start + size;
+> >  }
+> >
+> > +hwaddr riscv_load_fdt(hwaddr dram_base, uint64_t mem_size, void *fdt)
+>
+> I think we should use uint32_t for the return value type, since it is
+> always below 4GiB
+>
 
-Syntax:
-topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- \
-                      <qemu executable> [<qemu executable options>] \
-                      <target executable> [<target execurable options>]
+You are correct. I will update it. Thanks.
+> > +{
+> > +    hwaddr temp, fdt_addr;
+> > +    hwaddr dram_end = dram_base + mem_size;
+> > +    int fdtsize = fdt_totalsize(fdt);
+> > +
+> > +    if (fdtsize <= 0) {
+> > +        error_report("invalid device-tree");
+> > +        exit(1);
+> > +    }
+> > +
+> > +    /*
+> > +     * We should put fdt as far as possible to avoid kernel/initrd overwriting
+> > +     * its content. But it should be addressable by 32 bit system as well.
+> > +     * Thus, put it at an aligned address that less than fdt size from end of
+> > +     * dram or 4GB whichever is lesser.
+> > +     */
+> > +    temp = MIN(dram_end, 4096 * MiB);
+> > +    fdt_addr = QEMU_ALIGN_DOWN(temp - fdtsize, 2 * MiB);
+> > +
+> > +    fdt_pack(fdt);
+> > +    /* copy in the device tree */
+> > +    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+>
+> Use fdtsize
+>
 
-[-h] - Print the script arguments help message.
-[-n] - Specify the number of top functions to print.
-     - If this flag is not specified, the tool defaults to 25.
+Sure.
+> > +
+> > +    rom_add_blob_fixed_as("fdt", fdt, fdtsize, fdt_addr,
+> > +                          &address_space_memory);
+> > +
+> > +    return fdt_addr;
+> > +}
+> > +
+> >  void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
+> > -                               hwaddr rom_size, void *fdt)
+> > +                               hwaddr rom_size,
+> > +                               hwaddr fdt_load_addr, void *fdt)
+> >  {
+> >      int i;
+> >      /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > +    uint32_t reset_vec[10] = {
+> > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
+>
+> fw_dync should be introduced in the next patch, so this line should be
+> kept unchanged in this patch
+>
+As we have fdt_laddr, keeping it unchanged may create confusion with
+another dtb label.
+I will change the label to "end" in the next version.
 
-Example of usage:
-topN_callgrind.py -n 20 -- qemu-arm coulomb_double-arm
+> >          0xf1402573,                  /*     csrr   a0, mhartid  */
+> >  #if defined(TARGET_RISCV32)
+> > +        0x0202a583,                  /*     lw     a1, 32(t0) */
+> >          0x0182a283,                  /*     lw     t0, 24(t0) */
+> >  #elif defined(TARGET_RISCV64)
+> > +        0x0202b583,                  /*     ld     a1, 32(t0) */
+> >          0x0182b283,                  /*     ld     t0, 24(t0) */
+> >  #endif
+> >          0x00028067,                  /*     jr     t0 */
+> >          0x00000000,
+> >          start_addr,                  /* start: .dword */
+> >          0x00000000,
+> > -                                     /* dtb: */
+> > +        fdt_load_addr,               /* fdt_laddr: .dword */
+> > +        0x00000000,
+> > +                                     /* fw_dyn: */
+> >      };
+> >
+> >      /* copy in the reset vector in little_endian byte order */
+> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > +    for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
+> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> >      }
+> >      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> >                            rom_base, &address_space_memory);
+> >
+> > -    /* copy in the device tree */
+> > -    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
+> > -        rom_size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> > -    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
+> > -                           rom_base + sizeof(reset_vec),
+> > -                           &address_space_memory);
+> > -
+> >      return;
+> >  }
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index 395b21703ab4..7d39a4e4ec6d 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -379,6 +379,7 @@ static void sifive_u_machine_init(MachineState *machine)
+> >      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
+> >      target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
+> >      int i;
+> > +    hwaddr fdt_load_addr;
+> >
+> >      /* Initialize SoC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
+> > @@ -450,40 +451,37 @@ static void sifive_u_machine_init(MachineState *machine)
+> >          }
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_load_fdt(memmap[SIFIVE_U_DRAM].base,
+> > +                                   machine->ram_size, s->fdt);
+> > +
+> >      /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > +    uint32_t reset_vec[11] = {
+> >          s->msel,                       /* MSEL pin state */
+> > -        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x01c28593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
+> > +        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
+> >          0xf1402573,                    /*     csrr   a0, mhartid  */
+> >  #if defined(TARGET_RISCV32)
+> > +        0x0202a583,                    /*     lw     a1, 32(t0) */
+> >          0x0182a283,                    /*     lw     t0, 24(t0) */
+> >  #elif defined(TARGET_RISCV64)
+> > -        0x0182e283,                    /*     lwu    t0, 24(t0) */
+> > +        0x0202b583,                    /*     ld     a1, 32(t0) */
+> > +        0x0182b283,                    /*     ld     t0, 24(t0) */
+>
+> This change (lwu => ld) is unnecessary.
+>
+start_addr is a dword. Currently, the start address is within 32 bits.
+But it can be changed to more than 32 bits. No ?
 
-Example Output:
-No.  Percentage Function Name         Source File
-----  --------- ------------------    ------------------------------
-   1    24.577% 0x00000000082db000    ???
-   2    20.467% float64_mul           <qemu>/fpu/softfloat.c
-   3    14.720% float64_sub           <qemu>/fpu/softfloat.c
-   4    13.864% float64_add           <qemu>/fpu/softfloat.c
-   5     4.876% helper_mulsd          <qemu>/target/i386/ops_sse.h
-   6     3.767% helper_subsd          <qemu>/target/i386/ops_sse.h
-   7     3.549% helper_addsd          <qemu>/target/i386/ops_sse.h
-   8     2.185% helper_ucomisd        <qemu>/target/i386/ops_sse.h
-   9     1.667% helper_lookup_tb_ptr  <qemu>/include/exec/tb-lookup.h
-  10     1.662% f64_compare           <qemu>/fpu/softfloat.c
-  11     1.509% helper_lookup_tb_ptr  <qemu>/accel/tcg/tcg-runtime.c
-  12     0.635% helper_lookup_tb_ptr  <qemu>/include/exec/exec-all.h
-  13     0.616% float64_div           <qemu>/fpu/softfloat.c
-  14     0.502% helper_pand_xmm       <qemu>/target/i386/ops_sse.h
-  15     0.502% float64_mul           <qemu>/include/fpu/softfloat.h
-  16     0.476% helper_lookup_tb_ptr  <qemu>/target/i386/cpu.h
-  17     0.437% float64_compare_quiet <qemu>/fpu/softfloat.c
-  18     0.414% helper_pxor_xmm       <qemu>/target/i386/ops_sse.h
-  19     0.353% round_to_int          <qemu>/fpu/softfloat.c
-  20     0.347% helper_cc_compute_all <qemu>/target/i386/cc_helper.c
+> >  #endif
+> >          0x00028067,                    /*     jr     t0 */
+> >          0x00000000,
+> >          start_addr,                    /* start: .dword */
+> > -                                       /* dtb: */
+> > +        0x00000000,
+>
+> unnecessary change. Above lwu can be kept unchanged
+>
+> > +        fdt_load_addr,                 /* fdt_laddr: .dword */
+> > +        0x00000000,
+> > +                                       /* fw_dyn: */
+>
+> should be in next patch
+>
+Will do.
 
-Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
----
- scripts/performance/topN_callgrind.py | 140 ++++++++++++++++++++++++++
- 1 file changed, 140 insertions(+)
- create mode 100755 scripts/performance/topN_callgrind.py
+> >      };
+> >
+> >      /* copy in the reset vector in little_endian byte order */
+> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > +    for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
+> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> >      }
+> >      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> >                            memmap[SIFIVE_U_MROM].base, &address_space_memory);
+> > -
+> > -    /* copy in the device tree */
+> > -    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+> > -            memmap[SIFIVE_U_MROM].size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> > -    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+> > -                          memmap[SIFIVE_U_MROM].base + sizeof(reset_vec),
+> > -                          &address_space_memory);
+> >  }
+> >
+> >  static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
+> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> > index c696077cbc16..69f050c07e5a 100644
+> > --- a/hw/riscv/spike.c
+> > +++ b/hw/riscv/spike.c
+> > @@ -163,6 +163,7 @@ static void spike_board_init(MachineState *machine)
+> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> >      unsigned int smp_cpus = machine->smp.cpus;
+> > +    hwaddr fdt_load_addr;
+> >
+> >      /* Initialize SOC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc,
+> > @@ -208,9 +209,13 @@ static void spike_board_init(MachineState *machine)
+> >          }
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_load_fdt(memmap[SPIKE_DRAM].base,
+> > +                                   machine->ram_size, s->fdt);
+> >      /* load the reset vector */
+> >      riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
+> > -                              memmap[SPIKE_MROM].size, s->fdt);
+> > +                              memmap[SPIKE_MROM].size,
+> > +                              fdt_load_addr, s->fdt);
+> >
+> >      /* initialize HTIF using symbols found in load_kernel */
+> >      htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> > index 8ec77e43de26..639e284fc2e3 100644
+> > --- a/hw/riscv/virt.c
+> > +++ b/hw/riscv/virt.c
+> > @@ -478,6 +478,7 @@ static void virt_machine_init(MachineState *machine)
+> >      char *plic_hart_config;
+> >      size_t plic_hart_config_len;
+> >      target_ulong start_addr = memmap[VIRT_DRAM].base;
+> > +    hwaddr fdt_load_addr;
+> >      int i;
+> >      unsigned int smp_cpus = machine->smp.cpus;
+> >
+> > @@ -532,9 +533,13 @@ static void virt_machine_init(MachineState *machine)
+> >          start_addr = virt_memmap[VIRT_FLASH].base;
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_load_fdt(memmap[VIRT_DRAM].base,
+> > +                                   machine->ram_size, s->fdt);
+> >      /* load the reset vector */
+> >      riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
+> > -                              virt_memmap[VIRT_MROM].size, s->fdt);
+> > +                              virt_memmap[VIRT_MROM].size,
+> > +                              fdt_load_addr, s->fdt);
+> >
+> >      /* create PLIC hart topology configuration string */
+> >      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+> > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> > index 3e9759c89aa2..f64fcadd2390 100644
+> > --- a/include/hw/riscv/boot.h
+> > +++ b/include/hw/riscv/boot.h
+> > @@ -35,7 +35,10 @@ target_ulong riscv_load_kernel(const char *kernel_filename,
+> >                                 symbol_fn_t sym_cb);
+> >  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >                           uint64_t kernel_entry, hwaddr *start);
+> > +hwaddr riscv_load_fdt(hwaddr dram_start, uint64_t dram_size,
+> > +                                void *fdt);
+>
+> nits: not indented to (
+>
+> >  void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
+> > -                               hwaddr rom_size, void *fdt);
+> > +                               hwaddr rom_size,
+> > +                               hwaddr fdt_load_addr, void *fdt);
+> >
+> >  #endif /* RISCV_BOOT_H */
+>
+> Regards,
+> Bin
+>
 
-diff --git a/scripts/performance/topN_callgrind.py b/scripts/performance/topN_callgrind.py
-new file mode 100755
-index 0000000000..67c59197af
---- /dev/null
-+++ b/scripts/performance/topN_callgrind.py
-@@ -0,0 +1,140 @@
-+#!/usr/bin/env python3
-+
-+#  Print the top N most executed functions in QEMU using callgrind.
-+#  Syntax:
-+#  topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- \
-+#           <qemu executable> [<qemu executable options>] \
-+#           <target executable> [<target execurable options>]
-+#
-+#  [-h] - Print the script arguments help message.
-+#  [-n] - Specify the number of top functions to print.
-+#       - If this flag is not specified, the tool defaults to 25.
-+#
-+#  Example of usage:
-+#  topN_callgrind.py -n 20 -- qemu-arm coulomb_double-arm
-+#
-+#  This file is a part of the project "TCG Continuous Benchmarking".
-+#
-+#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-+#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+#
-+#  This program is free software: you can redistribute it and/or modify
-+#  it under the terms of the GNU General Public License as published by
-+#  the Free Software Foundation, either version 2 of the License, or
-+#  (at your option) any later version.
-+#
-+#  This program is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+#  GNU General Public License for more details.
-+#
-+#  You should have received a copy of the GNU General Public License
-+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
-+
-+import argparse
-+import os
-+import subprocess
-+import sys
-+
-+
-+# Parse the command line arguments
-+parser = argparse.ArgumentParser(
-+    usage='topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- '
-+          '<qemu executable> [<qemu executable options>] '
-+          '<target executable> [<target executable options>]')
-+
-+parser.add_argument('-n', dest='top', type=int, default=25,
-+                    help='Specify the number of top functions to print.')
-+
-+parser.add_argument('command', type=str, nargs='+', help=argparse.SUPPRESS)
-+
-+args = parser.parse_args()
-+
-+# Extract the needed variables from the args
-+command = args.command
-+top = args.top
-+
-+# Insure that valgrind is installed
-+check_valgrind_presence = subprocess.run(["which", "valgrind"],
-+                                         stdout=subprocess.DEVNULL)
-+if check_valgrind_presence.returncode:
-+    sys.exit("Please install valgrind before running the script!")
-+
-+# Run callgrind
-+callgrind = subprocess.run((
-+    ["valgrind", "--tool=callgrind", "--callgrind-out-file=/tmp/callgrind.data"]
-+    + command),
-+    stdout=subprocess.DEVNULL,
-+    stderr=subprocess.PIPE)
-+if callgrind.returncode:
-+    sys.exit(callgrind.stderr.decode("utf-8"))
-+
-+# Save callgrind_annotate output to /tmp/callgrind_annotate.out
-+with open("/tmp/callgrind_annotate.out", "w") as output:
-+    callgrind_annotate = subprocess.run(["callgrind_annotate",
-+                                         "/tmp/callgrind.data"],
-+                                        stdout=output,
-+                                        stderr=subprocess.PIPE)
-+    if callgrind_annotate.returncode:
-+        os.unlink('/tmp/callgrind.data')
-+        output.close()
-+        os.unlink('/tmp/callgrind_annotate.out')
-+        sys.exit(callgrind_annotate.stderr.decode("utf-8"))
-+
-+# Read the callgrind_annotate output to callgrind_data[]
-+callgrind_data = []
-+with open('/tmp/callgrind_annotate.out', 'r') as data:
-+    callgrind_data = data.readlines()
-+
-+# Line number with the total number of instructions
-+total_instructions_line_number = 20
-+
-+# Get the total number of instructions
-+total_instructions_line_data = callgrind_data[total_instructions_line_number]
-+total_number_of_instructions = total_instructions_line_data.split(' ')[0]
-+total_number_of_instructions = int(
-+    total_number_of_instructions.replace(',', ''))
-+
-+# Line number with the top function
-+first_func_line = 25
-+
-+# Number of functions recorded by callgrind, last two lines are always empty
-+number_of_functions = len(callgrind_data) - first_func_line - 2
-+
-+# Limit the number of top functions to "top"
-+number_of_top_functions = (top if number_of_functions >
-+                           top else number_of_functions)
-+
-+# Store the data of the top functions in top_functions[]
-+top_functions = callgrind_data[first_func_line:
-+                               first_func_line + number_of_top_functions]
-+
-+# Print table header
-+print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
-+                                                         'Percentage',
-+                                                         'Function Name',
-+                                                         'Source File',
-+                                                         '-' * 4,
-+                                                         '-' * 10,
-+                                                         '-' * 30,
-+                                                         '-' * 30,
-+                                                         ))
-+
-+# Print top N functions
-+for (index, function) in enumerate(top_functions, start=1):
-+    function_data = function.split()
-+    # Calculate function percentage
-+    function_instructions = float(function_data[0].replace(',', ''))
-+    function_percentage = (function_instructions /
-+                           total_number_of_instructions)*100
-+    # Get function name and source files path
-+    function_source_file, function_name = function_data[1].split(':')
-+    # Print extracted data
-+    print('{:>4}  {:>9.3f}%  {:<30}  {}'.format(index,
-+                                                round(function_percentage, 3),
-+                                                function_name,
-+                                                function_source_file))
-+
-+# Remove intermediate files
-+os.unlink('/tmp/callgrind.data')
-+os.unlink('/tmp/callgrind_annotate.out')
+
 -- 
-2.17.1
-
+Regards,
+Atish
 
