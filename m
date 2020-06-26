@@ -2,93 +2,132 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D54C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E85DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9576207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9576207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id ED3C02078D
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eACeHCn4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED3C02078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jonlA-00085e-1W
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:47:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48810)
+	id 1jonlI-0008Ky-8e
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:47:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jonkK-0007AV-UV; Fri, 26 Jun 2020 08:46:20 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34890
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jonkJ-0004GQ-1L; Fri, 26 Jun 2020 08:46:20 -0400
-Received: from host86-158-109-79.range86-158.btcentralplus.com
- ([86.158.109.79] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jonkI-0000Ui-9c; Fri, 26 Jun 2020 13:46:21 +0100
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <cover.1592315226.git.balaton@eik.bme.hu>
- <de15b4f489d2277d0d11c0b652c514905ee8f875.1592315226.git.balaton@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <128959fe-6b62-0835-b8ec-e5bcc46dc7d8@ilande.co.uk>
-Date: Fri, 26 Jun 2020 13:46:13 +0100
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jonjt-0006hq-NS
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:45:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35058
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jonjr-0003yB-WC
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:45:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593175550;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2+D0UVkLJ0evD1GIZmpHDqPsq6zMGALoN556+t57m8E=;
+ b=eACeHCn4Wm/Q0RGGBku2knobrCP1syqfAIU+M4RC93ZlVQPhUVCmqRXa4+mjbcMsIBrs3+
+ vTHgkeA8nJS3USlT0scSK97x8XN0HyqnLp1TYhPtzLmhMoDj6Xu1/SVIsMYfJN/kidGF3r
+ AybBrPch0eo9AJhNVYDfv0p5P1+x7+c=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-_QQYH9s5NLioZuf2nZiW8Q-1; Fri, 26 Jun 2020 08:45:49 -0400
+X-MC-Unique: _QQYH9s5NLioZuf2nZiW8Q-1
+Received: by mail-wr1-f70.google.com with SMTP id i12so10629140wrx.11
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 05:45:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=VANejHRbGBgY/Xc4lXaWDqiG7lfOXGQhHth4wXyM0P4=;
+ b=PzueJomzxgbfSa3keshp5TgZ1AM+5OZBwF2t6wJP6WDOqqxdRh/IOL/nz988+H9oCK
+ G5sCOfv4vOjVILATF5ohs8hN/kS4HHMbkfmor1TXv49XkhfFalJx7HavvQViCZIiWbE5
+ N1OdJDHoucaKygchQ03QrjolVN+RszMeIpgWgIGoYKpnO7QimGoohQh/0eJ8KRO1X2tc
+ bte8RIhzTGo4Sn9w52EQXZIQqmvx0MHCQyGC9T/Bm1koT3JqT21nxtfPnxbCd68ymbpy
+ 2BYAbDxlakERKEWpUBbFHHz1gGkF3wb9T/OYoyhwk0RG+HOWKQMpDwNGLUNj7KSPCaue
+ aJ5Q==
+X-Gm-Message-State: AOAM530ejUbllNd6iJZeJhdorsifHvNs8aSaHtI5ANag7Phh6iZTXrfk
+ H9Az4pgOB/pKsR5wN89AiBNc3xzRlgYqVINpbalhQjtf2saysrlbE6f0ECOe7niyCfx6xgi8Yd6
+ eml+BqZ61ZnwVV2E=
+X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr3119052wme.45.1593175547965; 
+ Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOjcLZmx9rPqHo7acNxil0zGdSF0AETnLWZh4pQxwlFY084HcxKmi6bNxDfqz32oxjZqr8cQ==
+X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr3119027wme.45.1593175547693; 
+ Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id k185sm14220080wmk.47.2020.06.26.05.45.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
+Subject: Re: [PATCH 04/17] block/nvme: Be explicit we share NvmeIdCtrl /
+ NvmeIdNs structures
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200625184838.28172-1-philmd@redhat.com>
+ <20200625184838.28172-5-philmd@redhat.com>
+ <20200626111905.GK281902@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <cf603d70-1aee-5973-afd2-962ba8707169@redhat.com>
+Date: Fri, 26 Jun 2020 14:45:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <de15b4f489d2277d0d11c0b652c514905ee8f875.1592315226.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200626111905.GK281902@stefanha-x1.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.158.109.79
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v5 04/11] mac_oldworld: Drop some variables
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,122 +140,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/06/2020 14:47, BALATON Zoltan wrote:
-
-> Values not used frequently enough may not worth putting in a local
-> variable, especially with names almost as long as the original value
-> because that does not improve readability, to the contrary it makes it
-> harder to see what value is used. Drop a few such variables.
+On 6/26/20 1:19 PM, Stefan Hajnoczi wrote:
+> On Thu, Jun 25, 2020 at 08:48:25PM +0200, Philippe Mathieu-Daudé wrote:
+>> We allocate an unique chunk of memory then use it for two
+>> different structures. Introduce the 'idsz_max' variable to
+>> hold the maximum size, to make it clearer the size is enough
+>> to hold the two structures.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> FIXME: reword with something that makes more sense...
+>> ---
+>>  block/nvme.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/nvme.c b/block/nvme.c
+>> index 71f8cf27a8..ffda804a8e 100644
+>> --- a/block/nvme.c
+>> +++ b/block/nvme.c
+>> @@ -438,6 +438,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+>>      BDRVNVMeState *s = bs->opaque;
+>>      NvmeIdCtrl *idctrl;
+>>      NvmeIdNs *idns;
+>> +    size_t idsz_max;
+>>      NvmeLBAF *lbaf;
+>>      uint8_t *resp;
+>>      uint16_t oncs;
+>> @@ -448,14 +449,15 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+>>          .cdw10 = cpu_to_le32(0x1),
+>>      };
+>>  
+>> -    resp = qemu_try_blockalign0(bs, sizeof(NvmeIdCtrl));
+>> +    idsz_max = MAX_CONST(sizeof(NvmeIdCtrl), sizeof(NvmeIdNs));
+>> +    resp = qemu_try_blockalign0(bs, idsz_max);
+>>      if (!resp) {
+>>          error_setg(errp, "Cannot allocate buffer for identify response");
+>>          goto out;
+>>      }
+>>      idctrl = (NvmeIdCtrl *)resp;
+>>      idns = (NvmeIdNs *)resp;
+>> -    r = qemu_vfio_dma_map(s->vfio, resp, sizeof(NvmeIdCtrl), true, &iova);
+>> +    r = qemu_vfio_dma_map(s->vfio, resp, idsz_max, true, &iova);
 > 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/ppc/mac_oldworld.c | 33 ++++++++++++++++-----------------
->  1 file changed, 16 insertions(+), 17 deletions(-)
+> _nvme_check_size() has compile-time asserts that check
+> sizeof(NvmeIdCtrl) == sizeof(NvmeIdNs) == 4096.
 > 
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index d1c4244b1e..4200008851 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
->  static void ppc_heathrow_init(MachineState *machine)
->  {
->      ram_addr_t ram_size = machine->ram_size;
-> -    const char *kernel_filename = machine->kernel_filename;
-> -    const char *kernel_cmdline = machine->kernel_cmdline;
-> -    const char *initrd_filename = machine->initrd_filename;
->      const char *boot_device = machine->boot_order;
->      PowerPCCPU *cpu = NULL;
->      CPUPPCState *env = NULL;
->      char *filename;
-> -    int linux_boot, i;
-> +    int i;
->      MemoryRegion *bios = g_new(MemoryRegion, 1);
->      uint32_t kernel_base, initrd_base, cmdline_base = 0;
->      int32_t kernel_size, initrd_size;
-> @@ -108,8 +105,6 @@ static void ppc_heathrow_init(MachineState *machine)
->      void *fw_cfg;
->      uint64_t tbfreq;
->  
-> -    linux_boot = (kernel_filename != NULL);
-> -
->      /* init CPUs */
->      for (i = 0; i < smp_cpus; i++) {
->          cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-> @@ -159,7 +154,7 @@ static void ppc_heathrow_init(MachineState *machine)
->          exit(1);
->      }
->  
-> -    if (linux_boot) {
-> +    if (machine->kernel_filename) {
->          uint64_t lowaddr = 0;
->          int bswap_needed;
->  
-> @@ -169,30 +164,33 @@ static void ppc_heathrow_init(MachineState *machine)
->          bswap_needed = 0;
->  #endif
->          kernel_base = KERNEL_LOAD_ADDR;
-> -        kernel_size = load_elf(kernel_filename, NULL,
-> +        kernel_size = load_elf(machine->kernel_filename, NULL,
->                                 translate_kernel_address, NULL,
->                                 NULL, &lowaddr, NULL, NULL, 1, PPC_ELF_MACHINE,
->                                 0, 0);
->          if (kernel_size < 0)
-> -            kernel_size = load_aout(kernel_filename, kernel_base,
-> +            kernel_size = load_aout(machine->kernel_filename, kernel_base,
->                                      ram_size - kernel_base, bswap_needed,
->                                      TARGET_PAGE_SIZE);
->          if (kernel_size < 0)
-> -            kernel_size = load_image_targphys(kernel_filename,
-> +            kernel_size = load_image_targphys(machine->kernel_filename,
->                                                kernel_base,
->                                                ram_size - kernel_base);
->          if (kernel_size < 0) {
-> -            error_report("could not load kernel '%s'", kernel_filename);
-> +            error_report("could not load kernel '%s'",
-> +                         machine->kernel_filename);
->              exit(1);
->          }
->          /* load initrd */
-> -        if (initrd_filename) {
-> -            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
-> -            initrd_size = load_image_targphys(initrd_filename, initrd_base,
-> +        if (machine->initrd_filename) {
-> +            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
-> +                                            KERNEL_GAP);
-> +            initrd_size = load_image_targphys(machine->initrd_filename,
-> +                                              initrd_base,
->                                                ram_size - initrd_base);
->              if (initrd_size < 0) {
->                  error_report("could not load initial ram disk '%s'",
-> -                             initrd_filename);
-> +                             machine->initrd_filename);
->                  exit(1);
->              }
->              cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
-> @@ -336,9 +334,10 @@ static void ppc_heathrow_init(MachineState *machine)
->      fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
->      fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
->      fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
-> -    if (kernel_cmdline) {
-> +    if (machine->kernel_cmdline) {
->          fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
-> -        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
-> +        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
-> +                         machine->kernel_cmdline);
->      } else {
->          fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
->      }
+> I suggest the following cleanup:
+> 
+>   union {
+>       NvmeIdCtrl ctrl;
+>       NvmeIdNs ns;
+>   } *id;
+>   ...
+>   id = qemu_try_blockalign0(bs, sizeof(*id));
+>   ...
+>   r = qemu_vfio_dma_map(s->vfio, resp, sizeof(*id), true, &iova);
+> 
+> and accesses to idctl are replaced with id->ctrl and idns with id->ns.
+> 
+> This eliminates the casts, makes it clear that this data is overlapping,
+> and avoids the need for idsz_max.
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Clever idea, thanks!
 
-
-ATB,
-
-Mark.
 
