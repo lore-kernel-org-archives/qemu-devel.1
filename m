@@ -2,128 +2,64 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E69C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00263C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:05:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E6B1207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:03:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1tzPzDS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6B1207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAB5B2088E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:05:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAB5B2088E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jooxK-00050i-LZ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:03:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43030)
+	id 1jooyT-0006YY-3W
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:05:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joowN-0003yY-OX
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:02:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33880
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1joowM-0003o2-CD
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:02:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593180169;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fFeuO2M40Y+laH4RbKBBHDvR8QJTWwQ0zOUA3ulr+fY=;
- b=M1tzPzDSfDyEwSU0lIHuwH0laOvADfsDAZgs7He4g88D1dlop1wbmonXyO93Ua9kPJwQof
- +B2OTZwo8P3kSG3g1UtmXzXgCLgpjxWwmM+hJGbiKiOkJjVKPhlh2/FwG/d7CG8nawCW5+
- 5nPvtrOVMfOiAAb5PSZgSAkU3+auews=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-kv74VaQLN3OSMgZd1kcPNg-1; Fri, 26 Jun 2020 10:02:48 -0400
-X-MC-Unique: kv74VaQLN3OSMgZd1kcPNg-1
-Received: by mail-wm1-f69.google.com with SMTP id a21so11104104wmd.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 07:02:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=77OBxt9fQuKr3OJ7RxV2dzeaX2yp9/tcSCGPsFTUw+w=;
- b=Ax4g1y1PvXYrURIwA8lcGq6cBo5Hj+n/rSFNqept9nHtWObskJ/MXnLM7dWfRrcCz4
- yYeM2mpHtutlL3rrkCfB4Ujsy5fgnn+daU6ijdcSWWSt7ruTxcWikoidfZpy0hJt1Ux/
- UwIZvfcLNWj+FNiGn9JOj1NFQ+zj+LXiXFH4z9FzIJ1KpnBe/Gi6OKPSGmOy0+ycYWRn
- SSsCEhPyBlvGyYM3gTK8cLakahzMlHnmd9d8H6MKbPU3Ys3WENakFA7n+LcDb1csLvHY
- UjfqtJDZKKwRSzFV1ENYT/wnkXJCb/2wGdMRLUqXYWvKYzJET0Di5Mm5chT9hx48aMyc
- DACw==
-X-Gm-Message-State: AOAM531USJwGJpfVIXhw12bSZ7GtOcRfWljtOu4yPd/guyCV70zOtwL7
- 75q7Cw2ifn5HjnBQWqXvwxEcU/+ABHqVehdQ7I4td74bD/+cKMHcl0cRy3DR8aFdX2T1t029aop
- htteibuin+CFZ6Qc=
-X-Received: by 2002:a1c:7f87:: with SMTP id a129mr3825864wmd.10.1593180165194; 
- Fri, 26 Jun 2020 07:02:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXirmBehOeNvFOdy3ZZgGxKr5PHsQPUxgE9xers87Oi5KZa9PjblJvVfQk68y8rlB6XaI3nw==
-X-Received: by 2002:a1c:7f87:: with SMTP id a129mr3825835wmd.10.1593180164954; 
- Fri, 26 Jun 2020 07:02:44 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id g144sm19818342wme.2.2020.06.26.07.02.43
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 07:02:44 -0700 (PDT)
-Subject: Re: [PATCH 01/17] block/nvme: Avoid further processing if trace event
- not enabled
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200625184838.28172-1-philmd@redhat.com>
- <20200625184838.28172-2-philmd@redhat.com>
- <20200626103651.GH281902@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <a3d7754c-38d8-ec9a-18d8-1a489d0c55ba@redhat.com>
-Date: Fri, 26 Jun 2020 16:02:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1joox7-000574-Mb; Fri, 26 Jun 2020 10:03:37 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:44567)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1joox4-00044s-Gn; Fri, 26 Jun 2020 10:03:36 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id BCB727482D3;
+ Fri, 26 Jun 2020 16:03:29 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 8DD287482CD; Fri, 26 Jun 2020 16:03:29 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 8C2887475FA;
+ Fri, 26 Jun 2020 16:03:29 +0200 (CEST)
+Date: Fri, 26 Jun 2020 16:03:29 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 1/3] hw/i2c/smbus_eeprom: Set QOM parent
+In-Reply-To: <f7da6118-a27a-a09d-9c8f-92cbf2eca96f@amsat.org>
+Message-ID: <alpine.BSF.2.22.395.2006261557050.56498@zero.eik.bme.hu>
+References: <20200626102744.15053-1-f4bug@amsat.org>
+ <20200626102744.15053-2-f4bug@amsat.org>
+ <alpine.BSF.2.22.395.2006261240500.94870@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2006261251480.94870@zero.eik.bme.hu>
+ <f7da6118-a27a-a09d-9c8f-92cbf2eca96f@amsat.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200626103651.GH281902@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Content-Type: multipart/mixed;
+ boundary="3866299591-1593934291-1593180209=:56498"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,23 +73,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Markus Armbruster <armbru@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-ppc@nongnu.org, =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
+ Huacai Chen <chenhc@lemote.com>, Fred Konrad <konrad@adacore.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/20 12:36 PM, Stefan Hajnoczi wrote:
-> On Thu, Jun 25, 2020 at 08:48:22PM +0200, Philippe Mathieu-Daudé wrote:
->> Avoid further processing if TRACE_NVME_SUBMIT_COMMAND_RAW is
->> not enabled.
-> 
-> Why?
-> 
-> This saves 8 trace events, each with 8 arguments. I guess the intent is
-> to improve performance. Did you measure an improvement?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-No testing, I just tried to outsmart the compiler :/
+--3866299591-1593934291-1593180209=:56498
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
+On Fri, 26 Jun 2020, Philippe Mathieu-Daudé wrote:
+> + Eduardo / Mark / Edgard / Alistair / Fred for QOM design.
+>
+> On 6/26/20 12:54 PM, BALATON Zoltan wrote:
+>> On Fri, 26 Jun 2020, BALATON Zoltan wrote:
+>>> On Fri, 26 Jun 2020, Philippe Mathieu-Daudé wrote:
+>>>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>> Aspeed change pending latest ARM pull-request, so meanwhile sending
+>>>> as RFC.
+>>>> ---
+>>>> include/hw/i2c/smbus_eeprom.h |  9 ++++++---
+>>>> hw/i2c/smbus_eeprom.c         | 13 ++++++++++---
+>>>> hw/mips/fuloong2e.c           |  2 +-
+>>>> hw/ppc/sam460ex.c             |  2 +-
+>>>> 4 files changed, 18 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/i2c/smbus_eeprom.h
+>>>> b/include/hw/i2c/smbus_eeprom.h
+>>>> index 68b0063ab6..037612bbbb 100644
+>>>> --- a/include/hw/i2c/smbus_eeprom.h
+>>>> +++ b/include/hw/i2c/smbus_eeprom.h
+>>>> @@ -26,9 +26,12 @@
+>>>> #include "exec/cpu-common.h"
+>>>> #include "hw/i2c/i2c.h"
+>>>>
+>>>> -void smbus_eeprom_init_one(I2CBus *bus, uint8_t address, uint8_t
+>>>> *eeprom_buf);
+>>>> -void smbus_eeprom_init(I2CBus *bus, int nb_eeprom,
+>>>> -                       const uint8_t *eeprom_spd, int size);
+>>>> +void smbus_eeprom_init_one(Object *parent_obj, const char *child_name,
+>>>> +                           I2CBus *smbus, uint8_t address,
+>>>> +                           uint8_t *eeprom_buf);
+>>>> +void smbus_eeprom_init(Object *parent_obj, const char
+>>>> *child_name_prefix,
+>>>> +                       I2CBus *smbus, int nb_eeprom,
+>>>> +                       const uint8_t *eeprom_spd, int eeprom_spd_size);
+>>>
+>>> Keeping I2CBus *smbus and uint8_t address as first parameters before
+>>> parent_obj and name looks better to me. These functions still operate
+>>> on an I2Cbus so could be regarded as methods of I2CBus therefore first
+>>> parameter should be that.
+>>
+>> Also isn't parent_obj is the I2Cbus itself? Why is that need to be
+>> passed? The i2c_init_bus() also takes parent and name params so both
+>> I2Cbus and it's parent should be available as parents of the new I2C
+>> device here without more parameters. What am I missing here?
+>
+> This is where I'm confused too and what I want to resolve with this
+> RFC series :)
+>
+> The SPD EEPROM is soldered on the DIMM module. The DIMM exposes the
+> memory address/data pins and the i2c pins. We plug DIMMs on a
+> (mother)board.
+>
+> I see the DIMM module being the parent. As we don't model it in QOM,
+> I used the MemoryRegion (which is what the SPD is describing).
+>
+> We could represent the DIMM as a container of DRAM + SPD EEPROM, but
+> it makes the modeling slightly more complex. The only benefit is a
+> clearer modeling.
+>
+> I'm not sure why the I2C bus is expected to be the parent. Maybe an
+> old wrong assumption?
+
+I guess it's a question of what the parent should mean? Is it parent of 
+the object in which case it's the I2CBus (which is kind of logical view of 
+the object tree modelling the machine) or the parent of the thing modelled 
+in the machine (which is physical view of the machine components) then it 
+should be the RAM module. The confusion probably comes from this question 
+not answered. Also the DIMM module is not modelled so when you assign SPD 
+eeproms to memory region it could be multiple SPD eeproms will be parented 
+by a single RAM memory region (possibly not covering it fully as in the 
+mac_oldworld or sam460ex case discussed in another thread). This does not 
+seem too intuitive.
+
+Regards,
+BALATON Zoltan
+--3866299591-1593934291-1593180209=:56498--
 
