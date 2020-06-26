@@ -2,92 +2,67 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0F0C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA15C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A1920DD4
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Koo6kdzC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A1920DD4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 739F920DD4
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:36:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739F920DD4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokmo-0001w8-64
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57488)
+	id 1jokmt-00025H-OK
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:36:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jokk2-0005ek-AL
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:33:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34911
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jokjz-00029V-Pn
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:33:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593164027;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=JwInyFqPNq+XPB0DyOjAdFbK431fsG1hPSaA2tOyD8Y=;
- b=Koo6kdzC9UX0ZCSgMu3XJUJ5rGXeHpxZHSQdY9mAf71P4mgSci/si87B8z/t8XbV7WCOtj
- 24EUMqawsQhALeA/dvAFeyRBdYHQsNTBUcRVIMv7PkE4/SlyeT0ceT867+STbT7RHY5WvS
- Bmmce6Jor1usv7X+4N82tZadwemeDjw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-WIhMDPZHNTSGNwJ0sarg7g-1; Fri, 26 Jun 2020 05:33:15 -0400
-X-MC-Unique: WIhMDPZHNTSGNwJ0sarg7g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD159193F561;
- Fri, 26 Jun 2020 09:33:13 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61D6B1011396;
- Fri, 26 Jun 2020 09:33:00 +0000 (UTC)
-Date: Fri, 26 Jun 2020 10:32:57 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-Message-ID: <20200626093257.GC1028934@redhat.com>
-References: <20200619114526.6a6f70c6.cohuck@redhat.com>
- <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
- <20200619120530.256c36cb.cohuck@redhat.com>
- <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
- <20200622140254.0dbe5d8c.cohuck@redhat.com>
- <20200625052518.GD172395@umbus.fritz.box>
- <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
- <20200626044259.GK172395@umbus.fritz.box>
- <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
- <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jokbf-0006LD-Gb; Fri, 26 Jun 2020 05:25:11 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34370
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jokbc-0005ZK-Qx; Fri, 26 Jun 2020 05:25:11 -0400
+Received: from host86-158-109-79.range86-158.btcentralplus.com
+ ([86.158.109.79] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jokba-0007bz-Ft; Fri, 26 Jun 2020 10:25:11 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: peter.maydell@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Date: Fri, 26 Jun 2020 10:23:14 +0100
+Message-Id: <20200626092317.3875-20-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
+References: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.158.109.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PULL 19/22] mac_via: rework ADB state machine to be compatible with
+ both MacOS and Linux
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,98 +75,510 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pair@us.ibm.com, Cornelia Huck <cohuck@redhat.com>, brijesh.singh@amd.com,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, pasic@linux.ibm.com,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 11:01:58AM +0200, Janosch Frank wrote:
-> On 6/26/20 8:53 AM, David Hildenbrand wrote:
-> >>>>> Does this have any implications when probing with the 'none' machine?
-> >>>>
-> >>>> I'm not sure.  In your case, I guess the cpu bit would still show up
-> >>>> as before, so it would tell you base feature availability, but not
-> >>>> whether you can use the new configuration option.
-> >>>>
-> >>>> Since the HTL option is generic, you could still set it on the "none"
-> >>>> machine, though it wouldn't really have any effect.  That is, if you
-> >>>> could create a suitable object to point it at, which would depend on
-> >>>> ... details.
-> >>>>
-> >>>
-> >>> The important point is that we never want the (expanded) host cpu model
-> >>> look different when either specifying or not specifying the HTL
-> >>> property.
-> >>
-> >> Ah, yes, I see your point.  So my current suggestion will satisfy
-> >> that, basically it is:
-> >>
-> >> cpu has unpack (inc. by default) && htl specified
-> >> 	=> works (allowing secure), as expected
-> > 
-> > ack
-> > 
-> >>
-> >> !cpu has unpack && htl specified
-> >> 	=> bails out with an error
-> > 
-> > ack
-> > 
-> >>
-> >> !cpu has unpack && !htl specified
-> >> 	=> works for a non-secure guest, as expected
-> >> 	=> guest will fail if it attempts to go secure
-> > 
-> > ack, behavior just like running on older hw without unpack
-> > 
-> >>
-> >> cpu has unpack && !htl specified
-> >> 	=> works as expected for a non-secure guest (unpack feature is
-> >> 	   present, but unused)
-> >> 	=> secure guest may work "by accident", but only if all virtio
-> >> 	   properties have the right values, which is the user's
-> >> 	   problem
-> >>
-> >> That last case is kinda ugly, but I think it's tolerable.
-> > 
-> > Right, we must not affect non-secure guests, and existing secure setups
-> > (e.g., older qemu machines). Will have to think about this some more,
-> > but does not sound too crazy.
-> 
-> I severely dislike having to specify things to make PV work.
-> The IOMMU is already a thorn in our side and we're working on making the
-> whole ordeal completely transparent so the only requirement to make this
-> work is the right machine, kernel, qemu and kernel cmd line option
-> "prot_virt=1". That's why we do the reboot into PV mode in the first place.
-> 
-> I.e. the goal is that if customers convert compatible guests into
-> protected ones and start them up on a z15 on a distro with PV support
-> they can just use the guest without having to change XML or command line
-> parameters.
+The existing ADB state machine is designed to work with Linux which has a different
+interpretation of the state machine detailed in "Guide to the Macintosh Family
+Hardware". In particular the current Linux implementation includes an extra change
+to IDLE state when switching the VIA between send and receive modes which does not
+occur in MacOS, and omitting this transition causes the current mac_via ADB state
+machine to fail.
 
-If you're exposing new features to the guest machine, then it is usually
-to be expected that XML and QEMU command line will change. Some simple
-things might be hidable behind a new QEMU machine type or CPU model, but
-there's a limit to how much should be hidden that way while staying sane.
+Rework the ADB state machine accordingly so that it can enumerate and autopoll the
+ADB under both Linux and MacOS, including the addition of the new adb_autopoll_block()
+and adb_autopoll_unblock() functions.
 
-I'd really expect the configuration to change when switching a guest to
-a new hardware platform and wanting major new functionality to be enabled.
-The XML / QEMU config is a low level instantiation of a particular feature
-set, optimized for a specific machine, rather than a high level description
-of ideal "best" config independent of host machine.
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Tested-by: Finn Thain <fthain@telegraphics.com.au>
+Acked-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200623204936.24064-20-mark.cave-ayland@ilande.co.uk>
+---
+ hw/misc/mac_via.c         | 375 ++++++++++++++++++++++++++------------
+ hw/misc/trace-events      |   3 +
+ include/hw/misc/mac_via.h |   1 +
+ 3 files changed, 260 insertions(+), 119 deletions(-)
 
-Regards,
-Daniel
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+index a1dc00d9f6..71b6f92645 100644
+--- a/hw/misc/mac_via.c
++++ b/hw/misc/mac_via.c
+@@ -599,176 +599,312 @@ static void via1_rtc_update(MacVIAState *m)
+     m->cmd = REG_EMPTY;
+ }
+ 
+-static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
++static void adb_via_poll(void *opaque)
+ {
+-    ADBBusState *adb_bus = &s->adb_bus;
++    MacVIAState *m = opaque;
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++    ADBBusState *adb_bus = &m->adb_bus;
++    uint8_t obuf[9];
++    uint8_t *data = &s->sr;
++    int olen;
++    uint16_t pending;
+ 
+-    if (state != ADB_STATE_IDLE) {
+-        return 0;
++    /*
++     * Setting vADBInt below indicates that an autopoll reply has been
++     * received, however we must block autopoll until the point where
++     * the entire reply has been read back to the host
++     */
++    if (adb_bus->autopoll_blocked) {
++        return;
++    } else {
++        adb_autopoll_block(adb_bus);
+     }
+ 
+-    if (s->adb_data_in_size < s->adb_data_in_index) {
+-        return 0;
+-    }
++    m->adb_data_in_index = 0;
++    m->adb_data_out_index = 0;
++    olen = adb_poll(adb_bus, obuf, adb_bus->autopoll_mask);
++
++    if (olen > 0) {
++        /* Autopoll response */
++        *data = obuf[0];
++        olen--;
++        memcpy(m->adb_data_in, &obuf[1], olen);
++        m->adb_data_in_size = olen;
++
++        s->b &= ~VIA1B_vADBInt;
++        qemu_irq_raise(m->adb_data_ready);
++    } else if (olen < 0) {
++        /* Bus timeout (device does not exist) */
++        *data = 0xff;
++        s->b |= VIA1B_vADBInt;
++        adb_autopoll_unblock(adb_bus);
++    } else {
++        pending = adb_bus->pending & ~(1 << (m->adb_autopoll_cmd >> 4));
++
++        if (pending) {
++            /*
++             * Bus timeout (device exists but another device has data). Block
++             * autopoll so the OS can read out the first EVEN and first ODD
++             * byte to determine bus timeout and SRQ status
++             */
++            *data = m->adb_autopoll_cmd;
++            s->b &= ~VIA1B_vADBInt;
+ 
+-    if (s->adb_data_out_index != 0) {
+-        return 0;
+-    }
++            obuf[0] = 0xff;
++            obuf[1] = 0xff;
++            olen = 2;
+ 
+-    s->adb_data_in_index = 0;
+-    s->adb_data_out_index = 0;
+-    s->adb_data_in_size = adb_poll(adb_bus, s->adb_data_in,
+-                                   adb_bus->autopoll_mask);
++            memcpy(m->adb_data_in, obuf, olen);
++            m->adb_data_in_size = olen;
+ 
+-    if (s->adb_data_in_size) {
+-        *data = s->adb_data_in[s->adb_data_in_index++];
+-        qemu_irq_raise(s->adb_data_ready);
++            qemu_irq_raise(m->adb_data_ready);
++        } else {
++            /* Bus timeout (device exists but no other device has data) */
++            *data = 0;
++            s->b |= VIA1B_vADBInt;
++            adb_autopoll_unblock(adb_bus);
++        }
+     }
+ 
+-    return s->adb_data_in_size;
++    trace_via1_adb_poll(*data, (s->b & VIA1B_vADBInt) ? "+" : "-",
++                        adb_bus->status, m->adb_data_in_index, olen);
+ }
+ 
+-static int adb_via_send(MacVIAState *s, int state, uint8_t data)
++static int adb_via_send_len(uint8_t data)
+ {
+-    switch (state) {
+-    case ADB_STATE_NEW:
+-        s->adb_data_out_index = 0;
+-        break;
+-    case ADB_STATE_EVEN:
+-        if ((s->adb_data_out_index & 1) == 0) {
+-            return 0;
+-        }
+-        break;
+-    case ADB_STATE_ODD:
+-        if (s->adb_data_out_index & 1) {
+-            return 0;
++    /* Determine the send length from the given ADB command */
++    uint8_t cmd = data & 0xc;
++    uint8_t reg = data & 0x3;
++
++    switch (cmd) {
++    case 0x8:
++        /* Listen command */
++        switch (reg) {
++        case 2:
++            /* Register 2 is only used for the keyboard */
++            return 3;
++        case 3:
++            /*
++             * Fortunately our devices only implement writes
++             * to register 3 which is fixed at 2 bytes
++             */
++            return 3;
++        default:
++            qemu_log_mask(LOG_UNIMP, "ADB unknown length for register %d\n",
++                          reg);
++            return 1;
+         }
+-        break;
+-    case ADB_STATE_IDLE:
+-        return 0;
++    default:
++        /* Talk, BusReset */
++        return 1;
+     }
+-
+-    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
+-
+-    s->adb_data_out[s->adb_data_out_index++] = data;
+-    qemu_irq_raise(s->adb_data_ready);
+-    return 1;
+ }
+ 
+-static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
++static void adb_via_send(MacVIAState *s, int state, uint8_t data)
+ {
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&s->mos6522_via1);
++    MOS6522State *ms = MOS6522(v1s);
++    ADBBusState *adb_bus = &s->adb_bus;
++    uint16_t autopoll_mask;
++
+     switch (state) {
+     case ADB_STATE_NEW:
+-        return 0;
+-
+-    case ADB_STATE_EVEN:
+-        if (s->adb_data_in_size <= 0) {
+-            qemu_irq_raise(s->adb_data_ready);
+-            return 0;
+-        }
+-
+-        if (s->adb_data_in_index >= s->adb_data_in_size) {
+-            *data = 0;
+-            qemu_irq_raise(s->adb_data_ready);
+-            return 1;
+-        }
+-
+-        if ((s->adb_data_in_index & 1) == 0) {
+-            return 0;
++        /*
++         * Command byte: vADBInt tells host autopoll data already present
++         * in VIA shift register and ADB transceiver
++         */
++        adb_autopoll_block(adb_bus);
++
++        if (adb_bus->status & ADB_STATUS_POLLREPLY) {
++            /* Tell the host the existing data is from autopoll */
++            ms->b &= ~VIA1B_vADBInt;
++        } else {
++            ms->b |= VIA1B_vADBInt;
++            s->adb_data_out_index = 0;
++            s->adb_data_out[s->adb_data_out_index++] = data;
+         }
+ 
++        trace_via1_adb_send(" NEW", data, (ms->b & VIA1B_vADBInt) ? "+" : "-");
++        qemu_irq_raise(s->adb_data_ready);
+         break;
+ 
++    case ADB_STATE_EVEN:
+     case ADB_STATE_ODD:
+-        if (s->adb_data_in_size <= 0) {
+-            qemu_irq_raise(s->adb_data_ready);
+-            return 0;
+-        }
+-
+-        if (s->adb_data_in_index >= s->adb_data_in_size) {
+-            *data = 0;
+-            qemu_irq_raise(s->adb_data_ready);
+-            return 1;
+-        }
+-
+-        if (s->adb_data_in_index & 1) {
+-            return 0;
+-        }
++        ms->b |= VIA1B_vADBInt;
++        s->adb_data_out[s->adb_data_out_index++] = data;
+ 
++        trace_via1_adb_send(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
++                            data, (ms->b & VIA1B_vADBInt) ? "+" : "-");
++        qemu_irq_raise(s->adb_data_ready);
+         break;
+ 
+     case ADB_STATE_IDLE:
+-        if (s->adb_data_out_index == 0) {
+-            return 0;
+-        }
++        return;
++    }
+ 
+-        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
++    /* If the command is complete, execute it */
++    if (s->adb_data_out_index == adb_via_send_len(s->adb_data_out[0])) {
++        s->adb_data_in_size = adb_request(adb_bus, s->adb_data_in,
+                                           s->adb_data_out,
+                                           s->adb_data_out_index);
+-        s->adb_data_out_index = 0;
+         s->adb_data_in_index = 0;
+-        if (s->adb_data_in_size < 0) {
+-            *data = 0xff;
+-            qemu_irq_raise(s->adb_data_ready);
+-            return -1;
+-        }
+ 
+-        if (s->adb_data_in_size == 0) {
+-            return 0;
++        if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
++            /*
++             * Bus timeout (but allow first EVEN and ODD byte to indicate
++             * timeout via vADBInt and SRQ status)
++             */
++            s->adb_data_in[0] = 0xff;
++            s->adb_data_in[1] = 0xff;
++            s->adb_data_in_size = 2;
+         }
+ 
+-        break;
+-    }
+-
+-    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
++        /*
++         * If last command is TALK, store it for use by autopoll and adjust
++         * the autopoll mask accordingly
++         */
++        if ((s->adb_data_out[0] & 0xc) == 0xc) {
++            s->adb_autopoll_cmd = s->adb_data_out[0];
+ 
+-    *data = s->adb_data_in[s->adb_data_in_index++];
+-    qemu_irq_raise(s->adb_data_ready);
+-    if (*data == 0xff || *data == 0) {
+-        return 0;
++            autopoll_mask = 1 << (s->adb_autopoll_cmd >> 4);
++            adb_set_autopoll_mask(adb_bus, autopoll_mask);
++        }
+     }
+-    return 1;
+ }
+ 
+-static void via1_adb_update(MacVIAState *m)
++static void adb_via_receive(MacVIAState *s, int state, uint8_t *data)
+ {
+-    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+-    MOS6522State *s = MOS6522(v1s);
+-    int state;
+-    int ret;
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&s->mos6522_via1);
++    MOS6522State *ms = MOS6522(v1s);
++    ADBBusState *adb_bus = &s->adb_bus;
++    uint16_t pending;
+ 
+-    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
++    switch (state) {
++    case ADB_STATE_NEW:
++        ms->b |= VIA1B_vADBInt;
++        return;
+ 
+-    if (s->acr & VIA1ACR_vShiftOut) {
+-        /* output mode */
+-        ret = adb_via_send(m, state, s->sr);
+-        if (ret > 0) {
+-            s->b &= ~VIA1B_vADBInt;
++    case ADB_STATE_IDLE:
++        /*
++         * Since adb_request() will have already consumed the data from the
++         * device, we must detect this extra state change and re-inject the
++         * reponse as either a "fake" autopoll reply or bus timeout
++         * accordingly
++         */
++        if (s->adb_data_in_index == 0) {
++            if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
++                *data = 0xff;
++                ms->b |= VIA1B_vADBInt;
++                qemu_irq_raise(s->adb_data_ready);
++            } else if (s->adb_data_in_size > 0) {
++                adb_bus->status = ADB_STATUS_POLLREPLY;
++                *data = s->adb_autopoll_cmd;
++                ms->b &= ~VIA1B_vADBInt;
++                qemu_irq_raise(s->adb_data_ready);
++            }
+         } else {
+-            s->b |= VIA1B_vADBInt;
++            ms->b |= VIA1B_vADBInt;
++            adb_autopoll_unblock(adb_bus);
+         }
+-    } else {
+-        /* input mode */
+-        ret = adb_via_receive(m, state, &s->sr);
+-        if (ret > 0 && s->sr != 0xff) {
+-            s->b &= ~VIA1B_vADBInt;
+-        } else {
+-            s->b |= VIA1B_vADBInt;
++
++        trace_via1_adb_receive("IDLE", *data,
++                        (ms->b & VIA1B_vADBInt) ? "+" : "-", adb_bus->status,
++                        s->adb_data_in_index, s->adb_data_in_size);
++
++        break;
++
++    case ADB_STATE_EVEN:
++    case ADB_STATE_ODD:
++        switch (s->adb_data_in_index) {
++        case 0:
++            /* First EVEN byte: vADBInt indicates bus timeout */
++            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
++                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
++                                   adb_bus->status, s->adb_data_in_index,
++                                   s->adb_data_in_size);
++
++            *data = s->adb_data_in[s->adb_data_in_index++];
++            if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
++                ms->b &= ~VIA1B_vADBInt;
++            } else {
++                ms->b |= VIA1B_vADBInt;
++            }
++            break;
++
++        case 1:
++            /* First ODD byte: vADBInt indicates SRQ */
++            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
++                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
++                                   adb_bus->status, s->adb_data_in_index,
++                                   s->adb_data_in_size);
++
++            *data = s->adb_data_in[s->adb_data_in_index++];
++            pending = adb_bus->pending & ~(1 << (s->adb_autopoll_cmd >> 4));
++            if (pending) {
++                ms->b &= ~VIA1B_vADBInt;
++            } else {
++                ms->b |= VIA1B_vADBInt;
++            }
++            break;
++
++        default:
++            /*
++             * Otherwise vADBInt indicates end of data. Note that Linux
++             * specifically checks for the sequence 0x0 0xff to confirm the
++             * end of the poll reply, so provide these extra bytes below to
++             * keep it happy
++             */
++            trace_via1_adb_receive(state == ADB_STATE_EVEN ? "EVEN" : " ODD",
++                                   *data, (ms->b & VIA1B_vADBInt) ? "+" : "-",
++                                   adb_bus->status, s->adb_data_in_index,
++                                   s->adb_data_in_size);
++
++            if (s->adb_data_in_index < s->adb_data_in_size) {
++                /* Next data byte */
++                *data = s->adb_data_in[s->adb_data_in_index++];
++                ms->b |= VIA1B_vADBInt;
++            } else if (s->adb_data_in_index == s->adb_data_in_size) {
++                if (adb_bus->status & ADB_STATUS_BUSTIMEOUT) {
++                    /* Bus timeout (no more data) */
++                    *data = 0xff;
++                } else {
++                    /* Return 0x0 after reply */
++                    *data = 0;
++                }
++                s->adb_data_in_index++;
++                ms->b &= ~VIA1B_vADBInt;
++            } else {
++                /* Bus timeout (no more data) */
++                *data = 0xff;
++                ms->b &= ~VIA1B_vADBInt;
++                adb_bus->status = 0;
++                adb_autopoll_unblock(adb_bus);
++            }
++            break;
+         }
++
++        qemu_irq_raise(s->adb_data_ready);
++        break;
+     }
+ }
+ 
+-static void via_adb_poll(void *opaque)
++static void via1_adb_update(MacVIAState *m)
+ {
+-    MacVIAState *m = opaque;
+     MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+     MOS6522State *s = MOS6522(v1s);
+-    int state;
++    int oldstate, state;
+ 
+-    if (s->b & VIA1B_vADBInt) {
+-        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
+-        if (adb_via_poll(m, state, &s->sr)) {
+-            s->b &= ~VIA1B_vADBInt;
++    oldstate = (v1s->last_b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
++    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
++
++    if (state != oldstate) {
++        if (s->acr & VIA1ACR_vShiftOut) {
++            /* output mode */
++            adb_via_send(m, state, s->sr);
++        } else {
++            /* input mode */
++            adb_via_receive(m, state, &s->sr);
+         }
+     }
+ }
+@@ -916,7 +1052,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+     qemu_get_timedate(&tm, 0);
+     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+ 
+-    adb_register_autopoll_callback(adb_bus, via_adb_poll, m);
++    adb_register_autopoll_callback(adb_bus, adb_via_poll, m);
+     m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
+                                                VIA1_IRQ_ADB_READY_BIT);
+ 
+@@ -1019,6 +1155,7 @@ static const VMStateDescription vmstate_mac_via = {
+         VMSTATE_INT32(adb_data_out_index, MacVIAState),
+         VMSTATE_BUFFER(adb_data_in, MacVIAState),
+         VMSTATE_BUFFER(adb_data_out, MacVIAState),
++        VMSTATE_UINT8(adb_autopoll_cmd, MacVIAState),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 5561746866..68a6d9f2ab 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -202,6 +202,9 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=%u value=0x%02x"
+ via1_rtc_cmd_pram_write(int addr, int value) "addr=%u value=0x%02x"
+ via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
+ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
++via1_adb_send(const char *state, uint8_t data, const char *vadbint) "state %s data=0x%02x vADBInt=%s"
++via1_adb_receive(const char *state, uint8_t data, const char *vadbint, int status, int index, int size) "state %s data=0x%02x vADBInt=%s status=0x%x index=%d size=%d"
++via1_adb_poll(uint8_t data, const char *vadbint, int status, int index, int size) "data=0x%02x vADBInt=%s status=0x%x index=%d size=%d"
+ 
+ # grlib_ahb_apb_pnp.c
+ grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
+index 2aaf9e27bf..0be05d649b 100644
+--- a/include/hw/misc/mac_via.h
++++ b/include/hw/misc/mac_via.h
+@@ -112,6 +112,7 @@ typedef struct MacVIAState {
+     int adb_data_out_index;
+     uint8_t adb_data_in[128];
+     uint8_t adb_data_out[16];
++    uint8_t adb_autopoll_cmd;
+ } MacVIAState;
+ 
+ #endif
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
 
 
