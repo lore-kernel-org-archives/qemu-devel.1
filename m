@@ -2,79 +2,122 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F6BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 877F3C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:44:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43EAC207D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56C5E207D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 17:44:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSzMBbEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43EAC207D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMiwfT1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C5E207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1josHS-0006wi-Ik
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45746)
+	id 1josOX-0000GA-L2
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 13:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1josGk-0006X2-EY
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:36:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29759
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1josNr-0008Cs-5O
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:43:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24588
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1josGg-0001qG-2O
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:36:05 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1josNp-0001A7-Ft
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 13:43:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593192960;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=89Exa60zlaf8K+mkEb/WEfzK+dHzN4QIV7FfVM9UBeU=;
- b=MSzMBbEIpIVAiWIYXrFR6JQqgk7Lyt5prQVyvy5iDG/FQ6a5pKmaSvpD+N524HhnI1Kqzu
- BC9QKx8rKQMnASMACgj6eupYR5W6es1pRhc90O+FPIrIbw6z3VRkpAPmBH4+paIofZVsGD
- FFa6aQs2sqidHFjFIuLaRcJ1pG/k3W0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-MnehnZpwPFWuwF0b5bt3fg-1; Fri, 26 Jun 2020 13:35:58 -0400
-X-MC-Unique: MnehnZpwPFWuwF0b5bt3fg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E446F1902EA1;
- Fri, 26 Jun 2020 17:35:56 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C9EF768DA;
- Fri, 26 Jun 2020 17:35:41 +0000 (UTC)
-Date: Fri, 26 Jun 2020 18:35:38 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH 09/10] spice: Put spice functions in a separate load module
-Message-ID: <20200626173538.GP1028934@redhat.com>
-References: <20200626164307.3327380-1-dinechin@redhat.com>
- <20200626164307.3327380-10-dinechin@redhat.com>
+ s=mimecast20190719; t=1593193404;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GLH+qjmtdJRiEFR35qzgch+R0KInn1y878pjML2nRfI=;
+ b=EMiwfT1iwI85ruLdvzR8ff/2QjZMZ8TT2RXnlKsYILnNk6NAKLJm80Hc9EtC+e4m0hRZt5
+ d6nTxhWwsUJ6G/veJMbggUvPAOa8tbdgy+2FGvgEd1bnsWMtJ3GbQvRPIy+2wV+GnEOFeO
+ GWNZJBTCHncH6e+2+hvBsVIQnlpmWTc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-QmxZi0PWN7C7ickgqx7D0g-1; Fri, 26 Jun 2020 13:43:20 -0400
+X-MC-Unique: QmxZi0PWN7C7ickgqx7D0g-1
+Received: by mail-wm1-f70.google.com with SMTP id a21so11771659wmd.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 10:43:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=GLH+qjmtdJRiEFR35qzgch+R0KInn1y878pjML2nRfI=;
+ b=m3StZ70Euc5jAACD+ZnYkINEimOnDZz+9dd2oDUtcCyak3VGkB9PqtWH+LPGk5K18h
+ MIpaClFH9/z3+orDZBXiYXuBRLFjCyc8HM2goGlphPRbdioPLZdOWJXZOH2rxxuhTrgK
+ DG0eNHVvb2y+0Z5Y3E7J3dwYlNwgynt1iGxL1oF3TRwJOrpaFnNQGNJ4Zp6da0U0xQ40
+ 21clfj9XEoidUIKVDiI/q0tffs+fzSd1R3FkRnqTdPTjUm3N/UsqTKvMCWigM5ijodWD
+ FsqInbSQONMg8LdO2/bGcAKESumN7QVF6DC5rLsk+pDyPumv1I9uA9WaIIoq6rgDCDXH
+ Ztog==
+X-Gm-Message-State: AOAM531Ie+YBEKjOj3XsHHP/nPGDX9jbgKDsJtItYbWZDWeKLDDPPOwV
+ NbPvfdWYaoUAsJxQaSU/Sg8hK7jtfBQRd8B5My7PG/m5R15naimAf7yu6PwvbP5G824kq0NkrzG
+ 7NyBTlMdBeHYVSGM=
+X-Received: by 2002:a1c:238d:: with SMTP id j135mr4440511wmj.46.1593193399255; 
+ Fri, 26 Jun 2020 10:43:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw8FcXlkV8A5oYF8EkVv9yiHbvLNLZ9iEC9xswAx2RL1TwnCUVXHlFqrc/LTxgl+oMdpmtKbQ==
+X-Received: by 2002:a1c:238d:: with SMTP id j135mr4440482wmj.46.1593193398893; 
+ Fri, 26 Jun 2020 10:43:18 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id s18sm41378236wra.85.2020.06.26.10.43.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 26 Jun 2020 10:43:18 -0700 (PDT)
+Subject: Re: [PATCH v5 08/15] hw/sd/sdcard: Check address is in range
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200626164026.766-1-f4bug@amsat.org>
+ <20200626164026.766-9-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <001fb1d8-c689-36b9-3d49-31285c82422a@redhat.com>
+Date: Fri, 26 Jun 2020 19:43:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200626164307.3327380-10-dinechin@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200626164026.766-9-f4bug@amsat.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -82,7 +125,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,249 +138,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 06:43:06PM +0200, Christophe de Dinechin wrote:
-> Use the MODIFACE and MODIMPL macros to to redirect the highest-level
-> qemu_spice functions into the spice-app.so load module when SPICE is
-> compiled as a module.
+On 6/26/20 6:40 PM, Philippe Mathieu-Daudé wrote:
+> As a defense, assert if the requested address is out of the card area.
 > 
-> With these changes, the following shared libraries are no longer
-> necessary in the top-level qemu binary:
-> 
->  	libspice-server.so.1 => /lib64/libspice-server.so.1 (HEX)
->  	libopus.so.0 => /lib64/libopus.so.0 (HEX)
->  	liblz4.so.1 => /lib64/liblz4.so.1 (HEX)
->  	libgstapp-1.0.so.0 => /lib64/libgstapp-1.0.so.0 (HEX)
->  	libgstvideo-1.0.so.0 => /lib64/libgstvideo-1.0.so.0 (HEX)
->  	libgstbase-1.0.so.0 => /lib64/libgstbase-1.0.so.0 (HEX)
->  	libgstreamer-1.0.so.0 => /lib64/libgstreamer-1.0.so.0 (HEX)
->  	libssl.so.1.1 => /lib64/libssl.so.1.1 (HEX)
->  	liborc-0.4.so.0 => /lib64/liborc-0.4.so.0 (HEX)
-> 
-> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/ui/qemu-spice.h | 24 +++++++++++++++---------
->  monitor/hmp-cmds.c      |  6 ++++++
->  softmmu/vl.c            |  1 +
->  ui/spice-core.c         | 31 +++++++++++++++++++++----------
->  ui/spice-display.c      |  2 +-
->  5 files changed, 44 insertions(+), 20 deletions(-)
+>  hw/sd/sd.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
 > 
-> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
-> index 8c23dfe717..0f7e139da5 100644
-> --- a/include/ui/qemu-spice.h
-> +++ b/include/ui/qemu-spice.h
-> @@ -24,22 +24,28 @@
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 22392e5084..2689a27b49 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -537,8 +537,10 @@ static void sd_response_r7_make(SDState *sd, uint8_t *response)
+>      stl_be_p(response, sd->vhs);
+>  }
 >  
->  #include <spice.h>
->  #include "qemu/config-file.h"
-> +#include "qemu/module.h"
->  
-> -extern int using_spice;
-> +#define using_spice     (qemu_is_using_spice())
->  
-> -void qemu_spice_init(void);
-> +MODIFACE(bool, qemu_is_using_spice,(void));
-> +MODIFACE(void, qemu_start_using_spice, (void));
-> +MODIFACE(void, qemu_spice_init, (void));
->  void qemu_spice_input_init(void);
->  void qemu_spice_audio_init(void);
-> -void qemu_spice_display_init(void);
-> -int qemu_spice_display_add_client(int csock, int skipauth, int tls);
-> +MODIFACE(void, qemu_spice_display_init, (void));
-> +MODIFACE(int, qemu_spice_display_add_client, (int csock, int skipauth, int tls));
->  int qemu_spice_add_interface(SpiceBaseInstance *sin);
->  bool qemu_spice_have_display_interface(QemuConsole *con);
->  int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *con);
-> -int qemu_spice_set_passwd(const char *passwd,
-> -                          bool fail_if_connected, bool disconnect_if_connected);
-> -int qemu_spice_set_pw_expire(time_t expires);
-> -int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
-> -                            const char *subject);
-> +MODIFACE(int, qemu_spice_set_passwd, (const char *passwd,
-> +                                      bool fail_if_connected,
-> +                                      bool disconnect_if_connected));
-> +MODIFACE(int, qemu_spice_set_pw_expire,(time_t expires));
-> +MODIFACE(int, qemu_spice_migrate_info,(const char *hostname,
-> +                                       int port, int tls_port,
-> +                                       const char *subject));
-> +MODIFACE(struct SpiceInfo *,qemu_spice_query, (Error **errp));
+> -static inline uint64_t sd_addr_to_wpnum(uint64_t addr)
+> +static uint64_t sd_addr_to_wpnum(SDState *sd, uint64_t addr)
+>  {
+> +    assert(addr < sd->size);
 
-This macro usage looks kind of unpleasant and its hard to understand
-just what is going on, especially why some methods are changed but
-others are not.
+This should be:
 
-IIUC, the goal is to turn all these into weak symbols so they don't
-need to be resolved immediately at startup, and instead have an
-impl of them provided dynamically at runtime.
+       assert(addr <= sd->size);
 
-If so the more normal approach would be to have a struct defining
-a set of callbacks, that can be registered. Or if there's a natural
-fit with QOM, then a QOM interface that can then have a QOM object
-impl registered as a singleton.
-
->  #if !defined(SPICE_SERVER_VERSION) || (SPICE_SERVER_VERSION < 0xc06)
->  #define SPICE_NEEDS_SET_MM_TIME 1
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 2b0b58a336..6bd9c52658 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -56,6 +56,7 @@
->  #include "migration/misc.h"
->  
->  #ifdef CONFIG_SPICE
-> +#include "ui/qemu-spice.h"
->  #include <spice/enums.h>
->  #endif
->  
-> @@ -573,6 +574,11 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
->  #endif
->  
->  #ifdef CONFIG_SPICE
-> +SpiceInfo *qmp_query_spice(Error **errp)
-> +{
-> +    return qemu_spice_query(errp);
-> +}
 > +
->  void hmp_info_spice(Monitor *mon, const QDict *qdict)
->  {
->      SpiceChannelList *chan;
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 3e15ee2435..c94b4fa49b 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -22,6 +22,7 @@
->   * THE SOFTWARE.
->   */
+>      return addr >> (HWBLOCK_SHIFT + SECTOR_SHIFT + WPGROUP_SHIFT);
+>  }
 >  
-> +#define MODULE_STUBS
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "qemu/units.h"
-> diff --git a/ui/spice-core.c b/ui/spice-core.c
-> index ecc2ec2c55..dbc1886b77 100644
-> --- a/ui/spice-core.c
-> +++ b/ui/spice-core.c
-> @@ -48,7 +48,7 @@ static time_t auth_expires = TIME_MAX;
->  static int spice_migration_completed;
->  static int spice_display_is_running;
->  static int spice_have_target_host;
-> -int using_spice = 0;
-> +static int is_using_spice = 0;
+> @@ -575,7 +577,7 @@ static void sd_reset(DeviceState *dev)
+>      sd_set_cardstatus(sd);
+>      sd_set_sdstatus(sd);
 >  
->  static QemuThread me;
->  
-> @@ -503,7 +503,7 @@ static QemuOptsList qemu_spice_opts = {
->      },
->  };
->  
-> -SpiceInfo *qmp_query_spice(Error **errp)
-> +MODIMPL(SpiceInfo *,qemu_spice_query,(Error **errp))
->  {
->      QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
->      int port, tls_port;
-> @@ -579,8 +579,9 @@ static void migration_state_notifier(Notifier *notifier, void *data)
+> -    sect = sd_addr_to_wpnum(size) + 1;
+> +    sect = sd_addr_to_wpnum(sd, size) + 1;
+>      g_free(sd->wp_groups);
+>      sd->wp_switch = sd->blk ? blk_is_read_only(sd->blk) : false;
+>      sd->wpgrps_size = sect;
+> @@ -759,8 +761,8 @@ static void sd_erase(SDState *sd)
+>          erase_end *= HWBLOCK_SIZE;
 >      }
+>  
+> -    erase_start = sd_addr_to_wpnum(erase_start);
+> -    erase_end = sd_addr_to_wpnum(erase_end);
+> +    erase_start = sd_addr_to_wpnum(sd, erase_start);
+> +    erase_end = sd_addr_to_wpnum(sd, erase_end);
+>      sd->erase_start = 0;
+>      sd->erase_end = 0;
+>      sd->csd[14] |= 0x40;
+> @@ -777,7 +779,7 @@ static uint32_t sd_wpbits(SDState *sd, uint64_t addr)
+>      uint32_t i, wpnum;
+>      uint32_t ret = 0;
+>  
+> -    wpnum = sd_addr_to_wpnum(addr);
+> +    wpnum = sd_addr_to_wpnum(sd, addr);
+>  
+>      for (i = 0; i < 32; i++, wpnum++, addr += WPGROUP_SIZE) {
+>          if (addr < sd->size && test_bit(wpnum, sd->wp_groups)) {
+> @@ -819,7 +821,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+>  
+>  static inline bool sd_wp_addr(SDState *sd, uint64_t addr)
+>  {
+> -    return test_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
+> +    return test_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
 >  }
 >  
-> -int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
-> -                            const char *subject)
-> +MODIMPL(int, qemu_spice_migrate_info, (const char *hostname,
-> +                                       int port, int tls_port,
-> +                                       const char *subject))
->  {
->      int ret;
+>  static void sd_lock_command(SDState *sd)
+> @@ -1331,7 +1333,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>              }
 >  
-> @@ -634,7 +635,17 @@ static void vm_change_state_handler(void *opaque, int running,
->      }
->  }
+>              sd->state = sd_programming_state;
+> -            set_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
+> +            set_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
+>              /* Bzzzzzzztt .... Operation complete.  */
+>              sd->state = sd_transfer_state;
+>              return sd_r1b;
+> @@ -1350,7 +1352,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>              }
 >  
-> -void qemu_spice_init(void)
-> +MODIMPL(bool, qemu_is_using_spice, (void))
-> +{
-> +    return is_using_spice;
-> +}
-> +
-> +MODIMPL(void, qemu_start_using_spice, (void))
-> +{
-> +    is_using_spice = 1;
-> +}
-> +
-> +MODIMPL(void, qemu_spice_init, (void))
->  {
->      QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
->      const char *password, *str, *x509_dir, *addr,
-> @@ -796,7 +807,7 @@ void qemu_spice_init(void)
->          error_report("failed to initialize spice server");
->          exit(1);
->      };
-> -    using_spice = 1;
-> +    qemu_start_using_spice();
->  
->      migration_state.notify = migration_state_notifier;
->      add_migration_state_change_notifier(&migration_state);
-> @@ -945,8 +956,8 @@ static int qemu_spice_set_ticket(bool fail_if_conn, bool disconnect_if_conn)
->                                     fail_if_conn, disconnect_if_conn);
->  }
->  
-> -int qemu_spice_set_passwd(const char *passwd,
-> -                          bool fail_if_conn, bool disconnect_if_conn)
-> +MODIMPL(int, qemu_spice_set_passwd,(const char *passwd,
-> +                                    bool fail_if_conn, bool disconnect_if_conn))
->  {
->      if (strcmp(auth, "spice") != 0) {
->          return -1;
-> @@ -957,13 +968,13 @@ int qemu_spice_set_passwd(const char *passwd,
->      return qemu_spice_set_ticket(fail_if_conn, disconnect_if_conn);
->  }
->  
-> -int qemu_spice_set_pw_expire(time_t expires)
-> +MODIMPL(int, qemu_spice_set_pw_expire, (time_t expires))
->  {
->      auth_expires = expires;
->      return qemu_spice_set_ticket(false, false);
->  }
->  
-> -int qemu_spice_display_add_client(int csock, int skipauth, int tls)
-> +MODIMPL(int, qemu_spice_display_add_client, (int csock, int skipauth, int tls))
->  {
->      if (tls) {
->          return spice_server_add_ssl_client(spice_server, csock, skipauth);
-> diff --git a/ui/spice-display.c b/ui/spice-display.c
-> index 19632fdf6c..90529695fe 100644
-> --- a/ui/spice-display.c
-> +++ b/ui/spice-display.c
-> @@ -1164,7 +1164,7 @@ static void qemu_spice_display_init_one(QemuConsole *con)
->      register_displaychangelistener(&ssd->dcl);
->  }
->  
-> -void qemu_spice_display_init(void)
-> +MODIMPL(void, qemu_spice_display_init,(void))
->  {
->      QemuOptsList *olist = qemu_find_opts("spice");
->      QemuOpts *opts = QTAILQ_FIRST(&olist->head);
-> -- 
-> 2.26.2
+>              sd->state = sd_programming_state;
+> -            clear_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
+> +            clear_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
+>              /* Bzzzzzzztt .... Operation complete.  */
+>              sd->state = sd_transfer_state;
+>              return sd_r1b;
 > 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
