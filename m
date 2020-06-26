@@ -2,89 +2,97 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35679C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 645E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:48:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00EFF20706
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F07220706
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoUoH1RS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EFF20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VHlFSAMw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F07220706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqZX-0000et-8b
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:47:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43792)
+	id 1joqa8-0001cx-Fk
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:48:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joqYh-0007ym-0E
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:46:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59907
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1joqYe-0006br-Lz
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:46:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593186387;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ZVClUSSwocLX08CzAt+OlHSvE9IJQxOD1nAt9dC0Hic=;
- b=YoUoH1RSQBYK4YLZEGNxIsCD17n8eLN4t2GHMK2nBM3DajN26YkApVST6ISZQWWrbkHXPz
- rk16D3GtCrQRbyS9ezqBvsipLjN7rCGkXIiRZ2nJVNMyWOaJ8wSbSIHmJcwtfSxE2FUTDD
- Gvrfl8iatbwrM2Bltbv7hD4mN/6Gs/Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-j0Yyh8KaNbivJRIPGO0LZw-1; Fri, 26 Jun 2020 11:46:25 -0400
-X-MC-Unique: j0Yyh8KaNbivJRIPGO0LZw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5899A8015FD;
- Fri, 26 Jun 2020 15:46:24 +0000 (UTC)
-Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E34BE71688;
- Fri, 26 Jun 2020 15:46:23 +0000 (UTC)
-Date: Fri, 26 Jun 2020 16:46:22 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v9 0/5] vhost-user block device backend implementation
-Message-ID: <20200626154622.GC316372@stefanha-x1.localdomain>
-References: <20200614183907.514282-1-coiby.xu@gmail.com>
- <20200619120746.GA2422025@stefanha-x1.localdomain>
- <20200625124656.ddca4ofgfhdgoerj@Rk>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joqQP-0001iZ-Dd
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:37:57 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40721)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1joqQN-0007m9-KT
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:37:57 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id cm23so5099775pjb.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Eiz+0GIH3tsZSp0WdMCWIyldsATrwS/pF9mZlVSR5ok=;
+ b=VHlFSAMwdTCzu9zIzmcXRfKrRfWh5lKpSI72VIfIaxOl5DrWo0nNAIBHDpPCqQp6IO
+ VfW6tGdUk74Awh0xVXqjkqUR52zvIK3vb2mWDszcuwPPathl4g8oyiq24ruUZ2KC9h42
+ rtLszQIdTLD6dx2FgLuclazXWKF6YUrv0ZsLJbsBLET+cArFLTns6OgzC1PkAj5OJNjL
+ zbfGpUsdO71wFDNI/ov9SUHTJo1LxYFt9BXsk0HMXQHEVGl2sNex3swFyw7owlB6B6S5
+ 054SijRvYAKMOovdpsXh/PQuGDAPhWxsdK618ABPiqEGnIdFKY5ALBW6HWAyDKsuz4Jd
+ humw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Eiz+0GIH3tsZSp0WdMCWIyldsATrwS/pF9mZlVSR5ok=;
+ b=Es2wAJXjeKrnwaOmjy2XMZhwWdURkBK+giEl3+DFS44jg/OvwypNbuAs46XHkuVfGW
+ GYExBf8QTkokH7GYM3eDYbbYoupO2+roX+bz9dtdtLM3UN3LGHzNbSkyNG20CZk2Eqi6
+ +R0t/X/1vQWihJqSkOD5iGbiVS7/xsClp+Au3iDr/48HLGDlhVqXwph7y56ZejcY9t8v
+ u0czZzsYTOCifn3mahNsuv67a9md036qNOn7ZchV7gLQkWGmhSnmn0KBxx+UOn+SfEaJ
+ VzyZjHQprYKZqPUajfVmwO5RFYKjmVUnC0piE6SVHJLLo+we7KZVsoumQRYVE3dreplS
+ oLjA==
+X-Gm-Message-State: AOAM533hWeHw6vFK3dxCg7iBFdFmo03O43ivq4TIFK0LMMU5B7oMBd8H
+ D4RUHEGVVw4WXNUn2SPHR8S8YQ==
+X-Google-Smtp-Source: ABdhPJxl6rOu+gPTwnzGhvLUhqPjcElNMpVciBvOig896C26rh1U5UG/l+L6jcAp8E1IgTZqrETcCQ==
+X-Received: by 2002:a17:902:ff18:: with SMTP id
+ f24mr3067144plj.118.1593185873996; 
+ Fri, 26 Jun 2020 08:37:53 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id m3sm18607983pfk.171.2020.06.26.08.37.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 26 Jun 2020 08:37:53 -0700 (PDT)
+Subject: Re: [PATCH v5] tcg: Sanitize shift constants on ppc64le so that shift
+ operations with large constants don't generate invalid instructions.
+To: agrecascino123@gmail.com, qemu-devel@nongnu.org
+References: <20200607211100.22858-1-agrecascino123@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <45a69aac-c803-950a-ee5d-e087f791a41e@linaro.org>
+Date: Fri, 26 Jun 2020 08:37:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200625124656.ddca4ofgfhdgoerj@Rk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2/5bycvrmDh4d1IB"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200607211100.22858-1-agrecascino123@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,68 +105,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
+Cc: "Catherine A. Frederick" <chocola@animebitch.es>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---2/5bycvrmDh4d1IB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 6/7/20 2:10 PM, agrecascino123@gmail.com wrote:
+> From: "Catherine A. Frederick" <chocola@animebitch.es>
+> 
+> Signed-off-by: Catherine A. Frederick <chocola@animebitch.es>
+> ---
+> Okay, I removed the bad "fix" on sar_i64, and the asserts in the various functions. 
+> Crossing my fingers here.
+> 
+>  tcg/ppc/tcg-target.inc.c | 34 +++++++++++++++++++++++++++++-----
+>  1 file changed, 29 insertions(+), 5 deletions(-)
 
-On Thu, Jun 25, 2020 at 08:46:56PM +0800, Coiby Xu wrote:
-> On Fri, Jun 19, 2020 at 01:07:46PM +0100, Stefan Hajnoczi wrote:
-> > On Mon, Jun 15, 2020 at 02:39:02AM +0800, Coiby Xu wrote:
-> > > v9
-> > >  - move logical block size check function to a utility function
-> > >  - fix issues regarding license, coding style, memory deallocation, e=
-tc.
-> >=20
-> > I have replied with patches that you can consider squashing into your
-> > series. I was testing this patch series and decided it was easier to
-> > send code than to go back and write review comments since I was already
-> > on a git branch.
-> >=20
-> > My patches can be combined into your original patches using "git rebase
-> > -i" and the "fixup" or "squash" directive.
-> >=20
-> > Please add my Signed-off-by: line to affected patches when squashing
-> > patches so that the git log records that I have confirmed that I have
-> > permission to contribute this code.
-> >=20
-> > If you have questions about any of the patches, please let me know.
->=20
-> Besides your Signed-off-by: line, shouldn't I also add copyright info to
-> the affected files as follows?
->=20
->  * Copyright (c) 2020 Coiby Xu <coiby.xu@gmail.com>
->  *
->  * Copyright (c) 2020 Red Hat, Inc., Stefan Hajnoczi <stefanha@redhat.com=
->
+Sorry for losing track of this.  Now queued to tcg-next.
 
-The following would be good:
 
- * Copyright (c) 2020 Red Hat, Inc.
-
-Thanks,
-Stefan
-
---2/5bycvrmDh4d1IB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl72GE4ACgkQnKSrs4Gr
-c8jhNAf+Ka7gRUT2JVdkP99vayZYD4tMVVRKSxi8QBOWzUvbLR7YFecmfENyNZiN
-YBvTWdeDovy4LanMH7jX3ow3BAWFJZNPscwa5Z+NRrkufvQujRWBb20FtuyTGRw5
-PqRmQ3RWtHte/jjsP49r0QoWxyv8R1HjF00zG9KzO0Pn9OBWfk5eHbw5X04SN83h
-IJXtmP0shV9TeHndEhO2TFKd27bDk2RAv+7kMTwVCw5MwJQtnswW8LK/a9jYxAnL
-mPVlbbBwzoPLLOWw/bjjG+Q3GYScZIjzus6TQ1PixvW5ZTuDQMYvB1U099Fx6mdu
-SwgCJvEuvwUGFB/3xtNdHzq39w/XsA==
-=NElB
------END PGP SIGNATURE-----
-
---2/5bycvrmDh4d1IB--
-
+r~
 
