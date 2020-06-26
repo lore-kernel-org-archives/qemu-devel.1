@@ -2,67 +2,89 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83966C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 06:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52604C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 06:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 523B12076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 06:43:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BB9F2076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 06:44:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a3jP50fJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 523B12076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="it8QtmCD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB9F2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joi4p-0005wC-KV
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 02:43:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49732)
+	id 1joi5r-0007Zo-E5
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 02:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joi2O-0001Pm-KN; Fri, 26 Jun 2020 02:40:36 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33727 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joi2L-0001EO-AJ; Fri, 26 Jun 2020 02:40:36 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49tS1l5GXJz9sSn; Fri, 26 Jun 2020 16:40:27 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1593153627;
- bh=Zyd+21TNwqZFVKinK1W1M3pyiXHfAgldAX7SQP9sG7M=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=a3jP50fJ/pRcUgCgBjAiNZy64+/5W/KehzC+xNUPrDW9YwsW26QsaryGKwMAa7Doa
- JOXoUKGA590YmrbLMpRdFyCWHWPEZyEredUtsDLmmE2DXenDmqcvvURfecN/1JKvQG
- O/1VzUDrD4D+saf7I+GzARIyuRLOYvnqcMz0mWMM=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 2/4] spapr: Fix typos in comments and macro indentation
-Date: Fri, 26 Jun 2020 16:40:22 +1000
-Message-Id: <20200626064024.383996-3-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200626064024.383996-1-david@gibson.dropbear.id.au>
-References: <20200626064024.383996-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1joi3V-0003jn-9D
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 02:41:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35793
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1joi3S-0001ZO-B0
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 02:41:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593153701;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YqH1QU9PbMdH2k5uJqypd3cikFYJ1ExseHF+8Y/4DtI=;
+ b=it8QtmCDit9gJypGMMWzj2RgHb5w/MXfLFPWU5+6GHrFaRFdC1IILCSmM8cXGyHpvDnCnh
+ aRK6f3+wrFkmlYUXoMjSRuyAbOjdeSBbLlQ4htVfOz//xICyp64mpdZ77FAhV6D2qGxy+Q
+ 26RgmJdPaTJXyexW9P0XYAeGbOMqyKk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-95-lJ1iFIgVNUqRxbH2tIMdXw-1; Fri, 26 Jun 2020 02:41:38 -0400
+X-MC-Unique: lJ1iFIgVNUqRxbH2tIMdXw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D6DC64ACA;
+ Fri, 26 Jun 2020 06:41:37 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-248.ams2.redhat.com
+ [10.36.112.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 615E37FE8B;
+ Fri, 26 Jun 2020 06:41:35 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Date: Fri, 26 Jun 2020 08:41:22 +0200
+Message-Id: <20200626064122.9252-2-eperezma@redhat.com>
+In-Reply-To: <20200626064122.9252-1-eperezma@redhat.com>
+References: <20200626064122.9252-1-eperezma@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eperezma@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,72 +97,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gustavo Romero <gromero@linux.ibm.com>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Peter Xu <peterx@redhat.com>, Avi Kivity <avi@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gustavo Romero <gromero@linux.ibm.com>
+Bug reference: https://bugs.launchpad.net/qemu/+bug/1885175
 
-This commit fixes typos in spapr_vio_reg_to_irq() comments and a macro
-indentation.
+It is possible to hit this assertion on rhel7 guests if iommu is
+properly enabled.
 
-Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
-Message-Id: <1590710681-12873-1-git-send-email-gromero@linux.ibm.com>
-Acked-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/ppc/spapr_vio.c         | 6 +++---
- include/hw/ppc/xive_regs.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ memory.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 4318ed9638..731080d989 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -420,7 +420,7 @@ static void spapr_vio_busdev_reset(DeviceState *qdev)
- }
+diff --git a/memory.c b/memory.c
+index 2f15a4b250..7f789710d2 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1915,8 +1915,6 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+         return;
+     }
  
- /*
-- * The register property of a VIO device is defined in livirt using
-+ * The register property of a VIO device is defined in libvirt using
-  * 0x1000 as a base register number plus a 0x1000 increment. For the
-  * VIO tty device, the base number is changed to 0x30000000. QEMU uses
-  * a base register number of 0x71000000 and then a simple increment.
-@@ -450,7 +450,7 @@ static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
- 
-     } else if (reg >= 0x30000000) {
-         /*
--         * VIO tty devices register values, when allocated by livirt,
-+         * VIO tty devices register values, when allocated by libvirt,
-          * are mapped in range [0xf0 - 0xff], gives us a maximum of 16
-          * vtys.
-          */
-@@ -459,7 +459,7 @@ static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+-    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
+-
+     if (entry->perm & IOMMU_RW) {
+         request_flags = IOMMU_NOTIFIER_MAP;
      } else {
-         /*
-          * Other VIO devices register values, when allocated by
--         * livirt, should be mapped in range [0x00 - 0xef]. Conflicts
-+         * libvirt, should be mapped in range [0x00 - 0xef]. Conflicts
-          * will be detected when IRQ is claimed.
-          */
-         irq = (reg >> 12) & 0xff;
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 09f243600c..7879692825 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -71,7 +71,7 @@
-  * QW word 2 contains the valid bit at the top and other fields
-  * depending on the QW.
-  */
--#define TM_WORD2                0x8
-+#define   TM_WORD2              0x8
- #define   TM_QW0W2_VU           PPC_BIT32(0)
- #define   TM_QW0W2_LOGIC_SERV   PPC_BITMASK32(1, 31) /* XX 2,31 ? */
- #define   TM_QW1W2_VO           PPC_BIT32(0)
 -- 
-2.26.2
+2.18.1
 
 
