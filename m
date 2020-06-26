@@ -2,88 +2,86 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FF9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 515F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:32:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 771FF207D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22DCF207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:32:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FTnUcbkF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771FF207D8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M9PAo1GG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DCF207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jot8l-0001OX-Lc
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:31:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60142)
+	id 1jot8u-0001eG-Bl
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:32:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jot7X-00006h-TT
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:30:39 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33217)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jot0E-0003mv-W1
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:07 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53418)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jot7V-00006V-T5
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:30:39 -0400
-Received: by mail-pl1-x644.google.com with SMTP id 35so4579431ple.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:30:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jot0D-00057v-AT
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:06 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j18so9660869wmi.3
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:23:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=PTJcDQO5aEuvretSBIS4yy5RHu6MPt9cNZhgh83l8YE=;
- b=FTnUcbkFfuCrC8p7nSWPWbTZAtR3Ou1yveL6/vVdPBCq3gZ73vdIgSV9h3OrDEV4J3
- 06YQhBztDkgxJQsEfmAR/peVHpI+YkJ4SlyVFsLDpGu7qz2d399Hov0MHteEQIDNXJp9
- 2GLPGW6Yaa1KpUXQbTpoC4I1BMP5hD+GLgXW1isG5dTMgI+RkXyLUInp1H6EQMMYontx
- rI58uJAzot/OzVsNHzMf6jIK9dLT3ivi4wGKfWu9lHxsClObzat8IaHSyog8UtUUGHpY
- DZaILeLfsqA1Z0JLO1Gn1KjEUQ2ZpARLHAP5vi4nMsdn2Nx5OThrJYtQKXQ4USFyjW2d
- ji1Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=AGl2Uc8EGJJxA1tr+9fN1UmCX9zweogDk66dtMF1ioY=;
+ b=M9PAo1GGD/3IdoVQbke8syP8CW0gW8XptiHLbRxVTvJMO1Za+Uhg/sLumcGRRacG46
+ LuLVVAriBCUozEZZmbgE0EGy6wG/r8ZhhVIcZBYdiodX5a8nCJ+2l6Z/6vNO7yGGb8ZA
+ cwws9nDgt2Xxel5GSQPBy7udJpiH3Vk4b1wJNV1g3/y6y6IEJXZcEjisN9WZeo4KWM6U
+ IBvh5WeI129WfnuheRzXlUdWySG5RYfnTyFzxYEQDKe1ie1dQiIe/bl05zShL1nNLtqS
+ WuUS1P5b0TMKHRXxY2uqvXWuEd55GEvZdZgmNKIiplFPgaJKD5aGnxKOuh2kFy33W5pE
+ OyGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PTJcDQO5aEuvretSBIS4yy5RHu6MPt9cNZhgh83l8YE=;
- b=iGu2jj6FtKHWQmJBZFYyjnwhf6Ew2tT5QyxNPpYb07oca5R4XyY4XbqPj6CyTobj5D
- KGp0w6/53vmt03GpDAyCx7TnNsTWSOivKrYkxRHGYDQJk/8OiGh+ls2nAUj+j0wC/n98
- reRY0vJdHw8/1o03CJkP5qYet6YAbwFmAnCJX6UJbuRyqW/K2hKBK1aAr0k76MIlhpFn
- 14istKbh/Sz1aHl/mqRC0HQPtFlHEpqYUfOQ9I6F3qCQm696C0Ucrir1uQzNgjOPHPer
- pYv/OShIRiv6WYNu4+1hhiJesyiC3X8W4f891/Jg1MeN9aPIgslwJAGREfnhdrWikrTU
- x07A==
-X-Gm-Message-State: AOAM531iVFjIqYUCBTKPPCKi8abjZu45FByoczi3Db+inbBuz9vSZ501
- y81IwsDa6o5lzM/WMGHMJoWGZA==
-X-Google-Smtp-Source: ABdhPJw73YE5ugtWzmlxcNnULtFBSsxNP2EYeuHKpGuK2GMIQL1WZm7G8A/oy2pJyF3j2fkSoL3eYg==
-X-Received: by 2002:a17:902:7045:: with SMTP id
- h5mr3655100plt.151.1593196235603; 
- Fri, 26 Jun 2020 11:30:35 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id y5sm23804520pgl.85.2020.06.26.11.30.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 11:30:34 -0700 (PDT)
-Subject: Re: [PATCH v1 12/18] tests/vm: allow us to take advantage of MTTCG
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200622143204.12921-1-alex.bennee@linaro.org>
- <20200622143204.12921-13-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
-Date: Fri, 26 Jun 2020 11:30:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=AGl2Uc8EGJJxA1tr+9fN1UmCX9zweogDk66dtMF1ioY=;
+ b=q5ndwkf+g5XTX5CMkgqkd2R69odql2AP6vVq3uzZwFoClkIySa78rA0pWs/F7F9umN
+ v4W7G/b30ns+VD5HFPn5/feBGdhV7hozxT4XQ3gmuymME3C3i6n/Lesamltx79KG/VMf
+ GEno+hUC29ZlMYDltKwA2ifoJrflnzKXAHwS2Vhb63xc+bPVZ8VJGPCmLA703TzmW3kj
+ nHACTiFXGqb21bJ4SMeMSXNCJFHIyDLYh8kmxgEBK6TyS1NMMtJsx7mQ4YOmKayedGH7
+ E6dLNJQ1Qeroa1UEgnO2KwFYmNW7yDRXAwDILY5wLbnXPzv8sF2ru/RCdDE85DSw/OYC
+ Cj/Q==
+X-Gm-Message-State: AOAM530XYpuprKpHeANPVdhOy+Rk88Z8WkN6JpG+1JOfAbGz7BlCsO9O
+ 1C6NJfOzBvvU7FuwiCNxMp8a5A==
+X-Google-Smtp-Source: ABdhPJxeoMHPxTRYeLNWzBwOTp24A/CWsn9Y6KR0VDO2Cb2mV+/71sVQCreF8Swyczl4g7NuvS5R1Q==
+X-Received: by 2002:a1c:f608:: with SMTP id w8mr4632677wmc.78.1593195783948;
+ Fri, 26 Jun 2020 11:23:03 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c2sm38315159wrv.47.2020.06.26.11.22.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 11:22:57 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E04EA1FFB3;
+ Fri, 26 Jun 2020 19:14:03 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v3 29/30] gitlab: limit re-builds of the containers
+Date: Fri, 26 Jun 2020 19:13:56 +0100
+Message-Id: <20200626181357.26211-30-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200626181357.26211-1-alex.bennee@linaro.org>
+References: <20200626181357.26211-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200622143204.12921-13-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,26 +104,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, f4bug@amsat.org,
- cota@braap.org, aurelien@aurel32.net
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/22/20 7:31 AM, Alex Bennée wrote:
->          if kvm_available(vmcls.arch):
->              return multiprocessing.cpu_count() // 2
-> +        elif os.uname().machine == "x86_64" and \
-> +             vmcls.arch in ["aarch64", "x86_64", "i386"]:
-> +            # MTTCG is available on these arches and we can allow more cores.
-> +            # But only up to a reasonable limit. User can always override
-> +            # these limits with --jobs.
-> +            return min(multiprocessing.cpu_count() // 2, 8)
->          else:
+Most of the time we are just rebuilding the same things. We can skip
+this although currently there is no mechanism for picking up new
+distro releases.
 
-And if multiprocessing.cpu_count() == 1?
-Seems like we should add max(count, 1) as well.
+Rather than try to be too fine grained allow any change to trigger all
+the images being rebuilt.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .gitlab-ci.d/containers.yml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-r~
+diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
+index 20b2fb1de5d..f56aa44f711 100644
+--- a/.gitlab-ci.d/containers.yml
++++ b/.gitlab-ci.d/containers.yml
+@@ -19,6 +19,10 @@
+     - docker push "$TAG"
+   after_script:
+     - docker logout
++  only:
++    changes:
++      - .gitlab-ci.d/containers.yml
++      - tests/docker/*
+ 
+ amd64-centos7-container:
+   <<: *container_job_definition
+-- 
+2.20.1
+
 
