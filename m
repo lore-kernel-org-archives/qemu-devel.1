@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FDBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:54:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8898020663
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAF3B20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wg0mvBG5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8898020663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5kEdFbh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF3B20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joooe-0003ay-Pu
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:54:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39938)
+	id 1jooog-0003ct-0R
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joonp-0002JK-85
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:54:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48700
+ id 1joonj-0002AI-TC
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:53:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37222
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joonn-0007SH-EO
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:54:00 -0400
+ id 1joonh-0007N7-AJ
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 09:53:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593179638;
+ s=mimecast20190719; t=1593179632;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1Coc7YhNwRtaq+GZF70Tm/pQLX8ecmv6v06aUbi2xqE=;
- b=Wg0mvBG5cH9VTQemjqS0qvpGIY9wXrdCOR26bn1eApBM2PT2+O6xfpMsdHeqxachGA2OLC
- mDstWTSi2Uo9jBw6YPAlkk582tLiap+Ne3G7qc/7ha2QFuUYIdSCC7Ro3BJDYVFfMWOa+f
- TwLW6o9dpYFMN8Ho2pj5K3vlkb4qxlI=
+ bh=mn1ydtPGwBAJexQ9to2YqXw29q/oVmls3ki6AHaXg4U=;
+ b=D5kEdFbhRcoRrMa0ceKax+IPhgCoZ5rExgG4qWaZipasqSavkujqvZcl3dcqgVMr8oztaZ
+ YMDnFt14EaCdkGg+/o61+hk2hURqakmFZZoUhL35Wjk/VAiHxBuXPw0dvJqS5D2hhlJcgi
+ uwDL7E1A2kkVYSOicN6mR4/TSh7rNrA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-yWFyqraoMfOA9bGxxW2h1g-1; Fri, 26 Jun 2020 09:53:55 -0400
-X-MC-Unique: yWFyqraoMfOA9bGxxW2h1g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-342-EO0arRRbOVGbIxBLzjvxGg-1; Fri, 26 Jun 2020 09:53:48 -0400
+X-MC-Unique: EO0arRRbOVGbIxBLzjvxGg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5107F107ACCA;
- Fri, 26 Jun 2020 13:53:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF6681005512;
+ Fri, 26 Jun 2020 13:53:46 +0000 (UTC)
 Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57E8F19C4F;
- Fri, 26 Jun 2020 13:53:44 +0000 (UTC)
-Subject: Re: [PATCH RESEND 1/9] hw/arm/smmu-common: Factorize some code in
- smmu_ptw_64()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D5C9B10016E8;
+ Fri, 26 Jun 2020 13:53:38 +0000 (UTC)
+Subject: Re: [PATCH RESEND 3/9] hw/arm/smmu: Simplify the IOTLB key format
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200611161500.23580-1-eric.auger@redhat.com>
- <20200611161500.23580-2-eric.auger@redhat.com>
- <CAFEAcA-8EjTYGb-RCp6=znbpWUS7rZZuCHTFtPSmQ6NzMM2mXg@mail.gmail.com>
+ <20200611161500.23580-4-eric.auger@redhat.com>
+ <CAFEAcA-+eFh7q5-gQwTWxMCSV38ErwB-GZoigW+_sP-=Pmp1kw@mail.gmail.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e6e0080a-8d66-8dde-0179-90b95b554cca@redhat.com>
-Date: Fri, 26 Jun 2020 15:53:42 +0200
+Message-ID: <848a0cab-ec2c-5004-d9b8-79d4678e0db5@redhat.com>
+Date: Fri, 26 Jun 2020 15:53:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-8EjTYGb-RCp6=znbpWUS7rZZuCHTFtPSmQ6NzMM2mXg@mail.gmail.com>
+In-Reply-To: <CAFEAcA-+eFh7q5-gQwTWxMCSV38ErwB-GZoigW+_sP-=Pmp1kw@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120;
+Received-SPF: pass client-ip=205.139.110.120;
  envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -113,42 +112,51 @@ Sender: "Qemu-devel"
 
 Hi Peter,
 
-On 6/25/20 4:49 PM, Peter Maydell wrote:
+On 6/25/20 5:03 PM, Peter Maydell wrote:
 > On Thu, 11 Jun 2020 at 17:15, Eric Auger <eric.auger@redhat.com> wrote:
 >>
->> Page and block PTE decoding can share some code. Let's
->> first handle table PTE and factorize some code shared by
->> page and block PTEs.
+>> Instead of using a Jenkins hash function to generate
+>> the key let's just use a 64 bit unsigned integer that
+>> contains the asid and the 40 upper bits of the iova.
+>> A maximum of 52-bit IOVA is supported. This change in the
+>> key format also prepares for the addition of new fields
+>> in subsequent patches (granule and level).
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/smmu-common.c | 51 ++++++++++++++++----------------------------
->>  1 file changed, 18 insertions(+), 33 deletions(-)
->>
->> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
->> index e13a5f4a7c..f2de2be527 100644
->> --- a/hw/arm/smmu-common.c
->> +++ b/hw/arm/smmu-common.c
->> @@ -186,12 +186,12 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
->>          uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
->>          uint64_t mask = subpage_size - 1;
->>          uint32_t offset = iova_level_offset(iova, inputsize, level, granule_sz);
->> -        uint64_t pte;
->> +        uint64_t pte, gpa;
->>          dma_addr_t pte_addr = baseaddr + offset * sizeof(pte);
->>          uint8_t ap;
->>
->>          if (get_pte(baseaddr, offset, &pte, info)) {
->> -                goto error;
->> +            break;
 > 
-> get_pte() fills in info->type (to SMMU_PTW_ERR_WALK_EABT) on
-> error; changing this from "goto error" to "break" means we'll
-> now execute the "info->type = SMMU_PTW_ERR_TRANSLATION" that
-> comes between the end of the while loop and the error: label,
-> overwriting the wrong error type.
+>> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+>> index 1dceec5cb1..7b9d2f0eb7 100644
+>> --- a/include/hw/arm/smmu-common.h
+>> +++ b/include/hw/arm/smmu-common.h
+>> @@ -88,11 +88,6 @@ typedef struct SMMUPciBus {
+>>      SMMUDevice   *pbdev[]; /* Parent array is sparse, so dynamically alloc */
+>>  } SMMUPciBus;
+>>
+>> -typedef struct SMMUIOTLBKey {
+>> -    uint64_t iova;
+>> -    uint16_t asid;
+>> -} SMMUIOTLBKey;
+> 
+> I think we should keep the SMMUIOTLBKey type to abstract out what
+> the key type is under the hood, so it would now be
+>  typedef uint64_t SMMUIOTLBKey;
 
-Agreed.
+OK
+> 
+> (and then the code that works with SMMUIOTLBKeys should never
+> directly look at it as a uint64_t. If you wanted you could
+> put the abstraction layer into place with the existing
+> SMMUIOTLBKey type and then change the type in a second patch.)
+
+done this way
+
+> 
+>> +uint64_t smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
+> 
+> This should return SMMUIOTLBKey rather than uint64_t,
+> or pass in the pointer, like:
+>    smmu_get_iotlb_key(SMMUIOTLBKey *key, uint16_t asid, uint64_t iova);
+sure
 
 Thanks
 
