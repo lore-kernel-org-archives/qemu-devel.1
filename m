@@ -2,80 +2,83 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 917FFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 151D8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D92B207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA472207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:43:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nq4H/Ejv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D92B207FC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="txwXMu4X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA472207FC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jorRE-0003hJ-Id
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:42:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57130)
+	id 1jorRv-0005ND-3t
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorOy-00008z-JK; Fri, 26 Jun 2020 12:40:34 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53635)
+ id 1jorP6-0000Ez-BH; Fri, 26 Jun 2020 12:40:41 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41804)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorOw-0005zT-Nh; Fri, 26 Jun 2020 12:40:32 -0400
-Received: by mail-wm1-x344.google.com with SMTP id j18so9409600wmi.3;
- Fri, 26 Jun 2020 09:40:29 -0700 (PDT)
+ id 1jorP4-00064t-1M; Fri, 26 Jun 2020 12:40:39 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h15so10103321wrq.8;
+ Fri, 26 Jun 2020 09:40:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=q9NxDW2oQ9w4rrOZiKQo2soGzZ8yBLvV0TRmyvXJhd8=;
- b=Nq4H/Ejv9nri+mryeLy1j0xw2hWX1d6WofvdGeckWWqHHlWxL0/o0PIFGl0S4py5eh
- FPUtffUdWzCCpNWuYRh/CUW29pMl9zWaWhQeKlGGw70wG90A+7DTPUzbW/HWW7utRQwQ
- dVdxzSEIW0w80PI7mfXdcQWPWWZlFXI6GNLbDoK9acWAdzajK4Hkq7/37CygzMCFgfjC
- +9448sTsI6PKnW1qM7gZW28QDLaZk0KnDvy79xbwiaK91O0/XnMCByW/b7P2tzfD0FHA
- +50GiLCPHIAJkm/7Y5sSipjpQbdUKSY67CLwyvrmgehAcxihPySBjVD34hx8Lx0VhhDX
- jP4A==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2FehWZv489g7gLp1IpuJgAw0ELgG4HGTfqwfreEPxtg=;
+ b=txwXMu4XvTfD1f8pUQtQk9yXebkKYepKvggw1Vy3cu4GclrXThTd6ud0foK3bRYntS
+ 6wtabgp+67wFTD0dMNy6CD6qkcRi8rCb+FC/ZBl4t207YvdHOCC5oiFpTQPVGh6+qnCm
+ LlHOOw7WMqZaTBUpO9MBu5ykhC3jcIVt6SGzocvRnmbvRx4t7o/mGb/fsHyKG6XGMTnk
+ YfG6SWbnMyRY6TO/I7uiXH9gK/mQbHFw51WeF2gxAzNrXz9cwFtSjiRpUjIhdAgnFzzs
+ CNI8bTqvkvZ4WIcY2dx5HUALUdNBiBLq3V6OcYfMJwjt1wRNDc7dXi2fSl/pv89FIszO
+ AxFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=q9NxDW2oQ9w4rrOZiKQo2soGzZ8yBLvV0TRmyvXJhd8=;
- b=mKfwpaMCYnQJVu/9t4fSb1XcRXyiYiBmOai2r9lIY6Npyb89P5bOk6ybWj6KQrEUno
- 2MTWvk1Y/K58A9odDDhiec1yVFudsGK7L0/6ODk6WfXecG6nhtvZ1cljzuLycHzkqqB5
- HnKXGZbjFjzzHYv7MjBRw5GkpUHMJ91VgC8xFeTidTWxLGQr4eAwViAX+QiX4Cj9BW4/
- ADwj8ZdnQ+RWNtn4Cxwxrdn8sZfHyuvg1iHuFAtvceX3i6FwcBVcGsW6QnZqeYLbOjXh
- IXxarDM6UWqKU9APBNFXFp5jUROCYysDRdcYqJXw0IT+xFzwqvqJOIaeqa+3xL65rPuj
- T3Hg==
-X-Gm-Message-State: AOAM533B/bYLNMe62tqeccdSalxopDXzaHkgAdKzE06LBw4bqMPhZcti
- fEll2XY8zuGgCISAasapBoRDKkiK
-X-Google-Smtp-Source: ABdhPJwOMpDmb99nh5naGP4G/dvGTd7T4rzAhlsFajltFdcSMbnkUrK9zB0BYTczvFmJHZQWclCOHw==
-X-Received: by 2002:a1c:b182:: with SMTP id a124mr4119349wmf.114.1593189628827; 
- Fri, 26 Jun 2020 09:40:28 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=2FehWZv489g7gLp1IpuJgAw0ELgG4HGTfqwfreEPxtg=;
+ b=OBZE9fTWxbdYDNO0wQf6VLvLzDz5T3VbiT4qSLCiJ6x9W9hdy+MVqJUAkURu9t06Re
+ lJpiUvaCoh2T0V6ifMrk4npOYqfhFdPIfl6RIXjpelYJHtbsiAn9TLHj6JMrlVN1+A93
+ DhJE0bPMDffaiCikUmGrknEVUWNWtOGzfnmwtKUTF1CHxoIeFWz5pTSq3aBj6EyszQW2
+ vrXYz13ai7g8WFBP3Lnp6Uz9qLbXS2uKlFfc6vdIz1vfN0sci+15K5x2twnRRUCysW0t
+ bp4JCa9DGn7NwtYfNfAmgrJoid6814diF7xxnhaeDvLK+xvjqdNd09cKFmA6/1zbDoJ4
+ BF4g==
+X-Gm-Message-State: AOAM532wc0MCT2ORI/3tWjgIIZQwCzCUAwYwMxc2oHLFJvXj2Jzmbvke
+ 9GifoiVlROinnpU7+R645ydE4cjH
+X-Google-Smtp-Source: ABdhPJxhoIM0XKrZpYY5JRU12pZfUtcDMDVd8w90AzShwY73VCFzDA9QhdQW9mNLc343257Rvb8IOw==
+X-Received: by 2002:adf:de01:: with SMTP id b1mr4507277wrm.305.1593189636111; 
+ Fri, 26 Jun 2020 09:40:36 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id f12sm24623646wrw.53.2020.06.26.09.40.27
+ by smtp.gmail.com with ESMTPSA id f12sm24623646wrw.53.2020.06.26.09.40.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 09:40:28 -0700 (PDT)
+ Fri, 26 Jun 2020 09:40:35 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/15] hw/sd/sdcard: Fix CVE-2020-13253 & cleanups
-Date: Fri, 26 Jun 2020 18:40:11 +0200
-Message-Id: <20200626164026.766-1-f4bug@amsat.org>
+Subject: [PATCH v5 06/15] hw/sd/sdcard: Restrict Class 6 commands to SCSD cards
+Date: Fri, 26 Jun 2020 18:40:17 +0200
+Message-Id: <20200626164026.766-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200626164026.766-1-f4bug@amsat.org>
+References: <20200626164026.766-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -84,7 +87,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,63 +108,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patches 5 & 6 fix CVE-2020-13253.
-The rest are (accumulated) cleanups.
+Only SCSD cards support Class 6 (Block Oriented Write Protection)
+commands.
 
-Missing review:
-[PATCH 01/15] MAINTAINERS: Cc qemu-block mailing list
-[PATCH 03/15] hw/sd/sdcard: Move some definitions to use them
-[PATCH 04/15] hw/sd/sdcard: Use the HWBLOCK_SIZE definition
-[PATCH 05/15] hw/sd/sdcard: Do not switch to ReceivingData if
-[PATCH 07/15] hw/sd/sdcard: Initialize constant values first
-[PATCH 08/15] hw/sd/sdcard: Check address is in range
-[PATCH 12/15] hw/sd/sdcard: Make iolen unsigned
-[PATCH 13/15] hw/sd/sdcard: Correctly display the command name in
+  "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
 
-$ git backport-diff -u v3
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-001/15:[----] [--] 'MAINTAINERS: Cc qemu-block mailing list'
-002/15:[----] [--] 'hw/sd/sdcard: Update coding style to make checkpatch.pl happy'
-003/15:[down] 'hw/sd/sdcard: Move some definitions to use them earlier'
-004/15:[down] 'hw/sd/sdcard: Use the HWBLOCK_SIZE definition'
-005/15:[0030] [FC] 'hw/sd/sdcard: Do not switch to ReceivingData if address is invalid'
-006/15:[----] [--] 'hw/sd/sdcard: Restrict Class 6 commands to SCSD cards'
-007/15:[down] 'hw/sd/sdcard: Initialize constant values first'
-008/15:[down] 'hw/sd/sdcard: Check address is in range'
-009/15:[----] [--] 'hw/sd/sdcard: Update the SDState documentation'
-010/15:[----] [--] 'hw/sd/sdcard: Simplify cmd_valid_while_locked()'
-011/15:[----] [--] 'hw/sd/sdcard: Constify sd_crc*()'s message argument'
-012/15:[0004] [FC] 'hw/sd/sdcard: Make iolen unsigned'
-013/15:[----] [-C] 'hw/sd/sdcard: Correctly display the command name in trace events'
-014/15:[0004] [FC] 'hw/sd/sdcard: Display offset in read/write_data() trace events'
-015/15:[----] [--] 'hw/sd/sdcard: Simplify realize() a bit'
+  4.3.14 Command Functional Difference in Card Capacity Types
 
-Philippe Mathieu-Daudé (15):
-  MAINTAINERS: Cc qemu-block mailing list
-  hw/sd/sdcard: Update coding style to make checkpatch.pl happy
-  hw/sd/sdcard: Move some definitions to use them earlier
-  hw/sd/sdcard: Use the HWBLOCK_SIZE definition
-  hw/sd/sdcard: Do not switch to ReceivingData if address is invalid
-  hw/sd/sdcard: Restrict Class 6 commands to SCSD cards
-  hw/sd/sdcard: Initialize constant values first
-  hw/sd/sdcard: Check address is in range
-  hw/sd/sdcard: Update the SDState documentation
-  hw/sd/sdcard: Simplify cmd_valid_while_locked()
-  hw/sd/sdcard: Constify sd_crc*()'s message argument
-  hw/sd/sdcard: Make iolen unsigned
-  hw/sd/sdcard: Correctly display the command name in trace events
-  hw/sd/sdcard: Display offset in read/write_data() trace events
-  hw/sd/sdcard: Simplify realize() a bit
+  * Write Protected Group
 
- hw/sd/sd.c         | 173 +++++++++++++++++++++++++++------------------
- MAINTAINERS        |   1 +
- hw/sd/trace-events |   4 +-
- 3 files changed, 109 insertions(+), 69 deletions(-)
+  SDHC and SDXC do not support write-protected groups. Issuing
+  CMD28, CMD29 and CMD30 generates the ILLEGAL_COMMAND error.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 7e0d684aca..871c30a67f 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -922,6 +922,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         sd->multi_blk_cnt = 0;
+     }
+ 
++    if (sd_cmd_class[req.cmd] == 6 && FIELD_EX32(sd->ocr, OCR, CARD_CAPACITY)) {
++        /* Only Standard Capacity cards support class 6 commands */
++        return sd_illegal;
++    }
++
+     switch (req.cmd) {
+     /* Basic commands (Class 0 and Class 1) */
+     case 0:	/* CMD0:   GO_IDLE_STATE */
 -- 
 2.21.3
 
