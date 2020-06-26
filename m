@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DCB8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EC5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:19:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F1D3206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:19:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A05B206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dqWOJlKf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1D3206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sB4t23C6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A05B206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joswZ-0006SY-DV
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55924)
+	id 1joswb-0006Xp-G8
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:19:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1josrZ-0007Lw-Nx
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:14:09 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40075)
+ id 1josrw-0007aW-1Q
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:14:32 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45990)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1josrW-0001GV-Pz
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:14:09 -0400
-Received: by mail-wm1-x335.google.com with SMTP id f139so10206245wmf.5
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:14:04 -0700 (PDT)
+ id 1josro-0001KV-1Y
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:14:31 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s10so10319519wrw.12
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=m1Iumf3YfxuO4NhxteboEtLnibs/CAVIrPHuCmkmoi4=;
- b=dqWOJlKfEXXrQ5El2Mou/hg9MPmvlcBwmpo2y7b5XPYIGjRCchzRKdcnw55GGK3SK5
- mBxsX8XmFnM4KWx3j46V8VjsKvAG6Pe/oZcSZ/xI7v3GLTrC9tN1DnmyEg4n1oPXUz8z
- q0tDIRLXvgZVKbKE1y325a9soT7I9YW7707bT71tlZUPbWx7goCojrKJPb5O+VmOvMnK
- HuRuGksSrlIfZr/P6J5TeLgQyk4hL/seR7XYi6AAG89F/rRNieBjXjX1EU6XSN+DnlEU
- IjjCNrzdxPjx504rZxSnEYY0q++gZSVx/pNRsqJfkCrAPQLAO12bAwfMuHhN5bokISK1
- vzjQ==
+ bh=WD6VNcX9MpLlUaAe843m6W+P0R0E6C+GHfBa0ZiWKL8=;
+ b=sB4t23C63XFYudmFGw/QAueZ3O0JxTTy+p5jQ68zcbTOMcxUZwvODcb7zSsWSRI7wB
+ gLG06zrhvS3YxOoYDK2N6IzL7zdMHPDxW6A+FLz/eTU4dDbnTtzx3zzO41tlcXVtSNi8
+ GdtZ3zuFX3wMGQTpQPuzsJkSjsH5JCok71xYWtMUR7lnxGOgeHqIQKl9xIaz3cnGlWF/
+ 0Hquo9H3rsHZcYbZGnNHlTxeEXl6Vhjh1UaQ84xsarPdA+T4yxr2N98sHA6J6fQ92td3
+ O7LMqbe83QSULUp2vkFKh2cXjW3Jlb2y/HezgwWZLBDq73+IJfvQ1rOr5FQHh9pMrZM4
+ YP7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=m1Iumf3YfxuO4NhxteboEtLnibs/CAVIrPHuCmkmoi4=;
- b=YDg9DLwkhSH6usBLDbIHVBIapCzfbf90BWxqn4NQ+DOm/86SlyGmXGclp93nuNO+Gx
- ocol1xwVTLKCUker7MDyewxYABSRMxfyivsBylxWDDMnjpzRag09zrzRMIh4Y2NYhlbu
- GvRUfyUIjueiIfAvDrZ7ulxh1hV110t53wc4UznOjLGm7oYK7xl8hf/icZb7mJ/MTPIN
- WuuwGvuRX1EysbHf91y3jNrqgnB5WLhezrILONBX54U7VOj1uJSnkNWd1V/uEZo0LcXH
- n02+0itzph7K0wi9vVUGvZsiSSI1Lkeqo6lSoRJUGsz91KB/j2rUKf+ELNxM+Q9CazdH
- vQVg==
-X-Gm-Message-State: AOAM5330JrjKZxHD8p7Z22wQMVwN1mLg3rqServKWDS8b7znnI+GiBkv
- 20Wvd0hFgZsBVpbni0V1ZXUEbw==
-X-Google-Smtp-Source: ABdhPJwpVf8vaAdumjhQSdDeqbgL5dxM+ou+ZZOdA7zrUNuRezJ3aBS+1wkq56i8sFXVp3G6tOLn4Q==
-X-Received: by 2002:a05:600c:410f:: with SMTP id
- j15mr4601927wmi.128.1593195243970; 
- Fri, 26 Jun 2020 11:14:03 -0700 (PDT)
+ bh=WD6VNcX9MpLlUaAe843m6W+P0R0E6C+GHfBa0ZiWKL8=;
+ b=jK3XtE1YODvTyYfWzr5j2VnsNJ8zG9mNO8VxOyjIIOWGGLoD1zVNiYyNODrtGn1o5Q
+ kYUDHTw/tBOVcQfVAKyaQeMP5GSbxZyu+0svZfjZnb417uZKGRb+wKV1Nmw+ct1yiIQi
+ 7iOZK/C1oubie2TaPZuOEQuO+58J3oDj0LDJrFR7cB0eXT+6MRmxCL6Lb1h5MG71l2Db
+ Jl5PcICvYSEyfIyoJ6fKlSqXRjTYJvAP6h3LkLStEDksnvj3zR2ZLe9/4oyPxhXN0wtP
+ UMAi0VOmr3YoNgC2bFHZo1m2wOyncNlCEVV/FchVWOaqujsIRNfdsaX/6jkiBGCPKHRA
+ LOTg==
+X-Gm-Message-State: AOAM531j1b9NDuh8b7wLVagZrJPR2DEO4AEjcMQuVdImuDDdBgnE0bia
+ YBRNnPmBri5uFzUOuUlrDx+lmw==
+X-Google-Smtp-Source: ABdhPJztmzHduPFZwXOfBacTsjNrmux0rlLpLNcyH+vBz0Kpo/dHCUEcp7jJywS1qs1DfsRcN/fxMA==
+X-Received: by 2002:adf:e850:: with SMTP id d16mr5223297wrn.426.1593195261491; 
+ Fri, 26 Jun 2020 11:14:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j41sm39616234wre.12.2020.06.26.11.13.58
+ by smtp.gmail.com with ESMTPSA id h203sm18620032wme.37.2020.06.26.11.14.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 11:14:02 -0700 (PDT)
+ Fri, 26 Jun 2020 11:14:13 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3C1FF1FF8F;
- Fri, 26 Jun 2020 19:13:58 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 477A51FFA9;
+ Fri, 26 Jun 2020 19:14:02 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 03/30] tests/vm: pass args through to BaseVM's __init__
-Date: Fri, 26 Jun 2020 19:13:30 +0100
-Message-Id: <20200626181357.26211-4-alex.bennee@linaro.org>
+Subject: [PATCH v3 21/30] gitlab: build containers with buildkit and metadata
+Date: Fri, 26 Jun 2020 19:13:48 +0100
+Message-Id: <20200626181357.26211-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626181357.26211-1-alex.bennee@linaro.org>
 References: <20200626181357.26211-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x335.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -90,8 +89,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,80 +103,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
+Cc: fam@euphon.net, berrange@redhat.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
  aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+According to the documentation to be able to use --cache-from for
+remote registries you need to enable both buildkit and inline the
+metadata. We want to do this to support pulling from gitlab when users
+build their local docker images.
 
-Adding the args parameter to BaseVM's __init__.
-We will shortly need to pass more parameters to the class
-so let's just pass args rather than growing the parameter list.
-
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200601211421.1277-2-robert.foley@linaro.org>
 ---
- tests/vm/basevm.py | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ .gitlab-ci.d/containers.yml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index a80b616a08d..5a58e6c3930 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -61,11 +61,10 @@ class BaseVM(object):
-     # 4 is arbitrary, but greater than 2,
-     # since we found we need to wait more than twice as long.
-     tcg_ssh_timeout_multiplier = 4
--    def __init__(self, debug=False, vcpus=None, genisoimage=None,
--                 build_path=None):
-+    def __init__(self, args):
-         self._guest = None
--        self._genisoimage = genisoimage
--        self._build_path = build_path
-+        self._genisoimage = args.genisoimage
-+        self._build_path = args.build_path
-         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
-                                                          suffix=".tmp",
-                                                          dir="."))
-@@ -78,7 +77,7 @@ class BaseVM(object):
-         self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
-         open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
- 
--        self.debug = debug
-+        self.debug = args.debug
-         self._stderr = sys.stderr
-         self._devnull = open(os.devnull, "w")
-         if self.debug:
-@@ -92,8 +91,8 @@ class BaseVM(object):
-                        (",ipv6=no" if not self.ipv6 else ""),
-             "-device", "virtio-net-pci,netdev=vnet",
-             "-vnc", "127.0.0.1:0,to=20"]
--        if vcpus and vcpus > 1:
--            self._args += ["-smp", "%d" % vcpus]
-+        if args.jobs and args.jobs > 1:
-+            self._args += ["-smp", "%d" % args.jobs]
-         if kvm_available(self.arch):
-             self._args += ["-enable-kvm"]
-         else:
-@@ -456,8 +455,7 @@ def main(vmcls):
-             return 1
-         logging.basicConfig(level=(logging.DEBUG if args.debug
-                                    else logging.WARN))
--        vm = vmcls(debug=args.debug, vcpus=args.jobs,
--                   genisoimage=args.genisoimage, build_path=args.build_path)
-+        vm = vmcls(args)
-         if args.build_image:
-             if os.path.exists(args.image) and not args.force:
-                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
+index 580439647ef..ba9c24e98f1 100644
+--- a/.gitlab-ci.d/containers.yml
++++ b/.gitlab-ci.d/containers.yml
+@@ -13,7 +13,9 @@
+   script:
+     - docker pull "$TAG" || docker pull "$COMMON_TAG" || true
+     - sed -i -e "s,FROM qemu/,FROM $CI_REGISTRY_IMAGE/qemu/," tests/docker/dockerfiles/$NAME.docker
+-    - docker build --cache-from "$TAG" --cache-from "$COMMON_TAG" --tag "$TAG" -f "tests/docker/dockerfiles/$NAME.docker" tests/docker/dockerfiles
++    - DOCKER_BUILDKIT=1 docker build --cache-from "$TAG" --cache-from "$COMMON_TAG" --tag "$TAG"
++                                     --build-arg BUILDKIT_INLINE_CACHE=1
++                                     -f "tests/docker/dockerfiles/$NAME.docker" tests/docker/dockerfiles
+     - docker push "$TAG"
+   after_script:
+     - docker logout
 -- 
 2.20.1
 
