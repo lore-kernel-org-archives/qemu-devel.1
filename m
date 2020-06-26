@@ -2,95 +2,65 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBAAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E92C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:25:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEA1020707
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:25:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="K/CaBa7w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA1020707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1DEEF20885
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:25:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DEEF20885
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jowmZ-00049j-0G
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:25:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53648)
+	id 1jowmi-0004Me-9S
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:25:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowIw-000492-VX
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:54:38 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39471)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jowkE-0000y2-AB; Fri, 26 Jun 2020 18:22:51 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:38207)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowIu-00033f-JE
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:54:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593208477; x=1624744477;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=9RZQj6v4mM7B38WHOPz+ON5a60a5621bnFIU0HDca6I=;
- b=K/CaBa7wh3zPR858jkskSWH/yuxYgsUVQWyzcbZd7Z9hhdXw2LOZ6PBV
- CGGMg6lv9z4hUL3GKoNtDxabDNx19USDhxhwKRC4lkWhr644EZ2/lEc88
- TO0kHl1xq/li9tv3slws0ptpLO1kszBCYeWsfav8Wcn2KNG044eIlFJ4v
- Mt4a50gX/K5+fakQwvPxpvvQBCEe4YTT4SV1sRHarEfxTQK7k33skEZjn
- 07DDPX2coi5gvlyHVXuL5rnbi4w1D6hM01AHH3okGwtZNT/kr43tu6Xfv
- BYz8jy2TE9y+2W5tndCNtYkSr7QoXdgtQh3PqeLcHhieXZ++U2W3k4gKk w==;
-IronPort-SDR: s5cmhKxdnEaAdw7JmD8m1zzZhgNXW4A9rDAReFCvEWdFRQxNINCVhibavvLtbpc6G1Hym7b+rl
- f5H5OHWLOsXuXT0314hfGlzN1JZGvdYdoszH3lJ2DF5zoau8xjKEgi8MN8zPGXHU5a6o9x655n
- aNNAG1F34FTDOsI3SsB4Xv/TOYjMdNRd9uiAam6naRwZ5XsPY78BlIc1s4mlFMPdiaoo7XqaBd
- eqpSR1bgelZ2FoS+MdGnzEXlEE0i5vQnhdFBjYWnuut5WCmyzSzHmK41MvWoIXcplHRazJBEuW
- Yqk=
-X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="244048411"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:51 +0800
-IronPort-SDR: AIdeM50OB+04Yk4P6RxuAJeTamzDVVyKzrbpzYGerzw5uaIBGl2Yni7Bq2dlZlyZZ2gvMc7i0d
- s2OOsOrj+l04Lm9creO8BzRRqDevBToHw=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2020 14:42:47 -0700
-IronPort-SDR: 1nyGyC77WeW0ZK0htlc/9hZCzOlu4HYbOWcxUzq3NNW5yhrDc7oi2Ve/8B5L0HjzEpCTHQCCF/
- NgggUfDAG6ww==
-WDCIronportException: Internal
-Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.58.206])
- by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:49 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 52/63] target/riscv: vector mask population count vmpopc
-Date: Fri, 26 Jun 2020 14:43:59 -0700
-Message-Id: <20200626214410.3613258-53-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200626214410.3613258-1-alistair.francis@wdc.com>
-References: <20200626214410.3613258-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jowkA-0001fK-A1; Fri, 26 Jun 2020 18:22:49 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 215F47475FA;
+ Sat, 27 Jun 2020 00:22:43 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id ECCEC74632C; Sat, 27 Jun 2020 00:22:42 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id EB62674633D;
+ Sat, 27 Jun 2020 00:22:42 +0200 (CEST)
+Date: Sat, 27 Jun 2020 00:22:42 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v5 06/11] mac_oldworld: Rename ppc_heathrow_reset to
+ ppc_heathrow_cpu_reset
+In-Reply-To: <1dfc4c68-c85d-5e56-d3c2-d68ce0b2355c@ilande.co.uk>
+Message-ID: <alpine.BSF.2.22.395.2006270009510.64843@zero.eik.bme.hu>
+References: <cover.1592315226.git.balaton@eik.bme.hu>
+ <c2f41c551f7393b5bde733cbf78a1fcb151f3e89.1592315226.git.balaton@eik.bme.hu>
+ <1dfc4c68-c85d-5e56-d3c2-d68ce0b2355c@ilande.co.uk>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=439617756=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:44
+Content-Type: multipart/mixed;
+ boundary="3866299591-1397681742-1593210162=:64843"
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:57:16
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,117 +73,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200623215920.2594-51-zhiwei_liu@c-sky.com
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   |  2 ++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 32 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 20 ++++++++++++++++
- 4 files changed, 55 insertions(+)
+--3866299591-1397681742-1593210162=:64843
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 292279f0c5..abae503b9c 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1101,3 +1101,5 @@ DEF_HELPER_6(vmor_mm, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vmnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_4(vmpopc_m, tl, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c71cbef182..971c06c09e 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -555,6 +555,7 @@ vmor_mm         011010 - ..... ..... 010 ..... 1010111 @r
- vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
- vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
- vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
-+vmpopc_m        010100 . ..... ----- 010 ..... 1010111 @r2_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index e2954aa99a..f2d229b151 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2389,3 +2389,35 @@ GEN_MM_TRANS(vmor_mm)
- GEN_MM_TRANS(vmnor_mm)
- GEN_MM_TRANS(vmornot_mm)
- GEN_MM_TRANS(vmxnor_mm)
-+
-+/* Vector mask population count vmpopc */
-+static bool trans_vmpopc_m(DisasContext *s, arg_rmr *a)
-+{
-+    if (vext_check_isa_ill(s)) {
-+        TCGv_ptr src2, mask;
-+        TCGv dst;
-+        TCGv_i32 desc;
-+        uint32_t data = 0;
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+
-+        mask = tcg_temp_new_ptr();
-+        src2 = tcg_temp_new_ptr();
-+        dst = tcg_temp_new();
-+        desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-+
-+        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
-+        tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
-+
-+        gen_helper_vmpopc_m(dst, mask, src2, cpu_env, desc);
-+        gen_set_gpr(a->rd, dst);
-+
-+        tcg_temp_free_ptr(mask);
-+        tcg_temp_free_ptr(src2);
-+        tcg_temp_free(dst);
-+        tcg_temp_free_i32(desc);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 028abd1871..b443819239 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4542,3 +4542,23 @@ GEN_VEXT_MASK_VV(vmor_mm, DO_OR)
- GEN_VEXT_MASK_VV(vmnor_mm, DO_NOR)
- GEN_VEXT_MASK_VV(vmornot_mm, DO_ORNOT)
- GEN_VEXT_MASK_VV(vmxnor_mm, DO_XNOR)
-+
-+/* Vector mask population count vmpopc */
-+target_ulong HELPER(vmpopc_m)(void *v0, void *vs2, CPURISCVState *env,
-+                              uint32_t desc)
-+{
-+    target_ulong cnt = 0;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vl = env->vl;
-+    int i;
-+
-+    for (i = 0; i < vl; i++) {
-+        if (vm || vext_elem_mask(v0, mlen, i)) {
-+            if (vext_elem_mask(vs2, mlen, i)) {
-+                cnt++;
-+            }
-+        }
-+    }
-+    return cnt;
-+}
--- 
-2.27.0
+On Fri, 26 Jun 2020, Mark Cave-Ayland wrote:
+> On 16/06/2020 14:47, BALATON Zoltan wrote:
+>
+>> This function resets a CPU not the whole machine so reflect that in
+>> its name.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/ppc/mac_oldworld.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>> index 4200008851..f97f241e0c 100644
+>> --- a/hw/ppc/mac_oldworld.c
+>> +++ b/hw/ppc/mac_oldworld.c
+>> @@ -73,7 +73,7 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+>>      return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+>>  }
+>>
+>> -static void ppc_heathrow_reset(void *opaque)
+>> +static void ppc_heathrow_cpu_reset(void *opaque)
+>>  {
+>>      PowerPCCPU *cpu = opaque;
+>>
+>> @@ -112,7 +112,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>>
+>>          /* Set time-base frequency to 16.6 Mhz */
+>>          cpu_ppc_tb_init(env,  TBFREQ);
+>> -        qemu_register_reset(ppc_heathrow_reset, cpu);
+>> +        qemu_register_reset(ppc_heathrow_cpu_reset, cpu);
+>>      }
+>>
+>>      /* allocate RAM */
+>
+> As per my previous comment on your earlier version, I don't agree with this - the
+> reset is being registered at board level, it just so happens that as it's only
+> touching the CPU due to the opaque being passed in.
+>
+> I'd be inclined to pass in a suitable HeathrowMachineState object containing a
+> reference to the CPU instead.
 
+It's not a board level reset func but a CPU level one. See where it's 
+registered here:
+
+https://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/mac_oldworld.c;h=f8c204ead73843098084bf5213ac4046d7d843c4;hb=HEAD#l111
+
+One for each CPU and as there could be more than one CPU, this won't work 
+with a single reference in HeathrowMachineState. We could reset CPUs in a 
+board level reset func (added by next patch) but I don't know how to 
+access CPU objects from MachineState (it did not look trivial when I've 
+looked) so I just left it as it is for later clean up separate from this 
+series. I've just renamed it to avoid confusion with board level reset 
+func which is usually named *_reset but I could call that 
+ppc_heathrow_board_reset and then we don't need this patch but I think 
+this is cleaner.
+
+I don't even know why we need a reset func to reset the CPU, I'd expect 
+that to be the default behaviour of any board reset without needing to 
+register a func to do it.
+
+Regards,
+BALATON Zoltan
+--3866299591-1397681742-1593210162=:64843--
 
