@@ -2,88 +2,157 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0848C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C551C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABDB520E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:01:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xtjl9hhu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABDB520E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1CF9620DD4
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:03:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF9620DD4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokF9-0000SG-WD
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:01:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50110)
+	id 1jokGk-0001YY-Dn
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jokEJ-0008IW-41
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:01:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53161
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jokEG-0004ly-Kx
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:01:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593162058;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5TwqtnnQS5I5qrSHsU5G3Cfde7vXOqlZ1uKnLBxK+us=;
- b=Xtjl9hhuSOLu6OOocSkyhjAkUDMdnAKtkRd2pxx3Tf3e3LyaO0KXq9bR03pMeTFmQXOOTe
- 0eBIaGm7bLSJe8CWewknIiBhUnsb3WpO27zsGPXDEKK0av1fwmPn5hQYQAAft76jc2qoEO
- U+b2T9CT20Qx+xkSfRzRTyByRMhgXgs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-8VpHzZ30PrCK3WRK6dGhEQ-1; Fri, 26 Jun 2020 05:00:56 -0400
-X-MC-Unique: 8VpHzZ30PrCK3WRK6dGhEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21C9C800C60;
- Fri, 26 Jun 2020 09:00:55 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F2DE05BAE0;
- Fri, 26 Jun 2020 09:00:52 +0000 (UTC)
-Date: Fri, 26 Jun 2020 11:00:50 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v6 1/2] target/arm: kvm: Handle DABT with no valid ISS
-Message-ID: <20200626090050.3sqsukopwydv43od@kamzik.brq.redhat.com>
-References: <20200625220336.10186-1-beata.michalska@linaro.org>
- <20200625220336.10186-2-beata.michalska@linaro.org>
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jokFh-0000xP-60; Fri, 26 Jun 2020 05:02:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52890)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jokFa-0005sk-2p; Fri, 26 Jun 2020 05:02:28 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05Q8XIhh134679; Fri, 26 Jun 2020 05:02:13 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04d55j-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 05:02:12 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q8XJtk134695;
+ Fri, 26 Jun 2020 05:02:11 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04d52e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 05:02:11 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q90noQ027936;
+ Fri, 26 Jun 2020 09:02:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma03ams.nl.ibm.com with ESMTP id 31uus52u6v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 09:02:02 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05Q91xDJ1507808
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jun 2020 09:02:00 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D650F4C05C;
+ Fri, 26 Jun 2020 09:01:59 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 06AC34C040;
+ Fri, 26 Jun 2020 09:01:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.191.93])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 26 Jun 2020 09:01:58 +0000 (GMT)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To: David Hildenbrand <david@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619114526.6a6f70c6.cohuck@redhat.com>
+ <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+ <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ <20200626044259.GK172395@umbus.fritz.box>
+ <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+Date: Fri, 26 Jun 2020 11:01:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200625220336.10186-2-beata.michalska@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="o0wnudrGTveFKQZVihsDES1creHCyYN8y"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-26_04:2020-06-26,
+ 2020-06-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1011
+ lowpriorityscore=0 phishscore=0 impostorscore=0 cotscore=-2147483648
+ bulkscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006260062
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 05:02:19
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,142 +165,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Christoffer.Dall@arm.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: pair@us.ibm.com, brijesh.singh@amd.com,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ pasic@linux.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 11:03:35PM +0100, Beata Michalska wrote:
-> On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
-> exception with no valid ISS info to be decoded. The lack of decode info
-> makes it at least tricky to emulate those instruction which is one of the
-> (many) reasons why KVM will not even try to do so.
-> 
-> Add support for handling those by requesting KVM to inject external
-> dabt into the quest.
-> 
-> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> ---
->  target/arm/kvm.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 58 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index eef3bbd..265c4b8 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -39,6 +39,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->  
->  static bool cap_has_mp_state;
->  static bool cap_has_inject_serror_esr;
-> +static bool cap_has_inject_ext_dabt;
->  
->  static ARMHostCPUFeatures arm_host_cpu_features;
->  
-> @@ -245,6 +246,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->          ret = -EINVAL;
->      }
->  
-> +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
-> +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
-> +            error_report("Failed to enable KVM_CAP_ARM_NISV_TO_USER cap");
-> +        } else {
-> +            /* Set status for supporting the external dabt injection */
-> +            cap_has_inject_ext_dabt = kvm_check_extension(s,
-> +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
-> +        }
-> +    }
-> +
->      return ret;
->  }
->  
-> @@ -810,6 +821,47 @@ void kvm_arm_vm_state_change(void *opaque, int running, RunState state)
->      }
->  }
->  
-> +/**
-> + * kvm_arm_handle_dabt_nisv:
-> + * @cs: CPUState
-> + * @esr_iss: ISS encoding (limited) for the exception from Data Abort
-> + *           ISV bit set to '0b0' -> no valid instruction syndrome
-> + * @fault_ipa: faulting address for the synchronous data abort
-> + *
-> + * Returns: 0 if the exception has been handled, < 0 otherwise
-> + */
-> +static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-> +                             uint64_t fault_ipa)
-> +{
-> +    /*
-> +     * Request KVM to inject the external data abort into the guest
-> +     */
-> +    if (cap_has_inject_ext_dabt) {
-> +        struct kvm_vcpu_events events;
-> +        /*
-> +         * KVM_CAP_ARM_INJECT_EXT_DABT support implies one for
-> +         * KVM_CAP_VCPU_EVENTS
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y
+Content-Type: multipart/mixed; boundary="PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2"
 
-KVM_CAP_ARM_INJECT_EXT_DABT implies KVM_CAP_VCPU_EVENTS
+--PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-And this comment should probably come just before the
-KVM_SET_VCPU_EVENTS ioctl.
+On 6/26/20 8:53 AM, David Hildenbrand wrote:
+>>>>> Does this have any implications when probing with the 'none' machin=
+e?
+>>>>
+>>>> I'm not sure.  In your case, I guess the cpu bit would still show up=
 
-> +         */
-> +        memset(&events, 0, sizeof(events));
+>>>> as before, so it would tell you base feature availability, but not
+>>>> whether you can use the new configuration option.
+>>>>
+>>>> Since the HTL option is generic, you could still set it on the "none=
+"
+>>>> machine, though it wouldn't really have any effect.  That is, if you=
 
-nit: How about using '= {0}' when declaring the variable, rather than this
-memset?
+>>>> could create a suitable object to point it at, which would depend on=
 
-> +        /*
-> +         * Skipping all the overhead of syncing vcpu regs back and forth
-> +         * and messing around with the vcpu_dirty flag to avoid
-> +         * overwriting changes done by KVM : directly calling
-> +         * the associated ioctl with the status set for external data abort,
-> +         * which, in turn, will be directly delivered to the affected vcpu.
+>>>> ... details.
+>>>>
+>>>
+>>> The important point is that we never want the (expanded) host cpu mod=
+el
+>>> look different when either specifying or not specifying the HTL
+>>> property.
+>>
+>> Ah, yes, I see your point.  So my current suggestion will satisfy
+>> that, basically it is:
+>>
+>> cpu has unpack (inc. by default) && htl specified
+>> 	=3D> works (allowing secure), as expected
+>=20
+> ack
+>=20
+>>
+>> !cpu has unpack && htl specified
+>> 	=3D> bails out with an error
+>=20
+> ack
+>=20
+>>
+>> !cpu has unpack && !htl specified
+>> 	=3D> works for a non-secure guest, as expected
+>> 	=3D> guest will fail if it attempts to go secure
+>=20
+> ack, behavior just like running on older hw without unpack
+>=20
+>>
+>> cpu has unpack && !htl specified
+>> 	=3D> works as expected for a non-secure guest (unpack feature is
+>> 	   present, but unused)
+>> 	=3D> secure guest may work "by accident", but only if all virtio
+>> 	   properties have the right values, which is the user's
+>> 	   problem
+>>
+>> That last case is kinda ugly, but I think it's tolerable.
+>=20
+> Right, we must not affect non-secure guests, and existing secure setups=
 
-The external data abort event will be handled immediately by KVM and does
-not need any other CPU state. This means we can skip CPU synchronization
-and set this event, but only this event, here.
+> (e.g., older qemu machines). Will have to think about this some more,
+> but does not sound too crazy.
 
-> +         */
-> +        events.exception.ext_dabt_pending = 1;
-> +
-> +        return kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-> +    } else {
-> +        error_report("Data abort exception triggered by guest memory access "
-> +                     "at physical address: 0x"  TARGET_FMT_lx,
-> +                     (target_ulong)fault_ipa);
-> +        error_printf("KVM unable to emulate faulting instruction.\n");
-> +    }
-> +    return -1;
-> +}
-> +
->  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->  {
->      int ret = 0;
-> @@ -820,7 +872,12 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->              ret = EXCP_DEBUG;
->          } /* otherwise return to guest */
->          break;
-> -    default:
-> +    case KVM_EXIT_ARM_NISV:
-> +        /* External DABT with no valid iss to decode */
-> +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
-> +                                       run->arm_nisv.fault_ipa);
-> +        break;
-> +     default:
->          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
->                        __func__, run->exit_reason);
->          break;
-> -- 
-> 2.7.4
-> 
-> 
+I severely dislike having to specify things to make PV work.
+The IOMMU is already a thorn in our side and we're working on making the
+whole ordeal completely transparent so the only requirement to make this
+work is the right machine, kernel, qemu and kernel cmd line option
+"prot_virt=3D1". That's why we do the reboot into PV mode in the first pl=
+ace.
 
-Besides the suggested comment changes and the memset nit
+I.e. the goal is that if customers convert compatible guests into
+protected ones and start them up on a z15 on a distro with PV support
+they can just use the guest without having to change XML or command line
+parameters.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Internal customers have already created bugs because they did not follow
+the documentation and the more cmd options we bring the more bugzillas
+we'll get.
 
-Thanks,
-drew
+PV is already in the field/GA and can be ordered, as is our documentation=
+=2E
+
+@Christian: Please chime in here
+
+>=20
+> Thanks!
+>=20
+
+
+
+--PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2--
+
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71uYYACgkQ41TmuOI4
+ufh+hA/9Ew+NYmS9OZ7ysDBd+nuPwAvjL3nfozml/up8dRizMntrRlzATKd0jvtL
+JxP6ZANUjyWPT0BN0fJRgH3hsugvMjQ3W9jeVtPYN7RoPnv3ffSd5H5qDL6TA2Je
+NReItg5BJXNEk+PhAOlIoKdfyjHu0ptWM2zdtF27JHk/hrBMhby7jYdpssLNI3XJ
+FIRYt9iea0KVfVyhhn66Ts1ZCBFwULR3mkH3kEpeQ6I7qUA5hrfT4bz8OCIhSIsv
+mHOYDORdfv8dYeIdxdtK2dw311+/OS/4cliQnEM2s0rzTg947L3zh3rHQ4/ymT9B
+8sogwzZLbMryvqLnHJT1WXTMzZHI6uDsRfn8b/Zoddyi99k1Lpc1lnjoWtDMMk4e
+LDMB5bNNB045MwA5bIlzSpvJOqX02QiFP/23Eq2lwHXtEYrf///xZcp1q6jaTUdw
+IYBWVyOFSnt5NrT/ZSKQYAHPBYvCBCj4wZsVeS6imBhlf5iJLfSvqKWRG3rbPpyP
+ToTFuyhbIAf5VPyw/sJ1k0ssv7k3cccCBrNdl8rH43r2qAyeYcFuCPPZ3aOil6Fm
+i4jSw2cqTMfthz5C1hV5PLsQ6CpOgfBYRZ0E7yOG9s7eMkY4ngNJnAuZ4NCeHaM4
+DbUwzB7/mvnMTcEP3wd4Oeg2OrwNDiUm519lJrW/RuTMOkKB9eo=
+=aF15
+-----END PGP SIGNATURE-----
+
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y--
 
 
