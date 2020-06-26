@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 613D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD244C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CC87207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85DFD207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:29:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FUtsWH9X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC87207E8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cKgrCgYo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85DFD207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqI8-0002NP-D3
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:29:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35936)
+	id 1joqID-0002c4-P4
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4K-0002wH-II
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:08 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:53877)
+ id 1joq47-0002PP-2C
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:55 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38306)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4I-0006bY-KF
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:08 -0400
-Received: by mail-wm1-x332.google.com with SMTP id j18so9159129wmi.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:06 -0700 (PDT)
+ id 1joq45-0006PR-1O
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z13so9868327wrw.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=4niuaNLMyHoiI7IBJkW4eFNXSPAaql3UxQ8+CmFrSD4=;
- b=FUtsWH9XeaIaSpYAIGbzeeIhRVzgFR2S5orqMEBXz73Qr3Y4haB+LxAhT/It29SO2i
- HSXZAu3ZGkYQwpD71P6eR41ap+2zGQZrOePSMjo+u1xyoH2rHp4eCkdrvgIohaGB+/kq
- Fys6WZGARiYFfE205/r4lQk1vJoLAI/P8oWqi+cVeK73FZ7Gqwx7eabtKrz3KxfyCEt5
- /ec/56UCj4/twsiyasEEl9+koNrXEkzW7GPSR6lKtx5MblM9I4ODLymSaf7aOhtkdzG9
- 3HxoVQyupCY7vjyQpWGrdop01PblJYUEaykobO+M7YK3ERjfUVKCGZKKeUpTIbqnH8gt
- jobQ==
+ bh=Z0lRJqULuNMXERsdHXo4sn61X1OFLxEJyzOhHFNclDo=;
+ b=cKgrCgYo8puFlpGPDhYJbcC85AeAJy4TTSutuFXDjq9WBTHQ3aeb1OngvIsHpmDQOC
+ KvUFZ2ljO+N5AxEcO7Teg/00jTZLJC0NkZA3TWh6hTNf2CjpkHY2/tz4UtsD5gOVuL4k
+ T+7J4ph5GecIDTkvPqT/lE7D9qMQC9Cnj0UStnO5rKMCu+dRnQOSLd7WyOxBYn7qk7PS
+ vMwslapTD4qwGKCQQFGG+yvvCupYiu2V21PnNhZrtUBxtQGtNq83T9XTE/YyHKO9zeN1
+ 487GP5UWexD3k9QwSHQj58ieSq/CvtoJvE+zNzwrj16k/tcy8CeIhQQNEyFwooLwg/DO
+ 7LOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4niuaNLMyHoiI7IBJkW4eFNXSPAaql3UxQ8+CmFrSD4=;
- b=lMQJZhIGNYFK+Zi389LWlA2vWk1RQ6zLGVYaVLSsHtyIVIYiSbUhMDKBLymmDeo72V
- 0tDc+Xax261NUABpsa8nOTml52+lkb6eXc7gRueZJxd26S8INlOoRYtY/KRCOoMEi8ip
- FqOkf//SWQjY73f8+wearGE5PVPS6i4K13IHl8+b0frkPqa+MXgpFibajhsoCfKT2OBg
- XYMGIr3INmEFmMAsnkyVoZk9ah+IUIwx8fpfxBkMW+3uJ+QcLwju+4PUYTAKdrmYjd51
- 7FffGXa7/UWHWFf2LiGS9kEksq7Fwy+n4VhrFT91rS/RqAXnarhS+j7lwWIhW2O96lPe
- syDQ==
-X-Gm-Message-State: AOAM530aEkHV13LSYmcpuHHbC7EzIRk5Xdo4iV3N/ijuxcJEvznrpIg/
- 5137a61LrVbSuaiy+vnMSRj2edxsVjY//g==
-X-Google-Smtp-Source: ABdhPJx5lJbau7IuhvNtK81XTa0QDkb8Wg7yzYv/QoSugT5Pt5xVKmrORLfMS3vLSQfDkPXAt7rEkg==
-X-Received: by 2002:a05:600c:2202:: with SMTP id
- z2mr4157128wml.13.1593184505008; 
- Fri, 26 Jun 2020 08:15:05 -0700 (PDT)
+ bh=Z0lRJqULuNMXERsdHXo4sn61X1OFLxEJyzOhHFNclDo=;
+ b=ksIoGM5F5r5btGzWOzXoLWPS6+Pozvyo2HEuOuSumZwVEF8Biz9SDktpQ2TcP1OIx6
+ BEFYbFOyjaMSOFQ124gT116cT7pgqeaECJZNZqq7So61CDi9x6OX5SKdkji2ZifNdDeg
+ pWwcYuo6hi0j3+PG5oSK4J7nIdB8n9zp+OeMYLgD2lz7B9kS5ktj6E0u3J+Il3PuOqjw
+ XuhgHBi8Bi5XPrtknWRRubbl5TwgoDIOl6KG8sn673svsgMlFcHmPaLJ+u4QRHozdL2q
+ pqez2hXY+pSkv059x7P7U8nRw1oPe0HanTakEYLgZvqF7qvX2A86ZyXjxQvtb6PV7gi2
+ XhuQ==
+X-Gm-Message-State: AOAM531pxHp1Lvry7wXQh4OG0lqXVVRJSCGUjVT//BObccUY+26Bdn4x
+ gAKv4w8xvE8AWSeOMwbCu6GklN16SEU0XA==
+X-Google-Smtp-Source: ABdhPJzUFl/K06e1wWq3nqO7kqav9dMfIXSyNWGg1nksp30lASgmWbp0eMhHeHuKTwOfSZNvx0HSjQ==
+X-Received: by 2002:adf:a396:: with SMTP id l22mr4308707wrb.24.1593184491181; 
+ Fri, 26 Jun 2020 08:14:51 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.03
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.50
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:15:04 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:50 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 33/57] target/arm: Move regime_el to internals.h
-Date: Fri, 26 Jun 2020 16:14:00 +0100
-Message-Id: <20200626151424.30117-34-peter.maydell@linaro.org>
+Subject: [PULL 22/57] target/arm: Revise decoding for disas_add_sub_imm
+Date: Fri, 26 Jun 2020 16:13:49 +0100
+Message-Id: <20200626151424.30117-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x332.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,111 +106,80 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-We will shortly need this in mte_helper.c as well.
+The current Arm ARM has adjusted the official decode of
+"Add/subtract (immediate)" so that the shift field is only bit 22,
+and bit 23 is part of the op1 field of the parent category
+"Data processing - immediate".
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-22-richard.henderson@linaro.org
+Message-id: 20200626033144.790098-11-richard.henderson@linaro.org
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h | 36 ++++++++++++++++++++++++++++++++++++
- target/arm/helper.c    | 36 ------------------------------------
- 2 files changed, 36 insertions(+), 36 deletions(-)
+ target/arm/translate-a64.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 5c69d4e5a56..c36fcb151b7 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -913,6 +913,42 @@ static inline bool regime_is_pan(CPUARMState *env, ARMMMUIdx mmu_idx)
-     }
- }
- 
-+/* Return the exception level which controls this address translation regime */
-+static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
-+{
-+    switch (mmu_idx) {
-+    case ARMMMUIdx_E20_0:
-+    case ARMMMUIdx_E20_2:
-+    case ARMMMUIdx_E20_2_PAN:
-+    case ARMMMUIdx_Stage2:
-+    case ARMMMUIdx_E2:
-+        return 2;
-+    case ARMMMUIdx_SE3:
-+        return 3;
-+    case ARMMMUIdx_SE10_0:
-+        return arm_el_is_aa64(env, 3) ? 1 : 3;
-+    case ARMMMUIdx_SE10_1:
-+    case ARMMMUIdx_SE10_1_PAN:
-+    case ARMMMUIdx_Stage1_E0:
-+    case ARMMMUIdx_Stage1_E1:
-+    case ARMMMUIdx_Stage1_E1_PAN:
-+    case ARMMMUIdx_E10_0:
-+    case ARMMMUIdx_E10_1:
-+    case ARMMMUIdx_E10_1_PAN:
-+    case ARMMMUIdx_MPrivNegPri:
-+    case ARMMMUIdx_MUserNegPri:
-+    case ARMMMUIdx_MPriv:
-+    case ARMMMUIdx_MUser:
-+    case ARMMMUIdx_MSPrivNegPri:
-+    case ARMMMUIdx_MSUserNegPri:
-+    case ARMMMUIdx_MSPriv:
-+    case ARMMMUIdx_MSUser:
-+        return 1;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- /* Return the FSR value for a debug exception (watchpoint, hardware
-  * breakpoint or BKPT insn) targeting the specified exception level.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 30683061f94..03aa0925983 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3754,22 +3754,22 @@ static void disas_pc_rel_adr(DisasContext *s, uint32_t insn)
+ /*
+  * Add/subtract (immediate)
+  *
+- *  31 30 29 28       24 23 22 21         10 9   5 4   0
+- * +--+--+--+-----------+-----+-------------+-----+-----+
+- * |sf|op| S| 1 0 0 0 1 |shift|    imm12    |  Rn | Rd  |
+- * +--+--+--+-----------+-----+-------------+-----+-----+
++ *  31 30 29 28         23 22 21         10 9   5 4   0
++ * +--+--+--+-------------+--+-------------+-----+-----+
++ * |sf|op| S| 1 0 0 0 1 0 |sh|    imm12    |  Rn | Rd  |
++ * +--+--+--+-------------+--+-------------+-----+-----+
+  *
+  *    sf: 0 -> 32bit, 1 -> 64bit
+  *    op: 0 -> add  , 1 -> sub
+  *     S: 1 -> set flags
+- * shift: 00 -> LSL imm by 0, 01 -> LSL imm by 12
++ *    sh: 1 -> LSL imm by 12
   */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index d8c31d03dad..d14313de664 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9793,42 +9793,6 @@ void arm_cpu_do_interrupt(CPUState *cs)
- }
- #endif /* !CONFIG_USER_ONLY */
- 
--/* Return the exception level which controls this address translation regime */
--static uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
--{
--    switch (mmu_idx) {
--    case ARMMMUIdx_E20_0:
--    case ARMMMUIdx_E20_2:
--    case ARMMMUIdx_E20_2_PAN:
--    case ARMMMUIdx_Stage2:
--    case ARMMMUIdx_E2:
--        return 2;
--    case ARMMMUIdx_SE3:
--        return 3;
--    case ARMMMUIdx_SE10_0:
--        return arm_el_is_aa64(env, 3) ? 1 : 3;
--    case ARMMMUIdx_SE10_1:
--    case ARMMMUIdx_SE10_1_PAN:
--    case ARMMMUIdx_Stage1_E0:
--    case ARMMMUIdx_Stage1_E1:
--    case ARMMMUIdx_Stage1_E1_PAN:
--    case ARMMMUIdx_E10_0:
--    case ARMMMUIdx_E10_1:
--    case ARMMMUIdx_E10_1_PAN:
--    case ARMMMUIdx_MPrivNegPri:
--    case ARMMMUIdx_MUserNegPri:
--    case ARMMMUIdx_MPriv:
--    case ARMMMUIdx_MUser:
--    case ARMMMUIdx_MSPrivNegPri:
--    case ARMMMUIdx_MSUserNegPri:
--    case ARMMMUIdx_MSPriv:
--    case ARMMMUIdx_MSUser:
--        return 1;
--    default:
--        g_assert_not_reached();
--    }
--}
--
- uint64_t arm_sctlr(CPUARMState *env, int el)
+ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
  {
-     /* Only EL0 needs to be adjusted for EL1&0 or EL2&0. */
+     int rd = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+     uint64_t imm = extract32(insn, 10, 12);
+-    int shift = extract32(insn, 22, 2);
++    bool shift = extract32(insn, 22, 1);
+     bool setflags = extract32(insn, 29, 1);
+     bool sub_op = extract32(insn, 30, 1);
+     bool is_64bit = extract32(insn, 31, 1);
+@@ -3778,15 +3778,8 @@ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
+     TCGv_i64 tcg_rd = setflags ? cpu_reg(s, rd) : cpu_reg_sp(s, rd);
+     TCGv_i64 tcg_result;
+ 
+-    switch (shift) {
+-    case 0x0:
+-        break;
+-    case 0x1:
++    if (shift) {
+         imm <<= 12;
+-        break;
+-    default:
+-        unallocated_encoding(s);
+-        return;
+     }
+ 
+     tcg_result = tcg_temp_new_i64();
+@@ -4174,7 +4167,7 @@ static void disas_data_proc_imm(DisasContext *s, uint32_t insn)
+     case 0x20: case 0x21: /* PC-rel. addressing */
+         disas_pc_rel_adr(s, insn);
+         break;
+-    case 0x22: case 0x23: /* Add/subtract (immediate) */
++    case 0x22: /* Add/subtract (immediate) */
+         disas_add_sub_imm(s, insn);
+         break;
+     case 0x24: /* Logical (immediate) */
 -- 
 2.20.1
 
