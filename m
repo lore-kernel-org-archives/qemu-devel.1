@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB70C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851FEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F185B20702
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FC0720702
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:16:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wF3jCnfe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F185B20702
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="viX4ROki"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC0720702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joq59-0003ru-1A
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35328)
+	id 1joq5F-00047R-Er
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:16:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3m-0001qI-Ty
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:34 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:40794)
+ id 1joq3z-00026R-Ue
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:47 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:37170)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3k-0006CG-3r
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:34 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id f139so9704230wmf.5
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:31 -0700 (PDT)
+ id 1joq3w-0006IN-Pi
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:47 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id a6so9868289wrm.4
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=gAVU66Bka2C31iTs/7lhQdbitwvERu6cMLvGdW1VOYU=;
- b=wF3jCnfedOFNoYhYCM+xFBrQXmjhgvuXH3fLFP73VeATuzHsYWSmp46hqIp8dI7bnb
- BhVGMEOuPf6wfCNnbl+KLNv4BsFYdbEMZdVqUjKnW8LRYRS4LP10agenMVXiENsQyUmO
- L97mxhhVTlI3R9QmJoxmpLFU9h85Uv010lkDdVc++/2U+pQYFaLaKH4N0+JlOaOVYaBz
- TWivR9QJ2XBW0lo3aDm7V1Hyb+qm4LggraEg+IN6lDQQ+5v5EGQ+F0u1JK7JRHnFuYP5
- Y/tyS/DBIaILTWiAUREORSpd0QbYhCpIp+2p6RqXpzuZNHpZqXc3guZwoBg0f+MQLBT1
- oTRA==
+ bh=KiwKMAfLqBpV0Mc8jDI36+MCGtlMsxICaCbL8Ck1LtA=;
+ b=viX4ROki9khXvURFoFHvwAW4qmRvNI1j3aTat0WLzRFeDUVmfut10SBSAlLI6Y5YgO
+ YeTzj71kRWt6VRRCf1nAdSfa9+3qve8wb4BJfW64q7nXtMf0ekGQvBhlVwCiih6+nfOo
+ UTl33igRbfRbct1kvr2rKLlgE0Ndnh2DC3zQ3JNCIxweioR4ftvns6Y0GIV0GD+J4Bmc
+ gAXYYD0lgvp0Ex7HIVrFV8b1Tr2FFe5+nDFeQCPTU3IAiwL3upKxJiPTX+SeMmjazYD8
+ eIEPGd8Bw5ClPhPf9V3x1ROldFy0mxAJ0JR1KWh9/VIb1TQuuUubucLqcpDxz5KymI/Q
+ Jk6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gAVU66Bka2C31iTs/7lhQdbitwvERu6cMLvGdW1VOYU=;
- b=ffT0LW7X/bY1Q1lgf97wi/94AXgKfqhCzGkSw28iT13EN3BtbCe/cZKztj0zGoBEOE
- leuRV4FsXtmr8+X5RnpYsNSXPGTGxp7vvnrqFzJrM9GgcuyBxCK+sXU4QOnjQXulKsKC
- MFCd/P0rKkU5HwXoGaBb8lzVV/wL5/FiE2/WDNgUO6pWs6X1l1D+c66bEVYbBU2nf0mF
- h67+B3ILA5xrup3bGGz+91bHjeI596Wxl8WRj+z75tr+28PKt4/X5scOSAMed6Hm5rOs
- UgEHNy3Ju0cLtQmuZaPMAeriMid+/b0T0sizxzoYAKEs+TBdqlrB1gY3CzXfDGFvglpO
- wt1A==
-X-Gm-Message-State: AOAM532vi+CzNGkUJ4ifUeENyrhfGQovcoIq6lFTSIiW0wOrRUTuKhjS
- kbicIvsT5dWQUhnRXwEnGLvfMwG+d2L2cw==
-X-Google-Smtp-Source: ABdhPJzIZ7vAtohsyjJZ1XmOJJObhrXr4eqSBvVJlgZgBjxCkQ29BVpnPr7UTg6aq8iMRHa+uwG4+A==
-X-Received: by 2002:a1c:2d54:: with SMTP id t81mr4247277wmt.154.1593184470404; 
- Fri, 26 Jun 2020 08:14:30 -0700 (PDT)
+ bh=KiwKMAfLqBpV0Mc8jDI36+MCGtlMsxICaCbL8Ck1LtA=;
+ b=PbizvoJqeZm1c/Gp97Lu/6IdioZSHQRHFdCTCD/bw7h3/brDxsJE1gKDJOFhaxg9Fe
+ WHZojbpOVCEkZI7TDiPIwcLnANgfrBkgrAmS8xorKh7hQhDTzx4rm62KHAHHfQc/wKeB
+ h3UY//avu8haoYAGmD2fffKJTBu3006Saj7P30SYSYFtFTqfoI6EkTXv1GZuHC6b58uc
+ k4kJAQPXpl5uBCMU/hPJQrt0qBhct+buYNAog+aubiIYG9P2zY2DbC11BKzVyeOcAL+n
+ MHRrOL4LjaKSrR81h5LdB0hgJbfpnCsNdyahItWm51xfvmruhDPdxN2MFYaSdmC4/Nzv
+ tyow==
+X-Gm-Message-State: AOAM531sPnNUL/U38BgX6aULOQzVA9ggmI/FnkAIOdb1ZIv1AivBh7dT
+ WlRSheMhrxAL3JV630TKMhNEW2balTeI+w==
+X-Google-Smtp-Source: ABdhPJwbpdXvjx3kn9wB+AxaIeKP6qi5gG0T0KAzQvBznRZ3fFEVjzKaKColgahPcVH6h1u3UcJAwQ==
+X-Received: by 2002:adf:de01:: with SMTP id b1mr4160836wrm.305.1593184480108; 
+ Fri, 26 Jun 2020 08:14:40 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.29
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.38
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:29 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:39 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/57] hw/arm/aspeed: QOM'ify AspeedMachineState
-Date: Fri, 26 Jun 2020 16:13:30 +0100
-Message-Id: <20200626151424.30117-4-peter.maydell@linaro.org>
+Subject: [PULL 12/57] hw/misc/pca9552: Model qdev output GPIOs
+Date: Fri, 26 Jun 2020 16:13:39 +0100
+Message-Id: <20200626151424.30117-13-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,87 +107,72 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-AspeedMachineState seems crippled. We use incorrectly 2
-different structures to do the same thing. Merge them
-altogether:
-- Move AspeedMachine fields to AspeedMachineState
-- AspeedMachineState is now QOM
-- Remove unused AspeedMachine structure
+The PCA9552 has 16 GPIOs which can be used as input,
+output or PWM mode. QEMU models the output GPIO with
+the qemu_irq type. Let the device expose the 16 GPIOs
+to allow us to later connect LEDs to these outputs.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20200623072132.2868-4-f4bug@amsat.org
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20200623072723.6324-10-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/aspeed.h |  8 +-------
- hw/arm/aspeed.c         | 11 +++++++----
- 2 files changed, 8 insertions(+), 11 deletions(-)
+ include/hw/misc/pca9552.h | 1 +
+ hw/misc/pca9552.c         | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 5114ba0bd4f..09da9d9accf 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -15,13 +15,7 @@ typedef struct AspeedMachineState AspeedMachineState;
+diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
+index bf1a5891378..600356fbf90 100644
+--- a/include/hw/misc/pca9552.h
++++ b/include/hw/misc/pca9552.h
+@@ -27,6 +27,7 @@ typedef struct PCA955xState {
+     uint8_t pointer;
  
- #define TYPE_ASPEED_MACHINE       MACHINE_TYPE_NAME("aspeed")
- #define ASPEED_MACHINE(obj) \
--    OBJECT_CHECK(AspeedMachine, (obj), TYPE_ASPEED_MACHINE)
--
--typedef struct AspeedMachine {
--    MachineState parent_obj;
--
--    bool mmio_exec;
--} AspeedMachine;
-+    OBJECT_CHECK(AspeedMachineState, (obj), TYPE_ASPEED_MACHINE)
+     uint8_t regs[PCA955X_NR_REGS];
++    qemu_irq gpio[PCA955X_PIN_COUNT_MAX];
+     char *description; /* For debugging purpose only */
+ } PCA955xState;
  
- #define ASPEED_MAC0_ON   (1 << 0)
- #define ASPEED_MAC1_ON   (1 << 1)
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index a167b736970..665d04fbf68 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -33,9 +33,14 @@ static struct arm_boot_info aspeed_board_binfo = {
- };
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index 1c3ad57432a..80caa9ec8fc 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -17,6 +17,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/misc/pca9552.h"
+ #include "hw/misc/pca9552_regs.h"
++#include "hw/irq.h"
+ #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+@@ -111,9 +112,11 @@ static void pca955x_update_pin_input(PCA955xState *s)
  
- struct AspeedMachineState {
-+    /* Private */
-+    MachineState parent_obj;
-+    /* Public */
-+
-     AspeedSoCState soc;
-     MemoryRegion ram_container;
-     MemoryRegion max_ram;
-+    bool mmio_exec;
- };
+         switch (config) {
+         case PCA9552_LED_ON:
++            qemu_set_irq(s->gpio[i], 1);
+             s->regs[input_reg] |= 1 << input_shift;
+             break;
+         case PCA9552_LED_OFF:
++            qemu_set_irq(s->gpio[i], 0);
+             s->regs[input_reg] &= ~(1 << input_shift);
+             break;
+         case PCA9552_LED_PWM0:
+@@ -374,11 +377,14 @@ static void pca955x_initfn(Object *obj)
  
- /* Palmetto hardware value: 0x120CE416 */
-@@ -253,7 +258,7 @@ static void sdhci_attach_drive(SDHCIState *sdhci, DriveInfo *dinfo)
- 
- static void aspeed_machine_init(MachineState *machine)
+ static void pca955x_realize(DeviceState *dev, Error **errp)
  {
--    AspeedMachineState *bmc;
-+    AspeedMachineState *bmc = ASPEED_MACHINE(machine);
-     AspeedMachineClass *amc = ASPEED_MACHINE_GET_CLASS(machine);
-     AspeedSoCClass *sc;
-     DriveInfo *drive0 = drive_get(IF_MTD, 0, 0);
-@@ -261,8 +266,6 @@ static void aspeed_machine_init(MachineState *machine)
-     int i;
-     NICInfo *nd = &nd_table[0];
++    PCA955xClass *k = PCA955X_GET_CLASS(dev);
+     PCA955xState *s = PCA955X(dev);
  
--    bmc = g_new0(AspeedMachineState, 1);
--
-     memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
-                        4 * GiB);
-     memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
-@@ -751,7 +754,7 @@ static const TypeInfo aspeed_machine_types[] = {
-     }, {
-         .name          = TYPE_ASPEED_MACHINE,
-         .parent        = TYPE_MACHINE,
--        .instance_size = sizeof(AspeedMachine),
-+        .instance_size = sizeof(AspeedMachineState),
-         .instance_init = aspeed_machine_instance_init,
-         .class_size    = sizeof(AspeedMachineClass),
-         .class_init    = aspeed_machine_class_init,
+     if (!s->description) {
+         s->description = g_strdup("pca-unspecified");
+     }
++
++    qdev_init_gpio_out(dev, s->gpio, k->pin_count);
+ }
+ 
+ static Property pca955x_properties[] = {
 -- 
 2.20.1
 
