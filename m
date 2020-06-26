@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D80C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3030CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C093F20C09
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:23:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1D5C20836
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:24:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HI4KS185"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C093F20C09
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ly/I8LaG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D5C20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jot0w-00059x-T8
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:23:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58266)
+	id 1jot1T-0006UJ-6E
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:24:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jot05-0003Qn-Pp
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:22:57 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35581)
+ id 1jot0D-0003kB-RM
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:05 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:51574)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jot04-00050b-8q
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:22:57 -0400
-Received: by mail-wm1-x341.google.com with SMTP id l2so8754094wmf.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:22:55 -0700 (PDT)
+ id 1jot0C-000574-3Y
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:05 -0400
+Received: by mail-wm1-x331.google.com with SMTP id 22so9670312wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:23:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UsvCJ1FtgsYHjIIgU0bFzUSnvljWkIkb9Subsb2kO6E=;
- b=HI4KS185qC+55mTwfaURF8bnOdQJtP0e40UJLtp/NS5TxHakZPKe4QVpWt2FLMtXaF
- 1BleFv29NtccJLYy+P2fZQWekYU1s2xA55Sfuv/fWCAp7T84wfPqlekf1qivS5KUDPNB
- 0LNzFggT2mNNHF0TVBcHQ1RVBFZUTCB0NFJAS3OSQ9ubhCWCZ47c6qVLqli5QXY6Dfcp
- gO1ffGgtApgAPWnewRxAlMziWW0nqkbU1MBr8kCTn78NrhYBmPSsRPsjc0KQj7Ys4DaS
- v6csIBOzlm889rNFt91GS5kROqzMIRjRRcBhEwE7BrQytU8Kf2NiYdpXd3VTud7zpVJU
- eJLg==
+ bh=vbgKfgzF0oNn2074SqLFMYEK1X+QIMzjn//YRC3OJSQ=;
+ b=Ly/I8LaGFwdn3atTS2Vp1SEpTemt9xGPPNb2xmHIeAZ3JHwFSNpxBPw8RWq196afHF
+ 0Q/6Xik3ZVKabIbuuG/CW2lTET7x25nXWXYx76yuzzmGT/eo5beZtoTFV81zUCsz+5Q1
+ TPofBITU9+5N6MGYoIbirqS+4hKy3czG+aNu6wwgap91sMSHWXKqVDtgYY+iL+OEISbe
+ y13qaVIsXJ2AM8CgQIGg2V/mH9JxJGGasbHYWbWdOCG3KiO5XCJTtwWQ28aZFJyh4+tl
+ o8KYmqczlhcrShGP6Hm6lZgs1x6DPpW5XYzP8Fai+zqRaAH8GQMWzFtyuXoIlm2q8Dy+
+ mOQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UsvCJ1FtgsYHjIIgU0bFzUSnvljWkIkb9Subsb2kO6E=;
- b=Dza/YWxzICyfLlhGVfLm3JHj556OUOZIwwdKIpGtuTF8E8SRI9jufZ6cmI3VptYIoN
- YkMTTM4er/3t6KqnZt25IanZE5NA7L1ZigyQzbBGTmiDtci+GJfCcdG525cwwHsuetiF
- r+Gt8ZxEtErzk79FVoN+rrX4dokUSOxYnCC1Aslgur4aqg+r1pEBaIOqKwDFUs5pxzB3
- 9ToXv7i5ByVJVnHR5+7dmfdpJo5oq1lXfdCVut1sWOC1tmtOQvT+giMfy1TFgeBNpSZE
- o72tzFjNnSxnIGKg8X3RImWhq5F5TaLSSXet4cZ+/blULe5Lloz0vdhXFqk26IqCbTMT
- u5AA==
-X-Gm-Message-State: AOAM53079WlgSdMQqJAFf/UAEPH9MTA+jCg3+fjDPCFH1HYApggTVaIv
- 9Nq1wci20SCzUo7sD56YG1qDpQ==
-X-Google-Smtp-Source: ABdhPJyUu9mCVjoMCns72qXRVAts0xau7VyfRALREgyAj5LtSJJPoLESwXoK4ugeFTH0rUZ4F2uocA==
-X-Received: by 2002:a1c:2e47:: with SMTP id u68mr4929167wmu.45.1593195774898; 
- Fri, 26 Jun 2020 11:22:54 -0700 (PDT)
+ bh=vbgKfgzF0oNn2074SqLFMYEK1X+QIMzjn//YRC3OJSQ=;
+ b=KniArJOK0tPtqBirOk3ps6DOQuE8frFQ1BB1U4s9KjGAhQguMd/7EVkVbDRl4KM/7F
+ uYg6rE7ikHbNplV3A4ttsry/ZGSOmzwdoahKf7vPMSeuFhgMvAHsY+4P3o29LIv5zp14
+ YsBUqpplMNLtKzY/Hgw9gy068Y3TQLYcxcE/q3nxoSBcuz7ztkV85v7qO7TwnuSf+ke8
+ TJ6HFMtHykW7pYjz+4a+OmWFl+IcK2a9ZR9e+CBSuVbgCWkm1OOhfW2uHp6GySQxxoc1
+ EfaF+EGBMzhsXefxvxiLgB3/ARhf5js+2/kPpyFRtcYM6LxZhy7U2FcjDAM1ySRfFw21
+ smWQ==
+X-Gm-Message-State: AOAM532eMm+RWdt7ajGjy2N5HVf1t/W9+ZqziCFrVyQULYlaeo1GF99l
+ fRr+rArTn7rIidcMc+auX4bRXA==
+X-Google-Smtp-Source: ABdhPJwvcbLh7ydLb7v+IjdCTgL+lqjDDGQknIQjP0H7mz70ptkKFEKgtDGTajU/Z5gOfxrWw1hNAw==
+X-Received: by 2002:a7b:ce97:: with SMTP id q23mr4784657wmj.89.1593195782665; 
+ Fri, 26 Jun 2020 11:23:02 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r12sm37304294wrc.22.2020.06.26.11.22.51
+ by smtp.gmail.com with ESMTPSA id g14sm4615026wrm.93.2020.06.26.11.22.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 11:22:51 -0700 (PDT)
+ Fri, 26 Jun 2020 11:22:57 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6FCFD1FF9C;
- Fri, 26 Jun 2020 19:14:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id AF6761FFB1;
+ Fri, 26 Jun 2020 19:14:03 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/30] tests/docker: check for an parameters not empty
- string
-Date: Fri, 26 Jun 2020 19:13:41 +0100
-Message-Id: <20200626181357.26211-15-alex.bennee@linaro.org>
+Subject: [PATCH  v3 28/30] gitlab: split build-disabled into two phases
+Date: Fri, 26 Jun 2020 19:13:55 +0100
+Message-Id: <20200626181357.26211-29-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626181357.26211-1-alex.bennee@linaro.org>
 References: <20200626181357.26211-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,36 +103,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Maydell <peter.maydell@linaro.org>,
- berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
  aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- tests/docker/common.rc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As we run check-qtest in "SLOW" mode this can timeout so split into
+two jobs.
 
-diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-index 02cd67a8c5e..b27ce17e333 100755
---- a/tests/docker/common.rc
-+++ b/tests/docker/common.rc
-@@ -47,7 +47,7 @@ build_qemu()
- check_qemu()
- {
-     # default to make check unless the caller specifies
--    if test -z "$@"; then
-+    if [ $# == 0 ]; then
-         INVOCATION="check"
-     else
-         INVOCATION="$@"
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .gitlab-ci.yml | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index eb5b335c1e9..c6f1addc2f3 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -110,7 +110,7 @@ check:system-fedora-alt:
+     IMAGE: fedora
+     MAKE_CHECK_ARGS: check-acceptance
+ 
+-build-disabled:
++build:system-fedora-disabled:
+   <<: *native_build_job_definition
+   variables:
+     IMAGE: fedora
+@@ -121,6 +121,17 @@ build-disabled:
+       --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
+       --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
+     TARGETS: i386-softmmu ppc64-softmmu mips64-softmmu i386-linux-user
++  artifacts:
++    paths:
++      - build
++
++qtest:system-fedora-disabled:
++  <<: *native_test_job_definition
++  needs:
++    - job: build:system-fedora-disabled
++      artifacts: true
++  variables:
++    IMAGE: fedora
+     MAKE_CHECK_ARGS: check-qtest SPEED=slow
+ 
+ build-tcg-disabled:
 -- 
 2.20.1
 
