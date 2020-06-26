@@ -2,87 +2,87 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE95C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4780C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B1D520C09
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DFD720B80
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 22:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MYcBFgDo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1D520C09
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cR9heUeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DFD720B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jowWA-0001cd-5T
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:08:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53018)
+	id 1jowWw-0002xh-Kd
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 18:09:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowIH-0003A5-GR
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:54:00 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:3622)
+ id 1jowIS-0003GS-Of
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:54:08 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=439617756=alistair.francis@wdc.com>)
- id 1jowIA-0002yu-SV
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:53:54 -0400
+ id 1jowIP-00031I-Pc
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:54:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593208430; x=1624744430;
+ t=1593208453; x=1624744453;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=gj1u+FapHCwwuIZgqjGxFFgeMDqarp33uURoM2xuAB8=;
- b=MYcBFgDoYjG2lVd8rVsQszA6Ses+F9pMNFEJNFx0KwGV8L6cjA5qcVUf
- 5KbOPKQi6aWge8jXbPG2c+buELbWVF01cCpatBbdjph2yspx11kZGyCAS
- g27mOjRrmCkzBxjP5OcSpDr48C1ZeVXPKK/nWBGjpFFZfBxq3zMmvvd5M
- iT3uOnHj2p71XjN9AoaWKEo511UizJafOOnFBX479du3KHzoN5aNoSX+l
- FBLcT957CVBTApjq2HpARHoxwV1+CT+vaXiN1HrDFK1YaX4wehqKTsI31
- ARcH5Q6/2h99IuineHp9dHkYN8IxQkKSr7nssr84xX4EJ8mR8gR8fhX4B g==;
-IronPort-SDR: YkloRcOG+JHKiLAxVT5JflH0SOhgMFrYPobmS0lwEXF84KFANVAUDt+NFxjlPDTICRb1OiD4X3
- zPYfuruOTXVfdeYHhwH48GCZV/j62dyD7ww55G9TUQiwaTcwF6PVlce1DdKSO0zcJvEx9HC+HR
- d2tJ5UrXmb1B/NzudjIhKPZmzoBfIHAQ2a4m9cCUgGgZPZqC3qEHknW87K1a6cnUEQGFOspw9l
- e8xgzQfE58X1p5V4DKE/zZNY/YquZjlJV1QAY3rSBPqzS9Dzdu4WADQOQjmHPoV+SUI5xirAjD
- IEk=
-X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="250261259"
+ bh=npSraeScPd7EftUU6+M4EAb0MQbJNkVxG/9W0YusQXA=;
+ b=cR9heUeBbpIZ0pWHxtfpxVY3nOqwNVhXv2pIE44rjSnw2XyboIyvygiL
+ SMPrcueKjEc6I5jgcevGhOTyWQ6tlJZfYuygx46CM9FvAwVYDkhQfaKpX
+ t7V7Kuu+rrCVxEdGbMyYAM6iMEVOigoFKaqwlAyleOB6bN0oe2GNWoN1p
+ MzyAIBP6MUkSsStzgsyIr3QVviyc15e2mGdqLttDZ3NW1wkA9Z9AUEShQ
+ xOjW602BmuMVvzwwX+FZQmAkG9ATONzZK1lv57w8mUJCY/+xkb39Qv2Dz
+ XPj4ipWktqZs7z4pdv/qBMou2CNlOUIWUsKQ5B/Iy/jdLGgpd2oMckiLL Q==;
+IronPort-SDR: 03svj+dcfw33+QvY/Q0bzYNSZC62Uqq8cmlOpdBW6L6Yrfj4Owc4W6TwU+CJA4vhgom+TuhSjt
+ VZPpQxSaBfwYZYlhLczqFycMLmiZ0pQ58Iy4tcTBPWMV7/jK43CVxm1YxOdO35SxnxQqg62/6N
+ ZSavBaRsjCb3/cJIDN7GFFCFSqhXLgvMMQdmS1pg0Yw9gCdscFo/s+gZykkgPMSeopGaSbPle4
+ RSFYpxijLKP2Zyo2cyXfCXV2pUbQjePY1y5tyy4FkIg4QdF8q/FYconWYUWt1mV9WE46l/Tj0o
+ yfI=
+X-IronPort-AV: E=Sophos;i="5.75,285,1589212800"; d="scan'208";a="244048399"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:40 +0800
-IronPort-SDR: XUtclv3oF28rqbCTFrl2dhv7RjZ7FmPG07X+N0YZwJvMrjO3Z+nSNYN6P0guzIaoZfVkhtXioI
- QuYGZf1zSH5pqmBPbJXB90K2L+RYdZ0pI=
+ by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2020 05:53:48 +0800
+IronPort-SDR: XztPG8t+kx9kBjQAUOzOdxh3md1lsV2cpPodcZbEm6l3bzDUNMQUKZ4fotELOL8g/1XjgB7VLr
+ 2pdKwzC5po8ar7dw4LQy3wGkwTE8WEc9c=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Jun 2020 14:42:38 -0700
-IronPort-SDR: u9x9oi+I+CTA0LWNLNr4GOOSzfgKEeC8ndTD003KIkittX/kQSN50o/RPHIRWB+WgWGm6ZH9fX
- gW9xtCpPHpwA==
+ 26 Jun 2020 14:42:44 -0700
+IronPort-SDR: 2s8db9vmyjht57bGM2oM/z2El/pzhpYRXE/DdNhK1DMizXfArjH3IJzD62f8V8z98UzCtQzdZN
+ zOmKSkpJc3fw==
 WDCIronportException: Internal
 Received: from 2hc7cg2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.206])
- by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:40 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 26 Jun 2020 14:53:46 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 21/63] target/riscv: vector integer divide instructions
-Date: Fri, 26 Jun 2020 14:43:28 -0700
-Message-Id: <20200626214410.3613258-22-alistair.francis@wdc.com>
+Subject: [PULL 42/63] target/riscv: vector floating-point classify instructions
+Date: Fri, 26 Jun 2020 14:43:49 -0700
+Message-Id: <20200626214410.3613258-43-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200626214410.3613258-1-alistair.francis@wdc.com>
 References: <20200626214410.3613258-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
+Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=439617756=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:37
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:53:44
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -115,175 +115,221 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200623215920.2594-20-zhiwei_liu@c-sky.com
+Message-id: 20200623215920.2594-41-zhiwei_liu@c-sky.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   | 33 +++++++++++
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
- target/riscv/vector_helper.c            | 74 +++++++++++++++++++++++++
- 4 files changed, 125 insertions(+)
+ target/riscv/helper.h                   |  4 ++
+ target/riscv/internals.h                |  5 ++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/fpu_helper.c               | 33 +--------
+ target/riscv/insn_trans/trans_rvv.inc.c |  3 +
+ target/riscv/vector_helper.c            | 91 +++++++++++++++++++++++++
+ 6 files changed, 107 insertions(+), 30 deletions(-)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c2de0d29ba..e14979e452 100644
+index 0e8d241831..fb744c5ec9 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -568,3 +568,36 @@ DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+@@ -996,3 +996,7 @@ DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 +
-+DEF_HELPER_6(vdivu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_5(vfclass_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfclass_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+index e59e8b30ad..f3cea478f7 100644
+--- a/target/riscv/internals.h
++++ b/target/riscv/internals.h
+@@ -27,4 +27,9 @@ FIELD(VDATA, VM, 8, 1)
+ FIELD(VDATA, LMUL, 9, 2)
+ FIELD(VDATA, NF, 11, 4)
+ FIELD(VDATA, WD, 11, 1)
++
++/* float point classify helpers */
++target_ulong fclass_h(uint64_t frs1);
++target_ulong fclass_s(uint64_t frs1);
++target_ulong fclass_d(uint64_t frs1);
+ #endif
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 6b29aad4d2..cf58764308 100644
+index 59fb1a2425..6912eda259 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -373,6 +373,14 @@ vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
- vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
- vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
- vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
-+vdivu_vv        100000 . ..... ..... 010 ..... 1010111 @r_vm
-+vdivu_vx        100000 . ..... ..... 110 ..... 1010111 @r_vm
-+vdiv_vv         100001 . ..... ..... 010 ..... 1010111 @r_vm
-+vdiv_vx         100001 . ..... ..... 110 ..... 1010111 @r_vm
-+vremu_vv        100010 . ..... ..... 010 ..... 1010111 @r_vm
-+vremu_vx        100010 . ..... ..... 110 ..... 1010111 @r_vm
-+vrem_vv         100011 . ..... ..... 010 ..... 1010111 @r_vm
-+vrem_vx         100011 . ..... ..... 110 ..... 1010111 @r_vm
+@@ -514,6 +514,7 @@ vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
+ vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
+ vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
+ vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
++vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
+index 0b79562a69..4379756dc4 100644
+--- a/target/riscv/fpu_helper.c
++++ b/target/riscv/fpu_helper.c
+@@ -22,6 +22,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "fpu/softfloat.h"
++#include "internals.h"
+ 
+ target_ulong riscv_cpu_get_fflags(CPURISCVState *env)
+ {
+@@ -230,21 +231,7 @@ uint64_t helper_fcvt_s_lu(CPURISCVState *env, uint64_t rs1)
+ 
+ target_ulong helper_fclass_s(uint64_t frs1)
+ {
+-    float32 f = frs1;
+-    bool sign = float32_is_neg(f);
+-
+-    if (float32_is_infinity(f)) {
+-        return sign ? 1 << 0 : 1 << 7;
+-    } else if (float32_is_zero(f)) {
+-        return sign ? 1 << 3 : 1 << 4;
+-    } else if (float32_is_zero_or_denormal(f)) {
+-        return sign ? 1 << 2 : 1 << 5;
+-    } else if (float32_is_any_nan(f)) {
+-        float_status s = { }; /* for snan_bit_is_one */
+-        return float32_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
+-    } else {
+-        return sign ? 1 << 1 : 1 << 6;
+-    }
++    return fclass_s(frs1);
+ }
+ 
+ uint64_t helper_fadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
+@@ -353,19 +340,5 @@ uint64_t helper_fcvt_d_lu(CPURISCVState *env, uint64_t rs1)
+ 
+ target_ulong helper_fclass_d(uint64_t frs1)
+ {
+-    float64 f = frs1;
+-    bool sign = float64_is_neg(f);
+-
+-    if (float64_is_infinity(f)) {
+-        return sign ? 1 << 0 : 1 << 7;
+-    } else if (float64_is_zero(f)) {
+-        return sign ? 1 << 3 : 1 << 4;
+-    } else if (float64_is_zero_or_denormal(f)) {
+-        return sign ? 1 << 2 : 1 << 5;
+-    } else if (float64_is_any_nan(f)) {
+-        float_status s = { }; /* for snan_bit_is_one */
+-        return float64_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
+-    } else {
+-        return sign ? 1 << 1 : 1 << 6;
+-    }
++    return fclass_d(frs1);
+ }
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b5ea1c59a1..f3a8baf581 100644
+index 791d377e3c..361bdce654 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1581,3 +1581,13 @@ GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
- GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
- GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
+@@ -2181,3 +2181,6 @@ GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
+ GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
+ GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
+ GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
 +
-+/* Vector Integer Divide Instructions */
-+GEN_OPIVV_TRANS(vdivu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vdiv_vv, opivv_check)
-+GEN_OPIVV_TRANS(vremu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vrem_vv, opivv_check)
-+GEN_OPIVX_TRANS(vdivu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vdiv_vx, opivx_check)
-+GEN_OPIVX_TRANS(vremu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vrem_vx, opivx_check)
++/* Vector Floating-Point Classify Instruction */
++GEN_OPFV_TRANS(vfclass_v, opfv_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index ce4aae8753..e0a372967a 100644
+index feb045813d..67cd409112 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -1766,3 +1766,77 @@ GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
+@@ -4103,3 +4103,94 @@ GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
+ GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
+ GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
+ GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
 +
-+/* Vector Integer Divide Instructions */
-+#define DO_DIVU(N, M) (unlikely(M == 0) ? (__typeof(N))(-1) : N / M)
-+#define DO_REMU(N, M) (unlikely(M == 0) ? N : N % M)
-+#define DO_DIV(N, M)  (unlikely(M == 0) ? (__typeof(N))(-1) :\
-+        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? N : N / M)
-+#define DO_REM(N, M)  (unlikely(M == 0) ? N :\
-+        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? 0 : N % M)
++/* Vector Floating-Point Classify Instruction */
++#define OPIVV1(NAME, TD, T2, TX2, HD, HS2, OP)         \
++static void do_##NAME(void *vd, void *vs2, int i)      \
++{                                                      \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                    \
++    *((TD *)vd + HD(i)) = OP(s2);                      \
++}
 +
-+RVVCALL(OPIVV2, vdivu_vv_b, OP_UUU_B, H1, H1, H1, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_h, OP_UUU_H, H2, H2, H2, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_w, OP_UUU_W, H4, H4, H4, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_d, OP_UUU_D, H8, H8, H8, DO_DIVU)
-+RVVCALL(OPIVV2, vdiv_vv_b, OP_SSS_B, H1, H1, H1, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_h, OP_SSS_H, H2, H2, H2, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_w, OP_SSS_W, H4, H4, H4, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_d, OP_SSS_D, H8, H8, H8, DO_DIV)
-+RVVCALL(OPIVV2, vremu_vv_b, OP_UUU_B, H1, H1, H1, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_h, OP_UUU_H, H2, H2, H2, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_w, OP_UUU_W, H4, H4, H4, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_d, OP_UUU_D, H8, H8, H8, DO_REMU)
-+RVVCALL(OPIVV2, vrem_vv_b, OP_SSS_B, H1, H1, H1, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_h, OP_SSS_H, H2, H2, H2, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_w, OP_SSS_W, H4, H4, H4, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_d, OP_SSS_D, H8, H8, H8, DO_REM)
-+GEN_VEXT_VV(vdivu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vdivu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vdivu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vdivu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vdiv_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vdiv_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vdiv_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vdiv_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vremu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vremu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vremu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vremu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vrem_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vrem_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vrem_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vrem_vv_d, 8, 8, clearq)
++#define GEN_VEXT_V(NAME, ESZ, DSZ, CLEAR_FN)           \
++void HELPER(NAME)(void *vd, void *v0, void *vs2,       \
++                  CPURISCVState *env, uint32_t desc)   \
++{                                                      \
++    uint32_t vlmax = vext_maxsz(desc) / ESZ;           \
++    uint32_t mlen = vext_mlen(desc);                   \
++    uint32_t vm = vext_vm(desc);                       \
++    uint32_t vl = env->vl;                             \
++    uint32_t i;                                        \
++                                                       \
++    for (i = 0; i < vl; i++) {                         \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {     \
++            continue;                                  \
++        }                                              \
++        do_##NAME(vd, vs2, i);                         \
++    }                                                  \
++    CLEAR_FN(vd, vl, vl * DSZ,  vlmax * DSZ);          \
++}
 +
-+RVVCALL(OPIVX2, vdivu_vx_b, OP_UUU_B, H1, H1, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_h, OP_UUU_H, H2, H2, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_w, OP_UUU_W, H4, H4, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_d, OP_UUU_D, H8, H8, DO_DIVU)
-+RVVCALL(OPIVX2, vdiv_vx_b, OP_SSS_B, H1, H1, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_h, OP_SSS_H, H2, H2, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_w, OP_SSS_W, H4, H4, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_d, OP_SSS_D, H8, H8, DO_DIV)
-+RVVCALL(OPIVX2, vremu_vx_b, OP_UUU_B, H1, H1, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_h, OP_UUU_H, H2, H2, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_w, OP_UUU_W, H4, H4, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_d, OP_UUU_D, H8, H8, DO_REMU)
-+RVVCALL(OPIVX2, vrem_vx_b, OP_SSS_B, H1, H1, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_h, OP_SSS_H, H2, H2, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_w, OP_SSS_W, H4, H4, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_d, OP_SSS_D, H8, H8, DO_REM)
-+GEN_VEXT_VX(vdivu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vdivu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vdivu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vdivu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vdiv_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vdiv_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vdiv_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vdiv_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vremu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vremu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vremu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vremu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vrem_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vrem_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vrem_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vrem_vx_d, 8, 8, clearq)
++target_ulong fclass_h(uint64_t frs1)
++{
++    float16 f = frs1;
++    bool sign = float16_is_neg(f);
++
++    if (float16_is_infinity(f)) {
++        return sign ? 1 << 0 : 1 << 7;
++    } else if (float16_is_zero(f)) {
++        return sign ? 1 << 3 : 1 << 4;
++    } else if (float16_is_zero_or_denormal(f)) {
++        return sign ? 1 << 2 : 1 << 5;
++    } else if (float16_is_any_nan(f)) {
++        float_status s = { }; /* for snan_bit_is_one */
++        return float16_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
++    } else {
++        return sign ? 1 << 1 : 1 << 6;
++    }
++}
++
++target_ulong fclass_s(uint64_t frs1)
++{
++    float32 f = frs1;
++    bool sign = float32_is_neg(f);
++
++    if (float32_is_infinity(f)) {
++        return sign ? 1 << 0 : 1 << 7;
++    } else if (float32_is_zero(f)) {
++        return sign ? 1 << 3 : 1 << 4;
++    } else if (float32_is_zero_or_denormal(f)) {
++        return sign ? 1 << 2 : 1 << 5;
++    } else if (float32_is_any_nan(f)) {
++        float_status s = { }; /* for snan_bit_is_one */
++        return float32_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
++    } else {
++        return sign ? 1 << 1 : 1 << 6;
++    }
++}
++
++target_ulong fclass_d(uint64_t frs1)
++{
++    float64 f = frs1;
++    bool sign = float64_is_neg(f);
++
++    if (float64_is_infinity(f)) {
++        return sign ? 1 << 0 : 1 << 7;
++    } else if (float64_is_zero(f)) {
++        return sign ? 1 << 3 : 1 << 4;
++    } else if (float64_is_zero_or_denormal(f)) {
++        return sign ? 1 << 2 : 1 << 5;
++    } else if (float64_is_any_nan(f)) {
++        float_status s = { }; /* for snan_bit_is_one */
++        return float64_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
++    } else {
++        return sign ? 1 << 1 : 1 << 6;
++    }
++}
++
++RVVCALL(OPIVV1, vfclass_v_h, OP_UU_H, H2, H2, fclass_h)
++RVVCALL(OPIVV1, vfclass_v_w, OP_UU_W, H4, H4, fclass_s)
++RVVCALL(OPIVV1, vfclass_v_d, OP_UU_D, H8, H8, fclass_d)
++GEN_VEXT_V(vfclass_v_h, 2, 2, clearh)
++GEN_VEXT_V(vfclass_v_w, 4, 4, clearl)
++GEN_VEXT_V(vfclass_v_d, 8, 8, clearq)
 -- 
 2.27.0
 
