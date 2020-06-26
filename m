@@ -4,84 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60098C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9880BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F08C20836
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:27:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56FA320836
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t2VuEGbP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F08C20836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="boXIJc9W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56FA320836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jot4e-0003cQ-DF
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:27:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58398)
+	id 1jot5o-0005Jy-8y
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:28:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jot0G-0003rI-LN
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:08 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34635)
+ id 1jot08-0003WR-7P
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:00 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34183)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jot0E-00058K-JQ
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:23:08 -0400
-Received: by mail-wr1-x434.google.com with SMTP id f7so7385006wrw.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:23:06 -0700 (PDT)
+ id 1jot06-00052D-Jh
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:22:59 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f7so7384678wrw.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:22:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8+ywLSq/cpQR9jk1x4FDeODnKkLS2LjIS17ZB0FsQ2E=;
- b=t2VuEGbPaVY2reVVq1TouABum0h/TkvNxEmYOmFMPu6EqOygHm0DfKVYcEsACMkk5e
- OLz+p1yxJVimcULfYgCMU/ac3a1IftHMuZSLZY5rJGSEJIBh3hRkdtXZvbj5At3qe3iS
- WSg+QUOlMNQ03meX2oqUIdrODWd0fvlN057PKexc2/v9a8gQuSN6NM0RVMXj+65u6unZ
- uujj36fyCdpp4cAXjCcd2baOCPwieNS6dJt4KMU2Wyhh8TKrmRaGUBcXbvjbxHvfHqua
- rw/711UqyQJSSN7i3E0qQqJLDXax6WtJD1LXq9MN9NT6lIwmlpgC5pOkTlUHrkDeTF28
- kivA==
+ bh=/rK0Sms5MapCn5tnpSN1o9DxY3jR2MXQyjMdJcVhwfU=;
+ b=boXIJc9W7CwmZkyFXNg1XQfbfSOzTIxKVQMBHFjkWZe6z3Ue4vs80QjuJ8GcC8N/Y3
+ rVh4P1+wyZCDapbiRoVMkb6ltxXLtG810trz6wmTK09siTrG3s9LAUnX8LlD8PFGp4Eo
+ VsoWFgvpduQyGRp7cMtXyq0pnBINXcLova+DTjyI8OucjrtY40UeJxfJXxfndUFeqZI7
+ c6xbST5lapx37onPgD+ZlJVLuPqQOU05ZRfpqrJ8r+vU1O9SfWIwrxeUJ6ecU5HIejXG
+ 11SxHJWQIzoSPoBpdR6I7svpTEeDzuCQ1aMIxiHGVOK9PP2LfTThxx+IyBg9jwYtevv8
+ +rTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8+ywLSq/cpQR9jk1x4FDeODnKkLS2LjIS17ZB0FsQ2E=;
- b=ZfwMHwOfKqHfhV+n51MaMGBGO9kFqeuBQDudS25RFTxZPhMyRm5s1blrjhoH1v7Fa1
- DP5CWzfrE6p+6UqUXJ3GRJHmo3NX2D+KxjCpjb8rS30MgYph7npoTIcFSRwNNp+GyLT6
- 3ywoMSPdEZkiuv1NzakfWRlUFD7OSlrDsbjinIo9tXbdecPoAgZn8dI9EFWOL57FaFYF
- 3bm2rVKCD+NYiYRVHN59IYj99Qhnrh5pik4ONNh2UMNonCzajzBwTSUaqnlRJTwA0/A9
- b/aQ067CAmsEd7FTdAS7jqwgx9WJLBwUDuQ8jZ9JhuaUiYsuf5o6yLDGDYR/XAhIBMSu
- cpgQ==
-X-Gm-Message-State: AOAM531XLgtcoaTSIwypQ0UBB9x5mdOPZBjSxWXWU3cGN5ZODwTMHX5e
- 60J4JsepjqevNuhdMFYX9DTp3Q==
-X-Google-Smtp-Source: ABdhPJx15jdfgtME4nsEudWIAGeIPo+KeJ5rwWH0LMMH51+e4hcuu8/8+USt0/BBkRHSxLFBcxdcrw==
-X-Received: by 2002:adf:82f5:: with SMTP id 108mr5009572wrc.218.1593195785203; 
- Fri, 26 Jun 2020 11:23:05 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 11sm18436613wmg.41.2020.06.26.11.22.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=/rK0Sms5MapCn5tnpSN1o9DxY3jR2MXQyjMdJcVhwfU=;
+ b=rQFjZzKQ/R46dUEIWamj8UyBu6vxD87rn80POH5fQwnc7zrGtr9COj4pDdTykK2ovn
+ 6ffEopcT79L502MGwMbvY/K4vbzvGAqlILK6iJnhJljVreyQhNqBrnO6qGY6tjueNXUR
+ sXOTtPf3n3119foPZhAaWPMAXTIDdT8iaWup0yr+3HbBl8Kvg9d5E1O8XlraxXooc4NE
+ 7UIkKx7YU//ibOUG26dS2sLyUwBLyzEoDPcTzihcqCw05Nld8hKjTJRijsZzIZRlO0Sm
+ fzO2XDTQxDMMtezW6bBiFWUbX8gE97COu/SQPue95e68McCXIzA0dRP5r5FwKzM2sPKp
+ 88FQ==
+X-Gm-Message-State: AOAM531Wd2R8f3+D5D1dqPrruqcre1szJTSbXlpRaQQirVPLqRLjzrKn
+ UbpU5HECUWOiDZk8vYEvJSJSoA==
+X-Google-Smtp-Source: ABdhPJyNzOa1s4PYUPAkq+oZ3KTyqWbVik413SsrnBTX3dCqc3Lp4+4iR3p36MSWnTmBhYb5RFzn1w==
+X-Received: by 2002:adf:de01:: with SMTP id b1mr4897537wrm.305.1593195777236; 
  Fri, 26 Jun 2020 11:22:57 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 14sm17823377wmk.19.2020.06.26.11.22.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 26 Jun 2020 11:22:53 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E3C381FFAB;
- Fri, 26 Jun 2020 19:14:02 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 56F551FFAE;
+ Fri, 26 Jun 2020 19:14:03 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 24/30] gitlab: add acceptance testing to system builds
-Date: Fri, 26 Jun 2020 19:13:51 +0100
-Message-Id: <20200626181357.26211-25-alex.bennee@linaro.org>
+Subject: [PATCH  v3 26/30] gitlab: enable check-tcg for linux-user tests
+Date: Fri, 26 Jun 2020 19:13:53 +0100
+Message-Id: <20200626181357.26211-27-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626181357.26211-1-alex.bennee@linaro.org>
 References: <20200626181357.26211-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,166 +113,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As part of migrating things from Travis to GitLab add the acceptance
-tests. To do this:
-
-  - rename system1 to system-ubuntu-main
-  - rename system2 to system-fedora-misc
-  - split into build/check/acceptance
-  - remove -j from check stages
-  - use artifacts to save build stage
-  - add post acceptance template and use
+Switch to building in the new debian-all-test-cross image which has
+most of the cross compilers inline.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200622143204.12921-16-alex.bennee@linaro.org>
-
 ---
-v2
-  - updated with danp's docker changes
-  - use needs instead of dependancies
-  - touch all the build files to prevent rebuild
----
- .gitlab-ci.yml | 66 +++++++++++++++++++++++++++++++++++++++++++++++---
- .travis.yml    | 23 ------------------
- 2 files changed, 63 insertions(+), 26 deletions(-)
+ .gitlab-ci.yml | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index a7abc55a5c6..5ae8130bd1a 100644
+index 5ae8130bd1a..17c3349dd9e 100644
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
-@@ -1,8 +1,12 @@
-+# Currently we have two build stages after our containers are built:
-+#  - build (for traditional build and test or first stage build)
-+#  - test (for test stages, using build artefacts from a build stage)
- stages:
-   - containers
-   - containers-layer2
-   - containers-layer3
-   - build
-+  - test
- 
- include:
-   - local: '/.gitlab-ci.d/edk2.yml'
-@@ -24,26 +28,82 @@ include:
-         ../configure --enable-werror $CONFIGURE_ARGS ;
-       fi
-     - make -j"$JOBS"
--    - make -j"$JOBS" $MAKE_CHECK_ARGS
-+    - if test -n "$MAKE_CHECK_ARGS";
-+      then
-+        make $MAKE_CHECK_ARGS ;
-+      fi
-+
-+.native_test_job_template: &native_test_job_definition
-+  stage: test
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - cd build
-+    - find . -type f -exec touch {} +
-+    - make $MAKE_CHECK_ARGS
-+
-+.post_acceptance_template: &post_acceptance
-+  after_script:
-+    - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-+    - du -chs $HOME/avocado/data/cache
- 
--build-system1:
-+build:system-ubuntu-main:
+@@ -140,10 +140,9 @@ build-tcg-disabled:
+ build-user:
    <<: *native_build_job_definition
    variables:
-     IMAGE: ubuntu2004
-     TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu lm32-softmmu
-       moxie-softmmu microblazeel-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu
-       riscv64-softmmu sparc-softmmu
-+  artifacts:
-+    paths:
-+      - build
-+
-+check:system-ubuntu-main:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build:system-ubuntu-main
-+      artifacts: true
-+  variables:
-+    IMAGE: ubuntu2004
-     MAKE_CHECK_ARGS: check
+-    IMAGE: ubuntu2004
+-    CONFIGURE_ARGS: --disable-system --disable-guest-agent
+-      --disable-capstone --disable-slirp --disable-fdt
+-    MAKE_CHECK_ARGS:  run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
++    IMAGE: debian-all-test-cross
++    CONFIGURE_ARGS: --disable-tools --disable-system
++    MAKE_CHECK_ARGS: check-tcg
  
--build-system2:
-+acceptance:system-ubuntu-main:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build:system-ubuntu-main
-+      artifacts: true
-+  variables:
-+    IMAGE: ubuntu2004
-+    MAKE_CHECK_ARGS: check-acceptance
-+
-+build:system-fedora-alt:
+ build-clang:
    <<: *native_build_job_definition
-   variables:
-     IMAGE: fedora
-     TARGETS: tricore-softmmu unicore32-softmmu microblaze-softmmu mips-softmmu
-       riscv32-softmmu s390x-softmmu sh4-softmmu sparc64-softmmu x86_64-softmmu
-       xtensa-softmmu nios2-softmmu or1k-softmmu
-+  artifacts:
-+    paths:
-+      - build
-+
-+check:system-fedora-alt:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build:system-fedora-alt
-+      artifacts: true
-+  variables:
-+    IMAGE: fedora
-     MAKE_CHECK_ARGS: check
- 
-+check:system-fedora-alt:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build:system-fedora-alt
-+      artifacts: true
-+  variables:
-+    IMAGE: fedora
-+    MAKE_CHECK_ARGS: check-acceptance
-+
- build-disabled:
-   <<: *native_build_job_definition
-   variables:
-diff --git a/.travis.yml b/.travis.yml
-index 74158f741b1..c24dfbe377f 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -289,29 +289,6 @@ jobs:
-       python: 3.6
- 
- 
--    # Acceptance (Functional) tests
--    - name: "GCC check-acceptance"
--      dist: bionic
--      env:
--        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sh4-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
--        - TEST_CMD="make check-acceptance"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-acceptance"
--      after_script:
--        - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
--        - du -chs $HOME/avocado/data/cache
--      addons:
--        apt:
--          packages:
--            - python3-pil
--            - python3-pip
--            - python3-numpy
--            - python3-opencv
--            - python3-venv
--            - rpm2cpio
--            - tesseract-ocr
--            - tesseract-ocr-eng
--
--
-     # Using newer GCC with sanitizers
-     - name: "GCC9 with sanitizers (softmmu)"
-       addons:
 -- 
 2.20.1
 
