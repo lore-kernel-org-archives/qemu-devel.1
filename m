@@ -4,75 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2D1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 04:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBF4C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 04:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19E0420767
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 04:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70A4820767
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 04:04:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oJQGPQmi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19E0420767
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RvnyuXDp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70A4820767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jofa0-0007Lh-B9
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 00:03:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43030)
+	id 1jofb1-0008D4-Nn
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 00:04:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jof6e-0001WQ-TR
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:48 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45238)
+ id 1jof6g-0001Zh-4T
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:50 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46455)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jof6d-00028s-3e
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:48 -0400
-Received: by mail-pf1-x442.google.com with SMTP id a127so4037949pfa.12
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 20:32:46 -0700 (PDT)
+ id 1jof6e-00029a-LN
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:49 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b16so4033616pfi.13
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 20:32:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UjqghZMppldJJQFCz4puY4NIT8Id2WOfJG93PywKQl8=;
- b=oJQGPQmitKNtnEQOFZ7B040mdDpGJ4Li5laWEnkKtf4RvSCQFyKw0/0WtYXvQ+tEWj
- WL15tT6BTSX2t0WQrhuDua1AoJaFnP1G/EwcMaFeqZ0tOxjSsHjBMtvVoudjjhVBVzuE
- dJK8onjFX64H1rs9laiu29nKXDqi7eWGy10kQh0Hq6aly7cl6dkEChZjOe38xPST5v7f
- vx5A4xkrxN+6JPVGh2DAcBALWxV96xIpS7NaumWhe4HjaVoyPNRTRwdRLSxHU6mbgloK
- 0NZfMHGumE5oOKMUfGymHUoqr4VvK5jr7w0f1ny7bfE7tYis6I4XnJhq6oarJuFQm3t4
- krSQ==
+ bh=8SXI3lbgZ0UAYQNgtyM7Qe9sZGMnhZE8cWfw/l5JLCg=;
+ b=RvnyuXDpI+gKZktcyestmDB7I9NQqDabkurOrmxomrmouuZbHMaA5ocFxOB3UhHANY
+ qNAQtKf9amHCQUuaZ1iuY39WZ5GlEpfOKRnsYbb0hm4wMiFqFPsJrdDqF59MVvBR18+D
+ TfYy8Sv262IQ/ymkMugQIU9b7vubFzs0cUoeZl/cbbKbhazi0yP8VP/hwCzi75+EbsRq
+ pvs4CFtW77f5CJgkqoItQPQqPQtqF732F/5yhhxnUcMOvr8ImxeONw7bf8ptAkqhR6Sd
+ IefYuSnw5vcPSS/M97+IlkIah2w8Dfriatgqqn3pR5T7C8lLIaK10tR/ObKDBiFAmuJ8
+ NIVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UjqghZMppldJJQFCz4puY4NIT8Id2WOfJG93PywKQl8=;
- b=lX/P6FbY3c6pc2oUBIegkumKaY1XnKVKOGXrkricq2tuSOvgttiU4iyAO7cZrR+6x5
- HTvD+WG1mbX/UOtv7gLeJuAbgM2klUVLgU9oTQokyiL7ZcoTPmy2Uomov5pkzajLVRNf
- 0bUcN7iy1BlSawCXAlymSZfJcMcJlzxBDZSdZ33PzXEawuMe0smMnmIFLiC9CONv1VPB
- 3OT1vLdik+yVyBzs56MBSW1Pwokw7qUwzj0rWh1hvyF1b7zldQjeb68kAzAVpUw8KqO+
- QduBC4SrLPoG/D4Fw7Jrs1gh4af1XPIZRA7FIRadzD1obPaoxvMz7V98TAHJvX91FYL7
- dC3w==
-X-Gm-Message-State: AOAM530hUmIR1GFCWGDTZ2uW2wp8YnaazVyeeGHW+/5IiU4Y7UdmDGo4
- +ijwkeud2QUW1Or1YbTh83D30uOLZMM=
-X-Google-Smtp-Source: ABdhPJw5mvkEB9AuE9RiJxJfnOSLbMFC1Jm/6JbcD8mb6BhFVrdacGYM6hzm4J/ZVC2EwEAxuWehPg==
-X-Received: by 2002:a63:cf03:: with SMTP id j3mr947773pgg.24.1593142365268;
- Thu, 25 Jun 2020 20:32:45 -0700 (PDT)
+ bh=8SXI3lbgZ0UAYQNgtyM7Qe9sZGMnhZE8cWfw/l5JLCg=;
+ b=KSTckJEiKuY/nQ/+w/PtzEJqCVPYYnyM6q05tlw/Fo1tFCPTjWjTrF/ljGL4nyS7sG
+ ZjEamE/O7y3UAlXS6NLp8hKLCy4rSTA3p/xMaFpEsArmENzHMDG/36TIQ1IEvV+bXnoZ
+ Zq/NCndJLoAUgE/5+cSbBNKZ1WoffBVJAt4qwkPrHiRdU3xW0A4cGFSxVq49k7ECF/FB
+ K13NZORyY1yrwL4IrPAEwkXjuhb1qV+waxBtvoqwZCKXlBYutR/EfMGA63u1vX0TBJxq
+ i7Nv5COl6/paxvB05CLFWR26sS/ygxF3sLtxdm8Igs3qYhMt1ZlbTfVsNUmA05YaT62H
+ +nBw==
+X-Gm-Message-State: AOAM532wD6QJ0Gba6LLfIfwQJ0P16ecN0cZvG3yOsxEh5OGfrqHse//K
+ nCVyRv33fh383tTXaqFj5UrBBxZFWzU=
+X-Google-Smtp-Source: ABdhPJzyIHTyWWHX7DqLWTHh/7I6NAm5DcCGIElu+exjcv2uHNoPy/HBfqsKWd+PLuYSgKkSjk3LaQ==
+X-Received: by 2002:a65:6393:: with SMTP id h19mr911005pgv.278.1593142366938; 
+ Thu, 25 Jun 2020 20:32:46 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id y27sm1605256pgc.56.2020.06.25.20.32.44
+ by smtp.gmail.com with ESMTPSA id y27sm1605256pgc.56.2020.06.25.20.32.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 25 Jun 2020 20:32:44 -0700 (PDT)
+ Thu, 25 Jun 2020 20:32:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 44/46] target/arm: Add allocation tag storage for system
- mode
-Date: Thu, 25 Jun 2020 20:31:42 -0700
-Message-Id: <20200626033144.790098-45-richard.henderson@linaro.org>
+Subject: [PATCH v9 45/46] target/arm: Enable MTE
+Date: Thu, 25 Jun 2020 20:31:43 -0700
+Message-Id: <20200626033144.790098-46-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200626033144.790098-1-richard.henderson@linaro.org>
 References: <20200626033144.790098-1-richard.henderson@linaro.org>
@@ -87,8 +86,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,166 +106,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Look up the physical address for the given virtual address,
-convert that to a tag physical address, and finally return
-the host address that backs it.
+We now implement all of the components of MTE, without actually
+supporting any tagged memory.  All MTE instructions will work,
+trivially, so we can enable support.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/mte_helper.c | 131 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+v6: Delay user-only cpu reset bits to the user-only patch set.
+v9: Add some commentary (pmm)
+---
+ target/arm/cpu64.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 4f9bd3add3..5ea57d487a 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "internals.h"
- #include "exec/exec-all.h"
-+#include "exec/ram_addr.h"
- #include "exec/cpu_ldst.h"
- #include "exec/helper-proto.h"
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index a0c1d8894b..a2f4733eed 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -654,6 +654,11 @@ static void aarch64_max_initfn(Object *obj)
  
-@@ -74,8 +75,138 @@ static uint8_t *allocation_tag_mem(CPUARMState *env, int ptr_mmu_idx,
-                                    int ptr_size, MMUAccessType tag_access,
-                                    int tag_size, uintptr_t ra)
- {
-+#ifdef CONFIG_USER_ONLY
-     /* Tag storage not implemented.  */
-     return NULL;
-+#else
-+    uintptr_t index;
-+    CPUIOTLBEntry *iotlbentry;
-+    int in_page, flags;
-+    ram_addr_t ptr_ra;
-+    hwaddr ptr_paddr, tag_paddr, xlat;
-+    MemoryRegion *mr;
-+    ARMASIdx tag_asi;
-+    AddressSpace *tag_as;
-+    void *host;
-+
-+    /*
-+     * Probe the first byte of the virtual address.  This raises an
-+     * exception for inaccessible pages, and resolves the virtual address
-+     * into the softmmu tlb.
-+     *
-+     * When RA == 0, this is for mte_probe1.  The page is expected to be
-+     * valid.  Indicate to probe_access_flags no-fault, then assert that
-+     * we received a valid page.
-+     */
-+    flags = probe_access_flags(env, ptr, ptr_access, ptr_mmu_idx,
-+                               ra == 0, &host, ra);
-+    assert(!(flags & TLB_INVALID_MASK));
-+
-+    /*
-+     * Find the iotlbentry for ptr.  This *must* be present in the TLB
-+     * because we just found the mapping.
-+     * TODO: Perhaps there should be a cputlb helper that returns a
-+     * matching tlb entry + iotlb entry.
-+     */
-+    index = tlb_index(env, ptr_mmu_idx, ptr);
-+# ifdef CONFIG_DEBUG_TCG
-+    {
-+        CPUTLBEntry *entry = tlb_entry(env, ptr_mmu_idx, ptr);
-+        target_ulong comparator = (ptr_access == MMU_DATA_LOAD
-+                                   ? entry->addr_read
-+                                   : tlb_addr_write(entry));
-+        g_assert(tlb_hit(comparator, ptr));
-+    }
-+# endif
-+    iotlbentry = &env_tlb(env)->d[ptr_mmu_idx].iotlb[index];
-+
-+    /* If the virtual page MemAttr != Tagged, access unchecked. */
-+    if (!arm_tlb_mte_tagged(&iotlbentry->attrs)) {
-+        return NULL;
-+    }
-+
-+    /*
-+     * If not backed by host ram, there is no tag storage: access unchecked.
-+     * This is probably a guest os bug though, so log it.
-+     */
-+    if (unlikely(flags & TLB_MMIO)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Page @ 0x%" PRIx64 " indicates Tagged Normal memory "
-+                      "but is not backed by host ram\n", ptr);
-+        return NULL;
-+    }
-+
-+    /*
-+     * The Normal memory access can extend to the next page.  E.g. a single
-+     * 8-byte access to the last byte of a page will check only the last
-+     * tag on the first page.
-+     * Any page access exception has priority over tag check exception.
-+     */
-+    in_page = -(ptr | TARGET_PAGE_MASK);
-+    if (unlikely(ptr_size > in_page)) {
-+        void *ignore;
-+        flags |= probe_access_flags(env, ptr + in_page, ptr_access,
-+                                    ptr_mmu_idx, ra == 0, &ignore, ra);
-+        assert(!(flags & TLB_INVALID_MASK));
-+    }
-+
-+    /* Any debug exception has priority over a tag check exception. */
-+    if (unlikely(flags & TLB_WATCHPOINT)) {
-+        int wp = ptr_access == MMU_DATA_LOAD ? BP_MEM_READ : BP_MEM_WRITE;
-+        assert(ra != 0);
-+        cpu_check_watchpoint(env_cpu(env), ptr, ptr_size,
-+                             iotlbentry->attrs, wp, ra);
-+    }
-+
-+    /*
-+     * Find the physical address within the normal mem space.
-+     * The memory region lookup must succeed because TLB_MMIO was
-+     * not set in the cputlb lookup above.
-+     */
-+    mr = memory_region_from_host(host, &ptr_ra);
-+    tcg_debug_assert(mr != NULL);
-+    tcg_debug_assert(memory_region_is_ram(mr));
-+    ptr_paddr = ptr_ra;
-+    do {
-+        ptr_paddr += mr->addr;
-+        mr = mr->container;
-+    } while (mr);
-+
-+    /* Convert to the physical address in tag space.  */
-+    tag_paddr = ptr_paddr >> (LOG2_TAG_GRANULE + 1);
-+
-+    /* Look up the address in tag space. */
-+    tag_asi = iotlbentry->attrs.secure ? ARMASIdx_TagS : ARMASIdx_TagNS;
-+    tag_as = cpu_get_address_space(env_cpu(env), tag_asi);
-+    mr = address_space_translate(tag_as, tag_paddr, &xlat, NULL,
-+                                 tag_access == MMU_DATA_STORE,
-+                                 iotlbentry->attrs);
-+
-+    /*
-+     * Note that @mr will never be NULL.  If there is nothing in the address
-+     * space at @tag_paddr, the translation will return the unallocated memory
-+     * region.  For our purposes, the result must be ram.
-+     */
-+    if (unlikely(!memory_region_is_ram(mr))) {
-+        /* ??? Failure is a board configuration error. */
-+        qemu_log_mask(LOG_UNIMP,
-+                      "Tag Memory @ 0x%" HWADDR_PRIx " not found for "
-+                      "Normal Memory @ 0x%" HWADDR_PRIx "\n",
-+                      tag_paddr, ptr_paddr);
-+        return NULL;
-+    }
-+
-+    /*
-+     * Ensure the tag memory is dirty on write, for migration.
-+     * Tag memory can never contain code or display memory (vga).
-+     */
-+    if (tag_access == MMU_DATA_STORE) {
-+        ram_addr_t tag_ra = memory_region_get_ram_addr(mr) + xlat;
-+        cpu_physical_memory_set_dirty_flag(tag_ra, DIRTY_MEMORY_MIGRATION);
-+    }
-+
-+    return memory_region_get_ram_ptr(mr) + xlat;
-+#endif
- }
+         t = cpu->isar.id_aa64pfr1;
+         t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
++        /*
++         * Begin with full support for MTE; will be downgraded to MTE=1
++         * during realize if the board provides no tag memory.
++         */
++        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
+         cpu->isar.id_aa64pfr1 = t;
  
- uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
+         t = cpu->isar.id_aa64mmfr1;
 -- 
 2.25.1
 
