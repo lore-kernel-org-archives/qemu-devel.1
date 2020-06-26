@@ -2,84 +2,84 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E3DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D730CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:30:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFAE6207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A413E2080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:30:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L9I6MPnB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFAE6207FC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WYXcFypo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A413E2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqJ6-0004P6-Ud
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35512)
+	id 1joqJR-0005Fs-Lr
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:30:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3z-00024V-3I
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:47 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:54879)
+ id 1joq4K-0002wp-Pw
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:08 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52114)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3r-0006HF-Uu
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:46 -0400
-Received: by mail-wm1-x336.google.com with SMTP id o8so9155250wmh.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:39 -0700 (PDT)
+ id 1joq4H-0006b2-Fj
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:08 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 22so9168889wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=amm+Xwelw2VlS16IoGViV05sMwQyqKglsr1nUDeUMzc=;
- b=L9I6MPnBMynVstZHCNTeCqW3qUr/7ccQdoU+qM9PT+EOsSfQEMVYOtBa1kp4ryCFLu
- 0y2fEm1SMmXZScba85AQpTJEhoc1sh18GdaKSj49LMrta6nr9Mux/iDOWfeg8rhixGdh
- gCgQJv84HoSSZhza/IdEjKbesTLa3e03sj5WrMiSQzi7t/322MYfsvcBTMWF307mB+GU
- 6oSauxf8PvUiGpLWit25+78+c/6WT+a7QfuTyePF3SU23ky9uH3UVikK0AVsRBWJV0uC
- 39XPBpbNYY2LYL4Rhwz6jWWBYGxwoHi8MRKyGAReQGRT1SgrAUmDN/i9m8BcITjbCu45
- F+PQ==
+ bh=1ExlIGPJB8Fog/WP+ZDYVXNtqRB+snzWoC2Xcpf4m9c=;
+ b=WYXcFypopJPOHq9cpC5vwELv555v7YszdOGZfPWSGC3sog1ngbpDv3EUtuzVVnrvY5
+ 58p9afQ4KckRiQUyADa8iEmN4S/1t9tb8VBISm5NMrIru4wTSI1Zw+WCs98vHDXnpi68
+ y8BXIRPlyUsv2N4QVbWUKiUfwMXWzHqgP5BZj3+qW0boAtlyLi5zhYjftrDLFadrPOR9
+ Ffr93kqI9XabnoWivBenDX3iPPpzOUFpvfdpuCbEEOL7xSfKaaVOMXAm/EWEqc7NfyUX
+ jW+7q00pzL0n4Vvrn4lnSLvEEPtIKvwyAZQNSssigPPQcF1CEV8zVYpXhaLqMomOtjMF
+ PVXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=amm+Xwelw2VlS16IoGViV05sMwQyqKglsr1nUDeUMzc=;
- b=W6RfdsFx9wK4v9z0biiVDB2yfmGLkcEARrwgtTG4W/JYM5ZouL64fn3aL3keV64RKk
- 4eN99gXfewx2nj+tfPj5lVULOLi991Pw+QLsi+tLX3Jw3szMqttPnZG7HHZ5xwWhYLwq
- ns7PCYhDk2AqpYliWs3p11LPhmdBtXsEORyzt0RQ1rIPbZi9E2gnLYSFjxTJi0VwXclU
- IVjmSgXw9vj3oMqzFXAy/raSGhdzqoP4vuBakBr2Wdebfe4oDrWNtz6jLF4dbFb0tMgj
- iea7LzcUT79lQvqUyq895XczBPLBvrZKL8/RlEsmuvkm4ar16nRKpvepS+CM4CrYNwsz
- ZASg==
-X-Gm-Message-State: AOAM5323Ll4PWEofJVOEKA9MK9Pk/SImE4FlrERTgwzHBz4LUE/FnbZs
- eZskKkTgyba4Yc1uKWa02PxKDcD9YXIA6A==
-X-Google-Smtp-Source: ABdhPJxhCc25FxQW1bYV1tSWDd0I0659PEMnjTzbnTzZvBK9qBw0ArGLuChi5oSOU9tGC17mazsqZw==
-X-Received: by 2002:a1c:2d83:: with SMTP id t125mr4026270wmt.187.1593184477864; 
- Fri, 26 Jun 2020 08:14:37 -0700 (PDT)
+ bh=1ExlIGPJB8Fog/WP+ZDYVXNtqRB+snzWoC2Xcpf4m9c=;
+ b=SrVfnluhF4iZr1qdB49eNeXWxuOPgc35cV1sB1LxBsdTpzCQNpwLxjnNYSGk9lffYG
+ dpHywlYYSlgxmzJ31msU+pQKn5QcHCYlsXGWpWnPYVJrOFiWwJ2HWBsXi9cjNg6IJX33
+ FoUnhPmlwBB0TaTucbY6+FBFhQBbQbZeCgE5uZmL7Q8CPPRzPh0fqxMJkoDOJCK9aiRC
+ ZqawUfMB79Yr/wZHJKH2eG5xoyxSf2UwMPBCnPgocamXIpHWBAJVzYC5rxKON5aigFke
+ /ynC6aoPHizF+LHVOXmjZRqVxFHqRbqZ5+FJYHG3kePR1kdWD9XBdxzrlookICGAG54A
+ dBUA==
+X-Gm-Message-State: AOAM533MhiDCTpJrezcuQ8uBSLyLu8VPQXCFI2aaLhEyKrGRWWYlaRE0
+ lLe+aQjn+MeCT30CUlvwxlNUIa173Hs51A==
+X-Google-Smtp-Source: ABdhPJyxK89fqX+TZeUXwPBrC/n+lYSnKWG5+uCLlkXfUSb+FjRd0f1tf9Epksm03kFNPjXsr2oHKA==
+X-Received: by 2002:a05:600c:2f08:: with SMTP id
+ r8mr3737410wmn.113.1593184503906; 
+ Fri, 26 Jun 2020 08:15:03 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.37
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.02
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:37 -0700 (PDT)
+ Fri, 26 Jun 2020 08:15:02 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/57] hw/arm/aspeed: Describe each PCA9552 device
-Date: Fri, 26 Jun 2020 16:13:37 +0100
-Message-Id: <20200626151424.30117-11-peter.maydell@linaro.org>
+Subject: [PULL 32/57] target/arm: Implement the access tag cache flushes
+Date: Fri, 26 Jun 2020 16:13:59 +0100
+Message-Id: <20200626151424.30117-33-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x336.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,59 +105,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We have 2 distinct PCA9552 devices. Set their description
-to distinguish them when looking at the trace events.
+Like the regular data cache flushes, these are nops within qemu.
 
-Description name taken from:
-https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20200623072723.6324-8-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200626033144.790098-21-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/aspeed.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ target/arm/helper.c | 65 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 665d04fbf68..379f9672a56 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -508,12 +508,15 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
- {
-     AspeedSoCState *soc = &bmc->soc;
-     uint8_t *eeprom_buf = g_malloc0(8 * 1024);
-+    DeviceState *dev;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 2c6ec244af8..d8c31d03dad 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6929,6 +6929,32 @@ static const ARMCPRegInfo mte_reginfo[] = {
+       .opc0 = 3, .opc1 = 3, .crn = 4, .crm = 2, .opc2 = 7,
+       .type = ARM_CP_NO_RAW,
+       .access = PL0_RW, .readfn = tco_read, .writefn = tco_write },
++    { .name = "DC_IGVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 3,
++      .type = ARM_CP_NOP, .access = PL1_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_IGSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 4,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
++    { .name = "DC_IGDVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 5,
++      .type = ARM_CP_NOP, .access = PL1_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_IGDSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 6,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
++    { .name = "DC_CGSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 4,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
++    { .name = "DC_CGDSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 6,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
++    { .name = "DC_CIGSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 4,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
++    { .name = "DC_CIGDSW", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 6,
++      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
+     REGINFO_SENTINEL
+ };
  
-     /* Bus 3: TODO bmp280@77 */
-     /* Bus 3: TODO max31785@52 */
-     /* Bus 3: TODO dps310@76 */
--    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), TYPE_PCA9552,
--                     0x60);
-+    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
-+    qdev_prop_set_string(dev, "description", "pca1");
-+    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3),
-+                          &error_fatal);
+@@ -6938,6 +6964,43 @@ static const ARMCPRegInfo mte_tco_ro_reginfo[] = {
+       .type = ARM_CP_CONST, .access = PL0_RW, },
+     REGINFO_SENTINEL
+ };
++
++static const ARMCPRegInfo mte_el0_cacheop_reginfo[] = {
++    { .name = "DC_CGVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 3,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CGDVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 5,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CGVAP", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 3,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CGDVAP", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 5,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CGVADP", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 3,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CGDVADP", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 5,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CIGVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 3,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    { .name = "DC_CIGDVAC", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 5,
++      .type = ARM_CP_NOP, .access = PL0_W,
++      .accessfn = aa64_cacheop_poc_access },
++    REGINFO_SENTINEL
++};
++
+ #endif
  
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423", 0x4c);
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423", 0x4c);
-@@ -528,8 +531,10 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
- 
-     smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), 0x51,
-                           eeprom_buf);
--    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), TYPE_PCA9552,
--                     0x60);
-+    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
-+    qdev_prop_set_string(dev, "description", "pca0");
-+    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11),
-+                          &error_fatal);
-     /* Bus 11: TODO ucd90160@64 */
- }
+ static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -8071,8 +8134,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+      */
+     if (cpu_isar_feature(aa64_mte, cpu)) {
+         define_arm_cp_regs(cpu, mte_reginfo);
++        define_arm_cp_regs(cpu, mte_el0_cacheop_reginfo);
+     } else if (cpu_isar_feature(aa64_mte_insn_reg, cpu)) {
+         define_arm_cp_regs(cpu, mte_tco_ro_reginfo);
++        define_arm_cp_regs(cpu, mte_el0_cacheop_reginfo);
+     }
+ #endif
  
 -- 
 2.20.1
