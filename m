@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D37C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C0B4207E8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:23:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 550EF20773
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:23:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hxWb1ZbI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C0B4207E8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d52chu5v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 550EF20773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqCB-0007fQ-CR
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:23:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35574)
+	id 1joqCF-0007pZ-Ip
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq41-00029R-6I
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:49 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33414)
+ id 1joq43-0002GA-OH
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:51 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3x-0006Jb-E7
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:48 -0400
-Received: by mail-wm1-x344.google.com with SMTP id a6so9087934wmm.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:43 -0700 (PDT)
+ id 1joq40-0006Lk-09
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id l17so9180738wmj.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=rjuUJVD20e+gziaQHiWZSwoTVScu50+CWJVxi25EUi0=;
- b=hxWb1ZbI7ZjxzlwUEX7AYsgh6PXtnVBPZa+B6C9LsN7/huzG2Gc5/cmHG+55HpHIwW
- /gctvslhWJmMukLwbTgA0zcXgRuYSk6HV+Ls7cvoskNh7HKAeXBSRbta3lwttzVeLG9l
- gnyWBEbUGNMsKBdjNbTvnbzQLw0ccDO/cVIVWflM5xVHbK9cjwCaFVj3i0KXRpgUsYT9
- skxM1b/1hmlmagNNhHjae8RiiIf8TEKtb9Vl6fXdhc7BpvAuAMbvDzXLfFF4kMx/UsCF
- vLtRi3CkNQWfhdyFYqL2di9gmKw6a+GHO4qC0R7VzR/7p2zXXxRl0JZsMC9lJh6qlgsx
- DN7A==
+ bh=lxJLokSSwLrc0Y70TKAH3hjExPU/swMhK4k3zquMN7k=;
+ b=d52chu5vPUyG1Z1B5gVU1A93r7nvg5fqXx74TyrFQBbdhBtbS3EIcP7GiuHAsHcljX
+ dJ/q3XDo1oYmpFy5K+oiZoAKpJnivFd4IlpPRioapzsyZ2OZPYKewJMblQZw1NziH49P
+ Oh1pv2ACIwyXYfYFEtQAj+wMhGt8Bshd/qLiEV9kUodH99APvFfkBWDz17WTebI5pVwv
+ 8BaQ5dS4XI5/XjzmLvABIv0XvPzQyC9pvo9srEgsFc5gfxPKj1WliN8hqc1X1Z89tZXb
+ ByQhmZZaH+ziidvQUqjRuGmWFcBoDeV6jWAJT/Fpxh0Sa9NGg8bs/G9Qp8IGj0Hiriij
+ Ks4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rjuUJVD20e+gziaQHiWZSwoTVScu50+CWJVxi25EUi0=;
- b=CGF9VqnZHWxno71fIZ0beitCpZqTBtdGtfsmiKw7mnUrYwl6ojC9z1cBLWsplSnGy/
- /lsCrkfOOjfTv7ARRE3NoBujAgWHZ4++9RAO9TsXV2W8y5Ab9lktxPQF4OthCaaK0j03
- 4QRYrqAP4dZZVpCu9WrKpbYrzwJHtpuMjASBp5jR69VI8no+BuEicZIV1du90iFzy/21
- hIbuM+xdJcCAC9VCq/DAtKbrVydgkBiSlho0HJhsAFor8XhoEQ2MW/BRhflD7oLFnSf4
- dE5GWMyZhI1nYGbLHINaBb4eBtdxiM7NINb+0/qhog6dt6Ni1UG3hqQ7ag1dE8YtVbg9
- zSyQ==
-X-Gm-Message-State: AOAM530uEEGPITJuUSBfeoLI/WOcsPSTq6hZT1P8UJcZVoQrz5bwbteG
- PquRDMXQk8WzR4UYQno0W3v8dWPNWYPUnQ==
-X-Google-Smtp-Source: ABdhPJzaZ/1zxa6AwmD2hIDklCxxKpTIGVpqazaCIC4JEK4/CSFvK4ActxUvKXcFtlfUckoMc1Wk+w==
-X-Received: by 2002:a1c:6354:: with SMTP id x81mr3823816wmb.98.1593184482122; 
- Fri, 26 Jun 2020 08:14:42 -0700 (PDT)
+ bh=lxJLokSSwLrc0Y70TKAH3hjExPU/swMhK4k3zquMN7k=;
+ b=VLZe8F3SAIV97htvNEOKBjYTCflZ4N19HQFcpXxud0NwHgI21MNzs07c3uY3pt51bY
+ BsxaZ72WaYjgTErVOkjiNWySodzOux407yDU5cN5xIPGcLIUDT7kBpDZW1AbibGBXFQs
+ SPGifXiIsKtvtYy/YIcj2rI4EroRQejKOOZb4q1dzTLx9bQt/Gr9n4TzVsozEbrXVDBz
+ ERCJdnuASpuO7fjabNM3LIvSn8eW4RwcJVegyMUM/sd7Fg+v+FhvahXZRJuniB2yqLqa
+ OTB6ovzQ5gzqVjfoEfBCYm4uBzxQqMAFlwkbyh2AdjqnBA14NuFC6OKKDZ3w2ZlGni5U
+ J3hw==
+X-Gm-Message-State: AOAM531IZGNvTI0tLtT/SxmMLXQbjBrVs1R9ZEYbX6cVcX6nigkef0e9
+ NxGqaNL/BuqU2A5xCz/r99Ygaxpp0M4hBw==
+X-Google-Smtp-Source: ABdhPJyYkrv89QA3ynsxGMLOWEiUlDgQeAJjc5DzRmEZ1e97XH5BG2TaLjXsa0RWDTFJbk9WcgxKDQ==
+X-Received: by 2002:a1c:b182:: with SMTP id a124mr3770187wmf.114.1593184486284; 
+ Fri, 26 Jun 2020 08:14:46 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.41
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.45
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:41 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/57] target/arm: Improve masking of SCR RES0 bits
-Date: Fri, 26 Jun 2020 16:13:41 +0100
-Message-Id: <20200626151424.30117-15-peter.maydell@linaro.org>
+Subject: [PULL 18/57] target/arm: Add DISAS_UPDATE_NOCHAIN
+Date: Fri, 26 Jun 2020 16:13:45 +0100
+Message-Id: <20200626151424.30117-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
@@ -106,53 +106,68 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Protect reads of aa64 id registers with ARM_CP_STATE_AA64.
-Use this as a simpler test than arm_el_is_aa64, since EL3
-cannot change mode.
+Add an option that writes back the PC, like DISAS_UPDATE_EXIT,
+but does not exit back to the main loop.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-3-richard.henderson@linaro.org
+Message-id: 20200626033144.790098-7-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ target/arm/translate.h     | 2 ++
+ target/arm/translate-a64.c | 3 +++
+ target/arm/translate.c     | 4 ++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 972a7667309..a29f0a28d84 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -2011,9 +2011,16 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-     uint32_t valid_mask = 0x3fff;
-     ARMCPU *cpu = env_archcpu(env);
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index d5edef2943f..6dfe24cedc0 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -173,6 +173,8 @@ static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+  * return from cpu_tb_exec.
+  */
+ #define DISAS_EXIT      DISAS_TARGET_9
++/* CPU state was modified dynamically; no need to exit, but do not chain. */
++#define DISAS_UPDATE_NOCHAIN  DISAS_TARGET_10
  
--    if (arm_el_is_aa64(env, 3)) {
-+    if (ri->state == ARM_CP_STATE_AA64) {
-         value |= SCR_FW | SCR_AW;   /* these two bits are RES1.  */
-         valid_mask &= ~SCR_NET;
-+
-+        if (cpu_isar_feature(aa64_lor, cpu)) {
-+            valid_mask |= SCR_TLOR;
-+        }
-+        if (cpu_isar_feature(aa64_pauth, cpu)) {
-+            valid_mask |= SCR_API | SCR_APK;
-+        }
-     } else {
-         valid_mask &= ~(SCR_RW | SCR_ST);
-     }
-@@ -2032,12 +2039,6 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-             valid_mask &= ~SCR_SMD;
-         }
-     }
--    if (cpu_isar_feature(aa64_lor, cpu)) {
--        valid_mask |= SCR_TLOR;
--    }
--    if (cpu_isar_feature(aa64_pauth, cpu)) {
--        valid_mask |= SCR_API | SCR_APK;
--    }
- 
-     /* Clear all-context RES0 bits.  */
-     value &= valid_mask;
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e4795ae100c..027be7d8c29 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14298,6 +14298,9 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_EXIT:
+             tcg_gen_exit_tb(NULL, 0);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_a64_set_pc_im(dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             tcg_gen_lookup_and_goto_ptr();
+             break;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 146ff5ddc24..c39a929b938 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8874,6 +8874,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_NEXT:
+         case DISAS_TOO_MANY:
+         case DISAS_UPDATE_EXIT:
++        case DISAS_UPDATE_NOCHAIN:
+             gen_set_pc_im(dc, dc->base.pc_next);
+             /* fall through */
+         default:
+@@ -8897,6 +8898,9 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 1, dc->base.pc_next);
+             break;
++        case DISAS_UPDATE_NOCHAIN:
++            gen_set_pc_im(dc, dc->base.pc_next);
++            /* fall through */
+         case DISAS_JUMP:
+             gen_goto_ptr();
+             break;
 -- 
 2.20.1
 
