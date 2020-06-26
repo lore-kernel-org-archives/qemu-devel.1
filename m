@@ -4,63 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 102A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C92C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D067D2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:48:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EDCB2075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 20:48:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRew1HBv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D067D2075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cv5qGzMk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDCB2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jovGl-0007b5-2Q
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:48:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33990)
+	id 1jovHG-00009J-D7
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 16:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAj-0007Ar-Oy
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:06 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40627
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAf-00078G-3M
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:01 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22033
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAe-0005sl-OT
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:03 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jovAc-0005rm-0T
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 16:42:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593204120;
+ s=mimecast20190719; t=1593204117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BgPXhXn50eUAAS9+s9eH+67pArlk591EX0K8bG86+G0=;
- b=TRew1HBvn0svzxCkd6hqjZv0FaNt242N8Q4okhYPCe/cvGKE9WcPs+XMERdoSTFFWir17e
- TFmqwt0hHFxNWhbMHaBnU7ngC1aaRastleCvB2ctvhKI1hDvbWI8ZJRPq+BdKnSTfKOV82
- bywFp28Er8gHs98jpiWkdnuFkGvGPyk=
+ bh=VGhfiTXbiXd+kEnKFvL/DKq9TUWbI6mf0WxW/E8MJ8E=;
+ b=Cv5qGzMkQvRNKXBRDYQGvLzQvnA2na2pCqFmPjoLjY/ofaVAycsdDivxuD2N6Z+nXz5rey
+ FxVC4plzFTr4OmtmT1dGoYfZf4zkQjiPxCGzPqWeAAKjbn/JwpoPfBXUNTvuG7N01Mwro/
+ LTn543pVP7I8YVC1Sl25efaN5+ytk/w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-9IMUI3OnNkaFtm6faG1Kvg-1; Fri, 26 Jun 2020 16:41:58 -0400
-X-MC-Unique: 9IMUI3OnNkaFtm6faG1Kvg-1
+ us-mta-223-UiOS-Z6LNuSRkgzxosSuCQ-1; Fri, 26 Jun 2020 16:41:55 -0400
+X-MC-Unique: UiOS-Z6LNuSRkgzxosSuCQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 787F7107ACCA;
- Fri, 26 Jun 2020 20:41:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91559107ACCA;
+ Fri, 26 Jun 2020 20:41:54 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A338B19C58;
- Fri, 26 Jun 2020 20:41:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C5F219C58;
+ Fri, 26 Jun 2020 20:41:53 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/16] python/machine.py: fix _popen access
-Date: Fri, 26 Jun 2020 16:41:30 -0400
-Message-Id: <20200626204133.14500-14-jsnow@redhat.com>
+Subject: [PATCH v4 10/16] python/machine.py: Handle None events in events_wait
+Date: Fri, 26 Jun 2020 16:41:27 -0400
+Message-Id: <20200626204133.14500-11-jsnow@redhat.com>
 In-Reply-To: <20200626204133.14500-1-jsnow@redhat.com>
 References: <20200626204133.14500-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,80 +99,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As always, Optional[T] causes problems with unchecked access. Add a
-helper that asserts the pipe is present before we attempt to talk with
-it.
+If the timeout is 0, we can get None back. Handle this explicitly.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- python/qemu/machine.py | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ python/qemu/machine.py | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
 diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index cb3db1f66a..c189fa4e28 100644
+index 8eb10a4bc1..f65bd18c1a 100644
 --- a/python/qemu/machine.py
 +++ b/python/qemu/machine.py
-@@ -114,7 +114,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         # Runstate
-         self._qemu_log_path = None
-         self._qemu_log_file = None
--        self._popen = None
-+        self._popen: Optional['subprocess.Popen[bytes]'] = None
-         self._events = []
-         self._iolog = None
-         self._qmp_set = True   # Enable QMP monitor by default.
-@@ -227,6 +227,12 @@ def is_running(self):
-         """Returns true if the VM is running."""
-         return self._popen is not None and self._popen.poll() is None
+@@ -33,7 +33,7 @@
+ from types import TracebackType
  
-+    @property
-+    def _subp(self) -> 'subprocess.Popen[bytes]':
-+        if self._popen is None:
-+            raise QEMUMachineError('Subprocess pipe not present')
-+        return self._popen
+ from . import qmp
+-from .qmp import SocketAddrT
++from .qmp import SocketAddrT, QMPMessage
+ 
+ LOG = logging.getLogger(__name__)
+ 
+@@ -552,13 +552,20 @@ def event_wait(self, name, timeout=60.0, match=None):
+ 
+     def events_wait(self, events, timeout=60.0):
+         """
+-        events_wait waits for and returns a named event
+-        from QMP with a timeout.
++        events_wait waits for and returns a single named event from QMP.
++        In the case of multiple qualifying events, this function returns the
++        first one.
+ 
+-        events: a sequence of (name, match_criteria) tuples.
+-                The match criteria are optional and may be None.
+-                See event_match for details.
+-        timeout: QEMUMonitorProtocol.pull_event timeout parameter.
++        :param events: A sequence of (name, match_criteria) tuples.
++                       The match criteria are optional and may be None.
++                       See event_match for details.
++        :param timeout: Optional timeout, in seconds.
++                        See QEMUMonitorProtocol.pull_event.
 +
-     def exitcode(self):
-         """Returns the exit code if possible, or None."""
-         if self._popen is None:
-@@ -237,7 +243,7 @@ def get_pid(self):
-         """Returns the PID of the running process, or None."""
-         if not self.is_running():
-             return None
--        return self._popen.pid
-+        return self._subp.pid
- 
-     def _load_io_log(self):
-         if self._qemu_log_path is not None:
-@@ -369,7 +375,7 @@ def wait(self):
++        :raise QMPTimeoutError: If timeout was non-zero and no matching events
++                                were found.
++        :return: A QMP event matching the filter criteria.
++                 If timeout was 0 and no event matched, None.
          """
-         Wait for the VM to power off
-         """
--        self._popen.wait()
-+        self._subp.wait()
-         if self._qmp_connection:
-             self._qmp.close()
-         self._post_shutdown()
-@@ -381,8 +387,8 @@ def _hard_shutdown(self) -> None:
-         if not self.is_running():
-             return
+         def _match(event):
+             for name, match in events:
+@@ -566,6 +573,8 @@ def _match(event):
+                     return True
+             return False
  
--        self._popen.kill()
--        self._popen.wait(timeout=60)
-+        self._subp.kill()
-+        self._subp.wait(timeout=60)
- 
-     def _soft_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
-         """
-@@ -407,7 +413,7 @@ def _soft_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
-                         raise
-             self._qmp.close()
- 
--        self._popen.wait(timeout=timeout)
-+        self._subp.wait(timeout=timeout)
- 
-     def _do_shutdown(self, has_quit: bool = False, timeout: int = 3) -> None:
-         """
++        event: Optional[QMPMessage]
++
+         # Search cached events
+         for event in self._events:
+             if _match(event):
+@@ -575,6 +584,10 @@ def _match(event):
+         # Poll for new events
+         while True:
+             event = self._qmp.pull_event(wait=timeout)
++            if event is None:
++                # NB: None is only returned when timeout is false-ish.
++                # Timeouts raise QMPTimeoutError instead!
++                break
+             if _match(event):
+                 return event
+             self._events.append(event)
 -- 
 2.21.3
 
