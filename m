@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A01C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44669C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E461212CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E461212CC
+	by mail.kernel.org (Postfix) with ESMTPS id 17F22212CC
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17F22212CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokbM-0005DB-BA
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:24:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54780)
+	id 1jokbQ-0005Nd-BU
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:24:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jokaA-0003Mc-Ar; Fri, 26 Jun 2020 05:23:38 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34182
+ id 1jokaG-0003Xf-BM; Fri, 26 Jun 2020 05:23:44 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34192
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1joka8-0004MQ-Pi; Fri, 26 Jun 2020 05:23:38 -0400
+ id 1jokaE-0004RD-2d; Fri, 26 Jun 2020 05:23:44 -0400
 Received: from host86-158-109-79.range86-158.btcentralplus.com
  ([86.158.109.79] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1joka7-0007bz-JX; Fri, 26 Jun 2020 10:23:39 +0100
+ id 1jokaB-0007bz-BE; Fri, 26 Jun 2020 10:23:44 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: peter.maydell@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au,
  qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Fri, 26 Jun 2020 10:22:56 +0100
-Message-Id: <20200626092317.3875-2-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 26 Jun 2020 10:22:57 +0100
+Message-Id: <20200626092317.3875-3-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
 References: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.158.109.79
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 01/22] adb: coding style update to fix checkpatch errors
+Subject: [PULL 02/22] adb: fix adb-mouse read length and revert
+ disable-reg3-direct-writes workaround
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,52 +79,184 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will help ensure that style guidelines are being maintained during
-subsequent changes.
+Commit 84051eb400 "adb: add property to disable direct reg 3 writes" introduced
+a workaround for spurious writes to ADB register 3 when MacOS 9 enables
+autopoll on the mouse device. Further analysis shows that the problem is that
+only a partial request is sent, and since the len parameter is ignored then
+stale data from the previous request is used causing the incorrect address
+assignment.
+
+Remove the disable-reg3-direct-writes workaround and instead check the length
+parameter when the write is attempted, discarding the invalid request.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Finn Thain <fthain@telegraphics.com.au>
 Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200623204936.24064-2-mark.cave-ayland@ilande.co.uk>
+Message-Id: <20200623204936.24064-3-mark.cave-ayland@ilande.co.uk>
 ---
- hw/input/adb.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/input/adb-kbd.c     | 26 +++++++++++------------
+ hw/input/adb-mouse.c   | 48 ++++++++++++++++++++++++------------------
+ hw/input/adb.c         |  7 ------
+ hw/ppc/mac_newworld.c  |  2 --
+ include/hw/input/adb.h |  1 -
+ 5 files changed, 40 insertions(+), 44 deletions(-)
 
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index a6d5c9b7c9..027dd3e531 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -259,21 +259,19 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
+                 trace_adb_kbd_request_change_addr(d->devaddr);
+                 break;
+             default:
+-                if (!d->disable_direct_reg3_writes) {
+-                    d->devaddr = buf[1] & 0xf;
+-
+-                    /* we support handlers:
+-                     * 1: Apple Standard Keyboard
+-                     * 2: Apple Extended Keyboard (LShift = RShift)
+-                     * 3: Apple Extended Keyboard (LShift != RShift)
+-                     */
+-                    if (buf[2] == 1 || buf[2] == 2 || buf[2] == 3) {
+-                        d->handler = buf[2];
+-                    }
+-
+-                    trace_adb_kbd_request_change_addr_and_handler(d->devaddr,
+-                                                                  d->handler);
++                d->devaddr = buf[1] & 0xf;
++                /*
++                 * we support handlers:
++                 * 1: Apple Standard Keyboard
++                 * 2: Apple Extended Keyboard (LShift = RShift)
++                 * 3: Apple Extended Keyboard (LShift != RShift)
++                 */
++                if (buf[2] == 1 || buf[2] == 2 || buf[2] == 3) {
++                    d->handler = buf[2];
+                 }
++
++                trace_adb_kbd_request_change_addr_and_handler(d->devaddr,
++                                                              d->handler);
+                 break;
+             }
+         }
+diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+index aeba41bddd..78b6f5030c 100644
+--- a/hw/input/adb-mouse.c
++++ b/hw/input/adb-mouse.c
+@@ -135,6 +135,16 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+         case 2:
+             break;
+         case 3:
++            /*
++             * MacOS 9 has a bug in its ADB driver whereby after configuring
++             * the ADB bus devices it sends another write of invalid length
++             * to reg 3. Make sure we ignore it to prevent an address clash
++             * with the previous device.
++             */
++            if (len != 3) {
++                return 0;
++            }
++
+             switch (buf[2]) {
+             case ADB_CMD_SELF_TEST:
+                 break;
+@@ -145,27 +155,25 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+                 trace_adb_mouse_request_change_addr(d->devaddr);
+                 break;
+             default:
+-                if (!d->disable_direct_reg3_writes) {
+-                    d->devaddr = buf[1] & 0xf;
+-
+-                    /* we support handlers:
+-                     * 0x01: Classic Apple Mouse Protocol / 100 cpi operations
+-                     * 0x02: Classic Apple Mouse Protocol / 200 cpi operations
+-                     * we don't support handlers (at least):
+-                     * 0x03: Mouse systems A3 trackball
+-                     * 0x04: Extended Apple Mouse Protocol
+-                     * 0x2f: Microspeed mouse
+-                     * 0x42: Macally
+-                     * 0x5f: Microspeed mouse
+-                     * 0x66: Microspeed mouse
+-                     */
+-                    if (buf[2] == 1 || buf[2] == 2) {
+-                        d->handler = buf[2];
+-                    }
+-
+-                    trace_adb_mouse_request_change_addr_and_handler(
+-                        d->devaddr, d->handler);
++                d->devaddr = buf[1] & 0xf;
++                /*
++                 * we support handlers:
++                 * 0x01: Classic Apple Mouse Protocol / 100 cpi operations
++                 * 0x02: Classic Apple Mouse Protocol / 200 cpi operations
++                 * we don't support handlers (at least):
++                 * 0x03: Mouse systems A3 trackball
++                 * 0x04: Extended Apple Mouse Protocol
++                 * 0x2f: Microspeed mouse
++                 * 0x42: Macally
++                 * 0x5f: Microspeed mouse
++                 * 0x66: Microspeed mouse
++                 */
++                if (buf[2] == 1 || buf[2] == 2) {
++                    d->handler = buf[2];
+                 }
++
++                trace_adb_mouse_request_change_addr_and_handler(d->devaddr,
++                                                                d->handler);
+                 break;
+             }
+         }
 diff --git a/hw/input/adb.c b/hw/input/adb.c
-index b1ac4a3852..bf1bc30d19 100644
+index bf1bc30d19..d85278a7b7 100644
 --- a/hw/input/adb.c
 +++ b/hw/input/adb.c
-@@ -44,14 +44,14 @@ int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
+@@ -118,18 +118,11 @@ static void adb_device_realizefn(DeviceState *dev, Error **errp)
+     bus->devices[bus->nb_devices++] = d;
+ }
  
-     cmd = buf[0] & 0xf;
-     if (cmd == ADB_BUSRESET) {
--        for(i = 0; i < s->nb_devices; i++) {
-+        for (i = 0; i < s->nb_devices; i++) {
-             d = s->devices[i];
-             adb_device_reset(d);
-         }
-         return 0;
+-static Property adb_device_properties[] = {
+-    DEFINE_PROP_BOOL("disable-direct-reg3-writes", ADBDevice,
+-                     disable_direct_reg3_writes, false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void adb_device_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     dc->realize = adb_device_realizefn;
+-    device_class_set_props(dc, adb_device_properties);
+     dc->bus_type = TYPE_ADB_BUS;
+ }
+ 
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 5f3a028e6a..828c5992ae 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -404,11 +404,9 @@ static void ppc_core99_init(MachineState *machine)
+ 
+         adb_bus = qdev_get_child_bus(dev, "adb.0");
+         dev = qdev_new(TYPE_ADB_KEYBOARD);
+-        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
+         qdev_realize_and_unref(dev, adb_bus, &error_fatal);
+ 
+         dev = qdev_new(TYPE_ADB_MOUSE);
+-        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
+         qdev_realize_and_unref(dev, adb_bus, &error_fatal);
      }
-     devaddr = buf[0] >> 4;
--    for(i = 0; i < s->nb_devices; i++) {
-+    for (i = 0; i < s->nb_devices; i++) {
-         d = s->devices[i];
-         if (d->devaddr == devaddr) {
-             ADBDeviceClass *adc = ADB_DEVICE_GET_CLASS(d);
-@@ -69,9 +69,10 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
-     uint8_t buf[1];
  
-     olen = 0;
--    for(i = 0; i < s->nb_devices; i++) {
--        if (s->poll_index >= s->nb_devices)
-+    for (i = 0; i < s->nb_devices; i++) {
-+        if (s->poll_index >= s->nb_devices) {
-             s->poll_index = 0;
-+        }
-         d = s->devices[s->poll_index];
-         if ((1 << d->devaddr) & poll_mask) {
-             buf[0] = ADB_READREG | (d->devaddr << 4);
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index b7b32e2b16..4d2c565f54 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -49,7 +49,6 @@ struct ADBDevice {
+ 
+     int devaddr;
+     int handler;
+-    bool disable_direct_reg3_writes;
+ };
+ 
+ #define ADB_DEVICE_CLASS(cls) \
 -- 
 2.20.1
 
