@@ -2,78 +2,76 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3148DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D4EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:35:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 061F2207D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:34:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27A2B206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:35:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="ArZ88rsI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061F2207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CqguY54Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A2B206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jotBg-0004yP-8m
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:34:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59248)
+	id 1jotCV-0005lC-F0
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:35:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kevin@koconnor.net>)
- id 1jot4H-0003Yd-Id
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:27:17 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:33830)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jot5p-0005nB-PK
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:28:53 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:36773)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <kevin@koconnor.net>)
- id 1jot4F-0006pz-Qi
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:27:17 -0400
-Received: by mail-qt1-x842.google.com with SMTP id u17so8211887qtq.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:27:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=iEJC1YlLyjXiFKqMnruqiG43upSnXlNcSKjzuG0A1wk=;
- b=ArZ88rsIy1MnR67Ncf5sMC06OJ8lS1G3Hs/drsNVP22evN7wqJ6DRWsQiTIxZxPa4x
- Aft7aRFMjn9xZ5urLDg3uVD1EP0/qJmM5FU+zYjuYT9ZYCOu1+WgW2HWAxxV6Nv11TyX
- sKVdgI+b+tgpH5GOQ1BYEp44fM9DYph5nUZe8=
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jot5o-0007RX-1p
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:28:53 -0400
+Received: by mail-ot1-x333.google.com with SMTP id 72so9509667otc.3
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:28:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uXD+8j0mSmONGAQEBtM4j2ZqesHLozj7Tl61qO1NF0g=;
+ b=CqguY54YEBIrdlk1X3+prTUj2jtC1ChWLSjkH6RLGqaw0k8o7JX/xATyjYGfDoWkyz
+ tts3D07hua7jJZ8CPiGwR6EXWTS91KzusuKfy8xGmURy0/CFX2Gu4yiiJ14OqCXK1GHS
+ 2h1jVmmDcSsNs7QA9KhnKT/FGhyPSZMgTlFsmi29ESHa6G8uf1Co2XrG0Bi6RDXVAKPX
+ KOmW3yzoqIPXGDvTOfNuJmMWWJxohT8q7ClS1Al+nCKmBf0BIXVfjUCANgeMQf2yMFO5
+ 3jptEVUIW+sptEK4yUXlIwmOBNSkLWZ70gkJyl10CAiuc3lrAb8Q9IsjZfLfMZlPg8p6
+ 4AyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=iEJC1YlLyjXiFKqMnruqiG43upSnXlNcSKjzuG0A1wk=;
- b=rfYsKG+wVkZ4948jaZx4mwRwPaMz7eC35kKXYwMTZyJh24HV0xiUO6N9oumlELoRz0
- EVnvDB4VFfX1nvP9O3Ihrgq5wq+s36oP264t5a91O9fFy2hY8vjFjcRudbeJJkfIyI6r
- am0JtLkfF9s9K5x7n/QwmlWLVrGs2KoduWa7wnZTvhd6qGgBtDKGPFOvoaD08EmL+Hb+
- uMtqrK/LQMiTdCghB9HUg2QuZu2pexVwIUpHyP6qQWj8dq+6DekTx4PR6jpyG/dL2n0h
- g4B1f5/ZZ4O/MxSMpMUVa4EQJj3xdaBKAJaC8Ljt7Y/Ho7xEfftYqL19OOCgq66JuFQv
- /2FQ==
-X-Gm-Message-State: AOAM533/gdfVYVUDjGtGT11atUPFW/mXW8pMw5mHlMfSAOdv6n2aLLrn
- B/6TEfGTmea1VDlTAAMbrpWr9Q==
-X-Google-Smtp-Source: ABdhPJwopHER5LzhCPlNFZedaXF9ukpSjTepc3tAeeUrAzZPkNwFAXmdMNMjU2oRBiCgtx94lzMywQ==
-X-Received: by 2002:ac8:6f26:: with SMTP id i6mr4119394qtv.61.1593196034473;
- Fri, 26 Jun 2020 11:27:14 -0700 (PDT)
-Received: from localhost ([64.9.245.160])
- by smtp.gmail.com with ESMTPSA id x13sm9017992qts.57.2020.06.26.11.27.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 11:27:13 -0700 (PDT)
-Date: Fri, 26 Jun 2020 14:27:13 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: Re: [PATCH v2] timer: Handle decrements of PIT counter
-Message-ID: <20200626182713.GA1074920@morn.lan>
-References: <20200626180656.3441-1-r.bolshakov@yadro.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uXD+8j0mSmONGAQEBtM4j2ZqesHLozj7Tl61qO1NF0g=;
+ b=qY2lEWE5UQUIYSqGzFWVd7V2liz79s+u42lRneWsa84WZJCSgxk3+s6mYtUNlkbpZD
+ m5KYQlkmH0++NsIwF2ZqSwjaz0opUHkK17SFkBpZzYqoV4tKKalpJH4KORqApE+VLkXw
+ Nr14LuHCNUvjgts6jk/ioEgGz8B4jqbB4hzIpyDAFMmaISk3iRX/AK28z+bUp2cB9BgD
+ D5KZskQjTn+PlfJekdKwNhzIujEKMPMJUc0+mEQWogxH03verK6VXk4vgICEpXIxebLp
+ EdUGD0ZNU1SGnJKr8amp5yzg2XK3GlamR6JKF+2HHWeXliHACIq5Nyz48B4jYjd/56Rl
+ +6xA==
+X-Gm-Message-State: AOAM5303P31pxf6SRqaejzy+3POCyNn2z14bEMnQmtNWNIjrMYKVbJTS
+ ZP5Mz2oQdMq2WEW+qrAyeEqSjvjfy4czcD7FX3RJeQ==
+X-Google-Smtp-Source: ABdhPJz1FReIOmwJT7xOV11Q7ta+Z8kldwZgFvQdJUy2di5Khl2BN5/Gkbxiu7adAhH4uSWC/cXXpUPMmiymcS5fI2U=
+X-Received: by 2002:a4a:9528:: with SMTP id m37mr3576025ooi.85.1593196130434; 
+ Fri, 26 Jun 2020 11:28:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200626180656.3441-1-r.bolshakov@yadro.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=kevin@koconnor.net; helo=mail-qt1-x842.google.com
+References: <20200615204008.3069956-1-armbru@redhat.com>
+In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jun 2020 19:28:39 +0100
+Message-ID: <CAFEAcA_EnwYq4je-_OQz22zpxeqcSjaZnP7ieN-CyHC3pJp2Zw@mail.gmail.com>
+Subject: Re: [PULL 00/84] QOM patches for 2020-06-15
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x333.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,32 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: seabios@seabios.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 09:06:58PM +0300, Roman Bolshakov wrote:
-> There's a fallback to PIT if TSC is not present but it doesn't work
-> properly. It prevents boot from floppy on isapc and 486 cpu [1][2].
-> 
-> SeaBIOS configures PIT in Mode 2. PIT counter is decremented in the mode
-> but timer_adjust_bits() thinks that the counter overflows and increases
-> 32-bit tick counter on each detected "overflow". Invalid overflow
-> detection results in 55ms time advance (1 / 18.2Hz) on each read from
-> PIT counter. So all timers expire much faster and 5-second floppy
-> timeout expires in 83 real microseconds (or just a bit longer).
-> 
-> It can be fixed by making the counter recieved from PIT an increasing
-> value so it can be passed to timer_adjust_bits():
-> 0, 1, 2 and up to 65535 and then the counter is re-loaded with 0.
-> 
-> 1. https://bugs.launchpad.net/seabios/+bug/1840719
-> 2. https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03924.html
+On Mon, 15 Jun 2020 at 21:43, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-06-12 23:06:22 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qom-2020-06-15
+>
+> for you to fetch changes up to b77b5b3dc7a4730d804090d359c57d33573cf85a:
+>
+>   MAINTAINERS: Make section QOM cover hw/core/*bus.c as well (2020-06-15 22:06:04 +0200)
+>
+> ----------------------------------------------------------------
+> QOM patches for 2020-06-15
+>
+> * Make "info qom-tree" show children sorted
+> * Fixes around device realization
+> * Rework how we plug into devices into their parent bus
 
-Thanks.  I committed this change.
+Hi. I've just noticed that this commit added new global-scope
+functions to header files without documentation comments, eg
 
--Kevin
+bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
+
+Please could you provide some follow-up patches that document them?
+I don't think we have any hope of getting people to follow whatever
+the correct new way to create/configure/realize devices is if we
+don't document it :-(   [Concrete example: I now have no idea
+how this is supposed to work after this patchset.]
+
+thanks
+-- PMM
 
