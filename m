@@ -7,79 +7,76 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CE4C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6B9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31DEA20768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:34:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8F1A207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:35:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="azdGvDOI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DEA20768
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRzqZPRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F1A207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolhB-00070c-F4
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:34:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41072)
+	id 1jolho-0007wW-Vv
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:35:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldp-00026p-Ed
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50429
- helo=us-smtp-1.mimecast.com)
+ id 1joldn-00024L-FM
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31110
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldn-0003G7-N4
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:29 -0400
+ id 1joldl-0003ET-1Q
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593167487;
+ s=mimecast20190719; t=1593167484;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oYVFAVqYGf5neJ3Wr0VtiQUIg29jzhHrC/alVMqoehE=;
- b=azdGvDOIKHwCKt9lTyc6CILGls8H09AXU4IbRJhUtI+l6N3fjogVWuCg4gMe7nb0GpAAXY
- 7hPvXVCRahTlGE9u9ccqdg4/mQIaCgSoPARm39UnfM6gJGN3gH3esZKHCnXA2k77zyW9hk
- NY/99vGB4HGR7P56g5FlTbMqwGS8Tns=
+ bh=m18OtvO+pwwl+9y2p967SeZ8hr3gDW4LkN6LcVLKgFI=;
+ b=YRzqZPRdZGrqxlw9TkiHJS7Krw/TveN135biCHn6PeWXfH8Sujw50zDcCDerI64Qo2/ioA
+ y/Adi8pfgb3E0pTkpBcUH0/AywHNkqfx2uCnCX4R8BsZ5Ad+Uyzm6WQDkDtZY2ywI07ctD
+ PJ962uL0ebepErUN4qv9sIfNX7jsFBc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-fd_208t-M4WH4m7eLJ7wsA-1; Fri, 26 Jun 2020 06:31:25 -0400
-X-MC-Unique: fd_208t-M4WH4m7eLJ7wsA-1
+ us-mta-158-hqg_4F6zNSSN71ORm25eKw-1; Fri, 26 Jun 2020 06:31:18 -0400
+X-MC-Unique: hqg_4F6zNSSN71ORm25eKw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46DB010059A0;
- Fri, 26 Jun 2020 10:31:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92E53800C60;
+ Fri, 26 Jun 2020 10:31:17 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C2482610F3;
- Fri, 26 Jun 2020 10:31:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1BA1F61169;
+ Fri, 26 Jun 2020 10:31:14 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
  armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
  bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v6 3/5] virtio-iommu: Handle reserved regions in the
- translation process
-Date: Fri, 26 Jun 2020 12:30:55 +0200
-Message-Id: <20200626103057.11263-4-eric.auger@redhat.com>
+Subject: [PATCH v6 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+Date: Fri, 26 Jun 2020 12:30:53 +0200
+Message-Id: <20200626103057.11263-2-eric.auger@redhat.com>
 In-Reply-To: <20200626103057.11263-1-eric.auger@redhat.com>
 References: <20200626103057.11263-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:55:55
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,67 +101,203 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When translating an address we need to check if it belongs to
-a reserved virtual address range. If it does, there are 2 cases:
+Introduce a new property defining a reserved region:
+<low address>:<high address>:<type>.
 
-- it belongs to a RESERVED region: the guest should neither use
-  this address in a MAP not instruct the end-point to DMA on
-  them. We report an error
+This will be used to encode reserved IOVA regions.
 
-- It belongs to an MSI region: we bypass the translation.
+For instance, in virtio-iommu use case, reserved IOVA regions
+will be passed by the machine code to the virtio-iommu-pci
+device (an array of those). The type of the reserved region
+will match the virtio_iommu_probe_resv_mem subtype value:
+- VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+- VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
+
+on PC/Q35 machine, this will be used to inform the
+virtio-iommu-pci device it should bypass the MSI region.
+The reserved region will be: 0xfee00000:0xfeefffff:1.
+
+On ARM, we can declare the ITS MSI doorbell as an MSI
+region to prevent MSIs from being mapped on guest side.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
 ---
 
-v1 -> v2:
-- use addr when testing addr belongs to the reserved region
-  and use a block local variable
----
- hw/virtio/virtio-iommu.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+v4 -> v5:
+- type becomes an unsigned + comment/error rewording
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 5e72fd53a1..4a50e24d21 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -603,6 +603,7 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-     uint32_t sid, flags;
-     bool bypass_allowed;
-     bool found;
-+    int i;
+v3 -> v4:
+- use ':' instead of commas as separators.
+- rearrange error messages
+- check snprintf returned value
+- dared to keep Markus' R-b despite those changes
+---
+ include/exec/memory.h        |  6 +++
+ include/hw/qdev-properties.h |  3 ++
+ include/qemu/typedefs.h      |  1 +
+ hw/core/qdev-properties.c    | 89 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 99 insertions(+)
+
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 7207025bd4..84ee5b7a01 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -51,6 +51,12 @@ extern bool global_dirty_log;
  
-     interval.low = addr;
-     interval.high = addr + 1;
-@@ -636,6 +637,25 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         goto unlock;
-     }
+ typedef struct MemoryRegionOps MemoryRegionOps;
  
-+    for (i = 0; i < s->nb_reserved_regions; i++) {
-+        ReservedRegion *reg = &s->reserved_regions[i];
++struct ReservedRegion {
++    hwaddr low;
++    hwaddr high;
++    unsigned type;
++};
 +
-+        if (addr >= reg->low && addr <= reg->high) {
-+            switch (reg->type) {
-+            case VIRTIO_IOMMU_RESV_MEM_T_MSI:
-+                entry.perm = flag;
-+                break;
-+            case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
-+            default:
-+                virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                          VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                          sid, addr);
-+                break;
-+            }
-+            goto unlock;
-+        }
+ typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+ 
+ /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 49c6cd2460..944e3f2e0c 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -19,6 +19,7 @@ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
+ extern const PropertyInfo qdev_prop_tpm;
+ extern const PropertyInfo qdev_prop_macaddr;
++extern const PropertyInfo qdev_prop_reserved_region;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+ extern const PropertyInfo qdev_prop_multifd_compression;
+ extern const PropertyInfo qdev_prop_losttickpolicy;
+@@ -184,6 +185,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+     DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
+ #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
++#define DEFINE_PROP_RESERVED_REGION(_n, _s, _f)         \
++    DEFINE_PROP(_n, _s, _f, qdev_prop_reserved_region, ReservedRegion)
+ #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+ #define DEFINE_PROP_MULTIFD_COMPRESSION(_n, _s, _f, _d) \
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index ce4a78b687..15f5047bf1 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -58,6 +58,7 @@ typedef struct ISABus ISABus;
+ typedef struct ISADevice ISADevice;
+ typedef struct IsaDma IsaDma;
+ typedef struct MACAddr MACAddr;
++typedef struct ReservedRegion ReservedRegion;
+ typedef struct MachineClass MachineClass;
+ typedef struct MachineState MachineState;
+ typedef struct MemoryListener MemoryListener;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 71f8aca7c6..ca7771f307 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -15,6 +15,7 @@
+ #include "chardev/char.h"
+ #include "qemu/uuid.h"
+ #include "qemu/units.h"
++#include "qemu/cutils.h"
+ 
+ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+                                   Error **errp)
+@@ -578,6 +579,94 @@ const PropertyInfo qdev_prop_macaddr = {
+     .set   = set_mac,
+ };
+ 
++/* --- Reserved Region --- */
++
++/*
++ * Accepted syntax:
++ *   <low address>:<high address>:<type>
++ *   where low/high addresses are uint64_t in hexadecimal
++ *   and type is a non-negative decimal integer
++ */
++static void get_reserved_region(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
++    char buffer[64];
++    char *p = buffer;
++    int rc;
++
++    rc = snprintf(buffer, sizeof(buffer), "0x%"PRIx64":0x%"PRIx64":%u",
++                  rr->low, rr->high, rr->type);
++    assert(rc < sizeof(buffer));
++
++    visit_type_str(v, name, &p, errp);
++}
++
++static void set_reserved_region(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
++    Error *local_err = NULL;
++    const char *endptr;
++    char *str;
++    int ret;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
 +    }
 +
-     if (!ep->domain) {
-         if (!bypass_allowed) {
-             error_report_once("%s %02x:%02x.%01x not attached to any domain",
++    visit_type_str(v, name, &str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    ret = qemu_strtou64(str, &endptr, 16, &rr->low);
++    if (ret) {
++        error_setg(errp, "start address of '%s'"
++                   " must be a hexadecimal integer", name);
++        goto out;
++    }
++    if (*endptr != ':') {
++        goto separator_error;
++    }
++
++    ret = qemu_strtou64(endptr + 1, &endptr, 16, &rr->high);
++    if (ret) {
++        error_setg(errp, "end address of '%s'"
++                   " must be a hexadecimal integer", name);
++        goto out;
++    }
++    if (*endptr != ':') {
++        goto separator_error;
++    }
++
++    ret = qemu_strtoui(endptr + 1, &endptr, 10, &rr->type);
++    if (ret) {
++        error_setg(errp, "type of '%s'"
++                   " must be a non-negative decimal integer", name);
++    }
++    goto out;
++
++separator_error:
++    error_setg(errp, "reserved region fields must be separated with ':'");
++out:
++    g_free(str);
++    return;
++}
++
++const PropertyInfo qdev_prop_reserved_region = {
++    .name  = "reserved_region",
++    .description = "Reserved Region, example: 0xFEE00000:0xFEEFFFFF:0",
++    .get   = get_reserved_region,
++    .set   = set_reserved_region,
++};
++
+ /* --- on/off/auto --- */
+ 
+ const PropertyInfo qdev_prop_on_off_auto = {
 -- 
 2.20.1
 
