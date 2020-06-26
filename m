@@ -2,96 +2,88 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E736CC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14A1C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5F222067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:28:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F332206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 14:32:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Du8Y45h+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F222067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpCMcwob"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F332206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jopLL-0002v7-W5
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:28:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49858)
+	id 1jopOm-000596-Mu
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 10:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jopJP-0001CT-Jn; Fri, 26 Jun 2020 10:26:39 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51632)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jopJO-0002Ip-2g; Fri, 26 Jun 2020 10:26:39 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 22so9018371wmg.1;
- Fri, 26 Jun 2020 07:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=a+4BIaAmzumkK8oIJ5s3CLD4zDdPi1t/e6IFA4OGKoc=;
- b=Du8Y45h+4QtSd80HsPO/pV7vN8rFmnw5kRNBXQu+fNhY83iMPx4DKoe08z/hYfdLu3
- h5RoJ/BHJmJ/NLy5m+GIkaPGBx3iTfq120La1a4BhK/7ozUIrjKIYB4HXOOQ4soDpcqF
- mBreHWc61xHxv4ljiRjw4myY4vWAhjUFhr5OHAjLkjUHKqcgEykhAXCxyocv+sOQFmuh
- EVZBLtIBvxTCR+OmvfSan3hsK+I2KRFcxUpEzVXowHD6hzzvV295MLF8z4uNsZAV6Nv1
- U7GRjJR77Jb+ZJzeRdebuU53HjZ8rNbP04XH2B20H/IIaH+sMrH/z1EY7ctw537EffMK
- Z35Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=a+4BIaAmzumkK8oIJ5s3CLD4zDdPi1t/e6IFA4OGKoc=;
- b=SuRQQkLu3y5b0//nPVj9KOnk5Hzaktr7S4B8lzwVi7ZG1asFmTBRXHK6/72De5IhBi
- WNn8gUdrybIaWDlnma8p+OE86+wXmVFOU40/PbEjfvUWs2thrWv4EApRzGOsOhNpAMJt
- kMj3oMs4MwlPH5PM4nusi/75dScjqyhaep1uYAUwF2FFVw5POV8+sFY6fZytFM1sk6xT
- TvCwWe5hL7SjaHIzgp7OdwlaaajwmT2vELBxnqRYFIN57IkyCLeSAPQYJeC5tqsAE46Q
- HQD0OX5SYal/dFa8zyI5HtQgS5XEKG/2sbZ/HiLqpDZ3YDrMrsP0M3GR1oeqiJ9OyQiK
- Z1zA==
-X-Gm-Message-State: AOAM530T++Df8FypV46gDyHZ2NKCQZU3T9/dkL8720Hjc34FAEH4aAaA
- qd5KEw7OgyGHTq31mKCKn3E=
-X-Google-Smtp-Source: ABdhPJyN1dskcImBD07NWgMJf+NOsT8SYeynhgt+6554H0UpckvE+Dz4dBj2R6IdOJeSNPx5oYMeHA==
-X-Received: by 2002:a7b:c92e:: with SMTP id h14mr3655497wml.36.1593181595611; 
- Fri, 26 Jun 2020 07:26:35 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e5sm37126818wrs.33.2020.06.26.07.26.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 07:26:34 -0700 (PDT)
-Subject: Re: [RFC PATCH 2/3] hw/i2c/smbus_eeprom: Add description based on
- child name
-To: BALATON Zoltan <balaton@eik.bme.hu>, Eduardo Habkost <ehabkost@redhat.com>
-References: <20200626102744.15053-1-f4bug@amsat.org>
- <20200626102744.15053-3-f4bug@amsat.org>
- <alpine.BSF.2.22.395.2006261255120.94870@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5895e827-68e9-8204-aeba-e066d8c0d680@amsat.org>
-Date: Fri, 26 Jun 2020 16:26:33 +0200
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jopNs-0003sx-7e
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:31:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44031
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jopNp-0004S7-6t
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 10:31:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593181870;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Mdj6WkRabNOg+n11I5GylXjjrZ5g0Ru2RakJCt3hczE=;
+ b=OpCMcwob/rtt0AKI3VMDDu5QKFfHfURH2mbV5P+qOMWbmDddvzsbslN2mBgcIL7koqtJex
+ rgYNc+LgPQbJriC/5s5P365oFZLyyGza7cXdq2CGgt8XdmiN4pWgKljDJ5/OCcDxZZ8N4b
+ oxWl0d3lIwo6G2WdBR/nwQAiMCYYuf4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-drMKyH_hNp2BkYUV5U98xA-1; Fri, 26 Jun 2020 10:31:06 -0400
+X-MC-Unique: drMKyH_hNp2BkYUV5U98xA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F0B5107ACCA;
+ Fri, 26 Jun 2020 14:31:05 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EF237FEBE;
+ Fri, 26 Jun 2020 14:31:05 +0000 (UTC)
+Subject: Re: [PATCH 5/5] haiku build fix
+To: David CARLIER <devnexen@gmail.com>, QEMU Trivial
+ <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+References: <CA+XhMqxcvPwakFCC2Qy-S3FZ1NdVJ2rojsZGg5S7KK-feZ-BnA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <2dc07aa4-ed63-182f-06e2-a0b33453cb31@redhat.com>
+Date: Fri, 26 Jun 2020 09:31:04 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2006261255120.94870@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CA+XhMqxcvPwakFCC2Qy-S3FZ1NdVJ2rojsZGg5S7KK-feZ-BnA@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,60 +97,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Markus Armbruster <armbru@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/20 1:00 PM, BALATON Zoltan wrote:
-> On Fri, 26 Jun 2020, Philippe Mathieu-Daudé wrote:
->> Suggested-by: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> hw/i2c/smbus_eeprom.c | 3 +++
->> 1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
->> index 879fd7c416..22ba7b20d4 100644
->> --- a/hw/i2c/smbus_eeprom.c
->> +++ b/hw/i2c/smbus_eeprom.c
->> @@ -47,6 +47,7 @@ typedef struct SMBusEEPROMDevice {
->>     uint8_t *init_data;
->>     uint8_t offset;
->>     bool accessed;
->> +    char *description;
->> } SMBusEEPROMDevice;
->>
->> static uint8_t eeprom_receive_byte(SMBusDevice *dev)
->> @@ -134,7 +135,9 @@ static void smbus_eeprom_realize(DeviceState *dev,
->> Error **errp)
->>     smbus_eeprom_reset(dev);
->>     if (eeprom->init_data == NULL) {
->>         error_setg(errp, "init_data cannot be NULL");
->> +        return;
->>     }
->> +    eeprom->description =
->> object_get_canonical_path_component(OBJECT(dev));
->> }
->>
->> static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
-> 
-> What is this for? Shouldn't this description field be in some parent
-> object and whatever wants to print it could use the
-> object_get_canonical_path_component() as default value if it's not set
-> instead of adding more boiler plate to every object?
+On 6/26/20 7:54 AM, David CARLIER wrote:
+>>From 6fa7a4108236f513201192654e07c7044a3d7e58 Mon Sep 17 00:00:00 2001
+> From: David Carlier <devnexen@gmail.com>
+> Date: Fri, 26 Jun 2020 13:51:37 +0000
+> Subject: [PATCH 3/3] qemu_init_exec_dir Haiku implementation
 
-You are right, if we want to use this field generically, it should be
-a static Object field. I'll defer that question to Eduardo/Markus.
+meta-comment: the original subject line says 5/5, while this line says 
+3/3, which adds to the confusion of which patches are actually doing 
+what, as well as which iteration of the patches we are on.  Also, the 
+original subject line "haiku build fix" has been repeated for multiple 
+distinct emails; better is to have the subject line come from the patch 
+itself (the contents of this line would have been better as the overall 
+patch subject).
 
-> 
-> Regards,
-> BALATON Zoltan
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
