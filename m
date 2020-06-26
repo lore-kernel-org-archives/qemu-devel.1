@@ -2,124 +2,79 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E85DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 367CAC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED3C02078D
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02AE92078D
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:48:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eACeHCn4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED3C02078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faZ49iEx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02AE92078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jonlI-0008Ky-8e
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:47:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
+	id 1jonmJ-0001YP-8z
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:48:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jonjt-0006hq-NS
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:45:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35058
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jonl4-0008Hz-9l
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:47:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47590
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jonjr-0003yB-WC
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:45:53 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jonl2-0004kC-Bk
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593175550;
+ s=mimecast20190719; t=1593175623;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=2+D0UVkLJ0evD1GIZmpHDqPsq6zMGALoN556+t57m8E=;
- b=eACeHCn4Wm/Q0RGGBku2knobrCP1syqfAIU+M4RC93ZlVQPhUVCmqRXa4+mjbcMsIBrs3+
- vTHgkeA8nJS3USlT0scSK97x8XN0HyqnLp1TYhPtzLmhMoDj6Xu1/SVIsMYfJN/kidGF3r
- AybBrPch0eo9AJhNVYDfv0p5P1+x7+c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-_QQYH9s5NLioZuf2nZiW8Q-1; Fri, 26 Jun 2020 08:45:49 -0400
-X-MC-Unique: _QQYH9s5NLioZuf2nZiW8Q-1
-Received: by mail-wr1-f70.google.com with SMTP id i12so10629140wrx.11
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 05:45:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=VANejHRbGBgY/Xc4lXaWDqiG7lfOXGQhHth4wXyM0P4=;
- b=PzueJomzxgbfSa3keshp5TgZ1AM+5OZBwF2t6wJP6WDOqqxdRh/IOL/nz988+H9oCK
- G5sCOfv4vOjVILATF5ohs8hN/kS4HHMbkfmor1TXv49XkhfFalJx7HavvQViCZIiWbE5
- N1OdJDHoucaKygchQ03QrjolVN+RszMeIpgWgIGoYKpnO7QimGoohQh/0eJ8KRO1X2tc
- bte8RIhzTGo4Sn9w52EQXZIQqmvx0MHCQyGC9T/Bm1koT3JqT21nxtfPnxbCd68ymbpy
- 2BYAbDxlakERKEWpUBbFHHz1gGkF3wb9T/OYoyhwk0RG+HOWKQMpDwNGLUNj7KSPCaue
- aJ5Q==
-X-Gm-Message-State: AOAM530ejUbllNd6iJZeJhdorsifHvNs8aSaHtI5ANag7Phh6iZTXrfk
- H9Az4pgOB/pKsR5wN89AiBNc3xzRlgYqVINpbalhQjtf2saysrlbE6f0ECOe7niyCfx6xgi8Yd6
- eml+BqZ61ZnwVV2E=
-X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr3119052wme.45.1593175547965; 
- Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzOjcLZmx9rPqHo7acNxil0zGdSF0AETnLWZh4pQxwlFY084HcxKmi6bNxDfqz32oxjZqr8cQ==
-X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr3119027wme.45.1593175547693; 
- Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id k185sm14220080wmk.47.2020.06.26.05.45.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 05:45:47 -0700 (PDT)
-Subject: Re: [PATCH 04/17] block/nvme: Be explicit we share NvmeIdCtrl /
- NvmeIdNs structures
-To: Stefan Hajnoczi <stefanha@redhat.com>
+ in-reply-to:in-reply-to:references:references;
+ bh=gLSqZOrfewjgQrgYXcj0+sqXBegu2p03gX3Kd1WQbzI=;
+ b=faZ49iExGEVQokYivqvK667BYTTrUC7svrUc4/RYpIRyod5UCmgbUYHvsXbgus2nuwl746
+ +iRcrR9C2Ap5pysH3xbINHWUOPVpWfFJWddufeya5GgRvVbm7uwyYhmraHJT1VQTjBUKq0
+ JtC0vhi+ku4esC9xLp4dKXZQd18r/hE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-eFYkVfzwNOmmIg_zr6NQXA-1; Fri, 26 Jun 2020 08:46:39 -0400
+X-MC-Unique: eFYkVfzwNOmmIg_zr6NQXA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB5E9107ACCA;
+ Fri, 26 Jun 2020 12:46:37 +0000 (UTC)
+Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C89519D61;
+ Fri, 26 Jun 2020 12:46:37 +0000 (UTC)
+Date: Fri, 26 Jun 2020 13:46:36 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 17/17] block/nvme: Check BDRVNVMeState::plugged out of
+ nvme_process_completion
+Message-ID: <20200626124636.GX281902@stefanha-x1.localdomain>
 References: <20200625184838.28172-1-philmd@redhat.com>
- <20200625184838.28172-5-philmd@redhat.com>
- <20200626111905.GK281902@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <cf603d70-1aee-5973-afd2-962ba8707169@redhat.com>
-Date: Fri, 26 Jun 2020 14:45:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200625184838.28172-18-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200626111905.GK281902@stefanha-x1.localdomain>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+In-Reply-To: <20200625184838.28172-18-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="uN3tURjgVTLfI0kr"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 02:19:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -147,67 +102,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/20 1:19 PM, Stefan Hajnoczi wrote:
-> On Thu, Jun 25, 2020 at 08:48:25PM +0200, Philippe Mathieu-Daudé wrote:
->> We allocate an unique chunk of memory then use it for two
->> different structures. Introduce the 'idsz_max' variable to
->> hold the maximum size, to make it clearer the size is enough
->> to hold the two structures.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> FIXME: reword with something that makes more sense...
->> ---
->>  block/nvme.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/nvme.c b/block/nvme.c
->> index 71f8cf27a8..ffda804a8e 100644
->> --- a/block/nvme.c
->> +++ b/block/nvme.c
->> @@ -438,6 +438,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
->>      BDRVNVMeState *s = bs->opaque;
->>      NvmeIdCtrl *idctrl;
->>      NvmeIdNs *idns;
->> +    size_t idsz_max;
->>      NvmeLBAF *lbaf;
->>      uint8_t *resp;
->>      uint16_t oncs;
->> @@ -448,14 +449,15 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
->>          .cdw10 = cpu_to_le32(0x1),
->>      };
->>  
->> -    resp = qemu_try_blockalign0(bs, sizeof(NvmeIdCtrl));
->> +    idsz_max = MAX_CONST(sizeof(NvmeIdCtrl), sizeof(NvmeIdNs));
->> +    resp = qemu_try_blockalign0(bs, idsz_max);
->>      if (!resp) {
->>          error_setg(errp, "Cannot allocate buffer for identify response");
->>          goto out;
->>      }
->>      idctrl = (NvmeIdCtrl *)resp;
->>      idns = (NvmeIdNs *)resp;
->> -    r = qemu_vfio_dma_map(s->vfio, resp, sizeof(NvmeIdCtrl), true, &iova);
->> +    r = qemu_vfio_dma_map(s->vfio, resp, idsz_max, true, &iova);
-> 
-> _nvme_check_size() has compile-time asserts that check
-> sizeof(NvmeIdCtrl) == sizeof(NvmeIdNs) == 4096.
-> 
-> I suggest the following cleanup:
-> 
->   union {
->       NvmeIdCtrl ctrl;
->       NvmeIdNs ns;
->   } *id;
->   ...
->   id = qemu_try_blockalign0(bs, sizeof(*id));
->   ...
->   r = qemu_vfio_dma_map(s->vfio, resp, sizeof(*id), true, &iova);
-> 
-> and accesses to idctl are replaced with id->ctrl and idns with id->ns.
-> 
-> This eliminates the casts, makes it clear that this data is overlapping,
-> and avoids the need for idsz_max.
+--uN3tURjgVTLfI0kr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Clever idea, thanks!
+On Thu, Jun 25, 2020 at 08:48:38PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> @@ -529,10 +529,13 @@ static bool nvme_poll_queues(BDRVNVMeState *s)
+>      bool progress =3D false;
+>      int i;
+> =20
+> +    if (s->plugged) {
+> +        return false;
+> +    }
+>      for (i =3D 0; i < s->nr_queues; i++) {
+>          NVMeQueuePair *q =3D s->queues[i];
+>          qemu_mutex_lock(&q->lock);
+> -        while (nvme_process_completion(s, q)) {
+> +        while (nvme_process_completion(q)) {
+>              /* Keep polling */
+>              progress =3D true;
+>          }
+
+This code transformation is correct but I hope plugged can be removed
+from the completion code path in the future since its purpose is for
+batching submissions.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--uN3tURjgVTLfI0kr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl717isACgkQnKSrs4Gr
+c8jtngf+P0bsodENylbh/CfwLtR6CC4VXXAdzzJObtdRtB3RsllaDgDauDk9tD7A
+FSgfVEOcO52TktD3SVs8qBhhVaHWSAFnihXcJpTqm9vGpLBwDw/rqa0dLszv1GP6
+1TuUH/7+LBZkuS13NhRNr157cMtyAbquyy3KulQpRjhGdMduL3JvM9BbCL3rYJA2
+Ch2fUsQ5A+fb06/NrroWoDRQwHEEXsmY5/BTVMF2mDqGCAEAbAVqOKMZRUl1E116
+K8uv4hSsZB4+YVRwNtcpBAVSNQZuf9/xuALesPf2kNKMqlIweyq1aAsHN4AlMn6N
+FAC1L2D7x8pVcVQNe9ZgdJcK/FxdSw==
+=uqJ0
+-----END PGP SIGNATURE-----
+
+--uN3tURjgVTLfI0kr--
 
 
