@@ -2,59 +2,86 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51708C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEEDBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:00:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A8712076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 12:58:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A8712076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tachyum.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A01C20775
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 13:00:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZoBkaoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A01C20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jonwE-00059u-G8
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 08:58:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51202)
+	id 1jonyC-0006PR-Qn
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 09:00:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mkysel@tachyum.com>)
- id 1jonu7-0002Pp-Tx
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:56:27 -0400
-Received: from mx1.tachyum.com ([66.160.133.170]:31153 helo=mail.tachyum.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mkysel@tachyum.com>)
- id 1jonu5-0001U0-VE
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:56:27 -0400
-Received: by mail.tachyum.com (Postfix, from userid 1001)
- id D1A15859; Fri, 26 Jun 2020 05:56:24 -0700 (PDT)
-Received: from tsk-dev-swd001.tachyum.sk (unknown [93.184.71.90])
- by mail.tachyum.com (Postfix) with ESMTP id 2BFA5857;
- Fri, 26 Jun 2020 05:56:23 -0700 (PDT)
-From: Matus Kysel <mkysel@tachyum.com>
-To: mkysel@tachyum.com, riku.voipio@iki.fi, laurent@vivier.eu,
- qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] linux-user: support of semtimedop syscall
-Date: Fri, 26 Jun 2020 14:46:12 +0200
-Message-Id: <20200626124612.58593-3-mkysel@tachyum.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200626124612.58593-1-mkysel@tachyum.com>
-References: <20200626124612.58593-1-mkysel@tachyum.com>
-Received-SPF: pass client-ip=66.160.133.170; envelope-from=mkysel@tachyum.com;
- helo=mail.tachyum.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 07:27:33
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jonxH-0005eZ-5D
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:59:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30836
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jonxE-0002er-PV
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 08:59:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593176379;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/eujCzkKLyh0OkB2WlxP+JFAAQ7Zyclc2suTaKoQmvQ=;
+ b=AZoBkaoOqPLBq2d3kaA8UqMTXOX2I2mU+opNGKHCEgoPnPGxUTdjPxTT/Y8Lizf6KP49jP
+ xhjaoj+RRWKPU5QmxC2+rxTprwRU6QiPkuzxCwMLc6LKUK5fc+i3TtQ/lvCWY5jHKeWFr6
+ PPPl/zFCZve4/ADm1EjJWBCBEaIMDYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-_6oXG1mIO1O5K5TrynexsQ-1; Fri, 26 Jun 2020 08:59:36 -0400
+X-MC-Unique: _6oXG1mIO1O5K5TrynexsQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94046107ACCA;
+ Fri, 26 Jun 2020 12:59:35 +0000 (UTC)
+Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3602171671;
+ Fri, 26 Jun 2020 12:59:35 +0000 (UTC)
+Date: Fri, 26 Jun 2020 13:59:33 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [RFC PATCH 15/17] block/nvme: Use per-queue AIO context
+Message-ID: <20200626125933.GY281902@stefanha-x1.localdomain>
+References: <20200625184838.28172-1-philmd@redhat.com>
+ <20200625184838.28172-16-philmd@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200625184838.28172-16-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6Jy4/gb9ZgnsEOX8"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,126 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We should add support of semtimedop syscall as new version of glibc
-2.31 uses semop based on semtimedop
-(commit: https://gitlab.com/freedesktop-sdk/mirrors/sourceware/glibc/-/commit/765cdd0bffd77960ae852104fc4ea5edcdb8aed3 ).
+--6Jy4/gb9ZgnsEOX8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Matus Kysel <mkysel@tachyum.com>
----
- linux-user/syscall.c | 58 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 6 deletions(-)
+On Thu, Jun 25, 2020 at 08:48:36PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> To be able to use multiple queues on the same hardware,
+> we need to have each queue able to receive IRQ notifications
+> in the correct AIO context.
+> The context has to be proper to each queue, not to the block
+> driver. Move aio_context from BDRVNVMeState to NVMeQueuePair.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+> RFC because I'm not familiar with AIO context
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 990412733b..538a7e673c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1232,7 +1232,8 @@ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
-     defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6) || \
-     defined(TARGET_NR_nanosleep) || defined(TARGET_NR_clock_settime) || \
-     defined(TARGET_NR_utimensat) || defined(TARGET_NR_mq_timedsend) || \
--    defined(TARGET_NR_mq_timedreceive)
-+    defined(TARGET_NR_mq_timedreceive) || defined(TARGET_NR_ipc) || \
-+    defined(TARGET_NR_semop) || defined(TARGET_NR_semtimedop)
- static inline abi_long target_to_host_timespec(struct timespec *host_ts,
-                                                abi_ulong target_addr)
- {
-@@ -3880,25 +3881,53 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
-     return 0;
- }
- 
--static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
-+#if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
-+    defined(TARGET_NR_semtimedop)
-+
-+/*
-+ * This macro is required to handle the s390 variants, which passes the
-+ * arguments in a different order than default.
-+ */
-+#ifdef __s390x__
-+#define SEMTIMEDOP_IPC_ARGS(__nsops, __sops, __timeout) \
-+  (__nsops), (__timeout), (__sops)
-+#else
-+#define SEMTIMEDOP_IPC_ARGS(__nsops, __sops, __timeout) \
-+  (__nsops), 0, (__sops), (__timeout)
-+#endif
-+
-+static inline abi_long do_semtimedop(int semid,
-+                                     abi_long ptr,
-+                                     unsigned nsops,
-+                                     abi_long timeout)
- {
-     struct sembuf sops[nsops];
-+    struct timespec ts, *pts = NULL;
-     abi_long ret;
- 
-+    if (timeout) {
-+        pts = &ts;
-+        if (target_to_host_timespec(pts, timeout)) {
-+            return -TARGET_EFAULT;
-+        }
-+    }
-+
-     if (target_to_host_sembuf(sops, ptr, nsops))
-         return -TARGET_EFAULT;
- 
-     ret = -TARGET_ENOSYS;
- #ifdef __NR_semtimedop
--    ret = get_errno(safe_semtimedop(semid, sops, nsops, NULL));
-+    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
- #endif
- #ifdef __NR_ipc
-     if (ret == -TARGET_ENOSYS) {
--        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, 0));
-+        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid,
-+                                 SEMTIMEDOP_IPC_ARGS(nsops, sops, (long)pts)));
-     }
- #endif
-     return ret;
- }
-+#endif
- 
- struct target_msqid_ds
- {
-@@ -4393,7 +4422,20 @@ static abi_long do_ipc(CPUArchState *cpu_env,
- 
-     switch (call) {
-     case IPCOP_semop:
--        ret = do_semop(first, ptr, second);
-+        ret = do_semtimedop(first, ptr, second, 0);
-+        break;
-+    case IPCOP_semtimedop:
-+    /*
-+     * The s390 sys_ipc variant has only five parameters instead of six
-+     * (as for default variant) and the only difference is the handling of
-+     * SEMTIMEDOP where on s390 the third parameter is used as a pointer
-+     * to a struct timespec where the generic variant uses fifth parameter.
-+     */
-+#if defined(TARGET_S390X)
-+        ret = do_semtimedop(first, ptr, second, third);
-+#else
-+        ret = do_semtimedop(first, ptr, second, fifth);
-+#endif
-         break;
- 
-     case IPCOP_semget:
-@@ -9644,7 +9686,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #endif
- #ifdef TARGET_NR_semop
-     case TARGET_NR_semop:
--        return do_semop(arg1, arg2, arg3);
-+        return do_semtimedop(arg1, arg2, arg3, 0);
-+#endif
-+#ifdef TARGET_NR_semtimedop
-+    case TARGET_NR_semtimedop:
-+        return do_semtimedop(arg1, arg2, arg3, arg4);
- #endif
- #ifdef TARGET_NR_semctl
-     case TARGET_NR_semctl:
--- 
-2.17.1
+To keep things simple I suggest only doing Step 1 in this patch series.
+
+Step 1:
+The existing irq_notifier handler re-enters the request coroutine from a
+BH scheduled in the BlockDriverState's AioContext. It doesn't matter
+where the irq_notifier is handled, the completions will run in their
+respective BlockDriverState AioContexts. This means that two
+BlockDriverStates with different AioContexts sharing a single hardware
+state will work correctly with just a single hardware queue. Therefore
+multiqueue support is not required to support multiple BDSes with
+different AioContexts.
+
+Step 2:
+Better performance can be achieved by creating multiple hardware
+queuepairs, each with its own irq_notifier. During request submission a
+int queue_idx_from_aio_context(AioContext *ctx) mapping function selects
+a hardware queue. Hopefully that hardware queue's irq_notifier is
+handled in the same Aiocontext for best performance, but there might be
+cases where there are more BDS AioContexts than nvme hw queues.
+
+Step 3:
+When the QEMU block layer has multiqueue support then we'll no longer
+map the BlockDriverState AioContext to a queue index but instead use
+qemu_get_current_aio_context(). At this point a single BDS can process
+I/O in multiple AioContexts and hardware queuepairs.
+
+--6Jy4/gb9ZgnsEOX8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl718TUACgkQnKSrs4Gr
+c8hnOwf/T5EUkPjtvjyQBafQVX8OEsP/JXHGXB3CHe2xbfA8eurqYk4dD6bIa2PA
+peY1nHO0GI27SmkA7IgtuM5WzkNAlorqzqms+5WKNRvySr8dMKbgxRDoHP9qKVeR
+eqkV1Jvm5V7CPiLgpGYJ5SODu5pRtAFoU29IfynUGZTp4nJEnq9ILX63I8LTK5hq
+uyuPADgKdqnPZWSF9h4s4fNEGPudgCw3awgi3kmQnoOcxeKd/ye+d/CQvWwB5jQo
+mc0ZQ1amBEn4HzeG0tyto4d4ZsELOd7xLOkrvB2LkAuymTNdu+KRCyz3avRHbu8M
+zBApSEsFMGMVxEvD4k8W9KJHP9a/+A==
+=axOL
+-----END PGP SIGNATURE-----
+
+--6Jy4/gb9ZgnsEOX8--
 
 
