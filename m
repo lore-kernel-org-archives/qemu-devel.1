@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C601C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CD6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 448402080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94DF92080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HASE1GBT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448402080C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E1nVzuOw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DF92080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqL4-00081Q-BT
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:32:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35600)
+	id 1joqLc-0000Q4-Nx
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:33:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq42-0002CQ-Cm
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:50 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:33991)
+ id 1joq4S-00033Z-DF
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:16 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:39511)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq3x-0006JC-99
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:50 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id u26so9095741wmn.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:42 -0700 (PDT)
+ id 1joq4O-0006d9-Kp
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:16 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id t194so9709888wmt.4
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=0jclhN1iI8Ils0M7tH4L8prj0mKxUP8gosaZhHheF7I=;
- b=HASE1GBTZmsW0//eemhsZdvHpYvDq7eTQhv0Pxnxuz2yMkdcE7TajImcK5b5ng01ZY
- 858zW3VEdnaz/iWkxeRKTYN617GAYSeTfGbUPTYFpCOh7wwlnUPLJQTtdA4djQbj4zoY
- JvMbpELmCVw7N2jLYuY+RzJfZ394ig41hNSYLWexSu1lVtBg2BjYQ03vXXONGs6TAZCu
- qZ/57pvNSFy+AKMdi/im9DFMQrBc2gx2aLPHY4YYkqWfsziLTkedKAIba1icFRL4AxTH
- Ww/8cVNRPMBceS7nhhDAsRVsC8u1+35p6jBtExMtgyMZxUZvdNOTj51//AWvQKjyOKE4
- z3jg==
+ bh=DW69FT0TKjdcN1PDGM+IN2DdN9Pu11pDMtHQlg2vqlE=;
+ b=E1nVzuOwrTxeifLstlo98v4xMdiz60u7eMDO7Yd2Lhe4YDCAlymJ3tE/DCtcZPqopk
+ ZTZ6sjp8EvRM/SbNQp0bVblda9mQ2E/hUAUfXXDkI1LjoQ4LrdA9yraOuu5CJk1VUhNC
+ ymf39hPtXnGp+99x212AHdNA5WgYxppkCTv0DQENMRnP20qbe0SC6v3mJ9BEO/85KKRa
+ PQ0KHwl2taK9tkj8E5ozCmqYGSPx10/3Yh4pwncqXjWwhUb9xfQ/b/wzKQzuFg3ympRa
+ 0ftYz1XqKBW0nWBAhcjEdPQaujxhLQ92YUbtRnihKkPaicbhk1HnJdokOYPxiM+/ljHF
+ fwnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0jclhN1iI8Ils0M7tH4L8prj0mKxUP8gosaZhHheF7I=;
- b=gP4s8PuQ2YEoc6A5ibUsBPoFtwEtKN4TJ6v3gIh3wp9oYBekDt6GVbVakhLbkQGHSv
- Vtpno3xtjcYZOD8v5w18u/QlkEHf5bN/fYvUtNwbkF7zt16xzZzajxesDg47C6LTsstT
- fRuFRR0Tz53ZEfyry/S7/0bM5vDwGG4YZvurJr1x+HMdIMfYhBZ0kYKSe1qOsqU1Zwfz
- tzq6ah98t7UIgzYty4AZetAWsd/ntSn+5HqKqtLXvkf1dSZV4krcpLovb8buMHCrwkwK
- FC2HTLuC/RR1ZIYmoKd8CO0XSrBRo5rGZ5wP8btItp0EA7k+s/vPCc+LkXXYoP1f1pT0
- 7XEQ==
-X-Gm-Message-State: AOAM530xNf+gyxk2RUSCLygzeNqE5mPlaAl0KC4FkUP4+Hv+dpPmWh6k
- B8OSk4A83ET/tQzDKolFRntrfHjJ5e/1Dw==
-X-Google-Smtp-Source: ABdhPJwT97GDmfQwclQl0bbdVr5si7nN4+0sRWTxSvxHzuQEEE0J7YWNIEQNhVMabh2l7Dmn9HIPbA==
-X-Received: by 2002:a7b:ca52:: with SMTP id m18mr3919302wml.92.1593184481073; 
- Fri, 26 Jun 2020 08:14:41 -0700 (PDT)
+ bh=DW69FT0TKjdcN1PDGM+IN2DdN9Pu11pDMtHQlg2vqlE=;
+ b=AKffENBUzF1UrInoyGLioC+A1HgJkdEoNNzVhgPY6wXNEgHRxCdlADbX+rC9a7vI8F
+ /5ERq6FZJjFAuOhGw9WtB2HoFeKE8hfUxqtoY6lxwrvkfGh9i/gr9k6xJ18vE1ftySe3
+ 8EP5q58vBgFAVwP/eeJZ+1z/wbwg7dfwXAtKRKRRcgQajvDPXA4LwuVvA+vc4qh+fpPY
+ 4x/1uaZeuSYWvwgRnX8Nmxx9hZSqMpHqNhaavFdy8f91Pe9NqBizhSmKyIrGfBi9Nfbe
+ F9eGjPKy2U4oZS+OA/a1pf6uiWdBEDuUcK8w9GpxjbBcEXdE2dTbjhzpHHoq/1vBFwuv
+ UNxA==
+X-Gm-Message-State: AOAM5313x+cqAF80YXr3boZtNNuMBtR65pSvYN0wzRbMvbbCh57UDzKn
+ AAE498sq1sSeExPQTokf50Nkt+ow58FXew==
+X-Google-Smtp-Source: ABdhPJz3M/Yku6fYrpdclEXlL7Tv2XBAC94oJhzRyVxyQzN9FC9DIddhdM0oTQH1c4iuWXNW0a+q7Q==
+X-Received: by 2002:a1c:1984:: with SMTP id 126mr3725313wmz.147.1593184510386; 
+ Fri, 26 Jun 2020 08:15:10 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.40
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:14:40 -0700 (PDT)
+ Fri, 26 Jun 2020 08:15:09 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/57] target/arm: Add isar tests for mte
-Date: Fri, 26 Jun 2020 16:13:40 +0100
-Message-Id: <20200626151424.30117-14-peter.maydell@linaro.org>
+Subject: [PULL 37/57] target/arm: Implement helper_mte_check1
+Date: Fri, 26 Jun 2020 16:14:04 +0100
+Message-Id: <20200626151424.30117-38-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,35 +106,229 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
+Fill out the stub that was added earlier.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-2-richard.henderson@linaro.org
+Message-id: 20200626033144.790098-26-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/arm/internals.h  |  48 +++++++++++++++
+ target/arm/mte_helper.c | 132 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 179 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cf66b8c7fb0..ff70115801f 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3814,6 +3814,16 @@ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index fb92ef6b840..807830cc400 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1318,6 +1318,10 @@ FIELD(MTEDESC, WRITE, 8, 1)
+ FIELD(MTEDESC, ESIZE, 9, 5)
+ FIELD(MTEDESC, TSIZE, 14, 10)  /* mte_checkN only */
+ 
++bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr);
++uint64_t mte_check1(CPUARMState *env, uint32_t desc,
++                    uint64_t ptr, uintptr_t ra);
++
+ static inline int allocation_tag_from_addr(uint64_t ptr)
+ {
+     return extract64(ptr, 56, 4);
+@@ -1328,4 +1332,48 @@ static inline uint64_t address_with_allocation_tag(uint64_t ptr, int rtag)
+     return deposit64(ptr, 56, 4, rtag);
  }
  
-+static inline bool isar_feature_aa64_mte_insn_reg(const ARMISARegisters *id)
++/* Return true if tbi bits mean that the access is checked.  */
++static inline bool tbi_check(uint32_t desc, int bit55)
 +{
-+    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) != 0;
++    return (desc >> (R_MTEDESC_TBI_SHIFT + bit55)) & 1;
 +}
 +
-+static inline bool isar_feature_aa64_mte(const ARMISARegisters *id)
++/* Return true if tcma bits mean that the access is unchecked.  */
++static inline bool tcma_check(uint32_t desc, int bit55, int ptr_tag)
 +{
-+    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) >= 2;
++    /*
++     * We had extracted bit55 and ptr_tag for other reasons, so fold
++     * (ptr<59:55> == 00000 || ptr<59:55> == 11111) into a single test.
++     */
++    bool match = ((ptr_tag + bit55) & 0xf) == 0;
++    bool tcma = (desc >> (R_MTEDESC_TCMA_SHIFT + bit55)) & 1;
++    return tcma && match;
 +}
 +
- static inline bool isar_feature_aa64_pmu_8_1(const ARMISARegisters *id)
++/*
++ * For TBI, ideally, we would do nothing.  Proper behaviour on fault is
++ * for the tag to be present in the FAR_ELx register.  But for user-only
++ * mode, we do not have a TLB with which to implement this, so we must
++ * remove the top byte.
++ */
++static inline uint64_t useronly_clean_ptr(uint64_t ptr)
++{
++    /* TBI is known to be enabled. */
++#ifdef CONFIG_USER_ONLY
++    ptr = sextract64(ptr, 0, 56);
++#endif
++    return ptr;
++}
++
++static inline uint64_t useronly_maybe_clean_ptr(uint32_t desc, uint64_t ptr)
++{
++#ifdef CONFIG_USER_ONLY
++    int64_t clean_ptr = sextract64(ptr, 0, 56);
++    if (tbi_check(desc, clean_ptr < 0)) {
++        ptr = clean_ptr;
++    }
++#endif
++    return ptr;
++}
++
+ #endif
+diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+index 907a12b3664..c8a5e7c0edd 100644
+--- a/target/arm/mte_helper.c
++++ b/target/arm/mte_helper.c
+@@ -359,12 +359,142 @@ void HELPER(stzgm_tags)(CPUARMState *env, uint64_t ptr, uint64_t val)
+     }
+ }
+ 
++/* Record a tag check failure.  */
++static void mte_check_fail(CPUARMState *env, int mmu_idx,
++                           uint64_t dirty_ptr, uintptr_t ra)
++{
++    ARMMMUIdx arm_mmu_idx = core_to_aa64_mmu_idx(mmu_idx);
++    int el, reg_el, tcf, select;
++    uint64_t sctlr;
++
++    reg_el = regime_el(env, arm_mmu_idx);
++    sctlr = env->cp15.sctlr_el[reg_el];
++
++    switch (arm_mmu_idx) {
++    case ARMMMUIdx_E10_0:
++    case ARMMMUIdx_E20_0:
++        el = 0;
++        tcf = extract64(sctlr, 38, 2);
++        break;
++    default:
++        el = reg_el;
++        tcf = extract64(sctlr, 40, 2);
++    }
++
++    switch (tcf) {
++    case 1:
++        /*
++         * Tag check fail causes a synchronous exception.
++         *
++         * In restore_state_to_opc, we set the exception syndrome
++         * for the load or store operation.  Unwind first so we
++         * may overwrite that with the syndrome for the tag check.
++         */
++        cpu_restore_state(env_cpu(env), ra, true);
++        env->exception.vaddress = dirty_ptr;
++        raise_exception(env, EXCP_DATA_ABORT,
++                        syn_data_abort_no_iss(el != 0, 0, 0, 0, 0, 0, 0x11),
++                        exception_target_el(env));
++        /* noreturn, but fall through to the assert anyway */
++
++    case 0:
++        /*
++         * Tag check fail does not affect the PE.
++         * We eliminate this case by not setting MTE_ACTIVE
++         * in tb_flags, so that we never make this runtime call.
++         */
++        g_assert_not_reached();
++
++    case 2:
++        /* Tag check fail causes asynchronous flag set.  */
++        mmu_idx = arm_mmu_idx_el(env, el);
++        if (regime_has_2_ranges(mmu_idx)) {
++            select = extract64(dirty_ptr, 55, 1);
++        } else {
++            select = 0;
++        }
++        env->cp15.tfsr_el[el] |= 1 << select;
++        break;
++
++    default:
++        /* Case 3: Reserved. */
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "Tag check failure with SCTLR_EL%d.TCF%s "
++                      "set to reserved value %d\n",
++                      reg_el, el ? "" : "0", tcf);
++        break;
++    }
++}
++
+ /*
+  * Perform an MTE checked access for a single logical or atomic access.
+  */
++static bool mte_probe1_int(CPUARMState *env, uint32_t desc, uint64_t ptr,
++                           uintptr_t ra, int bit55)
++{
++    int mem_tag, mmu_idx, ptr_tag, size;
++    MMUAccessType type;
++    uint8_t *mem;
++
++    ptr_tag = allocation_tag_from_addr(ptr);
++
++    if (tcma_check(desc, bit55, ptr_tag)) {
++        return true;
++    }
++
++    mmu_idx = FIELD_EX32(desc, MTEDESC, MIDX);
++    type = FIELD_EX32(desc, MTEDESC, WRITE) ? MMU_DATA_STORE : MMU_DATA_LOAD;
++    size = FIELD_EX32(desc, MTEDESC, ESIZE);
++
++    mem = allocation_tag_mem(env, mmu_idx, ptr, type, size,
++                             MMU_DATA_LOAD, 1, ra);
++    if (!mem) {
++        return true;
++    }
++
++    mem_tag = load_tag1(ptr, mem);
++    return ptr_tag == mem_tag;
++}
++
++/*
++ * No-fault version of mte_check1, to be used by SVE for MemSingleNF.
++ * Returns false if the access is Checked and the check failed.  This
++ * is only intended to probe the tag -- the validity of the page must
++ * be checked beforehand.
++ */
++bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr)
++{
++    int bit55 = extract64(ptr, 55, 1);
++
++    /* If TBI is disabled, the access is unchecked. */
++    if (unlikely(!tbi_check(desc, bit55))) {
++        return true;
++    }
++
++    return mte_probe1_int(env, desc, ptr, 0, bit55);
++}
++
++uint64_t mte_check1(CPUARMState *env, uint32_t desc,
++                    uint64_t ptr, uintptr_t ra)
++{
++    int bit55 = extract64(ptr, 55, 1);
++
++    /* If TBI is disabled, the access is unchecked, and ptr is not dirty. */
++    if (unlikely(!tbi_check(desc, bit55))) {
++        return ptr;
++    }
++
++    if (unlikely(!mte_probe1_int(env, desc, ptr, ra, bit55))) {
++        int mmu_idx = FIELD_EX32(desc, MTEDESC, MIDX);
++        mte_check_fail(env, mmu_idx, ptr, ra);
++    }
++
++    return useronly_clean_ptr(ptr);
++}
++
+ uint64_t HELPER(mte_check1)(CPUARMState *env, uint32_t desc, uint64_t ptr)
  {
-     return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 4 &&
+-    return ptr;
++    return mte_check1(env, desc, ptr, GETPC());
+ }
+ 
+ /*
 -- 
 2.20.1
 
