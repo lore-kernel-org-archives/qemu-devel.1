@@ -2,97 +2,71 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26995C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F2DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:22:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4392208C7
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:16:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hoHReGnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4392208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2580E206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:22:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2580E206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jovhr-0000QO-8S
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:16:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43060)
+	id 1jovo6-0001u8-EH
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:22:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jovgx-0008Nm-7x
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:15:23 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35946)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jovgv-0006wn-Co
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:15:22 -0400
-Received: by mail-pg1-x543.google.com with SMTP id p3so5476456pgh.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 14:15:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TnsxSYtlyD5UdfYpwfgVJO4ttCMw5H2Cc++Mk71mCI4=;
- b=hoHReGnX3ahhebK/9Px/YPKbYInGaSP+LGvKhxmFxC2k5pCGA+8guA/TDKiitQHYzI
- AXFN+0Cq6v5rEzVomB5WooLpmP3UsqMtKCuIRzUeCK59o10d7fysagjPJSzG/OMPhwak
- h06YaNYHI5BTnrLGUC1ksDKBgLksEzOD5Ack/b2PRueXAwq2mboVHGQWAJSrTU5omUCh
- h/uJPfLZLxP76kv965RgImlcyepzifQZ2yx+qpHxZN2g9/wCybxl885lO+3kwMOgSmRe
- 6ZT0mgntt8zb+0i6RD/3LokuJ0Rf5XEV3su4y0BDSZUfyj18xrJST2NPkQu5xkhc0fIq
- 2zEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TnsxSYtlyD5UdfYpwfgVJO4ttCMw5H2Cc++Mk71mCI4=;
- b=GqBgjvFgme8StPnOQFPnO99M4UHvPCM76dAz/vT6SupqZnCr+6PjdNeRZzut4tRmQ7
- qtr/8Cj4xmD6wnj1a540Z4uL9xO8BO8diaTepvqzFXSxLIG4/uWfL5KaSapHmFVZ4OPx
- v01nsQgxCN43TaUZfksBA6aRSsf1IpsRacvTixxWz6F5C6pMDxMExR/PVXoF5/LFv4nm
- eCuJMZhYBIPKYNvT0a3/cc2KpTukYiaB0k4Z43NFq/Yoe7Ry8vrvgQwxXIGPTKCVDZ6s
- JSL61UroVL1YBmrsuHeGQP5nNevOil3n/iE2V0dTlBfskUFNo11qCeTh9iIOAAExJaFw
- LrGA==
-X-Gm-Message-State: AOAM533LF0fNgx+N4B/7np1ekXfjpzEe4ex7Z6Mcv6ObJX2UGM+Pfrlc
- MQ1mZ+lDr54/GVsbQtuD9gBghQ==
-X-Google-Smtp-Source: ABdhPJxVErUgS9PceqHZNqMIEbnAMIuoq93wtlHFFl//r+xz5F6Ue5KrHxJEUt489yHF+8S/V1/hXA==
-X-Received: by 2002:a63:3d42:: with SMTP id k63mr617268pga.330.1593206119722; 
- Fri, 26 Jun 2020 14:15:19 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id fv7sm8550561pjb.22.2020.06.26.14.15.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 14:15:18 -0700 (PDT)
-Subject: Re: [PATCH] hw/core/null-machine: Do not initialize unused chardev
- backends
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200624105611.1049-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <26bed6d5-cbca-bf97-f44f-5bb4ecf6d91c@linaro.org>
-Date: Fri, 26 Jun 2020 14:15:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jovnX-0001So-Da; Fri, 26 Jun 2020 17:22:11 -0400
+Resent-Date: Fri, 26 Jun 2020 17:22:11 -0400
+Resent-Message-Id: <E1jovnX-0001So-Da@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21744)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jovnU-00088p-Ux; Fri, 26 Jun 2020 17:22:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593206510; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=lWELCa3GiMJhnhEnunpqKnioBmtMy1ubPxX4ZQeBJzU66o1433iutryu2bURYkowVkfzs54r4nwR1wY2ovPwFe8JTPKlLJnJhdi4y4S8+bIAUccQrokKFCIpQqVFsQdXZfYoCw7PyGMvouU2ym1v9Xynn5YIcWdCPYNRcMWgfmM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593206510;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=0ZpV3/SV9MKS3yjkLl+eMf4TnSKlt208+OTmdH0Z/3Q=; 
+ b=ca3UV9FxJBr/bvxvBm8Ui4VRnKA1J7r3GU0315S3y3rynviSIajtM6+MvV8VIQMKIE30pxxfhu1J0Z1gcAuWUHqX3UHfpvf3JYbkgK0GKi8OtSrA21Cgelm9rklhnBvhL6WCHLm8tAxgTW37OdxQMrsOECu/swRDlPX2e7FCMaQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593206508551157.82381704701595;
+ Fri, 26 Jun 2020 14:21:48 -0700 (PDT)
+Message-ID: <159320650695.31217.10438128113566606768@d1fd068a5071>
+Subject: Re: [PATCH 0/6] target/riscv: NaN-boxing for multiple precison
+In-Reply-To: <20200626205917.4545-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200624105611.1049-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: zhiwei_liu@c-sky.com
+Date: Fri, 26 Jun 2020 14:21:48 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 17:22:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,30 +79,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com,
+ palmer@dabbelt.com, zhiwei_liu@c-sky.com, ianjiang.ict@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 3:56 AM, Philippe Mathieu-Daudé wrote:
-> The MachineClass uses an inverted logic (inherited from the
-> PC machines [*]) to create the chardev backends for the default
-> devices (see commits 998bbd74b9d..aa40fc9c964 and ac33f8fad14).
-> 
-> As the none-machine doesn't have any hardware device, it is
-> pointless to initialize chardev backends. Fix by setting the
-> 'no_defaults' bits in its MachineClass.
-> 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/core/null-machine.c | 5 +++++
->  1 file changed, 5 insertions(+)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNjIwNTkxNy40NTQ1
+LTEtemhpd2VpX2xpdUBjLXNreS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXIt
+aW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
+ZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICAgIHJhaXNlIENh
+bGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vy
+cm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywg
+J2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YzI4ZjFmY2Y2OGI5NDlkZjk2YTY2OThmMWQwOThhMWUn
+LCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAn
+LS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9
+JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1df
+RU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9w
+YXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12
+JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0ydjdsYTBlZi9zcmMvZG9ja2VyLXNyYy4y
+MDIwLTA2LTI2LTE3LjE2LjI5LjE3NTMxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9y
+YScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJv
+IGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51
+dWlkPWMyOGYxZmNmNjhiOTQ5ZGY5NmE2Njk4ZjFkMDk4YTFlCm1ha2VbMV06ICoqKiBbZG9ja2Vy
+LXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLTJ2N2xhMGVmL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWlu
+Z3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDVtMTguODA1cwp1c2VyICAgIDBtOS4yMDFzCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
+MDYyNjIwNTkxNy40NTQ1LTEtemhpd2VpX2xpdUBjLXNreS5jb20vdGVzdGluZy5kb2NrZXItbWlu
+Z3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
