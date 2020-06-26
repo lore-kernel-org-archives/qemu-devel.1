@@ -2,89 +2,84 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB38BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDADC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4D7320767
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:57:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B59420767
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 03:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PuT8PmYg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D7320767
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W8Qbi1wL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B59420767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jofUX-0002Wk-0H
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 23:57:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46852)
+	id 1jofVA-0003QH-B4
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jun 2020 23:58:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jofRB-0004sL-CH
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:54:01 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36565)
+ id 1jof6U-00014l-CQ
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:38 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35496)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jofR8-0005bY-KZ
- for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:54:01 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id h22so4385829pjf.1
- for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 20:53:58 -0700 (PDT)
+ id 1jof6S-00024J-OK
+ for qemu-devel@nongnu.org; Thu, 25 Jun 2020 23:32:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id h185so4065826pfg.2
+ for <qemu-devel@nongnu.org>; Thu, 25 Jun 2020 20:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Re9Lg1r2LWOJ1SxULupJHxJffyaoVYAOqDCDTSEhS64=;
- b=PuT8PmYgZbCeW4UIw0YokcFwECEa+Ph1+XztTTi/33ZQ+rJr7pQVK99KazxQOhDLxC
- QyhFGhQUK1wQNubbwX/qTPhZWrv02zEPkl8qEyxU+5eEMGzRbOj5dMBZe99CtBjQIrP5
- 5kSuJni8WYvwuHw2BjgNOSMXeXkmWAvv77T/peeHeML5VJspdkWuIUPFZq6DwLO6t4da
- J3KHxfPNR4/BZlA96A4ulTQyENn5Q/bRi0kxmuk0YByzTSnHGiPQiaxSghW5r7zeMj1d
- GMpH76Q0iwvkLLO4T7Y+aoupO7btS1f1e6mAOhmygLf07eWkTl/YrE8ZsSBxg9ft+t95
- cpCw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=73dckcvlkTiMvsVB7ETeQRaRlxizQr/3gWMqHjU/tSo=;
+ b=W8Qbi1wLW52QmqrXSHjYeU1TMlq5oXRauaNOtuTZIeOkuhO6/Ge0hMowIOeQDC/mAO
+ SSXW9OKf0KPJIat3Pa7uC0nQRt9lBTQBGSOFM/wNOLZYpWZECLgp0H0EKpCp9w+p5TZe
+ N0+exm6aeLNYnsMss0/VF58f6NUU353fvdnx0Mg2iTTNuwmPf9hysBOQCHN/8GmRU3Ui
+ fj9IU02MXpW2XFNzrrtq7qGdXLroCt104CKfgUyLvWAW+Ggi/Z7ME/4sueTsg1xhvv0j
+ q39hIt4IZHJ757A+zBH7Alh8AdOvTHTjvt6OP058xJB0fzsUyTdZ2O5lOOul5TPCsllW
+ NgAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Re9Lg1r2LWOJ1SxULupJHxJffyaoVYAOqDCDTSEhS64=;
- b=iJ1G8ZkObvlaGB7qho/Z24E8SDBl3oMkj574kpm0rRBIO6AHHow+MuNFQq1H9iUT1X
- sdBLHa35dsEfSInTZMMkbNpyjvZ7YSJ0Wc6HlpTect8uNeQ9dnxigl6XrsWz1F0/RNO/
- fxON83jKkB/G4hVPgd1IJ6mBbmOCCMxdC8ver/o+qQUouex7ih/J5hNreJk5yNRq8eBj
- K0yf/5ZlaRBDMBylZWCdM/gtPUQEqqsHyUCGiwfSaNNGijmyLOtBttyZeF2PyJBBWCK2
- X4U2ESwh87wUiWQcYgk9x3BIFEuLRl70kMBz7nQOhnyuVFZ8/MFv3imucngxx8xh4MPS
- hGOA==
-X-Gm-Message-State: AOAM530Yex8vlwgRl9kWuxzoyjZzSUiZGm45FgywbFHqpvxocdruq057
- IKYfTFIKqG9w+xVfsxjgujCzEOCJ/FA=
-X-Google-Smtp-Source: ABdhPJxFsUNSsFZAiZ3vS4fZGikalyiVQukequ/nbpdigxN5yXXSehkesvAnrA3rpa1EYrSzHTvO3w==
-X-Received: by 2002:a17:902:148:: with SMTP id 66mr328158plb.308.1593143637232; 
- Thu, 25 Jun 2020 20:53:57 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id cv3sm9323877pjb.45.2020.06.25.20.53.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Jun 2020 20:53:56 -0700 (PDT)
-Subject: Re: [PATCH v3 8/8] target/ppc: add vdiv{su}{wd} vmod{su}{wd}
- instructions
-To: Lijun Pan <ljp@linux.vnet.ibm.com>
-References: <20200625170018.64265-1-ljp@linux.ibm.com>
- <20200625170018.64265-9-ljp@linux.ibm.com>
- <4561adf0-2be1-e9c3-49d8-9de8c414ec40@linaro.org>
- <233C7E06-CCB3-4164-82D5-7BC765CC8E01@linux.vnet.ibm.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=73dckcvlkTiMvsVB7ETeQRaRlxizQr/3gWMqHjU/tSo=;
+ b=ZP0dVDuBn6N3RjbxEsa8Xx4KDw3SS7doPC4LnZFw6OgOUM55dafIOCgY7P32KJWbGB
+ WQwEJGdwJilpZTY0O1l2XVTnngkb5X3l2EdB3bsbOOUzyTwwXdteaUYrdKdvAVkbLh31
+ pKVZQeUhzwer+LjUsnp3/lraSOM4C988P1thpRm8lQGlSOPG1Ei8U6iymFlJyWctxqqt
+ AYVe96JT0zQaLQE7tL/3fPQ0udysi7u/89U8CBNdlTYjs520CVCMrS1yPbwqCY0sYhZd
+ q43Lshy2yvC/ZzaQiPPJ37R4ym1PmV7TVCBe2UuML496RLsYal/0pcc/jjnI+b9ZL37n
+ l8RA==
+X-Gm-Message-State: AOAM533xWkVZFDgMgj3pLuvUhDON9yU5SXk37cstZ9NFzbmKHzlcZEez
+ fBDr/9mz9xnWYZo/AbfEWpTpFjT0PbQ=
+X-Google-Smtp-Source: ABdhPJwdbtla+TEDx/RTiS/xFWkcKIKijT/mu3oYNbdjhUfRlPEXztt8SM/DklevYmcpuOU5XL9ddQ==
+X-Received: by 2002:aa7:85da:: with SMTP id z26mr819894pfn.13.1593142355015;
+ Thu, 25 Jun 2020 20:32:35 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id y27sm1605256pgc.56.2020.06.25.20.32.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 25 Jun 2020 20:32:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0095b0c7-ae6d-7a09-98b2-bf830b566186@linaro.org>
-Date: Thu, 25 Jun 2020 20:53:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 36/46] target/arm: Handle TBI for sve scalar + int memory
+ ops
+Date: Thu, 25 Jun 2020 20:31:34 -0700
+Message-Id: <20200626033144.790098-37-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200626033144.790098-1-richard.henderson@linaro.org>
+References: <20200626033144.790098-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <233C7E06-CCB3-4164-82D5-7BC765CC8E01@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,41 +101,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, david.spickett@linaro.org,
+ steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 2:15 PM, Lijun Pan wrote:
-> 
-> 
->> On Jun 25, 2020, at 1:37 PM, Richard Henderson <richard.henderson@linaro.org> wrote:
->>
->> On 6/25/20 10:00 AM, Lijun Pan wrote:
->>> +#define VDIV_MOD_DO(name, op, element, sign, bit)                       \
->>> +    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
->>> +    {                                                                   \
->>> +        int i;                                                          \
->>> +                                                                        \
->>> +                                                                        \
->>> +        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
->>> +            if (unlikely((b->element[i] == 0) ||                        \
->>> +                (sign &&                                                \
->>> +                (b->element[i] == UINT##bit##_MAX) &&                   \
->>> +                (a->element[i] == INT##bit##_MIN))))                    \
->>> +                continue;                                               \
->>> +            r->element[i] = a->element[i] op b->element[i];             \
->>> +        }                                                               \
->>> +    }
->>
->> Missing braces for the if.  Extra blank line before the for.
-> 
-> No, the braces are enough.
+We still need to handle tbi for user-only when mte is inactive.
 
-No they are not.  See CODING_STYLE.rst.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.h | 1 +
+ target/arm/translate-a64.c | 2 +-
+ target/arm/translate-sve.c | 6 ++++--
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-
-r~
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+index 781c441399..49e4865918 100644
+--- a/target/arm/translate-a64.h
++++ b/target/arm/translate-a64.h
+@@ -40,6 +40,7 @@ TCGv_ptr get_fpstatus_ptr(bool);
+ bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+                             unsigned int imms, unsigned int immr);
+ bool sve_access_check(DisasContext *s);
++TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr);
+ TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
+                         bool tag_checked, int log2_size);
+ TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 7a3774bfda..e46c4a49e0 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -215,7 +215,7 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+  * of the write-back address.
+  */
+ 
+-static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
++TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
+ {
+     TCGv_i64 clean = new_tmp_a64(s);
+ #ifdef CONFIG_USER_ONLY
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index e4fbe48493..04eda9a126 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4587,9 +4587,8 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+      * For e.g. LD4, there are not enough arguments to pass all 4
+      * registers as pointers, so encode the regno into the data field.
+      * For consistency, do this even for LD1.
+-     * TODO: mte_n check here while callers are updated.
+      */
+-    if (mte_n && s->mte_active[0]) {
++    if (s->mte_active[0]) {
+         int msz = dtype_msz(dtype);
+ 
+         desc = FIELD_DP32(desc, MTEDESC, MIDX, get_mem_index(s));
+@@ -4599,7 +4598,10 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+         desc = FIELD_DP32(desc, MTEDESC, ESIZE, 1 << msz);
+         desc = FIELD_DP32(desc, MTEDESC, TSIZE, mte_n << msz);
+         desc <<= SVE_MTEDESC_SHIFT;
++    } else {
++        addr = clean_data_tbi(s, addr);
+     }
++
+     desc = simd_desc(vsz, vsz, zt | desc);
+     t_desc = tcg_const_i32(desc);
+     t_pg = tcg_temp_new_ptr();
+-- 
+2.25.1
 
 
