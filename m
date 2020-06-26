@@ -2,74 +2,97 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC26C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 05:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 176E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 05:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F4C20768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 05:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D45582076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 05:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jnCzMNrl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F4C20768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5r9K3M5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D45582076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joh9O-00077J-8P
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 01:43:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39078)
+	id 1johG5-0000Tf-4e
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 01:50:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joh8g-0006Zx-CW; Fri, 26 Jun 2020 01:43:02 -0400
-Received: from ozlabs.org ([203.11.71.1]:54163)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1joh8c-0000Nw-C7; Fri, 26 Jun 2020 01:43:02 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49tQlJ01lyz9sSc; Fri, 26 Jun 2020 15:42:51 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1593150172;
- bh=iD16IXZFAh5RfUbHS6Y8juImA3EwRSNNnBkAvImyly8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jnCzMNrl9l+rYL0vvU4apLkftlDgf4oR3XP9LeauFpGiSGevGFzoZbmbH9ArEW5zm
- nMpFsHUCAoXadFvTJPPuUu2P+DiFS2+c58GA3qqftCN29Vham5qzeKyAqFVBGsDIVT
- RTpOMcUvnbfnSb/RjChs9xSPU2MmB5o/rKWz/jXM=
-Date: Fri, 26 Jun 2020 14:42:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-Message-ID: <20200626044259.GK172395@umbus.fritz.box>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
- <20200619114526.6a6f70c6.cohuck@redhat.com>
- <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
- <20200619120530.256c36cb.cohuck@redhat.com>
- <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
- <20200622140254.0dbe5d8c.cohuck@redhat.com>
- <20200625052518.GD172395@umbus.fritz.box>
- <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1johFD-0008Ix-4A
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 01:49:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40899
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1johFA-0006Jo-MQ
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 01:49:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593150582;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zBB5Kc01AV5iMpHBiKmtIDqnoeqJ0UIzbRx2RkA+DDE=;
+ b=I5r9K3M5ZeFoCHoqoRacGnbff65apfdftJOrwGzUWK7SBIXwmQrJotTzRg5CCOa4Y+/qJZ
+ TIXhsZ3xJhu64LQIfzuxFgRwEmRHOsRtztyI02kpV5lt3y/CgqvQiCrcwRQmij9DNDZpZl
+ 8KRB4c2EgBygFWc/3jhPVjE3CnJ2EOg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-iwNn_NUaO0-6x3-DFWqX6w-1; Fri, 26 Jun 2020 01:49:38 -0400
+X-MC-Unique: iwNn_NUaO0-6x3-DFWqX6w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B33681800D4A;
+ Fri, 26 Jun 2020 05:49:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2206571671;
+ Fri, 26 Jun 2020 05:49:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 810D311384D4; Fri, 26 Jun 2020 07:49:34 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v4 4/8] hw/misc/pca9552: Add a 'description' property for
+ debugging purpose
+References: <20200620225854.31160-1-f4bug@amsat.org>
+ <20200620225854.31160-5-f4bug@amsat.org>
+ <4d335933-9669-43e1-0966-5f0255142012@kaod.org>
+ <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
+ <deccf836-48ef-7112-d66e-a8d3cc4a9681@kaod.org>
+ <877dvv4pmg.fsf@dusky.pond.sub.org>
+ <2d1b8b24-3b2c-d84e-8026-e369f6531247@amsat.org>
+ <03da95ed-399d-53e2-c946-a45f1a771701@amsat.org>
+Date: Fri, 26 Jun 2020 07:49:34 +0200
+In-Reply-To: <03da95ed-399d-53e2-c946-a45f1a771701@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 25 Jun 2020 16:23:44
+ +0200")
+Message-ID: <87bll6tlzl.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8tUgZ4IE8L4vmMyh"
-Content-Disposition: inline
-In-Reply-To: <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 00:31:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 01:49:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,148 +105,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, mst@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- dgilbert@redhat.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, mdroth@linux.vnet.ibm.com,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-arm@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
---8tUgZ4IE8L4vmMyh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 6/25/20 10:12 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 6/25/20 8:37 AM, Markus Armbruster wrote:
+>>> C=C3=A9dric Le Goater <clg@kaod.org> writes:
+>>>
+>>>> On 6/22/20 10:31 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>> On 6/22/20 8:27 AM, C=C3=A9dric Le Goater wrote:
+>>>>>> On 6/21/20 12:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>>>> Add a description field to distinguish between multiple devices.
+>>>
+>>> Pardon my lack of imagination: how does this help you with debugging?
+>>=20
+>> Ah, the patch subject is indeed incorrect, this should be:
+>> "... for *tracing* purpose" (I use tracing when debugging).
+>>=20
+>> In the next patch, we use the 'description' property:
+>>=20
+>> +# pca9552.c
+>> +pca9552_gpio_status(const char *description, const char *buf) "%s GPIOs
+>> 0-15 [%s]"
+>>=20
+>> So when the machine has multiple PCA9552 and guest accesses both,
+>> we can distinct which one is used. For me having "pca1" / "pca0"
+>> is easier to follow than the address of the QOM object.
+>>=20
+>>>
+>>>>>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>>>
+>>>>>> Could it be a QOM attribute ?=20
+>>>>>
+>>>>> What do you call a 'QOM attribute'?
+>>>>> Is it what qdev properties implement?
+>>>>> (in this case via DEFINE_PROP_STRING).
+>>>>
+>>>> I meant a default Object property, which would apply to all Objects.=
+=20
+>>>
+>>> Good point.  Many devices have multiple component objects of the same
+>>> type.
+>>>
+>>>> What you did is fine, so :
+>>>>
+>>>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>
+>>>> but, may be, a well defined child name is enough for the purpose.
+>>>
+>>> object_get_canonical_path() returns a distinct path for each (component=
+)
+>>> object.  The path components are the child property names.
+>>>
+>>> Properties can have descriptions: object_property_set_description().
+>>=20
+>> TIL object_property_set_description :>
+>>=20
+>> Ah, there is no equivalent object_property_get_description(),
+>> we have to use object_get_canonical_path(). Hmm, not obvious.
+>>=20
+>>>
+>>> Sufficient?
+>>=20
+>> I don't know... This seems a complex way to do something simple...
+>> This is already a QDEV. Having to use QOM API seems going
+>> backward, since we have the DEFINE_PROP_STRING() macros available
+>> in "hw/qdev-properties.h".
+>>=20
+>> Maybe I'm not seeing the advantages clearly. I'll try later.
+>
+> The canonical path is not very helpful in trace log...
 
-On Thu, Jun 25, 2020 at 09:06:05AM +0200, David Hildenbrand wrote:
-> >> Still unsure how to bring this new machine property and the cpu feature
-> >> together. Would be great to have the same interface everywhere, but
-> >> having two distinct command line objects depend on each other sucks.
-> >=20
-> > Kinda, but the reality is that hardware - virtual and otherwise -
-> > frequently doesn't have entirely orthogonal configuration for each of
-> > its components.  This is by no means new in that regard.
-> >=20
-> >> Automatically setting the feature bit if pv is supported complicates
-> >> things further.
-> >=20
-> > AIUI, on s390 the "unpack" feature is available by default on recent
-> > models.  In that case you could do this:
-> >=20
-> >  * Don't modify either cpu or HTL options based on each other
-> >  * Bail out if the user specifies a non "unpack" secure CPU along with
-> >    the HTL option
-> >=20
-> > Cases of note:
-> >  - User specifies an old CPU model + htl
-> >    or explicitly sets unpack=3Doff + htl
-> > 	=3D> fails with an error, correctly
-> >  - User specifies modern/default cpu + htl, with secure aware guest
-> >  	=3D> works as a secure guest
-> >  - User specifies modern/default cpu + htl, with non secure aware guest
-> > 	=3D> works, though not secure (and maybe slower than neccessary)
-> >  - User specifies modern/default cpu, no htl, with non-secure guest
-> >  	=3D> works, "unpack" feature is present but unused
-> >  - User specifies modern/default cpu, no htl, secure guest
-> >   	=3D> this is the worst one.  It kind of works by accident if
-> > 	   you've also  manually specified whatever virtio (and
-> > 	   anything else) options are necessary. Ugly, but no
-> > 	   different from the situation right now, IIUC
-> >=20
-> >> (Is there any requirement that the machine object has been already set
-> >> up before the cpu features are processed? Or the other way around?)
-> >=20
-> > CPUs are usually created by the machine, so I believe we can count on
-> > the machine object being there first.
->=20
-> CPU model initialization is one of the first things machine
-> initialization code does on s390x.
+Why?
 
-As it is for most platforms, but still, the values of machine
-properties are available to you at this point.
+Okay, I checked the code.  Since the devices in question don't get a
+composition tree parent assigned, realize puts them in the
+/machine/unattached orphanage.  The canonical path is something like
+"/machine/unattached/device[6]", which is less than clear.
 
-> static void ccw_init(MachineState *machine)
-> {
->     [... memory init ...]
->     s390_sclp_init();
->     s390_memory_init(machine->ram);
->     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
->     s390_init_cpus(machine);
->     [...]
-> }
->=20
-> >=20
-> >> Does this have any implications when probing with the 'none' machine?
-> >=20
-> > I'm not sure.  In your case, I guess the cpu bit would still show up
-> > as before, so it would tell you base feature availability, but not
-> > whether you can use the new configuration option.
-> >=20
-> > Since the HTL option is generic, you could still set it on the "none"
-> > machine, though it wouldn't really have any effect.  That is, if you
-> > could create a suitable object to point it at, which would depend on
-> > ... details.
-> >=20
->=20
-> The important point is that we never want the (expanded) host cpu model
-> look different when either specifying or not specifying the HTL
-> property.
+The components of the canonical path are the names of the QOM child
+properties.  object_get_canonical_path_component() returns the last one,
+in this case "device[6]".
 
-Ah, yes, I see your point.  So my current suggestion will satisfy
-that, basically it is:
+If we made the devices QOM children of some other device, we could name
+the child properties "pca0" and "pca1".
+object_get_canonical_path_component() would then return the strings you
+want to see.
 
-cpu has unpack (inc. by default) && htl specified
-	=3D> works (allowing secure), as expected
+We make a device a QOM child of some QOM parent device only if the child
+is a component device of the parent (hence the name "composition
+tree").
 
-!cpu has unpack && htl specified
-	=3D> bails out with an error
+Are these devices integral components of something else, or are they
+separate chips?
 
-!cpu has unpack && !htl specified
-	=3D> works for a non-secure guest, as expected
-	=3D> guest will fail if it attempts to go secure
+> The description I set matches the hardware definitions
+> and is easier to follow, see patch #6 (where it is set)
+> where the description comes from:
+>
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg714658.html
+>
+>   Description name taken from:
+>   https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.x=
+ml
+>
+> So in this particular case I don't find the canonical pathname
+> practical (from an hardware debugging perspective).
 
-cpu has unpack && !htl specified
-	=3D> works as expected for a non-secure guest (unpack feature is
-	   present, but unused)
-	=3D> secure guest may work "by accident", but only if all virtio
-	   properties have the right values, which is the user's
-	   problem
+Personally, I'd be content with i2c bus and address for debugging
+purposes.
 
-That last case is kinda ugly, but I think it's tolerable.
+The i2c buses *are* components: canonical paths look like
+"/machine/soc/i2c/aspeed.i2c.3".  The combination of
+object_get_canonical_path_component(dev) and
+object_property_get_uint(dev, "address", &error_abort) identifies any
+i2c device on this machine, not just the two you decorate with a
+description string.
 
-> We don't want to run into issues where libvirt probes and gets
-> host model X, but when using that probed model (automatically) for a
-> guest domain, we suddenly cannot run X anymore.
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---8tUgZ4IE8L4vmMyh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl71fNMACgkQbDjKyiDZ
-s5Jn7g/7B85dO80x9MKReXN358gRZcNMYr3LcZ+HlyE7pMOyKFQ7vvFKN8BSEmYP
-Y6MOR0P+i4kusGH5Y/HfKMBintgZoljg/ibJ/Nhpt2x9g2jrBai4heJ1IIY9MMjs
-HxDTXLZCxIauYIL3HYHOf7UAjdWnnrvQGX2cqY6vCKS4J7RrAs5+DPI+xHhpBh66
-/+8gkZbcEdz7l55rjSsJ2h238hMzFmCNzu3pJlx/CviQNp1ScSu3aOT9LkRFfIBL
-TlSCey5xnudp5uQSHhsEZjMflJUqlZtQ1zOyqFmOEQ5QpBnU9oLZqRY2SenJumps
-05Imr/lJg1EeRw2hZXugcc1o1G5rQkfJXAgQd5ikxGxtCGC1ly5xsWepyjGaEw5Y
-d5VDo2g/al3lLm07V6xJ0MSHpTWxksX23S4P0iH6iPFLxA1yqLjU2rqNhcpZ9X3q
-n59CEam7H8kPo5xsS+4TkpGGB0bgXX4/uRNv4L+nYQ5z6p7ruhTbt4EeTCphbqR1
-9JAB0gIkXZzWpDyW8gTXPs86lT+04619xQKK1QuAmRgqDadYmPt8/NefbX7qGbln
-MrL7wPHP9vH2Ei1xeVg2QSPGYCLk4kIQknktwPScVq1sVQm4QFbmFaS3ug8dAjWB
-DCGZ4aUGyqgIFVDNgmX7mydhH1YZUnOn406Jd8Pa11SA25GMJoU=
-=86Td
------END PGP SIGNATURE-----
-
---8tUgZ4IE8L4vmMyh--
 
