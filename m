@@ -2,81 +2,69 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-14.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BEF7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828D2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 346A2212CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:21:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 346A2212CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 50833212CC
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:24:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50833212CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokYB-0002G2-GV
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:21:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54204)
+	id 1jokbF-0004sw-EC
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:24:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jokXN-0001Mk-IN
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58018)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jokXK-0001Ay-9y
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 05:20:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jokXI-000835-Jk
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 90AF02E802B
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 09:20:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1joka9-0003MS-Fh; Fri, 26 Jun 2020 05:23:37 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34172
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1joka7-0004J0-4Y; Fri, 26 Jun 2020 05:23:37 -0400
+Received: from host86-158-109-79.range86-158.btcentralplus.com
+ ([86.158.109.79] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1joka1-0007bz-Kw; Fri, 26 Jun 2020 10:23:35 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: peter.maydell@linaro.org, laurent@vivier.eu, david@gibson.dropbear.id.au,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Date: Fri, 26 Jun 2020 10:22:55 +0100
+Message-Id: <20200626092317.3875-1-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 Jun 2020 09:13:01 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1885247@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aleksandar-markovic philmd pmaydell
-X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159315507826.13901.17398620572438937429.malonedeb@wampee.canonical.com>
- <CAHiYmc7_ra2qWJ8mkZ-vqL5vN2BKdWxAZeKNnMEkPtien5-fsw@mail.gmail.com>
-Message-ID: <b34bf27c-3189-addc-0c50-b0c0c533876d@redhat.com>
-Subject: Re: [Bug 1885247] [NEW] Build error in Intel 32-bit hosts
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a6741db570c938e5a4b0538cf71bc753f55c377d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:10:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.158.109.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PULL 00/22] qemu-macppc queue 20200626
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,87 +73,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885247 <1885247@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200626091301.Wi399_AIdddptk5n7hHRQu0YiPdJjYTYXrLgY0PiU74@z>
 
-On 6/26/20 9:37 AM, Aleksandar Markovic wrote:
-> =D0=BF=D0=B5=D1=82, 26. =D1=98=D1=83=D0=BD 2020. =D1=83 09:11 Aleksandar =
-Markovic
-> <1885247@bugs.launchpad.net> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
->>
->> Public bug reported:
->>
->> The code base is on master, checked out on Thursday June25th 2020,
->> 0250c595c9d. The build procedure:
->>
->> $ mkdir build-gcc
->> $ cd build-gcc
->> $ ../configure
->> $ make
->>
->> The build error message is:
->>
->>   CC      x86_64-softmmu/hw/hyperv/hyperv.o
->>   CC      x86_64-softmmu/hw/hyperv/hyperv_testdev.o
->>   CC      x86_64-softmmu/hw/hyperv/vmbus.o
->> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function =E2=80=98gpa=
-dl_iter_io=E2=80=99:
->> /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast to po=
-inter from integer of different size [-Werror=3Dint-to-pointer-cast]
->>          p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_=
-in_page);
->>              ^
->> cc1: all warnings being treated as errors
->> make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69: hw/hyperv/vmbus=
-.o] Error 1
->> make: *** [Makefile:527: x86_64-softmmu/all] Error 2
+The following changes since commit 5acc270a355120ce967ca1f1eeca0abbdb9303c8:
 
-FWIW there is no CI job covering x86 KVM on 32-bit host build.
-Should this be covered? I guess the problem is no CI services
-provide 32-bit x86...
+  Merge remote-tracking branch 'remotes/xtensa/tags/20200625-xtensa' into staging (2020-06-25 21:20:45 +0100)
 
--- =
+are available in the Git repository at:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885247
+  git://github.com/mcayland/qemu.git tags/qemu-macppc-20200626
 
-Title:
-  Build error in Intel 32-bit hosts
+for you to fetch changes up to e590e7f01479a1d4544aac062fe9fdb986502294:
 
-Status in QEMU:
-  New
+  adb: add ADB bus trace events (2020-06-26 10:13:52 +0100)
 
-Bug description:
-  The code base is on master, checked out on Thursday June25th 2020,
-  0250c595c9d. The build procedure:
+----------------------------------------------------------------
+qemu-macppc patches
 
-  $ mkdir build-gcc
-  $ cd build-gcc
-  $ ../configure
-  $ make
+----------------------------------------------------------------
+Mark Cave-Ayland (22):
+      adb: coding style update to fix checkpatch errors
+      adb: fix adb-mouse read length and revert disable-reg3-direct-writes workaround
+      cuda: convert ADB autopoll timer from ns to ms
+      pmu: fix duplicate autopoll mask variable
+      pmu: honour autopoll_rate_ms when rearming the ADB autopoll timer
+      adb: introduce realize/unrealize and VMStateDescription for ADB bus
+      adb: create autopoll variables directly within ADBBusState
+      cuda: convert to use ADBBusState internal autopoll variables
+      pmu: convert to use ADBBusState internal autopoll variables
+      mac_via: convert to use ADBBusState internal autopoll variables
+      adb: introduce new ADBDeviceHasData method to ADBDeviceClass
+      adb: keep track of devices with pending data
+      adb: add status field for holding information about the last ADB request
+      adb: use adb_request() only for explicit requests
+      adb: add autopoll_blocked variable to block autopoll
+      cuda: add adb_autopoll_block() and adb_autopoll_unblock() functions
+      pmu: add adb_autopoll_block() and adb_autopoll_unblock() functions
+      mac_via: move VIA1 portB write logic into mos6522_q800_via1_write()
+      mac_via: rework ADB state machine to be compatible with both MacOS and Linux
+      adb: only call autopoll callbacks when autopoll is not blocked
+      adb: use adb_device prefix for ADB device trace events
+      adb: add ADB bus trace events
 
-  The build error message is:
-
-    CC      x86_64-softmmu/hw/hyperv/hyperv.o
-    CC      x86_64-softmmu/hw/hyperv/hyperv_testdev.o
-    CC      x86_64-softmmu/hw/hyperv/vmbus.o
-  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c: In function =E2=80=98gpad=
-l_iter_io=E2=80=99:
-  /home/rtrk/Build/qemu-master/hw/hyperv/vmbus.c:386:13: error: cast to poi=
-nter from integer of different size [-Werror=3Dint-to-pointer-cast]
-           p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_i=
-n_page);
-               ^
-  cc1: all warnings being treated as errors
-  make[1]: *** [/home/rtrk/Build/qemu-master/rules.mak:69: hw/hyperv/vmbus.=
-o] Error 1
-  make: *** [Makefile:527: x86_64-softmmu/all] Error 2
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885247/+subscriptions
+ hw/input/adb-kbd.c           |  42 +++--
+ hw/input/adb-mouse.c         |  65 ++++---
+ hw/input/adb.c               | 210 ++++++++++++++++++++--
+ hw/input/trace-events        |  27 +--
+ hw/misc/mac_via.c            | 411 ++++++++++++++++++++++++++++---------------
+ hw/misc/macio/cuda.c         |  60 +++----
+ hw/misc/macio/pmu.c          |  47 +++--
+ hw/misc/trace-events         |   3 +
+ hw/ppc/mac_newworld.c        |   2 -
+ include/hw/input/adb.h       |  26 ++-
+ include/hw/misc/mac_via.h    |   2 +-
+ include/hw/misc/macio/cuda.h |   4 -
+ include/hw/misc/macio/pmu.h  |   4 -
+ 13 files changed, 620 insertions(+), 283 deletions(-)
 
