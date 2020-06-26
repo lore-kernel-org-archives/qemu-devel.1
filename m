@@ -2,87 +2,63 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B70C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A65C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0924206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:50:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MtQV7Lqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0924206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 36334206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:55:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36334206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolwV-0007ug-49
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45054)
+	id 1jom0v-0001E4-Dv
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:55:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jolvP-0006p3-0e
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:49:39 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43670)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jolvM-0002ZG-9J
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:49:38 -0400
-Received: by mail-oi1-x243.google.com with SMTP id x83so114184oif.10
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 03:49:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Uk3+XOX8UBsxbr7+evqJ3YqsSaNIWDccByaCccjbNv4=;
- b=MtQV7Lqs96ypPvQuXzK8KXSrh+5VCdm+DVmbS7UHWLcqzCqCJqI/zPqWPycGRxplnx
- r/KzaNGu+HWBfGxBURs8rZeywZuM4Qy2iFMAeW6wUIYzgx/juv/mcSrOV7omxvGgipp3
- 2aYVTDKfK4gnjWnYHwxu2+pplZu91LmIIEVOorCtjiBd6k16f1URKrslC3+KzD7kpBCy
- QFKCQqStGk12T6UVS6N7031IrU2mlyaxaXv/IKoK8GwooX01YNJ0CjycCDAYVIkYCJy0
- c4KEvxR1A03ny5pGFMol3HO/2advkhGXOaLNM7XGMHngvKhxwH+QH+H5Mbei5INPVcqc
- n1PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Uk3+XOX8UBsxbr7+evqJ3YqsSaNIWDccByaCccjbNv4=;
- b=g67+NYcFVSlgpXcYJUegqssNGyKZdhC0MeaGA3O/sCuTI22VYal5MuytumsxsnrKh6
- fVypOascDpdurwQE4yO8aFVEtCR1qNoWUWWMym+GjKIqzFhbKz1U+9pk4OL98N5tv+Rt
- yuCwF9w7ATJ3x1s4uCpH/Kt3TUzLMF2Btzw2xZ1WDXfQWRLo/e9R+T3gGjfOjV7f7oDo
- EJuvA6O373cU4QFWMI+kWXvOjmA6iKQMxmi+LbwfjQITHyVZda+b0FiuBWGXIit+ejIA
- mw8E9l4Cdye6j24LhkcycqT0TOlAk56xrSQ/fWky6MwJwnvNW8bQIAlNMte6+44+di0X
- xqbQ==
-X-Gm-Message-State: AOAM532bv5AfirPDVH4nkUFulM8Gh2W+wOYXVoR77XDgc3LMdmQsc8Y4
- KpN8g/wi4c+K8ys9UurDEg+xh6ALqjPUgx4sT6paMg==
-X-Google-Smtp-Source: ABdhPJwhbuH5iG4G5jMd8ffSPTciPuqZoX96zvqUuwDHXPkijEIkHBjXsC65m1rPaIVPfLAiiAuiFJSwWV1oHYQ5nm0=
-X-Received: by 2002:aca:1a07:: with SMTP id a7mr1891532oia.163.1593168574948; 
- Fri, 26 Jun 2020 03:49:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jom09-0000LT-7T; Fri, 26 Jun 2020 06:54:33 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:12995)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jom06-0003z9-FK; Fri, 26 Jun 2020 06:54:32 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 607BE748DCC;
+ Fri, 26 Jun 2020 12:54:24 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 2525F748DCB; Fri, 26 Jun 2020 12:54:24 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 23D44748DCD;
+ Fri, 26 Jun 2020 12:54:24 +0200 (CEST)
+Date: Fri, 26 Jun 2020 12:54:24 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 1/3] hw/i2c/smbus_eeprom: Set QOM parent
+In-Reply-To: <alpine.BSF.2.22.395.2006261240500.94870@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.22.395.2006261251480.94870@zero.eik.bme.hu>
+References: <20200626102744.15053-1-f4bug@amsat.org>
+ <20200626102744.15053-2-f4bug@amsat.org>
+ <alpine.BSF.2.22.395.2006261240500.94870@zero.eik.bme.hu>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <20200624100210.59975-1-stefanha@redhat.com>
- <CAFEAcA_K7MtnEjRMZCbmYrJCm6qD4N7ZMHvGuAzXL9gD2zQNuA@mail.gmail.com>
- <20200626102506.GD281902@stefanha-x1.localdomain>
-In-Reply-To: <20200626102506.GD281902@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jun 2020 11:49:23 +0100
-Message-ID: <CAFEAcA_kbt1Cmy3t+FWoZ_-OQ+=HgE=uzDbeXmFeJKnVdAdNFQ@mail.gmail.com>
-Subject: Re: [PULL 00/12] Block patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+Content-Type: multipart/mixed;
+ boundary="3866299591-1414184857-1593168864=:94870"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,100 +71,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Markus Armbruster <armbru@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-ppc@nongnu.org, =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
+ Huacai Chen <chenhc@lemote.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jun 2020 at 11:25, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Thu, Jun 25, 2020 at 02:31:14PM +0100, Peter Maydell wrote:
-> > On Wed, 24 Jun 2020 at 11:02, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > The following changes since commit 171199f56f5f9bdf1e5d670d09ef1351d8f01bae:
-> > >
-> > >   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-apply-20200619-3' into staging (2020-06-22 14:45:25 +0100)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://github.com/stefanha/qemu.git tags/block-pull-request
-> > >
-> > > for you to fetch changes up to 7838c67f22a81fcf669785cd6c0876438422071a:
-> > >
-> > >   block/nvme: support nested aio_poll() (2020-06-23 15:46:08 +0100)
-> > >
-> > > ----------------------------------------------------------------
-> > > Pull request
-> > >
-> > > ----------------------------------------------------------------
-> >
-> > Failure on iotest 030, x86-64 Linux:
-> >
-> >   TEST    iotest-qcow2: 030 [fail]
-> > QEMU          --
-> > "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
-> > -nodefaults -display none -accel qtest
-> > QEMU_IMG      --
-> > "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-img"
-> > QEMU_IO       --
-> > "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-io"
-> >  --cache writeback --aio threads -f qcow2
-> > QEMU_NBD      --
-> > "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-nbd"
-> > IMGFMT        -- qcow2 (compat=1.1)
-> > IMGPROTO      -- file
-> > PLATFORM      -- Linux/x86_64 e104462 4.15.0-76-generic
-> > TEST_DIR      --
-> > /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/scratch
-> > SOCK_DIR      -- /tmp/tmp.8tgdDjoZcO
-> > SOCKET_SCM_HELPER --
-> > /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotest/socket_scm_helper
-> >
-> > --- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/030.out
-> >  2019-07-15 17:18:35.251364738 +0100
-> > +++ /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/030.out.bad
-> >   2020-06-25 14:04:28.500534007 +0100
-> > @@ -1,5 +1,17 @@
-> > -...........................
-> > +.............F.............
-> > +======================================================================
-> > +FAIL: test_stream_parallel (__main__.TestParallelOps)
-> > +----------------------------------------------------------------------
-> > +Traceback (most recent call last):
-> > +  File "030", line 246, in test_stream_parallel
-> > +    self.assert_qmp(result, 'return', {})
-> > +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
-> > line 848, in assert_qmp
-> > +    result = self.dictpath(d, path)
-> > +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
-> > line 822, in dictpath
-> > +    self.fail(f'failed path traversal for "{path}" in "{d}"')
-> > +AssertionError: failed path traversal for "return" in "{'error':
-> > {'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
-> > found"}}"
-> > +
-> >  ----------------------------------------------------------------------
-> >  Ran 27 tests
-> >
-> > -OK
-> > +FAILED (failures=1)
->
-> Strange, I can't reproduce this failure on my pull request branch or on
-> qemu.git/master.
->
-> Is this failure deterministic? Are you sure it is introduced by this
-> pull request?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-It might be a random one that you got hit by; I just bounced
-the request because it's a block pullreq rather than anything
-obviously unrelated (and because I hadn't seen it before). I
-can have another go at merging this if you don't think it looks
-like it would be something caused by any of the patches in
-this series.
+--3866299591-1414184857-1593168864=:94870
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-thanks
--- PMM
+On Fri, 26 Jun 2020, BALATON Zoltan wrote:
+> On Fri, 26 Jun 2020, Philippe Mathieu-Daudé wrote:
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> Aspeed change pending latest ARM pull-request, so meanwhile sending
+>> as RFC.
+>> ---
+>> include/hw/i2c/smbus_eeprom.h |  9 ++++++---
+>> hw/i2c/smbus_eeprom.c         | 13 ++++++++++---
+>> hw/mips/fuloong2e.c           |  2 +-
+>> hw/ppc/sam460ex.c             |  2 +-
+>> 4 files changed, 18 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/include/hw/i2c/smbus_eeprom.h b/include/hw/i2c/smbus_eeprom.h
+>> index 68b0063ab6..037612bbbb 100644
+>> --- a/include/hw/i2c/smbus_eeprom.h
+>> +++ b/include/hw/i2c/smbus_eeprom.h
+>> @@ -26,9 +26,12 @@
+>> #include "exec/cpu-common.h"
+>> #include "hw/i2c/i2c.h"
+>> 
+>> -void smbus_eeprom_init_one(I2CBus *bus, uint8_t address, uint8_t 
+>> *eeprom_buf);
+>> -void smbus_eeprom_init(I2CBus *bus, int nb_eeprom,
+>> -                       const uint8_t *eeprom_spd, int size);
+>> +void smbus_eeprom_init_one(Object *parent_obj, const char *child_name,
+>> +                           I2CBus *smbus, uint8_t address,
+>> +                           uint8_t *eeprom_buf);
+>> +void smbus_eeprom_init(Object *parent_obj, const char *child_name_prefix,
+>> +                       I2CBus *smbus, int nb_eeprom,
+>> +                       const uint8_t *eeprom_spd, int eeprom_spd_size);
+>
+> Keeping I2CBus *smbus and uint8_t address as first parameters before 
+> parent_obj and name looks better to me. These functions still operate on an 
+> I2Cbus so could be regarded as methods of I2CBus therefore first parameter 
+> should be that.
+
+Also isn't parent_obj is the I2Cbus itself? Why is that need to be passed? 
+The i2c_init_bus() also takes parent and name params so both I2Cbus and 
+it's parent should be available as parents of the new I2C device here 
+without more parameters. What am I missing here?
+
+> Regards,
+> BALATON Zoltan
+>
+>> enum sdram_type { SDR = 0x4, DDR = 0x7, DDR2 = 0x8 };
+>> uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size);
+>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+>> index b7def9eeb8..879fd7c416 100644
+>> --- a/hw/i2c/smbus_eeprom.c
+>> +++ b/hw/i2c/smbus_eeprom.c
+>> @@ -165,7 +165,9 @@ static void smbus_eeprom_register_types(void)
+>> 
+>> type_init(smbus_eeprom_register_types)
+>> 
+>> -void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t 
+>> *eeprom_buf)
+>> +void smbus_eeprom_init_one(Object *parent_obj, const char *child_name,
+>> +                           I2CBus *smbus, uint8_t address,
+>> +                           uint8_t *eeprom_buf)
+>> {
+>>     DeviceState *dev;
+>> 
+>> @@ -173,10 +175,12 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t 
+>> address, uint8_t *eeprom_buf)
+>>     qdev_prop_set_uint8(dev, "address", address);
+>>     /* FIXME: use an array of byte or block backend property? */
+>>     SMBUS_EEPROM(dev)->init_data = eeprom_buf;
+>> +    object_property_add_child(parent_obj, child_name, OBJECT(dev));
+>>     qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);
+>> }
+>> 
+>> -void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+>> +void smbus_eeprom_init(Object *parent_obj, const char *child_name_prefix,
+>> +                       I2CBus *smbus, int nb_eeprom,
+>>                        const uint8_t *eeprom_spd, int eeprom_spd_size)
+>> {
+>>     int i;
+>> @@ -189,8 +193,11 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+>>     }
+>>
+>>     for (i = 0; i < nb_eeprom; i++) {
+>> -        smbus_eeprom_init_one(smbus, 0x50 + i,
+>> +        char *name = g_strdup_printf("%s-%d", child_name_prefix, i);
+>> +
+>> +        smbus_eeprom_init_one(parent_obj, name, smbus, 0x50 + i,
+>>                               eeprom_buf + (i * SMBUS_EEPROM_SIZE));
+>> +        g_free(name);
+>>     }
+>> }
+>> 
+>> diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
+>> index 8ca31e5162..304a096c6a 100644
+>> --- a/hw/mips/fuloong2e.c
+>> +++ b/hw/mips/fuloong2e.c
+>> @@ -377,7 +377,7 @@ static void mips_fuloong2e_init(MachineState *machine)
+>>
+>>     /* Populate SPD eeprom data */
+>>     spd_data = spd_data_generate(DDR, machine->ram_size);
+>> -    smbus_eeprom_init_one(smbus, 0x50, spd_data);
+>> +    smbus_eeprom_init_one(OBJECT(machine->ram), "spd", smbus, 0x50, 
+>> spd_data);
+>>
+>>     mc146818_rtc_init(isa_bus, 2000, NULL);
+>> 
+>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+>> index 1a106a68de..064d07f4e2 100644
+>> --- a/hw/ppc/sam460ex.c
+>> +++ b/hw/ppc/sam460ex.c
+>> @@ -337,7 +337,7 @@ static void sam460ex_init(MachineState *machine)
+>>     spd_data = spd_data_generate(ram_sizes[0] < 128 * MiB ? DDR : DDR2,
+>>                                  ram_sizes[0]);
+>>     spd_data[20] = 4; /* SO-DIMM module */
+>> -    smbus_eeprom_init_one(i2c, 0x50, spd_data);
+>> +    smbus_eeprom_init_one(OBJECT(machine->ram), "spd", i2c, 0x50, 
+>> spd_data);
+>>     /* RTC */
+>>     i2c_create_slave(i2c, "m41t80", 0x68);
+>> 
+>
+--3866299591-1414184857-1593168864=:94870--
 
