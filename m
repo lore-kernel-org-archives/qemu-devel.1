@@ -2,104 +2,156 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7715C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6A1221532
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:44:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vDmo5m+w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A1221532
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6E39A20836
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 09:50:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E39A20836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jokuQ-0006CX-7J
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:44:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59266)
+	id 1jol0M-0007kn-Em
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 05:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1joktp-0005fL-HG; Fri, 26 Jun 2020 05:43:57 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40448)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1joktn-0007ZR-Sl; Fri, 26 Jun 2020 05:43:57 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h5so8837162wrc.7;
- Fri, 26 Jun 2020 02:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=epw7Ya6mrSaGCZp6nWlwRKSneX+jRfVGp7MULgc8HsY=;
- b=vDmo5m+w1Mca2MdXfsczqoN8j7EfGlJY3KNbkhXGS8Q344cVp5EewVfJoTJMG27GBz
- P5u+8nlabbc8Al7OuGrTO8vdC7RKl4sTqQCTLMZIL0QucovmUlBgId5GalrfrMyO5h0Z
- q6zmoD679/N0xyr5EoPqjSCu/SE7k1XJncxhVIua8mqC6jAVl3Zkjq11GHfL04UdzjIb
- Yptq2omhMeuSfMqdd6MCbOKrH0F7scYhq0GJ5wFzMzZt2nZozwUpFT9tXMDzEK83meYH
- zSvtX2nkMW59VLswJNpBgY7Soia8tMsaqS/JGqoihCKdzkIFwCLu+y0XrxWJx7Qb3yB8
- dz+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=epw7Ya6mrSaGCZp6nWlwRKSneX+jRfVGp7MULgc8HsY=;
- b=RcxiKyKSqVBTIq0tuBpgQmyK6Jx/trKCb0Be3I3rj6IG48eBaRGPJFZzEpFORw2Q/I
- P0bu0/s/4D3uBnVhb7CtASiKXSQ7QY5wyzoC6tLF9w0HXwgADJaxVVkLSmrHfrOUrVWL
- FgjVglUN/tExYRxewCioqxYW1O26+c/7WF/cSOSlkgHQER0L/OBriNo+8/P7vpoOolgQ
- lppCwDs/HuMaywrrGB1qmQWWnW2id06qKuts22GkEKw9iXHpAchhk+G4aleOsfrjfDWQ
- VYXAkbSp6CPGQtIMYhPhzPSMxny6dry08y8FoiRMw8T7GvVCXkciYgDohI8Yn80lugbx
- 690w==
-X-Gm-Message-State: AOAM530ukfs8oZmoUemCLGGcllMT99VA1ZAXHuy+WXOKF9MiC1JGrFc9
- 3k8dBT8OWvZaqyE4B6q8iqI=
-X-Google-Smtp-Source: ABdhPJzjM2AzaeEiDe0zng5wWHeoVzBkrH97so/vWkTc+AsXOtVJ7OsYWoNKY2Wf35P5nQBYxQHcLA==
-X-Received: by 2002:a05:6000:128e:: with SMTP id
- f14mr3020663wrx.276.1593164633724; 
- Fri, 26 Jun 2020 02:43:53 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id p17sm16020070wma.47.2020.06.26.02.43.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 26 Jun 2020 02:43:52 -0700 (PDT)
-Subject: Re: [PATCH v4 4/8] hw/misc/pca9552: Add a 'description' property for
- debugging purpose
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200620225854.31160-1-f4bug@amsat.org>
- <20200620225854.31160-5-f4bug@amsat.org>
- <4d335933-9669-43e1-0966-5f0255142012@kaod.org>
- <34fe3d2b-6b41-0509-f172-5b45486fdf0c@amsat.org>
- <deccf836-48ef-7112-d66e-a8d3cc4a9681@kaod.org>
- <877dvv4pmg.fsf@dusky.pond.sub.org>
- <2d1b8b24-3b2c-d84e-8026-e369f6531247@amsat.org>
- <03da95ed-399d-53e2-c946-a45f1a771701@amsat.org>
- <87bll6tlzl.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <61d1f904-0d4f-4ae6-2d4e-3d8e87a9b77c@amsat.org>
-Date: Fri, 26 Jun 2020 11:43:51 +0200
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jokzX-0007ID-Ge; Fri, 26 Jun 2020 05:49:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63246)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jokzV-00018R-Ao; Fri, 26 Jun 2020 05:49:51 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05Q9XFBo111593; Fri, 26 Jun 2020 05:49:42 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04ecgf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 05:49:41 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q9XTT2112117;
+ Fri, 26 Jun 2020 05:49:40 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04ecdq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 05:49:40 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q9kVJY019295;
+ Fri, 26 Jun 2020 09:49:33 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma02fra.de.ibm.com with ESMTP id 31uusk1cpr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jun 2020 09:49:33 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 05Q9nUt063111530
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jun 2020 09:49:30 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 631414C059;
+ Fri, 26 Jun 2020 09:49:30 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 81E804C050;
+ Fri, 26 Jun 2020 09:49:29 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.191.93])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 26 Jun 2020 09:49:29 +0000 (GMT)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200619114526.6a6f70c6.cohuck@redhat.com>
+ <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+ <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ <20200626044259.GK172395@umbus.fritz.box>
+ <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
+ <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+ <20200626093257.GC1028934@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <558e8978-01ba-d8e8-9986-15efbbcbca96@linux.ibm.com>
+Date: Fri, 26 Jun 2020 11:49:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <87bll6tlzl.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200626093257.GC1028934@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="LSRjVWTvjpyGh8EqBsR5FDOJlg4cZ38mp"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-26_05:2020-06-26,
+ 2020-06-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 impostorscore=0 cotscore=-2147483648
+ bulkscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006260069
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 05:02:19
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,146 +164,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>
+Cc: pair@us.ibm.com, Cornelia Huck <cohuck@redhat.com>, brijesh.singh@amd.com,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, pasic@linux.ibm.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
+ mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/26/20 7:49 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> On 6/25/20 10:12 AM, Philippe Mathieu-Daudé wrote:
->>> On 6/25/20 8:37 AM, Markus Armbruster wrote:
->>>> Cédric Le Goater <clg@kaod.org> writes:
->>>>
->>>>> On 6/22/20 10:31 AM, Philippe Mathieu-Daudé wrote:
->>>>>> On 6/22/20 8:27 AM, Cédric Le Goater wrote:
->>>>>>> On 6/21/20 12:58 AM, Philippe Mathieu-Daudé wrote:
->>>>>>>> Add a description field to distinguish between multiple devices.
->>>>
->>>> Pardon my lack of imagination: how does this help you with debugging?
->>>
->>> Ah, the patch subject is indeed incorrect, this should be:
->>> "... for *tracing* purpose" (I use tracing when debugging).
->>>
->>> In the next patch, we use the 'description' property:
->>>
->>> +# pca9552.c
->>> +pca9552_gpio_status(const char *description, const char *buf) "%s GPIOs
->>> 0-15 [%s]"
->>>
->>> So when the machine has multiple PCA9552 and guest accesses both,
->>> we can distinct which one is used. For me having "pca1" / "pca0"
->>> is easier to follow than the address of the QOM object.
->>>
->>>>
->>>>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
->>>>>>>
->>>>>>> Could it be a QOM attribute ? 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LSRjVWTvjpyGh8EqBsR5FDOJlg4cZ38mp
+Content-Type: multipart/mixed; boundary="Gdsnewjk3SIoIW55EUKLL588lnbjn5qAD"
+
+--Gdsnewjk3SIoIW55EUKLL588lnbjn5qAD
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 6/26/20 11:32 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Jun 26, 2020 at 11:01:58AM +0200, Janosch Frank wrote:
+>> On 6/26/20 8:53 AM, David Hildenbrand wrote:
+>>>>>>> Does this have any implications when probing with the 'none' mach=
+ine?
 >>>>>>
->>>>>> What do you call a 'QOM attribute'?
->>>>>> Is it what qdev properties implement?
->>>>>> (in this case via DEFINE_PROP_STRING).
+>>>>>> I'm not sure.  In your case, I guess the cpu bit would still show =
+up
+>>>>>> as before, so it would tell you base feature availability, but not=
+
+>>>>>> whether you can use the new configuration option.
+>>>>>>
+>>>>>> Since the HTL option is generic, you could still set it on the "no=
+ne"
+>>>>>> machine, though it wouldn't really have any effect.  That is, if y=
+ou
+>>>>>> could create a suitable object to point it at, which would depend =
+on
+>>>>>> ... details.
+>>>>>>
 >>>>>
->>>>> I meant a default Object property, which would apply to all Objects. 
+>>>>> The important point is that we never want the (expanded) host cpu m=
+odel
+>>>>> look different when either specifying or not specifying the HTL
+>>>>> property.
 >>>>
->>>> Good point.  Many devices have multiple component objects of the same
->>>> type.
+>>>> Ah, yes, I see your point.  So my current suggestion will satisfy
+>>>> that, basically it is:
 >>>>
->>>>> What you did is fine, so :
->>>>>
->>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
->>>>>
->>>>> but, may be, a well defined child name is enough for the purpose.
->>>>
->>>> object_get_canonical_path() returns a distinct path for each (component)
->>>> object.  The path components are the child property names.
->>>>
->>>> Properties can have descriptions: object_property_set_description().
+>>>> cpu has unpack (inc. by default) && htl specified
+>>>> 	=3D> works (allowing secure), as expected
 >>>
->>> TIL object_property_set_description :>
->>>
->>> Ah, there is no equivalent object_property_get_description(),
->>> we have to use object_get_canonical_path(). Hmm, not obvious.
+>>> ack
 >>>
 >>>>
->>>> Sufficient?
+>>>> !cpu has unpack && htl specified
+>>>> 	=3D> bails out with an error
 >>>
->>> I don't know... This seems a complex way to do something simple...
->>> This is already a QDEV. Having to use QOM API seems going
->>> backward, since we have the DEFINE_PROP_STRING() macros available
->>> in "hw/qdev-properties.h".
+>>> ack
 >>>
->>> Maybe I'm not seeing the advantages clearly. I'll try later.
+>>>>
+>>>> !cpu has unpack && !htl specified
+>>>> 	=3D> works for a non-secure guest, as expected
+>>>> 	=3D> guest will fail if it attempts to go secure
+>>>
+>>> ack, behavior just like running on older hw without unpack
+>>>
+>>>>
+>>>> cpu has unpack && !htl specified
+>>>> 	=3D> works as expected for a non-secure guest (unpack feature is
+>>>> 	   present, but unused)
+>>>> 	=3D> secure guest may work "by accident", but only if all virtio
+>>>> 	   properties have the right values, which is the user's
+>>>> 	   problem
+>>>>
+>>>> That last case is kinda ugly, but I think it's tolerable.
+>>>
+>>> Right, we must not affect non-secure guests, and existing secure setu=
+ps
+>>> (e.g., older qemu machines). Will have to think about this some more,=
+
+>>> but does not sound too crazy.
 >>
->> The canonical path is not very helpful in trace log...
-> 
-> Why?
-> 
-> Okay, I checked the code.  Since the devices in question don't get a
-> composition tree parent assigned, realize puts them in the
-> /machine/unattached orphanage.  The canonical path is something like
-> "/machine/unattached/device[6]", which is less than clear.
-> 
-> The components of the canonical path are the names of the QOM child
-> properties.  object_get_canonical_path_component() returns the last one,
-> in this case "device[6]".
-> 
-> If we made the devices QOM children of some other device, we could name
-> the child properties "pca0" and "pca1".
-> object_get_canonical_path_component() would then return the strings you
-> want to see.
-> 
-> We make a device a QOM child of some QOM parent device only if the child
-> is a component device of the parent (hence the name "composition
-> tree").
-> 
-> Are these devices integral components of something else, or are they
-> separate chips?
-
-Separate chips in the machine (actually not even on the machine mother
-board where is the CPU, but on a daughter board card).
-
-So in the composition tree I expect to see them as
-
-  /machine/pca0
-  /machine/pca1
-
->> The description I set matches the hardware definitions
->> and is easier to follow, see patch #6 (where it is set)
->> where the description comes from:
+>> I severely dislike having to specify things to make PV work.
+>> The IOMMU is already a thorn in our side and we're working on making t=
+he
+>> whole ordeal completely transparent so the only requirement to make th=
+is
+>> work is the right machine, kernel, qemu and kernel cmd line option
+>> "prot_virt=3D1". That's why we do the reboot into PV mode in the first=
+ place.
 >>
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg714658.html
->>
->>   Description name taken from:
->>   https://github.com/open-power/witherspoon-xml/blob/master/witherspoon.xml
->>
->> So in this particular case I don't find the canonical pathname
->> practical (from an hardware debugging perspective).
-> 
-> Personally, I'd be content with i2c bus and address for debugging
-> purposes.
-> 
-> The i2c buses *are* components: canonical paths look like
-> "/machine/soc/i2c/aspeed.i2c.3".  The combination of
-> object_get_canonical_path_component(dev) and
-> object_property_get_uint(dev, "address", &error_abort) identifies any
-> i2c device on this machine, not just the two you decorate with a
-> description string.
+>> I.e. the goal is that if customers convert compatible guests into
+>> protected ones and start them up on a z15 on a distro with PV support
+>> they can just use the guest without having to change XML or command li=
+ne
+>> parameters.
+>=20
+> If you're exposing new features to the guest machine, then it is usuall=
+y
+> to be expected that XML and QEMU command line will change. Some simple
+> things might be hidable behind a new QEMU machine type or CPU model, bu=
+t
+> there's a limit to how much should be hidden that way while staying san=
+e.
+>=20
+> I'd really expect the configuration to change when switching a guest to=
 
-The I2C busses is provided by Aspeed peripherals. I counted 19 different
-I2C busses on this machine.
+> a new hardware platform and wanting major new functionality to be enabl=
+ed.
+> The XML / QEMU config is a low level instantiation of a particular feat=
+ure
+> set, optimized for a specific machine, rather than a high level descrip=
+tion
+> of ideal "best" config independent of host machine.
 
-"pca0" is connected to i2c bus #11, "pca1" to bus #3.
+You still have to set the host command line and make sure that unpack is
+available. Currently you also have to specify the IOMMU which we like to
+drop as a requirement. Everything else is dependent on runtime
+information which tells us if we need to take a PV or non-PV branch.
+Having the unpack facility should be enough to use the unpack facility.
 
-I still don't think this will be practical, but I'll try your
-suggestion.
+Keep in mind that we have no real concept of a special protected VM to
+begin with. If the VM never boots into a protected kernel it will never
+be protected. On a reboot it drops from protected into unprotected mode
+to execute the bios and boot loader and then may or may not move back
+into a protected state.
 
-Regards,
+>=20
+> Regards,
+> Daniel
+>=20
 
-Phil.
+
+
+--Gdsnewjk3SIoIW55EUKLL588lnbjn5qAD--
+
+--LSRjVWTvjpyGh8EqBsR5FDOJlg4cZ38mp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71xKkACgkQ41TmuOI4
+ufjY7hAApwOS+szI1tqqJ7jJBL09+9RoBwJqgo7yfsLEu2IjkZeNiPdC22i9Klor
+bynOo5Ckv4ves0XZE3crynUlvQEzPaS9itRr58E0ukYQ8gUX3D17wgiKEHr0K9jp
+0Oh/pAW+VuSuz/nPnWTG5OzauA2a3ERqXwhH8oi4eDNbSGoJYr02AFP29g1J9yoC
+9ATHZGlfTe79X5ZT7rCwAkzDJl0IlKkl9muvbXJc56e7UXuZQjeGAMg0oj50elFY
+Clq/uNt42nQlEKnqv0KACRINcJjm9E54UIMOi/gVygBYZFs19GCstqg7KiXw7U2X
+OcFywj2tYSwyemsCYQv2WpFRfpk5Bba9SfMnC3wR0zwMmjBbaBNO8EAWepCiqlQr
+g2CTtv65W3r7jRhmMtNPwrLAJ1qSIRq4qZbCoDdgZRbDqMA1eRBZsFAw01rmNBjE
+shvQgEKLdqOtXhCZl6EyLHp1UETLtRhQVEmjrVYBdM+6wmaFwwlJVYQ/RL7gVr5e
+HPXE0lW2ebeQaDu6LsrpAOgZjeQOYs+6rP1iR+pVWzXvtFojvTYs6AV8J1GD2Lzv
+4XkaLAQP+c3Hx+w1B3kzqo0+wFtgd2xz9P8Sahtjm1JSzwZztLv1G/F1WchCpWHI
+CT/hmfaTtpeNW/lwFbAFVYJpELahKmkLFvSfyhIPjr5RnD6VvF8=
+=Bms6
+-----END PGP SIGNATURE-----
+
+--LSRjVWTvjpyGh8EqBsR5FDOJlg4cZ38mp--
+
 
