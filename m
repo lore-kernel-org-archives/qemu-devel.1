@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F5AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CD2C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 907EF2088E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1840208C7
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 21:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="s12u75hy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 907EF2088E
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="B15W5z+e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1840208C7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jow6R-00080u-Pi
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:41:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49544)
+	id 1jow6b-00089D-6R
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 17:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jow5P-0006jU-QJ
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:40:39 -0400
+ id 1jow5S-0006mG-3K
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:40:42 -0400
 Received: from mail-db8eur05on2124.outbound.protection.outlook.com
  ([40.107.20.124]:39136 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jow5O-0004FJ-5B
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:40:39 -0400
+ id 1jow5Q-0004FJ-1s
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 17:40:41 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mvsd//ieVzB69oeAq602H7yxWa2bMqsK6KWAMxho7AnJW0yTlxAuxZ72l+tk1yeV+f4XF7Z+expmr4sVuc/uM6jFDTu0DAif7Mbn1Zwavt7LFvjibXjAJ8s/+nRXurnlEufY21Rf/7ipVYbPkxDu69cow4gpjtqIL5Wr4lX1q6Q1o+uktMyIVPSq3CBXbzbCfXqGVT6S0Vv9dRyysvFv3Y2+ROrXvoo/I90Frs96C+yOAPnJfDaApJ8E36lJ/PTf/YaWwM5LbM2xMmF+Euds/YMEBMbNVQqU8P1eWv28ywXaGQ0prb6Xjp0gOPoY4SlnWSkuDjjkVk7k1bupwhFmbQ==
+ b=DsvthOMAidyZxPd4G/1xPPET03BbgNsTwSlmKjqQByX9cHvYhuJ4bO19u8K2tAQvipOfTpUNHye6l362N3zNY/d05GAjshPERlPoMOSoraMFM99zvD0MJxLkiyvD/OiuO/yPbbfAo4BEcO4MKSPSCh3C/Ur3uF7nZYRGIpjs0qgs0CCBOvRXGcw/84MDNB2WqdjZRrEgLAsmefDKwhfrLj8rx+W2ic8JGhvcKa4Qno6JbPwrn2+M+pBYAx5QizdAKDChlR22VmmpROlwVsI/MJBwa+vbsZTSZzMoocET3gEldTxg6yoC4OC6ypsv36ZPPSupPDmStJ/7dmFczOZVmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MsZzd8qdifyi1SBubYzCR5kC4yvuuYIuX7CUtsNn2Tc=;
- b=AQYGAg66srFlBuXngd1I6su/EyEkNEvMALIAWZyzG37r0mm1MPLOnblVeK1LueWtkeTx9CPrBFPH41r8uC8bRlbvLIunz3YxuJSZbYECi2EBzl+SGVc5+Dj6Uv+KpRMJ2mE00PR0lpQm5VIvPBNm1Lg8WJ2V8+QuRbOMiWrcTOOtfT7dZGftq5KbxxzfXfOiW+HCIzskEOu6oDYh/6/JrsDaLpYEN5sOzZs6UqClDRLDd8CYfOf3X6UQ93GvjYdU60rF3LiiEoFVf4oqmc3tmvPq8dCLIDUnZmHbA6C8jgBX86gDR+sRk01VLYSAE8Y6fH6FPjCxZEjQkI3sxRwnFQ==
+ bh=gS6+bJznuhZnLeLbDo/lo5JjYfjmHeP3FECNDOcTNUA=;
+ b=BHdUVCfDrxaNHaQA5gbKTWMNJa7WW0BdbvBhGfQAkQEKfWKAbYyk8AOe/Jb1U+DCQ5kYt53Rqyh4kvLX4c5v4yGxdsdUJ/LW0BbS6feKUxlVYzTSp1h99/F0fLSEcGfwP6D/I0NbrsSbChoS+ulw99j3raMoKjSKUB/OI4ZLwTbYH6SWzGBoO2sC91JOyAPhDDGbOB5uqeD7OjMMuTzB5YBn1ypEPZAxH/GoXvuEiO7v3hgxsKDNqgUlL5nLBBaeDpe5iauewhZeVq/uq9WooVzicr3SVhzL5jkw3JokIW9gcv9jEroy2Dkwp3Q6KozFWMTr/xBqpW7f5iBkY6dGqg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
  dkim=pass header.d=syrmia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MsZzd8qdifyi1SBubYzCR5kC4yvuuYIuX7CUtsNn2Tc=;
- b=s12u75hyhUjhPJtz4GKc2ACIcn0aNA0PCSsrIfFBXUqAM4DnxD2cKl4U2vnNOGCtTEMyH5O0a+OqB73W12IYu0qAg8s1QCd+95GW4IEtAvDQFDylb5oB+kEjVULFc8kHHiROEoCWR3WmipyDpwAtWvoe+Vsl5/oRW0XR5vAiv7U=
+ bh=gS6+bJznuhZnLeLbDo/lo5JjYfjmHeP3FECNDOcTNUA=;
+ b=B15W5z+eaOUrMzWsEe8AvOAcsO8ZVdfTChLIxr7SyCw4w/BJiG6Pg6/2qq2Hi0pVh6Uoax/T2bxzTZD1xlbmTRmJCIwpJQBW/varopjqhv3pu8UKlcS+IJpEHufNWljl7vsLGlxIRS5tYGZlv88jPfqUxcXwbX5CXR9XYLda4h8=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
 Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
@@ -63,10 +63,10 @@ Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
  21:39:59 +0000
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] linux-user: Add strace support for printing arguments of
- syscalls used to lock and unlock memory
-Date: Fri, 26 Jun 2020 23:39:36 +0200
-Message-Id: <20200626213937.20333-3-Filip.Bozuta@syrmia.com>
+Subject: [PATCH 3/3] linux-user: Add strace support for printing arguments of
+ some clock and time functions
+Date: Fri, 26 Jun 2020 23:39:37 +0200
+Message-Id: <20200626213937.20333-4-Filip.Bozuta@syrmia.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200626213937.20333-1-Filip.Bozuta@syrmia.com>
 References: <20200626213937.20333-1-Filip.Bozuta@syrmia.com>
@@ -79,33 +79,33 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost.localdomain (147.91.217.240) by
  ZR0P278CA0044.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1d::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3131.20 via Frontend Transport; Fri, 26 Jun 2020 21:39:58 +0000
+ 15.20.3131.20 via Frontend Transport; Fri, 26 Jun 2020 21:39:59 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [147.91.217.240]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bf9dca0d-cd9c-4320-de28-08d81a197992
+X-MS-Office365-Filtering-Correlation-Id: bcfa21a9-e82c-49a3-2130-08d81a197a01
 X-MS-TrafficTypeDiagnostic: AM6PR03MB5234:
-X-Microsoft-Antispam-PRVS: <AM6PR03MB52345C5A306EFF8ACE94AC92EB930@AM6PR03MB5234.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1751;
+X-Microsoft-Antispam-PRVS: <AM6PR03MB52346295CD09E9ADED7F46A8EB930@AM6PR03MB5234.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
 X-Forefront-PRVS: 0446F0FCE1
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ppT8pMXd/U6iCnAD0OG/zr3LD8+Vkk9a8SX8V32KEVWXxQd9iaB0m0ph10H7rHtMnI11h/FNcSdwrk/atpkAoqMF3OQutUgBJG5u6VLuYASCzKc4C5RVecxNokuLfDvnKJ0zvl94LS1mRdfd2VYL5J+sB1Xcr3gGcREeIlbJb/PAXssVa225p8qLA+HWABxDTENZJ3unDzz5IP8UDc43DB3YMFxNYlRcpV6lD63wqVXWxu/Is4z1RKt1SgJquPnaXjrECzh0IbJnPyAVwq7fo4nMpN1abHvW2ZzU+wQKTQCmptjudS1dmE2Zv4t0AcfKi3Bz7fDzKbLCyULJhzT6LpsPtExgxJlDdDy84Vbtj4qs55GXu07VB/OGhwvWoEBPc/Ey71TN6dMHLZmMsmafgg14ntq34w/ffzCj8u0NetSa3L7yP8fQR1ZfTtBfW/K0F2FvQzeqlFkjtcupxLXYGKrAzi9D+Q5CEXbuLweNSIM=
+X-Microsoft-Antispam-Message-Info: BgAIybkNR9LavtnFMOEuSACavGViY52Mlwqknbset3KzqSOf/ntso+R/qFQe3EK/nuLcqqooFpXKZzI0KyMu4ggNGeHejbzmMUrx4waAT1Kx1Je+u8gaYxM6UOKAmyvnbt4HoDIyc5/FJoTz4f0frw7UWVaZ/ovFJkXKIrwL9g7afsTPtAFGaTw4OsmmLm4UfEIYozP731+ukOwSJ+SL8l+48Vf7TVA2jA4/G3+aJsYbhfx2lhn6VOcN+V0qJymcJgagRmcXXxPLQ0T7W2sZ1dugWRmytVxTOQogWfeNg4b/qtkTykpUGVgNSeCHUJqfP7P6+eLgKyiUkk77i8LKTSQKxKgKpIRrJobpoq4HO6NXfjy5/3TedjNIuIXSW7MtTsIhDypDTpc7u1rBNbj6hklTXlKKg8DiuA2UKxrBhXM95f/BkHUsA3nmRfbthL0p9SPG1tM4x8l4omukEPFhHw==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(39830400003)(376002)(346002)(396003)(136003)(366004)(4326008)(6666004)(6506007)(1076003)(508600001)(83380400001)(966005)(86362001)(6512007)(16526019)(186003)(6486002)(52116002)(316002)(6916009)(36756003)(2906002)(66476007)(66946007)(69590400007)(66556008)(8936002)(26005)(5660300002)(8676002)(2616005)(956004)(21314003);
+ SFS:(39830400003)(376002)(346002)(396003)(136003)(366004)(4326008)(6666004)(6506007)(1076003)(508600001)(83380400001)(966005)(86362001)(6512007)(30864003)(16526019)(186003)(6486002)(52116002)(316002)(6916009)(36756003)(2906002)(66476007)(66946007)(69590400007)(66556008)(8936002)(26005)(5660300002)(8676002)(2616005)(956004);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: lHtdsj4C4Njl1kYrXFp30yUUkOMLbMXydwLqDpEW2Q9zk8UVAXfW0FRM5pPjGSee+TbcaDABgB8t2MvcyiuenYzKzDHD3kBApjAFFLmGGSNF5PU0Mnn9+nU3M9JdJlwk9M1l/cPpF5mvGc5HhuYDzS1wGNl3knrCJ0LMf8KHP+65g6GDOhOtX1EH+f0JVcakpzoSnTOnWwwdoHIQwiJjORRK8gSbrZh7frL3KwNOmxeN4+V5acWBrn2fHiWkTe2CLJthYjqZIb4OmUVDky/TkZnl9FTaiedPfrzDUWv4uJ5aVhprDREPvj3TiVuKF0cP45Kw/mSC5wrnBXwrPTC9tPF0Tpk9IgBE4R1EcJYI3uyx3vAUiLxGrQmEMUu9FeSqlc9UHrj7laI5jkHVZSeo3aEd6oF3KPHEuMqaFTsb++GzQOJYr9+uCpHnqj1VFGNIkjYUy68Hlc4sam7ZalSSHi78mAUp0t2XwsTCgWun0Ws=
+X-MS-Exchange-AntiSpam-MessageData: pjSQ5w13IKhswtnYp7zmFe+2zTjTQ22cDeExvJR1E2eHOmj9QWkyG4Q1iwiALZJhiAXTrdgp3s62+AUVz4EpccCgRhRfJ4H0CRlyt+dsag3MJdWXVECPeqcmDJR88DtGNNFFd7jWWZrUlilcIuYW4xIvfJevcGYfPba1K0J3mVNeVvDtlomHPe4aDVcgcRzbfp9cwbOsxKxz9wmH2bZzNooAFOzUFr9NQx99wmJxmYahQwEICPRcg9EmwSSYVvzrnztqHk0V2iUpxXW2oaCwfE0ORbVc6hZLJ69Tju2VHcPPpmuC4tRgpsuf/EdAiVF03VShrBd5F9szYmXMQ9Tp+fXRCPSp6/n/00tJ081F64jU4wPAIe26NRfYcKHrfeLowX19LCoFA3J3f09FOBC/dWMd2sKYAWc2t7b1uLNE7TM7AMujo23YUNqHUQzuzw65FNKFrpCIUUTIA+RQPqXmcp7BpwbxsC8INC/imEVffJ8=
 X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf9dca0d-cd9c-4320-de28-08d81a197992
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcfa21a9-e82c-49a3-2130-08d81a197a01
 X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2020 21:39:59.1086 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2020 21:39:59.8832 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sT1sSVMc3fQNmlgEiwdINMpY1krHgTsTpHDmmKU+4iPP3UAFpG6flJ26jfiTTZWSBGVXCq78w4oxGCoDXtEJfw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: aoNZeourPGBC0irvwCPxIhnuvdHEAgdIlTS2Xoj6BKPcfeYQV8fP6AsAlOVPRfWc3LijzlljVS8JH2C4xyH5gQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB5234
 Received-SPF: pass client-ip=40.107.20.124;
  envelope-from=Filip.Bozuta@syrmia.com;
@@ -139,106 +139,341 @@ Sender: "Qemu-devel"
 
 This patch implements strace argument printing functionality for following syscalls:
 
-    * mlock, munlock, mlockall, munlockall - lock and unlock memory
+    * clock_getres, clock_gettime, clock_settime - clock and time functions
 
-       int mlock(const void *addr, size_t len)
-       int munlock(const void *addr, size_t len)
-       int mlockall(int flags)
-       int munlockall(void)
-       man page: https://man7.org/linux/man-pages/man2/mlock.2.html
+        int clock_getres(clockid_t clockid, struct timespec *res)
+        int clock_gettime(clockid_t clockid, struct timespec *tp)
+        int clock_settime(clockid_t clockid, const struct timespec *tp)
+        man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
+
+    * gettimeofday - get time
+
+        int gettimeofday(struct timeval *tv, struct timezone *tz)
+        man page: https://man7.org/linux/man-pages/man2/gettimeofday.2.html
+
+    * getitimer, setitimer - get or set value of an interval timer
+
+        int getitimer(int which, struct itimerval *curr_value)
+        int setitimer(int which, const struct itimerval *new_value,
+                      struct itimerval *old_value)
+        man page: https://man7.org/linux/man-pages/man2/getitimer.2.html
 
 Implementation notes:
 
-    Syscall mlockall() takes an argument that is composed of predefined values
-    which represent flags that determine the type of locking operation that is
-    to be performed. For that reason, a printing function "print_mlockall" was
-    stated in file "strace.list". This printing function uses an already existing
-    function "print_flags()" to print the "flags" argument.  These flags are stated
-    inside an array "mlockall_flags" that contains values of type "struct flags".
-    These values are instantiated using an existing macro "FLAG_GENERIC()".
-    The other syscalls have only primitive argument types, so the
-    rest of the implementation was handled by stating an appropriate
-    printing format in file "strace.list". Syscall mlock2() is not implemented in
-    "syscall.c" and thus it's argument printing is not implemented in this patch.
+    All of the syscalls have some structue types as argument types and thus
+    a separate printing function was stated in file "strace.list" for each
+    of them. All of these functions use existing functions for their
+    appropriate structure types ("print_timeval()" and "print_timezone()").
+    Functions "print_timespec()" and "print_itimerval()" were added in this
+    patch so that they can be used to print types "struct timespec" and
+    "struct itimerval" used by some of the syscalls. Function "print_itimerval()"
+    uses the existing function "print_timeval()" to print fields of the
+    structure "struct itimerval" that are of type "struct timeval".
+    Also, the existing function "print_timeval()" was changed a little so
+    that it prints the field names beside the values. Syscalls "clock_getres()"
+    and "clocK_gettime()" have the same number and types of arguments and
+    thus their print functions "print_clock_getres" and "print_clock_gettime"
+    shate a common definition in file "strace.c".
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 ---
- linux-user/strace.c    | 21 +++++++++++++++++++++
- linux-user/strace.list |  8 ++++----
- 2 files changed, 25 insertions(+), 4 deletions(-)
+ linux-user/strace.c    | 186 ++++++++++++++++++++++++++++++++++++++++-
+ linux-user/strace.list |  16 ++--
+ 2 files changed, 194 insertions(+), 8 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index dccfbc46e9..1fc4404310 100644
+index 1fc4404310..414748d0fa 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1161,6 +1161,15 @@ UNUSED static struct flags falloc_flags[] = {
- #endif
- };
- 
-+UNUSED static struct flags mlockall_flags[] = {
-+    FLAG_GENERIC(MCL_CURRENT),
-+    FLAG_GENERIC(MCL_FUTURE),
-+#ifdef MCL_ONFAULT
-+    FLAG_GENERIC(MCL_ONFAULT),
-+#endif
-+    FLAG_END,
-+};
-+
- /*
-  * print_xxx utility functions.  These are used to print syscall
-  * parameters in certain format.  All of these have parameter
-@@ -1939,6 +1948,18 @@ print_truncate(const struct syscallname *name,
- #define print_truncate64     print_truncate
+@@ -64,7 +64,9 @@ UNUSED static void print_string(abi_long, int);
+ UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+ UNUSED static void print_raw_param(const char *, abi_long, int);
+ UNUSED static void print_timeval(abi_ulong, int);
++UNUSED static void print_timespec(abi_ulong, int);
+ UNUSED static void print_timezone(abi_ulong, int);
++UNUSED static void print_itimerval(abi_ulong, int);
+ UNUSED static void print_number(abi_long, int);
+ UNUSED static void print_signal(abi_ulong, int);
+ UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+@@ -833,6 +835,65 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret,
+ }
  #endif
  
-+#ifdef TARGET_NR_mlockall
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
 +static void
-+print_mlockall(const struct syscallname *name,
++print_syscall_ret_clock_gettime(const struct syscallname *name, abi_long ret,
++                                abi_long arg0, abi_long arg1, abi_long arg2,
++                                abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_err(ret);
++
++    if (ret >= 0) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timespec(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#define print_syscall_ret_clock_getres     print_syscall_ret_clock_gettime
++#endif
++
++#ifdef TARGET_NR_gettimeofday
++static void
++print_syscall_ret_gettimeofday(const struct syscallname *name, abi_long ret,
++                               abi_long arg0, abi_long arg1, abi_long arg2,
++                               abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_err(ret);
++
++    if (ret >= 0) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timeval(arg0, 0);
++        print_timezone(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_syscall_ret_getitimer(const struct syscallname *name, abi_long ret,
++                            abi_long arg0, abi_long arg1, abi_long arg2,
++                            abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_err(ret);
++
++    if (ret >= 0) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_itimerval(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
+ #if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+  || defined(TARGGET_NR_flistxattr)
+ static void
+@@ -1371,13 +1432,34 @@ print_timeval(abi_ulong tv_addr, int last)
+             print_pointer(tv_addr, last);
+             return;
+         }
+-        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
+-            tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_usec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
+         unlock_user(tv, tv_addr, 0);
+     } else
+         qemu_log("NULL%s", get_comma(last));
+ }
+ 
++static void
++print_timespec(abi_ulong ts_addr, int last)
++{
++    if (ts_addr) {
++        struct target_timespec *ts;
++
++        ts = lock_user(VERIFY_READ, ts_addr, sizeof(*ts), 1);
++        if (!ts) {
++            print_pointer(ts_addr, last);
++            return;
++        }
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_nsec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(ts->tv_sec), tswapal(ts->tv_nsec), get_comma(last));
++        unlock_user(ts, ts_addr, 0);
++    } else {
++        qemu_log("NULL%s", get_comma(last));
++    }
++}
++
+ static void
+ print_timezone(abi_ulong tz_addr, int last)
+ {
+@@ -1397,6 +1479,21 @@ print_timezone(abi_ulong tz_addr, int last)
+     }
+ }
+ 
++static void
++print_itimerval(abi_ulong it_addr, int last)
++{
++    if (it_addr) {
++        qemu_log("{it_interval=");
++        print_timeval(it_addr, 0);
++        qemu_log("it_value=");
++        print_timeval(it_addr +
++                      offsetof(struct target_itimerval, it_value), 1);
++        qemu_log("}%s", get_comma(last));
++    } else {
++        qemu_log("NULL%s", get_comma(last));
++    }
++}
++
+ #undef UNUSED
+ 
+ #ifdef TARGET_NR_accept
+@@ -1839,6 +1936,19 @@ print_futimesat(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_gettimeofday
++static void
++print_gettimeofday(const struct syscallname *name,
 +    abi_long arg0, abi_long arg1, abi_long arg2,
 +    abi_long arg3, abi_long arg4, abi_long arg5)
 +{
 +    print_syscall_prologue(name);
-+    print_flags(mlockall_flags, arg0, 1);
++    print_pointer(arg0, 0);
++    print_pointer(arg1, 1);
 +    print_syscall_epilogue(name);
 +}
 +#endif
 +
- #if defined(TARGET_NR_socket)
+ #ifdef TARGET_NR_settimeofday
  static void
- print_socket(const struct syscallname *name,
+ print_settimeofday(const struct syscallname *name,
+@@ -1852,6 +1962,78 @@ print_settimeofday(const struct syscallname *name,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
++static void
++print_clock_gettime(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_clockid(arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#define print_clock_getres     print_clock_gettime
++#endif
++
++#ifdef TARGET_NR_clock_settime
++static void
++print_clock_settime(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_clockid(arg0, 0);
++    print_timespec(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_getitimer(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    switch (arg0) {
++    case ITIMER_REAL:
++        qemu_log("ITIMER_REAL,"); break;
++    case ITIMER_VIRTUAL:
++        qemu_log("ITIMER_VIRTUAL,"); break;
++    case ITIMER_PROF:
++        qemu_log("ITIMER_PROF,"); break;
++    default:
++        print_raw_param("%#x", arg1, 0);
++    }
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_setitimer
++static void
++print_setitimer(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    switch (arg0) {
++    case ITIMER_REAL:
++        qemu_log("ITIMER_REAL,"); break;
++    case ITIMER_VIRTUAL:
++        qemu_log("ITIMER_VIRTUAL,"); break;
++    case ITIMER_PROF:
++        qemu_log("ITIMER_PROF,"); break;
++    default:
++        print_raw_param("%#x", arg1, 0);
++    }
++    print_itimerval(arg1, 0);
++    print_itimerval(arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #ifdef TARGET_NR_link
+ static void
+ print_link(const struct syscallname *name,
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 3b77b22daf..822b6be49c 100644
+index 822b6be49c..6b5cef149f 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -567,13 +567,13 @@
- { TARGET_NR_mknodat, "mknodat" , NULL, print_mknodat, NULL },
+@@ -83,16 +83,18 @@
+ { TARGET_NR_clock_adjtime, "clock_adjtime" , NULL, print_clock_adjtime, NULL },
  #endif
- #ifdef TARGET_NR_mlock
--{ TARGET_NR_mlock, "mlock" , NULL, NULL, NULL },
-+{ TARGET_NR_mlock, "mlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
+ #ifdef TARGET_NR_clock_getres
+-{ TARGET_NR_clock_getres, "clock_getres" , NULL, NULL, NULL },
++{ TARGET_NR_clock_getres, "clock_getres" , NULL, print_clock_getres,
++                          print_syscall_ret_clock_getres },
  #endif
- #ifdef TARGET_NR_mlock2
- { TARGET_NR_mlock2, "mlock2" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_clock_gettime
+-{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, print_clock_gettime,
++                           print_syscall_ret_clock_gettime },
  #endif
- #ifdef TARGET_NR_mlockall
--{ TARGET_NR_mlockall, "mlockall" , NULL, NULL, NULL },
-+{ TARGET_NR_mlockall, "mlockall" , NULL, print_mlockall, NULL },
+ #ifdef TARGET_NR_clock_nanosleep
+ { TARGET_NR_clock_nanosleep, "clock_nanosleep" , NULL, NULL, NULL },
  #endif
- #ifdef TARGET_NR_mmap
- { TARGET_NR_mmap, "mmap" , NULL, print_mmap, print_syscall_ret_addr },
-@@ -636,10 +636,10 @@
- { TARGET_NR_multiplexer, "multiplexer" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_clock_settime
+-{ TARGET_NR_clock_settime, "clock_settime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_settime, "clock_settime" , NULL, print_clock_settime, NULL },
  #endif
- #ifdef TARGET_NR_munlock
--{ TARGET_NR_munlock, "munlock" , NULL, NULL, NULL },
-+{ TARGET_NR_munlock, "munlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
+ #ifdef TARGET_NR_clone
+ { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
+@@ -315,7 +317,8 @@
+ { TARGET_NR_gethostname, "gethostname" , NULL, NULL, NULL },
  #endif
- #ifdef TARGET_NR_munlockall
--{ TARGET_NR_munlockall, "munlockall" , NULL, NULL, NULL },
-+{ TARGET_NR_munlockall, "munlockall" , "%s()", NULL, NULL },
+ #ifdef TARGET_NR_getitimer
+-{ TARGET_NR_getitimer, "getitimer" , NULL, NULL, NULL },
++{ TARGET_NR_getitimer, "getitimer" , NULL, print_getitimer,
++                       print_syscall_ret_getitimer },
  #endif
- #ifdef TARGET_NR_munmap
- { TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
+ #ifdef TARGET_NR_get_kernel_syms
+ { TARGET_NR_get_kernel_syms, "get_kernel_syms" , NULL, NULL, NULL },
+@@ -388,7 +391,8 @@
+ { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettimeofday
+-{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
++{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday,
++                          print_syscall_ret_gettimeofday },
+ #endif
+ #ifdef TARGET_NR_getuid
+ { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+@@ -1290,7 +1294,7 @@
+ { TARGET_NR_sethostname, "sethostname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setitimer
+-{ TARGET_NR_setitimer, "setitimer" , NULL, NULL, NULL },
++{ TARGET_NR_setitimer, "setitimer" , NULL, print_setitimer, NULL },
+ #endif
+ #ifdef TARGET_NR_set_mempolicy
+ { TARGET_NR_set_mempolicy, "set_mempolicy" , NULL, NULL, NULL },
 -- 
 2.17.1
 
