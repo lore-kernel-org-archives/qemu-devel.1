@@ -2,92 +2,85 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB1CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74618C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 674B6206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:50:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40355206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 16:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qUcy4cqt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 674B6206A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2npcwkr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40355206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jorYl-00020B-KZ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57268)
+	id 1jorZy-0004QD-BE
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 12:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorPC-0000KS-EF; Fri, 26 Jun 2020 12:40:46 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56252)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jorPA-0006B6-SJ; Fri, 26 Jun 2020 12:40:46 -0400
-Received: by mail-wm1-x344.google.com with SMTP id g75so9395491wme.5;
- Fri, 26 Jun 2020 09:40:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SzJVtg/giHuTkd+J8k/OisBdWsb/IiYZi9QRfQu2hmE=;
- b=qUcy4cqtqne5kCrHujtYaDS0JqPF7akUIfY5NMEGhplfmgRPYn1EgH+t9eWyG36bUV
- +DYCjheTjcWXI2WqHifYE4oEwfcKcUc4PdUaXn/vFjgk/60D/GLMLVtgZlfBfnqdkd91
- mkPGnJsJnvBMCBljdWZPWPX3lJobtxxEvosC3O+fefJWzadFr8TSy7BxotV9D4doQwLl
- IxlFFR7+7VN05o+9sN1WDrzJr8vHeruRWFFX0fAAnmLWqv/UzT56p3IQ1YiZQeK5QdaN
- buHqt+hMqw1zYCYv5WO94rfnmxQelv/OGMg5ifqUdV5haAbEg76pnCv6M6FPd+lqn0vM
- ECYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=SzJVtg/giHuTkd+J8k/OisBdWsb/IiYZi9QRfQu2hmE=;
- b=SAHPv4Kos4jd0gXeJL9DVM+ovsS9ySvQA13K6Q+9CX56iPOL+YsN6TTRmsTz/cywLU
- eIHQt6N2cIm3XEDT+3TQkI4q5AR1PerN0OtLUchjna7jZoJoIE4TZNrCA/qFCjiudVzt
- Ob5u+GntR4gcc9KnrEoQ1vouEpl/4sS1UVYnPbpN9YvKsTJv+j2VzkU0GeLGAPQYIET1
- 5mpacoTki/vjzqHfW03TiNVlsgm01Ebz79e87PzTEfdyR2PqZJ9bayOOmiHe8WBdSJjT
- ey0USBHiYMPA+j96cbqN7pjBO0Ox6scP8BNdz7F6IB08kWp5uKSnoHvCSr2dtn8Rp8sv
- IBuw==
-X-Gm-Message-State: AOAM532UQgoPhrG/VwiVkjglI4Qy8PLFQhbXI7wfRGmejLrKBd3Ocqzd
- BAg0hphDGllpeWn0EvSV92XFKyOA
-X-Google-Smtp-Source: ABdhPJxNg58hLNwddX/dLsUrGVg5NJS0FI+TBoJZjE+u+tHe1wZN19TTn1cHt0ecEMSN2XiEuqAm+g==
-X-Received: by 2002:a1c:b182:: with SMTP id a124mr4120204wmf.114.1593189642944; 
- Fri, 26 Jun 2020 09:40:42 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id f12sm24623646wrw.53.2020.06.26.09.40.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 09:40:42 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jorSA-0006MH-7x
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:43:51 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31998
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jorS6-00071t-LE
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 12:43:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593189826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kUK4reOFVx7Y6uLGGUzuxOqez+MxH7/jHg5WH/q9hGI=;
+ b=D2npcwkr1q+vSYmX82wPBaeG+tkGGdF6LO+dc2fJ8lGfT9ILTU1ZMOVnXGrU7/OrIC/r9e
+ xsBB6HdPmArOvPMfRRHsSgJxg3bYvDXbjzJo9iMAG9YKUerAImpSAFRkpKmErUJPcvhm8e
+ teV1Dq5RXgDOWZFVuCby89tTLwwwYrA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-T-VK_PluMkiXUddw8QrRMw-1; Fri, 26 Jun 2020 12:43:42 -0400
+X-MC-Unique: T-VK_PluMkiXUddw8QrRMw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FEBF8064AE;
+ Fri, 26 Jun 2020 16:43:40 +0000 (UTC)
+Received: from turbo.com (ovpn-112-91.ams2.redhat.com [10.36.112.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DCC435C1BB;
+ Fri, 26 Jun 2020 16:43:28 +0000 (UTC)
+From: Christophe de Dinechin <dinechin@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 12/15] hw/sd/sdcard: Make iolen unsigned
-Date: Fri, 26 Jun 2020 18:40:23 +0200
-Message-Id: <20200626164026.766-13-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200626164026.766-1-f4bug@amsat.org>
-References: <20200626164026.766-1-f4bug@amsat.org>
+Subject: [PATCH 04/10] spice: Move all the spice-related code in spice-app.so
+Date: Fri, 26 Jun 2020 18:43:01 +0200
+Message-Id: <20200626164307.3327380-5-dinechin@redhat.com>
+In-Reply-To: <20200626164307.3327380-1-dinechin@redhat.com>
+References: <20200626164307.3327380-1-dinechin@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dinechin@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,52 +93,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+If we want to build spice as a separately loadable module, we need to
+put all the spice code in one loadable module, because the build
+system does not know how to deal with dependencies yet.
 
-I/O request length can not be negative.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
 ---
-v4: Use uint32_t (pm215)
----
- hw/sd/sd.c         | 2 +-
- hw/sd/trace-events | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ audio/Makefile.objs   | 2 +-
+ chardev/Makefile.objs | 3 +--
+ ui/Makefile.objs      | 8 ++++----
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 486538afc2..dc005e4d91 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1967,7 +1967,7 @@ uint8_t sd_read_data(SDState *sd)
- {
-     /* TODO: Append CRCs */
-     uint8_t ret;
--    int io_len;
-+    uint32_t io_len;
+diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+index b4a4c11f31..298c895ff5 100644
+--- a/audio/Makefile.objs
++++ b/audio/Makefile.objs
+@@ -1,5 +1,5 @@
+ common-obj-y = audio.o audio_legacy.o noaudio.o wavaudio.o mixeng.o
+-common-obj-$(CONFIG_SPICE) += spiceaudio.o
++spice-app.mo-objs += ../audio/spiceaudio.o
+ common-obj-$(CONFIG_AUDIO_COREAUDIO) += coreaudio.o
+ common-obj-$(CONFIG_AUDIO_DSOUND) += dsoundaudio.o
+ common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index fc9910d4f2..955fac0cf9 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -22,5 +22,4 @@ common-obj-$(CONFIG_BRLAPI) += baum.o
+ baum.o-cflags := $(SDL_CFLAGS)
+ baum.o-libs := $(BRLAPI_LIBS)
  
-     if (!sd->blk || !blk_is_inserted(sd->blk) || !sd->enable)
-         return 0x00;
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 5f09d32eb2..d0cd7c6ec4 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -52,7 +52,7 @@ sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
--sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, int length) "%s %20s/ CMD%02d len %d"
-+sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint32_t length) "%s %20s/ CMD%02d len %" PRIu32
- sdcard_set_voltage(uint16_t millivolts) "%u mV"
+-common-obj-$(CONFIG_SPICE) += spice.mo
+-spice.mo-objs := spice.o
++spice-app.mo-objs += ../chardev/spice.o
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index 504b196479..1ab515e23d 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -11,7 +11,6 @@ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+ common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
+ common-obj-y += input-barrier.o
+ common-obj-$(CONFIG_LINUX) += input-linux.o
+-common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
+ common-obj-$(CONFIG_COCOA) += cocoa.o
+ common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
+ common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
+@@ -53,10 +52,11 @@ curses.mo-objs := curses.o
+ curses.mo-cflags := $(CURSES_CFLAGS) $(ICONV_CFLAGS)
+ curses.mo-libs := $(CURSES_LIBS) $(ICONV_LIBS)
  
- # milkymist-memcard.c
+-ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),yy)
+-common-obj-$(if $(CONFIG_MODULES),m,y) += spice-app.mo
++common-obj-$(CONFIG_SPICE) += spice-app.mo
++spice-app.mo-objs += spice-core.o spice-input.o spice-display.o
++ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),ym)
++spice-app.mo-objs += spice-app.o
+ endif
+-spice-app.mo-objs := spice-app.o
+ spice-app.mo-cflags := $(GIO_CFLAGS)
+ spice-app.mo-libs := $(GIO_LIBS)
+ 
 -- 
-2.21.3
+2.26.2
 
 
