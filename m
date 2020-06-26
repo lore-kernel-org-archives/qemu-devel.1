@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 597D6C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D243C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 266F9207D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:36:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DE6720706
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tKorKVU8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266F9207D8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W68PDnB8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE6720706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqOu-00066d-72
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:36:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36060)
+	id 1joqP5-0006YO-KJ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:36:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4T-00034p-2H
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:17 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43493)
+ id 1joq4C-0002dD-19
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:00 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:41706)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4Q-0006dk-CI
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:16 -0400
-Received: by mail-wr1-x430.google.com with SMTP id j4so7405633wrp.10
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:13 -0700 (PDT)
+ id 1joq4A-0006Tr-8j
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:14:59 -0400
+Received: by mail-wr1-x430.google.com with SMTP id h15so9845550wrq.8
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:14:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=1+yw7gLXFotUGKxyde64a0l3p9IplpBYXObf7vT1zi4=;
- b=tKorKVU83T6sHgD7Hh3Bn3J5ucrGIcFELiwZ+k9Ll40i0AtZs61S57T4/lme+F6ciJ
- GA3+1zKMtgrs4ZLBAlgVdZypxodEUDtEUPGEYRZ47TPFlCUIle1IQq8EKlH9gXrgoB4r
- /CEJsXzK5zQA9rlDYbiaoTNWw9L4XqPmJRATRQcn6D+Sjv9+X4di6AYKiqw8CkKQSxKU
- KLIE4PbXYCSMyObb59VS0ltav7jvCO9BA/vaBXcopu6cD/ypeha49fRdnEApM5EMW2aq
- W2cQ5+bj4r471Did5A4lJ7puwYgslgoGgSjcqmdmztx4BpAy3viH6jeHolqZimsK4Qno
- Yi4w==
+ bh=Z3WhPCSbc/ErEx8VXjma/l1Goh9ApGA8m0ZTZ011C2o=;
+ b=W68PDnB8XVh76ZTvt739lPw4floRS3q6OJisncP8jyctXY8j8DFijsJZuIiTlbedwZ
+ IyPr/HH6x+ndy2jJanf+Vzc1opzPW9N6bDN3STJvHyzAXkQo6IlnQk3anHLY+Bet8g4s
+ FvrR6UFUE3yVwBBlZILutSXrL8uUBkZ5o6Mhe5+/5V+d+Oa3h9R5MjS+nzVysBQoxWI4
+ zpS9LYnxgv2OdYBXirx3CVf3S+xArStEL+fdnDem01su/JQZzLpkfD5E4MMCIMQm8k90
+ k9LKbU1wBYcm53sIYcqD2YZAZ+IW5VtIeuvzQ41U3HEisUbjZH59ukY1m31ht2m1D+h7
+ +UPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1+yw7gLXFotUGKxyde64a0l3p9IplpBYXObf7vT1zi4=;
- b=T0jlw/Eykj9oUFkifZANbtbvvdP4P6vXeCVMKNKhirp211FIedkYOZWsBeqGk4qTTh
- ttfxaQmNDMBJufewWoVafOo02XZP0LXBKO5EjKLyeE0rU9VoKetABGBVkb2xV/+/4JON
- E5yUtFm+R9WJmVXI4o7iF/ld7TbLmoLFylrDEMMeaRUrvR4CmTrrH+36LHDB+3/jx5IH
- q27itPDVOM+tqAaXVTpALkPJ3whHj20j2NzrGlTGilcgDGyNDAiSZVO4+K7PcqD4faWi
- Mjjm1+r/eIedoi21dLjRrgwSm5p3OMIE4LAoUJVTYsS+DW/cPjFKUqZz0kc/NoKz4qXP
- J9wQ==
-X-Gm-Message-State: AOAM533POeIxzjGSDMLTKbdNKfGqKl9hWX+wYDyQnBZQcB2bN/Bk+lk2
- ntdg5UtY7K8JWNUD0vLXAvC9ZqEe66pKZQ==
-X-Google-Smtp-Source: ABdhPJxcJUdKApYurMW05vGnvoGRNQxmBR5dKSkKZ7XtZuiWIqsxrFz1I6L3sRJwNr3+/GuYYNspVA==
-X-Received: by 2002:adf:de01:: with SMTP id b1mr4162914wrm.305.1593184511540; 
- Fri, 26 Jun 2020 08:15:11 -0700 (PDT)
+ bh=Z3WhPCSbc/ErEx8VXjma/l1Goh9ApGA8m0ZTZ011C2o=;
+ b=QlZsNAIfJ+9TJ+sEfyYG8O+ZlF2Zxgovj+/M8LJwKnvO8XgILEp3uVMXSIHBTqNnx5
+ 3dESgnYEp3NX5LmCcJdBOTOHBlsOurXjs358TfFUbfhL7oMguVFI89Sem4Bx6rdlnDiI
+ L99mfb9qziRhzgLebH8MHq3xJbslzH5jE65pUoOgFRGZA2jX1XTVdRSeroTL3m16xbau
+ gFIGHXoOdSrSyv5eNde1qug/KpukUC1eh3a/wVeAxYnP6OD1Nu/9CR36oztE/5mczbVl
+ cVSjq0374BrHCu6wouLy+IJoBPGf9HHu3Rx3jqYRhNuH+pMo8J98nWP510HJLGCzQGEZ
+ VOEQ==
+X-Gm-Message-State: AOAM533WXmLZROOrT9i5/1QX+25UN1VosuEv3MUjgbr+hqLR7JUnm00x
+ IWiA2RgMplvCgPqSwS8PUoWxpyE/lNL1yA==
+X-Google-Smtp-Source: ABdhPJyCfH1h7MiNl3v11mrX2M1bI4MnFYhs6eC+lnpBwBflCA9qUclwaKOqLL8MQfZhtSL6C8YV0A==
+X-Received: by 2002:adf:8067:: with SMTP id 94mr4093422wrk.427.1593184496559; 
+ Fri, 26 Jun 2020 08:14:56 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.10
+ by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.14.55
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:15:10 -0700 (PDT)
+ Fri, 26 Jun 2020 08:14:55 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 38/57] target/arm: Implement helper_mte_checkN
-Date: Fri, 26 Jun 2020 16:14:05 +0100
-Message-Id: <20200626151424.30117-39-peter.maydell@linaro.org>
+Subject: [PULL 26/57] target/arm: Define arm_cpu_do_unaligned_access for
+ user-only
+Date: Fri, 26 Jun 2020 16:13:53 +0100
+Message-Id: <20200626151424.30117-27-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
 References: <20200626151424.30117-1-peter.maydell@linaro.org>
@@ -106,206 +107,58 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Fill out the stub that was added earlier.
+Use the same code as system mode, so that we generate the same
+exception + syndrome for the unaligned access.
+
+For the moment, if MTE is enabled so that this path is reachable,
+this would generate a SIGSEGV in the user-only cpu_loop.  Decoding
+the syndrome to produce the proper SIGBUS will be done later.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-27-richard.henderson@linaro.org
+Message-id: 20200626033144.790098-15-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h  |   2 +
- target/arm/mte_helper.c | 165 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 166 insertions(+), 1 deletion(-)
+ target/arm/cpu.c        | 2 +-
+ target/arm/tlb_helper.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 807830cc400..c763a23dfba 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1321,6 +1321,8 @@ FIELD(MTEDESC, TSIZE, 14, 10)  /* mte_checkN only */
- bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr);
- uint64_t mte_check1(CPUARMState *env, uint32_t desc,
-                     uint64_t ptr, uintptr_t ra);
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc,
-+                    uint64_t ptr, uintptr_t ra);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e44e18062cf..d9b8ec791ed 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2169,8 +2169,8 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+     cc->tlb_fill = arm_cpu_tlb_fill;
+     cc->debug_excp_handler = arm_debug_excp_handler;
+     cc->debug_check_watchpoint = arm_debug_check_watchpoint;
+-#if !defined(CONFIG_USER_ONLY)
+     cc->do_unaligned_access = arm_cpu_do_unaligned_access;
++#if !defined(CONFIG_USER_ONLY)
+     cc->do_transaction_failed = arm_cpu_do_transaction_failed;
+     cc->adjust_watchpoint_address = arm_adjust_watchpoint_address;
+ #endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+index 7388494a554..522a6442a48 100644
+--- a/target/arm/tlb_helper.c
++++ b/target/arm/tlb_helper.c
+@@ -10,8 +10,6 @@
+ #include "internals.h"
+ #include "exec/exec-all.h"
  
- static inline int allocation_tag_from_addr(uint64_t ptr)
- {
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index c8a5e7c0edd..abe6af6b795 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -500,7 +500,170 @@ uint64_t HELPER(mte_check1)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- /*
-  * Perform an MTE checked access for multiple logical accesses.
-  */
-+
-+/**
-+ * checkN:
-+ * @tag: tag memory to test
-+ * @odd: true to begin testing at tags at odd nibble
-+ * @cmp: the tag to compare against
-+ * @count: number of tags to test
-+ *
-+ * Return the number of successful tests.
-+ * Thus a return value < @count indicates a failure.
-+ *
-+ * A note about sizes: count is expected to be small.
-+ *
-+ * The most common use will be LDP/STP of two integer registers,
-+ * which means 16 bytes of memory touching at most 2 tags, but
-+ * often the access is aligned and thus just 1 tag.
-+ *
-+ * Using AdvSIMD LD/ST (multiple), one can access 64 bytes of memory,
-+ * touching at most 5 tags.  SVE LDR/STR (vector) with the default
-+ * vector length is also 64 bytes; the maximum architectural length
-+ * is 256 bytes touching at most 9 tags.
-+ *
-+ * The loop below uses 7 logical operations and 1 memory operation
-+ * per tag pair.  An implementation that loads an aligned word and
-+ * uses masking to ignore adjacent tags requires 18 logical operations
-+ * and thus does not begin to pay off until 6 tags.
-+ * Which, according to the survey above, is unlikely to be common.
-+ */
-+static int checkN(uint8_t *mem, int odd, int cmp, int count)
-+{
-+    int n = 0, diff;
-+
-+    /* Replicate the test tag and compare.  */
-+    cmp *= 0x11;
-+    diff = *mem++ ^ cmp;
-+
-+    if (odd) {
-+        goto start_odd;
-+    }
-+
-+    while (1) {
-+        /* Test even tag. */
-+        if (unlikely((diff) & 0x0f)) {
-+            break;
-+        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+    start_odd:
-+        /* Test odd tag. */
-+        if (unlikely((diff) & 0xf0)) {
-+            break;
-+        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+        diff = *mem++ ^ cmp;
-+    }
-+    return n;
-+}
-+
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc,
-+                    uint64_t ptr, uintptr_t ra)
-+{
-+    int mmu_idx, ptr_tag, bit55;
-+    uint64_t ptr_last, ptr_end, prev_page, next_page;
-+    uint64_t tag_first, tag_end;
-+    uint64_t tag_byte_first, tag_byte_end;
-+    uint32_t esize, total, tag_count, tag_size, n, c;
-+    uint8_t *mem1, *mem2;
-+    MMUAccessType type;
-+
-+    bit55 = extract64(ptr, 55, 1);
-+
-+    /* If TBI is disabled, the access is unchecked, and ptr is not dirty. */
-+    if (unlikely(!tbi_check(desc, bit55))) {
-+        return ptr;
-+    }
-+
-+    ptr_tag = allocation_tag_from_addr(ptr);
-+
-+    if (tcma_check(desc, bit55, ptr_tag)) {
-+        goto done;
-+    }
-+
-+    mmu_idx = FIELD_EX32(desc, MTEDESC, MIDX);
-+    type = FIELD_EX32(desc, MTEDESC, WRITE) ? MMU_DATA_STORE : MMU_DATA_LOAD;
-+    esize = FIELD_EX32(desc, MTEDESC, ESIZE);
-+    total = FIELD_EX32(desc, MTEDESC, TSIZE);
-+
-+    /* Find the addr of the end of the access, and of the last element. */
-+    ptr_end = ptr + total;
-+    ptr_last = ptr_end - esize;
-+
-+    /* Round the bounds to the tag granule, and compute the number of tags. */
-+    tag_first = QEMU_ALIGN_DOWN(ptr, TAG_GRANULE);
-+    tag_end = QEMU_ALIGN_UP(ptr_last, TAG_GRANULE);
-+    tag_count = (tag_end - tag_first) / TAG_GRANULE;
-+
-+    /* Round the bounds to twice the tag granule, and compute the bytes. */
-+    tag_byte_first = QEMU_ALIGN_DOWN(ptr, 2 * TAG_GRANULE);
-+    tag_byte_end = QEMU_ALIGN_UP(ptr_last, 2 * TAG_GRANULE);
-+
-+    /* Locate the page boundaries. */
-+    prev_page = ptr & TARGET_PAGE_MASK;
-+    next_page = prev_page + TARGET_PAGE_SIZE;
-+
-+    if (likely(tag_end - prev_page <= TARGET_PAGE_SIZE)) {
-+        /* Memory access stays on one page. */
-+        tag_size = (tag_byte_end - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, total,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+        if (!mem1) {
-+            goto done;
-+        }
-+        /* Perform all of the comparisons. */
-+        n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, tag_count);
-+    } else {
-+        /* Memory access crosses to next page. */
-+        tag_size = (next_page - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, next_page - ptr,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        tag_size = (tag_byte_end - next_page) / (2 * TAG_GRANULE);
-+        mem2 = allocation_tag_mem(env, mmu_idx, next_page, type,
-+                                  ptr_end - next_page,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        /*
-+         * Perform all of the comparisons.
-+         * Note the possible but unlikely case of the operation spanning
-+         * two pages that do not both have tagging enabled.
-+         */
-+        n = c = (next_page - tag_first) / TAG_GRANULE;
-+        if (mem1) {
-+            n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, c);
-+        }
-+        if (n == c) {
-+            if (!mem2) {
-+                goto done;
-+            }
-+            n += checkN(mem2, 0, ptr_tag, tag_count - c);
-+        }
-+    }
-+
-+    /*
-+     * If we failed, we know which granule.  Compute the element that
-+     * is first in that granule, and signal failure on that element.
-+     */
-+    if (unlikely(n < tag_count)) {
-+        uint64_t fail_ofs;
-+
-+        fail_ofs = tag_first + n * TAG_GRANULE - ptr;
-+        fail_ofs = ROUND_UP(fail_ofs, esize);
-+        mte_check_fail(env, mmu_idx, ptr + fail_ofs, ra);
-+    }
-+
-+ done:
-+    return useronly_clean_ptr(ptr);
-+}
-+
- uint64_t HELPER(mte_checkN)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- {
--    return ptr;
-+    return mte_checkN(env, desc, ptr, GETPC());
+-#if !defined(CONFIG_USER_ONLY)
+-
+ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+                                             unsigned int target_el,
+                                             bool same_el, bool ea,
+@@ -122,6 +120,8 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+     arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
  }
+ 
++#if !defined(CONFIG_USER_ONLY)
++
+ /*
+  * arm_cpu_do_transaction_failed: handle a memory system error response
+  * (eg "no device/memory present at address") by raising an external abort
 -- 
 2.20.1
 
