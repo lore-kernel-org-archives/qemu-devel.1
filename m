@@ -2,92 +2,89 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 575CFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35679C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:47:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E60420773
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00EFF20706
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 15:47:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K0WC6DK9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E60420773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoUoH1RS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EFF20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joqYx-00081q-92
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
+	id 1joqZX-0000et-8b
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 11:47:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4m-0003aZ-CF
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:36 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50452)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1joq4k-0006kx-B0
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:15:35 -0400
-Received: by mail-wm1-x334.google.com with SMTP id l17so9183057wmj.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 08:15:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=zJG4LmoTNrjoY6KmdBOWs3FmVPzTalAXaLQDaG1a0is=;
- b=K0WC6DK9FR2Clq5Z7yvawTFy7Do1bKY9arCV+YRnIt9a7unvfPu81MPqtPZrJRYckL
- 0EsXRIhWb2ng2cgFMDhDWVIizTYZ/QCT4s7Ji9xhNvLgxdlTOs8nWXwcJ5/LAQ7DLu6k
- iGitiOei0e3HIUp58VVeBSDOZxgGH2n33If8M1EveOuZvD7Wg8wimOpHhkWxzW1DTUk4
- 71Sag+7TN+pEmRERymwCaF9wsAgW8LYNjuTg3bdrC0ZvQfzOaiytvx5mhK7tQA7YvENa
- 71RUguTXyDkevuB1UDiQtH8lv6rXOz7dsEcRAwPl9Q3frNf9QpjApNgGhCnU60+6KnTU
- BFyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zJG4LmoTNrjoY6KmdBOWs3FmVPzTalAXaLQDaG1a0is=;
- b=UrTEFrnUNTtt9arjlJkNTLH/FCRT3NcBeqykkeAexgKd/eFzuD6EdYp/xyjJZqOtPb
- tum70GFfpS/v92771swQ0MheTLvpiWOww5xo5xUnCoYKzjgpp8vFUI5sS6TmLHXPLg32
- ZjmWPjt2ijpUYvozyh0SnjsSKFkJj6XeJFsWb5xPf/7OogUdP707tFx4vxAp/UJkq1Um
- mn3iHyQh7itwsAHyYQp0OpjDMEQH1JfsXJoh5yqTGDs1LvxBPpxkzc0ciA4fkUHuhFcv
- iaMypaXa6sKV22VLRE6eP9bqQTpOomocqVFw/cNkWYGbrRpOz2jCjLWKUGmQPmXAk+wy
- 2H3g==
-X-Gm-Message-State: AOAM5306VptUJTOPjYNGI4fQMBHJddvG4gFflQVRWl0DRV8AbWsZrQb4
- YTu8/OSMIHLjQcdtyvt9XySiaJEZqGc91g==
-X-Google-Smtp-Source: ABdhPJzimoKSWS5nS8mFe4VsOngGit6HAgK60v0xf2ttpVFkLjAl54rteXLQfRELPIu2dJAQ7Bql5Q==
-X-Received: by 2002:a1c:6887:: with SMTP id d129mr3890265wmc.179.1593184532466; 
- Fri, 26 Jun 2020 08:15:32 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w13sm37838852wrr.67.2020.06.26.08.15.31
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 26 Jun 2020 08:15:31 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 54/57] target/arm: Cache the Tagged bit for a page in MemTxAttrs
-Date: Fri, 26 Jun 2020 16:14:21 +0100
-Message-Id: <20200626151424.30117-55-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200626151424.30117-1-peter.maydell@linaro.org>
-References: <20200626151424.30117-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1joqYh-0007ym-0E
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:46:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59907
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1joqYe-0006br-Lz
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 11:46:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593186387;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZVClUSSwocLX08CzAt+OlHSvE9IJQxOD1nAt9dC0Hic=;
+ b=YoUoH1RSQBYK4YLZEGNxIsCD17n8eLN4t2GHMK2nBM3DajN26YkApVST6ISZQWWrbkHXPz
+ rk16D3GtCrQRbyS9ezqBvsipLjN7rCGkXIiRZ2nJVNMyWOaJ8wSbSIHmJcwtfSxE2FUTDD
+ Gvrfl8iatbwrM2Bltbv7hD4mN/6Gs/Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-j0Yyh8KaNbivJRIPGO0LZw-1; Fri, 26 Jun 2020 11:46:25 -0400
+X-MC-Unique: j0Yyh8KaNbivJRIPGO0LZw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5899A8015FD;
+ Fri, 26 Jun 2020 15:46:24 +0000 (UTC)
+Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E34BE71688;
+ Fri, 26 Jun 2020 15:46:23 +0000 (UTC)
+Date: Fri, 26 Jun 2020 16:46:22 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [PATCH v9 0/5] vhost-user block device backend implementation
+Message-ID: <20200626154622.GC316372@stefanha-x1.localdomain>
+References: <20200614183907.514282-1-coiby.xu@gmail.com>
+ <20200619120746.GA2422025@stefanha-x1.localdomain>
+ <20200625124656.ddca4ofgfhdgoerj@Rk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200625124656.ddca4ofgfhdgoerj@Rk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="2/5bycvrmDh4d1IB"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,129 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+--2/5bycvrmDh4d1IB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This "bit" is a particular value of the page's MemAttr.
+On Thu, Jun 25, 2020 at 08:46:56PM +0800, Coiby Xu wrote:
+> On Fri, Jun 19, 2020 at 01:07:46PM +0100, Stefan Hajnoczi wrote:
+> > On Mon, Jun 15, 2020 at 02:39:02AM +0800, Coiby Xu wrote:
+> > > v9
+> > >  - move logical block size check function to a utility function
+> > >  - fix issues regarding license, coding style, memory deallocation, e=
+tc.
+> >=20
+> > I have replied with patches that you can consider squashing into your
+> > series. I was testing this patch series and decided it was easier to
+> > send code than to go back and write review comments since I was already
+> > on a git branch.
+> >=20
+> > My patches can be combined into your original patches using "git rebase
+> > -i" and the "fixup" or "squash" directive.
+> >=20
+> > Please add my Signed-off-by: line to affected patches when squashing
+> > patches so that the git log records that I have confirmed that I have
+> > permission to contribute this code.
+> >=20
+> > If you have questions about any of the patches, please let me know.
+>=20
+> Besides your Signed-off-by: line, shouldn't I also add copyright info to
+> the affected files as follows?
+>=20
+>  * Copyright (c) 2020 Coiby Xu <coiby.xu@gmail.com>
+>  *
+>  * Copyright (c) 2020 Red Hat, Inc., Stefan Hajnoczi <stefanha@redhat.com=
+>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200626033144.790098-43-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c     | 48 ++++++++++++++++++++++++++++++++++++++---
- target/arm/tlb_helper.c |  5 +++++
- 2 files changed, 50 insertions(+), 3 deletions(-)
+The following would be good:
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2072db2f92d..dc9c29f998f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11834,9 +11834,19 @@ static uint8_t combine_cacheattr_nibble(uint8_t s1, uint8_t s2)
-  */
- static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
- {
--    uint8_t s1lo = extract32(s1.attrs, 0, 4), s2lo = extract32(s2.attrs, 0, 4);
--    uint8_t s1hi = extract32(s1.attrs, 4, 4), s2hi = extract32(s2.attrs, 4, 4);
-+    uint8_t s1lo, s2lo, s1hi, s2hi;
-     ARMCacheAttrs ret;
-+    bool tagged = false;
-+
-+    if (s1.attrs == 0xf0) {
-+        tagged = true;
-+        s1.attrs = 0xff;
-+    }
-+
-+    s1lo = extract32(s1.attrs, 0, 4);
-+    s2lo = extract32(s2.attrs, 0, 4);
-+    s1hi = extract32(s1.attrs, 4, 4);
-+    s2hi = extract32(s2.attrs, 4, 4);
- 
-     /* Combine shareability attributes (table D4-43) */
-     if (s1.shareability == 2 || s2.shareability == 2) {
-@@ -11884,6 +11894,11 @@ static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
-         }
-     }
- 
-+    /* TODO: CombineS1S2Desc does not consider transient, only WB, RWA. */
-+    if (tagged && ret.attrs == 0xff) {
-+        ret.attrs = 0xf0;
-+    }
-+
-     return ret;
- }
- 
-@@ -11963,8 +11978,11 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
-                  *  Normal Non-Shareable,
-                  *  Inner Write-Back Read-Allocate Write-Allocate,
-                  *  Outer Write-Back Read-Allocate Write-Allocate.
-+                 * Do not overwrite Tagged within attrs.
-                  */
--                cacheattrs->attrs = 0xff;
-+                if (cacheattrs->attrs != 0xf0) {
-+                    cacheattrs->attrs = 0xff;
-+                }
-                 cacheattrs->shareability = 0;
-             }
-             *cacheattrs = combine_cacheattrs(*cacheattrs, cacheattrs2);
-@@ -12029,6 +12047,9 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
-     /* Definitely a real MMU, not an MPU */
- 
-     if (regime_translation_disabled(env, mmu_idx)) {
-+        uint64_t hcr;
-+        uint8_t memattr;
-+
-         /*
-          * MMU disabled.  S1 addresses within aa64 translation regimes are
-          * still checked for bounds -- see AArch64.TranslateAddressS1Off.
-@@ -12066,6 +12087,27 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
-         *phys_ptr = address;
-         *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-         *page_size = TARGET_PAGE_SIZE;
-+
-+        /* Fill in cacheattr a-la AArch64.TranslateAddressS1Off. */
-+        hcr = arm_hcr_el2_eff(env);
-+        cacheattrs->shareability = 0;
-+        if (hcr & HCR_DC) {
-+            if (hcr & HCR_DCT) {
-+                memattr = 0xf0;  /* Tagged, Normal, WB, RWA */
-+            } else {
-+                memattr = 0xff;  /* Normal, WB, RWA */
-+            }
-+        } else if (access_type == MMU_INST_FETCH) {
-+            if (regime_sctlr(env, mmu_idx) & SCTLR_I) {
-+                memattr = 0xee;  /* Normal, WT, RA, NT */
-+            } else {
-+                memattr = 0x44;  /* Normal, NC, No */
-+            }
-+            cacheattrs->shareability = 2; /* outer sharable */
-+        } else {
-+            memattr = 0x00;      /* Device, nGnRnE */
-+        }
-+        cacheattrs->attrs = memattr;
-         return 0;
-     }
- 
-diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
-index 89d90465a32..b35dc8a0118 100644
---- a/target/arm/tlb_helper.c
-+++ b/target/arm/tlb_helper.c
-@@ -188,6 +188,11 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-             phys_addr &= TARGET_PAGE_MASK;
-             address &= TARGET_PAGE_MASK;
-         }
-+        /* Notice and record tagged memory. */
-+        if (cpu_isar_feature(aa64_mte, cpu) && cacheattrs.attrs == 0xf0) {
-+            arm_tlb_mte_tagged(&attrs) = true;
-+        }
-+
-         tlb_set_page_with_attrs(cs, address, phys_addr, attrs,
-                                 prot, mmu_idx, page_size);
-         return true;
--- 
-2.20.1
+ * Copyright (c) 2020 Red Hat, Inc.
+
+Thanks,
+Stefan
+
+--2/5bycvrmDh4d1IB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl72GE4ACgkQnKSrs4Gr
+c8jhNAf+Ka7gRUT2JVdkP99vayZYD4tMVVRKSxi8QBOWzUvbLR7YFecmfENyNZiN
+YBvTWdeDovy4LanMH7jX3ow3BAWFJZNPscwa5Z+NRrkufvQujRWBb20FtuyTGRw5
+PqRmQ3RWtHte/jjsP49r0QoWxyv8R1HjF00zG9KzO0Pn9OBWfk5eHbw5X04SN83h
+IJXtmP0shV9TeHndEhO2TFKd27bDk2RAv+7kMTwVCw5MwJQtnswW8LK/a9jYxAnL
+mPVlbbBwzoPLLOWw/bjjG+Q3GYScZIjzus6TQ1PixvW5ZTuDQMYvB1U099Fx6mdu
+SwgCJvEuvwUGFB/3xtNdHzq39w/XsA==
+=NElB
+-----END PGP SIGNATURE-----
+
+--2/5bycvrmDh4d1IB--
 
 
