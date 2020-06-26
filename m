@@ -2,85 +2,87 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D4EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A2B206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C387206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 18:43:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CqguY54Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A2B206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZAO0Xqg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C387206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jotCV-0005lC-F0
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:35:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59630)
+	id 1jotKQ-0001Ii-M0
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 14:43:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jot5p-0005nB-PK
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:28:53 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:36773)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jot5o-0007RX-1p
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:28:53 -0400
-Received: by mail-ot1-x333.google.com with SMTP id 72so9509667otc.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 11:28:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uXD+8j0mSmONGAQEBtM4j2ZqesHLozj7Tl61qO1NF0g=;
- b=CqguY54YEBIrdlk1X3+prTUj2jtC1ChWLSjkH6RLGqaw0k8o7JX/xATyjYGfDoWkyz
- tts3D07hua7jJZ8CPiGwR6EXWTS91KzusuKfy8xGmURy0/CFX2Gu4yiiJ14OqCXK1GHS
- 2h1jVmmDcSsNs7QA9KhnKT/FGhyPSZMgTlFsmi29ESHa6G8uf1Co2XrG0Bi6RDXVAKPX
- KOmW3yzoqIPXGDvTOfNuJmMWWJxohT8q7ClS1Al+nCKmBf0BIXVfjUCANgeMQf2yMFO5
- 3jptEVUIW+sptEK4yUXlIwmOBNSkLWZ70gkJyl10CAiuc3lrAb8Q9IsjZfLfMZlPg8p6
- 4AyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uXD+8j0mSmONGAQEBtM4j2ZqesHLozj7Tl61qO1NF0g=;
- b=qY2lEWE5UQUIYSqGzFWVd7V2liz79s+u42lRneWsa84WZJCSgxk3+s6mYtUNlkbpZD
- m5KYQlkmH0++NsIwF2ZqSwjaz0opUHkK17SFkBpZzYqoV4tKKalpJH4KORqApE+VLkXw
- Nr14LuHCNUvjgts6jk/ioEgGz8B4jqbB4hzIpyDAFMmaISk3iRX/AK28z+bUp2cB9BgD
- D5KZskQjTn+PlfJekdKwNhzIujEKMPMJUc0+mEQWogxH03verK6VXk4vgICEpXIxebLp
- EdUGD0ZNU1SGnJKr8amp5yzg2XK3GlamR6JKF+2HHWeXliHACIq5Nyz48B4jYjd/56Rl
- +6xA==
-X-Gm-Message-State: AOAM5303P31pxf6SRqaejzy+3POCyNn2z14bEMnQmtNWNIjrMYKVbJTS
- ZP5Mz2oQdMq2WEW+qrAyeEqSjvjfy4czcD7FX3RJeQ==
-X-Google-Smtp-Source: ABdhPJz1FReIOmwJT7xOV11Q7ta+Z8kldwZgFvQdJUy2di5Khl2BN5/Gkbxiu7adAhH4uSWC/cXXpUPMmiymcS5fI2U=
-X-Received: by 2002:a4a:9528:: with SMTP id m37mr3576025ooi.85.1593196130434; 
- Fri, 26 Jun 2020 11:28:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jotJf-0000s4-D3
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:43:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42907
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jotJc-0000La-Sh
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 14:43:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593196983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3A11qs4Un9QS2F/U0WejBe+YhNl2tHu9skLugM2ygDE=;
+ b=BZAO0XqgSdFK5OSV3zNphd/4qHKecSv7O/0BjYIrvhUJWHbz0OvfqsMHRVbb6/g/omiO21
+ WplHvLr3ivPOevVzdjC02GDVaPAgol849dY7gqDd6EwIOx7GnkuE0jS+4Ns/d5hv+0GDuu
+ xmfU0owC0RXEV/3YSHx0MLW/qds5gc0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-u0DArtVbO-m79Nq_NDabwg-1; Fri, 26 Jun 2020 14:43:02 -0400
+X-MC-Unique: u0DArtVbO-m79Nq_NDabwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A16718585BD
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 18:43:01 +0000 (UTC)
+Received: from work-vm (ovpn-113-27.ams2.redhat.com [10.36.113.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CFED5D9C9;
+ Fri, 26 Jun 2020 18:42:54 +0000 (UTC)
+Date: Fri, 26 Jun 2020 19:42:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 3/3] virtiofsd: Allow addition or removal of capabilities
+Message-ID: <20200626184252.GS3087@work-vm>
+References: <20200625162929.46672-1-dgilbert@redhat.com>
+ <20200625162929.46672-4-dgilbert@redhat.com>
+ <20200626103117.GE281902@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20200615204008.3069956-1-armbru@redhat.com>
-In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jun 2020 19:28:39 +0100
-Message-ID: <CAFEAcA_EnwYq4je-_OQz22zpxeqcSjaZnP7ieN-CyHC3pJp2Zw@mail.gmail.com>
-Subject: Re: [PULL 00/84] QOM patches for 2020-06-15
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200626103117.GE281902@stefanha-x1.localdomain>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,43 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 15 Jun 2020 at 21:43, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-06-12 23:06:22 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qom-2020-06-15
->
-> for you to fetch changes up to b77b5b3dc7a4730d804090d359c57d33573cf85a:
->
->   MAINTAINERS: Make section QOM cover hw/core/*bus.c as well (2020-06-15 22:06:04 +0200)
->
-> ----------------------------------------------------------------
-> QOM patches for 2020-06-15
->
-> * Make "info qom-tree" show children sorted
-> * Fixes around device realization
-> * Rework how we plug into devices into their parent bus
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> On Thu, Jun 25, 2020 at 05:29:29PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > +    /*
+> > +     * The modcaps option is a colon separated list of caps,
+> > +     * each preceded by either + or -.
+> > +     */
+> > +    while (lo->modcaps) {
+> > +        capng_act_t action;
+> > +        int cap;
+> > +
+> > +        char *next = strchr(lo->modcaps, ':');
+> > +        if (next) {
+> > +            *next = '\0';
+> > +            next++;
+> > +        }
+> > +
+> > +        switch (lo->modcaps[0]) {
+> > +        case '+':
+> > +            action = CAPNG_ADD;
+> > +            break;
+> > +
+> > +        case '-':
+> > +            action = CAPNG_DROP;
+> > +            break;
+> > +
+> > +        default:
+> > +            fuse_log(FUSE_LOG_ERR,
+> > +                     "%s: Expecting '+'/'-' in modcaps but found '%c'\n",
+> > +                     __func__, lo->modcaps[0]);
+> > +            exit(1);
+> > +        }
+> > +        cap = capng_name_to_capability(lo->modcaps + 1);
+> > +        if (cap < 0) {
+> > +            fuse_log(FUSE_LOG_ERR, "%s: Unknown capability '%s'\n", __func__,
+> > +                     lo->modcaps);
+> > +            exit(1);
+> > +        }
+> > +        if (capng_update(action, CAPNG_PERMITTED | CAPNG_EFFECTIVE, cap)) {
+> > +            fuse_log(FUSE_LOG_ERR, "%s: capng_update failed for '%s'\n",
+> > +                     __func__, lo->modcaps);
+> > +            exit(1);
+> > +        }
+> > +
+> > +        lo->modcaps = next;
+> 
+> How about passing char *modcaps into this function so that lo->modcaps
+> isn't modified by the parsing loop? That seems a bit cleaner and if we
+> ever decide to free lo->modcaps it will work as expected.
 
-Hi. I've just noticed that this commit added new global-scope
-functions to header files without documentation comments, eg
+Yep, can do.
 
-bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
+Dave
 
-Please could you provide some follow-up patches that document them?
-I don't think we have any hope of getting people to follow whatever
-the correct new way to create/configure/realize devices is if we
-don't document it :-(   [Concrete example: I now have no idea
-how this is supposed to work after this patchset.]
+> Stefan
 
-thanks
--- PMM
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
