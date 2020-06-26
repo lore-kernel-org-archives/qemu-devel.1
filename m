@@ -2,79 +2,76 @@ Return-Path: <SRS0=ZkAM=AH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D03820768
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB15E20768
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jun 2020 10:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QkO9JmhO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D03820768
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJc1jhJd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB15E20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jolfG-0003n4-KJ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:32:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41000)
+	id 1jolfH-0003pV-Et
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 06:32:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldl-00023D-RN
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26684
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1joldn-00024Y-Pq
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38860
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1joldj-0003EB-OR
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:25 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1joldm-0003F1-7z
+ for qemu-devel@nongnu.org; Fri, 26 Jun 2020 06:31:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593167483;
+ s=mimecast20190719; t=1593167485;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=m33ECoIFTV063FsftIJwJYqULUr2FH4kF2wrU1uGAqE=;
- b=QkO9JmhOamW9eqamFUpFbYx1LlUbFTzmq4AFwUgmMvbUt2f7PcvQaJa/TxoRRRd4KjY5SV
- vTb20E6vwjq/98X5Pu0tALUit91SOZUDpPrKuy+aiVuve14mCEY3QBC9uBDXuxke7Sabmj
- LnCNPtVk0RChg8eN0BimwwqmeYnQCSw=
+ bh=ucis0h5PRWD9uffGXWYAjZ2udEIvXSj5tEihR7WFgX0=;
+ b=GJc1jhJdedWfy0klwkrVCF8JYinJaGpMQjvwp7PoxdLX/CY4AtUxxkpUz+O1vdis5haFmZ
+ a6fKSNp99OHtHVGaPSGlvlCDuIcsFrl1k9TdgHEoNoAlVM8tsy3dLsMTLGyDPn9DOTcbkB
+ ZZ6em8+FvWrO4eoMVLNNxZi9F3KaQVg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-hc3vXkZCPueTyGVRvbqh8w-1; Fri, 26 Jun 2020 06:31:21 -0400
-X-MC-Unique: hc3vXkZCPueTyGVRvbqh8w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-373-yWalPltzOiiQANiIlM_Tww-1; Fri, 26 Jun 2020 06:31:22 -0400
+X-MC-Unique: yWalPltzOiiQANiIlM_Tww-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CFBB107ACCA;
- Fri, 26 Jun 2020 10:31:20 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECDC6500DE;
- Fri, 26 Jun 2020 10:31:17 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
- armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
- bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v6 2/5] virtio-iommu: Implement RESV_MEM probe request
-Date: Fri, 26 Jun 2020 12:30:54 +0200
-Message-Id: <20200626103057.11263-3-eric.auger@redhat.com>
-In-Reply-To: <20200626103057.11263-1-eric.auger@redhat.com>
-References: <20200626103057.11263-1-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1733010059A4
+ for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 10:31:22 +0000 (UTC)
+Received: from localhost (ovpn-114-181.ams2.redhat.com [10.36.114.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2BCD5D9C5;
+ Fri, 26 Jun 2020 10:31:18 +0000 (UTC)
+Date: Fri, 26 Jun 2020 11:31:17 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 3/3] virtiofsd: Allow addition or removal of capabilities
+Message-ID: <20200626103117.GE281902@stefanha-x1.localdomain>
+References: <20200625162929.46672-1-dgilbert@redhat.com>
+ <20200625162929.46672-4-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200625162929.46672-4-dgilbert@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5oH/S/bF6lOfqCQb"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 03:23:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,231 +94,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements the PROBE request. At the moment,
-only THE RESV_MEM property is handled. The first goal is
-to report iommu wide reserved regions such as the MSI regions
-set by the machine code. On x86 this will be the IOAPIC MSI
-region, [0xFEE00000 - 0xFEEFFFFF], on ARM this may be the ITS
-doorbell.
+--5oH/S/bF6lOfqCQb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-In the future we may introduce per device reserved regions.
-This will be useful when protecting host assigned devices
-which may expose their own reserved regions
+On Thu, Jun 25, 2020 at 05:29:29PM +0100, Dr. David Alan Gilbert (git) wrote:
+> +    /*
+> +     * The modcaps option is a colon separated list of caps,
+> +     * each preceded by either + or -.
+> +     */
+> +    while (lo->modcaps) {
+> +        capng_act_t action;
+> +        int cap;
+> +
+> +        char *next = strchr(lo->modcaps, ':');
+> +        if (next) {
+> +            *next = '\0';
+> +            next++;
+> +        }
+> +
+> +        switch (lo->modcaps[0]) {
+> +        case '+':
+> +            action = CAPNG_ADD;
+> +            break;
+> +
+> +        case '-':
+> +            action = CAPNG_DROP;
+> +            break;
+> +
+> +        default:
+> +            fuse_log(FUSE_LOG_ERR,
+> +                     "%s: Expecting '+'/'-' in modcaps but found '%c'\n",
+> +                     __func__, lo->modcaps[0]);
+> +            exit(1);
+> +        }
+> +        cap = capng_name_to_capability(lo->modcaps + 1);
+> +        if (cap < 0) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: Unknown capability '%s'\n", __func__,
+> +                     lo->modcaps);
+> +            exit(1);
+> +        }
+> +        if (capng_update(action, CAPNG_PERMITTED | CAPNG_EFFECTIVE, cap)) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: capng_update failed for '%s'\n",
+> +                     __func__, lo->modcaps);
+> +            exit(1);
+> +        }
+> +
+> +        lo->modcaps = next;
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+How about passing char *modcaps into this function so that lo->modcaps
+isn't modified by the parsing loop? That seems a bit cleaner and if we
+ever decide to free lo->modcaps it will work as expected.
 
----
+Stefan
 
-v5 -> v6:
-- removed validation of s->reserved_regions[i].type in the
-  probe request as it should rather happen in the realize()
+--5oH/S/bF6lOfqCQb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-v4 -> v5:
-- assert if reserved region type is different from RESERVED or
-  MSI
+-----BEGIN PGP SIGNATURE-----
 
-v3 -> v4:
-- removed any reference to the NONE property that does not
-  exist anymore.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl71znUACgkQnKSrs4Gr
+c8j0/Af/YwHgpiz4d/bv1YWIa/3z3/uXi46uYPop/57woEuGGAXbj2yjw4Umn+nQ
+oZxBzRjfzb1A2TBLMp9KkN5QYR06ZiH7r6+M0erhQB8Jls6rJBRhCONxTFvHm+ju
+LrYHliNi0+UNsP7T4MFHbpDpWcS1SNgNlY4rGTIcgB5gYUr6bg7NJYv00O1qDxhm
+/Q7yE9KN75B/K6IsMBusrgEJeC+opa1016uchr+pp3nWGxsXf56n1D1wisRwuUtW
+CNA77KI/D6eykjNtcm7BrgbSDLIi5t7Y8+z1EqMFIdMoMHs5nkmlD3K6Pw6WdUJf
+FtNOyXG4DfIoFy2xb53xXjJO7Uv5Mw==
+=xKFP
+-----END PGP SIGNATURE-----
 
-v2 -> v3:
-- on probe, do not fill the reminder of the buffer with zeroes
-  as the buffer was already zero initialized (Bharat)
-
-v1 -> v2:
-- move the unlock back to the same place
-- remove the push label and factorize the code after the out label
-- fix a bunch of cpu_to_leX according to the latest spec revision
-- do not remove sizeof(last) from free space
-- check the ep exists
----
- include/hw/virtio/virtio-iommu.h |  2 +
- hw/virtio/virtio-iommu.c         | 90 ++++++++++++++++++++++++++++++--
- hw/virtio/trace-events           |  1 +
- 3 files changed, 89 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index e653004d7c..49eb105cd8 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -53,6 +53,8 @@ typedef struct VirtIOIOMMU {
-     GHashTable *as_by_busptr;
-     IOMMUPciBus *iommu_pcibus_by_bus_num[PCI_BUS_MAX];
-     PCIBus *primary_bus;
-+    ReservedRegion *reserved_regions;
-+    uint32_t nb_reserved_regions;
-     GTree *domains;
-     QemuMutex mutex;
-     GTree *endpoints;
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 483883ec1d..5e72fd53a1 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -38,6 +38,7 @@
- 
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
-+#define VIOMMU_PROBE_SIZE 512
- 
- typedef struct VirtIOIOMMUDomain {
-     uint32_t id;
-@@ -378,6 +379,61 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     return ret;
- }
- 
-+static ssize_t virtio_iommu_fill_resv_mem_prop(VirtIOIOMMU *s, uint32_t ep,
-+                                               uint8_t *buf, size_t free)
-+{
-+    struct virtio_iommu_probe_resv_mem prop = {};
-+    size_t size = sizeof(prop), length = size - sizeof(prop.head), total;
-+    int i;
-+
-+    total = size * s->nb_reserved_regions;
-+
-+    if (total > free) {
-+        return -ENOSPC;
-+    }
-+
-+    for (i = 0; i < s->nb_reserved_regions; i++) {
-+        prop.head.type = cpu_to_le16(VIRTIO_IOMMU_PROBE_T_RESV_MEM);
-+        prop.head.length = cpu_to_le16(length);
-+        prop.subtype = s->reserved_regions[i].type;
-+        prop.start = cpu_to_le64(s->reserved_regions[i].low);
-+        prop.end = cpu_to_le64(s->reserved_regions[i].high);
-+
-+        memcpy(buf, &prop, size);
-+
-+        trace_virtio_iommu_fill_resv_property(ep, prop.subtype,
-+                                              prop.start, prop.end);
-+        buf += size;
-+    }
-+    return total;
-+}
-+
-+/**
-+ * virtio_iommu_probe - Fill the probe request buffer with
-+ * the properties the device is able to return
-+ */
-+static int virtio_iommu_probe(VirtIOIOMMU *s,
-+                              struct virtio_iommu_req_probe *req,
-+                              uint8_t *buf)
-+{
-+    uint32_t ep_id = le32_to_cpu(req->endpoint);
-+    size_t free = VIOMMU_PROBE_SIZE;
-+    ssize_t count;
-+
-+    if (!virtio_iommu_mr(s, ep_id)) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+
-+    count = virtio_iommu_fill_resv_mem_prop(s, ep_id, buf, free);
-+    if (count < 0) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    buf += count;
-+    free -= count;
-+
-+    return VIRTIO_IOMMU_S_OK;
-+}
-+
- static int virtio_iommu_iov_to_req(struct iovec *iov,
-                                    unsigned int iov_cnt,
-                                    void *req, size_t req_sz)
-@@ -407,15 +463,27 @@ virtio_iommu_handle_req(detach)
- virtio_iommu_handle_req(map)
- virtio_iommu_handle_req(unmap)
- 
-+static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
-+                                     struct iovec *iov,
-+                                     unsigned int iov_cnt,
-+                                     uint8_t *buf)
-+{
-+    struct virtio_iommu_req_probe req;
-+    int ret = virtio_iommu_iov_to_req(iov, iov_cnt, &req, sizeof(req));
-+
-+    return ret ? ret : virtio_iommu_probe(s, &req, buf);
-+}
-+
- static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
-     struct virtio_iommu_req_head head;
-     struct virtio_iommu_req_tail tail = {};
-+    size_t output_size = sizeof(tail), sz;
-     VirtQueueElement *elem;
-     unsigned int iov_cnt;
-     struct iovec *iov;
--    size_t sz;
-+    void *buf = NULL;
- 
-     for (;;) {
-         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-@@ -452,6 +520,17 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-         case VIRTIO_IOMMU_T_UNMAP:
-             tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
-             break;
-+        case VIRTIO_IOMMU_T_PROBE:
-+        {
-+            struct virtio_iommu_req_tail *ptail;
-+
-+            output_size = s->config.probe_size + sizeof(tail);
-+            buf = g_malloc0(output_size);
-+
-+            ptail = (struct virtio_iommu_req_tail *)
-+                        (buf + s->config.probe_size);
-+            ptail->status = virtio_iommu_handle_probe(s, iov, iov_cnt, buf);
-+        }
-         default:
-             tail.status = VIRTIO_IOMMU_S_UNSUPP;
-         }
-@@ -459,12 +538,13 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
- 
- out:
-         sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
--                          &tail, sizeof(tail));
--        assert(sz == sizeof(tail));
-+                          buf ? buf : &tail, output_size);
-+        assert(sz == output_size);
- 
--        virtqueue_push(vq, elem, sizeof(tail));
-+        virtqueue_push(vq, elem, sz);
-         virtio_notify(vdev, vq);
-         g_free(elem);
-+        g_free(buf);
-     }
- }
- 
-@@ -667,6 +747,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     s->config.page_size_mask = TARGET_PAGE_MASK;
-     s->config.input_range.end = -1UL;
-     s->config.domain_range.end = 32;
-+    s->config.probe_size = VIOMMU_PROBE_SIZE;
- 
-     virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
-     virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
-@@ -676,6 +757,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
-+    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
- 
-     qemu_mutex_init(&s->mutex);
- 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 6427a0047d..23109f69bb 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -74,3 +74,4 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-+virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64" end=0x%"PRIx64
--- 
-2.20.1
+--5oH/S/bF6lOfqCQb--
 
 
