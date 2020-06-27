@@ -8,85 +8,88 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C78EC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB76C433E0
 	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C63F2071A
+	by mail.kernel.org (Postfix) with ESMTPS id BE4042071A
 	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXzxAkOH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C63F2071A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rcXYumDH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4042071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpGse-00041h-Eu
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 15:52:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33778)
+	id 1jpGsf-00043T-23
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 15:52:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jpGrf-0002PQ-MG
+ id 1jpGrf-0002Ox-Dn
  for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:51 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:47023)
+Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:42889)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jpGrd-0003vH-EQ
+ id 1jpGrb-0003uJ-Rs
  for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:51 -0400
-Received: by mail-ed1-x541.google.com with SMTP id dm19so3218979edb.13
- for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 12:51:49 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id z17so9469711edr.9
+ for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 12:51:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=YU0Awk4ZM0qzu5ZQ6OYVIlPFF2Q2vnGOu2wQJzJ+hiU=;
- b=dXzxAkOHciUqGn6ZPzEilCrQxHg5Ri3ldJJArxKfvr9wTnHBW1L2X0cC1WY50K18X7
- hih+JdyfiJBJcbVLdoTNFF2UEpEofY6fwiVHDAAonCGsCACBK7fT4ZNSJLXPjGPecH/0
- DLkxtAEX/dbC9K8MieUbXd61di95O4PzpulH87E1idpgyAnV1ZOuJW0Gg9ab0vXCVSYh
- /GzAB174tkNj4lcvwKCVFT9sKhrp5PNyXUiwg6pbQ2D/T/oJvO+3uH0XhXhbbeJ2Rpm8
- 7J5yN4zuBm2blkx2q7bk/8nX0CMPnnRWNc1+Kkzo9pNh3kruSkUiFfhK+zCtaLHyTNFR
- QBlw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=64eDVR5Sna6gcF5BUI1E9LG+Hd4AD5Rm3+MS+ZxvZvw=;
+ b=rcXYumDHgxhMEGk1J3ufNd+PQZqlx6iAW+/XhotH/hR+Ze8t/cmBdbeOwJcVnG+0xd
+ uRAH7Cyaa6C/IQg6/gyR/WkN382iyWErT0ts/uX4W5rG+t35od18o57rnm4l8L2CzsEh
+ jMNFdF+c8YJ1WN283jT9KuColXaI+rqJIFFMqxIingRgqSGlj2HzWYi8zSSnpyanN1ha
+ XoqSxFGQZMo5/ErJhyzcmL8TgMKZJW8RghJMXfe0KA/MG4iBkwZahzD8It3kb8mpm1cl
+ oZJL5pysgwPBfNa5mlu1e+2NtAg94OeJj5x9m9wLM1KTn2FJ8jlk4UsApYzKEKHNA5EM
+ p6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=YU0Awk4ZM0qzu5ZQ6OYVIlPFF2Q2vnGOu2wQJzJ+hiU=;
- b=S2SlwcEUAm42HPv4EbvIZWQ6hATFcRr19T7gwFT7Wm1xoaaZfb/go9wNVij8B91XKZ
- y7dQ3+VUIx+N5MbMmpEHd66RHgLlRbESYZAde2++4qWjw564clfQTBGsnw1qVtcpEKN6
- kocpA/B+47hPQ4m9VCYjYYq7AzvEAmDQ0/T7djgfRJZ/u/b1e+Nc1E3thLLJmqs2m8qX
- S/KgIYWsfgDyaUEzDoqkFkXCDeQBkpla920cb+TroFbHpgpCYY45114dMin4xUq6cB4S
- 6ZDNkUyofq925gj/5oyYvxqvOVSYXpBsaQ9GlJbSs2NdWuYgeGAxf22igZSrqa9Ey1FH
- 742A==
-X-Gm-Message-State: AOAM532M6POcyo+o7/KSvlhpq4xLzwT/ZO7Eo7txCcLg848njUs12Zn8
- 4oAYzFJ4SrOccY9FYlsm/B1hyQHl
-X-Google-Smtp-Source: ABdhPJzIJwouQ7MvfJ86uUSXb91n1pOhMuVYtLqZ/4DZBaCIm01BSy/+rbq4tKB1jAgb3QozM/FkeA==
-X-Received: by 2002:a05:6402:1597:: with SMTP id
- c23mr9462176edv.243.1593287507972; 
- Sat, 27 Jun 2020 12:51:47 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=64eDVR5Sna6gcF5BUI1E9LG+Hd4AD5Rm3+MS+ZxvZvw=;
+ b=ayunfi7ZQh5ZcE4+ilQqPLTYZIBDOfA+5vUPEYsbKXQlpI7qfAywDG7ErXDpf5omxF
+ RrTusnhRhl40/sZZFHtZfbLiAlo9mgbn16H7j0oUxnaB2aZFLvoysIQ9MtlVQquDTwWO
+ PI48KG7n8MCt3r3jw145ArAKia2aZI0yyyZ9rzRUy3X27IwBa+6RqbNL5FnECM3WSs6o
+ ncpgl/DK72RLy2jh9l+Z8MljlY1q0Cpc2Lr9Td21WSwyOYYgzfGPAkDbaJehq2zoPUrH
+ aVe8kP/hfdSoCU0NJV1Gm+xqig1+uoRtZvc8KdWYbjSa3mfakzxghFI6hevlhMna57/I
+ 100w==
+X-Gm-Message-State: AOAM531/Re3bX5lFO/WbuA0G0pceZkUdSfzjWJhmhT+ELPgP/d0uiqwE
+ snCOHJPEMBuUcgmTvwlHoHKx/Lkt
+X-Google-Smtp-Source: ABdhPJy1uw9hmdhoHqgEH1uACUYh0Lx+RBffCjM4C9eS/1Xyln6W9KJFWaFFZfzlPMKe7dfRDAGdNA==
+X-Received: by 2002:aa7:c808:: with SMTP id a8mr6768572edt.259.1593287505880; 
+ Sat, 27 Jun 2020 12:51:45 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id y11sm5298734ejw.63.2020.06.27.12.51.47
+ by smtp.gmail.com with ESMTPSA id y11sm5298734ejw.63.2020.06.27.12.51.44
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 27 Jun 2020 12:51:47 -0700 (PDT)
+ Sat, 27 Jun 2020 12:51:45 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 5/6] scripts/performance: Add topN_callgrind.py script
-Date: Sat, 27 Jun 2020 21:51:42 +0200
-Message-Id: <1593287503-25197-6-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 2/6] hw/intc: Add Loongson LIOINTC support
+Date: Sat, 27 Jun 2020 21:51:39 +0200
+Message-Id: <1593287503-25197-3-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1593287503-25197-1-git-send-email-aleksandar.qemu.devel@gmail.com>
 References: <1593287503-25197-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x541.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::533;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x533.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,202 +107,296 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+From: Huacai Chen <zltjiangshi@gmail.com>
 
-Python script that prints the top N most executed functions in QEMU
-using callgrind.
+Loongson-3 has an integrated liointc (Local I/O Interrupt Controller).
+It is similar to Goldfish interrupt controller, but more powerful (e.g.,
+it can route external interrupt to multi-cores).
 
-Syntax:
-topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- \
-                      <qemu executable> [<qemu executable options>] \
-                      <target executable> [<target execurable options>]
+Documents about Loongson-3's liointc:
+1, https://wiki.godson.ac.cn/ip_block:liointc;
+2, The "I/O中断" section of Loongson-3's user mannual, part 1.
 
-[-h] - Print the script arguments help message.
-[-n] - Specify the number of top functions to print.
-     - If this flag is not specified, the tool defaults to 25.
-
-Example of usage:
-topN_callgrind.py -n 20 -- qemu-arm coulomb_double-arm
-
-Example Output:
-No.  Percentage Function Name         Source File
-----  --------- ------------------    ------------------------------
-   1    24.577% 0x00000000082db000    ???
-   2    20.467% float64_mul           <qemu>/fpu/softfloat.c
-   3    14.720% float64_sub           <qemu>/fpu/softfloat.c
-   4    13.864% float64_add           <qemu>/fpu/softfloat.c
-   5     4.876% helper_mulsd          <qemu>/target/i386/ops_sse.h
-   6     3.767% helper_subsd          <qemu>/target/i386/ops_sse.h
-   7     3.549% helper_addsd          <qemu>/target/i386/ops_sse.h
-   8     2.185% helper_ucomisd        <qemu>/target/i386/ops_sse.h
-   9     1.667% helper_lookup_tb_ptr  <qemu>/include/exec/tb-lookup.h
-  10     1.662% f64_compare           <qemu>/fpu/softfloat.c
-  11     1.509% helper_lookup_tb_ptr  <qemu>/accel/tcg/tcg-runtime.c
-  12     0.635% helper_lookup_tb_ptr  <qemu>/include/exec/exec-all.h
-  13     0.616% float64_div           <qemu>/fpu/softfloat.c
-  14     0.502% helper_pand_xmm       <qemu>/target/i386/ops_sse.h
-  15     0.502% float64_mul           <qemu>/include/fpu/softfloat.h
-  16     0.476% helper_lookup_tb_ptr  <qemu>/target/i386/cpu.h
-  17     0.437% float64_compare_quiet <qemu>/fpu/softfloat.c
-  18     0.414% helper_pxor_xmm       <qemu>/target/i386/ops_sse.h
-  19     0.353% round_to_int          <qemu>/fpu/softfloat.c
-  20     0.347% helper_cc_compute_all <qemu>/target/i386/cc_helper.c
-
-Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200626164546.22102-3-ahmedkhaledkaraman@gmail.com>
+Message-Id: <1592995531-32600-3-git-send-email-chenhc@lemote.com>
 ---
- scripts/performance/topN_callgrind.py | 140 ++++++++++++++++++++++++++++++++++
- 1 file changed, 140 insertions(+)
- create mode 100755 scripts/performance/topN_callgrind.py
+ hw/intc/loongson_liointc.c | 242 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/intc/Kconfig            |   3 +
+ hw/intc/Makefile.objs      |   1 +
+ 3 files changed, 246 insertions(+)
+ create mode 100644 hw/intc/loongson_liointc.c
 
-diff --git a/scripts/performance/topN_callgrind.py b/scripts/performance/topN_callgrind.py
-new file mode 100755
-index 0000000..67c5919
+diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c
+new file mode 100644
+index 0000000..23ca51c
 --- /dev/null
-+++ b/scripts/performance/topN_callgrind.py
-@@ -0,0 +1,140 @@
-+#!/usr/bin/env python3
++++ b/hw/intc/loongson_liointc.c
+@@ -0,0 +1,242 @@
++/*
++ * QEMU Loongson Local I/O interrupt controler.
++ *
++ * Copyright (c) 2020 Jiaxun Yang <jiaxun.yang@flygoat.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
 +
-+#  Print the top N most executed functions in QEMU using callgrind.
-+#  Syntax:
-+#  topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- \
-+#           <qemu executable> [<qemu executable options>] \
-+#           <target executable> [<target execurable options>]
-+#
-+#  [-h] - Print the script arguments help message.
-+#  [-n] - Specify the number of top functions to print.
-+#       - If this flag is not specified, the tool defaults to 25.
-+#
-+#  Example of usage:
-+#  topN_callgrind.py -n 20 -- qemu-arm coulomb_double-arm
-+#
-+#  This file is a part of the project "TCG Continuous Benchmarking".
-+#
-+#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-+#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+#
-+#  This program is free software: you can redistribute it and/or modify
-+#  it under the terms of the GNU General Public License as published by
-+#  the Free Software Foundation, either version 2 of the License, or
-+#  (at your option) any later version.
-+#
-+#  This program is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+#  GNU General Public License for more details.
-+#
-+#  You should have received a copy of the GNU General Public License
-+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "qemu/module.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
 +
-+import argparse
-+import os
-+import subprocess
-+import sys
++#define D(x)
 +
++#define NUM_IRQS                32
 +
-+# Parse the command line arguments
-+parser = argparse.ArgumentParser(
-+    usage='topN_callgrind.py [-h] [-n] <number of displayed top functions>  -- '
-+          '<qemu executable> [<qemu executable options>] '
-+          '<target executable> [<target executable options>]')
++#define NUM_CORES               4
++#define NUM_IPS                 4
++#define NUM_PARENTS             (NUM_CORES * NUM_IPS)
++#define PARENT_COREx_IPy(x, y)  (NUM_IPS * x + y)
 +
-+parser.add_argument('-n', dest='top', type=int, default=25,
-+                    help='Specify the number of top functions to print.')
++#define R_MAPPER_START          0x0
++#define R_MAPPER_END            0x20
++#define R_ISR                   R_MAPPER_END
++#define R_IEN                   0x24
++#define R_IEN_SET               0x28
++#define R_IEN_CLR               0x2c
++#define R_PERCORE_ISR(x)        (0x40 + 0x8 * x)
++#define R_END                   0x64
 +
-+parser.add_argument('command', type=str, nargs='+', help=argparse.SUPPRESS)
++#define TYPE_LOONGSON_LIOINTC "loongson.liointc"
++#define LOONGSON_LIOINTC(obj) \
++        OBJECT_CHECK(struct loongson_liointc, (obj), TYPE_LOONGSON_LIOINTC)
 +
-+args = parser.parse_args()
++struct loongson_liointc {
++    SysBusDevice parent_obj;
 +
-+# Extract the needed variables from the args
-+command = args.command
-+top = args.top
++    MemoryRegion mmio;
++    qemu_irq parent_irq[NUM_PARENTS];
 +
-+# Insure that valgrind is installed
-+check_valgrind_presence = subprocess.run(["which", "valgrind"],
-+                                         stdout=subprocess.DEVNULL)
-+if check_valgrind_presence.returncode:
-+    sys.exit("Please install valgrind before running the script!")
++    uint8_t mapper[NUM_IRQS]; /* 0:3 for core, 4:7 for IP */
++    uint32_t isr;
++    uint32_t ien;
++    uint32_t per_core_isr[NUM_CORES];
 +
-+# Run callgrind
-+callgrind = subprocess.run((
-+    ["valgrind", "--tool=callgrind", "--callgrind-out-file=/tmp/callgrind.data"]
-+    + command),
-+    stdout=subprocess.DEVNULL,
-+    stderr=subprocess.PIPE)
-+if callgrind.returncode:
-+    sys.exit(callgrind.stderr.decode("utf-8"))
++    /* state of the interrupt input pins */
++    uint32_t pin_state;
++    bool parent_state[NUM_PARENTS];
++};
 +
-+# Save callgrind_annotate output to /tmp/callgrind_annotate.out
-+with open("/tmp/callgrind_annotate.out", "w") as output:
-+    callgrind_annotate = subprocess.run(["callgrind_annotate",
-+                                         "/tmp/callgrind.data"],
-+                                        stdout=output,
-+                                        stderr=subprocess.PIPE)
-+    if callgrind_annotate.returncode:
-+        os.unlink('/tmp/callgrind.data')
-+        output.close()
-+        os.unlink('/tmp/callgrind_annotate.out')
-+        sys.exit(callgrind_annotate.stderr.decode("utf-8"))
++static void update_irq(struct loongson_liointc *p)
++{
++    uint32_t irq, core, ip;
++    uint32_t per_ip_isr[NUM_IPS] = {0};
 +
-+# Read the callgrind_annotate output to callgrind_data[]
-+callgrind_data = []
-+with open('/tmp/callgrind_annotate.out', 'r') as data:
-+    callgrind_data = data.readlines()
++    /* level triggered interrupt */
++    p->isr = p->pin_state;
 +
-+# Line number with the total number of instructions
-+total_instructions_line_number = 20
++    /* Clear disabled IRQs */
++    p->isr &= p->ien;
 +
-+# Get the total number of instructions
-+total_instructions_line_data = callgrind_data[total_instructions_line_number]
-+total_number_of_instructions = total_instructions_line_data.split(' ')[0]
-+total_number_of_instructions = int(
-+    total_number_of_instructions.replace(',', ''))
++    /* Clear per_core_isr */
++    for (core = 0; core < NUM_CORES; core++) {
++        p->per_core_isr[core] = 0;
++    }
 +
-+# Line number with the top function
-+first_func_line = 25
++    /* Update per_core_isr and per_ip_isr */
++    for (irq = 0; irq < NUM_IRQS; irq++) {
++        if (!(p->isr & (1 << irq))) {
++            continue;
++        }
 +
-+# Number of functions recorded by callgrind, last two lines are always empty
-+number_of_functions = len(callgrind_data) - first_func_line - 2
++        for (core = 0; core < NUM_CORES; core++) {
++            if ((p->mapper[irq] & (1 << core))) {
++                p->per_core_isr[core] |= (1 << irq);
++            }
++        }
 +
-+# Limit the number of top functions to "top"
-+number_of_top_functions = (top if number_of_functions >
-+                           top else number_of_functions)
++        for (ip = 0; ip < NUM_IPS; ip++) {
++            if ((p->mapper[irq] & (1 << (ip + 4)))) {
++                per_ip_isr[ip] |= (1 << irq);
++            }
++        }
++    }
 +
-+# Store the data of the top functions in top_functions[]
-+top_functions = callgrind_data[first_func_line:
-+                               first_func_line + number_of_top_functions]
++    /* Emit IRQ to parent! */
++    for (core = 0; core < NUM_CORES; core++) {
++        for (ip = 0; ip < NUM_IPS; ip++) {
++            int parent = PARENT_COREx_IPy(core, ip);
++            if (p->parent_state[parent] !=
++                (!!p->per_core_isr[core] && !!per_ip_isr[ip])) {
++                p->parent_state[parent] = !p->parent_state[parent];
++                qemu_set_irq(p->parent_irq[parent], p->parent_state[parent]);
++            }
++        }
++    }
++}
 +
-+# Print table header
-+print('{:>4}  {:>10}  {:<30}  {}\n{}  {}  {}  {}'.format('No.',
-+                                                         'Percentage',
-+                                                         'Function Name',
-+                                                         'Source File',
-+                                                         '-' * 4,
-+                                                         '-' * 10,
-+                                                         '-' * 30,
-+                                                         '-' * 30,
-+                                                         ))
++static uint64_t
++liointc_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    struct loongson_liointc *p = opaque;
++    uint32_t r = 0;
 +
-+# Print top N functions
-+for (index, function) in enumerate(top_functions, start=1):
-+    function_data = function.split()
-+    # Calculate function percentage
-+    function_instructions = float(function_data[0].replace(',', ''))
-+    function_percentage = (function_instructions /
-+                           total_number_of_instructions)*100
-+    # Get function name and source files path
-+    function_source_file, function_name = function_data[1].split(':')
-+    # Print extracted data
-+    print('{:>4}  {:>9.3f}%  {:<30}  {}'.format(index,
-+                                                round(function_percentage, 3),
-+                                                function_name,
-+                                                function_source_file))
++    /* Mapper is 1 byte */
++    if (size == 1 && addr < R_MAPPER_END) {
++        r = p->mapper[addr];
++        goto out;
++    }
 +
-+# Remove intermediate files
-+os.unlink('/tmp/callgrind.data')
-+os.unlink('/tmp/callgrind_annotate.out')
++    /* Rest is 4 byte */
++    if (size != 4 || (addr % 4)) {
++        goto out;
++    }
++
++    if (addr >= R_PERCORE_ISR(0) &&
++        addr < R_PERCORE_ISR(NUM_CORES)) {
++        int core = (addr - R_PERCORE_ISR(0)) / 4;
++        r = p->per_core_isr[core];
++        goto out;
++    }
++
++    switch (addr) {
++    case R_ISR:
++        r = p->isr;
++        break;
++    case R_IEN:
++        r = p->ien;
++        break;
++    default:
++        break;
++    }
++
++out:
++    D(qemu_log("%s: size=%d addr=%lx val=%x\n", __func__, size, addr, r));
++    return r;
++}
++
++static void
++liointc_write(void *opaque, hwaddr addr,
++          uint64_t val64, unsigned int size)
++{
++    struct loongson_liointc *p = opaque;
++    uint32_t value = val64;
++
++    D(qemu_log("%s: size=%d, addr=%lx val=%x\n", __func__, size, addr, value));
++
++    /* Mapper is 1 byte */
++    if (size == 1 && addr < R_MAPPER_END) {
++        p->mapper[addr] = value;
++        goto out;
++    }
++
++    /* Rest is 4 byte */
++    if (size != 4 || (addr % 4)) {
++        goto out;
++    }
++
++    if (addr >= R_PERCORE_ISR(0) &&
++        addr < R_PERCORE_ISR(NUM_CORES)) {
++        int core = (addr - R_PERCORE_ISR(0)) / 4;
++        p->per_core_isr[core] = value;
++        goto out;
++    }
++
++    switch (addr) {
++    case R_IEN_SET:
++        p->ien |= value;
++        break;
++    case R_IEN_CLR:
++        p->ien &= ~value;
++        break;
++    default:
++        break;
++    }
++
++out:
++    update_irq(p);
++}
++
++static const MemoryRegionOps pic_ops = {
++    .read = liointc_read,
++    .write = liointc_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4
++    }
++};
++
++static void irq_handler(void *opaque, int irq, int level)
++{
++    struct loongson_liointc *p = opaque;
++
++    p->pin_state &= ~(1 << irq);
++    p->pin_state |= level << irq;
++    update_irq(p);
++}
++
++static void loongson_liointc_init(Object *obj)
++{
++    struct loongson_liointc *p = LOONGSON_LIOINTC(obj);
++    int i;
++
++    qdev_init_gpio_in(DEVICE(obj), irq_handler, 32);
++
++    for (i = 0; i < NUM_PARENTS; i++) {
++        sysbus_init_irq(SYS_BUS_DEVICE(obj), &p->parent_irq[i]);
++    }
++
++    memory_region_init_io(&p->mmio, obj, &pic_ops, p,
++                         "loongson.liointc", R_END);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &p->mmio);
++}
++
++static const TypeInfo loongson_liointc_info = {
++    .name          = TYPE_LOONGSON_LIOINTC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(struct loongson_liointc),
++    .instance_init = loongson_liointc_init,
++};
++
++static void loongson_liointc_register_types(void)
++{
++    type_register_static(&loongson_liointc_info);
++}
++
++type_init(loongson_liointc_register_types)
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index f562342..2ae1e89 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -64,3 +64,6 @@ config OMPIC
+ 
+ config RX_ICU
+     bool
++
++config LOONGSON_LIOINTC
++    bool
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index a420263..3ac2b40 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -51,3 +51,4 @@ obj-$(CONFIG_MIPS_CPS) += mips_gic.o
+ obj-$(CONFIG_NIOS2) += nios2_iic.o
+ obj-$(CONFIG_OMPIC) += ompic.o
+ obj-$(CONFIG_IBEX) += ibex_plic.o
++obj-$(CONFIG_LOONGSON_LIOINTC) += loongson_liointc.o
 -- 
 2.7.4
 
