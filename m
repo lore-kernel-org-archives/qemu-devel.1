@@ -2,93 +2,72 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A726C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 00:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15B9C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 00:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1076C20706
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 00:04:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OPFk7yQq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1076C20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id B69FD2073E
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 00:16:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69FD2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1joyKn-0003U7-CT
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 20:04:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53330)
+	id 1joyWI-00066e-Ve
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jun 2020 20:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3EYv2XgsKCv4nyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com>)
- id 1joyCT-000852-3D
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:56:05 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:55038)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3EYv2XgsKCv4nyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com>)
- id 1joyCQ-0002Ck-VG
- for qemu-devel@nongnu.org; Fri, 26 Jun 2020 19:56:04 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id p22so11458129ybg.21
- for <qemu-devel@nongnu.org>; Fri, 26 Jun 2020 16:56:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ezVubqNhatMt7jrAiju4ysHTsj0nXSxcDY5lBkuPaY4=;
- b=OPFk7yQqB+9SoEImTqqthAxB2z8l65HSKRl8qngEJMSYMB60nsVkSHg7Cam/P5S9z5
- 0/Q6LhLSB4awcRg7ui5dRinxWSqsI4ZVy7lQXO6oFcaUq1buI+CdpNMUR1uMu9/dMFID
- gmpRPriI4hGuJ7RmQT5CT43LciohGil54lVMfxK5t40X5jIlu8ikb7m+E9zfiJgg51UR
- +OkZ1lhTvfaYXSB1fmiWPNw+oA8yJDfvbcrz9XphexOeqkSN7Aj+pL/EElKzfsqV8yRA
- xRZRKWLj4ECAtOADUklUMVGxquqmVhdPyPsKNND6oLCLbi+xt2UyZ25iOef2pYHmkX28
- UkOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=ezVubqNhatMt7jrAiju4ysHTsj0nXSxcDY5lBkuPaY4=;
- b=p9hBP+FvM3DPsv50/ZJ6RzJdjeV1QN1uXmnzjIYZdCOTb8RfeNGZivhAngemC7qJ0T
- 8JPVymMPb+xoSpZcDo8JgPXLz8NLfVDKwZNQAPxqFR9p+u8/nXoc58kH+UiUwDd/rBi2
- MHTR0aaHko1llhSSq3y8Uiur41mpCllLNvFIFe2g5c6kJZf75ztuyrCMx2uqEfqEcZxo
- ZniIdHD7w7b5eU4OxNNnZdRupXTK7DmKHZLmo9G82OrYgzGmqZEXndG7YWve06PxqPOu
- 9GV1rhuFsjk804p4JYvNI0fUI+a5sWMkNivBoW0VBBVk3OsbNRh9RRXdpE49g2Hvyn8v
- GfkA==
-X-Gm-Message-State: AOAM531nlrQTZH3qf5atagKimrdF8dP9iTZnSlVf5afULvwDxOVIhKn3
- KkLaZBfWv/pob+qb4Avikk8Mvt1p2mss5irPZg==
-X-Google-Smtp-Source: ABdhPJwMzPQv3kCJcTiPlZUjJdFjCkZhZreSoqTws4T7dyv0NMTyEyY1VDiLhii2CUa6XTzhhV7f7RZitPSG32SGLg==
-X-Received: by 2002:a25:8404:: with SMTP id u4mr9403808ybk.515.1593215761503; 
- Fri, 26 Jun 2020 16:56:01 -0700 (PDT)
-Date: Fri, 26 Jun 2020 16:55:18 -0700
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1joyVV-0005Xy-9C; Fri, 26 Jun 2020 20:15:45 -0400
+Resent-Date: Fri, 26 Jun 2020 20:15:45 -0400
+Resent-Message-Id: <E1joyVV-0005Xy-9C@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21717)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1joyVS-0007ya-Q1; Fri, 26 Jun 2020 20:15:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593216922; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=PO2X9gNBASUXCoOex2HrMAKiNP19Ulc1ujz1i/GKDUNQTlNEMPGH/h6uKMy9B4iTpyBR7sdVYR8UFnIImRHyr4X2T1gkxbNj55aRtj7swF3CT4Bdsh9a/eGD80LilUCD40mHtHwe8zhbDbGpiPBzVcuj7uxm9HquS8mmKyxZ4MI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593216922;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=0d/k0A4SpoN+T2oFcRa0n/XWfcKz03ezQZ1uFcAy3+Y=; 
+ b=g1mfddDBkmu+T9BjSHJ5Ey6P4Ovw8y+YI0hL6A8G06CpYFT5sP5BQJkl+mYoKjWmQsvPB6nBjTaSGQZKhlWZ930DcTDLk0pbOQLm2PhfueSH01GAXg9fpFCuW/ypeBxUNCITGKLh6sPaqqeG/ekAlFLH8yK8L5uloF9/GkkwDzA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593216921046365.80413883175106;
+ Fri, 26 Jun 2020 17:15:21 -0700 (PDT)
+Message-ID: <159321691954.31217.5343564721050843276@d1fd068a5071>
+Subject: Re: [PATCH v3 00/12] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC
+ machines
 In-Reply-To: <20200626235519.591734-1-hskinnemoen@google.com>
-Message-Id: <20200626235519.591734-12-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200626235519.591734-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
-Subject: [PATCH v3 11/12] hw/arm: Wire up BMC boot flash for npcm750-evb and
- quanta-gsj
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: peter.maydell@linaro.org, clg@kaod.org, joel@jms.id.au
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
- envelope-from=3EYv2XgsKCv4nyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb4a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: hskinnemoen@google.com
+Date: Fri, 26 Jun 2020 17:15:21 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/26 20:15:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,76 +80,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, joel@jms.id.au,
+ kfting@nuvoton.com, qemu-arm@nongnu.org, clg@kaod.org, hskinnemoen@google.com,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows these NPCM7xx-based boards to boot from a flash image, e.g.
-one built with OpenBMC. For example like this:
-
-IMAGE=${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc
-qemu-system-arm -machine quanta-gsj -nographic \
-	-bios ~/qemu/bootrom/npcm7xx_bootrom.bin \
-	-drive file=${IMAGE},if=mtd,bus=0,unit=0,format=raw,snapshot=on
-
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- hw/arm/npcm7xx_boards.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-index ca33262a59..12bf5a216f 100644
---- a/hw/arm/npcm7xx_boards.c
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -19,6 +19,7 @@
- #include "hw/arm/npcm7xx.h"
- #include "hw/core/cpu.h"
- #include "hw/loader.h"
-+#include "hw/qdev-properties.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/units.h"
-@@ -65,6 +66,21 @@ static void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
-     arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
- }
- 
-+static void npcm7xx_connect_flash(NPCM7xxFIUState *fiu, int cs_no,
-+                                  const char *flash_type, DriveInfo *dinfo) {
-+    DeviceState *flash;
-+    qemu_irq flash_cs;
-+
-+    flash = qdev_new(flash_type);
-+    if (dinfo) {
-+        qdev_prop_set_drive(flash, "drive", blk_by_legacy_dinfo(dinfo));
-+    }
-+    qdev_realize_and_unref(flash, BUS(fiu->spi), &error_fatal);
-+
-+    flash_cs = qdev_get_gpio_in_named(flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(fiu), cs_no, flash_cs);
-+}
-+
- static NPCM7xxState *npcm7xx_create_soc(MachineState *machine,
-                                         uint32_t hw_straps)
- {
-@@ -88,6 +104,7 @@ static void npcm750_evb_init(MachineState *machine)
- 
-     soc = npcm7xx_create_soc(machine, NPCM750_EVB_POWER_ON_STRAPS);
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", drive_get(IF_MTD, 0, 0));
-     npcm7xx_load_kernel(machine, soc);
- }
- 
-@@ -97,6 +114,8 @@ static void quanta_gsj_init(MachineState *machine)
- 
-     soc = npcm7xx_create_soc(machine, QUANTA_GSJ_POWER_ON_STRAPS);
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "mx25l25635e",
-+                          drive_get(IF_MTD, 0, 0));
-     npcm7xx_load_kernel(machine, soc);
- }
- 
--- 
-2.27.0.212.ge8ba1cc988-goog
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyNjIzNTUxOS41OTE3
+MzQtMS1oc2tpbm5lbW9lbkBnb29nbGUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
+aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
+ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
+dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9j
+a2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
+d0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgICByYWlz
+ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
+c3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJl
+bCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWEyMzBlNGJkMTE2NzQ5YTA4NzhhNzU4YjQ5N2Vl
+NjdlJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVk
+JywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9P
+UFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdT
+SE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hv
+bWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
+ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdmc2YXVmdnYvc3JjL2RvY2tlci1z
+cmMuMjAyMC0wNi0yNi0yMC4wOS40Mi4yMTcwNzovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpm
+ZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24t
+emVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFu
+Y2UudXVpZD1hMjMwZTRiZDExNjc0OWEwODc4YTc1OGI0OTdlZTY3ZQptYWtlWzFdOiAqKiogW2Rv
+Y2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3Bh
+dGNoZXctdGVzdGVyLXRtcC12ZzZhdWZ2di9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
+LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICA1bTM4LjY2MnMKdXNlciAgICAwbTkuMTI5
+cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
+MjAyMDA2MjYyMzU1MTkuNTkxNzM0LTEtaHNraW5uZW1vZW5AZ29vZ2xlLmNvbS90ZXN0aW5nLmRv
+Y2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
