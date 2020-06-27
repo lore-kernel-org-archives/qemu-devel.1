@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58246C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22DFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24B24206E9
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AC1320775
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="C+5dRQAC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B24206E9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="suhNdEi3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC1320775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpEN7-0001mZ-BV
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 13:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34702)
+	id 1jpEOe-0004dT-JE
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 13:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jpELH-0007hl-DF
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:15 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46938)
+ id 1jpELM-0007lv-Nd
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:20 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:34720)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jpELF-00070u-6P
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:15 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH2VSK156352;
- Sat, 27 Jun 2020 17:10:00 GMT
+ id 1jpELJ-000722-5D
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:20 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH3Cs1035251;
+ Sat, 27 Jun 2020 17:10:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=JI2v9YgoXly9rGI8dNFJBhH/IYVdyUio6ib9fKlwgxI=;
- b=C+5dRQACXkytUxWDaaJrForPx5q6y1EhJXh8YmvJ9/QPjvkSz0K1PfXad47OY3OCT2gn
- LaNNXW84B+v8XvWyAPyP0vcv0h8I4u3RmRFikHqicFSGN9Y92v8yb8JkQsGcmzuMgKsl
- EbXmC/nkNv6DYiND/yh379XmgITxT6QP7zYMxSY7Cf5qWTntf5Jhc8+5S+EQH2hCjAuH
- 9aLUXXPTQsEiKSc+LlmVczPgnL6zdHf9H8va2u456mrpre3i/8bC3PlQ8WtPGR+2gNnT
- kc6q1/Nocv+o+FE+uxxKfoncok4r7Ownl5CLmcykavwjtDALbOvVjKbZ49slbZ+8N7AT mg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 31wx2m9ax7-1
+ bh=EiS8sV+XCqIOMkkXkmdM8pLFO1eLmi3z+cRUnsXjNuU=;
+ b=suhNdEi3C/Z5JcJ21folmDhesdn4cdROHXFey4mvpLTPIpX++8YtT50KTgfkTkq8sELi
+ Bysm6r5YOtzRPWHodVjiCbzGHQ3OoCtNB8zkOpZMaZ1LsTTE8JTJow3EnEUCX+j28sjO
+ bYjI68iqfh7Lcu2kP9HPK/bYZ88Wm4zz/UfUi0xu2MV2Agjz5NcTsP80DOrB0C7P1ky0
+ 49vCgxqEnnfL9BsSBsADOImQzbHarToGmcEq7i34pXZNK33W+2sFRmAa8cFzl4qb9Eid
+ rD4JgUWRimWVgNDhoO33hPaAdYUbt/qv/53T67vXdE9+62Ri8Kirr7oZ/tgOOoK8YjAA XQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 31wwhr9c9h-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Sat, 27 Jun 2020 17:10:00 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH8Pci081756;
- Sat, 27 Jun 2020 17:10:00 GMT
+ Sat, 27 Jun 2020 17:10:09 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH7afU195405;
+ Sat, 27 Jun 2020 17:10:09 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 31wv59awbe-1
+ by userp3030.oracle.com with ESMTP id 31wu7s8y31-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sat, 27 Jun 2020 17:09:59 +0000
+ Sat, 27 Jun 2020 17:10:09 +0000
 Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05RH9v5H002824;
- Sat, 27 Jun 2020 17:09:58 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05RHA7b7002851;
+ Sat, 27 Jun 2020 17:10:07 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Sat, 27 Jun 2020 10:09:57 -0700
+ with ESMTP ; Sat, 27 Jun 2020 10:10:07 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 06/21] multi-process: define MPQemuMsg format and
- transmission functions
-Date: Sat, 27 Jun 2020 10:09:28 -0700
-Message-Id: <f3e8c0b53e9ee337f2551f7326562cba1fffb908.1593273671.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v7 11/21] multi-process: introduce proxy object
+Date: Sat, 27 Jun 2020 10:09:33 -0700
+Message-Id: <91d295b59735fab5b46959b489b1384cc13bdb67.1593273671.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1593273671.git.elena.ufimtseva@oracle.com>
 References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
@@ -78,22 +77,22 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9665
  signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- suspectscore=3 bulkscore=0
- mlxscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ bulkscore=0 spamscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 suspectscore=1 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2006270124
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9665
  signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- mlxscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015 adultscore=0
- impostorscore=0 cotscore=-2147483648 priorityscore=1501 malwarescore=0
- phishscore=0 suspectscore=3 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006270123
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 13:10:09
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ malwarescore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 cotscore=-2147483648
+ mlxscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
+ spamscore=0 suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006270123
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=elena.ufimtseva@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 13:03:10
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -63
 X-Spam_score: -6.4
@@ -128,47 +127,49 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Defines MPQemuMsg, which is the message that is sent to the remote
-process. This message is sent over QIOChannel and is used to
-command the remote process to perform various tasks.
+Defines a PCI Device proxy object as a child of TYPE_PCI_DEVICE.
 
-Also defined the helper functions to send and receive messages over the
-QIOChannel
-
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- MAINTAINERS              |   2 +
- include/io/mpqemu-link.h |  75 +++++++++++++++++++
- io/Makefile.objs         |   2 +
- io/mpqemu-link.c         | 151 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 230 insertions(+)
- create mode 100644 include/io/mpqemu-link.h
- create mode 100644 io/mpqemu-link.c
+ MAINTAINERS            |  2 ++
+ hw/pci/Makefile.objs   |  1 +
+ hw/pci/proxy.c         | 70 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/pci/proxy.h | 43 ++++++++++++++++++++++++++
+ 4 files changed, 116 insertions(+)
+ create mode 100644 hw/pci/proxy.c
+ create mode 100644 include/hw/pci/proxy.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 83aae5b441..50a5fc53d6 100644
+index 017c96eace..b48c3114c1 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2947,6 +2947,8 @@ F: hw/pci-host/remote.c
- F: include/hw/pci-host/remote.h
- F: hw/i386/remote.c
- F: include/hw/i386/remote.h
-+F: io/mpqemu-link.c
-+F: include/io/mpqemu-link.h
+@@ -2952,6 +2952,8 @@ F: include/io/mpqemu-link.h
+ F: hw/i386/remote-msg.c
+ F: include/hw/i386/remote-memory.h
+ F: hw/i386/remote-memory.c
++F: hw/pci/proxy.c
++F: include/hw/pci/proxy.h
  
  Build and test automation
  -------------------------
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+index c78f2fb24b..515dda506c 100644
+--- a/hw/pci/Makefile.objs
++++ b/hw/pci/Makefile.objs
+@@ -12,3 +12,4 @@ common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
+ 
+ common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+ common-obj-$(CONFIG_ALL) += pci-stub.o
++obj-$(CONFIG_MPQEMU) += proxy.o
+diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
 new file mode 100644
-index 0000000000..1542e8ed07
+index 0000000000..6d62399c52
 --- /dev/null
-+++ b/include/io/mpqemu-link.h
-@@ -0,0 +1,75 @@
++++ b/hw/pci/proxy.c
+@@ -0,0 +1,70 @@
 +/*
-+ * Communication channel between QEMU and remote device process
-+ *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
@@ -176,238 +177,117 @@ index 0000000000..1542e8ed07
 + *
 + */
 +
-+#ifndef MPQEMU_LINK_H
-+#define MPQEMU_LINK_H
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include "hw/pci/proxy.h"
++#include "hw/pci/pci.h"
++#include "qapi/error.h"
++#include "io/channel-util.h"
++#include "hw/qdev-properties.h"
++#include "monitor/monitor.h"
++
++static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
++{
++    pdev->com = qio_channel_new_fd(fd, errp);
++}
++
++static Property proxy_properties[] = {
++    DEFINE_PROP_STRING("fd", PCIProxyDev, fd),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
++{
++    PCIProxyDev *dev = PCI_PROXY_DEV(device);
++    int proxyfd;
++
++    if (dev->fd) {
++        proxyfd = monitor_fd_param(cur_mon, dev->fd, errp);
++        if (proxyfd == -1) {
++            error_prepend(errp, "proxy: unable to parse proxyfd: ");
++            return;
++        }
++        proxy_set_socket(dev, proxyfd, errp);
++    }
++}
++
++static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = pci_proxy_dev_realize;
++    device_class_set_props(dc, proxy_properties);
++}
++
++static const TypeInfo pci_proxy_dev_type_info = {
++    .name          = TYPE_PCI_PROXY_DEV,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(PCIProxyDev),
++    .class_size    = sizeof(PCIProxyDevClass),
++    .class_init    = pci_proxy_dev_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void pci_proxy_dev_register_types(void)
++{
++    type_register_static(&pci_proxy_dev_type_info);
++}
++
++type_init(pci_proxy_dev_register_types)
+diff --git a/include/hw/pci/proxy.h b/include/hw/pci/proxy.h
+new file mode 100644
+index 0000000000..c1c7142fa2
+--- /dev/null
++++ b/include/hw/pci/proxy.h
+@@ -0,0 +1,43 @@
++/*
++ * Copyright © 2018, 2020 Oracle and/or its affiliates.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef PROXY_H
++#define PROXY_H
 +
 +#include "qemu/osdep.h"
 +#include "qemu-common.h"
 +
-+#include "qom/object.h"
-+#include "qemu/thread.h"
++#include "hw/pci/pci.h"
 +#include "io/channel.h"
 +
-+#define REMOTE_MAX_FDS 8
++#define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
 +
-+#define MPQEMU_MSG_HDR_SIZE offsetof(MPQemuMsg, data1.u64)
++#define PCI_PROXY_DEV(obj) \
++            OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
 +
-+/**
-+ * MPQemuCmd:
-+ *
-+ * MPQemuCmd enum type to specify the command to be executed on the remote
-+ * device.
-+ */
-+typedef enum {
-+    INIT = 0,
-+    MAX = INT_MAX,
-+} MPQemuCmd;
++#define PCI_PROXY_DEV_CLASS(klass) \
++            OBJECT_CLASS_CHECK(PCIProxyDevClass, (klass), TYPE_PCI_PROXY_DEV)
 +
-+/**
-+ * Maximum size of data2 field in the message to be transmitted.
-+ */
-+#define MPQEMU_MSG_DATA_MAX 256
++#define PCI_PROXY_DEV_GET_CLASS(obj) \
++            OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV)
 +
-+/**
-+ * MPQemuMsg:
-+ * @cmd: The remote command
-+ * @bytestream: Indicates if the data to be shared is structured (data1)
-+ *              or unstructured (data2)
-+ * @size: Size of the data to be shared
-+ * @data1: Structured data
-+ * @fds: File descriptors to be shared with remote device
-+ * @data2: Unstructured data
-+ *
-+ * MPQemuMsg Format of the message sent to the remote device from QEMU.
-+ *
-+ */
-+typedef struct {
-+    int cmd;
-+    int bytestream;
-+    size_t size;
++typedef struct PCIProxyDev {
++    PCIDevice parent_dev;
++    char *fd;
++    QIOChannel *com;
++} PCIProxyDev;
 +
-+    union {
-+        uint64_t u64;
-+    } data1;
++typedef struct PCIProxyDevClass {
++    PCIDeviceClass parent_class;
 +
-+    int fds[REMOTE_MAX_FDS];
-+    int num_fds;
++    void (*realize)(PCIProxyDev *dev, Error **errp);
 +
-+    /* Max size of data2 is MPQEMU_MSG_DATA_MAX */
-+    uint8_t *data2;
-+} MPQemuMsg;
++    char *command;
++} PCIProxyDevClass;
 +
-+void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc);
-+int mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc);
-+
-+bool mpqemu_msg_valid(MPQemuMsg *msg);
-+
-+#endif
-diff --git a/io/Makefile.objs b/io/Makefile.objs
-index 9a20fce4ed..5875ab0697 100644
---- a/io/Makefile.objs
-+++ b/io/Makefile.objs
-@@ -10,3 +10,5 @@ io-obj-y += channel-util.o
- io-obj-y += dns-resolver.o
- io-obj-y += net-listener.o
- io-obj-y += task.o
-+
-+io-obj-$(CONFIG_MPQEMU) += mpqemu-link.o
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-new file mode 100644
-index 0000000000..bfc542b5fd
---- /dev/null
-+++ b/io/mpqemu-link.c
-@@ -0,0 +1,151 @@
-+/*
-+ * Communication channel between QEMU and remote device process
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "qemu/module.h"
-+#include "io/mpqemu-link.h"
-+#include "qapi/error.h"
-+#include "qemu/iov.h"
-+#include "qemu/error-report.h"
-+
-+void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc)
-+{
-+    Error *local_err = NULL;
-+    struct iovec send[2];
-+    int *fds = NULL;
-+    size_t nfds = 0;
-+
-+    send[0].iov_base = msg;
-+    send[0].iov_len = MPQEMU_MSG_HDR_SIZE;
-+
-+    send[1].iov_base = msg->bytestream ? msg->data2 : (void *)&msg->data1;
-+    send[1].iov_len = msg->size;
-+
-+    if (msg->num_fds) {
-+        nfds = msg->num_fds;
-+        fds = msg->fds;
-+    }
-+
-+    (void)qio_channel_writev_full_all(ioc, send, G_N_ELEMENTS(send), fds, nfds,
-+                                      &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static int mpqemu_readv(QIOChannel *ioc, struct iovec *iov, int **fds,
-+                        size_t *nfds, Error **errp)
-+{
-+    size_t size, len;
-+
-+    size = iov->iov_len;
-+
-+    while (size > 0) {
-+        len = qio_channel_readv_full(ioc, iov, 1, fds, nfds, errp);
-+
-+        if (len == QIO_CHANNEL_ERR_BLOCK) {
-+            if (qemu_in_coroutine()) {
-+                qio_channel_yield(ioc, G_IO_IN);
-+            } else {
-+                qio_channel_wait(ioc, G_IO_IN);
-+            }
-+            continue;
-+        }
-+
-+        if (len <= 0) {
-+            return -EIO;
-+        }
-+
-+        size -= len;
-+    }
-+
-+    return iov->iov_len;
-+}
-+
-+int mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc)
-+{
-+    Error *local_err = NULL;
-+    int *fds = NULL;
-+    struct iovec hdr, data;
-+    size_t nfds = 0;
-+
-+    hdr.iov_base = g_malloc0(MPQEMU_MSG_HDR_SIZE);
-+    hdr.iov_len = MPQEMU_MSG_HDR_SIZE;
-+
-+    if (mpqemu_readv(ioc, &hdr, &fds, &nfds, &local_err) < 0) {
-+        return -EIO;
-+    }
-+
-+    memcpy(msg, hdr.iov_base, hdr.iov_len);
-+
-+    free(hdr.iov_base);
-+    if (msg->size > MPQEMU_MSG_DATA_MAX) {
-+        error_report("The message size is more than MPQEMU_MSG_DATA_MAX %d",
-+                     MPQEMU_MSG_DATA_MAX);
-+        return -EINVAL;
-+    }
-+
-+    data.iov_base = g_malloc0(msg->size);
-+    data.iov_len = msg->size;
-+
-+    if (mpqemu_readv(ioc, &data, NULL, NULL, &local_err) < 0) {
-+        return -EIO;
-+    }
-+
-+    if (msg->bytestream) {
-+        msg->data2 = calloc(1, msg->size);
-+        memcpy(msg->data2, data.iov_base, msg->size);
-+    } else {
-+        memcpy((void *)&msg->data1, data.iov_base, msg->size);
-+    }
-+
-+    free(data.iov_base);
-+
-+    if (nfds) {
-+        msg->num_fds = nfds;
-+        memcpy(msg->fds, fds, nfds * sizeof(int));
-+    }
-+
-+    return 0;
-+}
-+
-+bool mpqemu_msg_valid(MPQemuMsg *msg)
-+{
-+    if (msg->cmd >= MAX && msg->cmd < 0) {
-+        return false;
-+    }
-+
-+    if (msg->bytestream) {
-+        if (!msg->data2) {
-+            return false;
-+        }
-+    } else {
-+        if (msg->data2) {
-+            return false;
-+        }
-+    }
-+
-+    /* Verify FDs. */
-+    if (msg->num_fds >= REMOTE_MAX_FDS) {
-+        return false;
-+    }
-+
-+    if (msg->num_fds > 0) {
-+        for (int i = 0; i < msg->num_fds; i++) {
-+            if (fcntl(msg->fds[i], F_GETFL) == -1) {
-+                return false;
-+            }
-+        }
-+    }
-+
-+    return true;
-+}
++#endif /* PROXY_H */
 -- 
 2.25.GIT
 
