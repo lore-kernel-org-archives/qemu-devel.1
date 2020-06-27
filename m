@@ -2,81 +2,81 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4F2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 11:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D690C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 11:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A33182145D
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 11:57:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53D542145D
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 11:58:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9Un3IIk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A33182145D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzpGCNWz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D542145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jp9SB-00024F-UI
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 07:57:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36246)
+	id 1jp9T9-0002zd-Kn
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 07:58:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9RV-0001Zv-Kh
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 07:56:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22701
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9SN-0002K4-PP
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 07:57:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49154
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9RS-0002Ee-UV
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 07:56:21 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9SK-0002Hb-VU
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 07:57:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593258978;
+ s=mimecast20190719; t=1593259031;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Sf/QpYfw+dw/Lir1B/GUsUn+npBoRRBc5P+g/KzKKNM=;
- b=M9Un3IIkX4mxWkEAR+nlMxGIoaKoYlCtO3EYRfgaSlnti+EFPdEpCl4dZIMgZDTT4bT0x6
- hsiWpmZ/a+msXjujIOmKra7QBxaxDfPfj3sLwv47g+s46cMU6/fSdOG2952DUA7gGg7C+H
- Aa/Cqx6Gx3zlPltcnNSwuDvO54aISBo=
+ bh=Zv89ZB4vUrTNP7ZwdErfKoo67nnhoyETbniK4o3J5xM=;
+ b=DzpGCNWzs6DMy3G9+om5TNvgW6EbrIlGTWcXpoMLoz/0Eh2BVlBw32M++gXQBP80QflFyV
+ VaOhA3z+jb8HT+ugwCHz49mZt84QT59JJwp6EWHPbFz13zO6AX9Jlk1ZAyXNwDvribTX4s
+ zpKKDf4sS73h0JotJ3GLjLTHuPYd7dA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-YdqN8BfPMoGdsTf9_dTn5A-1; Sat, 27 Jun 2020 07:56:16 -0400
-X-MC-Unique: YdqN8BfPMoGdsTf9_dTn5A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-324-WoZ5SFRhOVef-JcF9RTO3w-1; Sat, 27 Jun 2020 07:57:10 -0400
+X-MC-Unique: WoZ5SFRhOVef-JcF9RTO3w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48047BFC0;
- Sat, 27 Jun 2020 11:56:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC3601800D4A;
+ Sat, 27 Jun 2020 11:57:08 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 275107C1FE;
- Sat, 27 Jun 2020 11:56:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A84A42B4B5;
+ Sat, 27 Jun 2020 11:57:08 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C303F11384A6; Sat, 27 Jun 2020 13:56:12 +0200 (CEST)
+ id 2269211384A6; Sat, 27 Jun 2020 13:57:07 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 08/46] error: Avoid unnecessary error_propagate() after
- error_setg()
+Subject: Re: [PATCH 06/46] error: Avoid error_propagate() when error is not
+ used here
 References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-9-armbru@redhat.com>
- <5e155834-78c3-4a64-834b-7d83328d7bed@virtuozzo.com>
-Date: Sat, 27 Jun 2020 13:56:12 +0200
-In-Reply-To: <5e155834-78c3-4a64-834b-7d83328d7bed@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Fri, 26 Jun 2020 21:22:11 +0300")
-Message-ID: <87imfcracj.fsf@dusky.pond.sub.org>
+ <20200624164344.3778251-7-armbru@redhat.com>
+ <45536875-9cf2-72d5-b555-8b8b1992085b@virtuozzo.com>
+Date: Sat, 27 Jun 2020 13:57:07 +0200
+In-Reply-To: <45536875-9cf2-72d5-b555-8b8b1992085b@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Fri, 26 Jun 2020 17:36:27 +0300")
+Message-ID: <87eeq0rab0.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 07:56:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 07:57:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -106,136 +106,138 @@ Sender: "Qemu-devel"
 Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
 > 24.06.2020 19:43, Markus Armbruster wrote:
->> Replace
->>
->>      error_setg(&err, ...);
->>      error_propagate(errp, err);
->>
->> by
->>
->>      error_setg(errp, ...);
->>
->> Related pattern:
->>
->>      if (...) {
->>          error_setg(&err, ...);
->>          goto out;
->>      }
->>      ...
->>   out:
->>      error_propagate(errp, err);
->>      return;
->>
->> When all paths to label out are that way, replace by
->>
->>      if (...) {
->>          error_setg(errp, ...);
->>          return;
->>      }
->>
->> and delete the label along with the error_propagate().
->>
->> When we have at most one other path that actually needs to propagate,
->> and maybe one at the end that where propagation is unnecessary, e.g.
->>
->>      foo(..., &err);
->>      if (err) {
->>          goto out;
->>      }
->>      ...
->>      bar(..., &err);
->>   out:
->>      error_propagate(errp, err);
->>      return;
->>
->> move the error_propagate() to where it's needed, like
->>
->>      if (...) {
->>          foo(..., &err);
->>          error_propagate(errp, err);
->>          return;
->>      }
->>      ...
->>      bar(..., errp);
->>      return;
->>
->> and transform the error_setg() as above.
->>
->> Bonus: the elimination of gotos will make later patches in this series
->> easier to review.
->>
->> Candidates for conversion tracked down with this Coccinelle script:
+>> When all we do with an Error we receive into a local variable is
+>> propagating to somewhere else, we can just as well receive it there
+>> right away.  Coccinelle script:
 >>
 >>      @@
->>      identifier err, errp;
+>>      identifier fun, err, errp;
 >>      expression list args;
 >>      @@
->>      -    error_setg(&err, args);
->>      +    error_setg(errp, args);
->> 	 ... when != err
->> 	 error_propagate(errp, err);
+>>      -    fun(args, &err);
+>>      +    fun(args, errp);
+>>           ... when != err
+>>               when strict
+>>      -    error_propagate(errp, err);
+>>
+>>      @@
+>>      identifier fun, err, errp;
+>>      expression list args;
+>>      expression ret;
+>>      @@
+>>      -    ret = fun(args, &err);
+>>      +    ret = fun(args, errp);
+>>           ... when != err
+>>               when strict
+>>      -    error_propagate(errp, err);
+>>
+>>      @@
+>>      identifier fun, err, errp;
+>>      expression list args;
+>>      expression ret;
+>>      @@
+>>      -    ret = fun(args, &err);
+>>      +    ret = fun(args, errp);
+>>           ... when != err
+>>               when strict
+>>           if (
+>>      (
+>>               ret
+>>      |
+>>               !ret
+>>      |
+>>               ret == 0
+>>      |
+>>               ret != 0
+>>      |
+>>               ret < 0
+>>      |
+>>               ret != NULL
+>>      |
+>>               ret == NULL
+>>      )
+>>              )
+>>           {
+>>               ... when != err
+>>                   when strict
+>>      -        error_propagate(errp, err);
+>>               ...
+>>           }
+>>
+>>      @@
+>>      identifier fun, err, errp;
+>>      expression list args;
+>>      @@
+>>           if (
+>>      (
+>>      -        fun(args, &err)
+>>      +        fun(args, errp)
+>>      |
+>>      -        !fun(args, &err)
+>>      +        !fun(args, errp)
+>>      |
+>>      -        fun(args, &err) == 0
+>>      +        fun(args, errp) == 0
+>>      |
+>>      -        fun(args, &err) != 0
+>>      +        fun(args, errp) != 0
+>>      |
+>>      -        fun(args, &err) < 0
+>>      +        fun(args, errp) < 0
+>>      |
+>>      -        fun(args, &err) == NULL
+>>      +        fun(args, errp) == NULL
+>>      |
+>>      -        fun(args, &err) != NULL
+>>      +        fun(args, errp) != NULL
+>>      )
+>>              )
+>>           {
+>>               ... when != err;
+>>                   when strict
+>>      -        error_propagate(errp, err);
+>>               ...
+>>           }
+>>
+>> The first two rules are prone to fail with "error_propagate(...)
+>> ... reachable by inconsistent control-flow paths".  Script without
+>> them re-run where that happens.
+>>
+>> Manually double-check @err is not used afterwards.  Dereferencing it
+>> would be use after free, but checking whether it's null would be
+>> legitimate.  One such change to qbus_realize() backed out.
+>>
+>> Suboptimal line breaks tweaked manually.
 >>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>   backends/cryptodev.c        | 11 +++---
->>   backends/hostmem-file.c     | 19 +++-------
->>   backends/hostmem-memfd.c    | 15 ++++----
->>   backends/hostmem.c          | 27 ++++++--------
->>   block/throttle-groups.c     | 22 +++++------
->>   hw/hyperv/vmbus.c           |  5 +--
->>   hw/i386/pc.c                | 35 ++++++------------
->>   hw/mem/nvdimm.c             | 17 ++++-----
->>   hw/mem/pc-dimm.c            | 14 +++----
->>   hw/misc/aspeed_sdmc.c       |  3 +-
->>   hw/ppc/rs6000_mc.c          |  9 ++---
->>   hw/ppc/spapr.c              | 73 ++++++++++++++++---------------------
->>   hw/ppc/spapr_pci.c          | 14 +++----
->>   hw/s390x/ipl.c              | 23 +++++-------
->>   hw/s390x/sclp.c             | 12 ++----
->>   hw/xen/xen_pt_config_init.c |  3 +-
->>   iothread.c                  | 12 +++---
->>   net/colo-compare.c          | 20 ++++------
->>   net/dump.c                  | 10 ++---
->>   net/filter-buffer.c         | 10 ++---
->>   qga/commands-win32.c        | 16 +++-----
->>   21 files changed, 151 insertions(+), 219 deletions(-)
->>
 >
 > [..]
 >
->> --- a/qga/commands-win32.c
->> +++ b/qga/commands-win32.c
->> @@ -282,9 +282,8 @@ static void execute_async(DWORD WINAPI (*func)(LPVOID), LPVOID opaque,
+>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+>> index 8d6156578f..6705220380 100644
+>> --- a/hw/intc/xics_kvm.c
+>> +++ b/hw/intc/xics_kvm.c
+>> @@ -316,9 +316,8 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
+>>               continue;
+>>           }
 >
-> You forget to remove unused local_err variable
+> local_err becomes unused in this function, we should drop it
 
-In my haste to get this series out for review, I took undadvisable
-shortcuts on Error * variable cleanup.  Need to do better for v2.
+Will fix.
 
->>         HANDLE thread = CreateThread(NULL, 0, func, opaque, 0,
->> NULL);
->>       if (!thread) {
->> -        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
->> +        error_setg(errp, QERR_QGA_COMMAND_FAILED,
->>                      "failed to dispatch asynchronous command");
->> -        error_propagate(errp, local_err);
->>       }
->>   }
->>   @@ -1274,31 +1273,28 @@ static void
->> check_suspend_mode(GuestSuspendMode mode, Error **errp)
->
-> and here (I assume, you remove unused variables with help of compiler, but don't compile for win32 :)
->
->
-> with these two local_err removed:
+> with this fixed:
 > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 Thanks!
 
-> Ohh, my brain is broken, I'd prefer to create such patches than to review them :)
-
-Rrrrrevenge!  ;)
-
-[...]
+>
+>>   -        ret = ics_set_kvm_state_one(ics, i, &local_err);
+>> +        ret = ics_set_kvm_state_one(ics, i, errp);
+>>           if (ret < 0) {
+>> -            error_propagate(errp, local_err);
+>>               return ret;
+>>           }
+>>       }
 
 
