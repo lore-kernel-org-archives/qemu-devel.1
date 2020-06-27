@@ -2,85 +2,79 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB76C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F23C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE4042071A
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 133182071A
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 19:53:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rcXYumDH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4042071A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bt0DHor8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 133182071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpGsf-00043T-23
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 15:52:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
+	id 1jpGtf-00065T-Cb
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 15:53:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jpGrf-0002Ox-Dn
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:51 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:42889)
+ id 1jpGrc-0002MW-54
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:48 -0400
+Received: from mail-ed1-x52a.google.com ([2a00:1450:4864:20::52a]:35436)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jpGrb-0003uJ-Rs
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:51 -0400
-Received: by mail-ed1-x533.google.com with SMTP id z17so9469711edr.9
- for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 12:51:47 -0700 (PDT)
+ id 1jpGra-0003sj-CA
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 15:51:47 -0400
+Received: by mail-ed1-x52a.google.com with SMTP id e15so9491107edr.2
+ for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 12:51:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=64eDVR5Sna6gcF5BUI1E9LG+Hd4AD5Rm3+MS+ZxvZvw=;
- b=rcXYumDHgxhMEGk1J3ufNd+PQZqlx6iAW+/XhotH/hR+Ze8t/cmBdbeOwJcVnG+0xd
- uRAH7Cyaa6C/IQg6/gyR/WkN382iyWErT0ts/uX4W5rG+t35od18o57rnm4l8L2CzsEh
- jMNFdF+c8YJ1WN283jT9KuColXaI+rqJIFFMqxIingRgqSGlj2HzWYi8zSSnpyanN1ha
- XoqSxFGQZMo5/ErJhyzcmL8TgMKZJW8RghJMXfe0KA/MG4iBkwZahzD8It3kb8mpm1cl
- oZJL5pysgwPBfNa5mlu1e+2NtAg94OeJj5x9m9wLM1KTn2FJ8jlk4UsApYzKEKHNA5EM
- p6yQ==
+ h=from:to:cc:subject:date:message-id;
+ bh=ePUAFhNTI5bjt2w/0LW26QVHrfylfhtZt/SOq+UY2b4=;
+ b=Bt0DHor84ZfyJq2fRQDVUJ50PrCq+Cr4ce5mFOF9qZsC4D52GvyjA1kMVG5a6ilSml
+ VHbQUIh4/5pY+ldwJNu/aTPVt0RrWCQa0Dbt3pOT9gKvrstempGs/DuNTGxNcTsyqS6c
+ Ct8gauiLwoXCOX6ZJmaOL/mRYknuKAzPYBKwHy8Th9YJN5BdwBfyGhUhsoA8N5p0Bx4Y
+ qmde7TrwO2wWR25/oRSdBe32Mzq4vyVZkUL5unExb2K+QbRRqbZLZqsyIHSLxLz7MJ0T
+ M0J22zdHXgPQaLOc7Ar2poRjyNOEJmdeCUX3SzTgFtZEOjjJTwGnNr+d+5do+Z2QECVY
+ 6TlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=64eDVR5Sna6gcF5BUI1E9LG+Hd4AD5Rm3+MS+ZxvZvw=;
- b=ayunfi7ZQh5ZcE4+ilQqPLTYZIBDOfA+5vUPEYsbKXQlpI7qfAywDG7ErXDpf5omxF
- RrTusnhRhl40/sZZFHtZfbLiAlo9mgbn16H7j0oUxnaB2aZFLvoysIQ9MtlVQquDTwWO
- PI48KG7n8MCt3r3jw145ArAKia2aZI0yyyZ9rzRUy3X27IwBa+6RqbNL5FnECM3WSs6o
- ncpgl/DK72RLy2jh9l+Z8MljlY1q0Cpc2Lr9Td21WSwyOYYgzfGPAkDbaJehq2zoPUrH
- aVe8kP/hfdSoCU0NJV1Gm+xqig1+uoRtZvc8KdWYbjSa3mfakzxghFI6hevlhMna57/I
- 100w==
-X-Gm-Message-State: AOAM531/Re3bX5lFO/WbuA0G0pceZkUdSfzjWJhmhT+ELPgP/d0uiqwE
- snCOHJPEMBuUcgmTvwlHoHKx/Lkt
-X-Google-Smtp-Source: ABdhPJy1uw9hmdhoHqgEH1uACUYh0Lx+RBffCjM4C9eS/1Xyln6W9KJFWaFFZfzlPMKe7dfRDAGdNA==
-X-Received: by 2002:aa7:c808:: with SMTP id a8mr6768572edt.259.1593287505880; 
- Sat, 27 Jun 2020 12:51:45 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=ePUAFhNTI5bjt2w/0LW26QVHrfylfhtZt/SOq+UY2b4=;
+ b=b9hOEen3VEg1tgMSdSb0jC8qxQ0ZDMGs+04x3qL/7vvDN3Vg/bpuoMpRE4XComaCSa
+ OkWc50s0fJ/GYblZSlWSBXHIvfHSxPpHTx5MPZEbuy1S/WuRmjkNO6sMnpz02JAkPA8b
+ AXERbHZsVXN+/G7Y6M4/jADclEMA3O79cmxAdyjC8pkD7l0ngipnh0saMNZ1PB+JsD3/
+ 5zU5pt7SOcnVt0laPwagcznnsD6p2AvVYLRJXksy0/Rm7Hf1KD8+d4/XLQkFTAvRDTU3
+ 2H1Bjq/nGcPdB5sBhY9Rs0gNhNCQ2hsHFB/hp/tbFqFySHoI+eHzwP72eIjbwM/IY6dI
+ n9pA==
+X-Gm-Message-State: AOAM531WeYuD22heARp2J+SI+FcDh6NDyt89SADipV8kCCq1OAZkpgtM
+ veFra5fjrR0pYY5YPb6bq9TsLwls
+X-Google-Smtp-Source: ABdhPJyso+5NFQjGx/vo8ysNwRopmGsPAfJzlegiWAhjL2e4tonQCHcp7qRb8xvsGJ2fgFMu/Y4BLg==
+X-Received: by 2002:aa7:c245:: with SMTP id y5mr10032925edo.189.1593287504096; 
+ Sat, 27 Jun 2020 12:51:44 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id y11sm5298734ejw.63.2020.06.27.12.51.44
+ by smtp.gmail.com with ESMTPSA id y11sm5298734ejw.63.2020.06.27.12.51.43
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 27 Jun 2020 12:51:45 -0700 (PDT)
+ Sat, 27 Jun 2020 12:51:43 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 2/6] hw/intc: Add Loongson LIOINTC support
-Date: Sat, 27 Jun 2020 21:51:39 +0200
-Message-Id: <1593287503-25197-3-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 0/6] MIPS + TCG Continuous Benchmarking queue for June 27th,
+ 2020
+Date: Sat, 27 Jun 2020 21:51:37 +0200
+Message-Id: <1593287503-25197-1-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1593287503-25197-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1593287503-25197-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x533.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::52a;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x52a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -88,8 +82,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,296 +101,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Huacai Chen <zltjiangshi@gmail.com>
+The following changes since commit 553cf5d7c47bee05a3dec9461c1f8430316d516b:
 
-Loongson-3 has an integrated liointc (Local I/O Interrupt Controller).
-It is similar to Goldfish interrupt controller, but more powerful (e.g.,
-it can route external interrupt to multi-cores).
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200626' into staging (2020-06-26 18:22:36 +0100)
 
-Documents about Loongson-3's liointc:
-1, https://wiki.godson.ac.cn/ip_block:liointc;
-2, The "I/O中断" section of Loongson-3's user mannual, part 1.
+are available in the git repository at:
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <1592995531-32600-3-git-send-email-chenhc@lemote.com>
----
- hw/intc/loongson_liointc.c | 242 +++++++++++++++++++++++++++++++++++++++++++++
- hw/intc/Kconfig            |   3 +
- hw/intc/Makefile.objs      |   1 +
- 3 files changed, 246 insertions(+)
+  https://github.com/AMarkovic/qemu tags/mips-gsoc-queue-jun-27-2020
+
+for you to fetch changes up to 53fb8bfb93487c0fd88b0babb9a52ec8d67cff7b:
+
+  MAINTAINERS: Add 'Performance Tools and Tests' subsection (2020-06-27 20:15:07 +0200)
+
+----------------------------------------------------------------
+
+MIPS + TCG Continuous Benchmarking queue for June 27th, 2020
+
+   Highlights:
+
+     - add two additional elements of Loongson-3 support
+     - add first two Python scripts as a part of a GSoC project
+
+   Notes:
+
+     - several checkpatch warnings on updating MAINTAINERS should be ignored
+
+----------------------------------------------------------------
+
+Ahmed Karaman (2):
+  scripts/performance: Add topN_perf.py script
+  scripts/performance: Add topN_callgrind.py script
+
+Aleksandar Markovic (1):
+  MAINTAINERS: Add 'Performance Tools and Tests' subsection
+
+Huacai Chen (3):
+  hw/mips: Implement the kvm_type() hook in MachineClass
+  hw/intc: Add Loongson LIOINTC support
+  MAINTAINERS: Add Loongson-3 maintainer and reviewer
+
+ target/mips/kvm_mips.h                |  11 ++
+ hw/intc/loongson_liointc.c            | 242 ++++++++++++++++++++++++++++++++++
+ target/mips/kvm.c                     |  26 ++++
+ MAINTAINERS                           |  13 ++
+ hw/intc/Kconfig                       |   3 +
+ hw/intc/Makefile.objs                 |   1 +
+ scripts/performance/topN_callgrind.py | 140 ++++++++++++++++++++
+ scripts/performance/topN_perf.py      | 149 +++++++++++++++++++++
+ 8 files changed, 585 insertions(+)
  create mode 100644 hw/intc/loongson_liointc.c
+ create mode 100755 scripts/performance/topN_callgrind.py
+ create mode 100755 scripts/performance/topN_perf.py
 
-diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c
-new file mode 100644
-index 0000000..23ca51c
---- /dev/null
-+++ b/hw/intc/loongson_liointc.c
-@@ -0,0 +1,242 @@
-+/*
-+ * QEMU Loongson Local I/O interrupt controler.
-+ *
-+ * Copyright (c) 2020 Jiaxun Yang <jiaxun.yang@flygoat.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "qemu/module.h"
-+#include "hw/irq.h"
-+#include "hw/qdev-properties.h"
-+
-+#define D(x)
-+
-+#define NUM_IRQS                32
-+
-+#define NUM_CORES               4
-+#define NUM_IPS                 4
-+#define NUM_PARENTS             (NUM_CORES * NUM_IPS)
-+#define PARENT_COREx_IPy(x, y)  (NUM_IPS * x + y)
-+
-+#define R_MAPPER_START          0x0
-+#define R_MAPPER_END            0x20
-+#define R_ISR                   R_MAPPER_END
-+#define R_IEN                   0x24
-+#define R_IEN_SET               0x28
-+#define R_IEN_CLR               0x2c
-+#define R_PERCORE_ISR(x)        (0x40 + 0x8 * x)
-+#define R_END                   0x64
-+
-+#define TYPE_LOONGSON_LIOINTC "loongson.liointc"
-+#define LOONGSON_LIOINTC(obj) \
-+        OBJECT_CHECK(struct loongson_liointc, (obj), TYPE_LOONGSON_LIOINTC)
-+
-+struct loongson_liointc {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+    qemu_irq parent_irq[NUM_PARENTS];
-+
-+    uint8_t mapper[NUM_IRQS]; /* 0:3 for core, 4:7 for IP */
-+    uint32_t isr;
-+    uint32_t ien;
-+    uint32_t per_core_isr[NUM_CORES];
-+
-+    /* state of the interrupt input pins */
-+    uint32_t pin_state;
-+    bool parent_state[NUM_PARENTS];
-+};
-+
-+static void update_irq(struct loongson_liointc *p)
-+{
-+    uint32_t irq, core, ip;
-+    uint32_t per_ip_isr[NUM_IPS] = {0};
-+
-+    /* level triggered interrupt */
-+    p->isr = p->pin_state;
-+
-+    /* Clear disabled IRQs */
-+    p->isr &= p->ien;
-+
-+    /* Clear per_core_isr */
-+    for (core = 0; core < NUM_CORES; core++) {
-+        p->per_core_isr[core] = 0;
-+    }
-+
-+    /* Update per_core_isr and per_ip_isr */
-+    for (irq = 0; irq < NUM_IRQS; irq++) {
-+        if (!(p->isr & (1 << irq))) {
-+            continue;
-+        }
-+
-+        for (core = 0; core < NUM_CORES; core++) {
-+            if ((p->mapper[irq] & (1 << core))) {
-+                p->per_core_isr[core] |= (1 << irq);
-+            }
-+        }
-+
-+        for (ip = 0; ip < NUM_IPS; ip++) {
-+            if ((p->mapper[irq] & (1 << (ip + 4)))) {
-+                per_ip_isr[ip] |= (1 << irq);
-+            }
-+        }
-+    }
-+
-+    /* Emit IRQ to parent! */
-+    for (core = 0; core < NUM_CORES; core++) {
-+        for (ip = 0; ip < NUM_IPS; ip++) {
-+            int parent = PARENT_COREx_IPy(core, ip);
-+            if (p->parent_state[parent] !=
-+                (!!p->per_core_isr[core] && !!per_ip_isr[ip])) {
-+                p->parent_state[parent] = !p->parent_state[parent];
-+                qemu_set_irq(p->parent_irq[parent], p->parent_state[parent]);
-+            }
-+        }
-+    }
-+}
-+
-+static uint64_t
-+liointc_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    struct loongson_liointc *p = opaque;
-+    uint32_t r = 0;
-+
-+    /* Mapper is 1 byte */
-+    if (size == 1 && addr < R_MAPPER_END) {
-+        r = p->mapper[addr];
-+        goto out;
-+    }
-+
-+    /* Rest is 4 byte */
-+    if (size != 4 || (addr % 4)) {
-+        goto out;
-+    }
-+
-+    if (addr >= R_PERCORE_ISR(0) &&
-+        addr < R_PERCORE_ISR(NUM_CORES)) {
-+        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        r = p->per_core_isr[core];
-+        goto out;
-+    }
-+
-+    switch (addr) {
-+    case R_ISR:
-+        r = p->isr;
-+        break;
-+    case R_IEN:
-+        r = p->ien;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+out:
-+    D(qemu_log("%s: size=%d addr=%lx val=%x\n", __func__, size, addr, r));
-+    return r;
-+}
-+
-+static void
-+liointc_write(void *opaque, hwaddr addr,
-+          uint64_t val64, unsigned int size)
-+{
-+    struct loongson_liointc *p = opaque;
-+    uint32_t value = val64;
-+
-+    D(qemu_log("%s: size=%d, addr=%lx val=%x\n", __func__, size, addr, value));
-+
-+    /* Mapper is 1 byte */
-+    if (size == 1 && addr < R_MAPPER_END) {
-+        p->mapper[addr] = value;
-+        goto out;
-+    }
-+
-+    /* Rest is 4 byte */
-+    if (size != 4 || (addr % 4)) {
-+        goto out;
-+    }
-+
-+    if (addr >= R_PERCORE_ISR(0) &&
-+        addr < R_PERCORE_ISR(NUM_CORES)) {
-+        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        p->per_core_isr[core] = value;
-+        goto out;
-+    }
-+
-+    switch (addr) {
-+    case R_IEN_SET:
-+        p->ien |= value;
-+        break;
-+    case R_IEN_CLR:
-+        p->ien &= ~value;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+out:
-+    update_irq(p);
-+}
-+
-+static const MemoryRegionOps pic_ops = {
-+    .read = liointc_read,
-+    .write = liointc_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void irq_handler(void *opaque, int irq, int level)
-+{
-+    struct loongson_liointc *p = opaque;
-+
-+    p->pin_state &= ~(1 << irq);
-+    p->pin_state |= level << irq;
-+    update_irq(p);
-+}
-+
-+static void loongson_liointc_init(Object *obj)
-+{
-+    struct loongson_liointc *p = LOONGSON_LIOINTC(obj);
-+    int i;
-+
-+    qdev_init_gpio_in(DEVICE(obj), irq_handler, 32);
-+
-+    for (i = 0; i < NUM_PARENTS; i++) {
-+        sysbus_init_irq(SYS_BUS_DEVICE(obj), &p->parent_irq[i]);
-+    }
-+
-+    memory_region_init_io(&p->mmio, obj, &pic_ops, p,
-+                         "loongson.liointc", R_END);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &p->mmio);
-+}
-+
-+static const TypeInfo loongson_liointc_info = {
-+    .name          = TYPE_LOONGSON_LIOINTC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(struct loongson_liointc),
-+    .instance_init = loongson_liointc_init,
-+};
-+
-+static void loongson_liointc_register_types(void)
-+{
-+    type_register_static(&loongson_liointc_info);
-+}
-+
-+type_init(loongson_liointc_register_types)
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index f562342..2ae1e89 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -64,3 +64,6 @@ config OMPIC
- 
- config RX_ICU
-     bool
-+
-+config LOONGSON_LIOINTC
-+    bool
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index a420263..3ac2b40 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -51,3 +51,4 @@ obj-$(CONFIG_MIPS_CPS) += mips_gic.o
- obj-$(CONFIG_NIOS2) += nios2_iic.o
- obj-$(CONFIG_OMPIC) += ompic.o
- obj-$(CONFIG_IBEX) += ibex_plic.o
-+obj-$(CONFIG_LOONGSON_LIOINTC) += loongson_liointc.o
 -- 
 2.7.4
 
