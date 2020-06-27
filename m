@@ -2,89 +2,88 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FC8C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 12:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11071C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 12:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E50B21707
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 12:23:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE17221707
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 12:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NA0NfqF3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E50B21707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mB9i07kv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE17221707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jp9rO-00006c-Bm
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 08:23:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40648)
+	id 1jpA0o-0001rT-28
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 08:32:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9qj-0007y5-Gt
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 08:22:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30374
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jp9qh-0005rq-SU
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 08:22:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593260543;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=VaVprD8Ftz5/0v7U7e9X5wy0OfkoFg6jOgctenkuGRw=;
- b=NA0NfqF3aAqT+I+RammG+S/Yu/ENVh6VuWjmU2wHsIhVbkVLnhablbikydcSbPHWjN2oMs
- JrAYi1YtriUHtU99cEB7Yi2wskttBb3f+g4rJq+xFq6ZBvacyCCqrfiRlon3sNl/tPalSr
- +JOB+PwYqR7k37pEevA+MnNc/9n6anI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-rhvIaRmFMPevaWQHDxbRGQ-1; Sat, 27 Jun 2020 08:22:18 -0400
-X-MC-Unique: rhvIaRmFMPevaWQHDxbRGQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E18E418B9FC4;
- Sat, 27 Jun 2020 12:22:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB9375D9D7;
- Sat, 27 Jun 2020 12:22:17 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 38F7011384A6; Sat, 27 Jun 2020 14:22:16 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 00/16] Crazy shit around -global (pardon my french)
-References: <20200622094227.1271650-1-armbru@redhat.com>
- <c0d6ea24-eb20-3d99-ae02-1d762fd6c9dd@redhat.com>
- <87zh8r7nzd.fsf@dusky.pond.sub.org>
- <3ca757d9-39ff-677e-8062-729c3cb9db42@redhat.com>
-Date: Sat, 27 Jun 2020 14:22:16 +0200
-In-Reply-To: <3ca757d9-39ff-677e-8062-729c3cb9db42@redhat.com> (John Snow's
- message of "Fri, 26 Jun 2020 11:11:04 -0400")
-Message-ID: <874kqwr953.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jp9zn-0001Qg-Ew
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 08:31:47 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:40727)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jp9zk-00079l-TY
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 08:31:47 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id s1so5836523ybo.7
+ for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 05:31:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=mZVXylNS0QqeZDNUQ0AqhV35xdT2vypPbdw2qcIaTgk=;
+ b=mB9i07kvncltTx+USIFQhfDsxrfy9w8lHaXu1M5l20tHl0Y90Cw7wi9lmne70ffzOs
+ +NQbQowpwfCns4a9FiSXJzsrD6ISg0JaF7RSZ8+LqWWZvvZLfXHxiRPPvgscTV1tVYqS
+ E0MZWuiK20xVTRXjoQSFLrj1lIf6BA8hijPf5xBDTPSsAJDIwKce8IjeaL8Q5p73n17t
+ XO+C4/JS9CSpGabGl9ABST1Sx/NnAaGUSnhu0AW6DVFQrQNK79bE+II/hNmMD45oq8FS
+ 7OXYvok/ka5lhRGTcCK0V4zr4kz7Dy/JS/LUo+4WgT9WkrDZFX60onrXlx4I+2wqewlo
+ PzKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=mZVXylNS0QqeZDNUQ0AqhV35xdT2vypPbdw2qcIaTgk=;
+ b=l3t5zH+iiEYbX5JAEIR50Eihkax9yXJKZlGr1oCin1czdtmCHzIYSdkGVTLbAyxyfj
+ W7PuNC9bLPwPVPxghDQ7HfOXPmzAQ95JKBwDIi+RA5nHbTv7mMv7d/OISj+/Kslex3lj
+ BlYuprxKL/KzJrspOhLbqDSXgTlyxcKR/ZHiWPznxVuTCkaqZaX93MmxYxbd9OSG4Lhw
+ wQIfiBp0c8orRgvJFRtiGE5/BbDdX357gtQ/pPhrSyRFk3jH8fCTwKhndwZkHsXcUvP0
+ jQw4oIz3v3lh+BWjMYrLhUFse+Qp6qE1rDaN+YgjYT6hV1Pf1t+96NytGOuQemWuIVNT
+ YGBg==
+X-Gm-Message-State: AOAM532ZjEUrzHezv4IY09Q+wZ4/GKzx3iqGW2RwnZbYJo2fp/C5Z5JV
+ cGu0LNRMh371FxywflqCKwBAIBx9YPbDaw3kt9E=
+X-Google-Smtp-Source: ABdhPJw6c9Wtya54LpgyN9fRIdlL/6lC6lxA6TqCJw9NS2ku7ij4KwVIgIITqk1Z9ZEnF7Is8TUZFYdadqV/HXe1SZE=
+X-Received: by 2002:a25:c507:: with SMTP id v7mr11874893ybe.306.1593261102721; 
+ Sat, 27 Jun 2020 05:31:42 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 07:57:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1593177220-28143-1-git-send-email-bmeng.cn@gmail.com>
+ <385afacc-f544-f595-ce8b-eed56fb7d017@redhat.com>
+In-Reply-To: <385afacc-f544-f595-ce8b-eed56fb7d017@redhat.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Sat, 27 Jun 2020 20:31:31 +0800
+Message-ID: <CAEUhbmX6jXrkC5TAgNBPBzTcy9xgFmbUeE2q+5ateFq_h7R-Pg@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Add an entry for OpenSBI firmware
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,94 +96,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, pbonzini@redhat.com, mreitz@redhat.com,
- David Alan Gilbert <dgilbert@redhat.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: David for insurance against me spewing nonsense about migration.
+Hi Philippe,
 
-John Snow <jsnow@redhat.com> writes:
-
-> On 6/25/20 12:45 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> On 6/22/20 5:42 AM, Markus Armbruster wrote:
->>>> There are three ways to configure backends:
->>>>
->>>> * -nic, -serial, -drive, ... (onboard devices)
->>>>
->>>> * Set the property with -device, or, if you feel masochistic, with
->>>>   -set device (pluggable devices)
->>>>
->>>> * Set the property with -global (both)
->>>>
->>>> The trouble is -global is terrible.
->>>>
->>>> It gets applied in object_new(), which can't fail.  We treat failure
->>>> to apply -global as fatal error, except when hot-plugging, where we
->>>> treat it as warning *boggle*.  I'm not addressing that today.
->>>>
->>>> Some code falls apart when you use both -global and the other way.
->>>>
->>>> To make life more interesting, we gave -drive two roles: with
->>>> interface type other than none, it's for configuring onboard devices,
->>>> and with interface type none, it's for defining backends for use with
->>>> -device and such.  Since we neglect to require interface type none for
->>>> the latter, you can use one -drive in both roles.  This confuses the
->>>> code about as much as you, dear reader, probably are by now.
->>>>
->>>> Because this still isn't interesting enough, there's yet another way
->>>> to configure backends, just for floppies: set the floppy controller's
->>>> property.  Goes back to the time when floppy wasn't a separate device,
->>>> and involves some Bad Magic.  Now -global can interact with itself!
->>>>
->>>> Digging through all this took me an embarrassing amount of time.
->>>> Hair, too.
->>>>
->>>> My patches reject some the silliest uses outright, and deprecate some
->>>> not so silly ones that have replacements.
->>>>
->>>> Apply on top of my "[PATCH v2 00/58] qdev: Rework how we plug into the
->>>> parent bus".
->>>>
->>>
->>> Oof. Thank you for your work in fixing our darkest corners. I sincerely
->>> appreciate it.
->>>
->>> The qdev tree ordering problems don't cause any issues for migration, do
->>> they?
->> 
->> This series should only change device configuration, not device state or
->> its encoding in the migration stream.
->> 
->> I'm not sure what you mean by "qdev tree ordering problems".  Ist it
->> commit e8c9e65816 'qom: Make "info qom-tree" show children sorted'?
->> 
->>> (I see you already sent a PR, so whatever!)
->> 
->> A question that might avoid a later migration debugging session is
->> *never* "whatever"!
->> 
+On Fri, Jun 26, 2020 at 10:05 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> I thought I had read that one of these patches changes the order in
-> which devices get instantiated, which I thought might change their QOM
-> paths. Which I thought *might* have some ramifications for migration,
-> but wasn't sure.
-
-Device instantiation order changes should not break migration.
-
-The order in which devices appear in the migration stream should not
-matter.
-
-> If it's just showing the same path outputs *sorted*, then there's no
-> problem.
+> On 6/26/20 3:13 PM, Bin Meng wrote:
+> > List me as the maintainer for OpenSBI firmware related files.
+> >
+> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> > ---
+> >
+> >  MAINTAINERS | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 1b40446..b0e2dd2 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -2609,6 +2609,13 @@ F: tests/uefi-test-tools/
+> >  F: .gitlab-ci.d/edk2.yml
+> >  F: .gitlab-ci.d/edk2/
+> >
+> > +OpenSBI Firmware
+> > +M: Bin Meng <bmeng.cn@gmail.com>
+> > +S: Supported
+> > +F: pc-bios/opensbi-*
+> > +F: .gitlab-ci.d/opensbi.yml
+> > +F: .gitlab-ci.d/opensbi/
 >
-> Likely misread.
+> Or simply:
 >
-> --js
+>    F: .gitlab-ci.d/opensbi*
 
+I was following the EDK2 entry example above. Should I send a v2 or
+leave this as it is?
+
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks for the review!
+
+Regards,
+Bin
 
