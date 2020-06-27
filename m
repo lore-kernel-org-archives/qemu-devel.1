@@ -2,86 +2,77 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EE7C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 20:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FDEC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 21:36:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DEEA20663
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 20:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 405CA206D7
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 21:36:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zx0aIqJc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DEEA20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XdxpcFom"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 405CA206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpHgl-0007ns-Da
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 16:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42696)
+	id 1jpIUs-0000zN-IR
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 17:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jpHfu-0007NA-Ah
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 16:43:46 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37253)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpIU5-0000Y2-JO
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 17:35:37 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:37124)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jpHfs-0002tI-3j
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 16:43:46 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d4so6544982pgk.4
- for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 13:43:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpIU1-00027n-Tf
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 17:35:37 -0400
+Received: by mail-ot1-x332.google.com with SMTP id w17so4102442otl.4
+ for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 14:35:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+WQjJGh2V3T30xcJjGPaL5lDoZ33TmpzpIRKf2o/+y4=;
- b=zx0aIqJcV3FjhsiYFF17LiIb4Yu1XEjXBWc0KlhYGDLDawKCZSx29lZNaCCOH7Hrim
- W5FXWfln2yi/ah1BFUXLQs3GE87+WousVhuV4hN3Ajw2u2wGkI22pFUUVGzGGfEbWpYj
- gLUbahyDQBF4XxihimZvmaIjxOdlGSpeRImPA8QMel0kaG1vvMHOxMdD1ieBPQcntSg4
- 5xbJGDNZSw/X5UIXrzoHBENNupqXhagfB+BqOyUw8GvJ3eQ08Pk1TS1cPiGLCGa9Mf+g
- FKvZnKUgY8gz5bKkX4tYii4x0iGlr1OTrD/s/AgKmLvhiOsjbzabM+EIl3DAw408ReXT
- /uPg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=MsJiXeJr1Xvdhi+WbuyBmY5tZOOiKlCBDrNJ75v4aEc=;
+ b=XdxpcFomXN2pRm1euEytXkqHg0DYmqJbcDOm01eaDWymwBlQMLEaLHYA8SPcS0mJUd
+ mw6wOnQolQaISjZlw0wMRnmkjAgHIkEfCRX6QydMLXRMr6m4iTl2eMgW5WwehY2vDPGW
+ ax32ftryo+bVWhClTPrd4RUsh7/QHN2MxJpqWNeMuJrwvim4I7P+6gfAB0Ak2lquMm7q
+ P3U9SfXC7D4pjWdYWNmNt0Mjj4GEF6V/F7Lgq/bUGPHAzd2/gReyyFrVxwDjaJqA5ssc
+ FKluctmV30rZPdKR7SJRThM6sUtNMgShZbEjgxNlGbPr3R3/ZdGpkbEPNiancs7wm0WD
+ 9E0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+WQjJGh2V3T30xcJjGPaL5lDoZ33TmpzpIRKf2o/+y4=;
- b=sivJTXqJAYYscLLTCiLienLDD4l1753f9kIUHg6ws8OCReENkI7yEriNJpXfniwtfX
- J5teAl2oaKzu7TaUSIVEkrzH9B4Li9Y+S/lkajiFIokWW60FJkUlxt00PcVnZFZdovOi
- lMvfllq0w+yBR5S6GWjBCtEhOPhCcQfkNOfs4hHFvVmQ5vhfRz+e6Uk8BUZ1CSRgzYrT
- KSweVFFNzAH1xdSAa4lgClUvZRmR+H09DtnPQNRqawmf3OC+2MySHmbk9UyAPtw9+9Dv
- dNsF57M6wjKqh+IlEhfoYIcA9BQB+POT2vDFDSsdEh0Ozps04FHHYxKPIxEb7GQzAAph
- lVCw==
-X-Gm-Message-State: AOAM530cUgRAXjPd/5NEgIzeS9ZdbfesN03GVqvDuEiI64YiJ95j56Cs
- nH0gnLfl4QuYRmIKNXPDvPkO6Q==
-X-Google-Smtp-Source: ABdhPJyRjuOvhuG8isx6RGiXSAXMt0E8S1vBJd9MBMYcgjAyxoJ03/yMkxLDFcrLhlHDeoIxJyFjkw==
-X-Received: by 2002:aa7:9af0:: with SMTP id y16mr8641625pfp.231.1593290620163; 
- Sat, 27 Jun 2020 13:43:40 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id f6sm31531065pfe.174.2020.06.27.13.43.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 27 Jun 2020 13:43:39 -0700 (PDT)
-Subject: Re: [PATCH v5] osdep: Make MIN/MAX evaluate arguments only once
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200625162602.700741-1-eblake@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c63269f4-e2da-4490-97b3-b2b260ed14d7@linaro.org>
-Date: Sat, 27 Jun 2020 13:43:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=MsJiXeJr1Xvdhi+WbuyBmY5tZOOiKlCBDrNJ75v4aEc=;
+ b=coe9G8SUsz3uw/aXS//fKbFksmSvVepFc3nboNcI2UNCZ2WOyKgwGmqOSEtLy2JgSK
+ pSqdMgy1NTeFMV6oYrAaarpMD+jtLsH1CHGg6+aEAGc0j75PxTyfqc6kgDCr/7sUKHxk
+ xtaIekjpqzFCut6CCr8i7DfVIMWcFTDpVG19tkbHh/LTkK8WR2kSNaaQYSXwsliszbl0
+ NRXaITUsWNmkfPd3x1+x/IQsrc/kor8YvdANQ0YGN4W4tmkrQA82fYuA0K5lNTnp/fJJ
+ K9UpV9ejkv+K5j25/zRZaDexulQxtaN2vSHIOYyXHhNKwBFid5XYQApRHuNrYxhXRZ6x
+ LlMQ==
+X-Gm-Message-State: AOAM532dW0ppK63Dar+KvK5N7iVnoxg9nS3maeyE5IIR0JI/zsk6Xjws
+ kY4T0j311MFxA6gT/sGiGXX+RkGvyPNqYcOrEqzPMg==
+X-Google-Smtp-Source: ABdhPJyb5+l4SvzQffkAdOJjrSsslG+I7NecLE/EucWhESBvtzUtTHI0Hv+w7Ak2O62GaENDl5VQNZs+Taip+7vTcJQ=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr5141328ota.91.1593293732456; 
+ Sat, 27 Jun 2020 14:35:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200625162602.700741-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+References: <20200626135608.6920-1-pbonzini@redhat.com>
+ <20200626135608.6920-3-pbonzini@redhat.com>
+In-Reply-To: <20200626135608.6920-3-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 27 Jun 2020 22:35:21 +0100
+Message-ID: <CAFEAcA9DOyivMUS1gAE_BPcmO7yf6J8d-_YZ8W=Ox8U_O0QcBg@mail.gmail.com>
+Subject: Re: [PULL v2 25/31] osdep: Make MIN/MAX evaluate arguments only once
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,89 +94,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 9:26 AM, Eric Blake wrote:
+On Fri, 26 Jun 2020 at 14:57, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: Eric Blake <eblake@redhat.com>
+>
 > I'm not aware of any immediate bugs in qemu where a second runtime
 > evaluation of the arguments to MIN() or MAX() causes a problem, but
 > proactively preventing such abuse is easier than falling prey to an
 > unintended case down the road.  At any rate, here's the conversation
 > that sparked the current patch:
 > https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
-> 
-> Update the MIN/MAX macros to only evaluate their argument once at
-> runtime; this uses typeof(1 ? (a) : (b)) to ensure that we are
-> promoting the temporaries to the same type as the final comparison (we
-> have to trigger type promotion, as typeof(bitfield) won't compile; and
-> we can't use typeof((a) + (b)) or even typeof((a) + 0), as some of our
-> uses of MAX are on void* pointers where such addition is undefined).
-> 
-> However, we are unable to work around gcc refusing to compile ({}) in
-> a constant context (such as the array length of a static variable),
-> even when only used in the dead branch of a __builtin_choose_expr(),
-> so we have to provide a second macro pair MIN_CONST and MAX_CONST for
-> use when both arguments are known to be compile-time constants and
-> where the result must also be usable as a constant; this second form
-> evaluates arguments multiple times but that doesn't matter for
-> constants.  By using a void expression as the expansion if a
-> non-constant is presented to this second form, we can enlist the
-> compiler to ensure the double evaluation is not attempted on
-> non-constants.
-> 
-> Alas, as both macros now rely on compiler intrinsics, they are no
-> longer usable in preprocessor #if conditions; those will just have to
-> be open-coded or the logic rewritten into #define or runtime 'if'
-> conditions (but where the compiler dead-code-elimination will probably
-> still apply).
-> 
-> I tested that both gcc 10.1.1 and clang 10.0.0 produce errors for all
-> forms of macro mis-use.  As the errors can sometimes be cryptic, I'm
-> demonstrating the gcc output:
-> 
-> Use of MIN when MIN_CONST is needed:
-> 
-> In file included from /home/eblake/qemu/qemu-img.c:25:
-> /home/eblake/qemu/include/qemu/osdep.h:249:5: error: braced-group within expression allowed only inside a function
->   249 |     ({                                                  \
->       |     ^
-> /home/eblake/qemu/qemu-img.c:92:12: note: in expansion of macro ‘MIN’
->    92 | char array[MIN(1, 2)] = "";
->       |            ^~~
-> 
-> Use of MIN_CONST when MIN is needed:
-> 
-> /home/eblake/qemu/qemu-img.c: In function ‘is_allocated_sectors’:
-> /home/eblake/qemu/qemu-img.c:1225:15: error: void value not ignored as it ought to be
->  1225 |             i = MIN_CONST(i, n);
->       |               ^
-> 
-> Use of MIN in the preprocessor:
-> 
-> In file included from /home/eblake/qemu/accel/tcg/translate-all.c:20:
-> /home/eblake/qemu/accel/tcg/translate-all.c: In function ‘page_check_range’:
-> /home/eblake/qemu/include/qemu/osdep.h:249:6: error: token "{" is not valid in preprocessor expressions
->   249 |     ({                                                  \
->       |      ^
-> 
-> Fix the resulting callsites that used #if or computed a compile-time
-> constant min or max to use the new macros.  cpu-defs.h is interesting,
-> as CPU_TLB_DYN_MAX_BITS is sometimes used as a constant and sometimes
-> dynamic.
-> 
-> It may be worth improving glib's MIN/MAX definitions to be saner, but
-> that is a task for another day.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hi; the changes in this patch seem to confuse Coverity.
 
-r~
+> +#undef MIN
+> +#define MIN(a, b)                                       \
+> +    ({                                                  \
+> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
+> +        _a < _b ? _a : _b;                              \
+> +    })
+> +#define MIN_CONST(a, b)                                         \
+> +    __builtin_choose_expr(                                      \
+> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
+> +        (a) < (b) ? (a) : (b),                                  \
+> +        ((void)0))
+> +#undef MAX
+> +#define MAX(a, b)                                       \
+> +    ({                                                  \
+> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
+> +        _a > _b ? _a : _b;                              \
+> +    })
+> +#define MAX_CONST(a, b)                                         \
+> +    __builtin_choose_expr(                                      \
+> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
+> +        (a) > (b) ? (a) : (b),                                  \
+> +        ((void)0))
+
+In particular, where MIN_CONST or MAX_CONST are used to
+define values that must be const, eg in qemu-file.c:
+ 50    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+or in hcd-xhci.h:
+217    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
+
+Coverity reports:
+
+CID 1429992 (#1 of 1): Unrecoverable parse warning (PARSE_ERROR)1.
+expr_not_constant: expression must have a constant value
+
+Can we do something (eg providing fallback less-intelligent
+versions of the macro ifdef __COVERITY__) to help it?
+
+(This is the cause of CID 1429992, 1429995, 1429997,
+1429999. Parse errors are unfortunate because Coverity
+abandons analysis of the affected function entirely,
+and analysis of its callers is also limited.)
+
+thanks
+-- PMM
 
