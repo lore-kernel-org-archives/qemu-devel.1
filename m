@@ -2,89 +2,93 @@ Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA70EC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F36C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A21720781
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5965A20775
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 17:13:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Gm2cMMdG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A21720781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Oe89Vxpm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5965A20775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpEOe-0004eD-PZ
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 13:13:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34774)
+	id 1jpEOg-0004hE-Gf
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 13:13:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jpELK-0007kz-W3
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:20 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46936)
+ id 1jpELP-0007vq-K7
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:23 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47030)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jpELH-00070t-IF
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:18 -0400
+ id 1jpELM-00072i-8D
+ for qemu-devel@nongnu.org; Sat, 27 Jun 2020 13:10:23 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH23Yf156267;
- Sat, 27 Jun 2020 17:09:53 GMT
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH2ZtU156367;
+ Sat, 27 Jun 2020 17:10:13 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=O3KrEYe5UkGPUGGhs7rr8EcXQfJfDXd5DMHibEJug0M=;
- b=Gm2cMMdGZS2ny5NCE4JtChIyyCDWZgoNExfXglulQ6h5F+ES18SktLRgSdD9EL9NYTu4
- widCzFVXgw5Hqv1PypuapQKDzc+zSmIygNycVck54IxhHHDOFhViKgL41LRQCB67WoY+
- PHkkcVJjOBIdrzhRVoMWIHFPMkYN1M7cdns4SJ2Yk8PPyT0wFc+JjJvR/l5SD/OIsWkR
- KcpzSOcR1WXFx371dApVw3D3ozWMLBYtEucUDoxizFnWlkOVV9E6AqUaeEgVsDymMZpP
- nTaoTzcUSIvz5q4f1fZWjy2wEIAkNmvQhrsa77iapVKJQcjKJfZaFDY1nz6k0QMxpDWH 8w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 31wx2m9awt-1
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=QWNGmCt4M4eOkFjbFAU1RTjyDzQBljVmuABqcrHbEqQ=;
+ b=Oe89Vxpm0OnZWICWa9mqkbCnvGpIwam0PNtn3nZZN1VYa/w029YxLEKVnG83n3rqo8vU
+ RwGUO6HxQdgfAot3m2QIljLwYkl9kT/uwJ9rqGs6xzGB0Yxw6MJX/vehrXCu7JJv9o/s
+ j0uvhB09W494JKNZsL6MDgYYZIAJuWA55/YNE0tCIqFvQIBZJAb9ZJY0rKmkVcMijl9y
+ qC4NzBhT3CzGc5XzcIN2W/hZCQrOr3//TR1irdOjtQmHl30HUAbrr+hMP7TACsWkQ+ql
+ cuhWK9TzHNTsVA4J2Czy2DwHNMhPy4/OFdDe0vbN/odBg334WUe+4eSV3anEWROt83yz WQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 31wx2m9axn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Sat, 27 Jun 2020 17:09:53 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH8Pl2102150;
- Sat, 27 Jun 2020 17:09:52 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 31wwx17sa8-1
+ Sat, 27 Jun 2020 17:10:13 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05RH7atv195219;
+ Sat, 27 Jun 2020 17:10:12 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 31wu7s8y44-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sat, 27 Jun 2020 17:09:52 +0000
+ Sat, 27 Jun 2020 17:10:12 +0000
 Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05RH9kuS030503;
- Sat, 27 Jun 2020 17:09:46 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05RHABIG024202;
+ Sat, 27 Jun 2020 17:10:11 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Sat, 27 Jun 2020 10:09:45 -0700
+ with ESMTP ; Sat, 27 Jun 2020 10:10:11 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 00/21] Initial support for multi-process qemu
-Date: Sat, 27 Jun 2020 10:09:22 -0700
-Message-Id: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH v7 13/21] multi-process: Forward PCI config space acceses to
+ the remote process
+Date: Sat, 27 Jun 2020 10:09:35 -0700
+Message-Id: <736d124ffb6c58e8061baba2503981f5e8b3f70b.1593273671.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
+In-Reply-To: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9665
  signatures=668680
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- suspectscore=0
- adultscore=0 mlxscore=0 spamscore=0 bulkscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006270124
+ bulkscore=0 spamscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 suspectscore=1 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006270124
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9665
  signatures=668680
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
  mlxscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=999 clxscore=1011 adultscore=0
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015 adultscore=0
  impostorscore=0 cotscore=-2147483648 priorityscore=1501 malwarescore=0
- phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ phishscore=0 suspectscore=1 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.12.0-2004280000 definitions=main-2006270123
 Received-SPF: pass client-ip=141.146.126.78;
  envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
@@ -96,8 +100,7 @@ X-Spam_bar: ------
 X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,161 +127,236 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Hello
+The Proxy Object sends the PCI config space accesses as messages
+to the remote process over the communication channel
 
-This is the v7 of the patchset.
-Thank you very much for the detailed feedback for v6. We appreciate your time.
+TODO:
+Investigate if the local PCI config writes can be dropped.
+Without the proxy local PCI config space writes for the device,
+the driver in the guest times out on the probing.
+We have tried to only refer to the remote for the PCI config writes,
+but the driver timeout in the guest forced as to left this
+as it is (removing local PCI config only).
 
-We have addressed the latest comments and suggestions that were
-provided on v6 patch series and incorporated to this patchset.
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+---
+ hw/i386/remote-msg.c     | 54 ++++++++++++++++++++++++++++++++++++++++
+ hw/pci/proxy.c           | 54 ++++++++++++++++++++++++++++++++++++++++
+ include/io/mpqemu-link.h |  8 ++++++
+ io/mpqemu-link.c         | 14 +++++++++++
+ 4 files changed, 130 insertions(+)
 
-This is the list of changes for v7:
- - QEMU & remote process share the same binary.
-   This allowed us to reduce the number of patches as well.
-
- - We introduced the machine type "remote" that drives the remote process
-   initialization.
-
- - v7 now uses QIOChannel for communication and descriptors management.
-
- - The remote process uses the main loop instead of a separate loop.
-
- - Co-routines support in the QEMU Proxy-remote process communication
-   The communication model based on co-routines needs some more work and
-   we would like to hear your take on it.
-   Stefan has shared some ideas how we can proceed and we will take this
-   to the next version after additional discussion.
-   We did not implement the protocol to listen and accept new connections.
-
-There are other changes that were incorporated from the feedback we have
-received on v6.
-
-We posted the Proof Of Concept patches [2] before the BoF session in 2018.
-Subsequently, we posted RFC v1 [3], RFC v2 [4], RFC v3 [5], RFC v4 [6],
-v5 [7] and v6 [8] of the patch series.
-Following people contributed to this patchset:
-
-John G Johnson <john.g.johnson@oracle.com>
-Jagannathan Raman <jag.raman@oracle.com>
-Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Kanth Ghatraju <kanth.ghatraju@oracle.com>
-Konrad Wilk <konrad.wilk@oracle.com>
-
-Also we would like to thank QEMU community for your help, suggestions
-and reviewing this large series of patches.
-
-For the full concept writeup about QEMU multi-process, please refer to
-docs/devel/qemu-multiprocess.rst. Also see docs/qemu-multiprocess.txt for
-usage information.
-
-We will post separate patchsets for the following improvements for
-the experimental Qemu multi-process:
- - Live migration;
- - communication channel improvements;
-
-We welcome all your ideas, concerns, and questions for this patchset.
-
-[1]: http://events17.linuxfoundation.org/sites/events/files/slides/KVM%20FORUM%20multi-process.pdf
-[1]: https://www.youtube.com/watch?v=Kq1-coHh7lg
-[2]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg566538.html
-[3]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg602285.html
-[4]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg624877.html
-[5]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg642000.html
-[6]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg655118.html
-[7]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg682429.html
-[8]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg697484.html
-
-Elena Ufimtseva (9):
-  multi-process: add qio channel function to transmit
-  multi-process: define MPQemuMsg format and transmission functions
-  multi-process: add co-routines to communicate with remote
-  multi-process: Initialize communication channel at the remote end
-  multi-process: introduce proxy object
-  multi-process: Forward PCI config space acceses to the remote process
-  multi-process: heartbeat messages to remote
-  multi-process: perform device reset in the remote process
-  multi-process: add configure and usage information
-
-Jagannathan Raman (11):
-  memory: alloc RAM from file at offset
-  multi-process: Add config option for multi-process QEMU
-  multi-process: setup PCI host bridge for remote device
-  multi-process: setup a machine object for remote device process
-  multi-process: Initialize message handler in remote device
-  multi-process: setup memory manager for remote device
-  multi-process: Connect Proxy Object with device in the remote process
-  multi-process: PCI BAR read/write handling for proxy & remote
-    endpoints
-  multi-process: Synchronize remote memory
-  multi-process: create IOHUB object to handle irq
-  multi-process: Retrieve PCI info from remote process
-
-John G Johnson (1):
-  multi-process: add the concept description to
-    docs/devel/qemu-multiprocess
-
- MAINTAINERS                          |  24 +
- backends/hostmem-memfd.c             |   2 +-
- configure                            |  11 +
- docs/devel/index.rst                 |   1 +
- docs/devel/multi-process.rst         | 957 +++++++++++++++++++++++++++
- docs/multi-process.rst               |  71 ++
- exec.c                               |  11 +-
- hw/Makefile.objs                     |   1 +
- hw/i386/Makefile.objs                |   3 +
- hw/i386/remote-memory.c              |  58 ++
- hw/i386/remote-msg.c                 | 301 +++++++++
- hw/i386/remote.c                     |  99 +++
- hw/misc/ivshmem.c                    |   3 +-
- hw/pci-host/Makefile.objs            |   1 +
- hw/pci-host/remote.c                 |  63 ++
- hw/pci/Makefile.objs                 |   2 +
- hw/pci/memory-sync.c                 | 214 ++++++
- hw/pci/proxy.c                       | 436 ++++++++++++
- hw/remote/Makefile.objs              |   1 +
- hw/remote/iohub.c                    | 153 +++++
- include/exec/memory.h                |   2 +
- include/exec/ram_addr.h              |   2 +-
- include/hw/i386/remote-memory.h      |  20 +
- include/hw/i386/remote.h             |  38 ++
- include/hw/pci-host/remote.h         |  34 +
- include/hw/pci/memory-sync.h         |  30 +
- include/hw/pci/pci_ids.h             |   3 +
- include/hw/pci/proxy.h               |  69 ++
- include/hw/remote/iohub.h            |  50 ++
- include/io/channel.h                 |  24 +
- include/io/mpqemu-link.h             | 140 ++++
- include/qemu/mmap-alloc.h            |   3 +-
- io/Makefile.objs                     |   2 +
- io/channel.c                         |  45 ++
- io/mpqemu-link.c                     | 277 ++++++++
- memory.c                             |   3 +-
- scripts/mpqemu-launcher-perf-mode.py |  67 ++
- scripts/mpqemu-launcher.py           |  47 ++
- util/mmap-alloc.c                    |   7 +-
- util/oslib-posix.c                   |   2 +-
- 40 files changed, 3264 insertions(+), 13 deletions(-)
- create mode 100644 docs/devel/multi-process.rst
- create mode 100644 docs/multi-process.rst
- create mode 100644 hw/i386/remote-memory.c
- create mode 100644 hw/i386/remote-msg.c
- create mode 100644 hw/i386/remote.c
- create mode 100644 hw/pci-host/remote.c
- create mode 100644 hw/pci/memory-sync.c
- create mode 100644 hw/pci/proxy.c
- create mode 100644 hw/remote/Makefile.objs
- create mode 100644 hw/remote/iohub.c
- create mode 100644 include/hw/i386/remote-memory.h
- create mode 100644 include/hw/i386/remote.h
- create mode 100644 include/hw/pci-host/remote.h
- create mode 100644 include/hw/pci/memory-sync.h
- create mode 100644 include/hw/pci/proxy.h
- create mode 100644 include/hw/remote/iohub.h
- create mode 100644 include/io/mpqemu-link.h
- create mode 100644 io/mpqemu-link.c
- create mode 100644 scripts/mpqemu-launcher-perf-mode.py
- create mode 100755 scripts/mpqemu-launcher.py
-
+diff --git a/hw/i386/remote-msg.c b/hw/i386/remote-msg.c
+index 68f50866bb..aa5780d521 100644
+--- a/hw/i386/remote-msg.c
++++ b/hw/i386/remote-msg.c
+@@ -11,10 +11,16 @@
+ 
+ static void process_connect_dev_msg(MPQemuMsg *msg, QIOChannel *com,
+                                     Error **errp);
++static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
++                                 MPQemuMsg *msg);
++static void process_config_read(QIOChannel *ioc, PCIDevice *dev,
++                                MPQemuMsg *msg);
+ 
+ gboolean mpqemu_process_msg(QIOChannel *ioc, GIOCondition cond,
+                             gpointer opaque)
+ {
++    DeviceState *dev = (DeviceState *)opaque;
++    PCIDevice *pci_dev = PCI_DEVICE(dev);
+     Error *local_err = NULL;
+     MPQemuMsg msg = { 0 };
+ 
+@@ -42,6 +48,12 @@ gboolean mpqemu_process_msg(QIOChannel *ioc, GIOCondition cond,
+     case CONNECT_DEV:
+         process_connect_dev_msg(&msg, ioc, &local_err);
+         break;
++    case PCI_CONFIG_WRITE:
++        process_config_write(ioc, pci_dev, &msg);
++        break;
++    case PCI_CONFIG_READ:
++        process_config_read(ioc, pci_dev, &msg);
++        break;
+     default:
+         error_setg(&local_err, "Unknown command (%d) received from proxy \
+                    in remote process pid=%d", msg.cmd, getpid());
+@@ -89,3 +101,45 @@ exit:
+ 
+     mpqemu_msg_send(&ret, com);
+ }
++
++static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
++                                 MPQemuMsg *msg)
++{
++    struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
++    MPQemuMsg ret = { 0 };
++
++    if (conf->addr >= PCI_CFG_SPACE_EXP_SIZE) {
++        error_report("Bad address received when writing PCI config, pid %d",
++                     getpid());
++        ret.data1.u64 = UINT64_MAX;
++    } else {
++        pci_default_write_config(dev, conf->addr, conf->val, conf->l);
++    }
++
++    ret.cmd = RET_MSG;
++    ret.bytestream = 0;
++    ret.size = sizeof(ret.data1);
++
++    mpqemu_msg_send(&ret, ioc);
++}
++
++static void process_config_read(QIOChannel *ioc, PCIDevice *dev,
++                                MPQemuMsg *msg)
++{
++    struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
++    MPQemuMsg ret = { 0 };
++
++    if (conf->addr >= PCI_CFG_SPACE_EXP_SIZE) {
++        error_report("Bad address received when reading PCI config, pid %d",
++                     getpid());
++        ret.data1.u64 = UINT64_MAX;
++    } else {
++        ret.data1.u64 = pci_default_read_config(dev, conf->addr, conf->l);
++    }
++
++    ret.cmd = RET_MSG;
++    ret.bytestream = 0;
++    ret.size = sizeof(ret.data1);
++
++    mpqemu_msg_send(&ret, ioc);
++}
+diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
+index 16649ed0ec..8934070a20 100644
+--- a/hw/pci/proxy.c
++++ b/hw/pci/proxy.c
+@@ -16,6 +16,7 @@
+ #include "hw/qdev-properties.h"
+ #include "monitor/monitor.h"
+ #include "io/mpqemu-link.h"
++#include "qemu/error-report.h"
+ 
+ static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
+ {
+@@ -69,12 +70,65 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+     }
+ }
+ 
++static int config_op_send(PCIProxyDev *pdev, uint32_t addr, uint32_t *val,
++                          int l, unsigned int op)
++{
++    struct conf_data_msg conf_data;
++    MPQemuMsg msg = { 0 };
++    long ret = -EINVAL;
++    Error *local_err = NULL;
++
++    conf_data.addr = addr;
++    conf_data.val = (op == PCI_CONFIG_WRITE) ? *val : 0;
++    conf_data.l = l;
++
++    msg.data2 = (uint8_t *)&conf_data;
++
++    msg.size = sizeof(conf_data);
++    msg.cmd = op;
++    msg.bytestream = 1;
++
++    ret = mpqemu_msg_send_reply_co(&msg, pdev->dev, &local_err);
++    if (local_err) {
++        error_report("Failed to exchange PCI_CONFIG message with remote");
++    }
++    if (op == PCI_CONFIG_READ) {
++        *val = (uint32_t)ret;
++    }
++
++    return ret;
++}
++
++static uint32_t pci_proxy_read_config(PCIDevice *d, uint32_t addr, int len)
++{
++    uint32_t val;
++
++    (void)config_op_send(PCI_PROXY_DEV(d), addr, &val, len, PCI_CONFIG_READ);
++
++    return val;
++}
++
++static void pci_proxy_write_config(PCIDevice *d, uint32_t addr, uint32_t val,
++                                   int l)
++{
++    /*
++     * Some of the functions access the copy of the remote device
++     * PCI config space, therefore maintain it updated.
++     */
++    pci_default_write_config(d, addr, val, l);
++
++    (void)config_op_send(PCI_PROXY_DEV(d), addr, &val, l, PCI_CONFIG_WRITE);
++}
++
+ static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+     k->realize = pci_proxy_dev_realize;
++    k->config_read = pci_proxy_read_config;
++    k->config_write = pci_proxy_write_config;
++
+     device_class_set_props(dc, proxy_properties);
+ }
+ 
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index d620806c17..bbd6f3db44 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -38,6 +38,8 @@ typedef enum {
+     SYNC_SYSMEM,
+     CONNECT_DEV,
+     RET_MSG,
++    PCI_CONFIG_WRITE,
++    PCI_CONFIG_READ,
+     MAX = INT_MAX,
+ } MPQemuCmd;
+ 
+@@ -47,6 +49,12 @@ typedef struct {
+     off_t offsets[REMOTE_MAX_FDS];
+ } SyncSysmemMsg;
+ 
++struct conf_data_msg {
++    uint32_t addr;
++    uint32_t val;
++    int l;
++};
++
+ /**
+  * Maximum size of data2 field in the message to be transmitted.
+  */
+diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+index 54df3b254e..19887611d0 100644
+--- a/io/mpqemu-link.c
++++ b/io/mpqemu-link.c
+@@ -242,6 +242,20 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
+             return false;
+         }
+         break;
++    case PCI_CONFIG_WRITE:
++    case PCI_CONFIG_READ:
++        if (msg->size != sizeof(struct conf_data_msg)) {
++            return false;
++        }
++        if (!msg->bytestream) {
++            return false;
++        }
++        struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
++
++        if (conf->l != 1 && conf->l != 2 && conf->l != 4) {
++            return false;
++        }
++        break;
+     default:
+         break;
+     }
 -- 
 2.25.GIT
 
