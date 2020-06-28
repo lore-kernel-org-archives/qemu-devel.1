@@ -1,100 +1,74 @@
-Return-Path: <SRS0=GMHn=AI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF7FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 22:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 861A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 00:51:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E195C20768
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jun 2020 22:49:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zSA9RRfv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E195C20768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 58EA120768
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 00:51:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58EA120768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpJdi-0001iq-39
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 18:49:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36562)
+	id 1jpLXV-0007OR-Jo
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jun 2020 20:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jpJcp-0001Dj-GS
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 18:48:43 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43231)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jpJcn-0004AB-Id
- for qemu-devel@nongnu.org; Sat, 27 Jun 2020 18:48:43 -0400
-Received: by mail-pf1-x441.google.com with SMTP id j12so6239754pfn.10
- for <qemu-devel@nongnu.org>; Sat, 27 Jun 2020 15:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=iuU0t04uho3+u1jEWN4+Tj4+LjtiwVd4BX2d3/21QFI=;
- b=zSA9RRfvcdsjv5QDHpgxPcYTbHeDE6l4Ho7mY96KFmUWHhBKzAnpzs07x5uEcJUNq2
- SRxte3tmCo1xipezYMRCagzvW9smS8usZ4qyczs/67iO9y6sBJinlV1+W5yBsxLuk0wc
- bboBbb9fYADfa3r56oyV/4znIjtu8+QnyO/epdcWhrTRMw1gedJ39jsvl1obQzMKsu0l
- Rmy4EiCzrpvvw3CqpTfM+xB9Rh3QLC3+e3jjutNLajVEPwnTf0LdkCD5pblvE8job7ZH
- mlv6662bRJY/F+UYKhZBX4FWsSlORr1U6/QpXk5T345pFb28k6LFv0h5kwiPMDzSQRYZ
- ktmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iuU0t04uho3+u1jEWN4+Tj4+LjtiwVd4BX2d3/21QFI=;
- b=Wug3YUGYEdY4CqCTqLFga83v3q0tC0rpsfRtJ+XmDH+k7f0TLlG0TIxS5WrOmswDIA
- vPR2/bpLaoyFNbmRhq1EZbn6eLHtejRSd5rnVjEMx08dPboEyZLPw+VJ6dD9cP63irev
- GbGf3Vf7KjpxCaK0mLYrlly7Ro9xJ4sNLHT5VyV4fTlxFeny93r2VeuQolpspN2arjeG
- RO+kkqSarO0cQyRqofImB76JJtJVJNkTXSMXoTPz6N2ZMlx7K+Act4SUTzs17s5zMvdf
- v+H99xUM3eK2f+Qxpci+PRU72ZiP2pB3rygB9a381DilOu6ctE/YO22POEzLoVphqoAG
- eWbA==
-X-Gm-Message-State: AOAM532OJXIDMJFVcsYIo2OE8IO2Fyg7J1auBLEHM8xkSzNQ0b6J4phV
- jSoeSUzUdPcYYxkp3x+a9qfVTg==
-X-Google-Smtp-Source: ABdhPJzeescqcgBy7xA57sZy1sl7pvVtA6NYsEXaSIc3Us6GyRRoSZMSIG7uh23jxlUwTbQtn5rtog==
-X-Received: by 2002:a62:fc15:: with SMTP id e21mr7951012pfh.167.1593298119875; 
- Sat, 27 Jun 2020 15:48:39 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id e9sm489474pjr.49.2020.06.27.15.48.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 27 Jun 2020 15:48:38 -0700 (PDT)
-Subject: Re: [PATCH for 5.0 v1 1/2] riscv: Don't use stage-2 PTE lookup
- protection flags
-To: Alistair Francis <alistair23@gmail.com>
-References: <cover.1585262586.git.alistair.francis@wdc.com>
- <931db85d6890ed4bc2b527fd1011197cd28299aa.1585262586.git.alistair.francis@wdc.com>
- <a7f32084-2060-1de5-8308-987bcddf1e6d@linaro.org>
- <CAKmqyKPdGp+5n_fRuzi74JK8z8rcXMU+KiJw5v2nTMApHqXauA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-X-Enigmail-Draft-Status: N11100
-Message-ID: <cb8ccef8-4a5d-9689-5027-a697fa859746@linaro.org>
-Date: Sat, 27 Jun 2020 15:48:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <arei.gonglei@huawei.com>)
+ id 1jpLWs-0006tU-6s; Sat, 27 Jun 2020 20:50:42 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2526 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <arei.gonglei@huawei.com>)
+ id 1jpLWp-0003py-P2; Sat, 27 Jun 2020 20:50:41 -0400
+Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.57])
+ by Forcepoint Email with ESMTP id 337E7F1C562C7F000B4B;
+ Sun, 28 Jun 2020 08:50:27 +0800 (CST)
+Received: from DGGEML424-HUB.china.huawei.com (10.1.199.41) by
+ dggeml405-hub.china.huawei.com (10.3.17.49) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Sun, 28 Jun 2020 08:50:26 +0800
+Received: from DGGEML511-MBX.china.huawei.com ([169.254.1.226]) by
+ dggeml424-hub.china.huawei.com ([10.1.199.41]) with mapi id 14.03.0487.000;
+ Sun, 28 Jun 2020 08:50:19 +0800
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [PATCH 05/46] virtio-crypto-pci: Tidy up
+ virtio_crypto_pci_realize()
+Thread-Topic: [PATCH 05/46] virtio-crypto-pci: Tidy up
+ virtio_crypto_pci_realize()
+Thread-Index: AQHWSkaxvNpRd0EgTES5AOCv5MWRMajtNxoQ
+Date: Sun, 28 Jun 2020 00:50:18 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DF6592C3@dggeml511-mbx.china.huawei.com>
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-6-armbru@redhat.com>
+In-Reply-To: <20200624164344.3778251-6-armbru@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.225.234]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPdGp+5n_fRuzi74JK8z8rcXMU+KiJw5v2nTMApHqXauA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.188;
+ envelope-from=arei.gonglei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/27 20:50:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,53 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 12:02 PM, Alistair Francis wrote:
->> (3) Do we need to validate vbase_prot for write before updating the PTE for
->> Access or Dirty?  That seems like a loop-hole to allow silent modification of
->> hypervisor read-only memory.
-> 
-> That's a good point.
-> 
-> Updating the accessed bit seems correct to me as we did access it and
-> that doesn't then provide write permissions.
 
-I guess my first question is: Does the stage2 hypervisor pte provide read-only
-memory?
+> -----Original Message-----
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> Sent: Thursday, June 25, 2020 12:43 AM
+> To: qemu-devel@nongnu.org
+> Cc: pbonzini@redhat.com; berrange@redhat.com; ehabkost@redhat.com;
+> qemu-block@nongnu.org; peter.maydell@linaro.org;
+> vsementsov@virtuozzo.com; Gonglei (Arei) <arei.gonglei@huawei.com>;
+> Michael S . Tsirkin <mst@redhat.com>
+> Subject: [PATCH 05/46] virtio-crypto-pci: Tidy up virtio_crypto_pci_reali=
+ze()
+>=20
+> virtio_crypto_pci_realize() continues after realization of its "virtio-cr=
+ypto-device"
+> fails.  Only an object_property_set_link() follows; looks harmless to me.=
+  Tidy
+> up anyway: return after failure, just like virtio_rng_pci_realize() does.
+>=20
+> Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/virtio/virtio-crypto-pci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
 
-If not, all of this is moot.
+Reviewed-by: Gonglei < arei.gonglei@huawei.com>
 
-However, if it does, consider:
+> diff --git a/hw/virtio/virtio-crypto-pci.c b/hw/virtio/virtio-crypto-pci.=
+c index
+> 72be531c95..0755722288 100644
+> --- a/hw/virtio/virtio-crypto-pci.c
+> +++ b/hw/virtio/virtio-crypto-pci.c
+> @@ -54,7 +54,9 @@ static void virtio_crypto_pci_realize(VirtIOPCIProxy
+> *vpci_dev, Error **errp)
+>      }
+>=20
+>      virtio_pci_force_virtio_1(vpci_dev);
+> -    qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+> +    if (!qdev_realize(vdev, BUS(&vpci_dev->bus), errp)) {
+> +        return;
+> +    }
+>      object_property_set_link(OBJECT(vcrypto),
+>                   OBJECT(vcrypto->vdev.conf.cryptodev), "cryptodev",
+>                   NULL);
+> --
+> 2.26.2
 
-  (1) The guest os creates a stage1 page table with a leaf table
-      within the read-only memory.  This is obviously hokey.
-
-  (2) The guest os accesses a virtual address that utilizes the
-      aforementioned PTE, the hardware (qemu) updates the
-      accessed bit.
-
-  (3) The read-only page has now been modified.  Oops.
-
->> I do wonder if it might be easier to manage all of this by using additional
->> TLBs to handle the stage2 and physical address spaces.  That's probably too
->> invasive for this stage of development though.
-> 
-> Do you mean change riscv_cpu_mmu_index() to take into account
-> virtulisation and have more then the current 3 (M, S and U) MMU
-> indexes?
-
-I had been thinking that you might be able to use some form of mmu-indexed
-load/lookup instead of address_space_ldq.  Which would require 1 mmuidx that is
-physically mapped (same as M?) and another that uses only the hypervisor's
-second stage lookup.
-
-
-r~
 
