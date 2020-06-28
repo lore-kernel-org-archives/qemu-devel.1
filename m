@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641D7C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C1CC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:25:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38CED20702
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:24:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38CED20702
+	by mail.kernel.org (Postfix) with ESMTPS id C50DA20578
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:25:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C50DA20578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpbyn-0008A5-Dz
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:24:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51610)
+	id 1jpbzc-0000cX-T2
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:25:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuV-0002Aw-DX; Sun, 28 Jun 2020 14:20:11 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:38375)
+ id 1jpbuZ-0002Jz-Av; Sun, 28 Jun 2020 14:20:15 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38392)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuT-0005MQ-KE; Sun, 28 Jun 2020 14:20:11 -0400
+ id 1jpbuW-0005Nw-Td; Sun, 28 Jun 2020 14:20:14 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 1CE59748DCB;
- Sun, 28 Jun 2020 20:20:08 +0200 (CEST)
+ by localhost (Postfix) with SMTP id 54C9074633D;
+ Sun, 28 Jun 2020 20:20:11 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id EC81E746331; Sun, 28 Jun 2020 20:20:07 +0200 (CEST)
-Message-Id: <d06cbbe37ae24ea18babf11913887c8b9891cfad.1593367416.git.balaton@eik.bme.hu>
+ id 20A76746331; Sun, 28 Jun 2020 20:20:11 +0200 (CEST)
+Message-Id: <2d6ab0ef6aef80311a24089ab2f1152f554dcd98.1593367416.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1593367416.git.balaton@eik.bme.hu>
 References: <cover.1593367416.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v6 07/11] mac_oldworld: Map macio to expected address at reset
+Subject: [RFC PATCH v6 10/11] WIP macio/cuda: Attempt to add i2c support
 Date: Sun, 28 Jun 2020 20:03:36 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 To: qemu-devel@nongnu.org,
     qemu-ppc@nongnu.org
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 14:20:01
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,94 +73,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a reset function that maps macio to the address expected by the
-firmware of the board at startup.
+This is not a final, RFC patch attempt to implement i2c bus in CUDA
+needed for firmware to access SPD data of installed RAM. The skeleton
+is there but actual implementation of I2C commands need to be refined
+because I don't know how this is supposed to work. In my understanding
+after an I2C command (at least for combined transfer) CUDA should
+enter a mode where reading subsequent values from VIA[SR] should
+return bytes received from the i2C device but not sure what ends this
+mode or how to model it correctly. So this patch just returns fixed
+amount of bytes expected by reading SPD eeproms just to make testing
+the firmware ROM possible. Help fixing and finishing this is welcome,
+I don't plan to spend more time with this so just submitted it for
+whoever picks this up.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ppc/mac.h          | 12 ++++++++++++
- hw/ppc/mac_oldworld.c | 15 ++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ hw/misc/macio/cuda.c         | 76 +++++++++++++++++++++++++++++++++++-
+ include/hw/misc/macio/cuda.h |  1 +
+ 2 files changed, 76 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 195967facd..58ae5a2226 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -60,6 +60,18 @@
- #define OLDWORLD_SCREAMER_TX_DMA_IRQ 0x08
- #define OLDWORLD_SCREAMER_RX_IRQ  0x09
- 
-+/* g3beige machine */
-+#define TYPE_HEATHROW_MACHINE MACHINE_TYPE_NAME("g3beige")
-+#define HEATHROW_MACHINE(obj) OBJECT_CHECK(HeathrowMachineState, (obj), \
-+                                           TYPE_HEATHROW_MACHINE)
-+
-+typedef struct HeathrowMachineState {
-+    /*< private >*/
-+    MachineState parent;
-+
-+    PCIDevice *macio;
-+} HeathrowMachineState;
-+
- /* New World IRQs */
- #define NEWWORLD_CUDA_IRQ      0x19
- #define NEWWORLD_PMU_IRQ       0x19
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index f97f241e0c..13562e26e6 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -73,6 +73,15 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
-     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+index 5bbc7770fa..3fc9773717 100644
+--- a/hw/misc/macio/cuda.c
++++ b/hw/misc/macio/cuda.c
+@@ -28,6 +28,7 @@
+ #include "hw/ppc/mac.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
++#include "hw/i2c/i2c.h"
+ #include "hw/input/adb.h"
+ #include "hw/misc/mos6522.h"
+ #include "hw/misc/macio/cuda.h"
+@@ -370,6 +371,75 @@ static bool cuda_cmd_set_time(CUDAState *s,
+     return true;
  }
  
-+static void ppc_heathrow_reset(MachineState *machine)
++static bool cuda_cmd_get_set_iic(CUDAState *s,
++                                 const uint8_t *in_data, int in_len,
++                                 uint8_t *out_data, int *out_len)
 +{
-+    HeathrowMachineState *m = HEATHROW_MACHINE(machine);
++    int i;
 +
-+    qemu_devices_reset();
-+    pci_default_write_config(m->macio, PCI_COMMAND, PCI_COMMAND_MEMORY, 2);
-+    pci_default_write_config(m->macio, PCI_BASE_ADDRESS_0, 0xf3000000, 4);
++    qemu_log_mask(LOG_UNIMP, "CUDA: unimplemented GET_SET_IIC %s 0x%x %d\n",
++                  (in_data[0] & 1 ? "read" : "write"), in_data[0] >> 1,
++                  in_len);
++    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1)) {
++        return false;
++    }
++    for (i = 0; i < in_len - 3; i++) {
++        if (i2c_send(s->i2c_bus, in_data[i])) {
++            i2c_end_transfer(s->i2c_bus);
++            return false;
++        }
++    }
++    return true;
 +}
 +
- static void ppc_heathrow_cpu_reset(void *opaque)
++static bool cuda_cmd_combined_iic(CUDAState *s,
++                                  const uint8_t *in_data, int in_len,
++                                  uint8_t *out_data, int *out_len)
++{
++    int i;
++
++    if (in_len < 3) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CUDA: COMBINED_FORMAT_IIC too few input bytes\n");
++        return false;
++    }
++    if ((in_data[0] & 0xfe) != (in_data[2] & 0xfe)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CUDA: COMBINED_FORMAT_IIC address mismatch\n");
++        return false;
++    }
++
++    uint8_t data = in_data[1];
++    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1) ||
++        i2c_send_recv(s->i2c_bus, &data, in_data[0] & 1)) {
++        return false;
++    }
++    i2c_end_transfer(s->i2c_bus);
++    if (in_data[2] & 1) {
++        if (i2c_start_transfer(s->i2c_bus, in_data[2] >> 1, in_data[2] & 1)) {
++            i2c_end_transfer(s->i2c_bus);
++            return false;
++        }
++        for (i = 0; i < 5; i++) {
++            if (i2c_send_recv(s->i2c_bus, &out_data[i], in_data[2] & 1)) {
++                i2c_end_transfer(s->i2c_bus);
++                return false;
++            }
++        }
++        *out_len = i;
++        i2c_end_transfer(s->i2c_bus);
++    } else {
++        for (i = 0; i < in_len - 3; i++) {
++            data = in_data[3 + i];
++            if (i2c_send_recv(s->i2c_bus, &data, in_data[2] & 1)) {
++                i2c_end_transfer(s->i2c_bus);
++                return false;
++            }
++        }
++    }
++    return true;
++}
++
+ static const CudaCommand handlers[] = {
+     { CUDA_AUTOPOLL, "AUTOPOLL", cuda_cmd_autopoll },
+     { CUDA_SET_AUTO_RATE, "SET_AUTO_RATE",  cuda_cmd_set_autorate },
+@@ -382,6 +452,8 @@ static const CudaCommand handlers[] = {
+       cuda_cmd_set_power_message },
+     { CUDA_GET_TIME, "GET_TIME", cuda_cmd_get_time },
+     { CUDA_SET_TIME, "SET_TIME", cuda_cmd_set_time },
++    { CUDA_GET_SET_IIC, "GET_SET_IIC", cuda_cmd_get_set_iic },
++    { CUDA_COMBINED_FORMAT_IIC, "COMBINED_FORMAT_IIC", cuda_cmd_combined_iic },
+ };
+ 
+ static void cuda_receive_packet(CUDAState *s,
+@@ -549,6 +621,7 @@ static void cuda_init(Object *obj)
  {
-     PowerPCCPU *cpu = opaque;
-@@ -82,6 +91,7 @@ static void ppc_heathrow_cpu_reset(void *opaque)
+     CUDAState *s = CUDA(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    DeviceState *dev = DEVICE(obj);
  
- static void ppc_heathrow_init(MachineState *machine)
- {
-+    HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
-     ram_addr_t ram_size = machine->ram_size;
-     const char *boot_device = machine->boot_order;
-     PowerPCCPU *cpu = NULL;
-@@ -287,6 +297,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     object_initialize_child(obj, "mos6522-cuda", &s->mos6522_cuda,
+                             TYPE_MOS6522_CUDA);
+@@ -557,7 +630,8 @@ static void cuda_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->mem);
  
-     /* MacIO */
-     macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
-+    hm->macio = macio;
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-@@ -439,6 +450,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = "Heathrow based PowerMAC";
-     mc->init = ppc_heathrow_init;
-+    mc->reset = ppc_heathrow_reset;
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = MAX_CPUS;
- #ifndef TARGET_PPC64
-@@ -455,9 +467,10 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
+     qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
+-                        DEVICE(obj), "adb.0");
++                        dev, "adb.0");
++    s->i2c_bus = i2c_init_bus(dev, "i2c");
  }
  
- static const TypeInfo ppc_heathrow_machine_info = {
--    .name          = MACHINE_TYPE_NAME("g3beige"),
-+    .name          = TYPE_HEATHROW_MACHINE,
-     .parent        = TYPE_MACHINE,
-     .class_init    = heathrow_class_init,
-+    .instance_size = sizeof(HeathrowMachineState),
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_FW_PATH_PROVIDER },
-         { }
+ static Property cuda_properties[] = {
+diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
+index a8cf0be1ec..6856ed7704 100644
+--- a/include/hw/misc/macio/cuda.h
++++ b/include/hw/misc/macio/cuda.h
+@@ -79,6 +79,7 @@ typedef struct CUDAState {
+ 
+     ADBBusState adb_bus;
+     MOS6522CUDAState mos6522_cuda;
++    I2CBus *i2c_bus;
+ 
+     uint32_t tick_offset;
+     uint64_t tb_frequency;
 -- 
 2.21.3
 
