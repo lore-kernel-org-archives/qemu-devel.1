@@ -2,87 +2,65 @@ Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDC5C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60CFA206C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:03:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X1Gyx4ct"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60CFA206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93A3F2053B
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A3F2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpca2-0005KK-K9
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 15:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59322)
+	id 1jpdKt-0004Nx-S6
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 15:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jpcZL-0004ot-Sg
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:02:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57518
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jpcZH-0002TR-Cs
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:02:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593370936;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EKx98bDzewSCMvRp+aYonJFCw773/klOGfHtB47zZWM=;
- b=X1Gyx4ctRWqYDDa8mnprdwiOh04jmiQa0eHQh+L/RB7vpGKmj7OknR2pqojsedDocrmwpD
- Qu/nz2U7ryPelbQrxNtK5fA8b7fG36inSHiGTiAHlb948FnxDgepULJ4sgWUc3Wx1Rnxvd
- zpoW8TyigwMwVEwu8I6P9+WzkM7fZ4Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-HA8e9OiNM_uG2h027nNxOg-1; Sun, 28 Jun 2020 15:02:14 -0400
-X-MC-Unique: HA8e9OiNM_uG2h027nNxOg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42955800FF1;
- Sun, 28 Jun 2020 19:02:13 +0000 (UTC)
-Received: from starship (unknown [10.35.206.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E478926358;
- Sun, 28 Jun 2020 19:02:11 +0000 (UTC)
-Message-ID: <5fb2b50eb521776dce76eb258da38ab832f00b80.camel@redhat.com>
-Subject: Re: [PATCH 03/19] iotests/common.rc: Add _require_working_luks
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 28 Jun 2020 22:02:10 +0300
-In-Reply-To: <20200625125548.870061-4-mreitz@redhat.com>
-References: <20200625125548.870061-1-mreitz@redhat.com>
- <20200625125548.870061-4-mreitz@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpdK9-0003sR-LF
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:50:45 -0400
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:35189)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpdK6-0000Jx-Ms
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:50:45 -0400
+X-Originating-IP: 82.252.130.88
+Received: from [192.168.1.155] (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay5-d.mail.gandi.net (Postfix) with ESMTPSA id D5A731C0003
+ for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 19:50:38 +0000 (UTC)
+Subject: Re: Crash when running Qemu.
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+References: <20d398f5-729e-57a7-db92-2243c106d832@tribudubois.net>
+ <bf691b10-c8ba-f92a-24dd-57f90382390c@tribudubois.net>
+ <b8d836b0-4e26-5c24-7ab9-c43bd6f92710@tribudubois.net>
+Message-ID: <74c610fa-f399-68f5-7f32-44663c0d3fc3@tribudubois.net>
+Date: Sun, 28 Jun 2020 21:50:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 15:02:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <b8d836b0-4e26-5c24-7ab9-c43bd6f92710@tribudubois.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.197; envelope-from=jcd@tribudubois.net;
+ helo=relay5-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 15:50:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,74 +73,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-06-25 at 14:55 +0200, Max Reitz wrote:
-> That the luks driver is present is little indication on whether it is
-> actually working.  Without the crypto libraries linked in, it does not
-> work.  So add this function, which tries to create a luks image to see
-> whether that actually works.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.rc | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-> index ba912555ca..f3667f48ab 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -740,6 +740,33 @@ _unsupported_imgopts()
->      done
->  }
->  
-> +# Caution: Overwrites $TEST_DIR/t.luks
-> +_require_working_luks()
-> +{
-> +    file="$TEST_DIR/t.luks"
-> +
-> +    output=$(
-> +        $QEMU_IMG create -f luks \
-> +            --object secret,id=sec0,data=hunter0 \
-> +            -o key-secret=sec0 \
-> +            -o iter-time=10 \
-> +            "$file" \
-> +            1M \
-> +            2>&1
-> +    )
-> +    status=$?
-> +
-> +    IMGFMT='luks' _rm_test_img "$file"
-> +
-> +    if [ $status != 0 ]; then
-> +        reason=$(echo "$output" | grep "$file:" | $SED -e "s#.*$file: *##")
-> +        if [ -z "$reason" ]; then
-> +            reason="Failed to create a LUKS image"
-> +        fi
-> +        _notrun "$reason"
-> +    fi
-> +}
-> +
->  # this test requires that a specified command (executable) exists
->  #
->  _require_command()
+I am not sure how it could influence the fact that I experience this bug 
+and others not necessarily but for what it is worth, I am using gcc 
+10.0.1 to compile Qemu.
 
+I might try to use a previous version to check if it changes the overall 
+behavior.
 
-Look OK. I also tested this by building the qemu with all the patches applied,a
-and with --disable-nettle --disable-gcrypt
+JC
 
-And now all my tests are skipped with this nice message:
-"No crypto library supporting PBKDF in this build: Function not implemented"
-
-Thank you very very much for implementing this!
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-
-Best regards,
-	Maxim Levitsky
+Le 28/06/2020 à 18:32, Jean-Christophe DUBOIS a écrit :
+> By reverting the recent (june 23) commit series on PCA9552 I can run 
+> Qemu again.
+>
+> Here is the git revert command I did.
+>
+> jcd@jcd-UX305CA:~/Projects/qemu/qemu$ git revert 
+> 8208335b9539e7b5aa4702b36e2f9a8abd704079..586f495b1e78c27e141ff432dd971eb41866fb80
+>
+> Regards
+>
+> JC
+>
+> Le 28/06/2020 à 17:57, Jean-Christophe DUBOIS a écrit :
+>> When ran from valgrind, qemu does not crash but the following output 
+>> is returned.
+>>
+>> valgrind --track-origins=yes 
+>> ../../qemu/qemu/arm-softmmu/qemu-system-arm -machine mcimx6ul-evk -m 
+>> 128M -display none -serial stdio -kernel ./OS.elf
+>> ==77479== Memcheck, a memory error detector
+>> ==77479== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et 
+>> al.
+>> ==77479== Using Valgrind-3.15.0 and LibVEX; rerun with -h for 
+>> copyright info
+>> ==77479== Command: ../../qemu/qemu/arm-softmmu/qemu-system-arm 
+>> -machine mcimx6ul-evk -m 128M -display none -serial stdio -kernel 
+>> ./OS.elf
+>> ==77479==
+>> ==77479== Invalid write of size 2
+>> ==77479==    at 0x6D8322: pca9552_class_init (pca9552.c:424)
+>> ==77479==    by 0x844D1F: type_initialize (object.c:1029)
+>> ==77479==    by 0x844D1F: object_class_foreach_tramp (object.c:1016)
+>> ==77479==    by 0x4AE1057: g_hash_table_foreach (in 
+>> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>> ==77479==    by 0x8453A4: object_class_foreach (object.c:1038)
+>> ==77479==    by 0x8453A4: object_class_get_list (object.c:1095)
+>> ==77479==    by 0x556194: select_machine (vl.c:2416)
+>> ==77479==    by 0x556194: qemu_init (vl.c:3828)
+>> ==77479==    by 0x40AF9C: main (main.c:48)
+>> ==77479==  Address 0x583f108 is 0 bytes after a block of size 200 
+>> alloc'd
+>> ==77479==    at 0x483DD99: calloc (in 
+>> /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+>> ==77479==    by 0x4AF8D30: g_malloc0 (in 
+>> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>> ==77479==    by 0x844258: type_initialize.part.0 (object.c:306)
+>> ==77479==    by 0x844D1F: type_initialize (object.c:1029)
+>> ==77479==    by 0x844D1F: object_class_foreach_tramp (object.c:1016)
+>> ==77479==    by 0x4AE1057: g_hash_table_foreach (in 
+>> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>> ==77479==    by 0x8453A4: object_class_foreach (object.c:1038)
+>> ==77479==    by 0x8453A4: object_class_get_list (object.c:1095)
+>> ==77479==    by 0x556194: select_machine (vl.c:2416)
+>> ==77479==    by 0x556194: qemu_init (vl.c:3828)
+>> ==77479==    by 0x40AF9C: main (main.c:48)
+>> ==77479==
+>> ==77479== Conditional jump or move depends on uninitialised value(s)
+>> ==77479==    at 0x41D944: tcg_target_init (tcg-target.inc.c:3867)
+>> ==77479==    by 0x41D944: tcg_context_init (tcg.c:983)
+>> ==77479==    by 0x48E60D: cpu_gen_init (translate-all.c:246)
+>> ==77479==    by 0x48E60D: tcg_exec_init (translate-all.c:1152)
+>> ==77479==    by 0x46FE7B: tcg_init (tcg-all.c:129)
+>> ==77479==    by 0x5E15A5: accel_init_machine (accel.c:55)
+>> ==77479==    by 0x55402F: do_configure_accelerator (vl.c:2708)
+>> ==77479==    by 0x94F1D1: qemu_opts_foreach (qemu-option.c:1163)
+>> ==77479==    by 0x5598B3: configure_accelerators (vl.c:2775)
+>> ==77479==    by 0x5598B3: qemu_init (vl.c:4152)
+>> ==77479==    by 0x40AF9C: main (main.c:48)
+>> ==77479==  Uninitialised value was created by a stack allocation
+>> ==77479==    at 0x4ADFE5F: ??? (in 
+>> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>> ==77479==
+>> ==77479== Warning: set address range perms: large range [0x6483000, 
+>> 0x46483000) (defined)
+>>
+>> ===================================================================
+>> =                       TCPIP INITIALIZATION =
+>> ===================================================================
+>> Initializing TCPIP...
+>>
+>> ------- i.MX6UL-EVK BOARD NETWORK CONFIG --------
+>>
+>>
+>>
+>> Starting ENET1...
+>>
+>> NetIF_LinkStateWaitUntilUp() failed w/ err = 30
+>>
+>>
+>> Starting ENET2...
+>>
+>> NetIF_LinkStateWaitUntilUp() failed w/ err = 30
+>>
+>> Network Configuration:
+>> qemu-system-arm: terminating on signal 2
+>> ==77479==
+>> ==77479== HEAP SUMMARY:
+>> ==77479==     in use at exit: 8,452,515 bytes in 57,040 blocks
+>> ==77479==   total heap usage: 97,248 allocs, 40,208 frees, 21,279,482 
+>> bytes allocated
+>> ==77479==
+>> ==77479== LEAK SUMMARY:
+>> ==77479==    definitely lost: 0 bytes in 0 blocks
+>> ==77479==    indirectly lost: 0 bytes in 0 blocks
+>> ==77479==      possibly lost: 3,474 bytes in 45 blocks
+>> ==77479==    still reachable: 8,449,041 bytes in 56,995 blocks
+>> ==77479==                       of which reachable via heuristic:
+>> ==77479==                         newarray           : 1,536 bytes in 
+>> 16 blocks
+>> ==77479==         suppressed: 0 bytes in 0 blocks
+>> ==77479== Rerun with --leak-check=full to see details of leaked memory
+>> ==77479==
+>> ==77479== For lists of detected and suppressed errors, rerun with: -s
+>> ==77479== ERROR SUMMARY: 3 errors from 2 contexts (suppressed: 0 from 0)
+>>
+>> Le 28/06/2020 à 12:55, Jean-Christophe DUBOIS a écrit :
+>>> Hi,
+>>>
+>>> Since the last pull I did this week end on the qemu git tree (master 
+>>> branch) I am unable to "start" qemu anymore (It was working OK from 
+>>> git master previously).
+>>>
+>>> Traces are provided bellow.
+>>>
+>>> Am I the only one to get this behavior?
+>>>
+>>> JC
+>>>
+>>> jcd@jcd-UX305CA:~/Projects/µCOS/work$ 
+>>> ../../qemu/qemu/arm-softmmu/qemu-system-arm -machine mcimx6ul-evk -m 
+>>> 128M -display none -serial stdio -kernel ./OS.elf
+>>> double free or corruption (!prev)
+>>> Abandon (core dumped)
+>>>
+>>> Running the same command from "gdb" provides the following backtrace.
+>>>
+>>> jcd@jcd-UX305CA:~/Projects/µCOS/work$ gdb 
+>>> ../../qemu/qemu/arm-softmmu/qemu-system-arm
+>>> GNU gdb (Ubuntu 9.1-0ubuntu1) 9.1
+>>> Copyright (C) 2020 Free Software Foundation, Inc.
+>>> License GPLv3+: GNU GPL version 3 or later 
+>>> <http://gnu.org/licenses/gpl.html>
+>>> This is free software: you are free to change and redistribute it.
+>>> There is NO WARRANTY, to the extent permitted by law.
+>>> Type "show copying" and "show warranty" for details.
+>>> This GDB was configured as "x86_64-linux-gnu".
+>>> Type "show configuration" for configuration details.
+>>> For bug reporting instructions, please see:
+>>> <http://www.gnu.org/software/gdb/bugs/>.
+>>> Find the GDB manual and other documentation resources online at:
+>>>     <http://www.gnu.org/software/gdb/documentation/>.
+>>>
+>>> For help, type "help".
+>>> Type "apropos word" to search for commands related to "word"...
+>>> Reading symbols from ../../qemu/qemu/arm-softmmu/qemu-system-arm...
+>>> (gdb) run -machine mcimx6ul-evk -m 128M -display none -serial stdio 
+>>> -kernel ./OS.elf
+>>> Starting program: ../../qemu/qemu/arm-softmmu/qemu-system-arm 
+>>> -machine mcimx6ul-evk -m 128M -display none -serial stdio -kernel 
+>>> ./OS.elf
+>>> [Thread debugging using libthread_db enabled]
+>>> Using host libthread_db library 
+>>> "/lib/x86_64-linux-gnu/libthread_db.so.1".
+>>> [New Thread 0x7ffff738e700 (LWP 71630)]
+>>> double free or corruption (!prev)
+>>>
+>>> Thread 1 "qemu-system-arm" received signal SIGABRT, Aborted.
+>>> __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+>>> 50    ../sysdeps/unix/sysv/linux/raise.c: Aucun fichier ou dossier 
+>>> de ce type.
+>>> (gdb) where
+>>> #0  __GI_raise (sig=sig@entry=6) at 
+>>> ../sysdeps/unix/sysv/linux/raise.c:50
+>>> #1  0x00007ffff75d8859 in __GI_abort () at abort.c:79
+>>> #2  0x00007ffff76433ee in __libc_message
+>>>     (action=action@entry=do_abort, fmt=fmt@entry=0x7ffff776d285 "%s\n")
+>>>     at ../sysdeps/posix/libc_fatal.c:155
+>>> #3  0x00007ffff764b47c in malloc_printerr
+>>>     (str=str@entry=0x7ffff776f690 "double free or corruption (!prev)")
+>>>     at malloc.c:5347
+>>> #4  0x00007ffff764d12c in _int_free
+>>>     (av=0x7ffff779eb80 <main_arena>, p=0x5555567a3990, 
+>>> have_lock=<optimized out>) at malloc.c:4317
+>>> #5  0x0000555555c906c3 in type_initialize_interface
+>>>     (ti=ti@entry=0x5555565b8f40, interface_type=0x555556597ad0, 
+>>> parent_type=0x55555662ca10) at qom/object.c:259
+>>> #6  0x0000555555c902da in type_initialize (ti=ti@entry=0x5555565b8f40)
+>>>     at qom/object.c:323
+>>> #7  0x0000555555c90d20 in type_initialize (ti=0x5555565b8f40)
+>>>     at qom/object.c:1028
+>>> #8  object_class_foreach_tramp
+>>>     (key=<optimized out>, value=0x5555565b8f40, opaque=0x7fffffffdc20)
+>>>     at qom/object.c:1016
+>>> #9  0x00007ffff7c89058 in g_hash_table_foreach ()
+>>>     at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #10 0x0000555555c913a5 in object_class_foreach
+>>>     (opaque=0x7fffffffdc18, include_abstract=false, 
+>>> implements_type=<optimized out>, fn=0x555555c8f270 
+>>> <object_class_get_list_tramp>) at qom/object.c:84
+>>> #11 object_class_get_list
+>>>     (implements_type=implements_type@entry=0x555555fd5e0c "machine", 
+>>> include_abstract=include_abstract@entry=false) at qom/object.c:1095
+>>> #12 0x00005555559a2195 in select_machine ()
+>>>     at /home/jcd/Projects/qemu/qemu/softmmu/vl.c:3828
+>>> #13 qemu_init (argc=<optimized out>, argv=0x7fffffffdef8, 
+>>> envp=<optimized out>)
+>>>     at /home/jcd/Projects/qemu/qemu/softmmu/vl.c:3828
+>>> #14 0x0000555555856f9d in main
+>>>     (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+>>>     at /home/jcd/Projects/qemu/qemu/softmmu/main.c:48
+>>> (gdb)
+>>>
+>>>
+>>
+>>
+>
+>
 
 
