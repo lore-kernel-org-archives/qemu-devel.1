@@ -4,52 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F2BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 11:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8BFFC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 11:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C41B206BE
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 11:21:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2A2B206BE
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 11:23:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YvAyKF8U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C41B206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DgYEfOLc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A2B206BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpVMp-00087d-Jc
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 07:20:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48748)
+	id 1jpVPB-0001s1-1c
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 07:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jpV6W-0007fY-BE; Sun, 28 Jun 2020 07:04:08 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42386)
+ id 1jpV6T-0007Xh-7D; Sun, 28 Jun 2020 07:04:05 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:42434)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jpV6M-0000XP-1j; Sun, 28 Jun 2020 07:04:07 -0400
+ id 1jpV6M-0000Xd-1a; Sun, 28 Jun 2020 07:04:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=wwP+F61UHuBD2MYWJK+ZYjI142FX+Mf725oBfkWGky0=; 
- b=YvAyKF8UG7g8uN7nAyM2EEFQVCviVEbvKc3BYVsTTrNu4r9Ks7wU6RkS24kaOzKj9YrFAC1akMqcFDVSUq0FpDyRrrM6+71puEFc7tstIXkQxdmWW+RKkWZp20gd049EML7jahQMHuKnOGNan9CQdc7gAUaOusQSAKH2maXqSRgd8a/N9UVOm1YrjgWmKry7OuUHTBCTH//kDyhTPqx58HBZOETDxZ4+vG8NzY4w6ehB9mxWMSFMzEZqsXFnSklWyeOYPdeWFo96X5yKjeVIzYCsNquO6TRJS3HgMc7eWZxUKCei1crwZIbhvmJCEG/E1wfq7a0rgu2JBMbz5ICopQ==;
+ bh=vkGYrXfcdj4PNvZd6fOUVK45aqY2/Zl/2hS53SipmT0=; 
+ b=DgYEfOLcgW4Anc1v8HxI5CABUq0sDgaJ2oL0Q3h5szK5GCrSW2XBi9kAy7nMBcXspWHabm/xwUsFZB5wTju9hn56eJUwVAqdSf9hTZMrje4Ly0RxCtIuaC89Lzp5uSdMobe+vCPxAArktxx2eDY8f+dozUWU/p5X3vQulv8kgxhmb9kNiiZ6w3tBsrBZ40jf4a8R2+JKBrMJOjhh2VoNUad5NXMyLaQJIFBEbTqRC0g3jrCdiO7LdQguxTMI1UKxu+UxcmFHPvTSqaonFO7XQwzRNjuBHCkvjwVlIaxBYyyzwk5urFgbM+es9dkSuBA4J00dKffHX83ddOMct2eJiA==;
 Received: from 26.red-79-158-236.dynamicip.rima-tde.net ([79.158.236.26]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jpV5Y-0002gm-5E; Sun, 28 Jun 2020 13:03:09 +0200
+ id 1jpV5Y-0002gt-D0; Sun, 28 Jun 2020 13:03:10 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jpV5I-000390-5G; Sun, 28 Jun 2020 13:02:52 +0200
+ id 1jpV5I-00039i-CH; Sun, 28 Jun 2020 13:02:52 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 23/34] qcow2: Add subcluster support to
- discard_in_l2_slice()
-Date: Sun, 28 Jun 2020 13:02:32 +0200
-Message-Id: <42685fa7a479b996eca7c185acfebe09483331b3.1593342067.git.berto@igalia.com>
+Subject: [PATCH v9 30/34] qcow2: Add prealloc field to QCowL2Meta
+Date: Sun, 28 Jun 2020 13:02:39 +0200
+Message-Id: <0dd88b3b4d3e90b28267267d7686cf5350d9dea0.1593342067.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593342067.git.berto@igalia.com>
 References: <cover.1593342067.git.berto@igalia.com>
@@ -85,109 +84,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Two things need to be taken into account here:
+This field allows us to indicate that the L2 metadata update does not
+come from a write request with actual data but from a preallocation
+request.
 
-1) With full_discard == true the L2 entry must be cleared completely.
-   This also includes the L2 bitmap if the image has extended L2
-   entries.
+For traditional images this does not make any difference, but for
+images with extended L2 entries this means that the clusters are
+allocated normally in the L2 table but individual subclusters are
+marked as unallocated.
 
-2) With full_discard == false we have to make the discarded cluster
-   read back as zeroes. With normal L2 entries this is done with the
-   QCOW_OFLAG_ZERO bit, whereas with extended L2 entries this is done
-   with the individual 'all zeroes' bits for each subcluster.
+This will allow preallocating images that have a backing file.
 
-   Note however that QCOW_OFLAG_ZERO is not supported in v2 qcow2
-   images so, if there is a backing file, discard cannot guarantee
-   that the image will read back as zeroes. If this is important for
-   the caller it should forbid it as qcow2_co_pdiscard() does (see
-   80f5c01183 for more details).
+There is one special case: when we resize an existing image we can
+also request that the new clusters are preallocated. If the image
+already had a backing file then we have to hide any possible stale
+data and zero out the new clusters (see commit 955c7d6687 for more
+details).
+
+In this case the subclusters cannot be left as unallocated so the L2
+bitmap must be updated.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cluster.c | 52 +++++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 29 deletions(-)
+ block/qcow2.h         | 8 ++++++++
+ block/qcow2-cluster.c | 2 +-
+ block/qcow2.c         | 6 ++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 4ef4ae4ab0..f3499e53bf 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -463,6 +463,14 @@ typedef struct QCowL2Meta
+      */
+     bool skip_cow;
+ 
++    /**
++     * Indicates that this is not a normal write request but a preallocation.
++     * If the image has extended L2 entries this means that no new individual
++     * subclusters will be marked as allocated in the L2 bitmap (but any
++     * existing contents of that bitmap will be kept).
++     */
++    bool prealloc;
++
+     /**
+      * The I/O vector with the data from the actual guest write request.
+      * If non-NULL, this is meant to be merged together with the data
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 4e59bbd545..edfc8ea91c 100644
+index 1641976028..c8217081f2 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1847,11 +1847,17 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-     assert(nb_clusters <= INT_MAX);
+@@ -1066,7 +1066,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+         set_l2_entry(s, l2_slice, l2_index + i, offset | QCOW_OFLAG_COPIED);
  
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t old_l2_entry;
--
--        old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
-+        uint64_t old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
-+        uint64_t old_l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
-+        uint64_t new_l2_entry = old_l2_entry;
-+        uint64_t new_l2_bitmap = old_l2_bitmap;
-+        QCow2ClusterType cluster_type =
-+            qcow2_get_cluster_type(bs, old_l2_entry);
+         /* Update bitmap with the subclusters that were just written */
+-        if (has_subclusters(s)) {
++        if (has_subclusters(s) && !m->prealloc) {
+             uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
+             unsigned written_from = m->cow_start.offset;
+             unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes ?:
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 72bd25e774..003f166024 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2086,6 +2086,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
+         QCowL2Meta *next;
  
-         /*
-+         * If full_discard is true, the cluster should not read back as zeroes,
-+         * but rather fall through to the backing file.
-+         *
-          * If full_discard is false, make sure that a discarded area reads back
-          * as zeroes for v3 images (we cannot do it for v2 without actually
-          * writing a zero-filled buffer). We can skip the operation if the
-@@ -1860,40 +1866,28 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-          *
-          * TODO We might want to use bdrv_block_status(bs) here, but we're
-          * holding s->lock, so that doesn't work today.
--         *
--         * If full_discard is true, the sector should not read back as zeroes,
--         * but rather fall through to the backing file.
-          */
--        switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
--        case QCOW2_CLUSTER_UNALLOCATED:
--            if (full_discard || !bs->backing) {
--                continue;
-+        if (full_discard) {
-+            new_l2_entry = new_l2_bitmap = 0;
-+        } else if (bs->backing || qcow2_cluster_is_allocated(cluster_type)) {
-+            if (has_subclusters(s)) {
-+                new_l2_entry = 0;
-+                new_l2_bitmap = QCOW_L2_BITMAP_ALL_ZEROES;
-+            } else {
-+                new_l2_entry = s->qcow_version >= 3 ? QCOW_OFLAG_ZERO : 0;
+         if (link_l2) {
++            assert(!l2meta->prealloc);
+             ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+             if (ret) {
+                 goto out;
+@@ -3131,6 +3132,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
+ 
+         while (meta) {
+             QCowL2Meta *next = meta->next;
++            meta->prealloc = true;
+ 
+             ret = qcow2_alloc_cluster_link_l2(bs, meta);
+             if (ret < 0) {
+@@ -4224,6 +4226,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+         int64_t clusters_allocated;
+         int64_t old_file_size, last_cluster, new_file_size;
+         uint64_t nb_new_data_clusters, nb_new_l2_tables;
++        bool subclusters_need_allocation = false;
+ 
+         /* With a data file, preallocation means just allocating the metadata
+          * and forwarding the truncate request to the data file */
+@@ -4305,6 +4308,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+                                    BDRV_REQ_ZERO_WRITE, NULL);
+             if (ret >= 0) {
+                 flags &= ~BDRV_REQ_ZERO_WRITE;
++                /* Ensure that we read zeroes and not backing file data */
++                subclusters_need_allocation = true;
              }
--            break;
-+        }
+         } else {
+             ret = -1;
+@@ -4343,6 +4348,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+                     .offset       = nb_clusters << s->cluster_bits,
+                     .nb_bytes     = 0,
+                 },
++                .prealloc     = !subclusters_need_allocation,
+             };
+             qemu_co_queue_init(&allocation.dependent_requests);
  
--        case QCOW2_CLUSTER_ZERO_PLAIN:
--            if (!full_discard) {
--                continue;
--            }
--            break;
--
--        case QCOW2_CLUSTER_ZERO_ALLOC:
--        case QCOW2_CLUSTER_NORMAL:
--        case QCOW2_CLUSTER_COMPRESSED:
--            break;
--
--        default:
--            abort();
-+        if (old_l2_entry == new_l2_entry && old_l2_bitmap == new_l2_bitmap) {
-+            continue;
-         }
- 
-         /* First remove L2 entries */
-         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
--        if (!full_discard && s->qcow_version >= 3) {
--            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
--        } else {
--            set_l2_entry(s, l2_slice, l2_index + i, 0);
-+        set_l2_entry(s, l2_slice, l2_index + i, new_l2_entry);
-+        if (has_subclusters(s)) {
-+            set_l2_bitmap(s, l2_slice, l2_index + i, new_l2_bitmap);
-         }
--
-         /* Then decrease the refcount */
-         qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
-     }
 -- 
 2.20.1
 
