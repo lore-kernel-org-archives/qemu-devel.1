@@ -2,61 +2,86 @@ Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FCBC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABA37206C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABA37206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 60CFA206C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 19:03:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X1Gyx4ct"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60CFA206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpc9Z-0007uk-0Z
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55030)
+	id 1jpca2-0005KK-K9
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 15:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpc8t-0007Eq-43; Sun, 28 Jun 2020 14:35:03 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:28674)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpc8r-0007b2-FK; Sun, 28 Jun 2020 14:35:02 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id BCF2A74632C;
- Sun, 28 Jun 2020 20:34:57 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id A0C6A745712; Sun, 28 Jun 2020 20:34:57 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 9F6587456F8;
- Sun, 28 Jun 2020 20:34:57 +0200 (CEST)
-Date: Sun, 28 Jun 2020 20:34:57 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v5 00/11] Mac Old World ROM experiment
-In-Reply-To: <7e7de183-e453-0907-71ca-c1c8126e5543@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2006282032040.88507@zero.eik.bme.hu>
-References: <cover.1592315226.git.balaton@eik.bme.hu>
- <alpine.BSF.2.22.395.2006261218180.94870@zero.eik.bme.hu>
- <7e7de183-e453-0907-71ca-c1c8126e5543@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jpcZL-0004ot-Sg
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:02:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57518
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jpcZH-0002TR-Cs
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 15:02:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593370936;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EKx98bDzewSCMvRp+aYonJFCw773/klOGfHtB47zZWM=;
+ b=X1Gyx4ctRWqYDDa8mnprdwiOh04jmiQa0eHQh+L/RB7vpGKmj7OknR2pqojsedDocrmwpD
+ Qu/nz2U7ryPelbQrxNtK5fA8b7fG36inSHiGTiAHlb948FnxDgepULJ4sgWUc3Wx1Rnxvd
+ zpoW8TyigwMwVEwu8I6P9+WzkM7fZ4Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-HA8e9OiNM_uG2h027nNxOg-1; Sun, 28 Jun 2020 15:02:14 -0400
+X-MC-Unique: HA8e9OiNM_uG2h027nNxOg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42955800FF1;
+ Sun, 28 Jun 2020 19:02:13 +0000 (UTC)
+Received: from starship (unknown [10.35.206.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E478926358;
+ Sun, 28 Jun 2020 19:02:11 +0000 (UTC)
+Message-ID: <5fb2b50eb521776dce76eb258da38ab832f00b80.camel@redhat.com>
+Subject: Re: [PATCH 03/19] iotests/common.rc: Add _require_working_luks
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Date: Sun, 28 Jun 2020 22:02:10 +0300
+In-Reply-To: <20200625125548.870061-4-mreitz@redhat.com>
+References: <20200625125548.870061-1-mreitz@redhat.com>
+ <20200625125548.870061-4-mreitz@redhat.com>
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 14:20:01
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 15:02:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,33 +95,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jun 2020, Mark Cave-Ayland wrote:
-> On 26/06/2020 11:21, BALATON Zoltan wrote:
->> What about these patches? At least those that are finished (up to patch 9) could be
->> merged. I've seen you sent a pull request but not including any of these. Will this
->> need another rebase after your patches? If I rebase them will you consider merging
->> them? (Otherwise I won't spend time with it.)
->
-> Ah sorry I missed the latest version of these. I'll take a quick look now.
+On Thu, 2020-06-25 at 14:55 +0200, Max Reitz wrote:
+> That the luks driver is present is little indication on whether it is
+> actually working.  Without the crypto libraries linked in, it does not
+> work.  So add this function, which tries to create a luks image to see
+> whether that actually works.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/common.rc | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+> index ba912555ca..f3667f48ab 100644
+> --- a/tests/qemu-iotests/common.rc
+> +++ b/tests/qemu-iotests/common.rc
+> @@ -740,6 +740,33 @@ _unsupported_imgopts()
+>      done
+>  }
+>  
+> +# Caution: Overwrites $TEST_DIR/t.luks
+> +_require_working_luks()
+> +{
+> +    file="$TEST_DIR/t.luks"
+> +
+> +    output=$(
+> +        $QEMU_IMG create -f luks \
+> +            --object secret,id=sec0,data=hunter0 \
+> +            -o key-secret=sec0 \
+> +            -o iter-time=10 \
+> +            "$file" \
+> +            1M \
+> +            2>&1
+> +    )
+> +    status=$?
+> +
+> +    IMGFMT='luks' _rm_test_img "$file"
+> +
+> +    if [ $status != 0 ]; then
+> +        reason=$(echo "$output" | grep "$file:" | $SED -e "s#.*$file: *##")
+> +        if [ -z "$reason" ]; then
+> +            reason="Failed to create a LUKS image"
+> +        fi
+> +        _notrun "$reason"
+> +    fi
+> +}
+> +
+>  # this test requires that a specified command (executable) exists
+>  #
+>  _require_command()
 
-In case you missed that I've just sent the latest v6 version of the series 
-with changes you've suggested and I made since.
 
-> (BTW it seems the patches in your patchset have started appearing in a random order
-> when sent to the list again?)
+Look OK. I also tested this by building the qemu with all the patches applied,a
+and with --disable-nettle --disable-gcrypt
 
-I've noticed this too but don't know why that happens or what to do to 
-prevent it. I submit these in one batch to my mail server which then seems 
-to send it off simultaneously and may end up out of order. I've tried 
-adding a 1 sec delay now but apparently that did not solve it. Sorry for 
-the inconvenience.
+And now all my tests are skipped with this nice message:
+"No crypto library supporting PBKDF in this build: Function not implemented"
 
-Regards,
-BALATON Zoltan
+Thank you very very much for implementing this!
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+
+Best regards,
+	Maxim Levitsky
+
 
