@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C1CC433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0593C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C50DA20578
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:25:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C50DA20578
+	by mail.kernel.org (Postfix) with ESMTPS id A8513206BE
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8513206BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpbzc-0000cX-T2
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:25:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
+	id 1jpc13-0003Ew-ST
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuZ-0002Jz-Av; Sun, 28 Jun 2020 14:20:15 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38392)
+ id 1jpbuW-0002Dj-Ik; Sun, 28 Jun 2020 14:20:12 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38378)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuW-0005Nw-Td; Sun, 28 Jun 2020 14:20:14 -0400
+ id 1jpbuU-0005N3-Mb; Sun, 28 Jun 2020 14:20:12 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 54C9074633D;
- Sun, 28 Jun 2020 20:20:11 +0200 (CEST)
+ by localhost (Postfix) with SMTP id 23982748DCC;
+ Sun, 28 Jun 2020 20:20:09 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 20A76746331; Sun, 28 Jun 2020 20:20:11 +0200 (CEST)
-Message-Id: <2d6ab0ef6aef80311a24089ab2f1152f554dcd98.1593367416.git.balaton@eik.bme.hu>
+ id 04188746331; Sun, 28 Jun 2020 20:20:09 +0200 (CEST)
+Message-Id: <73921e8573a7888cb97cf974aa789318fafaa399.1593367416.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1593367416.git.balaton@eik.bme.hu>
 References: <cover.1593367416.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [RFC PATCH v6 10/11] WIP macio/cuda: Attempt to add i2c support
+Subject: [PATCH v6 08/11] mac_oldworld: Add machine ID register
 Date: Sun, 28 Jun 2020 20:03:36 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,152 +73,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not a final, RFC patch attempt to implement i2c bus in CUDA
-needed for firmware to access SPD data of installed RAM. The skeleton
-is there but actual implementation of I2C commands need to be refined
-because I don't know how this is supposed to work. In my understanding
-after an I2C command (at least for combined transfer) CUDA should
-enter a mode where reading subsequent values from VIA[SR] should
-return bytes received from the i2C device but not sure what ends this
-mode or how to model it correctly. So this patch just returns fixed
-amount of bytes expected by reading SPD eeproms just to make testing
-the firmware ROM possible. Help fixing and finishing this is welcome,
-I don't plan to spend more time with this so just submitted it for
-whoever picks this up.
+The G3 beige machine has a machine ID register that is accessed by the
+firmware to deternine the board config. Add basic emulation of it.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/misc/macio/cuda.c         | 76 +++++++++++++++++++++++++++++++++++-
- include/hw/misc/macio/cuda.h |  1 +
- 2 files changed, 76 insertions(+), 1 deletion(-)
+v6: Make MemoryRegionOps static const
+v4: Move MermoryRegion to MachineState, use constants
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 5bbc7770fa..3fc9773717 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -28,6 +28,7 @@
- #include "hw/ppc/mac.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "hw/i2c/i2c.h"
- #include "hw/input/adb.h"
- #include "hw/misc/mos6522.h"
- #include "hw/misc/macio/cuda.h"
-@@ -370,6 +371,75 @@ static bool cuda_cmd_set_time(CUDAState *s,
-     return true;
+ hw/ppc/mac.h          |  1 +
+ hw/ppc/mac_oldworld.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 58ae5a2226..75f1853a7b 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -69,6 +69,7 @@ typedef struct HeathrowMachineState {
+     /*< private >*/
+     MachineState parent;
+ 
++    MemoryRegion machine_id;
+     PCIDevice *macio;
+ } HeathrowMachineState;
+ 
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 13562e26e6..8fbddba4eb 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -52,6 +52,9 @@
+ 
+ #define MAX_IDE_BUS 2
+ #define CFG_ADDR 0xf0000510
++#define MACHINE_ID_ADDR 0xff000004
++#define MACHINE_ID_VAL 0x3d8c
++
+ #define TBFREQ 16600000UL
+ #define CLOCKFREQ 266000000UL
+ #define BUSFREQ 66000000UL
+@@ -89,6 +92,22 @@ static void ppc_heathrow_cpu_reset(void *opaque)
+     cpu_reset(CPU(cpu));
  }
  
-+static bool cuda_cmd_get_set_iic(CUDAState *s,
-+                                 const uint8_t *in_data, int in_len,
-+                                 uint8_t *out_data, int *out_len)
++static uint64_t machine_id_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    int i;
-+
-+    qemu_log_mask(LOG_UNIMP, "CUDA: unimplemented GET_SET_IIC %s 0x%x %d\n",
-+                  (in_data[0] & 1 ? "read" : "write"), in_data[0] >> 1,
-+                  in_len);
-+    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1)) {
-+        return false;
-+    }
-+    for (i = 0; i < in_len - 3; i++) {
-+        if (i2c_send(s->i2c_bus, in_data[i])) {
-+            i2c_end_transfer(s->i2c_bus);
-+            return false;
-+        }
-+    }
-+    return true;
++    return (addr == 0 && size == 2 ? MACHINE_ID_VAL : 0);
 +}
 +
-+static bool cuda_cmd_combined_iic(CUDAState *s,
-+                                  const uint8_t *in_data, int in_len,
-+                                  uint8_t *out_data, int *out_len)
++static void machine_id_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
 +{
-+    int i;
-+
-+    if (in_len < 3) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CUDA: COMBINED_FORMAT_IIC too few input bytes\n");
-+        return false;
-+    }
-+    if ((in_data[0] & 0xfe) != (in_data[2] & 0xfe)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CUDA: COMBINED_FORMAT_IIC address mismatch\n");
-+        return false;
-+    }
-+
-+    uint8_t data = in_data[1];
-+    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1) ||
-+        i2c_send_recv(s->i2c_bus, &data, in_data[0] & 1)) {
-+        return false;
-+    }
-+    i2c_end_transfer(s->i2c_bus);
-+    if (in_data[2] & 1) {
-+        if (i2c_start_transfer(s->i2c_bus, in_data[2] >> 1, in_data[2] & 1)) {
-+            i2c_end_transfer(s->i2c_bus);
-+            return false;
-+        }
-+        for (i = 0; i < 5; i++) {
-+            if (i2c_send_recv(s->i2c_bus, &out_data[i], in_data[2] & 1)) {
-+                i2c_end_transfer(s->i2c_bus);
-+                return false;
-+            }
-+        }
-+        *out_len = i;
-+        i2c_end_transfer(s->i2c_bus);
-+    } else {
-+        for (i = 0; i < in_len - 3; i++) {
-+            data = in_data[3 + i];
-+            if (i2c_send_recv(s->i2c_bus, &data, in_data[2] & 1)) {
-+                i2c_end_transfer(s->i2c_bus);
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
++    return;
 +}
 +
- static const CudaCommand handlers[] = {
-     { CUDA_AUTOPOLL, "AUTOPOLL", cuda_cmd_autopoll },
-     { CUDA_SET_AUTO_RATE, "SET_AUTO_RATE",  cuda_cmd_set_autorate },
-@@ -382,6 +452,8 @@ static const CudaCommand handlers[] = {
-       cuda_cmd_set_power_message },
-     { CUDA_GET_TIME, "GET_TIME", cuda_cmd_get_time },
-     { CUDA_SET_TIME, "SET_TIME", cuda_cmd_set_time },
-+    { CUDA_GET_SET_IIC, "GET_SET_IIC", cuda_cmd_get_set_iic },
-+    { CUDA_COMBINED_FORMAT_IIC, "COMBINED_FORMAT_IIC", cuda_cmd_combined_iic },
- };
- 
- static void cuda_receive_packet(CUDAState *s,
-@@ -549,6 +621,7 @@ static void cuda_init(Object *obj)
++static const MemoryRegionOps machine_id_reg_ops = {
++    .read = machine_id_read,
++    .write = machine_id_write,
++};
++
+ static void ppc_heathrow_init(MachineState *machine)
  {
-     CUDAState *s = CUDA(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    DeviceState *dev = DEVICE(obj);
+     HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
+@@ -239,6 +258,11 @@ static void ppc_heathrow_init(MachineState *machine)
+         }
+     }
  
-     object_initialize_child(obj, "mos6522-cuda", &s->mos6522_cuda,
-                             TYPE_MOS6522_CUDA);
-@@ -557,7 +630,8 @@ static void cuda_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->mem);
- 
-     qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
--                        DEVICE(obj), "adb.0");
-+                        dev, "adb.0");
-+    s->i2c_bus = i2c_init_bus(dev, "i2c");
- }
- 
- static Property cuda_properties[] = {
-diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
-index a8cf0be1ec..6856ed7704 100644
---- a/include/hw/misc/macio/cuda.h
-+++ b/include/hw/misc/macio/cuda.h
-@@ -79,6 +79,7 @@ typedef struct CUDAState {
- 
-     ADBBusState adb_bus;
-     MOS6522CUDAState mos6522_cuda;
-+    I2CBus *i2c_bus;
- 
-     uint32_t tick_offset;
-     uint64_t tb_frequency;
++    memory_region_init_io(&hm->machine_id, OBJECT(machine),
++                          &machine_id_reg_ops, NULL, "machine_id", 2);
++    memory_region_add_subregion(get_system_memory(), MACHINE_ID_ADDR,
++                                &hm->machine_id);
++
+     /* XXX: we register only 1 output pin for heathrow PIC */
+     pic_dev = qdev_new(TYPE_HEATHROW);
+     sysbus_realize_and_unref(SYS_BUS_DEVICE(pic_dev), &error_fatal);
 -- 
 2.21.3
 
