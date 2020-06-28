@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0593C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C10C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8513206BE
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8513206BE
+	by mail.kernel.org (Postfix) with ESMTPS id 8EF3F206BE
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF3F206BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpc13-0003Ew-ST
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51624)
+	id 1jpc15-0003LE-Qq
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuW-0002Dj-Ik; Sun, 28 Jun 2020 14:20:12 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38378)
+ id 1jpbuY-0002HP-84; Sun, 28 Jun 2020 14:20:14 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38387)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuU-0005N3-Mb; Sun, 28 Jun 2020 14:20:12 -0400
+ id 1jpbuV-0005NQ-SR; Sun, 28 Jun 2020 14:20:13 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 23982748DCC;
- Sun, 28 Jun 2020 20:20:09 +0200 (CEST)
+ by localhost (Postfix) with SMTP id 58EC0748DCD;
+ Sun, 28 Jun 2020 20:20:10 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 04188746331; Sun, 28 Jun 2020 20:20:09 +0200 (CEST)
-Message-Id: <73921e8573a7888cb97cf974aa789318fafaa399.1593367416.git.balaton@eik.bme.hu>
+ id 11777746331; Sun, 28 Jun 2020 20:20:10 +0200 (CEST)
+Message-Id: <c4c0fdf928de0140e43c00f6aaa7877beb79e8d6.1593367416.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1593367416.git.balaton@eik.bme.hu>
 References: <cover.1593367416.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v6 08/11] mac_oldworld: Add machine ID register
+Subject: [PATCH v6 09/11] i2c: Match parameters of i2c_start_transfer and
+ i2c_send_recv
 Date: Sun, 28 Jun 2020 20:03:36 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,79 +74,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The G3 beige machine has a machine ID register that is accessed by the
-firmware to deternine the board config. Add basic emulation of it.
+These functions have a parameter that decides the direction of
+transfer but totally confusingly they don't match but inverted sense.
+To avoid frequent mistakes when using these functions change
+i2c_send_recv to match i2c_start_transfer. Also use bool in
+i2c_start_transfer instead of int to match i2c_send_recv.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
-v6: Make MemoryRegionOps static const
-v4: Move MermoryRegion to MachineState, use constants
+This probably won't be the solution accepted as Philippe has an
+alternative series fixing this problem here:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg07022.html
+but until that or something else is merged this will do for the next
+patch. When this gets sorted out I'll send a rebased version.
 
- hw/ppc/mac.h          |  1 +
- hw/ppc/mac_oldworld.c | 24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ hw/display/sm501.c   |  2 +-
+ hw/i2c/core.c        | 34 +++++++++++++++++-----------------
+ hw/i2c/ppc4xx_i2c.c  |  2 +-
+ include/hw/i2c/i2c.h |  4 ++--
+ 4 files changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 58ae5a2226..75f1853a7b 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -69,6 +69,7 @@ typedef struct HeathrowMachineState {
-     /*< private >*/
-     MachineState parent;
- 
-+    MemoryRegion machine_id;
-     PCIDevice *macio;
- } HeathrowMachineState;
- 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 13562e26e6..8fbddba4eb 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -52,6 +52,9 @@
- 
- #define MAX_IDE_BUS 2
- #define CFG_ADDR 0xf0000510
-+#define MACHINE_ID_ADDR 0xff000004
-+#define MACHINE_ID_VAL 0x3d8c
-+
- #define TBFREQ 16600000UL
- #define CLOCKFREQ 266000000UL
- #define BUSFREQ 66000000UL
-@@ -89,6 +92,22 @@ static void ppc_heathrow_cpu_reset(void *opaque)
-     cpu_reset(CPU(cpu));
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index a7fc08c52b..e714674681 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1041,7 +1041,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
+                                   s->i2c_byte_count + 1, s->i2c_addr >> 1);
+                     for (i = 0; i <= s->i2c_byte_count; i++) {
+                         res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
+-                                            !(s->i2c_addr & 1));
++                                            s->i2c_addr & 1);
+                         if (res) {
+                             SM501_DPRINTF("sm501 i2c : transfer failed"
+                                           " i=%d, res=%d\n", i, res);
+diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+index acf34a12d6..0303fefeaf 100644
+--- a/hw/i2c/core.c
++++ b/hw/i2c/core.c
+@@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
+  * without releasing the bus.  If that fails, the bus is still
+  * in a transaction.
+  */
+-int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
++int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
+ {
+     BusChild *kid;
+     I2CSlaveClass *sc;
+@@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
+     bus->broadcast = false;
  }
  
-+static uint64_t machine_id_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    return (addr == 0 && size == 2 ? MACHINE_ID_VAL : 0);
-+}
-+
-+static void machine_id_write(void *opaque, hwaddr addr,
-+                             uint64_t val, unsigned size)
-+{
-+    return;
-+}
-+
-+static const MemoryRegionOps machine_id_reg_ops = {
-+    .read = machine_id_read,
-+    .write = machine_id_write,
-+};
-+
- static void ppc_heathrow_init(MachineState *machine)
+-int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
++int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
  {
-     HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
-@@ -239,6 +258,11 @@ static void ppc_heathrow_init(MachineState *machine)
-         }
-     }
+     I2CSlaveClass *sc;
+     I2CSlave *s;
+     I2CNode *node;
+     int ret = 0;
  
-+    memory_region_init_io(&hm->machine_id, OBJECT(machine),
-+                          &machine_id_reg_ops, NULL, "machine_id", 2);
-+    memory_region_add_subregion(get_system_memory(), MACHINE_ID_ADDR,
-+                                &hm->machine_id);
-+
-     /* XXX: we register only 1 output pin for heathrow PIC */
-     pic_dev = qdev_new(TYPE_HEATHROW);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(pic_dev), &error_fatal);
+-    if (send) {
+-        QLIST_FOREACH(node, &bus->current_devs, next) {
+-            s = node->elt;
+-            sc = I2C_SLAVE_GET_CLASS(s);
+-            if (sc->send) {
+-                trace_i2c_send(s->address, *data);
+-                ret = ret || sc->send(s, *data);
+-            } else {
+-                ret = -1;
+-            }
+-        }
+-        return ret ? -1 : 0;
+-    } else {
++    if (recv) {
+         ret = 0xff;
+         if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
+             sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+@@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+         }
+         *data = ret;
+         return 0;
++    } else {
++        QLIST_FOREACH(node, &bus->current_devs, next) {
++            s = node->elt;
++            sc = I2C_SLAVE_GET_CLASS(s);
++            if (sc->send) {
++                trace_i2c_send(s->address, *data);
++                ret = ret || sc->send(s, *data);
++            } else {
++                ret = -1;
++            }
++        }
++        return ret ? -1 : 0;
+     }
+ }
+ 
+ int i2c_send(I2CBus *bus, uint8_t data)
+ {
+-    return i2c_send_recv(bus, &data, true);
++    return i2c_send_recv(bus, &data, false);
+ }
+ 
+ uint8_t i2c_recv(I2CBus *bus)
+ {
+     uint8_t data = 0xff;
+ 
+-    i2c_send_recv(bus, &data, false);
++    i2c_send_recv(bus, &data, true);
+     return data;
+ }
+ 
+diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+index c0a8e04567..d3899203a4 100644
+--- a/hw/i2c/ppc4xx_i2c.c
++++ b/hw/i2c/ppc4xx_i2c.c
+@@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+                     }
+                 }
+                 if (!(i2c->sts & IIC_STS_ERR) &&
+-                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
++                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
+                     i2c->sts |= IIC_STS_ERR;
+                     i2c->extsts |= IIC_EXTSTS_XFRA;
+                     break;
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index d6e3d85faf..ad2475d6a2 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -72,10 +72,10 @@ struct I2CBus {
+ I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
+ void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
+ int i2c_bus_busy(I2CBus *bus);
+-int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
++int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
+ void i2c_end_transfer(I2CBus *bus);
+ void i2c_nack(I2CBus *bus);
+-int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
++int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
+ int i2c_send(I2CBus *bus, uint8_t data);
+ uint8_t i2c_recv(I2CBus *bus);
+ 
 -- 
 2.21.3
 
