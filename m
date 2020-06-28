@@ -1,87 +1,93 @@
 Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D70E7C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 914EFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0A8C20738
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:17:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 455DE204EC
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:25:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XExUYfmc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A8C20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ekXE9kZf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455DE204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpY7M-000487-T0
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 10:17:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36416)
+	id 1jpYFn-0007l2-Ep
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 10:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.tribble@gmail.com>)
- id 1jpY6j-0003fV-KH
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:16:33 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:32865)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpYEX-0005tJ-9J
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:24:37 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45126)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.tribble@gmail.com>)
- id 1jpY6h-0003pG-JX
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:16:33 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id k22so934748oib.0
- for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 07:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=j2c75Dc40xqiMRHW+fKUjqNc7Kg5vNtLGA1SdtpsEy0=;
- b=XExUYfmcuAhEFx8G5tt9K9Yq0NEGlMXVWe6HFtcn7H9Hn/qiaJcjv/r3G8TTxdTY8A
- TapKAtY4T8b3aXNkEWNKC2mUYoyZySU7uEC491puUkdke/cIjVn/3A6P9Cj0ybd+cztA
- fZ099Jmvnznb9/FvdMBPtiqUBVPBBqFzXUL9kYAyJL5nhDLzJvohiDPveEPalJ+c33kY
- 0hN8X9G8x4t6iwZExOeme9zf15URkuXFqOswdpeUBMQb9f7aZoEiApjvAT+l9ahROZZK
- 8hefYBHzbZtce0onM0/oQIXyx4kD7z0JUwXgB6RAPOChh9kOTI1YpSwm5r37/2i6vrLd
- Xg/g==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpYEU-0004dx-VZ
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:24:37 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s10so14003033wrw.12
+ for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 07:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=qdRlIaC9JF2UI5+Pxfp+w0r90H6ul1msBFHx529BCTM=;
+ b=ekXE9kZfN3ysH5L8fkkLYcNpFitJbIJjdfuqzJYS0H3MqLnDamqbU1GWLFp1rnhzIm
+ rdCoI2tFyl8f0c+jj29L8mrjuHi46so6ZDY8NGjNG8ekNSAdD9TiL0KbE899sn4TPfE7
+ 0YSlZk3RwCywrQSuATon3YdbhvmL7gDxYWkZGVyaiwfFg2thTV2RGxSMpLgwazC6Nesi
+ ykp+OOGiMdzJSNvXFMzeFTONsjn1Lo0ZuKUsmPI/Foa6Gp0qRVLISZEH5U/+Fc36VtPs
+ EN8wqJ1Xx9/9m5SObldU/mcY2E5ICGusd8euFy5mANGT+2seDqQDvHvbdHnTAtjmu1kS
+ ZyNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=j2c75Dc40xqiMRHW+fKUjqNc7Kg5vNtLGA1SdtpsEy0=;
- b=tByic5HluNZ3d7OnMII2zboCg6MGz2Kt1QY+PEKjPkgnL7SBSKS83rTVCh3QTCMi4G
- yV34F9EtLzxcub71+5AcZ6ogN0agdKdQabWVq2uL0wZZcIsALFwWEi2QRXJMrXSji/FB
- mHllRxtxKgjSBMx5srbQC8Xt/E05WWY9Tkpd+f9ZF4SkkLxLG6LNaFC5GUFI3aXpoaJ3
- uIgY+21OOcgFwrLLPyx4aIhDzPa4ZTX92nmgNT7rFiubA/D5CXWBCSCXpMI+HexPLBWC
- 4r6rBdj9M8bABFO5fXEd+RTiMkuuPDOVPOnVIRMrq840CnTBUWQyJLbqI6s1tuZfYCX6
- fLgw==
-X-Gm-Message-State: AOAM533UAiF1Wl1KZZ1fynThfu2Qu73GcxX23xBeCVFm+eUEcOHm50JG
- /1JIAgNjM0FiQATWgzm4v/7/u6uRLVp3XggJ3g==
-X-Google-Smtp-Source: ABdhPJw+cG1P7L0+ldL6/fT4+XMqr10sFNeePgLQkdE9qFE37IKLuLANDMf/6AgVgXaU5QRfzmyBhTbQH6ifOYECEFw=
-X-Received: by 2002:aca:d681:: with SMTP id n123mr9108941oig.82.1593353790161; 
- Sun, 28 Jun 2020 07:16:30 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=qdRlIaC9JF2UI5+Pxfp+w0r90H6ul1msBFHx529BCTM=;
+ b=puVs2lzC9fkeiX1UpQG3SeDNQUW/hdQyMUYRf1YZ9zsI86S/ivR6yzSJVkvLLmBC1r
+ HHvNWM8uKItpIAotJhZOBi806DY/paMR6D7Qrr3MfHLl54wCI4ptcsPwX0i+DyfSbion
+ 7qNmSOUcP7UjTF1Nd4LlwMQuDaC/NmUDnErahfES5pODi6FdPqRepKGL3enbwLDWfuht
+ sEO0rhO97xyq6C7Cy7DBoLl2v7EDh65Pukij12vV5PeIdO4l8f2r7+8KQ82vlOXqrCtz
+ 8rXcXcPa25u1A+GjGCaaQ6Jwt/zUj0NmPDjUaH8vwtYDv9c5NCj0fvvQKL1OtcrcqJeT
+ yOMg==
+X-Gm-Message-State: AOAM532+laUydCsmTtw5PKdbyqRVr1TrJr5B8XdkPnjWTae/Yz5Kd2Il
+ uOJBbyazwc0BAFKF49i/HsGVDw==
+X-Google-Smtp-Source: ABdhPJwUmE6qY7v/o+A9UbsLAD6uZOZCf/nc5eVnMdLaQMeBzOSuRwLM6bx9wdtbzAJrjrFGBdSfcA==
+X-Received: by 2002:a5d:5651:: with SMTP id j17mr12440652wrw.145.1593354273499; 
+ Sun, 28 Jun 2020 07:24:33 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id h13sm5321555wml.42.2020.06.28.07.24.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 28 Jun 2020 07:24:32 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 01/17] hw/arm/spitz: Detabify
+Date: Sun, 28 Jun 2020 15:24:13 +0100
+Message-Id: <20200628142429.17111-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200628142429.17111-1-peter.maydell@linaro.org>
+References: <20200628142429.17111-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-References: <5EF7B7DB.6040305@mindspring.com>
- <CAFEAcA8RB5PdafUSM0hH0paw7MFTv-RJ1-Z6SdJWNsC7hvyToQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8RB5PdafUSM0hH0paw7MFTv-RJ1-Z6SdJWNsC7hvyToQ@mail.gmail.com>
-From: Peter Tribble <peter.tribble@gmail.com>
-Date: Sun, 28 Jun 2020 15:16:00 +0100
-Message-ID: <CAEgYsbE7s5hD+5ARj_Xt1D0ALDPDQx7uvocd5zRF6P=EzwxTZQ@mail.gmail.com>
-Subject: Re: Building in Solaris 11.4
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000aa076305a9259629"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22a;
- envelope-from=peter.tribble@gmail.com; helo=mail-oi1-x22a.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,193 +100,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Michele Denber <denber@mindspring.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000aa076305a9259629
-Content-Type: text/plain; charset="UTF-8"
+The spitz board has been around a long time, and still has a fair number
+of hard-coded tab characters in it. We're about to do some work on
+this source file, so start out by expanding out the tabs.
 
-On Sun, Jun 28, 2020 at 2:23 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+This commit is a pure whitespace only change.
 
-> On Sat, 27 Jun 2020 at 23:05, Michele Denber <denber@mindspring.com>
-> wrote:
-> >
-> > Well I removed the "static" from the line
-> >
-> > static int openpty(int *amaster, int *aslave, char *name,
-> >                    struct termios *termp, struct winsize *winp)
-> >
-> > in util/qemu-openpty.c.  I odn't know if that was the right thing to do
-> but it did allow it to compile.
->
-> No, that doesn't sound right. The code in qemu-openpty.c
-> for Solaris assumes that solaris does not provide
-> openpty(), and so it provides its own implementation.
-> This is a very old bit of portability-workaround. It
-> sounds like at least some Solaris versions do provide
-> a system openpty() in termios.h (in libc, or perhaps
-> needing an extra -lsomething?), in which case we want
-> to detect that and use it (not compiling the QEMU
-> code for solaris-without-openpty).
->
-> The first thing to do here would be to find out which
-> versions of Solaris provide openpty(), and which header
-> and library need to be used to compile code that uses it.
-> The gnulib docs think it is missing on Solaris 11.3:
-> do we care about supporting that as a host OS?
-> https://www.gnu.org/software/gnulib/manual/html_node/openpty.html
->
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Couple of checkpatch errors due to the QUEUE_KEY macro which can
+be ignored as this is just a detabify.
+---
+ hw/arm/spitz.c | 156 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 78 insertions(+), 78 deletions(-)
 
-I think you need to support older versions that don't ship openpty(),
-as 11.4 dropped support for a lot of older hardware so people with
-existing (older but working) hardware won't be able to upgrade to it.
-
-Also, illumos doesn't (yet) have openpty.
-
-
-> Then you'd need to improve configure so that it looked for
-> "does the system provide openpty() via termios.h" and defined
-> CONFIG_OPENPTY_IN_TERMIOS to indicate that; then if that is
-> set we qemu-openpty.c can make solaris use the "system has
-> openpty()" codepath rather than "system doesn't have that".
-> If it turns out that all Solaris versions new enough that we
-> might care about them do have openpty() we could also delete
-> the handling code for systems that don't.
->
-> > CC      monitor/trace.o
-> > util/drm.c: In function 'qemu_drm_rendernode_open':
-> > util/drm.c:41:16: error: 'struct dirent' has no member named 'd_type';
-> did you mean 'd_name'?
-> >          if (e->d_type != DT_CHR) {
-> >                 ^~~~~~
-> >                 d_name
-> > util/drm.c:41:26: error: 'DT_CHR' undeclared (first use in this
-> function); did you mean 'TH_CWR'?
-> >          if (e->d_type != DT_CHR) {
-> >                           ^~~~~~
-> >                           TH_CWR
-> > util/drm.c:41:26: note: each undeclared identifier is reported only once
-> for each function it appears in
-> > gmake: *** [/export/home/denber/qemu-5.0.0/rules.mak:69: util/drm.o]
-> Error 1
-> >
-> > This looks like more "not in Solaris" POSIX stuff.
->
-> Ah, the Haiku folks just ran into exactly this issue.
-> Their fix should also be good for Solaris:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08800.html
-> (This whole file is for using a Linux-specific feature so there's
-> no point even compiling it for other OSes.)
->
-> thanks
-> -- PMM
->
->
-
+diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+index fc18212e686..9eaedab79b5 100644
+--- a/hw/arm/spitz.c
++++ b/hw/arm/spitz.c
+@@ -34,25 +34,25 @@
+ #include "cpu.h"
+ 
+ #undef REG_FMT
+-#define REG_FMT			"0x%02lx"
++#define REG_FMT                         "0x%02lx"
+ 
+ /* Spitz Flash */
+-#define FLASH_BASE		0x0c000000
+-#define FLASH_ECCLPLB		0x00	/* Line parity 7 - 0 bit */
+-#define FLASH_ECCLPUB		0x04	/* Line parity 15 - 8 bit */
+-#define FLASH_ECCCP		0x08	/* Column parity 5 - 0 bit */
+-#define FLASH_ECCCNTR		0x0c	/* ECC byte counter */
+-#define FLASH_ECCCLRR		0x10	/* Clear ECC */
+-#define FLASH_FLASHIO		0x14	/* Flash I/O */
+-#define FLASH_FLASHCTL		0x18	/* Flash Control */
++#define FLASH_BASE              0x0c000000
++#define FLASH_ECCLPLB           0x00    /* Line parity 7 - 0 bit */
++#define FLASH_ECCLPUB           0x04    /* Line parity 15 - 8 bit */
++#define FLASH_ECCCP             0x08    /* Column parity 5 - 0 bit */
++#define FLASH_ECCCNTR           0x0c    /* ECC byte counter */
++#define FLASH_ECCCLRR           0x10    /* Clear ECC */
++#define FLASH_FLASHIO           0x14    /* Flash I/O */
++#define FLASH_FLASHCTL          0x18    /* Flash Control */
+ 
+-#define FLASHCTL_CE0		(1 << 0)
+-#define FLASHCTL_CLE		(1 << 1)
+-#define FLASHCTL_ALE		(1 << 2)
+-#define FLASHCTL_WP		(1 << 3)
+-#define FLASHCTL_CE1		(1 << 4)
+-#define FLASHCTL_RYBY		(1 << 5)
+-#define FLASHCTL_NCE		(FLASHCTL_CE0 | FLASHCTL_CE1)
++#define FLASHCTL_CE0            (1 << 0)
++#define FLASHCTL_CLE            (1 << 1)
++#define FLASHCTL_ALE            (1 << 2)
++#define FLASHCTL_WP             (1 << 3)
++#define FLASHCTL_CE1            (1 << 4)
++#define FLASHCTL_RYBY           (1 << 5)
++#define FLASHCTL_NCE            (FLASHCTL_CE0 | FLASHCTL_CE1)
+ 
+ #define TYPE_SL_NAND "sl-nand"
+ #define SL_NAND(obj) OBJECT_CHECK(SLNANDState, (obj), TYPE_SL_NAND)
+@@ -74,12 +74,12 @@ static uint64_t sl_read(void *opaque, hwaddr addr, unsigned size)
+     int ryby;
+ 
+     switch (addr) {
+-#define BSHR(byte, from, to)	((s->ecc.lp[byte] >> (from - to)) & (1 << to))
++#define BSHR(byte, from, to)    ((s->ecc.lp[byte] >> (from - to)) & (1 << to))
+     case FLASH_ECCLPLB:
+         return BSHR(0, 4, 0) | BSHR(0, 5, 2) | BSHR(0, 6, 4) | BSHR(0, 7, 6) |
+                 BSHR(1, 4, 1) | BSHR(1, 5, 3) | BSHR(1, 6, 5) | BSHR(1, 7, 7);
+ 
+-#define BSHL(byte, from, to)	((s->ecc.lp[byte] << (to - from)) & (1 << to))
++#define BSHL(byte, from, to)    ((s->ecc.lp[byte] << (to - from)) & (1 << to))
+     case FLASH_ECCLPUB:
+         return BSHL(0, 0, 0) | BSHL(0, 1, 2) | BSHL(0, 2, 4) | BSHL(0, 3, 6) |
+                 BSHL(1, 0, 1) | BSHL(1, 1, 3) | BSHL(1, 2, 5) | BSHL(1, 3, 7);
+@@ -191,8 +191,8 @@ static void sl_nand_realize(DeviceState *dev, Error **errp)
+ 
+ /* Spitz Keyboard */
+ 
+-#define SPITZ_KEY_STROBE_NUM	11
+-#define SPITZ_KEY_SENSE_NUM	7
++#define SPITZ_KEY_STROBE_NUM    11
++#define SPITZ_KEY_SENSE_NUM     7
+ 
+ static const int spitz_gpio_key_sense[SPITZ_KEY_SENSE_NUM] = {
+     12, 17, 91, 34, 36, 38, 39
+@@ -214,11 +214,11 @@ static int spitz_keymap[SPITZ_KEY_SENSE_NUM + 1][SPITZ_KEY_STROBE_NUM] = {
+     { 0x52, 0x43, 0x01, 0x47, 0x49,  -1 ,  -1 ,  -1 ,  -1 ,  -1 ,  -1  },
+ };
+ 
+-#define SPITZ_GPIO_AK_INT	13	/* Remote control */
+-#define SPITZ_GPIO_SYNC		16	/* Sync button */
+-#define SPITZ_GPIO_ON_KEY	95	/* Power button */
+-#define SPITZ_GPIO_SWA		97	/* Lid */
+-#define SPITZ_GPIO_SWB		96	/* Tablet mode */
++#define SPITZ_GPIO_AK_INT       13      /* Remote control */
++#define SPITZ_GPIO_SYNC                 16      /* Sync button */
++#define SPITZ_GPIO_ON_KEY       95      /* Power button */
++#define SPITZ_GPIO_SWA          97      /* Lid */
++#define SPITZ_GPIO_SWB          96      /* Tablet mode */
+ 
+ /* The special buttons are mapped to unused keys */
+ static const int spitz_gpiomap[5] = {
+@@ -300,7 +300,7 @@ static void spitz_keyboard_keydown(SpitzKeyboardState *s, int keycode)
+ #define SPITZ_MOD_CTRL    (1 << 8)
+ #define SPITZ_MOD_FN      (1 << 9)
+ 
+-#define QUEUE_KEY(c)	s->fifo[(s->fifopos + s->fifolen ++) & 0xf] = c
++#define QUEUE_KEY(c)    s->fifo[(s->fifopos + s->fifolen ++) & 0xf] = c
+ 
+ static void spitz_keyboard_handler(void *opaque, int keycode)
+ {
+@@ -308,25 +308,25 @@ static void spitz_keyboard_handler(void *opaque, int keycode)
+     uint16_t code;
+     int mapcode;
+     switch (keycode) {
+-    case 0x2a:	/* Left Shift */
++    case 0x2a:  /* Left Shift */
+         s->modifiers |= 1;
+         break;
+     case 0xaa:
+         s->modifiers &= ~1;
+         break;
+-    case 0x36:	/* Right Shift */
++    case 0x36:  /* Right Shift */
+         s->modifiers |= 2;
+         break;
+     case 0xb6:
+         s->modifiers &= ~2;
+         break;
+-    case 0x1d:	/* Control */
++    case 0x1d:  /* Control */
+         s->modifiers |= 4;
+         break;
+     case 0x9d:
+         s->modifiers &= ~4;
+         break;
+-    case 0x38:	/* Alt */
++    case 0x38:  /* Alt */
+         s->modifiers |= 8;
+         break;
+     case 0xb8:
+@@ -536,14 +536,14 @@ static void spitz_keyboard_realize(DeviceState *dev, Error **errp)
+ 
+ /* LCD backlight controller */
+ 
+-#define LCDTG_RESCTL	0x00
+-#define LCDTG_PHACTRL	0x01
+-#define LCDTG_DUTYCTRL	0x02
+-#define LCDTG_POWERREG0	0x03
+-#define LCDTG_POWERREG1	0x04
+-#define LCDTG_GPOR3	0x05
+-#define LCDTG_PICTRL	0x06
+-#define LCDTG_POLCTRL	0x07
++#define LCDTG_RESCTL    0x00
++#define LCDTG_PHACTRL   0x01
++#define LCDTG_DUTYCTRL  0x02
++#define LCDTG_POWERREG0         0x03
++#define LCDTG_POWERREG1         0x04
++#define LCDTG_GPOR3     0x05
++#define LCDTG_PICTRL    0x06
++#define LCDTG_POLCTRL   0x07
+ 
+ typedef struct {
+     SSISlave ssidev;
+@@ -623,12 +623,12 @@ static void spitz_lcdtg_realize(SSISlave *dev, Error **errp)
+ 
+ /* SSP devices */
+ 
+-#define CORGI_SSP_PORT		2
++#define CORGI_SSP_PORT          2
+ 
+-#define SPITZ_GPIO_LCDCON_CS	53
+-#define SPITZ_GPIO_ADS7846_CS	14
+-#define SPITZ_GPIO_MAX1111_CS	20
+-#define SPITZ_GPIO_TP_INT	11
++#define SPITZ_GPIO_LCDCON_CS    53
++#define SPITZ_GPIO_ADS7846_CS   14
++#define SPITZ_GPIO_MAX1111_CS   20
++#define SPITZ_GPIO_TP_INT       11
+ 
+ static DeviceState *max1111;
+ 
+@@ -659,13 +659,13 @@ static void corgi_ssp_gpio_cs(void *opaque, int line, int level)
+     s->enable[line] = !level;
+ }
+ 
+-#define MAX1111_BATT_VOLT	1
+-#define MAX1111_BATT_TEMP	2
+-#define MAX1111_ACIN_VOLT	3
++#define MAX1111_BATT_VOLT       1
++#define MAX1111_BATT_TEMP       2
++#define MAX1111_ACIN_VOLT       3
+ 
+-#define SPITZ_BATTERY_TEMP	0xe0	/* About 2.9V */
+-#define SPITZ_BATTERY_VOLT	0xd0	/* About 4.0V */
+-#define SPITZ_CHARGEON_ACIN	0x80	/* About 5.0V */
++#define SPITZ_BATTERY_TEMP      0xe0    /* About 2.9V */
++#define SPITZ_BATTERY_VOLT      0xd0    /* About 4.0V */
++#define SPITZ_CHARGEON_ACIN     0x80    /* About 5.0V */
+ 
+ static void spitz_adc_temp_on(void *opaque, int line, int level)
+ {
+@@ -735,11 +735,11 @@ static void spitz_microdrive_attach(PXA2xxState *cpu, int slot)
+ 
+ /* Wm8750 and Max7310 on I2C */
+ 
+-#define AKITA_MAX_ADDR	0x18
+-#define SPITZ_WM_ADDRL	0x1b
+-#define SPITZ_WM_ADDRH	0x1a
++#define AKITA_MAX_ADDR  0x18
++#define SPITZ_WM_ADDRL  0x1b
++#define SPITZ_WM_ADDRH  0x1a
+ 
+-#define SPITZ_GPIO_WM	5
++#define SPITZ_GPIO_WM   5
+ 
+ static void spitz_wm8750_addr(void *opaque, int line, int level)
+ {
+@@ -806,20 +806,20 @@ static void spitz_out_switch(void *opaque, int line, int level)
+     }
+ }
+ 
+-#define SPITZ_SCP_LED_GREEN		1
+-#define SPITZ_SCP_JK_B			2
+-#define SPITZ_SCP_CHRG_ON		3
+-#define SPITZ_SCP_MUTE_L		4
+-#define SPITZ_SCP_MUTE_R		5
+-#define SPITZ_SCP_CF_POWER		6
+-#define SPITZ_SCP_LED_ORANGE		7
+-#define SPITZ_SCP_JK_A			8
+-#define SPITZ_SCP_ADC_TEMP_ON		9
+-#define SPITZ_SCP2_IR_ON		1
+-#define SPITZ_SCP2_AKIN_PULLUP		2
+-#define SPITZ_SCP2_BACKLIGHT_CONT	7
+-#define SPITZ_SCP2_BACKLIGHT_ON		8
+-#define SPITZ_SCP2_MIC_BIAS		9
++#define SPITZ_SCP_LED_GREEN             1
++#define SPITZ_SCP_JK_B                  2
++#define SPITZ_SCP_CHRG_ON               3
++#define SPITZ_SCP_MUTE_L                4
++#define SPITZ_SCP_MUTE_R                5
++#define SPITZ_SCP_CF_POWER              6
++#define SPITZ_SCP_LED_ORANGE            7
++#define SPITZ_SCP_JK_A                  8
++#define SPITZ_SCP_ADC_TEMP_ON           9
++#define SPITZ_SCP2_IR_ON                1
++#define SPITZ_SCP2_AKIN_PULLUP          2
++#define SPITZ_SCP2_BACKLIGHT_CONT       7
++#define SPITZ_SCP2_BACKLIGHT_ON                 8
++#define SPITZ_SCP2_MIC_BIAS             9
+ 
+ static void spitz_scoop_gpio_setup(PXA2xxState *cpu,
+                 DeviceState *scp0, DeviceState *scp1)
+@@ -839,15 +839,15 @@ static void spitz_scoop_gpio_setup(PXA2xxState *cpu,
+     qdev_connect_gpio_out(scp0, SPITZ_SCP_ADC_TEMP_ON, outsignals[6]);
+ }
+ 
+-#define SPITZ_GPIO_HSYNC		22
+-#define SPITZ_GPIO_SD_DETECT		9
+-#define SPITZ_GPIO_SD_WP		81
+-#define SPITZ_GPIO_ON_RESET		89
+-#define SPITZ_GPIO_BAT_COVER		90
+-#define SPITZ_GPIO_CF1_IRQ		105
+-#define SPITZ_GPIO_CF1_CD		94
+-#define SPITZ_GPIO_CF2_IRQ		106
+-#define SPITZ_GPIO_CF2_CD		93
++#define SPITZ_GPIO_HSYNC                22
++#define SPITZ_GPIO_SD_DETECT            9
++#define SPITZ_GPIO_SD_WP                81
++#define SPITZ_GPIO_ON_RESET             89
++#define SPITZ_GPIO_BAT_COVER            90
++#define SPITZ_GPIO_CF1_IRQ              105
++#define SPITZ_GPIO_CF1_CD               94
++#define SPITZ_GPIO_CF2_IRQ              106
++#define SPITZ_GPIO_CF2_CD               93
+ 
+ static int spitz_hsync;
+ 
+@@ -907,8 +907,8 @@ static void spitz_gpio_setup(PXA2xxState *cpu, int slots)
+ /* Board init.  */
+ enum spitz_model_e { spitz, akita, borzoi, terrier };
+ 
+-#define SPITZ_RAM	0x04000000
+-#define SPITZ_ROM	0x00800000
++#define SPITZ_RAM       0x04000000
++#define SPITZ_ROM       0x00800000
+ 
+ static struct arm_boot_info spitz_binfo = {
+     .loader_start = PXA2XX_SDRAM_BASE,
 -- 
--Peter Tribble
-http://www.petertribble.co.uk/ - http://ptribble.blogspot.com/
+2.20.1
 
---000000000000aa076305a9259629
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jun 28, 2020 at 2:23 PM Peter=
- Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lina=
-ro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">On Sat, 27 Jun 2020 at 23:05, Michele Denber &lt;<a href=3D"mailto:de=
-nber@mindspring.com" target=3D"_blank">denber@mindspring.com</a>&gt; wrote:=
-<br>
-&gt;<br>
-&gt; Well I removed the &quot;static&quot; from the line<br>
-&gt;<br>
-&gt; static int openpty(int *amaster, int *aslave, char *name,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 s=
-truct termios *termp, struct winsize *winp)<br>
-&gt;<br>
-&gt; in util/qemu-openpty.c.=C2=A0 I odn&#39;t know if that was the right t=
-hing to do but it did allow it to compile.<br>
-<br>
-No, that doesn&#39;t sound right. The code in qemu-openpty.c<br>
-for Solaris assumes that solaris does not provide<br>
-openpty(), and so it provides its own implementation.<br>
-This is a very old bit of portability-workaround. It<br>
-sounds like at least some Solaris versions do provide<br>
-a system openpty() in termios.h (in libc, or perhaps<br>
-needing an extra -lsomething?), in which case we want<br>
-to detect that and use it (not compiling the QEMU<br>
-code for solaris-without-openpty).<br>
-<br>
-The first thing to do here would be to find out which<br>
-versions of Solaris provide openpty(), and which header<br>
-and library need to be used to compile code that uses it.<br>
-The gnulib docs think it is missing on Solaris 11.3:<br>
-do we care about supporting that as a host OS?<br>
-<a href=3D"https://www.gnu.org/software/gnulib/manual/html_node/openpty.htm=
-l" rel=3D"noreferrer" target=3D"_blank">https://www.gnu.org/software/gnulib=
-/manual/html_node/openpty.html</a><br></blockquote><div><br></div><div>I th=
-ink you need to support older versions that don&#39;t ship openpty(),<br></=
-div><div>as 11.4 dropped support for a lot of older hardware so people with=
-<br></div><div>existing (older but working) hardware won&#39;t be able to u=
-pgrade to it.<br><br></div><div>Also, illumos doesn&#39;t (yet) have openpt=
-y.<br></div><div>=C2=A0<br></div><blockquote class=3D"gmail_quote" style=3D=
-"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
-ft:1ex">
-Then you&#39;d need to improve configure so that it looked for<br>
-&quot;does the system provide openpty() via termios.h&quot; and defined<br>
-CONFIG_OPENPTY_IN_TERMIOS to indicate that; then if that is<br>
-set we qemu-openpty.c can make solaris use the &quot;system has<br>
-openpty()&quot; codepath rather than &quot;system doesn&#39;t have that&quo=
-t;.<br>
-If it turns out that all Solaris versions new enough that we<br>
-might care about them do have openpty() we could also delete<br>
-the handling code for systems that don&#39;t.<br>
-<br>
-&gt; CC=C2=A0 =C2=A0 =C2=A0 monitor/trace.o<br>
-&gt; util/drm.c: In function &#39;qemu_drm_rendernode_open&#39;:<br>
-&gt; util/drm.c:41:16: error: &#39;struct dirent&#39; has no member named &=
-#39;d_type&#39;; did you mean &#39;d_name&#39;?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (e-&gt;d_type !=3D DT_CHR) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~<br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0d_name<br=
->
-&gt; util/drm.c:41:26: error: &#39;DT_CHR&#39; undeclared (first use in thi=
-s function); did you mean &#39;TH_CWR&#39;?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (e-&gt;d_type !=3D DT_CHR) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0TH_CWR<br>
-&gt; util/drm.c:41:26: note: each undeclared identifier is reported only on=
-ce for each function it appears in<br>
-&gt; gmake: *** [/export/home/denber/qemu-5.0.0/rules.mak:69: util/drm.o] E=
-rror 1<br>
-&gt;<br>
-&gt; This looks like more &quot;not in Solaris&quot; POSIX stuff.<br>
-<br>
-Ah, the Haiku folks just ran into exactly this issue.<br>
-Their fix should also be good for Solaris:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08800.h=
-tml" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.org/archive/htm=
-l/qemu-devel/2020-06/msg08800.html</a><br>
-(This whole file is for using a Linux-specific feature so there&#39;s<br>
-no point even compiling it for other OSes.)<br>
-<br>
-thanks<br>
--- PMM<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">-Peter Tribble<br><a href=3D"http://www.petertribble.co.uk/=
-" target=3D"_blank">http://www.petertribble.co.uk/</a> - <a href=3D"http://=
-ptribble.blogspot.com/" target=3D"_blank">http://ptribble.blogspot.com/</a>=
-</div></div>
-
---000000000000aa076305a9259629--
 
