@@ -2,97 +2,61 @@ Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D273FC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 08:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD5AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 10:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BFD820771
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 08:20:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F81TaO7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BFD820771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 824B920768
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 10:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824B920768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpSXm-0002Lf-QK
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 04:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50900)
+	id 1jpUyv-0004cz-NX
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 06:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jpSX4-0001ur-22
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 04:19:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28876
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jpSX2-0003rc-5A
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 04:19:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593332359;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EFIWrpFRnlY8+OazB9ZVdlEN6ivECRMxyetkkjxpK9E=;
- b=F81TaO7es/l5cTWJ7R8ocrqVJuVgSBUGMlqj5rhK1YrZ/yuz88LZbKlakL9oaBjXi1x8uA
- 0Aw7MLVWii8gIzhx4a241ERx6Do2Fik2jX3mi4+BEc7e6duyy+a0UhjldRqYvAgcTr5+tw
- 0Hu8V1sSuQWxE1woDEGjOPG0yUzpv9I=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-nzL7qou_MGmw8cORROchVQ-1; Sun, 28 Jun 2020 04:19:15 -0400
-X-MC-Unique: nzL7qou_MGmw8cORROchVQ-1
-Received: by mail-pl1-f199.google.com with SMTP id b5so8280802pls.17
- for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 01:19:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=EFIWrpFRnlY8+OazB9ZVdlEN6ivECRMxyetkkjxpK9E=;
- b=RSUWIyCsOzc+BTPMGg0CH9VY0HGJP5NArkjS9XNzQ/It1Wvu13NfDO1tw2IDHFd80K
- JhKduQkvMnu/tVofqrmebv2QCfcRuuyUpb4z2gi4dts8Y0dNsHsR6JTGNwtWAND74IBh
- dfvtS8K9pmQDseIyvYvFAigRwgQ5hlr/pnhURDu+trBXKejtXeqUAOe3RkPiaOcnod2K
- EdkOLP46eCCTXAOnwVdr0CBWY/c7LQIcBmyGE79VM/A+kFI3BOmx4boiRs6PtwYExYxn
- F+r2lQI9GptD4tWliFCTnHf+Qh+bn5m3Y0CINOZd+xW6j4Bp8e54Tp2Q6L+z10aikhFk
- Amvw==
-X-Gm-Message-State: AOAM532d1ADFG+2ozIWS2V0jKb7ATZpMyCp1tvpUN+140Tju1knJM9yD
- n7muVLd9SPyjg7RAMV/0JNYdemo0qaMgCgudsid/CgnC9/NH/Pt5jSXhZfQ47einmle4vbrd8Qk
- l2B3yo5ahC6JQSwJMNxEMIfbN0aPaRhE=
-X-Received: by 2002:a17:902:b692:: with SMTP id
- c18mr8105577pls.274.1593332354590; 
- Sun, 28 Jun 2020 01:19:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz7chScDx2r3Q5aAti1+vzpA/MmhWTktGOLEtosWO5tA9UIDAtW/C7oduy4YsYC7P0zPmRcI42qDVGITR208NU=
-X-Received: by 2002:a17:902:b692:: with SMTP id
- c18mr8105545pls.274.1593332354338; 
- Sun, 28 Jun 2020 01:19:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpUyM-0004CR-VP
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 06:55:42 -0400
+Received: from relay1-d.mail.gandi.net ([217.70.183.193]:38775)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpUyK-0007bb-9h
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 06:55:42 -0400
+X-Originating-IP: 89.158.232.227
+Received: from [192.168.0.13] (89-158-232-227.rev.numericable.fr
+ [89.158.232.227]) (Authenticated sender: jcd@tribudubois.net)
+ by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id D708E240009
+ for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 10:55:34 +0000 (UTC)
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Subject: Crash when running Qemu.
+Message-ID: <20d398f5-729e-57a7-db92-2243c106d832@tribudubois.net>
+Date: Sun, 28 Jun 2020 12:55:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200622153756.19189-1-lulu@redhat.com>
- <2b8a5cd5-1306-6760-59aa-f0312868ee11@redhat.com>
-In-Reply-To: <2b8a5cd5-1306-6760-59aa-f0312868ee11@redhat.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Sun, 28 Jun 2020 16:19:03 +0800
-Message-ID: <CACLfguWC_rznRp20X1WpoJACP9Thk0OvAjA-m75+eGmnsJ6rkw@mail.gmail.com>
-Subject: Re: [PATCH v1 00/10] vDPA support in qemu
-To: Jason Wang <jasowang@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 03:07:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.193; envelope-from=jcd@tribudubois.net;
+ helo=relay1-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 06:55:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,45 +69,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Michael Tsirkin <mst@redhat.com>,
- mhabets@solarflare.com, qemu-devel@nongnu.org, hanand@xilinx.com,
- Rob Miller <rob.miller@broadcom.com>, saugatm@xilinx.com,
- Markus Armbruster <armbru@redhat.com>, hch@infradead.org,
- Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
- Shahaf Shuler <shahafs@mellanox.com>, kevin.tian@intel.com, parav@mellanox.com,
- Vitaly Mireyno <vmireyno@marvell.com>, "Liang,
- Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
- Zhihong" <zhihong.wang@intel.com>, Ariel Adam <aadam@redhat.com>,
- rdunlap@infradead.org, Maxime Coquelin <maxime.coquelin@redhat.com>, "Zhu,
- Lingshan" <lingshan.zhu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 3:07 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/6/22 =E4=B8=8B=E5=8D=8811:37, Cindy Lu wrote:
-> > vDPA device is a device that uses a datapath which complies with the
-> > virtio specifications with vendor specific control path. vDPA devices
-> > can be both physically located on the hardware or emulated by software.
-> > This RFC introduce the vDPA support in qemu
-> > TODO
-> > 1) vIOMMU support
-> > 2) live migration support
->
->
-> Jut notice that the config interrupt [1] looks missed in this series.
->
-> Please add them in next version.
->
-> Thanks
->
-> [1]
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
-/?id=3D776f395004d829bbbf18c159ed9beb517a208c71
->
-sure will add this part
+Hi,
+
+Since the last pull I did this week end on the qemu git tree (master 
+branch) I am unable to "start" qemu anymore (It was working OK from git 
+master previously).
+
+Traces are provided bellow.
+
+Am I the only one to get this behavior?
+
+JC
+
+jcd@jcd-UX305CA:~/Projects/µCOS/work$ 
+../../qemu/qemu/arm-softmmu/qemu-system-arm -machine mcimx6ul-evk -m 
+128M -display none -serial stdio -kernel ./OS.elf
+double free or corruption (!prev)
+Abandon (core dumped)
+
+Running the same command from "gdb" provides the following backtrace.
+
+jcd@jcd-UX305CA:~/Projects/µCOS/work$ gdb 
+../../qemu/qemu/arm-softmmu/qemu-system-arm
+GNU gdb (Ubuntu 9.1-0ubuntu1) 9.1
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later 
+<http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+     <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ../../qemu/qemu/arm-softmmu/qemu-system-arm...
+(gdb) run -machine mcimx6ul-evk -m 128M -display none -serial stdio 
+-kernel ./OS.elf
+Starting program: ../../qemu/qemu/arm-softmmu/qemu-system-arm -machine 
+mcimx6ul-evk -m 128M -display none -serial stdio -kernel ./OS.elf
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff738e700 (LWP 71630)]
+double free or corruption (!prev)
+
+Thread 1 "qemu-system-arm" received signal SIGABRT, Aborted.
+__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+50    ../sysdeps/unix/sysv/linux/raise.c: Aucun fichier ou dossier de ce 
+type.
+(gdb) where
+#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+#1  0x00007ffff75d8859 in __GI_abort () at abort.c:79
+#2  0x00007ffff76433ee in __libc_message
+     (action=action@entry=do_abort, fmt=fmt@entry=0x7ffff776d285 "%s\n")
+     at ../sysdeps/posix/libc_fatal.c:155
+#3  0x00007ffff764b47c in malloc_printerr
+     (str=str@entry=0x7ffff776f690 "double free or corruption (!prev)")
+     at malloc.c:5347
+#4  0x00007ffff764d12c in _int_free
+     (av=0x7ffff779eb80 <main_arena>, p=0x5555567a3990, 
+have_lock=<optimized out>) at malloc.c:4317
+#5  0x0000555555c906c3 in type_initialize_interface
+     (ti=ti@entry=0x5555565b8f40, interface_type=0x555556597ad0, 
+parent_type=0x55555662ca10) at qom/object.c:259
+#6  0x0000555555c902da in type_initialize (ti=ti@entry=0x5555565b8f40)
+     at qom/object.c:323
+#7  0x0000555555c90d20 in type_initialize (ti=0x5555565b8f40)
+     at qom/object.c:1028
+#8  object_class_foreach_tramp
+     (key=<optimized out>, value=0x5555565b8f40, opaque=0x7fffffffdc20)
+     at qom/object.c:1016
+#9  0x00007ffff7c89058 in g_hash_table_foreach ()
+     at /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#10 0x0000555555c913a5 in object_class_foreach
+     (opaque=0x7fffffffdc18, include_abstract=false, 
+implements_type=<optimized out>, fn=0x555555c8f270 
+<object_class_get_list_tramp>) at qom/object.c:84
+#11 object_class_get_list
+     (implements_type=implements_type@entry=0x555555fd5e0c "machine", 
+include_abstract=include_abstract@entry=false) at qom/object.c:1095
+#12 0x00005555559a2195 in select_machine ()
+     at /home/jcd/Projects/qemu/qemu/softmmu/vl.c:3828
+#13 qemu_init (argc=<optimized out>, argv=0x7fffffffdef8, 
+envp=<optimized out>)
+     at /home/jcd/Projects/qemu/qemu/softmmu/vl.c:3828
+#14 0x0000555555856f9d in main
+     (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+     at /home/jcd/Projects/qemu/qemu/softmmu/main.c:48
+(gdb)
 
 
