@@ -2,103 +2,64 @@ Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CAC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 513C6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:53:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BB2320702
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:48:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTiFN8nq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BB2320702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17EF020772
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 14:53:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17EF020772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpYc0-0007b4-8a
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 10:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43252)
+	id 1jpYgp-0001cf-Cb
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 10:53:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jpYb8-0007AZ-1s
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:47:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50132
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jpYb4-0008Dy-OX
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 10:47:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593355672;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vBWc9fuvd8KVNYmzjEEwO6Wb/9vYInQjiP1TLT8/+/U=;
- b=MTiFN8nqrU7mEVYCtl0E0lvUVnRVl9dUM8pKdz8wqwTBc7wMC3hGac5xA8Y4Z9bvfp7b6p
- TaBNoqqHFiso6IEqKHPqOkymYu0zHSiEG6a5L8fuMDS9B0plGB8VinxLo0N45+I4hRrptg
- J7brAIGoziIwNxuCobZqC5mix3gb7Vc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-52xdpizIMM2Dht3kIvHBLw-1; Sun, 28 Jun 2020 10:47:50 -0400
-X-MC-Unique: 52xdpizIMM2Dht3kIvHBLw-1
-Received: by mail-qt1-f199.google.com with SMTP id g6so10371991qtr.0
- for <qemu-devel@nongnu.org>; Sun, 28 Jun 2020 07:47:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=vBWc9fuvd8KVNYmzjEEwO6Wb/9vYInQjiP1TLT8/+/U=;
- b=kQ7NpSAqd0m0f/E9QRM7OylRIrmy7a0cJRQqmNCS0SSI1N7HrNp17AVpFu5tjXzmGw
- Ujdx9LmofaZzC1ZsXjjRHc5qQahvr0pUsmKsUDI01S9hjmpXptog0jKfHyzhJ1lXRgDk
- crb7HCt6MnNZdFw/OgGiMeTmNHKZpRF0BX8kqo8hRCPmFoberjzMuYAdpGr6JA8Rl5An
- KYhsAYqMSToWT0QjD7jsQ4Jw5qqvrr5QuvNy4AH6VgYZQp9P0CE74fNiO55jyFnZYzM6
- ILfdqrv1DO8f7oy6VgBePR4/mdvVXQmMoc692od9doGCvQCtQNTCL5QZIeUHZJ4Zk31h
- B3qA==
-X-Gm-Message-State: AOAM533fWULb+ZCY7YZhdX9s5X0I/CSU5rhPyIsgSx6yScCWpqJM0Zp8
- sg/ONPXOd3QJoyuRcUNYZ+6KN2sgGXfh2D2KJCQchY7DAUoDGcOid5Zwdz0vS7cv2um/315HTXP
- XPkIpOLZdkTyEx2A=
-X-Received: by 2002:a0c:e710:: with SMTP id d16mr11686900qvn.158.1593355669756; 
- Sun, 28 Jun 2020 07:47:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJeCfI7+XBg9jYtbYH2yPJ3RcfslCzP/R+CqfsYMOPtjAvE3LmsfQJTSDlhFWgP/2YpqdIxQ==
-X-Received: by 2002:a0c:e710:: with SMTP id d16mr11686872qvn.158.1593355669274; 
- Sun, 28 Jun 2020 07:47:49 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id f54sm15472231qte.76.2020.06.28.07.47.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 28 Jun 2020 07:47:48 -0700 (PDT)
-Date: Sun, 28 Jun 2020 10:47:46 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200628144746.GA239443@xz-x1>
-References: <20200626064122.9252-1-eperezma@redhat.com>
- <20200626064122.9252-2-eperezma@redhat.com>
- <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jpYg9-0000zn-O2; Sun, 28 Jun 2020 10:53:09 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:58507)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jpYg6-0000Mc-Gy; Sun, 28 Jun 2020 10:53:09 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id C6550746307;
+ Sun, 28 Jun 2020 16:53:02 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 81F8074594E; Sun, 28 Jun 2020 16:53:02 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 7FE9B7456F8;
+ Sun, 28 Jun 2020 16:53:02 +0200 (CEST)
+Date: Sun, 28 Jun 2020 16:53:02 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v5 09/11] macio: Add dummy screamer register area
+In-Reply-To: <alpine.BSF.2.22.395.2006281627240.21756@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.22.395.2006281633240.21756@zero.eik.bme.hu>
+References: <cover.1592315226.git.balaton@eik.bme.hu>
+ <ecaaee4ba802b7a53de03e401c4d68e94de554f5.1592315226.git.balaton@eik.bme.hu>
+ <3012998c-8345-f654-1de1-dd623ef375e8@ilande.co.uk>
+ <alpine.BSF.2.22.395.2006281406340.95193@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2006281555030.21756@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2006281627240.21756@zero.eik.bme.hu>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=peterx@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 10:47:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -112,121 +73,398 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 03:03:41PM +0800, Jason Wang wrote:
-> 
-> On 2020/6/27 上午5:29, Peter Xu wrote:
-> > Hi, Eugenio,
-> > 
-> > (CCing Eric, Yan and Michael too)
-> > 
-> > On Fri, Jun 26, 2020 at 08:41:22AM +0200, Eugenio Pérez wrote:
-> > > diff --git a/memory.c b/memory.c
-> > > index 2f15a4b250..7f789710d2 100644
-> > > --- a/memory.c
-> > > +++ b/memory.c
-> > > @@ -1915,8 +1915,6 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-> > >           return;
-> > >       }
-> > > -    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> > I can understand removing the assertion should solve the issue, however imho
-> > the major issue is not about this single assertion but the whole addr_mask
-> > issue behind with virtio...
-> 
-> 
-> I don't get here, it looks to the the range was from guest IOMMU drivers.
+With increasing screamer buffer size (you may want to fix this and 
+prevent buffer overflows, maybe should allocate it dynamically based on 
+what the guest programs?):
 
-Yes.  Note that I didn't mean that it's a problem in virtio, it's just the fact
-that virtio is the only one I know that would like to support arbitrary address
-range for the translated region.  I don't know about tcg, but vfio should still
-need some kind of page alignment in both the address and the addr_mask.  We
-have that assumption too across the memory core when we do translations.
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 75f1853a7b..05b289e086 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -108,7 +108,7 @@ typedef struct Core99MachineState {
+  #define TYPE_SCREAMER "screamer"
+  #define SCREAMER(obj) OBJECT_CHECK(ScreamerState, (obj), TYPE_SCREAMER)
 
-A further cause of the issue is the MSI region when vIOMMU enabled - currently
-we implemented the interrupt region using another memory region so it split the
-whole DMA region into two parts.  That's really a clean approach to IR
-implementation, however that's also a burden to the invalidation part because
-then we'll need to handle things like this when the listened range is not page
-alighed at all (neither 0-0xfedffff, nor 0xfef0000-MAX).  If without the IR
-region (so the whole iommu address range will be a single FlatRange), I think
-we probably don't need most of the logic in vtd_address_space_unmap() at all,
-then we can directly deliver all the IOTLB invalidations without splitting into
-small page aligned ranges to all the iommu notifiers.  Sadly, so far I still
-don't have ideal solution for it, because we definitely need IR.
+-#define SCREAMER_BUFFER_SIZE 0x4000
++#define SCREAMER_BUFFER_SIZE 0x8000
 
-> 
-> 
-> > 
-> > For normal IOTLB invalidations, we were trying our best to always make
-> > IOMMUTLBEntry contain a valid addr_mask to be 2**N-1.  E.g., that's what we're
-> > doing with the loop in vtd_address_space_unmap().
-> 
-> 
-> I'm sure such such assumption can work for any type of IOMMU.
-> 
-> 
-> > 
-> > But this is not the first time that we may want to break this assumption for
-> > virtio so that we make the IOTLB a tuple of (start, len), then that len can be
-> > not a address mask any more.  That seems to be more efficient for things like
-> > vhost because iotlbs there are not page based, so it'll be inefficient if we
-> > always guarantee the addr_mask because it'll be quite a lot more roundtrips of
-> > the same range of invalidation.  Here we've encountered another issue of
-> > triggering the assertion with virtio-net, but only with the old RHEL7 guest.
-> > 
-> > I'm thinking whether we can make the IOTLB invalidation configurable by
-> > specifying whether the backend of the notifier can handle arbitary address
-> > range in some way.  So we still have the guaranteed addr_masks by default
-> > (since I still don't think totally break the addr_mask restriction is wise...),
-> > however we can allow the special backends to take adavantage of using arbitary
-> > (start, len) ranges for reasons like performance.
-> > 
-> > To do that, a quick idea is to introduce a flag IOMMU_NOTIFIER_ARBITRARY_MASK
-> > to IOMMUNotifierFlag, to declare that the iommu notifier (and its backend) can
-> > take arbitrary address mask, then it can be any value and finally becomes a
-> > length rather than an addr_mask.  Then for every iommu notify() we can directly
-> > deliver whatever we've got from the upper layer to this notifier.  With the new
-> > flag, vhost can do iommu_notifier_init() with UNMAP|ARBITRARY_MASK so it
-> > declares this capability.  Then no matter for device iotlb or normal iotlb, we
-> > skip the complicated procedure to split a big range into small ranges that are
-> > with strict addr_mask, but directly deliver the message to the iommu notifier.
-> > E.g., we can skip the loop in vtd_address_space_unmap() if the notifier is with
-> > ARBITRARY flag set.
-> 
-> 
-> I'm not sure coupling IOMMU capability to notifier is the best choice.
+  typedef struct ScreamerState {
+      /*< private >*/
 
-IMHO it's not an IOMMU capability.  The flag I wanted to introduce is a
-capability of the one who listens to the IOMMU TLB updates.  For our case, it's
-virtio/vhost's capability to allow arbitrary length. The IOMMU itself
-definitely has some limitation on the address range to be bound to an IOTLB
-invalidation, e.g., the device-iotlb we're talking here only accept both the
-iova address and addr_mask to be aligned to 2**N-1.
+it now plays the startup chord and goes further but ends up accessing some 
+unassigned memory (I think it probably wants to map framebuffer or detect 
+PCI devices but something is not yet right, I don't see it talking to PCI 
+devices yet):
 
-> 
-> How about just convert to use a range [start, end] for any notifier and move
-> the checks (e.g the assert) into the actual notifier implemented (vhost or
-> vfio)?
+SCREAMER: Processing deferred buffer
+SCREAMER: DMA TX transfer: addr 58100 len: 8000  bpos: 0
+SCREAMER: DMA TX defer interrupt!
+SCREAMER: ########### AUDIO WRITE! 0 / 32768 - 11152
+SCREAMER: ########### AUDIO WRITE! 11152 / 32768 - 4128
+SCREAMER: ########### AUDIO WRITE! 15280 / 32768 - 1104
+SCREAMER: ########### AUDIO WRITE! 16384 / 32768 - 7024
+SCREAMER: ########### AUDIO WRITE! 23408 / 32768 - 4128
+SCREAMER: ########### AUDIO WRITE! 27536 / 32768 - 4128
+SCREAMER: ########### AUDIO WRITE! 31664 / 32768 - 1104
+SCREAMER: Processing deferred buffer
+SCREAMER: DMA TX transfer: addr 60100 len: 2b60  bpos: 0
+SCREAMER: screamer_write: addr 0000000000000001 val 1280
+SCREAMER: screamer_codec_write: addr 0000000000000001 val 280
+SCREAMER: setting mute: 0, attenuation L: 0 R: 0
+SCREAMER: screamer_read: addr 0000000000000002 -> 403100
+SCREAMER: screamer_read: addr 0000000000000001 -> 1280
+SCREAMER: screamer_write: addr 0000000000000001 val 6002
+SCREAMER: screamer_codec_write: addr 0000000000000006 val 2
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_data_send send: 0x01
+cuda_delay_set_sr_int
+cuda_data_send send: 0x22
+cuda_delay_set_sr_int
+cuda_data_send send: 0x8a
+cuda_delay_set_sr_int
+cuda_data_send send: 0x01
+cuda_delay_set_sr_int
+cuda_data_send send: 0x6f
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 5
+cuda_packet_receive_data [0] 0x01
+cuda_packet_receive_data [1] 0x22
+cuda_packet_receive_data [2] 0x8a
+cuda_packet_receive_data [3] 0x01
+cuda_packet_receive_data [4] 0x6f
+cuda_receive_packet_cmd handling command GET_SET_IIC
+CUDA: unimplemented GET_SET_IIC write 0x45 3
+CUDA: GET_SET_IIC: wrong parameters 4
+cuda_packet_send length 4
+cuda_packet_send_data [0] 0x02
+cuda_packet_send_data [1] 0x05
+cuda_packet_send_data [2] 0x01
+cuda_packet_send_data [3] 0x22
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x02
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x05
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x01
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x22
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+pci_cfg_read grackle 00:0 @0x8 -> 0x6000140
+pci_cfg_read grackle 00:0 @0xa8 -> 0x40e0c
+pci_cfg_write grackle 00:0 @0xa8 <- 0x40e0e
+pci_cfg_read grackle 00:0 @0xac -> 0x2000000
+pci_cfg_write grackle 00:0 @0xac <- 0x82470284
+pci_cfg_write grackle 00:0 @0xac <- 0xc2470284
+SCREAMER: ########### AUDIO WRITE! 0 / 11104 - 11104
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0xb000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0xb000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0xb000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0xb000000
+Unassigned mem write 00000000f3011190 = 0x9000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem read 00000000f3011190
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem read 00000000f3011190
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem read 00000000f3011190
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem read 00000000f3011190
+Unassigned mem write 00000000f3011190 = 0x1000000
+Unassigned mem write 00000000f3011190 = 0x3000000
+Unassigned mem read 00000000f3011190
+[bunch of more accesses to this address...]
+Unassigned mem read 00000000f3011170
+Unassigned mem read 00000000f3011170
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_data_send send: 0x01
+cuda_delay_set_sr_int
+cuda_data_send send: 0x25
+cuda_delay_set_sr_int
+cuda_data_send send: 0xa6
+cuda_delay_set_sr_int
+cuda_data_send send: 0x00
+cuda_delay_set_sr_int
+cuda_data_send send: 0xa7
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 5
+cuda_packet_receive_data [0] 0x01
+cuda_packet_receive_data [1] 0x25
+cuda_packet_receive_data [2] 0xa6
+cuda_packet_receive_data [3] 0x00
+cuda_packet_receive_data [4] 0xa7
+cuda_receive_packet_cmd handling command COMBINED_FORMAT_IIC
+CUDA: COMBINED_FORMAT_IIC: wrong parameters 4
+cuda_packet_send length 4
+cuda_packet_send_data [0] 0x02
+cuda_packet_send_data [1] 0x05
+cuda_packet_send_data [2] 0x01
+cuda_packet_send_data [3] 0x25
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x02
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x05
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x01
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x25
+cuda_delay_set_sr_int
+cuda_data_send send: 0x00
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 1
+cuda_packet_receive_data [0] 0x00
+cuda_packet_send length 3
+cuda_packet_send_data [0] 0x00
+cuda_packet_send_data [1] 0x00
+cuda_packet_send_data [2] 0x25
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x00
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x00
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x25
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_data_send send: 0x01
+cuda_delay_set_sr_int
+cuda_data_send send: 0x01
+cuda_delay_set_sr_int
+cuda_data_send send: 0xff
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 3
+cuda_packet_receive_data [0] 0x01
+cuda_packet_receive_data [1] 0x01
+cuda_packet_receive_data [2] 0xff
+cuda_receive_packet_cmd handling command AUTOPOLL
+cuda_packet_send length 3
+cuda_packet_send_data [0] 0x01
+cuda_packet_send_data [1] 0x00
+cuda_packet_send_data [2] 0x01
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x01
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x00
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x01
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_data_send send: 0x00
+cuda_delay_set_sr_int
+cuda_data_send send: 0x2f
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 2
+cuda_packet_receive_data [0] 0x00
+cuda_packet_receive_data [1] 0x2f
+cuda_packet_send length 4
+cuda_packet_send_data [0] 0x00
+cuda_packet_send_data [1] 0x00
+cuda_packet_send_data [2] 0x02
+cuda_packet_send_data [3] 0x01
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x00
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x00
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x02
+cuda_delay_set_sr_int
+cuda_data_recv recv: 0x01
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+pci_cfg_read grackle 00:0 @0x3c -> 0x0
+pci_cfg_read grackle 00:0 @0x3c -> 0x0
+pci_cfg_write grackle 00:0 @0x3f <- 0x0
+pci_cfg_write grackle 00:0 @0x3c <- 0x0
+pci_cfg_write grackle 00:0 @0x3d <- 0x0
+pci_cfg_write grackle 00:0 @0x3e <- 0x0
+cuda_data_send send: 0x00
+cuda_delay_set_sr_int
+cuda_data_send send: 0x00
+cuda_delay_set_sr_int
+cuda_delay_set_sr_int
+cuda_packet_receive length 2
+cuda_packet_receive_data [0] 0x00
+cuda_packet_receive_data [1] 0x00
+cuda_packet_send length 3
+cuda_packet_send_data [0] 0x00
+cuda_packet_send_data [1] 0x00
+cuda_packet_send_data [2] 0x00
+cuda_delay_set_sr_int
+Unassigned mem read 000000000fefe7b0
+Unassigned mem write 000000000feffffc = 0x0
+Unassigned mem write 000000000feffff8 = 0x0
+[...]
+Unassigned mem write 000000000febe018 = 0x0
+Unassigned mem write 000000000febe014 = 0x0
+Unassigned mem write 000000000febe010 = 0x0
+Unassigned mem write 000000000febe00c = 0x0
+Unassigned mem write 000000000febe008 = 0x0
+Unassigned mem write 000000000febe004 = 0x0
+Unassigned mem write 000000000febe000 = 0x0
+Unassigned mem write 000000000fefe908 = 0x0
+Unassigned mem write 000000000fefe90c = 0x0
+Unassigned mem write 000000000fefefbc = 0x0
+Unassigned mem write 000000000fefefb8 = 0x0
+Unassigned mem write 000000000fefefb4 = 0x0
+Unassigned mem write 000000000fefefb0 = 0x0
+Unassigned mem write 000000000fefefac = 0x0
+Unassigned mem write 000000000fefefa8 = 0x0
+Unassigned mem write 000000000fefefa4 = 0x20000
+Unassigned mem write 000000000fefefa0 = 0x2
+Unassigned mem write 000000000fefef9c = 0x10000
+Unassigned mem write 000000000fefef98 = 0x0
+Unassigned mem write 000000000fefef94 = 0x0
+Unassigned mem write 000000000fefef90 = 0x0
+Unassigned mem write 000000000fefef8c = 0x0
+Unassigned mem write 000000000fefef88 = 0x0
+Unassigned mem write 000000000fefef84 = 0x0
+Unassigned mem write 000000000fefef80 = 0x0
+Unassigned mem write 000000000fefef7c = 0x0
+Unassigned mem write 000000000fefef78 = 0x0
+Unassigned mem write 000000000fefef74 = 0x0
+Unassigned mem write 000000000fefef70 = 0x0
+Unassigned mem write 000000000fefef6c = 0xfee5e8
+Unassigned mem write 000000000fefef68 = 0x3fb97a0
+Unassigned mem write 000000000fefef64 = 0x3fb97a0
+Unassigned mem write 000000000fefef60 = 0x0
+Unassigned mem write 000000000fefed5c = 0x0
+Unassigned mem write 000000000fefed58 = 0x0
+Unassigned mem write 000000000fefed54 = 0x0
+Unassigned mem write 000000000fefed50 = 0x0
+Unassigned mem write 000000000fefed4c = 0x0
+Unassigned mem write 000000000fefed48 = 0x0
+Unassigned mem write 000000000fefed44 = 0x0
+Unassigned mem write 000000000fefed40 = 0x0
+Unassigned mem write 000000000fefed3c = 0x0
+Unassigned mem write 000000000fefed38 = 0x0
+[...]
+Unassigned mem write 000000000fefed64 = 0x0
+Unassigned mem write 000000000fefed60 = 0x0
+Unassigned mem write 000000000fefe630 = 0xfff0d000
+Unassigned mem write 000000000fefe5b0 = 0xfff16880
+Unassigned mem write 000000000fefec4c = 0x100000
+Unassigned mem write 000000000fefe634 = 0xfeff000
+Unassigned mem write 000000000fefe638 = 0xfebe000
+Unassigned mem write 000000000fefe63c = 0x10000000
+Unassigned mem write 000000000fefe640 = 0x0
+Unassigned mem write 000000000fefe644 = 0x0
+Unassigned mem write 000000000fefe648 = 0x6806e740
+Unassigned mem write 000000000fefe64c = 0xfff10000
+Unassigned mem write 000000000fefe650 = 0xfff11400
+Unassigned mem write 000000000fefe654 = 0x68fff100
+Unassigned mem write 000000000fefe658 = 0xfeff100
+Unassigned mem write 000000000fefe65c = 0xfeff100
+Unassigned mem write 000000000fefe670 = 0x200000
+Unassigned mem write 000000000fefe678 = 0xff9fffff
+Unassigned mem write 000000000fefe674 = 0xe00000
+Unassigned mem write 000000000fefe67c = 0xfeff070
+Unassigned mem write 000000000fefe680 = 0x7c
+Unassigned mem write 000000000fefe688 = 0x12
+Unassigned mem write 000000000fefe684 = 0xfefe920
+Unassigned mem write 000000000fefe66c = 0xfefeab8
+Unassigned mem write 000000000fefe910 = 0x0
+Unassigned mem write 000000000fefefc0 = 0x5fffefc0
+Unassigned mem write 000000000fefefc4 = 0x0
+Unassigned mem write 000000000fefefc8 = 0x5fffeb20
+Unassigned mem write 000000000fefefcc = 0x100
+Unassigned mem write 000000000fefefce = 0x80
+Unassigned mem write 000000000fefefd0 = 0x5fffeba0
+Unassigned mem write 000000000fefefd4 = 0x102
+Unassigned mem write 000000000fefefd6 = 0xa0
+Unassigned mem write 000000000fefefd8 = 0x5fffef60
+Unassigned mem write 000000000fefefdc = 0x101
+Unassigned mem write 000000000fefefde = 0x60
+Unassigned mem write 000000000fefefe0 = 0x5fffee60
+Unassigned mem write 000000000fefefe4 = 0x101
+Unassigned mem write 000000000fefefe6 = 0x100
+Unassigned mem write 000000000fefefe8 = 0x5fffed60
+Unassigned mem write 000000000fefefec = 0x100
+Unassigned mem write 000000000fefefee = 0x100
+Unassigned mem write 000000000fefeff0 = 0x5fffec40
+Unassigned mem write 000000000fefeff4 = 0x105
+Unassigned mem write 000000000fefeff6 = 0x120
+Unassigned mem write 000000000fefeff8 = 0x5fffef60
+Unassigned mem write 000000000fefeffc = 0x101
+Unassigned mem write 000000000fefeffe = 0x60
+Unassigned mem write 000000000fefff00 = 0x426f6f74
+Unassigned mem write 000000000fefff04 = 0x20476f73
+Unassigned mem write 000000000fefff08 = 0x73616d65
+Unassigned mem write 000000000fefff0c = 0x7220302e
+Unassigned mem write 000000000feff184 = 0x6806e6f4
+Unassigned mem write 000000000feff194 = 0x68fff000
+Unassigned mem write 000000000feff19c = 0x68080000
+Unassigned mem read 000000000fefe648
+Unassigned mem write 000000000feff15c = 0x0
+Unassigned mem read 000000000fefe640
+Unassigned mem read 000000000fefe640
+Unassigned mem read 000000000fefec10
+Unassigned mem write 000000000fefef60 = 0x80301
+Unassigned mem read 000000000fefe64c
+Unassigned mem write 000000000fefef90 = 0x0
+Unassigned mem write 000000000fefef8c = 0x0
+Unassigned mem write 000000000fefef88 = 0x0
+Unassigned mem write 000000000fefef84 = 0x0
+Unassigned mem write 000000000fefef80 = 0x0
+Unassigned mem write 000000000fefef7c = 0x0
+Unassigned mem write 000000000fefef78 = 0x0
+Unassigned mem write 000000000fefef74 = 0x0
+Unassigned mem write 000000000fefef70 = 0x0
+Trying to write invalid spr 0 (0x000) at fff10d38
+Unassigned mem read 000000000fefe64c
+Unassigned mem write 000000000fefe37c = 0x44e0
+Unassigned mem read 000000000fefe37c
+invalid/unsupported opcode: 00 - 00 - 00 - 00 (00000000) 00000000 0
+Unassigned mem read 000000000fefe37c
+Unassigned mem read 000000000fefe37c
+Unassigned mem read 000000000fefe37c
+Unassigned mem read 000000000fefe37c
+Unassigned mem read 000000000fefe37c
 
-IOMMUTLBEntry itself is the abstraction layer of TLB entry.  Hardware TLB entry
-is definitely not arbitrary range either (because AFAICT the hardware should
-only cache PFN rather than address, so at least PAGE_SIZE aligned).
-Introducing this flag will already make this trickier just to avoid introducing
-another similar struct to IOMMUTLBEntry, but I really don't want to make it a
-default option...  Not to mention I probably have no reason to urge the rest
-iommu notifier users (tcg, vfio) to change their existing good code to suite
-any of the backend who can cooperate with arbitrary address ranges...
+Then hangs here. Any idea what should be at 0xf3000000 and how that should 
+end up there and why it pokes 0x0fexxxxx (is that where it thinks the 
+frame buffer or some other devices should be because of something not read 
+correctly from 0xf3000000 area? Should that be the PCI devices but those 
+are expected to be at 0xfe000000 not 0x0fe00000. I stop here now waiting 
+for contribution to fix this up, this needs more knowledge about the 
+hardware that I have or want to learn at the moment.
 
-Thanks,
-
--- 
-Peter Xu
-
+Regards,
+BALATON Zoltan
 
