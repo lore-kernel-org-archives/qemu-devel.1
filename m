@@ -2,55 +2,57 @@ Return-Path: <SRS0=WNoQ=AJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD44C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD9DC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 387C420702
-	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:21:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387C420702
+	by mail.kernel.org (Postfix) with ESMTPS id 9CBFF20702
+	for <qemu-devel@archiver.kernel.org>; Sun, 28 Jun 2020 18:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CBFF20702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpbvw-0003vN-Bx
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:21:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51538)
+	id 1jpbvx-0003vr-RK
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 14:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuS-00024i-Fe; Sun, 28 Jun 2020 14:20:08 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38343)
+ id 1jpbuR-00023S-EK; Sun, 28 Jun 2020 14:20:07 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:38354)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpbuP-0005KY-3x; Sun, 28 Jun 2020 14:20:08 -0400
+ id 1jpbuO-0005Km-Tv; Sun, 28 Jun 2020 14:20:07 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 25AEC74594E;
- Sun, 28 Jun 2020 20:20:01 +0200 (CEST)
+ by localhost (Postfix) with SMTP id CEE5C7475FA;
+ Sun, 28 Jun 2020 20:20:02 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 9E8E5745712; Sun, 28 Jun 2020 20:20:00 +0200 (CEST)
-Message-Id: <cover.1593367416.git.balaton@eik.bme.hu>
+ id ACAF0746331; Sun, 28 Jun 2020 20:20:02 +0200 (CEST)
+Message-Id: <cf1ee4b79ff72d51e6e05027bb51439c2e6bbda1.1593367416.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1593367416.git.balaton@eik.bme.hu>
+References: <cover.1593367416.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v6 00/11] Mac Old World ROM experiment
+Subject: [PATCH v6 02/11] mac_newworld: Allow loading binary ROM image
 Date: Sun, 28 Jun 2020 20:03:36 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 To: qemu-devel@nongnu.org,
     qemu-ppc@nongnu.org
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 14:20:01
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,44 +73,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Latest version of this series with addressing review comments, adding
-review tags and tweaks to the WIP CUDA I2C support so with this on top
-of Mark's screaper patches (with a small fix) the ROM now plays the
-startup sound but then gets confused about some memory addresses. I
-don't want to debug this further so either some hints are needed what
-may be needed or someone could take over and finish these.
+Fall back to load binary ROM image if loading ELF fails. This also
+moves PROM_BASE and PROM_SIZE defines to board as these are matching
+the ROM size and address on this board and removes the now unused
+PROM_ADDR and BIOS_SIZE defines from common mac.h.
 
-I think at least up to patch 8 this could be merged already, the rest
-needs more work.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+Unlike mac_oldworld where the openbios-ppc image loads at end of ROM
+region here we only check size and assume ELF image is loaded from
+PROM_BASE, Checking the load addr here is tricky because this board is
+also be compiled both 64 and 32 bit and load_elf seems to always
+return 64 bit value so handling that could become a mess. If this is a
+problem then it's a preexisting one so should be fixed in a separate
+patch. This one just allows loading ROM binary too otherwise
+preserving previous behaviour.
 
-Regards,
-BALATON Zoltan
+ hw/ppc/mac.h          |  2 --
+ hw/ppc/mac_newworld.c | 22 ++++++++++++++--------
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-BALATON Zoltan (11):
-  mac_oldworld: Allow loading binary ROM image
-  mac_newworld: Allow loading binary ROM image
-  mac_oldworld: Drop a variable, use get_system_memory() directly
-  mac_oldworld: Drop some variables
-  grackle: Set revision in PCI config to match hardware
-  mac_oldworld: Rename ppc_heathrow_reset to ppc_heathrow_cpu_reset
-  mac_oldworld: Map macio to expected address at reset
-  mac_oldworld: Add machine ID register
-  i2c: Match parameters of i2c_start_transfer and i2c_send_recv
-  WIP macio/cuda: Attempt to add i2c support
-  mac_oldworld: Add SPD data to cover RAM
-
- hw/display/sm501.c           |   2 +-
- hw/i2c/core.c                |  34 +++++-----
- hw/i2c/ppc4xx_i2c.c          |   2 +-
- hw/misc/macio/cuda.c         |  76 ++++++++++++++++++++-
- hw/pci-host/grackle.c        |   2 +-
- hw/ppc/mac.h                 |  15 ++++-
- hw/ppc/mac_newworld.c        |  22 +++---
- hw/ppc/mac_oldworld.c        | 127 ++++++++++++++++++++++++++---------
- include/hw/i2c/i2c.h         |   4 +-
- include/hw/misc/macio/cuda.h |   1 +
- 10 files changed, 220 insertions(+), 65 deletions(-)
-
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 04e498bc57..195967facd 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -40,10 +40,8 @@
+ /* SMP is not enabled, for now */
+ #define MAX_CPUS 1
+ 
+-#define BIOS_SIZE        (1 * MiB)
+ #define NVRAM_SIZE        0x2000
+ #define PROM_FILENAME    "openbios-ppc"
+-#define PROM_ADDR         0xfff00000
+ 
+ #define KERNEL_LOAD_ADDR 0x01000000
+ #define KERNEL_GAP       0x00100000
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 828c5992ae..c88142af57 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -82,6 +82,8 @@
+ 
+ #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+ 
++#define PROM_BASE 0xfff00000
++#define PROM_SIZE (1 * MiB)
+ 
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+@@ -100,7 +102,7 @@ static void ppc_core99_reset(void *opaque)
+ 
+     cpu_reset(CPU(cpu));
+     /* 970 CPUs want to get their initial IP as part of their boot protocol */
+-    cpu->env.nip = PROM_ADDR + 0x100;
++    cpu->env.nip = PROM_BASE + 0x100;
+ }
+ 
+ /* PowerPC Mac99 hardware initialisation */
+@@ -153,25 +155,29 @@ static void ppc_core99_init(MachineState *machine)
+     /* allocate RAM */
+     memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+ 
+-    /* allocate and load BIOS */
+-    memory_region_init_rom(bios, NULL, "ppc_core99.bios", BIOS_SIZE,
++    /* allocate and load firmware ROM */
++    memory_region_init_rom(bios, NULL, "ppc_core99.bios", PROM_SIZE,
+                            &error_fatal);
++    memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
+ 
+-    if (bios_name == NULL)
++    if (!bios_name) {
+         bios_name = PROM_FILENAME;
++    }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+-    memory_region_add_subregion(get_system_memory(), PROM_ADDR, bios);
+-
+-    /* Load OpenBIOS (ELF) */
+     if (filename) {
++        /* Load OpenBIOS (ELF) */
+         bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
+                              NULL, NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+ 
++        if (bios_size <= 0) {
++            /* or load binary ROM image */
++            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
++        }
+         g_free(filename);
+     } else {
+         bios_size = -1;
+     }
+-    if (bios_size < 0 || bios_size > BIOS_SIZE) {
++    if (bios_size < 0 || bios_size > PROM_SIZE) {
+         error_report("could not load PowerPC bios '%s'", bios_name);
+         exit(1);
+     }
 -- 
 2.21.3
 
