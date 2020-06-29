@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39324C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DCCC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1964923428
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:36:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1964923428
+	by mail.kernel.org (Postfix) with ESMTPS id 243112225F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:37:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 243112225F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpydf-00043V-Cc
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 14:36:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35632)
+	id 1jpyeo-0005Q2-D1
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 14:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpyV5-0000n4-NB; Mon, 29 Jun 2020 14:27:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:45958)
+ id 1jpyV2-0000hs-44; Mon, 29 Jun 2020 14:27:24 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:45934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpyV2-0000e6-BQ; Mon, 29 Jun 2020 14:27:27 -0400
+ id 1jpyUz-0000cf-LR; Mon, 29 Jun 2020 14:27:23 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id DC54DBF450;
- Mon, 29 Jun 2020 18:26:58 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 51E32BF808;
+ Mon, 29 Jun 2020 18:26:56 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 16/17] hw/block/nvme: provide the mandatory subnqn field
-Date: Mon, 29 Jun 2020 20:26:41 +0200
-Message-Id: <20200629182642.1170387-17-its@irrelevant.dk>
+Subject: [PATCH 09/17] hw/block/nvme: flush write cache when disabled
+Date: Mon, 29 Jun 2020 20:26:34 +0200
+Message-Id: <20200629182642.1170387-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200629182642.1170387-1-its@irrelevant.dk>
 References: <20200629182642.1170387-1-its@irrelevant.dk>
@@ -75,28 +75,29 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-The SUBNQN field is mandatory in NVM Express 1.3.
+If the write cache is disabled with a Set Features command, flush it if
+currently enabled.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/block/nvme.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 798f6f30e7da..9f0b9de73307 100644
+index 39e680a15c56..c2507d8836fd 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -2131,6 +2131,9 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP |
-                            NVME_ONCS_FEATURES);
+@@ -1153,6 +1153,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
  
-+    pstrcpy((char *) id->subnqn, sizeof(id->subnqn), "nqn.2019-08.org.qemu:");
-+    pstrcat((char *) id->subnqn, sizeof(id->subnqn), n->params.serial);
+         break;
+     case NVME_VOLATILE_WRITE_CACHE:
++        if (!(dw11 & 0x1) && blk_enable_write_cache(n->conf.blk)) {
++            blk_flush(n->conf.blk);
++        }
 +
-     id->psd[0].mp = cpu_to_le16(0x9c4);
-     id->psd[0].enlat = cpu_to_le32(0x10);
-     id->psd[0].exlat = cpu_to_le32(0x4);
+         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+         break;
+     case NVME_NUMBER_OF_QUEUES:
 -- 
 2.27.0
 
