@@ -3,67 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B6C2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6981DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:16:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6FB420675
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:11:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6FB420675
+	by mail.kernel.org (Postfix) with ESMTPS id 420F42065D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:16:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 420F42065D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq07n-0006Ez-3X
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 16:11:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34856)
+	id 1jq0Cu-0000jV-GD
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 16:16:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jq07B-0005mz-QQ
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 16:10:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42832)
+ id 1jq0Bt-0007zP-Cl
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 16:15:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43726)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jq078-0000qu-Sf
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 16:10:53 -0400
+ id 1jq0Bq-0001cT-9I
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 16:15:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jq077-0004H8-2Z
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 20:10:49 +0000
+ id 1jq0Bo-0004nc-8i
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 20:15:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1014F2E80E7
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 20:10:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 3A5252E810C
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 20:15:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 20:05:11 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1884990@bugs.launchpad.net>
+Date: Mon, 29 Jun 2020 20:08:43 -0000
+From: Alexander Bulekov <1878645@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kvanals philmd
-X-Launchpad-Bug-Reporter: Kenneth Van Alstyne (kvanals)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159301342319.25339.2718719880566533302.malonedeb@gac.canonical.com>
-Message-Id: <159346111206.1764.16794421393119762394.malone@wampee.canonical.com>
-Subject: [Bug 1884990] Re: Cirrus graphics results in monochrome colour depth
- at 640x480 resolution
+X-Launchpad-Bug-Commenters: a1xndr ajbennee
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
+ <159344662125.1630.9077511492884316123.malone@chaenomeles.canonical.com>
+ <871rlxsnmr.fsf@linaro.org>
+Message-ID: <20200629200843.7fyiuemiscmleg6g@mozz.bu.edu>
+Subject: Re: [Bug 1878645] Re: null-ptr dereference in tcg_handle_interrupt
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3d3ac27644df92011a988f8c9f142b623e1184b4
+X-Launchpad-Hash: b56b293286878bed8a7177ebb5826abfe1649ba6
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
@@ -85,40 +85,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884990 <1884990@bugs.launchpad.net>
+Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200629200843.iDRK1eqSpVG6WcyUwQ117HXeiRUx01e_9rY49Uk1Brw@z>
 
-Yes, the maintainer will likely get the submodule updated before the
-next release.
+On 200629 2000, Alex Benn=C3=A9e wrote:
+> =
+
+> Alexander Bulekov <1878645@bugs.launchpad.net> writes:
+> =
+
+> > I don't think this is a qtest-specific error: =
+
+> > cat << EOF| qemu-system-i386 -M q35 -nographic -serial none -monitor st=
+dio
+> > o/4 0xcf8 0x8400f841
+> > o/4 0xcfc 0xaa215d6d
+> > o/4 0x6d30 0x2ef8ffbe
+> > o/1 0xb2 0x20
+> > EOF
+> >
+> > ...
+> > Segmentation fault
+> =
+
+> Both this and the qtest have the same problem of depending on
+> current_cpu which is a TLS variable which will never be correct from the
+> qtest or monitor context. There are only a few other cases.
+
+Ah that makes sense. It probably isn't a real issue, but I'll send
+patches with the changes you suggested below.
+Thank you
+
+> sun4m:cpu_halt_signal does:
+> =
+
+>     if (level && current_cpu) {
+>         cpu_interrupt(current_cpu, CPU_INTERRUPT_HALT);
+>     }
+> =
+
+> pxa2xx:pxa2xx_pwrmode_write does a bare:
+> =
+
+>     /* Suspend */
+>     cpu_interrupt(current_cpu, CPU_INTERRUPT_HALT);
+> =
+
+> but given the context has a CPUARMState *env it could arguably use that
+> to derive current_cpu but as it's only triggered by a system register
+> write you can't actually trigger from a monitor/qtest command.
+> =
+
+> I would suggest either:
+> =
+
+>         } else if (current_cpu) {
+>             cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
+>         }
+> =
+
+> or possibly:
+> =
+
+>         } else {
+>             cpu_interrupt(current_cpu ? current_cpu : first_cpu, CPU_INTE=
+RRUPT_SMI);
+>         }
+> =
+
+> if you really care about triggering a real IRQ from outside the CPU conte=
+xt.
+> =
+
+> -- =
+
+> Alex Benn=C3=A9e
+>
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884990
+https://bugs.launchpad.net/bugs/1878645
 
 Title:
-  Cirrus graphics results in monochrome colour depth at 640x480
-  resolution
+  null-ptr dereference in ich9_apm_ctrl_changed
 
 Status in QEMU:
   New
 
 Bug description:
-  Recently we upgraded to a distribution that bundled QEMU 4.2.0.  We
-  were previously running on QEMU 3.0.0.  When booting Windows 10 VMs on
-  x86_64, users experienced slow, monochrome graphics and the resolution
-  was restricted to 640x480.  Reverting to the prior vgabios-cirrus.bin
-  from the prior source tarball remediated the issue.
+  Hello,
+  While fuzzing, I found an input which triggers a NULL pointer dereference=
+ in
+  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
+is bug
+  is specific to QTest?
 
-  An example QEMU command line is below, if needed:
-  /bin/qemu-system-x86_64 -vnc 0.0.0.0:100 -device cirrus-vga,id=3Dvideo0,b=
-us=3Dpci.0,addr=3D0x2  -machine pc-i440fx-4.2,accel=3Dkvm,usb=3Doff,dump-gu=
-est-core=3Doff -cpu qemu64 -m 2048 -overcommit mem-lock=3Doff -smp 1,socket=
-s=3D1,cores=3D1,threads=3D1 -no-user-config -nodefaults -hda test.raw &
+  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
+00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
+  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
+  =3D=3D23862=3D=3DHint: address points to the zero page.
+      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
+mu/accel/tcg/tcg-all.c:57:21
+      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
+ude/hw/core/cpu.h:872:5
+      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
+emu/hw/isa/lpc_ich9.c:442:13
+      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
+hw/isa/apm.c:50:13
+      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
+pment/qemu/memory.c:483:5
+      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
+nt/qemu/memory.c:544:18
+      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
+pment/qemu/memory.c:1476:16
+      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
+/qemu/exec.c:3137:23
+      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
+c.c:3177:14
+      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
+u/exec.c:3268:18
+      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
+:60:5
+      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
+qemu/qtest.c:392:13
+      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
+mu/qtest.c:710:9
+      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
+c:722:5
+      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
+/qemu/chardev/char.c:183:9
+      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
+/chardev/char.c:195:9
+      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
+ev/char-fd.c:68:9
+      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
+elopment/qemu/io/channel-watch.c:84:12
+      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e897)
+      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
+ftmmu/vl.c:1664:9
+      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
+.c:49:5
+      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
+6-softmmu/qemu-system-i386+0xc9c819)
+
+  =
+
+  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
+qtest commands:
+
+  cat << EOF | ./qemu-system-i386 \
+  -qtest stdio -nographic -monitor none -serial none \
+  -M pc-q35-5.0
+  outl 0xcf8 0x8400f841
+  outl 0xcfc 0xaa215d6d
+  outl 0x6d30 0x2ef8ffbe
+  outb 0xb2 0x20
+  EOF
+
+  Please let me know if I can provide any further info.
+  -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884990/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
