@@ -2,39 +2,40 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B08B2C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40985C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:10:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74FDD239EF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:06:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FDD239EF
+	by mail.kernel.org (Postfix) with ESMTPS id 135F423A32
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:10:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135F423A32
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jprbx-0001ZL-QC
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:06:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40442)
+	id 1jprgG-0002zG-As
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:10:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jprbF-0000zJ-Bq
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:05:21 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:37493)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jprfd-0002XZ-DX
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:09:53 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:40235)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jprbD-00071F-AD
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:05:21 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jprfb-0007lP-H8
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:09:53 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MMnnm-1jZIeU0NvQ-00Imbk; Mon, 29 Jun 2020 13:05:14 +0200
-Subject: Re: [PATCH v7] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-To: chengang@emindsoft.com.cn, riku.voipio@iki.fi
-References: <20200605013221.22828-1-chengang@emindsoft.com.cn>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MhDAi-1jCh5t3Q9K-00eOQL; Mon, 29 Jun 2020 13:09:48 +0200
+Subject: Re: [PATCH v5 0/6] Add strace support for printing arguments of
+ selected syscalls
+To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200619123331.17387-1-filip.bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -78,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2f90b61a-b671-6f9c-a4a3-d031e3fbb56a@vivier.eu>
-Date: Mon, 29 Jun 2020 13:05:12 +0200
+Message-ID: <2e62ce84-3a9a-00c4-5e81-754df44b7f0b@vivier.eu>
+Date: Mon, 29 Jun 2020 13:09:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200605013221.22828-1-chengang@emindsoft.com.cn>
+In-Reply-To: <20200619123331.17387-1-filip.bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:CNs4WmZnMqcJ4pdMGsqcu0OXBfLQFt/rukvZMAeDM9Uq+RBVVU4
- l1c4o0PaGFP0glhHzQ5H+rPT+5VBBnuVXjE1hjrxcetTT3wH2sghlKotNeYWPrMKCtaAbzJ
- JM7o2UW11iGkRr3NPvhzmov8Jes+5yHy5UxPA5nWJ8xCh4AdPoW21HciNTt4LBDb5/6RD0Y
- nwx58iqRH/+/aWVysCcog==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:1EhJ/dKLAC0=:Uc7MzjdPF4Qq8KmCbO8sbj
- KZtFpoTgaAM0nhaBKfcRxwS593fdV3gHXlaDCtHcOA2yFzIU7fJvDQW4WbAAKnZOuj0VSdxbu
- b7u+HpswkihUjKRUxtsKKgeqplaIJlw5Xkpkv8ooMNM1iRAgW+Ono97JPFU7wUGZuBR4MtF+y
- UGYpVfkuw70soPLnd8MmbT0ZJdUPMVvV2rKUoiC5wWdXweQazmpgbN+W/i0DMP8FfCO9upWLg
- h9ZTClpJxVDjkBi5Ep4XEl8d/TOXw82pVA3pZhFg5itL9yvabac7cQEeQmLhdE0j0EbCDkIwY
- GMa6WXnrRrvZQoWcjSay5+nBJRL+twloEDhJVu7GfJC9MamaDoC3IsqRcDZ00GKqN6XK/9Ohr
- 3UxLZ++IBHbg+yMP3pqhkm+DLzjqFseV4UZBEpJc9lIX+Nhn78J/CVEyUo+6g2Np6IuE0H3k5
- 6x7I9HQ7mTOajZ1pgsYEIVNtWzChnlwv87x19S03uGPjBb3BdXXQh3/ig27Kx+llKpa9aZ0JZ
- aC8/lwWyv6EfCuZZN9izfmfHDHTrxBv5j1SGcVRrWUXAp2nYR3cbq5FbQnfM089oevVDsUyBb
- XK2fi7qpYmdBQy6FribWO/9gPS0JpwI44W0aFtI7WCwka7i1kx6Dk4aRTn+7sUaxjk3g1Bv5N
- 7CCV+HWwpX3idpT8ne0zAqt6U00j4Hj20JnMxzdaIZ0lIroxEmdwABxk5mTDCzpITb3g/lQ/6
- AQ0HV/9Iq4M2e5yUD13LON8ERdsMrXH7xo0XxmUeZRzYQ9KmRxdBwMFZbcE2kKsPCD1j9DmW+
- kg9hrtSwAggsBcLV7sAUFJH7pFGOWfv+/VQdFbUOX2Y+V22bFimNMWTDK6QZLSjK/NshYgd
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:EEUYMsQb0/fomsc2gQb40uYEuRRApmV5C5e7xIlL3DUDVYnfZRB
+ v+3Kt7LiW2GyrAwSNBeRCwmArg2ZuzM/JxuXsxzkGTKYiZljkfau9yqLbY9mTZHTVrIH8Ai
+ enBBBRpvhMfEnjreLohWgJ7svY/kjlZ/Kx0TxJltYq0RUeuaDzBmPFTf7R3oWYLmE41KngQ
+ +0xpxyU58z6ULTizu0z5w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:yg/XRoBezyc=:8vMM8QhqKWkFuAhqprk7tS
+ esSz83RRboK4EoDFUOAJrTqnJO+YDLbjnDSpTc/PB8TeHu0iyiUZuG0W0eW3GlIExGNhTJRhw
+ urA+meMsqQnYYONXQPBR93PxavwZT36rcanTwpO4JHWt6Et1CfsBkisH6/QuBUMuDyJRSGar9
+ 5CPYQAmiGnSOYhkENFU/iYNvKGWqXxDrTsGu4u/KnsY/JpS8YkIY5zRp7hdoBPJhtvEXmwyVs
+ 29AcpMhJ0+jddJOG++lkimPeUlwQ7tyLiSI8tczCZGbERcbvoqgCBJO67gYl60LG0eBZMMYfX
+ PjKXhthzrDo4DTAxHr7iUphaI/VEBs9mDY2rSy39bStDQmXeqpqmd3ZRoJo3UDvnrgEE/ehHY
+ P2xv+/PfzulGD7+NYzUGJ3PNjZ/q8U/JeGc3Y9movmWj3Eoa2ofaVKkKQR9FPcDEQlC/CeU3M
+ JNiH4qQVXTrp0gi6VGpSC7wa7ZW1udO9oiGDadvm/6tPtYxBWsd3AYt9nY4jubVaMbRoDkGM9
+ B+MAgmmwbV9uWoK0ZaL5X22F+hwLWiUlx5s7ryUsM1fyc4XbdRo0O8S3uc1UR3B7fpXlKPaXE
+ hIlgnn5qtN1M8EOInh/MA0AmXHV8SkyP037+ZOdj+14+k6wqkPe+m3wRcxmto4xRZ3M9yDJST
+ TqArM6RQ7vmBcCnbIZCTXrhW5S51srcVAM4ZF/RYkCf+Vy+Y3UcFmZ1W4hrwaL8SZ0zTjer07
+ PbA2XhmredllG7IxgEa1q9AtzGoTpfJn3cQRiDLsVIcW9/6JTyhadiLuQEehqkIvJbu6IL9Nh
+ 5Eb+SqgDktOv9X1tiIVf+c0v3xej00pST9TxaivPYSgH0U385s=
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 07:05:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 07:09:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -125,243 +126,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 05/06/2020 à 03:32, chengang@emindsoft.com.cn a écrit :
-> From: Chen Gang <chengang@emindsoft.com.cn>
+Le 19/06/2020 à 14:33, Filip Bozuta a écrit :
+> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > 
-> Another DRM_IOCTL_* commands will be done later.
+> This series covers strace support for printing arguments of following syscalls:
 > 
-> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
-> ---
->  configure                  | 10 ++++
->  linux-user/ioctls.h        |  5 ++
->  linux-user/syscall.c       | 98 ++++++++++++++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  | 15 ++++++
->  linux-user/syscall_types.h | 11 +++++
->  5 files changed, 139 insertions(+)
+>     *acct()           *lgetxattr()       *removexattr()       *lchown()
+>     *fsync()          *fgetxattr()       *lremovexattr()      *fallocate()
+>     *fdatasync()      *listxattr()       *fremovexattr()
+>     *listen()         *llistxattr()      *lseek()
+>     *getxattr()       *flistxattr()      *chown()
 > 
-> diff --git a/configure b/configure
-> index f087d2bcd1..389dbb1d09 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3136,6 +3136,13 @@ if ! check_include "ifaddrs.h" ; then
->    have_ifaddrs_h=no
->  fi
->  
-> +#########################################
-> +# libdrm check
-> +have_drm_h=no
-> +if check_include "libdrm/drm.h" ; then
-> +    have_drm_h=yes
-> +fi
-> +
->  ##########################################
->  # VTE probe
->  
-> @@ -7127,6 +7134,9 @@ fi
->  if test "$have_ifaddrs_h" = "yes" ; then
->      echo "HAVE_IFADDRS_H=y" >> $config_host_mak
->  fi
-> +if test "$have_drm_h" = "yes" ; then
-> +  echo "HAVE_DRM_H=y" >> $config_host_mak
-> +fi
->  if test "$have_broken_size_max" = "yes" ; then
->      echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
->  fi
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 0defa1d8c1..f2e2fa9c87 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -574,6 +574,11 @@
->    IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
->                  MK_PTR(MK_STRUCT(STRUCT_rtentry)))
->  
-> +#ifdef HAVE_DRM_H
-> +  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-> +                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-> +#endif
-> +
->  #ifdef TARGET_TIOCSTART
->    IOCTL_IGNORE(TIOCSTART)
->    IOCTL_IGNORE(TIOCSTOP)
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 7f6700c54e..c0515c4378 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -112,6 +112,9 @@
->  #include <linux/if_alg.h>
->  #include <linux/rtc.h>
->  #include <sound/asound.h>
-> +#ifdef HAVE_DRM_H
-> +#include <libdrm/drm.h>
-> +#endif
->  #include "linux_loop.h"
->  #include "uname.h"
->  
-> @@ -5276,6 +5279,101 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
->  }
->  #endif
->  
-> +#ifdef HAVE_DRM_H
-> +
-> +static void unlock_drm_version(struct drm_version *host_ver,
-> +                               struct target_drm_version *target_ver,
-> +                               bool copy)
-> +{
-> +    unlock_user(host_ver->name, target_ver->name,
-> +                                copy ? host_ver->name_len : 0);
-> +    unlock_user(host_ver->date, target_ver->date,
-> +                                copy ? host_ver->date_len : 0);
-> +    unlock_user(host_ver->desc, target_ver->desc,
-> +                                copy ? host_ver->desc_len : 0);
-> +}
-> +
-> +static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
-> +                                          struct target_drm_version *target_ver)
-> +{
-> +    memset(host_ver, 0, sizeof(*host_ver));
-> +
-> +    __get_user(host_ver->name_len, &target_ver->name_len);
-> +    if (host_ver->name_len) {
-> +        host_ver->name = lock_user(VERIFY_WRITE, target_ver->name,
-> +                                   target_ver->name_len, 0);
-> +        if (!host_ver->name) {
-> +            return -EFAULT;
-> +        }
-> +    }
-> +
-> +    __get_user(host_ver->date_len, &target_ver->date_len);
-> +    if (host_ver->date_len) {
-> +        host_ver->date = lock_user(VERIFY_WRITE, target_ver->date,
-> +                                   target_ver->date_len, 0);
-> +        if (!host_ver->date) {
-> +            goto err;
-> +        }
-> +    }
-> +
-> +    __get_user(host_ver->desc_len, &target_ver->desc_len);
-> +    if (host_ver->desc_len) {
-> +        host_ver->desc = lock_user(VERIFY_WRITE, target_ver->desc,
-> +                                   target_ver->desc_len, 0);
-> +        if (!host_ver->desc) {
-> +            goto err;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +err:
-> +    unlock_drm_version(host_ver, target_ver, false);
-> +    return -EFAULT;
-> +}
-> +
-> +static inline void host_to_target_drmversion(
-> +                                          struct target_drm_version *target_ver,
-> +                                          struct drm_version *host_ver)
-> +{
-> +    __put_user(host_ver->version_major, &target_ver->version_major);
-> +    __put_user(host_ver->version_minor, &target_ver->version_minor);
-> +    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
-> +    __put_user(host_ver->name_len, &target_ver->name_len);
-> +    __put_user(host_ver->date_len, &target_ver->date_len);
-> +    __put_user(host_ver->desc_len, &target_ver->desc_len);
-> +    unlock_drm_version(host_ver, target_ver, true);
-> +}
-> +
-> +static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-> +                             int fd, int cmd, abi_long arg)
-> +{
-> +    struct drm_version *ver;
-> +    struct target_drm_version *target_ver;
-> +    abi_long ret;
-> +
-> +    switch (ie->host_cmd) {
-> +    case DRM_IOCTL_VERSION:
-> +        if (!lock_user_struct(VERIFY_WRITE, target_ver, arg, 0)) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +        ver = (struct drm_version *)buf_temp;
-> +        ret = target_to_host_drmversion(ver, target_ver);
-> +        if (!is_error(ret)) {
-> +            ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-> +            if (is_error(ret)) {
-> +                unlock_drm_version(ver, target_ver, false);
-> +            } else {
-> +                host_to_target_drmversion(target_ver, ver);
-> +            }
-> +        }
-> +        unlock_user_struct(target_ver, arg, 0);
-> +        return ret;
-> +    }
-> +    return -TARGET_ENOSYS;
-> +}
-> +
-> +#endif
-> +
->  static IOCTLEntry ioctl_entries[] = {
->  #define IOCTL(cmd, access, ...) \
->      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 152ec637cb..3c261cff0e 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
->  #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
->  #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
->  
-> +/* drm ioctls */
-> +#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-> +
->  /* from asm/termbits.h */
->  
->  #define TARGET_NCC 8
-> @@ -2598,6 +2601,18 @@ struct target_mq_attr {
->      abi_long mq_curmsgs;
->  };
->  
-> +struct target_drm_version {
-> +    int version_major;
-> +    int version_minor;
-> +    int version_patchlevel;
-> +    abi_ulong name_len;
-> +    abi_ulong name;
-> +    abi_ulong date_len;
-> +    abi_ulong date;
-> +    abi_ulong desc_len;
-> +    abi_ulong desc;
-> +};
-> +
->  #include "socket.h"
->  
->  #include "errno_defs.h"
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 4e12c1661e..e2b0484f50 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
->  STRUCT(dm_target_msg,
->         TYPE_ULONGLONG) /* sector */
->  
-> +STRUCT(drm_version,
-> +       TYPE_INT, /* version_major */
-> +       TYPE_INT, /* version_minor */
-> +       TYPE_INT, /* version_patchlevel */
-> +       TYPE_ULONG, /* name_len */
-> +       TYPE_PTRVOID, /* name */
-> +       TYPE_ULONG, /* date_len */
-> +       TYPE_PTRVOID, /* date */
-> +       TYPE_ULONG, /* desc_len */
-> +       TYPE_PTRVOID) /* desc */
-> +
->  STRUCT(file_clone_range,
->         TYPE_LONGLONG, /* src_fd */
->         TYPE_ULONGLONG, /* src_offset */
+> The implementation details for strace support is described in this series patch
+> commit messages.
+> 
+> Testing method:
+> 
+>     Mini test programs were written that run these syscalls for different arguments.
+>     Those programs were compiled (sometimes using cross-compilers) for the following
+>     architectures:
+> 
+>         * Intel 64-bit (little endian) (gcc)
+>         * Power pc 32-bit (big endian) (powerpc-linux-gnu-gcc)
+>         * Power pc 64-bit (big endian) (powerpc64-linux-gnu-gcc)
+>         * Mips 32-bit (little endian) (mipsel-linux-gnu-gcc)
+>         * Mips 64-bit (little endian) (mips64el-linux-gnuabi64-gcc)
+> 
+>     The corresponding native programs were executed with strace, without using
+>     QEMU, on Intel Core i7-4790K (x86_64) host.
+> 
+>     All applicable compiled programs were in turn executed with "-strace"
+>     through QEMU and the strace printing results obtained were the same 
+>     ones gotten for native execution.
+> 
+> v2:
+> 
+>     * Added patch that extends strace support by enabling argument printing
+>       after syscall execution
+>     * Added strace support for argument printing for syscalls:
+>       removexattr(), lremovexattr(), fremovexattr()
+>     * Added "print_syscall_ret_listxattr()" that prints list of extended
+>       attributes after execution of syscalls: listxattr(), llistxattr(),
+>       flistxattr()
+>     * Corrected formats in some printing functions
+>     * Moved target_offset64() function definition from "syscall.c" to
+>       "qemu.h"
+> 
+> v3:
+> 
+>     * Added generic function SYSCALL_RET_ERR() that checks the return value
+>       and prints the approppriate error message
+>     * Added "print_syscall_ret_llistxattr" and "print_syscall_ret_flistxattr"
+>       in strace.list for "llistxattr()" and "flistxattr()" that have same
+>       definition as "print_syscall_ret_listxattr"
+> 
+> v4:
+> 
+>     * Changed error printing from macro SYSCALL_RET_ERR() to function
+>       print_syscall_err()
+>     * Changed while loop in "print_syscall_ret_listxattr()" to check printed
+>       bytes against size of the return value
+> 
+> v5:
+>     * Corrected "print_newselect()" and "print_syscall_ret_newselect()"
+>       to use the new functionality to store syscall argument values
+>     * Changed while loop in "print_syscall_ret_listxattr()" to check only the
+>       size of the return value without the variable for printed bytes
+> 
+> Filip Bozuta (6):
+>   linux-user: Extend strace support to enable argument printing after
+>     syscall execution
+>   linux-user: Add strace support for a group of syscalls
+>   linux-user: Add strace support for printing argument of syscalls used
+>     for extended attributes
+>   linux-user: Add strace support for printing arguments of lseek()
+>   linux-user: Add strace support for printing arguments of
+>     chown()/lchown()
+>   linux-user: Add strace support for printing arguments of fallocate()
+> 
+>  linux-user/qemu.h      |  20 ++-
+>  linux-user/strace.c    | 328 ++++++++++++++++++++++++++++++++++-------
+>  linux-user/strace.list |  37 ++---
+>  linux-user/syscall.c   |  18 +--
+>  4 files changed, 315 insertions(+), 88 deletions(-)
 > 
 
-Applied to my branch linux-user-for-5.1
+Applied to my linux-user-for-5.1 branch.
 
 Thanks,
 Laurent
