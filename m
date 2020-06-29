@@ -2,96 +2,101 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78035C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B623BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E1FC20786
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8287F23DB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfwT4PDz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1FC20786
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDe96kYX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8287F23DB3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jptzJ-00087D-IO
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 09:38:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58434)
+	id 1jpuAT-0003MZ-OX
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 09:49:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jptvK-0005kN-3s
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 09:34:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55082
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jpu9c-0002wT-0p
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 09:49:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55968
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jptvG-0007kh-Nq
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 09:34:13 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jpu9Z-0001LZ-TX
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 09:48:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593437649;
+ s=mimecast20190719; t=1593438536;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6G6ZOFeKfJZLTLZq79XL775/fwg88HTrCznauUmAspc=;
- b=dfwT4PDzS/v903EnoiTkRVeTC9KSu2IhaZ+iI0vojvMnk6bnh0yU6By90Sp88CHJ2d/5bh
- bc5ydWeTxV4znso52eCwtJEM0vQ7ChrDdzSjvTNj57EULOd7kWQ/CQXPS6fbWOqfqBe3k4
- 8St+8RCEdbDeq4oLrWGK+KWp/3F37IM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-D0BAG1XbMriG9Jc1n0NEmA-1; Mon, 29 Jun 2020 09:34:08 -0400
-X-MC-Unique: D0BAG1XbMriG9Jc1n0NEmA-1
-Received: by mail-qk1-f200.google.com with SMTP id q6so3707352qke.21
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 06:34:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=6G6ZOFeKfJZLTLZq79XL775/fwg88HTrCznauUmAspc=;
- b=VYa3H/0E8smqvvbyp9p2NdksV9DGHpaaDdyze2GQLMXEqmiK0l2Zx0bBD+iWRXBCQT
- F/nCpMNLI+wXd+YW/BWAG/2rstDhutp3gnVklib0Jhlul4YtjG83HfI9BrGaMmUTOaS4
- DCFrWS34N5lsXavRT7fvSRn6kELfh904Tn7MLroN8qpDCPSwakpaz7DfMx0saqYPUCqF
- /k8DTCMS1A68lbfXvpA3G0JLoKp2W/rANOVwh7vLB2kGQ8Ckqf2THlArwQiWXCmYzf+q
- uFIKMD5Grhw9Uh6+yUmq0C7wdWgUt5E7UA+z4XWPlGdg8l1KCHiW7opFbZ4BONpm04JJ
- Zb3Q==
-X-Gm-Message-State: AOAM532NPFrJwNlrXBXua2FFZeaPzjcYBBX4jDzRim5XJ1GffpWY0rTd
- /dH88V/p4TSP3CMQRsHf/rIIBmCqAp5J0H4c7sh4uaeGR2w8IylbY4TT4XTeVROotr13didW5eY
- gRgozH/BDrBeKN5o=
-X-Received: by 2002:a37:67c8:: with SMTP id b191mr15202098qkc.60.1593437646825; 
- Mon, 29 Jun 2020 06:34:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCm+421ABZLvznNAweWPd6Kyng8CAdcLHOb3FDQ8WwpAkuExfhCAsqbnlxX0JyelpkwEdpNQ==
-X-Received: by 2002:a37:67c8:: with SMTP id b191mr15202066qkc.60.1593437646395; 
- Mon, 29 Jun 2020 06:34:06 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id r76sm15844454qka.30.2020.06.29.06.34.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 06:34:05 -0700 (PDT)
-Date: Mon, 29 Jun 2020 09:34:03 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200629133403.GA266532@xz-x1>
-References: <20200626064122.9252-1-eperezma@redhat.com>
- <20200626064122.9252-2-eperezma@redhat.com>
- <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
+ to:to:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
+ bh=k6UOVrXT42HzQkSrqtTTLzaXmtk5D7/CPGnYCKXjuRE=;
+ b=gDe96kYX7z+5zFJge0sgOdiCi9khq1ti0PR2vN3IDMCVPFZupENImnRk6tGkz64F4mcun2
+ W52MhATrpdM65yukwYR7l3pCXIkJ+KGU6+viWgX2Zbk+9uevD+OkiUVZbfGatk6YpBQwry
+ knANHME9wc43VyM3eRbCS6vwRc6w0P4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-Ch6NjJ8nMrSdmvSdoDifcA-1; Mon, 29 Jun 2020 09:48:53 -0400
+X-MC-Unique: Ch6NjJ8nMrSdmvSdoDifcA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A7DB18FE876;
+ Mon, 29 Jun 2020 13:48:38 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-124.ams2.redhat.com
+ [10.36.112.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47C827BEA1;
+ Mon, 29 Jun 2020 13:48:37 +0000 (UTC)
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+From: Max Reitz <mreitz@redhat.com>
+Subject: Properly quitting qemu immediately after failing migration
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
+Date: Mon, 29 Jun 2020 15:48:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="B4jXxl8m24cCgVI6uzJNliuuiIlqgXVKt"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -114,176 +119,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 01:51:47PM +0800, Jason Wang wrote:
-> 
-> On 2020/6/28 下午10:47, Peter Xu wrote:
-> > On Sun, Jun 28, 2020 at 03:03:41PM +0800, Jason Wang wrote:
-> > > On 2020/6/27 上午5:29, Peter Xu wrote:
-> > > > Hi, Eugenio,
-> > > > 
-> > > > (CCing Eric, Yan and Michael too)
-> > > > 
-> > > > On Fri, Jun 26, 2020 at 08:41:22AM +0200, Eugenio Pérez wrote:
-> > > > > diff --git a/memory.c b/memory.c
-> > > > > index 2f15a4b250..7f789710d2 100644
-> > > > > --- a/memory.c
-> > > > > +++ b/memory.c
-> > > > > @@ -1915,8 +1915,6 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-> > > > >            return;
-> > > > >        }
-> > > > > -    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> > > > I can understand removing the assertion should solve the issue, however imho
-> > > > the major issue is not about this single assertion but the whole addr_mask
-> > > > issue behind with virtio...
-> > > 
-> > > I don't get here, it looks to the the range was from guest IOMMU drivers.
-> > Yes.  Note that I didn't mean that it's a problem in virtio, it's just the fact
-> > that virtio is the only one I know that would like to support arbitrary address
-> > range for the translated region.  I don't know about tcg, but vfio should still
-> > need some kind of page alignment in both the address and the addr_mask.  We
-> > have that assumption too across the memory core when we do translations.
-> 
-> 
-> Right but it looks to me the issue is not the alignment.
-> 
-> 
-> > 
-> > A further cause of the issue is the MSI region when vIOMMU enabled - currently
-> > we implemented the interrupt region using another memory region so it split the
-> > whole DMA region into two parts.  That's really a clean approach to IR
-> > implementation, however that's also a burden to the invalidation part because
-> > then we'll need to handle things like this when the listened range is not page
-> > alighed at all (neither 0-0xfedffff, nor 0xfef0000-MAX).  If without the IR
-> > region (so the whole iommu address range will be a single FlatRange),
-> 
-> 
-> Is this a bug? I remember that at least for vtd, it won't do any DMAR on the
-> intrrupt address range
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--B4jXxl8m24cCgVI6uzJNliuuiIlqgXVKt
+Content-Type: multipart/mixed; boundary="DeDPYUaO4WfaFsDaD6hMukrdybTutS1XW"
 
-I don't think it's a bug, at least it's working as how I understand...  that
-interrupt range is using an IR region, that's why I said the IR region splits
-the DMAR region into two pieces, so we have two FlatRange for the same
-IOMMUMemoryRegion.
+--DeDPYUaO4WfaFsDaD6hMukrdybTutS1XW
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> 
-> >   I think
-> > we probably don't need most of the logic in vtd_address_space_unmap() at all,
-> > then we can directly deliver all the IOTLB invalidations without splitting into
-> > small page aligned ranges to all the iommu notifiers.  Sadly, so far I still
-> > don't have ideal solution for it, because we definitely need IR.
-> 
-> 
-> Another possible (theoretical) issue (for vhost) is that it can't trigger
-> interrupt through the interrupt range.
+Hi,
 
-Hmm.. Could you explain?  When IR is enabled, all devices including virtio
-who send interrupt to 0xfeeXXXXX should be trapped by IR.
+In an iotest, I=E2=80=99m trying to quit qemu immediately after a migration=
+ has
+failed.  Unfortunately, that doesn=E2=80=99t seem to be possible in a clean=
+ way:
+migrate_fd_cleanup() runs only at some point after the migration state
+is already =E2=80=9Cfailed=E2=80=9D, so if I just wait for that =E2=80=9Cfa=
+iled=E2=80=9D state and
+immediately quit, some cleanup functions may not have been run yet.
 
-> 
-> 
-> > 
-> > > 
-> > > > For normal IOTLB invalidations, we were trying our best to always make
-> > > > IOMMUTLBEntry contain a valid addr_mask to be 2**N-1.  E.g., that's what we're
-> > > > doing with the loop in vtd_address_space_unmap().
-> > > 
-> > > I'm sure such such assumption can work for any type of IOMMU.
-> > > 
-> > > 
-> > > > But this is not the first time that we may want to break this assumption for
-> > > > virtio so that we make the IOTLB a tuple of (start, len), then that len can be
-> > > > not a address mask any more.  That seems to be more efficient for things like
-> > > > vhost because iotlbs there are not page based, so it'll be inefficient if we
-> > > > always guarantee the addr_mask because it'll be quite a lot more roundtrips of
-> > > > the same range of invalidation.  Here we've encountered another issue of
-> > > > triggering the assertion with virtio-net, but only with the old RHEL7 guest.
-> > > > 
-> > > > I'm thinking whether we can make the IOTLB invalidation configurable by
-> > > > specifying whether the backend of the notifier can handle arbitary address
-> > > > range in some way.  So we still have the guaranteed addr_masks by default
-> > > > (since I still don't think totally break the addr_mask restriction is wise...),
-> > > > however we can allow the special backends to take adavantage of using arbitary
-> > > > (start, len) ranges for reasons like performance.
-> > > > 
-> > > > To do that, a quick idea is to introduce a flag IOMMU_NOTIFIER_ARBITRARY_MASK
-> > > > to IOMMUNotifierFlag, to declare that the iommu notifier (and its backend) can
-> > > > take arbitrary address mask, then it can be any value and finally becomes a
-> > > > length rather than an addr_mask.  Then for every iommu notify() we can directly
-> > > > deliver whatever we've got from the upper layer to this notifier.  With the new
-> > > > flag, vhost can do iommu_notifier_init() with UNMAP|ARBITRARY_MASK so it
-> > > > declares this capability.  Then no matter for device iotlb or normal iotlb, we
-> > > > skip the complicated procedure to split a big range into small ranges that are
-> > > > with strict addr_mask, but directly deliver the message to the iommu notifier.
-> > > > E.g., we can skip the loop in vtd_address_space_unmap() if the notifier is with
-> > > > ARBITRARY flag set.
-> > > 
-> > > I'm not sure coupling IOMMU capability to notifier is the best choice.
-> > IMHO it's not an IOMMU capability.  The flag I wanted to introduce is a
-> > capability of the one who listens to the IOMMU TLB updates.  For our case, it's
-> > virtio/vhost's capability to allow arbitrary length. The IOMMU itself
-> > definitely has some limitation on the address range to be bound to an IOTLB
-> > invalidation, e.g., the device-iotlb we're talking here only accept both the
-> > iova address and addr_mask to be aligned to 2**N-1.
-> 
-> 
-> I think this go back to one of our previous discussion of whether to
-> introduce a dedicated notifiers for device IOTLB.
-> 
-> For IOMMU, it might have limitation like GAW, but for device IOTLB it
-> probably doesn't. That's the reason we hit the assert here.
+This is a problem with dirty bitmap migration at least, because it
+increases the refcount on all block devices that are to be migrated, so
+if we don=E2=80=99t call the cleanup function before quitting, the refcount=
+ will
+stay elevated and bdrv_close_all() will hit an assertion because those
+block devices are still around after blk_remove_all_bs() and
+blockdev_close_all_bdrv_states().
 
-I feel like even for hardware it shouldn't be arbitrary either, because the
-device iotlb sent from at least vt-d driver is very restricted too (borrowing
-the comment you wrote :):
+In practice this particular issue might not be that big of a problem,
+because it just means qemu aborts when the user intended to let it quit
+anyway.  But on one hand I could imagine that there are other clean-up
+paths that should definitely run before qemu quits (although I don=E2=80=99=
+t
+know), and on the other, it=E2=80=99s a problem for my test.
 
-    /* According to ATS spec table 2.4:
-     * S = 0, bits 15:12 = xxxx     range size: 4K
-     * S = 1, bits 15:12 = xxx0     range size: 8K
-     * S = 1, bits 15:12 = xx01     range size: 16K
-     * S = 1, bits 15:12 = x011     range size: 32K
-     * S = 1, bits 15:12 = 0111     range size: 64K
-     * ...
-     */
+I tried working around the problem for my test by waiting on =E2=80=9CUnabl=
+e to
+write=E2=80=9D appearing on stderr, because that indicates that
+migrate_fd_cleanup()=E2=80=99s error_report_err() has been reached.  But on=
+ one
+hand, that isn=E2=80=99t really nice, and on the other, it doesn=E2=80=99t =
+even work
+when the failure is on the source side (because then there is no
+s->error for migrate_fd_cleanup() to report).
 
-> 
-> 
-> > 
-> > > How about just convert to use a range [start, end] for any notifier and move
-> > > the checks (e.g the assert) into the actual notifier implemented (vhost or
-> > > vfio)?
-> > IOMMUTLBEntry itself is the abstraction layer of TLB entry.  Hardware TLB entry
-> > is definitely not arbitrary range either (because AFAICT the hardware should
-> > only cache PFN rather than address, so at least PAGE_SIZE aligned).
-> > Introducing this flag will already make this trickier just to avoid introducing
-> > another similar struct to IOMMUTLBEntry, but I really don't want to make it a
-> > default option...  Not to mention I probably have no reason to urge the rest
-> > iommu notifier users (tcg, vfio) to change their existing good code to suite
-> > any of the backend who can cooperate with arbitrary address ranges...
-> 
-> 
-> Ok, so it looks like we need a dedicated notifiers to device IOTLB.
+In all, I=E2=80=99m asking:
+(1) Is there a nice solution for me now to delay quitting qemu until the
+failed migration has been fully resolved, including the clean-up?
 
-Or we can also make a new flag for device iotlb just like current UNMAP? Then
-we replace the vhost type from UNMAP to DEVICE_IOTLB.  But IMHO using the
-ARBITRARY_LENGTH flag would work in a similar way.  DEVICE_IOTLB flag could
-also allow virtio/vhost to only receive one invalidation (now IIUC it'll
-receive both iotlb and device-iotlb for unmapping a page when ats=on), but then
-ats=on will be a must and it could break some old (misconfiged) qemu because
-afaict previously virtio/vhost could even work with vIOMMU (accidentally) even
-without ats=on.
+(2) Isn=E2=80=99t it a problem if qemu crashes when you issue =E2=80=9Cquit=
+=E2=80=9D via QMP at
+the wrong time?  Like, maybe lingering subprocesses when using =E2=80=9Cexe=
+c=E2=80=9D?
+
 
 Thanks,
 
--- 
-Peter Xu
+Max
+
+
+--DeDPYUaO4WfaFsDaD6hMukrdybTutS1XW--
+
+--B4jXxl8m24cCgVI6uzJNliuuiIlqgXVKt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl758TMACgkQ9AfbAGHV
+z0CgTQf9FkeOo1G1Hw9CYh3KQR8NpyDqxs2JPDgCQyz1GUFUysBCd/TO8RwqLXnw
+hQdT3M253+Tu7U1cTkYi7npplytTR99XGa4LYeclhi8Az6q+mlPlcLlaj17wIRjo
+3EpbJ07Evzean6QESVcTI/0j4nfUAmGhX34AxiOvBe6WVZ8a0gHN6+T7L4avL6FQ
+mv6T9ukccX2CxUJzoN6u59yt3jBWgl2L3Ru263gLNrj0hfytYSa5OxcfTQW4zirA
+38lJLYh8rP9DZ2yp4t7C0mB7fv0eqAw7ilNXGLJTxZD66asTJs5Bhv+QK50B62vI
+W1IW/csgw0hZcKnOjvcAlUxRKsZ82A==
+=Re5u
+-----END PGP SIGNATURE-----
+
+--B4jXxl8m24cCgVI6uzJNliuuiIlqgXVKt--
 
 
