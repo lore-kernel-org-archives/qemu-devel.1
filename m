@@ -2,78 +2,96 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE40C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE69C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:49:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0EDA23CD1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:46:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0EDA23CD1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1A2F223CD1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:49:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gig3/Y7w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2F223CD1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpsF0-0004Ke-0A
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:46:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
+	id 1jpsHw-0006HQ-DE
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:49:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpsEE-0003t8-BF
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:45:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45428)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpsEB-0005us-Nr
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:45:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jpsEA-00037J-Mo
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:45:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A964D2E80E7
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:45:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jpsHK-0005q6-GQ
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:48:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41187
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jpsHI-0006Qh-FH
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:48:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593431326;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=vU1Ah32Lth3iZ9ekQhWBzDsgtatE01H5+I+vU2Vx66k=;
+ b=gig3/Y7w1v5R2Fh7sJLGrwwmQ+49AZj92HFVwLRRFjxzvcBdc5ItbFBsUezhSaB3M7yl5m
+ mY7NSRzQTnZuFkrQmWfWRVIQ62xCLjULxDVLhXR4kwi15FccBwO/rkr9WeDqLNep3yYMb6
+ 4peU2awGDpoNxBPDR66wEQtMSvWVfcY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-1EYMEJ6ON-m25gMiWS133Q-1; Mon, 29 Jun 2020 07:48:43 -0400
+X-MC-Unique: 1EYMEJ6ON-m25gMiWS133Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16C088015FE;
+ Mon, 29 Jun 2020 11:48:42 +0000 (UTC)
+Received: from kaapi (ovpn-112-133.phx2.redhat.com [10.3.112.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 805C45D9DA;
+ Mon, 29 Jun 2020 11:48:35 +0000 (UTC)
+Date: Mon, 29 Jun 2020 17:18:32 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH v2 7/9] tz-ppc: add dummy read/write methods
+In-Reply-To: <CAKXe6S+E2gnqmSnPbDkj+Dh-KAHvPwSCw+jSb7QmgxWzTO=wyA@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.77.849.2006291714120.92950@xnncv>
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-8-ppandit@redhat.com>
+ <7ffe6cd9-fc23-3fdf-6c57-7bb0af0dd030@redhat.com>
+ <nycvar.YSQ.7.77.849.2006251427210.92950@xnncv>
+ <CAFEAcA9yP=y9nzvqs_GZF=n9EXz7SPY4kiR6ZqHF+T+f7mnV5g@mail.gmail.com>
+ <CAKXe6S+E2gnqmSnPbDkj+Dh-KAHvPwSCw+jSb7QmgxWzTO=wyA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 11:37:18 -0000
-From: Oksana Voshchana <1885553@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ovoshchana
-X-Launchpad-Bug-Reporter: Oksana Voshchana (ovoshchana)
-X-Launchpad-Bug-Modifier: Oksana Voshchana (ovoshchana)
-Message-Id: <159343063899.16720.10693725380601772129.malonedeb@soybean.canonical.com>
-Subject: [Bug 1885553] [NEW] make-check test failed with "Segmentation fault"
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 518ca3bd2bb5491a22edc3bba698fcfdc3e7e9d9
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed;
+ boundary="-1463810047-1415810342-1593431321=:92950"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,56 +100,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885553 <1885553@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463810047-1415810342-1593431321=:92950
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-While running the make-check testing on arm architecture the test failed wi=
-th error:
-"kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core =
-dumped)". Apart from that make-install test always passes.
-The problem doesn't reproduce in 100%
-qemu - from the master branch
-RHEL-8 kernel 4.18.0-221.el8.aarch64
-Logfile with an error you can to find in attachment
++-- On Mon, 29 Jun 2020, Li Qiang wrote --+
+| Peter Maydell <peter.maydell@linaro.org> 于2020年6月25日周四 下午8:22写道：
+| > The point of g_assert_not_reached() is that it documents and asserts that 
+| > the code is not reachable. If the read and write callbacks are unreachable 
+| > (which they are) then having their bodies just be a call to 
+| > g_assert_not_reached() is the best way to document that.
+| 
+| I agree with this.
 
-Thanks
+Okay, will do.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-1415810342-1593431321=:92950--
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "make_check.log"
-   https://bugs.launchpad.net/bugs/1885553/+attachment/5388127/+files/make_=
-check.log
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885553
-
-Title:
-  make-check test failed with "Segmentation fault"
-
-Status in QEMU:
-  New
-
-Bug description:
-  While running the make-check testing on arm architecture the test failed =
-with error:
-  "kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (cor=
-e dumped)". Apart from that make-install test always passes.
-  The problem doesn't reproduce in 100%
-  qemu - from the master branch
-  RHEL-8 kernel 4.18.0-221.el8.aarch64
-  Logfile with an error you can to find in attachment
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885553/+subscriptions
 
