@@ -2,41 +2,43 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C350BC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B8AC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:30:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D6E3206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:28:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6E3206F1
+	by mail.kernel.org (Postfix) with ESMTPS id D187A2081A
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:30:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D187A2081A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzSP-0001R1-SR
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51588)
+	id 1jpzU0-0003vu-2i
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:30:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRH-00081i-3j; Mon, 29 Jun 2020 15:27:35 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42886)
+ id 1jpzRF-00080w-2p; Mon, 29 Jun 2020 15:27:33 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42885)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRC-0002GX-Dk; Mon, 29 Jun 2020 15:27:34 -0400
+ id 1jpzRC-0002GW-Co; Mon, 29 Jun 2020 15:27:32 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 24E9E748DCF;
+ by localhost (Postfix) with SMTP id 4CCA2748DD1;
  Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 01C43745712; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
-Message-Id: <cover.1593456926.git.balaton@eik.bme.hu>
+ id 14B577482D3; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
+Message-Id: <5e9db897c3b48bce89891599c55752acfae1b892.1593456926.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1593456926.git.balaton@eik.bme.hu>
+References: <cover.1593456926.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v7 0/8] Mac Old World ROM experiment
+Subject: [PATCH v7 4/8] mac_oldworld: Drop some variables
 Date: Mon, 29 Jun 2020 20:55:26 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -71,52 +73,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is now a minimal set of patches needed to make it possible to
-experiment with a firmware ROM from real hardware. After finding out
-that the board firmware does not probe PCI devices but expects them at
-known fixed addresses we only need to change the address of the macio
-device to get the firmware correctly map it. This allows dropping
-workarounds in previous versions for this and now only the minimal set
-of patches are included to get the firmware loaded and do something.
-(Also excluded the grackle revision and machine ID pathes for now that
-may be needed as the firmware accesses these but seems to go further
-without them so until we hit a problem we can live without it,
-although I wonder if this causes us unnecessary debugging later so
-unless they cause regressions they could be merged).
+Values not used frequently enough may not worth putting in a local
+variable, especially with names almost as long as the original value
+because that does not improve readability, to the contrary it makes it
+harder to see what value is used. Drop a few such variables.
 
-I still don't get video output but at least it talks to the GPU chip
-now so it can be debugged and improved (this will either need
-emulating the correct chip the firmware has a driver for or an OF
-compliant ROM for the emulated card).
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/ppc/mac_oldworld.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
 
-As before the I2C part (patches 6-8) is RFC and unfinished but the
-first 5 patches should be good enough now. I hope someone can take
-care of I2C, I can look at the ati-vga side later.
-
-Regards,
-BALATON Zoltan
-
-BALATON Zoltan (8):
-  mac_oldworld: Allow loading binary ROM image
-  mac_newworld: Allow loading binary ROM image
-  mac_oldworld: Drop a variable, use get_system_memory() directly
-  mac_oldworld: Drop some variables
-  mac_oldworld: Change PCI address of macio to match real hardware
-  i2c: Match parameters of i2c_start_transfer and i2c_send_recv
-  WIP macio/cuda: Attempt to add i2c support
-  mac_oldworld: Add SPD data to cover RAM
-
- hw/display/sm501.c           |  2 +-
- hw/i2c/core.c                | 34 +++++++-------
- hw/i2c/ppc4xx_i2c.c          |  2 +-
- hw/misc/macio/cuda.c         | 76 ++++++++++++++++++++++++++++++-
- hw/ppc/mac.h                 |  2 -
- hw/ppc/mac_newworld.c        | 22 +++++----
- hw/ppc/mac_oldworld.c        | 86 +++++++++++++++++++++++-------------
- include/hw/i2c/i2c.h         |  4 +-
- include/hw/misc/macio/cuda.h |  1 +
- 9 files changed, 167 insertions(+), 62 deletions(-)
-
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index d1c4244b1e..4200008851 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
+ static void ppc_heathrow_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *kernel_filename = machine->kernel_filename;
+-    const char *kernel_cmdline = machine->kernel_cmdline;
+-    const char *initrd_filename = machine->initrd_filename;
+     const char *boot_device = machine->boot_order;
+     PowerPCCPU *cpu = NULL;
+     CPUPPCState *env = NULL;
+     char *filename;
+-    int linux_boot, i;
++    int i;
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+@@ -108,8 +105,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     void *fw_cfg;
+     uint64_t tbfreq;
+ 
+-    linux_boot = (kernel_filename != NULL);
+-
+     /* init CPUs */
+     for (i = 0; i < smp_cpus; i++) {
+         cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+@@ -159,7 +154,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    if (linux_boot) {
++    if (machine->kernel_filename) {
+         uint64_t lowaddr = 0;
+         int bswap_needed;
+ 
+@@ -169,30 +164,33 @@ static void ppc_heathrow_init(MachineState *machine)
+         bswap_needed = 0;
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+-        kernel_size = load_elf(kernel_filename, NULL,
++        kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL,
+                                NULL, &lowaddr, NULL, NULL, 1, PPC_ELF_MACHINE,
+                                0, 0);
+         if (kernel_size < 0)
+-            kernel_size = load_aout(kernel_filename, kernel_base,
++            kernel_size = load_aout(machine->kernel_filename, kernel_base,
+                                     ram_size - kernel_base, bswap_needed,
+                                     TARGET_PAGE_SIZE);
+         if (kernel_size < 0)
+-            kernel_size = load_image_targphys(kernel_filename,
++            kernel_size = load_image_targphys(machine->kernel_filename,
+                                               kernel_base,
+                                               ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            error_report("could not load kernel '%s'", kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+         /* load initrd */
+-        if (initrd_filename) {
+-            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
+-            initrd_size = load_image_targphys(initrd_filename, initrd_base,
++        if (machine->initrd_filename) {
++            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
++                                            KERNEL_GAP);
++            initrd_size = load_image_targphys(machine->initrd_filename,
++                                              initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+-                             initrd_filename);
++                             machine->initrd_filename);
+                 exit(1);
+             }
+             cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
+@@ -336,9 +334,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+-    if (kernel_cmdline) {
++    if (machine->kernel_cmdline) {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
+-        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
++        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
++                         machine->kernel_cmdline);
+     } else {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
+     }
 -- 
 2.21.3
 
