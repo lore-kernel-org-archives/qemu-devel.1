@@ -2,69 +2,88 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85397C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C6EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:42:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59F6425596
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:39:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F6425596
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 03A1D2559A
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:42:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tz1shILo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A1D2559A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpwov-0007uW-Eh
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55310)
+	id 1jpwrJ-00022a-4P
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:42:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jpwoJ-0007NN-G1
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:39:11 -0400
-Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:42169)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jpwoG-0007Om-O0
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:39:11 -0400
-Received: from player694.ha.ovh.net (unknown [10.108.54.97])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 46A2021B2A3
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 18:39:06 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player694.ha.ovh.net (Postfix) with ESMTPSA id A488613C94AD9;
- Mon, 29 Jun 2020 16:39:04 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-106R006016bf635-ca8a-4113-842c-b5b4a0762dee,8FB0D1E3D32E665923302A74B02F2B8B7D335768)
- smtp.auth=groug@kaod.org
-Date: Mon, 29 Jun 2020 18:39:02 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Message-ID: <20200629183902.75d6fb0b@bahia.lan>
-In-Reply-To: <3959658.0YslYoXCm0@silver>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <14ec5d880cfca878bf32e643243c7ab3f4a52440.1587309014.git.qemu_oss@crudebyte.com>
- <3959658.0YslYoXCm0@silver>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqH-0000Ho-B8
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:13 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:35515)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqF-0007uP-JO
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:13 -0400
+Received: by mail-lj1-x244.google.com with SMTP id f8so6496351ljc.2
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:41:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Hl2zUBqT9Q02UHEKkMWWwMmcZaqXnD6sNC1J/cTQNpo=;
+ b=Tz1shILo65cbNZiA8BuNaaWXEsyPzGaUx05mJbDGZZ4DtjHsmXEw2+VSmBUR/PUpWP
+ MwJpRloLH5nKKa8+L0xMhUMzfG39t3Tf167EHVMhrCgWGzE6zP2IRlWtRbbhuoxY8dYc
+ VZlhjWbAzeQY+ThtK7dprip2j98HEFmfry0o3InGSLhELfQS6hprpq3V14oDd8LMwCq0
+ rbBzEdEm/xWrZAZRU9leHT5mmoXK4/sEyfv8+pHKTXaIySZJoa9G3sueSNeAeq/IliEQ
+ 1IBcLwQlYa32V6vCc5kmaqyebUos53cVqG0bLfxUg05xy/jNL+Nva2wo4nTEk9p6JMar
+ IUsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Hl2zUBqT9Q02UHEKkMWWwMmcZaqXnD6sNC1J/cTQNpo=;
+ b=aUQ8plHkZhTv/GWNZtH/aXVyBT7MV3xjNXxBTeiRJbeF79k5e+n8jGLirdFdsUGFw+
+ po3Dq3dfjP2dH81mixmjkX2romuEhPkek+bOh0WJveU9DO8XkfO/7DCAE3MAufoMihEp
+ +1hzcJrdchUWLbT6f/IGXeEvk9irmRcU30BVx8ns2/bDhS+kKg67emAns/Lu3YHVTHVl
+ kLcYxf9MhFZAoDLOetRmpI8Zegirw3PN2s6BtFl7IBWZWTZZaXt1lSMN2iffnKz4H3c6
+ N1oZN+Dzt7ymuS69UA/CHASkLjjtaXDabQU0X2Suv8S/vK7ZEjpZ4FB0zITB8IneuvGU
+ UsWQ==
+X-Gm-Message-State: AOAM532U6A+ZZbQLD2xRC7tWSGkJY+2jpASyRTSJ4ul4aXmnJjgATLc5
+ Grpohux3+NtP++VVAzomLU3FCLf3wV9y3g==
+X-Google-Smtp-Source: ABdhPJwql9An/okZY9NNAK0RX7i0NhDwgars+V2njhkkv4lQ4DWgcclkOzLjMsAM/5iBHEEdITzzkw==
+X-Received: by 2002:a2e:8347:: with SMTP id l7mr8921097ljh.182.1593448868057; 
+ Mon, 29 Jun 2020 09:41:08 -0700 (PDT)
+Received: from localhost.localdomain (193-239-39-51.ksi-system.net.
+ [193.239.39.51])
+ by smtp.gmail.com with ESMTPSA id o1sm37641lfi.92.2020.06.29.09.41.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 09:41:07 -0700 (PDT)
+From: Szymon Lukasz <noh4hss@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/9] virtio-console: notify about the terminal size
+Date: Mon, 29 Jun 2020 18:40:32 +0200
+Message-Id: <20200629164041.472528-1-noh4hss@gmail.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 1812980325064284480
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudelledgfeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=87.98.177.69; envelope-from=groug@kaod.org;
- helo=6.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 12:39:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=noh4hss@gmail.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,59 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, berrange@redhat.com, amit@kernel.org, mst@redhat.com,
+ Szymon Lukasz <noh4hss@gmail.com>, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 03 Jun 2020 19:16:08 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+The goal of this series is to have a resizable terminal into a guest
+without having to set up networking and using, e.g. ssh.
 
-> On Sonntag, 19. April 2020 17:06:17 CEST Christian Schoenebeck wrote:
-> > Make top half really top half and bottom half really bottom half:
-> > 
-> > Each T_readdir request handling is hopping between threads (main
-> > I/O thread and background I/O driver threads) several times for
-> > every individual directory entry, which sums up to huge latencies
-> > for handling just a single T_readdir request.
-> > 
-> > Instead of doing that, collect now all required directory entries
-> > (including all potentially required stat buffers for each entry) in
-> > one rush on a background I/O thread from fs driver by calling the
-> > previously added function v9fs_co_readdir_many() instead of
-> > v9fs_co_readdir(), then assemble the entire resulting network
-> > response message for the readdir request on main I/O thread. The
-> > fs driver is still aborting the directory entry retrieval loop
-> > (on the background I/O thread inside of v9fs_co_readdir_many())
-> > as soon as it would exceed the client's requested maximum R_readdir
-> > response size. So this will not introduce a performance penalty on
-> > another end.
-> > 
-> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > ---
-> >  hw/9pfs/9p.c | 122 +++++++++++++++++++++++----------------------------
-> >  1 file changed, 55 insertions(+), 67 deletions(-)
-> 
-> Ping. Anybody?
-> 
-> I would like to roll out this patch set soon and this is the only patch in 
-> this series missing a review yet.
-> 
+The virtio spec allows a virtio-console device to notify the guest about
+terminal resizes in the host. Linux Kernel implements the driver part of
+the spec. This series implement the device part in QEMU.
 
-Hi Christian,
+This series adds support for a resizable terminal if a virtio console
+device is connected to the stdio backend. 
 
-Sorry for getting back to this only now :-\
+This series also introduces resize messages that can be sent over QMP to
+notify QEMU about the size of the terminal connented to some chardev.
+In the libvirt setting, it will allow to implement a resizable terminal 
+for virsh console and other libvirt clients.
 
-So I still have some concerns about the locking of the directory stream
-pointer a fid. It was initially introduced to avoid concurrent accesses
-by multiple threads to the corresponding internal glibc object, as
-recommended in the readdir(3) manual page. Now, this patch considerably
-extends the critical section to also contain calls to telldir() and all
-the _many_ readdir()... so I'm not sure exactly what's the purpose of
-that mutex right now. Please provide more details.
 
-Cheers,
+v3:
+add resize messages over QMP, as suggested by Daniel
 
---
-Greg
+v2:
+fix adding a new virtio feature bit to the virtio console device
+
+Szymon Lukasz (9):
+  chardev: add cols, rows fields
+  chardev: add CHR_EVENT_RESIZE
+  chardev: add qemu_chr_resize()
+  char-mux: add support for the terminal size
+  main-loop: change the handling of SIGWINCH
+  char-stdio: add support for the terminal size
+  qmp: add chardev-resize command
+  virtio-serial-bus: add terminal resize messages
+  virtio-console: notify the guest about terminal resizes
+
+ backends/cryptodev-vhost-user.c   |  1 +
+ chardev/char-fe.c                 | 13 +++++++
+ chardev/char-mux.c                | 18 ++++++++-
+ chardev/char-stdio.c              | 29 ++++++++++++++
+ chardev/char.c                    | 26 +++++++++++++
+ hw/block/vhost-user-blk.c         |  1 +
+ hw/char/terminal3270.c            |  1 +
+ hw/char/trace-events              |  1 +
+ hw/char/virtio-console.c          | 63 +++++++++++++++++++++++++++++--
+ hw/char/virtio-serial-bus.c       | 42 ++++++++++++++++++++-
+ hw/core/machine.c                 |  1 +
+ hw/ipmi/ipmi_bmc_extern.c         |  1 +
+ hw/usb/ccid-card-passthru.c       |  1 +
+ hw/usb/dev-serial.c               |  1 +
+ hw/usb/redirect.c                 |  1 +
+ include/chardev/char-fe.h         | 10 +++++
+ include/chardev/char.h            |  7 ++++
+ include/hw/virtio/virtio-serial.h |  5 +++
+ include/qemu/main-loop.h          |  4 ++
+ monitor/hmp.c                     |  1 +
+ monitor/qmp.c                     |  1 +
+ net/vhost-user.c                  |  1 +
+ qapi/char.json                    | 25 ++++++++++++
+ ui/curses.c                       | 11 +++---
+ util/main-loop.c                  | 21 +++++++++++
+ 25 files changed, 274 insertions(+), 12 deletions(-)
+
+-- 
+2.27.0
+
 
