@@ -2,69 +2,70 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5FCC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 00:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90200C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 01:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11020206C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 00:53:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11020206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 642CE206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 01:59:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642CE206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpi3O-000790-9M
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 20:53:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60638)
+	id 1jpj54-0006Ht-Ly
+	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 21:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jpi2T-0006i4-EI
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 20:52:49 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57852)
+ (Exim 4.90_1) (envelope-from <oscar.zhangbo@huawei.com>)
+ id 1jpj4W-0005sN-9w
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 21:59:00 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2470 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jpi2Q-0007k0-JS
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 20:52:49 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07719114|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_alarm|0.0461644-0.00132375-0.952512;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03298; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=4; RT=4; SR=0; TI=SMTPD_---.HuCYwXx_1593391957; 
-Received: from 30.225.208.24(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HuCYwXx_1593391957)
- by smtp.aliyun-inc.com(10.147.41.187);
- Mon, 29 Jun 2020 08:52:37 +0800
-Subject: Re: [PULL 00/63] riscv-to-apply queue
-To: Alistair Francis <alistair23@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200626214410.3613258-1-alistair.francis@wdc.com>
- <CAFEAcA-8QejH-sFsP_rmKuYdYbQdYRjrHaNz4vLHzfYiSBCKYA@mail.gmail.com>
- <CAKmqyKNo9rPtbtqb1R3OFKH71geYjo0mZONNLxkL0Mg6bnb1Zw@mail.gmail.com>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <ce1f8d52-7c87-b264-9463-4eeaf703ac64@c-sky.com>
-Date: Mon, 29 Jun 2020 08:52:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <oscar.zhangbo@huawei.com>)
+ id 1jpj4T-0007pA-OE
+ for qemu-devel@nongnu.org; Sun, 28 Jun 2020 21:59:00 -0400
+Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 729BFD0BA9580B1CD82D
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:58:45 +0800 (CST)
+Received: from DGGEML424-HUB.china.huawei.com (10.1.199.41) by
+ DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Mon, 29 Jun 2020 09:58:45 +0800
+Received: from DGGEML509-MBX.china.huawei.com ([169.254.1.116]) by
+ dggeml424-hub.china.huawei.com ([10.1.199.41]) with mapi id 14.03.0487.000;
+ Mon, 29 Jun 2020 09:58:39 +0800
+From: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: [RFC] secure boot: is it necessary to let qemu verify EDK2 efi file
+Thread-Topic: [RFC] secure boot: is it necessary to let qemu verify EDK2 efi
+ file
+Thread-Index: AdZNt6N6CpC/vlOZTGa5JPRml6k69Q==
+Date: Mon, 29 Jun 2020 01:58:38 +0000
+Message-ID: <0259E1C966E8C54AA93AA2B1240828E673155F7E@dggeml509-mbx.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.186.77]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNo9rPtbtqb1R3OFKH71geYjo0mZONNLxkL0Mg6bnb1Zw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 20:52:38
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.187;
+ envelope-from=oscar.zhangbo@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 21:58:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,71 +78,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Libin \(venvu\)" <venvu.li@huawei.com>,
+ "wujing \(O\)" <wujing42@huawei.com>, jiangfangjie <jiangfangjie@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/6/29 6:51, Alistair Francis wrote:
-> On Sun, Jun 28, 2020 at 7:30 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->> On Fri, 26 Jun 2020 at 22:53, Alistair Francis <alistair.francis@wdc.com> wrote:
->>> The following changes since commit 553cf5d7c47bee05a3dec9461c1f8430316d516b:
->>>
->>>    Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200626' into staging (2020-06-26 18:22:36 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>    git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200626-1
->>>
->>> for you to fetch changes up to b39d59434ea10649fdb9e0a339c30c76e38c5e17:
->>>
->>>    target/riscv: configure and turn on vector extension from command line (2020-06-26 14:22:15 -0700)
->>>
->>> ----------------------------------------------------------------
->>> This PR contains two patches to improve PLIC support in QEMU.
->>>
->>> The rest of the PR is adding support for the v0.7.1 RISC-V vector
->>> extensions. This is experimental support as the vector extensions are
->>> still in a draft state.
->>>
->> Hi; I'm afraid this fails to build on PPC64 and s390x (ie
->> our big-endian hosts):
-> LIU Zhiwei do you mind looking into this?
-Sure, I will.
-I have applied for a gcc compile farm account today, but it maybe a few 
-days later before I can login.
-Please accept my apologies for my oversight.
-
-Zhiwei
->
-> Alistair
->
->> /home/ubuntu/qemu/target/riscv/vector_helper.c: In function ‘vext_clear’:
->> /home/ubuntu/qemu/target/riscv/vector_helper.c: In function ‘vext_clear’:
->> /home/ubuntu/qemu/target/riscv/vector_helper.c:154:21: error: invalid
->> operands to binary & (have ‘void *’ and ‘long long unsigned int’)
->>           memset(tail & ~(7ULL), 0, part1);
->>                       ^
->> /home/ubuntu/qemu/target/riscv/vector_helper.c:155:27: error: invalid
->> operands to binary & (have ‘void *’ and ‘long long unsigned int’)
->>           memset((tail + 8) & ~(7ULL), 0, part2);
->>                  ~~~~~~~~~~ ^
->> /home/ubuntu/qemu/target/riscv/vector_helper.c:154:21: error: invalid
->> operands to binary & (have ‘void *’ and ‘long long unsigned int’)
->>           memset(tail & ~(7ULL), 0, part1);
->>                       ^
->> /home/ubuntu/qemu/target/riscv/vector_helper.c:155:27: error: invalid
->> operands to binary & (have ‘void *’ and ‘long long unsigned int’)
->>           memset((tail + 8) & ~(7ULL), 0, part2);
->>                  ~~~~~~~~~~ ^
->> /home/ubuntu/qemu/rules.mak:69: recipe for target
->> 'target/riscv/vector_helper.o' failed
->>
->>
->> thanks
->> -- PMM
-
+SGkgYWxsOg0KwqDCoMKgIFNlY3VyZSBib290IGZvciB2aXJ0dWFsIG1hY2hpbmUgTk9XQURBWVMg
+c3RhcnRzIGZyb20gZWRrMuKAmXMgdkJJT1MsIHdoaWNoIHZlcmlmaWVzIGd1ZXN0IE9T4oCZcyBz
+aGltL2dydWIyLiBUaGVuIGdydWIyIHZlcmlmaWVzIGd1ZXN0IE9T4oCZcyBrZXJuZWwuDQrjgIDj
+gIBGcm9tIHRoZSB2aWV3IG9mIHRoZSB3aG9sZSBjb21wbGV0ZSB0cnVzdCBjaGFpbiwgdGhlIEdV
+RVNUIHBhcnQgaXMgZGlzY29ubmVjdGVkIGZyb20gdGhlIEhPU1QgcGFydCwgYXMgdGhlIHZlcmlm
+aWNhdGlvbiBvZiB2QklPUyBpcyBtaXNzaW5nLCB0aGF0IGlzIHRvIHNheSwgbm8gb25lIHZlcmlm
+aWVzIHZCSU9TIGltYWdlIGZpbGUoUUVNVV9FRkkuZmQpLg0KIyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgIF9f
+X19fX19fXyAgICAgICBfX19fX19fX19fICAgICBfX19fX19fX19fXyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgfCAgICAgICAgIHxfX19fX3wg
+ICAgICAgICAgfF9fX3wgICAgICAgICAgIHwgICAgICAgIEhPU1QgcGFydCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIA0KIyAgICAgfF9SVE1fX19fX3wgICAgIHxfQklPU19fX19ffCAgIHxf
+a2VybmVsX19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgX19f
+X19fX19fXyAgICBfX19fX19fX19fXyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICB8ICAgICAgICAgIHxfX3wgICAg
+ICAgICAgIHwgICAgICAgICBHVUVTVCBwYXJ0ICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0K
+IyAgICAgICAgICAgICAgICAgICAgICB8X3ZCSU9TX19fX3wgIHxndWVzdCBrZXJuZWwgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIA0K44CA44CAVGh1cywgd2UgaGF2ZSB0byB2ZXJpZnkgdkJJT1MgaW4gb3JkZXIg
+dG8gY29tcGxldGUgdGhlIHRydXN0IGNoYWluLCBjb25uZWN0aW5nIHRoZSBob3N0IHBhcnQgd2l0
+aCB0aGUgZ3Vlc3QgcGFydC4gDQrjgIDjgIBPbmUgc29sdXRpb24gaXMgdXNpbmcgSU1BIHRvIHZl
+cmlmeSB0aGUgbGlidmlydC9xZW11IGJpbmFyaWVzIGFuZCB2QklPUyBpbWFnZSBmaWxlKFFFTVVf
+RUZJLmZkKS4NCuOAgOOAgFRoZSBvdGhlciBpcyBsZXQgSU1BIHZlcmlmeSBsaWJ2aXJ0L3FlbXUs
+IGJ1dCBsZXQgcWVtdSB2ZXJpZnkgdkJJT1MgaW1hZ2UgZmlsZSBhZnRlcndhcmRzLg0KDQrjgIDj
+gIBTb2x1dGlvbiAxOg0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0K
+IyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgIF9fX19fX19fXyAgICAgICBfX19fX19f
+X19fICAgICBfX19fX19fX19fXyAgICAgX19fX19fX19fXyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIA0KIyAgICAgfCAgICAgICAgIHxfX19fX3wgICAgICAgICAgfF9fX3wgICAgICAg
+ICAgIHxfX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAg
+ICAgfF9SVE1fX19fX3wgICAgIHxfQklPU19fX19ffCAgIHxfa2VybmVsX19fX3wgICB8X19saWJ2
+aXJ0X3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgX19fX19fX19fXyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHxfX19fX19fX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAg
+ICAgICB8X19xZW11X19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgX19fX19fX19fXyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHxfX19fX19fX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICB8X3ZCSU9TX19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IA0KCVNvbHV0aW9uIDI6DQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+DQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgX19fX19fX19fICAgICAgIF9fX19f
+X19fX18gICAgIF9fX19fX19fX19fICAgICBfX19fX19fX19fICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgDQojICAgICB8ICAgICAgICAgfF9fX19ffCAgICAgICAgICB8X19ffCAgICAg
+ICAgICAgfF9fX3wgICAgICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQoj
+ICAgICB8X1JUTV9fX19ffCAgICAgfF9CSU9TX19fX198ICAgfF9rZXJuZWxfX19ffCAgIHxfX2xp
+YnZpcnRffCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAgICAgICBfX19fX19fX19fICAgICAgIF9f
+X19fX19fX18gICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgfF9fX19fX19fX3wgICAgICAgICAgfF9fX19ffCAgICAgICAgICB8ICAgICAg
+ICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHxfX3FlbXVfX19ffCAgICAgfF92QklPU19fX198ICAgICAgICAgICAgICAgDQojICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQoNCsKgwqDC
+oCBXaGljaCBzb2x1dGlvbiBzaG91bGUgd2UgY2hvb3NlPyANCuOAgOOAgFNvbHV0aW9uIDEgc2Vl
+bXMgbXVjaCBlYXNpZXIuDQrjgIDjgIBCdXQgd2hlbiB3ZSBjb25zaWRlciBUUlVTVCBCT09UIGlu
+LCBpbiB0aGF0IHNpdHVhdGlvbiwgcWVtdSBIQVMgdG8gbWVhc3VyZSB2QklPUyBpbWFnZSwgYW5k
+IHB1dCB0aGUgbWVhc3VyZWQgdmFsdWUgaW50byB2VFBNJ3MgUENSLCB0aGF0IG1lYW5zLA0K44CA
+44CAcWVtdSBpcyByZXNwb25zaWJsZSBmb3IgbWVhc3VyaW5nIHRoZSB2QklPUyBkdXJpbmcgVFJV
+U1QgQk9PVCwgaXQgcGxheXMgYSByb2xlIHRoZXJlLg0K44CA44CAU28sIGFzIGxvbmcgYXMgcWVt
+dSBoYXMgdG8gcGxheSBhIHJvbGUgaW4gVFJVU1QgQk9PVCwgc2hhbGwgd2UgbGV0IHFlbXUgcGxh
+eSBhIHJvbGUgaW4gU0VDVVJFIEJPT1QgYXMgd2VsbD8gVXNpbmcgc29sdXNpb24gMj8NCuOAgOOA
+gA0K44CA44CAT3Igb3RoZXIgc3VnZ2VzdGlvbnM/IFRoYW5rcyENCg0K
 
