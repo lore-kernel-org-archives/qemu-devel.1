@@ -2,96 +2,78 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30375C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE40C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0A1423CD1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:44:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Owuec2Dd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A1423CD1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0EDA23CD1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:46:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0EDA23CD1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpsDX-0002zI-96
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:44:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53336)
+	id 1jpsF0-0004Ke-0A
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:46:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jpsBF-0000Mw-Hz
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:42:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27845
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jpsBC-0005Lq-K0
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:42:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593430949;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z/RkuIQuzK49gSskXus4OhUcVxCD4MLmT/3nETTyv/s=;
- b=Owuec2DdrjKp/JfadbIEt55XrdK/FTrJvRpDbEVKTfifHoGqlj+vwOQVRqz3moin40bzjy
- X1wiIk2D6Hm2AAmj7LzZmjpW8tApjL2x7Uykgx0yBepMbfFtWpz29m6StPErEVYfFVnaFV
- zwliuOzQ2z0XMN6Tutw9qxhL0c/bemQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-n2nuKfjHPUONQ-yRA55Vog-1; Mon, 29 Jun 2020 07:42:24 -0400
-X-MC-Unique: n2nuKfjHPUONQ-yRA55Vog-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54C8764AD4;
- Mon, 29 Jun 2020 11:42:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-140.ams2.redhat.com [10.36.112.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97645CF920;
- Mon, 29 Jun 2020 11:42:21 +0000 (UTC)
-Subject: Re: [PATCH v3 29/30] gitlab: limit re-builds of the containers
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200626181357.26211-1-alex.bennee@linaro.org>
- <20200626181357.26211-30-alex.bennee@linaro.org>
- <20200629100350.GF1298906@redhat.com> <87pn9irxjz.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7240239e-813c-3c4b-7886-fe5e87c9b092@redhat.com>
-Date: Mon, 29 Jun 2020 13:42:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpsEE-0003t8-BF
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:45:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45428)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpsEB-0005us-Nr
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:45:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jpsEA-00037J-Mo
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:45:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A964D2E80E7
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:45:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87pn9irxjz.fsf@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2020 11:37:18 -0000
+From: Oksana Voshchana <1885553@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ovoshchana
+X-Launchpad-Bug-Reporter: Oksana Voshchana (ovoshchana)
+X-Launchpad-Bug-Modifier: Oksana Voshchana (ovoshchana)
+Message-Id: <159343063899.16720.10693725380601772129.malonedeb@soybean.canonical.com>
+Subject: [Bug 1885553] [NEW] make-check test failed with "Segmentation fault"
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 518ca3bd2bb5491a22edc3bba698fcfdc3e7e9d9
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,62 +82,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
+Reply-To: Bug 1885553 <1885553@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/06/2020 12.11, Alex Bennée wrote:
-> 
-> Daniel P. Berrangé <berrange@redhat.com> writes:
-> 
->> On Fri, Jun 26, 2020 at 07:13:56PM +0100, Alex Bennée wrote:
->>> Most of the time we are just rebuilding the same things. We can skip
->>> this although currently there is no mechanism for picking up new
->>> distro releases.
->>>
->>> Rather than try to be too fine grained allow any change to trigger all
->>> the images being rebuilt.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>   .gitlab-ci.d/containers.yml | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
->>> index 20b2fb1de5d..f56aa44f711 100644
->>> --- a/.gitlab-ci.d/containers.yml
->>> +++ b/.gitlab-ci.d/containers.yml
->>> @@ -19,6 +19,10 @@
->>>       - docker push "$TAG"
->>>     after_script:
->>>       - docker logout
->>> +  only:
->>> +    changes:
->>> +      - .gitlab-ci.d/containers.yml
->>> +      - tests/docker/*
->>
->> How does this work for a person who forks the QEMU git repo and pushes
->> a change which doesn't touch the containers.yml file ?  AFAICT, all
->> their jobs will fail due to not having previously built any container
->> images in their brand new fork.
-> 
-> Hmm what we really need is a condition check to see if there is a local
-> registry with images in it.
+Public bug reported:
 
-Maybe it would be good enough to do something like this instead:
+While running the make-check testing on arm architecture the test failed wi=
+th error:
+"kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core =
+dumped)". Apart from that make-install test always passes.
+The problem doesn't reproduce in 100%
+qemu - from the master branch
+RHEL-8 kernel 4.18.0-221.el8.aarch64
+Logfile with an error you can to find in attachment
 
-   rules:
-     - if: '$CI_COMMIT_BRANCH == "master"'
-     - changes:
-       - .gitlab-ci.d/containers.yml
-       - tests/docker/*
+Thanks
 
-... so that the pipeline is certainly run the first time when the master 
-branch gets initialized? (I did not try it out, just had the idea after 
-looking at the gitlab CI docs)
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-  Thomas
+** Attachment added: "make_check.log"
+   https://bugs.launchpad.net/bugs/1885553/+attachment/5388127/+files/make_=
+check.log
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885553
+
+Title:
+  make-check test failed with "Segmentation fault"
+
+Status in QEMU:
+  New
+
+Bug description:
+  While running the make-check testing on arm architecture the test failed =
+with error:
+  "kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (cor=
+e dumped)". Apart from that make-install test always passes.
+  The problem doesn't reproduce in 100%
+  qemu - from the master branch
+  RHEL-8 kernel 4.18.0-221.el8.aarch64
+  Logfile with an error you can to find in attachment
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885553/+subscriptions
 
