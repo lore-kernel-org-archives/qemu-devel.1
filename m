@@ -2,96 +2,133 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22231C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E387DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:46:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EFF23E1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF9A623E1D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K330bgeW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EFF23E1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLexVHi3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF9A623E1D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpv21-0006Vy-6X
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:45:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48458)
+	id 1jpv3M-0008Ii-0I
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:46:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jpuy5-00031T-QK
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:41:09 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52762)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jpuy4-0001FI-1B
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:41:09 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q15so15631648wmj.2
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 07:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ATLAiO8uoee8c66oqfYdT1Zfnhx9V+nSe7jkQWl7mV0=;
- b=K330bgeW0TDh21sMdpaz5yV0p/OaAEHCzcgPusDNd/yVD5pFKIGY8krE7ignaTqVxm
- 6wmnVtiAP2MwLAsDwIRPA2po76+sEQFRlire4wRnc6Um4oYejrpWJPxbDHG0YQKtNK4v
- OXTMB+qw/CAoMPqf2brk/2Xl9oWXf0iQA5McKEVWnUdd2WdwQXRNCOg3yKImXmBZMcDK
- 2zcd/DOjl7w+OAbYKQdnUXQty8FPyHcNsJnQcJQtiw1Htrn9o3v5nL8nw5eZFV8t46EQ
- SC71jlrbP/910iHtZVzQu7sUdcdxtpXnwVyCiTFR2KmztHqkNkuAPi6DOxHEp7gVsNEp
- bw5A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpv2N-00076y-NQ
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:45:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47837
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpv2L-0001uQ-5m
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:45:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593441932;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=a7fecLKRKzupDlyHgNg0hIBsW9MUZ8EVKSi+Yu2PhVs=;
+ b=CLexVHi3ktV0MlNMQpX0evjTG6JhAwmYkKTEiLaWsrS10o4cZajyQsVDpj1/3PfI/ZgLB6
+ obFGoiZNa1DsMSZpM/voXUeFD9gQE7O6HCb51otwVbXUAH/U2a7G14umzvxUXngUboIh0X
+ 1564H0LM2FmQRsCjoD72acnbasusNZc=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-0jMN3RrcOf6dOodMg4Kn_g-1; Mon, 29 Jun 2020 10:45:26 -0400
+X-MC-Unique: 0jMN3RrcOf6dOodMg4Kn_g-1
+Received: by mail-ej1-f69.google.com with SMTP id lg24so10976213ejb.11
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 07:45:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ATLAiO8uoee8c66oqfYdT1Zfnhx9V+nSe7jkQWl7mV0=;
- b=jpPzxGSjSLa6ZVxhNMRIv/dHOXIGkDBXHFW2TQ4dfsDYcagKv279Itp+Iif47BY5UJ
- 8NV+XqXdTBEdVWPFxIuFMzlvldifCnt6c+f76Ad6Y+S6HkqrGAImO2do7K2g4NGPcm2n
- JUupUOiO4FahJu3wGQSEK/zbYvpl/W9afCJFPwcY84HYfdD6YmZ/IPcMS2QcesAoSjYA
- d0cb3Bsg9gTG19hJQfcKBVy+ASDaXksBtJOMXqtd7EWuJW9GznPbrgNs/PxAuZWyUoi7
- EdlfalPLCOsn5XAGozNE7RtMTiRLNdowHvTyyRbjnrwtAdlTMA4dljBNzOo6RKtOLt0x
- MiVA==
-X-Gm-Message-State: AOAM532cfXdcqbHMUtsjumxY/6ygPYSFnR0sqWY3x3KcVYPaRY09RQv7
- tIyjX5MCQAYVYbtJ2EBpZoGQpA==
-X-Google-Smtp-Source: ABdhPJyKDPiOTqf8IoPlxFpFGDCXpSmmBVkchVNsjE3zGsrjZiNCVwRV8iTsB+65cykt09cD4hnOFw==
-X-Received: by 2002:a1c:cc12:: with SMTP id h18mr16199423wmb.3.1593441665122; 
- Mon, 29 Jun 2020 07:41:05 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f14sm35907592wro.90.2020.06.29.07.41.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 07:41:03 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 248841FF7E;
- Mon, 29 Jun 2020 15:41:02 +0100 (BST)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=a7fecLKRKzupDlyHgNg0hIBsW9MUZ8EVKSi+Yu2PhVs=;
+ b=WelvB+4JOfXDlGb/G5pksO9evAVPSbNv6hos7sPUmftD/mNKdDZVY8EQUpfwsdIfg3
+ DTWMx8aYRHXnV/OMpYbh1Ip6bxDk+7aMC0nQ58tyBWA2CGeyhAcrh8zJvovs68utCMc+
+ yHmCcebi0WU7JBeef9e+FElag6Rej27jGnZZl56nBqlD5C6z7bb/+STiSj6sMT2QNa/C
+ 3oBp6phqSHr/zJke08xVD1+ONSAjTF2buMtOM1PRceokq3Q75j6myCDCcU8hrwMnZfhy
+ FFNw4k/Qfg5RLNFnY20IjVaz2DoSUC7EKXfUP9Dk/+YfXCUUb+00UNk002ddtTx/e6T1
+ 5ORg==
+X-Gm-Message-State: AOAM531U0Iy8znTd+8nZkBnhV9nziUk2o2w7kxlamgYBDkFHNmOgkEDa
+ jOfr2cJA0E5Kk26W+zW6dc6NYXRpYAXgjEoqGBQEcIZYBBGZ0Lv42MyIGcjrE8LOHkwcYHWH+f8
+ Ahj5Er6zNltIW7Nw=
+X-Received: by 2002:a17:906:a1cc:: with SMTP id
+ bx12mr13771165ejb.461.1593441925475; 
+ Mon, 29 Jun 2020 07:45:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgRfsScp2FhblNxVUgz5dNvuRzMMvI5as090uRx0eRqsaCWAFu9mruS5RnX6+qT2aoNWU4vw==
+X-Received: by 2002:a17:906:a1cc:: with SMTP id
+ bx12mr13771148ejb.461.1593441925300; 
+ Mon, 29 Jun 2020 07:45:25 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id t21sm19188162ejr.68.2020.06.29.07.45.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 29 Jun 2020 07:45:24 -0700 (PDT)
+Subject: Re: [PATCH v1 12/18] tests/vm: allow us to take advantage of MTTCG
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 References: <20200622143204.12921-1-alex.bennee@linaro.org>
  <20200622143204.12921-13-alex.bennee@linaro.org>
- <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v1 12/18] tests/vm: allow us to take advantage of MTTCG
-In-reply-to: <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
-Date: Mon, 29 Jun 2020 15:41:02 +0100
-Message-ID: <87bll2rl35.fsf@linaro.org>
+ <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org> <87bll2rl35.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <7cd0d2c8-4e3a-2c73-47d3-57f05a3fef2d@redhat.com>
+Date: Mon, 29 Jun 2020 16:45:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <87bll2rl35.fsf@linaro.org>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,54 +142,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, cota@braap.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/29/20 4:41 PM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> On 6/22/20 7:31 AM, Alex Bennée wrote:
+>>>          if kvm_available(vmcls.arch):
+>>>              return multiprocessing.cpu_count() // 2
+>>> +        elif os.uname().machine == "x86_64" and \
+>>> +             vmcls.arch in ["aarch64", "x86_64", "i386"]:
+>>> +            # MTTCG is available on these arches and we can allow more cores.
+>>> +            # But only up to a reasonable limit. User can always override
+>>> +            # these limits with --jobs.
+>>> +            return min(multiprocessing.cpu_count() // 2, 8)
+>>>          else:
+>>
+>> And if multiprocessing.cpu_count() == 1?
+>> Seems like we should add max(count, 1) as well.
+> 
+> As it also affects KVM:
+> 
+>     def get_default_jobs():
+>         if multiprocessing.cpu_count > 1:
+>             if kvm_available(vmcls.arch):
+>                 return multiprocessing.cpu_count() // 2
+>             elif os.uname().machine == "x86_64" and \
+>                  vmcls.arch in ["aarch64", "x86_64", "i386"]:
+>                 # MTTCG is available on these arches and we can allow more cores.
+>                 # But only up to a reasonable limit. User can always override
+>                 # these limits with --jobs.
+>                 return min(multiprocessing.cpu_count() // 2, 8)
+>         else:
+>             return 1
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+For this hunk:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> On 6/22/20 7:31 AM, Alex Benn=C3=A9e wrote:
->>          if kvm_available(vmcls.arch):
->>              return multiprocessing.cpu_count() // 2
->> +        elif os.uname().machine =3D=3D "x86_64" and \
->> +             vmcls.arch in ["aarch64", "x86_64", "i386"]:
->> +            # MTTCG is available on these arches and we can allow more =
-cores.
->> +            # But only up to a reasonable limit. User can always overri=
-de
->> +            # these limits with --jobs.
->> +            return min(multiprocessing.cpu_count() // 2, 8)
->>          else:
->
-> And if multiprocessing.cpu_count() =3D=3D 1?
-> Seems like we should add max(count, 1) as well.
+> 
+> 
+>>
+>>
+>> r~
+> 
+> 
 
-As it also affects KVM:
-
-    def get_default_jobs():
-        if multiprocessing.cpu_count > 1:
-            if kvm_available(vmcls.arch):
-                return multiprocessing.cpu_count() // 2
-            elif os.uname().machine =3D=3D "x86_64" and \
-                 vmcls.arch in ["aarch64", "x86_64", "i386"]:
-                # MTTCG is available on these arches and we can allow more =
-cores.
-                # But only up to a reasonable limit. User can always overri=
-de
-                # these limits with --jobs.
-                return min(multiprocessing.cpu_count() // 2, 8)
-        else:
-            return 1
-
-
->
->
-> r~
-
-
---=20
-Alex Benn=C3=A9e
 
