@@ -2,88 +2,88 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D681C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D196C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:30:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBDF823A01
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6789823B1D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:30:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C98N1+cn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBDF823A01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPasSw2g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6789823B1D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jprvG-0005MW-71
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:26:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48588)
+	id 1jprzF-0007lO-Jo
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:30:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jprtB-0001qp-FR
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:23:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21391
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jprt9-0002KA-Cr
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:23:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593429830;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jw7UiwOGIyvWhHB5Jzrchrq2TVGk+MCmncwnq0g6Xrg=;
- b=C98N1+cn5CEOM/yJ2UywpKAwChKpBz0nJ+WKapFlMfiKjU4Ut0Z3DnpnLPYAuLW9r6gpGX
- lkGevGMDvCpk5vF/da98UwrCBntjK2EfokjepD3VdwpgdFFcW6RCsClV5mfuTGyPo0N2SC
- G01xuUOdCV9T794sVGRBuRl1f5GRmts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-eZkf1yYtMIyhPLOnit8diA-1; Mon, 29 Jun 2020 07:23:47 -0400
-X-MC-Unique: eZkf1yYtMIyhPLOnit8diA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FCB0804001;
- Mon, 29 Jun 2020 11:23:47 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D7835D9DA;
- Mon, 29 Jun 2020 11:23:45 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- armbru@redhat.com
-Subject: [PATCH v4 3/3] tests/qmp-cmd-test: Add qmp/object-add-failure-modes
-Date: Mon, 29 Jun 2020 13:23:29 +0200
-Message-Id: <20200629112329.27611-4-eric.auger@redhat.com>
-In-Reply-To: <20200629112329.27611-1-eric.auger@redhat.com>
-References: <20200629112329.27611-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpryV-0007Jw-Mz
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:29:23 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38386)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpryT-0003Ht-Rm
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:29:23 -0400
+Received: by mail-ot1-x341.google.com with SMTP id t18so2320432otq.5
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 04:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=uFFEcaI48VLIrx/8geVvn4XNNeo0j4Nt3nFE9nXxT68=;
+ b=mPasSw2gxvmQMqAUe3weAc/U8E9p+zICEHJXPlMvrBkxOMS40yjc/i21neTBSk0gsv
+ ALr722yrKOQpTkzjNUfRzUSUClopN3x4ruYc8/KP7/ilJzTLLEoUlSaLqgvMA+1/34bH
+ pXsNn8pqkgFN9RDgtXDvr9Z9IxhK+zMxsQ/z//2KllUswJRhSEcBXYVvKyOe3dDPOlzP
+ qVPXRdrI3H5AgClIDIxQ9j6w8KKAi5fwqetCGxwmG6kM4wIBLvqDdioDmuu6c9abko8x
+ 51dKCRevVlmhH9bytykXUc0aHKWItVM35mryVQA/mI2iMogysaH0jBdRwqE/wcguvuaM
+ YH5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=uFFEcaI48VLIrx/8geVvn4XNNeo0j4Nt3nFE9nXxT68=;
+ b=VkXx0+5pFVt2eSXfAymhYowPx1+tSFDIjtUvlq5hLeoc4QXxqyrOboCruXpQvd2DX2
+ TYXU9QRg5bnueqSguvegFTXNVHqOu2zZiv9/Ecgcw8Or8Om/CXEyuboYFMrVQmpbcXUI
+ P9DrLrh/u9vIGeSSOoeWwKsI0y5ngFSm7GD1Ch+o/Q46VGshT4eNS1zAHMcB/4d2hWOz
+ VjHm9xskAh7/9uxey+ra6Gy6pLqqSRyGi1Df/J1/CFsrbMelO3lDV9/NWVKSDmEze/YO
+ vLZ2nMz4AnzGweqm4bGOycrmE47RWOw5NHO0VojHujCKGTMHInLjvOgNRPjcWKVsT06E
+ IisA==
+X-Gm-Message-State: AOAM5322VBGC0PY4y6TQU4zczV/R1TYc/8ADPPd7wJBeaT0J3q1SqyH3
+ BOvLrvH8fMrTnnAAo8D++g1gmRl5iRm8iU9wPdk=
+X-Google-Smtp-Source: ABdhPJzQZ+TuR+zHog2sBw7iEo1S0UqRn/+pRWDeISQ3NWV7xbovbCNBzriGsf7+Cko+XolwF8EvKKNQLy+VtUJprvM=
+X-Received: by 2002:a05:6830:1ad5:: with SMTP id
+ r21mr9308715otc.181.1593430160681; 
+ Mon, 29 Jun 2020 04:29:20 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-10-ppandit@redhat.com>
+In-Reply-To: <20200624185523.762240-10-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Jun 2020 19:28:44 +0800
+Message-ID: <CAKXe6SJHVSaEB1jfYwsiw1WjR7S7R61jkRZ4cHPXg_jfkz1FMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] memory: assert MemoryRegionOps callbacks are
+ defined
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,153 +96,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Merge the existing object-add test cases into a single test
-functions and cover more failure cases.
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B46=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=883:00=E5=86=99=E9=81=93=EF=BC=9A
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> When registering a MemoryRegionOps object, assert that its
+> read/write callback methods are defined. This avoids potential
+> guest crash via a NULL pointer dereference.
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  memory.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> Update v2: assert read/write_with_attrs methods
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg05717.html
+>
+> diff --git a/memory.c b/memory.c
+> index 2f15a4b250..3d635a1bca 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1496,7 +1496,13 @@ void memory_region_init_io(MemoryRegion *mr,
+>                             uint64_t size)
+>  {
+>      memory_region_init(mr, owner, name, size);
+> -    mr->ops =3D ops ? ops : &unassigned_mem_ops;
+> +    if (ops) {
+> +        assert(ops->read || ops->read_with_attrs);
+> +        assert(ops->write || ops->write_with_attrs);
+> +        mr->ops =3D ops;
+> +    } else {
+> +        mr->ops =3D &unassigned_mem_ops;
+> +    }
+>      mr->opaque =3D opaque;
+>      mr->terminates =3D true;
+>  }
+> @@ -1674,6 +1680,8 @@ void memory_region_init_rom_device_nomigrate(Memory=
+Region *mr,
+>  {
+>      Error *err =3D NULL;
+>      assert(ops);
+> +    assert(ops->read || ops->read_with_attrs);
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- tests/qtest/qmp-cmd-test.c | 98 +++++++++++++++++++++++++++++++++-----
- 1 file changed, 85 insertions(+), 13 deletions(-)
+Though here is not 100% right as the ROM device can has no read callback.
+However the device can change between ROMD mode or MMIO mode.
+So I think it's ok the developer can provide a null read callback even if t=
+hey
+don't need it.
 
-diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-index ceb3296691..4e755aaa95 100644
---- a/tests/qtest/qmp-cmd-test.c
-+++ b/tests/qtest/qmp-cmd-test.c
-@@ -200,25 +200,31 @@ static void add_query_tests(QmpSchema *schema)
-     }
- }
- 
--static void test_object_add_without_props(void)
-+static void test_object_add_failure_modes(void)
- {
-     QTestState *qts;
-     QDict *resp;
- 
-+    /* attempt to create an object without props */
-     qts = qtest_init(common_args);
-     resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-                     " {'qom-type': 'memory-backend-ram', 'id': 'ram1' } }");
-     g_assert_nonnull(resp);
-     qmp_assert_error_class(resp, "GenericError");
--    qtest_quit(qts);
--}
- 
--static void test_object_add_with_duplicate_id(void)
--{
--    QTestState *qts;
--    QDict *resp;
-+    /* attempt to create an object without qom-type */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
- 
--    qts = qtest_init(common_args);
-+    /* attempt to delete an object that does not exist */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
-+
-+    /* attempt to create 2 objects with duplicate id */
-     resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-                     " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
-     g_assert_nonnull(resp);
-@@ -227,6 +233,75 @@ static void test_object_add_with_duplicate_id(void)
-                     " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
-     g_assert_nonnull(resp);
-     qmp_assert_error_class(resp, "GenericError");
-+
-+    /* delete ram1 object */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* attempt to create an object with a property of a wrong type */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': '4294967296' } } }");
-+    g_assert_nonnull(resp);
-+    /* now do it right */
-+    qmp_assert_error_class(resp, "GenericError");
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* delete ram1 object */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* attempt to create an object without the id */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'props': {'size': '4294967296' } } }");
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
-+    /* now do it right */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* delete ram1 object */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* attempt to set a non existing property */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'sized': 4294967296 } } }");
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
-+    /* now do it right */
-+    resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1', 'props': {'size': 4294967296 } } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* delete ram1 object without id */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'ida': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+
-+    /* delete ram1 object */
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    g_assert(qdict_haskey(resp, "return"));
-+
-+    /* delete ram1 object that does not exist anymore*/
-+    resp = qtest_qmp(qts, "{'execute': 'object-del', 'arguments':"
-+                    " {'id': 'ram1' } }");
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
-+
-     qtest_quit(qts);
- }
- 
-@@ -240,11 +315,8 @@ int main(int argc, char *argv[])
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
- 
--    qtest_add_func("qmp/object-add-without-props",
--                   test_object_add_without_props);
--    qtest_add_func("qmp/object-add-duplicate-id",
--                   test_object_add_with_duplicate_id);
--    /* TODO: add coverage of generic object-add failure modes */
-+    qtest_add_func("qmp/object-add-failure-modes",
-+                   test_object_add_failure_modes);
- 
-     ret = g_test_run();
- 
--- 
-2.20.1
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
+
+> +    assert(ops->write || ops->write_with_attrs);
+>      memory_region_init(mr, owner, name, size);
+>      mr->ops =3D ops;
+>      mr->opaque =3D opaque;
+> --
+> 2.26.2
+>
 
