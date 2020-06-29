@@ -2,89 +2,96 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E03C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43973C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:08:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 063C325584
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DA0925584
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:08:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOVGDl9S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063C325584
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t8/NupSL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DA0925584
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpwJT-0007Y8-8t
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:07:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43744)
+	id 1jpwKX-0000CR-A4
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:08:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jpwF2-0003Iy-GC
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:02:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44850
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jpwEy-00006d-PM
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:02:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593446559;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IgnWzIplglTMmsrRpF0Pu+Pu7Lafz3+3ZP18OW9i2RE=;
- b=QOVGDl9S9phzhKfysPqBqnQL6Vs8tKuKpLYq2jo8GnbOrziyeKK6CCn9DiOlH4CtTcJjDC
- HKwsR06S2xlFHyL6OmZ3gA+ZlrwFjlyI6xG2LhY+ZsVq0+xMo1YtWLbU7DC4k21MLlSnsP
- lNdnbeMQ7n9Xjh+9BshpLr6qP6bDARU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-RKFfgpavOuG-qceDpXWrlA-1; Mon, 29 Jun 2020 12:02:11 -0400
-X-MC-Unique: RKFfgpavOuG-qceDpXWrlA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2DA18015FD;
- Mon, 29 Jun 2020 16:02:10 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9017B70915;
- Mon, 29 Jun 2020 16:02:04 +0000 (UTC)
-Subject: Re: [PATCH v2 3/3] scsi-disk: Add support for the GET LBA STATUS 16
- command
-To: Stefan Hajnoczi <stefanha@gmail.com>, Lin Ma <LMa@suse.com>
-References: <AM6PR04MB578290CA80CC6000756C4C0EC5920@AM6PR04MB5782.eurprd04.prod.outlook.com>
- <20200629103948.GF31392@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <556bd179-71b5-cbe7-1d8b-eff20e70a7c0@redhat.com>
-Date: Mon, 29 Jun 2020 11:02:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jpwFu-00046n-K1
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:03:38 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:36889)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jpwFs-0000Fc-3R
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:03:38 -0400
+Received: by mail-wr1-x432.google.com with SMTP id a6so17092905wrm.4
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:03:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=HwyPxTQQ5I1ijdgU0FZDIXSsnP4Nm69LJMsIKdswmE8=;
+ b=t8/NupSLtY8WIgF1OVzrmQJwMkyEkPaFuOib6K4JC7mQnPhODsiIe1bN1y5OsXKhiY
+ 4DBZdCZBieydKDS0eRys6ZR0p7Xc4ahv0+WYeQfQD4RKsWltLRC8gXEQhtloLZV0egZr
+ P29Fw/o251kBzYdo6LrhZE0fQMzC06YSZqlpeJRMh/vU8FF03aks0IBbH0IiWKATe5/E
+ qmwjPtT1ji8Uv0eDCYW3JOmhiAwgd3gy7hYtJjaUhcc2XyPdgpp8WHETLKJmQ0jaUOjt
+ r2Eq1naunTxnCxP6iGUQSVS7kJUSWU2Uz7FLzSXEKSQbTpx4L1eFGHF1HLLDF1NoIrzN
+ i4fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=HwyPxTQQ5I1ijdgU0FZDIXSsnP4Nm69LJMsIKdswmE8=;
+ b=qByHKxydm6krVg3wYS9ENXS4G+44s4qab9qFcEA1NkJQkUgTGycPVkG60tQTTVf/0I
+ Aq/my8yhxBLY4ACoApBm6PGk3EM7IQZvOQUI+VtLSDfx9Y5aRZZ9ZjghMHrD3VFqAM5K
+ Sz618jjZ50CMgA4mwYkpxRHZLs4zQspEmLLfeb5FxgcwQydDak4p0M9aSGe+2raQQnu8
+ pqdkAyFO/fGiIzyl8Bh0fCEJzho8p0GS8N1/u9+L09QLWqNexXqL8mHb6+r88HaqjAqx
+ 3dczVolzAgNaLmU/sJoRM6boLHqeyQbMWgvV/rBpMDSe0xExFrXsURzFCdlJlI3886rQ
+ h27Q==
+X-Gm-Message-State: AOAM532zB8ssC3r6LegFGZ9WXLJitDnKKGnOXYbb40VfW54Bp9RINr6R
+ aFIjYUIhs4gdKeMU1HcA3P09Fg==
+X-Google-Smtp-Source: ABdhPJyUtZbvESiR1zaqWHHxNpWw2vIdV5tto8sryiv64KpwHJ+tla6vpSZdPkfWse0AjIXDK0qk4Q==
+X-Received: by 2002:a5d:424f:: with SMTP id s15mr7539530wrr.342.1593446612530; 
+ Mon, 29 Jun 2020 09:03:32 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k126sm321210wmf.3.2020.06.29.09.03.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 09:03:31 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 47CAF1FF7E;
+ Mon, 29 Jun 2020 17:03:30 +0100 (BST)
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+In-reply-to: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+Date: Mon, 29 Jun 2020 17:03:30 +0100
+Message-ID: <878sg5svu5.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200629103948.GF31392@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x432.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,75 +104,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 5:39 AM, Stefan Hajnoczi wrote:
 
->>> SCSI defines 3 values and QEMU can represent all of them:
->>>
->>> 0 - mapped or unknown
->>> 1 - deallocated
->>> 2 - anchored
->>>
->>> See the BDRV_BLOCK_* constants in include/block/block.h. The
->>> is_deallocated boolean is not enough to represent this state, but the
->>> bdrv_block_status() return value can be used instead.
->>
->> I don't know which one in BDRV_BLOCK_* can be used to represent 'anchored'.
->> It seems that I need to use BDRV_BLOCK_* combination to recognized 'anchored',
->>
->> I'd like to use these combinations to analyze the bdrv_block_status() return value:
->> 'deallocated': BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_ZERO
->> 'anchored':    BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_OFFSET_VALID | ! BDRV_BLOCK_ZERO | ! BDRV_BLOCK_DATA
->> Am I right?
-> 
-> My understanding is that the SCSI status are mapped to QEMU block status
-> as follows:
-> 
-> allocated: BDRV_BLOCK_DATA | !BDRV_BLOCK_ZERO | BDRV_BLOCK_OFFSET_VALID
+Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
 
-I haven't read the scsi code, but as written, I would assume that any 
-portion of the block status with this result has the following properties:
-- reading sees guest-visible data; we cannot guarantee whether it is all 
-zero, and the data reserves actual space
+> Hi,
+>
+> The second report of the TCG Continuous Benchmarking series builds
+> upon the QEMU performance metrics calculated in the previous report.
+> This report presents a method to dissect the number of instructions
+> executed by a QEMU invocation into three main phases:
+> - Code Generation
+> - JIT Execution
+> - Helpers Execution
+> It devises a Python script that automates this process.
+>
+> After that, the report presents an experiment for comparing the
+> output of running the script on 17 different targets. Many conclusions
+> can be drawn from the results and two of them are discussed in the
+> analysis section.
 
-> anchored: BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO | BDRV_BLOCK_OFFSET_VALID
+A couple of comments. One think I think is missing from your analysis is
+the total number of guest instructions being emulated. As you point out
+each guest will have different code efficiency in terms of it's
+generated code.
 
-- reading sees all zeros, but the disk has reserved actual space such 
-that future writes will not run out of space
+Assuming your test case is constant execution (i.e. runs the same each
+time) you could run in through a plugins build to extract the number of
+guest instructions, e.g.:
 
-> deallocated: !BDRV_BLOCK_DATA
+  ./aarch64-linux-user/qemu-aarch64 -plugin tests/plugin/libinsn.so -d plug=
+in ./tests/tcg/aarch64-linux-user/sha1
+  SHA1=3D15dd99a1991e0b3826fede3deffc1feba42278e6
+  insns: 158603512
 
-- reading does not see data; future writes will have to reserve space. 
-I would expect this option might also have '| BDRV_BLOCK_ZERO' depending 
-on whether this particular scsi device guarantees that reads of an 
-unallocated portion see all zeros instead of unspecified garbage.
+I should have also pointed out in your last report that running FP heavy
+code will always be biased towards helper/softfloat code to the
+detriment of everything else. I think you need more of a mix of
+benchmarks to get a better view.
 
-> 
-> I have CCed Eric Blake, who is familiar with block status.
+When Emilio did the last set of analysis he used a suite he built out of
+nbench and a perl benchmark:
 
-Adding Vladimir in CC as well, as he has pending patches that try to 
-clear up the use of BDRV_BLOCK_* constants with regards to two different 
-queries:
-- allocation implies that data comes from this layer of a backing chain, 
-rather than deferring to a backing image
-- allocation implies that storage is reserved (that is, not sparse)
+  https://github.com/cota/dbt-bench
 
-It sounds like we are trying to represent the second question for scsi 
-(namely, the same question that gets answered by lseek(SEEK_HOLE) for 
-POSIX files), and not the first (namely, the question answered for qcow2 
-images).
+As he quoted in his README:
+
+  NBench programs are small, with execution time dominated by small code
+  loops. Thus, when run under a DBT engine, the resulting performance
+  depends almost entirely on the quality of the output code.
+
+  The Perl benchmarks compile Perl code. As is common for compilation
+  workloads, they execute large amounts of code and show no particular
+  code execution hotspots. Thus, the resulting DBT performance depends
+  largely on code translation speed.
+=20=20
+by only having one benchmark you are going to miss out on the envelope
+of use cases.
+
+>
+> Report link:
+>https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Dissecting-QEMU-In=
+to-Three-Main-Parts/
+>
+> Previous reports:
+> Report 1 - Measuring Basic Performance Metrics of QEMU:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
+>
+> Best regards,
+> Ahmed Karaman
 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+--=20
+Alex Benn=C3=A9e
 
