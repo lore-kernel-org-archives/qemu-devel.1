@@ -2,125 +2,98 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F54C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53849C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0749233A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:12:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E6B6233A2
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:13:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LrImMJ3H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0749233A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n61m2Ito"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E6B6233A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jppqE-0000fm-4j
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:12:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41360)
+	id 1jppr8-0001kZ-Be
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:13:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jpppO-0008CX-7T; Mon, 29 Jun 2020 05:11:50 -0400
-Received: from mail-eopbgr70114.outbound.protection.outlook.com
- ([40.107.7.114]:51768 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jpppL-0004S0-Kf; Mon, 29 Jun 2020 05:11:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KYgXwE368yBXltjI9RvL9gPp3qM3y4LAos7YoVMdHQejCV5EVM84ZDNGd41p+eSAJZB9zUvOl+Xl5jgOS7wt1NA+8VoT8/zCA/pusMdzajTqzF9vTQIgQm0w3B9n1vk7stclXWa2GQKCuBep7LZlrkKyMrsNvYRdnqm/NybD3QZcpqhVkbT+6v+raF1DCNiYKGqbA3Wp0ZyjB4PXYAYI07DpzcEv1RyQ6nGyEjJpuh6qDzD79VRXH9Fg7ALkwU2FzIdz6uzDRQwol8pHDmyUOSIkvHFhKa+98ySkR3rEG906hH9o6+W0+H+uBDAFm6d638M0nNSVFIV9BeiYS7NqXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H9CknoeUlfTJPdxiAsrrvxN5uNitvPtRMqrEVvo4mZ4=;
- b=OdmSe2XHpvK54Xg3S5ZzmblGTW6f2/1hxaFNCZxvxbHdKo/TbD5EqOhsvhshrstMf2LsZgrOug3oMiPY1zklPoZyT5poeE5giYs6ndqNtIye7MB5KVIeDg6f2h6/9EgMBciAOCHTr3ctq01CbK+WzlAKi07dodyuw4J/CHgs8nCLrTwgGDvB4yvwZg3zBbbpKihj92gf99Yr9AY3/ypkoVTk7qJcfzZe/NUyBQ9S1FcFi2vf2Gwo7CcpLa1fmPpzRIiS0JLve9Bntq79SXPEjiohAFUmsEfukuDAHs68fT1aqWxfBiZ2Eu8DPhktCI9grlH+qKwYMUhkZQjQmZbAzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H9CknoeUlfTJPdxiAsrrvxN5uNitvPtRMqrEVvo4mZ4=;
- b=LrImMJ3HWsuPPu0XmlfZZetdaCPQ5sP7TorAWxX3GruVxa5T3h4AzgbdJZs1i83ewA2/ZUwKcmt0nR+cFr11tLB9mSl8ZDHe/2bek8ljPgeMkGGQFPwwbP4ziGuYelVLHBauvuzkPd2hYpCrhD226XBPL8WVEjJaNiuhametKGc=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0802MB2420.eurprd08.prod.outlook.com (2603:10a6:203:9e::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21; Mon, 29 Jun
- 2020 09:11:44 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.026; Mon, 29 Jun 2020
- 09:11:44 +0000
-Subject: Re: [PATCH 10/46] qemu-option: Check return value instead of @err
- where convenient
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-11-armbru@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f8e32618-ff39-d505-9d49-1eddf71d364e@virtuozzo.com>
-Date: Mon, 29 Jun 2020 12:11:42 +0300
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jppq7-0000lY-VT; Mon, 29 Jun 2020 05:12:35 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54370)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jppq6-0004f7-3F; Mon, 29 Jun 2020 05:12:35 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o8so14639329wmh.4;
+ Mon, 29 Jun 2020 02:12:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ApZXEQ9IfNTdFDkZRhqnYOjG2XQP5mNGjswWoDZuxFM=;
+ b=n61m2ItoB5Pzbe54wa4r/mMx4KQIbSYJS0KJqL2SFahcBxaMigWVN32KymQJULRx2f
+ Zkcq0d2atOrEHxbt+T/PSyUleammRwDFYsCpcz/tqliDTrwCE/1p6jO4EeasV0zkEabX
+ sUodDTs4q7gTuoFj3fUMu9TIa+OwXmEfT/YPHBAjc1omGa4dHGrn9/FGicMJOYtJiNXH
+ KPW3cUggkTtxwSzPMFb2KffW3bCnl6L7oM+H6zSPHuK7IDH+dqfwC1zBdRLf8/HbhMcW
+ WPfRvtMxsUB+LLVqDlopWw7uHqX489zzVUBR493c4GvpcEUE2/bCsO6epbLMah+NDPi1
+ mYKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ApZXEQ9IfNTdFDkZRhqnYOjG2XQP5mNGjswWoDZuxFM=;
+ b=BMimckGyXa66cje+2KCioIlSg4IlN/4yKscQ6BxtMEjgdHZQ8wQ0dRr6kj2NvD5n7o
+ RPiu+y7aCIZJN8hbI/Q7ADQReGQRk9pYk6qKYVs+8kxmjcKaCDhq/Pb0hzqJFvpdRFAH
+ jh0adJZ5roYfNPCPxw0frnyLyNQZT21TWFQD65hRb+PtcaxiOcsY85zL358ZbDn2z6k4
+ Z7MB31qKqEjlabMlNiFVfpJNaBOPJKugONJL2enxwnCbHz1+eSuuqPgncLpfsnhNPRE1
+ oV0L9JTaUEm0DLMaiBUUhBs2w5ahfoudkHbhCL9amDGGw4SNnMMZTkMGwYfrc3huXN0g
+ 87DQ==
+X-Gm-Message-State: AOAM533s5AbIBZdCvh6aqHR0yxQtEfyv4h0Ar9+E1dCbzwm6atj/AAcK
+ jk+9KyPywMXSzbgp8IFGC4Q=
+X-Google-Smtp-Source: ABdhPJw/n2Df1DMK9bfEy7qf90bkZthF7yGJhtiav9939vS67Dq1GHVHaEDe+o3Rj6Y3DCw4gd52PQ==
+X-Received: by 2002:a1c:a4c6:: with SMTP id
+ n189mr15354256wme.173.1593421951805; 
+ Mon, 29 Jun 2020 02:12:31 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id d13sm32475764wrn.61.2020.06.29.02.12.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 29 Jun 2020 02:12:31 -0700 (PDT)
+Subject: Re: [PATCH 12/17] hw/arm/spitz: Encapsulate misc GPIO handling in a
+ device
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200628142429.17111-1-peter.maydell@linaro.org>
+ <20200628142429.17111-13-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <75bf7670-2916-be90-0d48-c12d2277d863@amsat.org>
+Date: Mon, 29 Jun 2020 11:12:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-In-Reply-To: <20200624164344.3778251-11-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.28) by
- FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3131.21 via Frontend Transport; Mon, 29 Jun 2020 09:11:43 +0000
-X-Originating-IP: [185.215.60.28]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a78d9fa6-8228-4fde-e9dd-08d81c0c7172
-X-MS-TrafficTypeDiagnostic: AM5PR0802MB2420:
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB24202DF3168744D9DE2FABF0C16E0@AM5PR0802MB2420.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1079;
-X-Forefront-PRVS: 044968D9E1
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: S7VURj6iM21mEhkspzMFbxQU8bOh2bm9vzZT4WTvKU4TRptXqZJWesRxmIzStjfPOAxtZ7lxNsZp6wwvmxB2M5rhDEddVQ6eeAk4yIBovEkbCnczUnseeAyLeXrhIlmh6hszVlYqLjrhFmYBf6Cj31Hbo8+DKY741ZUp6Jq59V+xnOxOMy0KUUrffpqzuSJ/j/8Ho59+fveBG4VG1H5O3Z1zOCT27MB6iJ82jbXD606yNzYqpREPNhF6m9mywPInvr1RGDh8hNAirUjFFwsc11sLk6cUBMg/1JOEY/xwaIaPDIqwLGBHUa9KjnAiobEecofSkwLUjfUuBKJXlPo/V3Yad18QzbwWiCrKpBEqF7tKGBKrS+lJwmYj1BRlpoR5
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(366004)(39840400004)(136003)(346002)(376002)(36756003)(31686004)(8676002)(66946007)(8936002)(31696002)(66476007)(66556008)(956004)(2616005)(186003)(16526019)(26005)(83380400001)(5660300002)(52116002)(2906002)(86362001)(478600001)(4326008)(16576012)(316002)(6486002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 4OwbMkXNQCQ3XSUN/KErFzp3yI4i4w/w0PFh7LyDkQCehQt7bU364Oh1VlyLI21GmmUl2sbSEdnLHxlKouFO5mAuP0iU/UCnxXCp03Lh5+KSGtLMAysqJbBmGBYUmg6c/jl7eAQaT7Vd0LqWUj2h0g6FkpMmebefacKUgA3ELojkpkJglwPMBvVI92DCz2F3bxS+086M4Yirq15f4gTP9+WwXR7Km34GdMvx3F0T9kcOlwV9iS9Aea4RSJtnzTX9ndCJI9d30y0ReNnSXvP4ChcPTHTByQscqGoCpI9v5Kgm7NMHv4QSfKCdx4gASrpg3du7IBR/PkTeeI5YjfJ0c5QiF3OIpMAiN4kICLEqi82aAAFuK1YMzu3ofyXcNf8URRhzm99nYnzWNuMFZskWauXcHiJ9kt/OYgrGKLEfW827TSo8UbEqBlnFl4gkyObFiAt/t3lrd4fOZ2APwNCqGBR6UTu790xT5RjoGUyaR4k=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a78d9fa6-8228-4fde-e9dd-08d81c0c7172
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2020 09:11:44.2950 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7hdtDjzwjPHQk/5UnPaoppcpqIXrmmST72RnisWqtfl4dReEijWFBrHiKo1vnE724S1D+bR84ytw/q+3xiKc2I/PuN8NU2wbMMIQUp4Alr8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2420
-Received-SPF: pass client-ip=40.107.7.114;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 05:11:45
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200628142429.17111-13-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,64 +106,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, peter.maydell@linaro.org
+Cc: Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24.06.2020 19:43, Markus Armbruster wrote:
-> Convert uses like
+On 6/28/20 4:24 PM, Peter Maydell wrote:
+> Currently we have a free-floating set of IRQs and a function
+> spitz_out_switch() which handle some miscellaneous GPIO lines for the
+> spitz board.  Encapsulate this behaviour in a simple QOM device.
 > 
->      opts = qemu_opts_create(..., &err);
->      if (err) {
->          ...
->      }
+> At this point we can finally remove the 'max1111' global, because the
+> ADC battery-temperature value is now handled by the misc-gpio device
+> writing the value to its outbound "adc-temp" GPIO, which the board
+> code wires up to the appropriate inbound GPIO line on the max1111.
 > 
-> to
+> This commit also fixes Coverity issue CID 1421913 (which pointed out
+> that the 'outsignals' in spitz_scoop_gpio_setup() were leaked),
+> because it removes the use of the qemu_allocate_irqs() API from this
+> code entirely.
 > 
->      opts = qemu_opts_create(..., &err);
->      if (!opts) {
->          ...
->      }
-> 
-> Eliminate error_propagate() that are now unnecessary.  Delete @err
-> that are now unused.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->   block/parallels.c  |  4 ++--
->   blockdev.c         |  5 ++---
->   qdev-monitor.c     |  6 ++----
->   util/qemu-config.c | 10 ++++------
->   util/qemu-option.c | 12 ++++--------
->   5 files changed, 14 insertions(+), 23 deletions(-)
+>  hw/arm/spitz.c | 129 +++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 87 insertions(+), 42 deletions(-)
 > 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index 860dbb80a2..b15c9ac28d 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
-> @@ -823,8 +823,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
->           }
->       }
->   
-> -    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, &local_err);
-> -    if (local_err != NULL) {
-> +    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, errp);
-> +    if (!opts) {
->           goto fail_options;
->       }
-
-Honestly, I don't like this hunk. as already complicated code (crossing gotos) becomes more
-complicated (add one more pattern to fail_options path: no-op error_propagate).
-
-At least, we'll need a follow-up patch, refactoring parallels_open() to drop "fail_options"
-label completely.
-
-Still, it should work and the rest is fine, so:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
+> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+> index 1400a56729d..bab9968ccee 100644
+> --- a/hw/arm/spitz.c
+> +++ b/hw/arm/spitz.c
+> @@ -51,6 +51,7 @@ typedef struct {
+>      DeviceState *max1111;
+>      DeviceState *scp0;
+>      DeviceState *scp1;
+> +    DeviceState *misc_gpio;
+>  } SpitzMachineState;
+>  
+>  #define TYPE_SPITZ_MACHINE "spitz-common"
+> @@ -658,8 +659,6 @@ static void spitz_lcdtg_realize(SSISlave *ssi, Error **errp)
+>  #define SPITZ_GPIO_MAX1111_CS   20
+>  #define SPITZ_GPIO_TP_INT       11
+>  
+> -static DeviceState *max1111;
+> -
+>  /* "Demux" the signal based on current chipselect */
+>  typedef struct {
+>      SSISlave ssidev;
+> @@ -695,18 +694,6 @@ static void corgi_ssp_gpio_cs(void *opaque, int line, int level)
+>  #define SPITZ_BATTERY_VOLT      0xd0    /* About 4.0V */
+>  #define SPITZ_CHARGEON_ACIN     0x80    /* About 5.0V */
+>  
+> -static void spitz_adc_temp_on(void *opaque, int line, int level)
+> -{
+> -    int batt_temp;
+> -
+> -    if (!max1111)
+> -        return;
+> -
+> -    batt_temp = level ? SPITZ_BATTERY_TEMP : 0;
+> -
+> -    qemu_set_irq(qdev_get_gpio_in(max1111, MAX1111_BATT_TEMP), batt_temp);
+> -}
+> -
+>  static void corgi_ssp_realize(SSISlave *d, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(d);
+> @@ -734,7 +721,6 @@ static void spitz_ssp_attach(SpitzMachineState *sms)
+>  
+>      bus = qdev_get_child_bus(sms->mux, "ssi2");
+>      sms->max1111 = qdev_new(TYPE_MAX_1111);
+> -    max1111 = sms->max1111;
+>      qdev_prop_set_uint8(sms->max1111, "input1" /* BATT_VOLT */,
+>                          SPITZ_BATTERY_VOLT);
+>      qdev_prop_set_uint8(sms->max1111, "input2" /* BATT_TEMP */, 0);
+> @@ -810,27 +796,66 @@ static void spitz_akita_i2c_setup(PXA2xxState *cpu)
+>  
+>  /* Other peripherals */
+>  
+> -static void spitz_out_switch(void *opaque, int line, int level)
+> +/*
+> + * Encapsulation of some miscellaneous GPIO line behaviour for the Spitz boards.
+> + *
+> + * QEMU interface:
+> + *  + named GPIO inputs "green-led", "orange-led", "charging", "discharging":
+> + *    these currently just print messages that the line has been signalled
+> + *  + named GPIO input "adc-temp-on": set to cause the battery-temperature
+> + *    value to be passed to the max111x ADC
+> + *  + named GPIO output "adc-temp": the ADC value, to be wired up to the max111x
+> + */
+> +#define TYPE_SPITZ_MISC_GPIO "spitz-misc-gpio"
+> +#define SPITZ_MISC_GPIO(obj) \
+> +    OBJECT_CHECK(SpitzMiscGPIOState, (obj), TYPE_SPITZ_MISC_GPIO)
+> +
+> +typedef struct SpitzMiscGPIOState {
+> +    SysBusDevice parent_obj;
+> +
+> +    qemu_irq adc_value;
+> +} SpitzMiscGPIOState;
+> +
+> +static void spitz_misc_charging(void *opaque, int n, int level)
+>  {
+> -    switch (line) {
+> -    case 0:
+> -        zaurus_printf("Charging %s.\n", level ? "off" : "on");
+> -        break;
+> -    case 1:
+> -        zaurus_printf("Discharging %s.\n", level ? "on" : "off");
+> -        break;
+> -    case 2:
+> -        zaurus_printf("Green LED %s.\n", level ? "on" : "off");
+> -        break;
+> -    case 3:
+> -        zaurus_printf("Orange LED %s.\n", level ? "on" : "off");
+> -        break;
+> -    case 6:
+> -        spitz_adc_temp_on(opaque, line, level);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -    }
+> +    zaurus_printf("Charging %s.\n", level ? "off" : "on");
+> +}
+> +
+> +static void spitz_misc_discharging(void *opaque, int n, int level)
+> +{
+> +    zaurus_printf("Discharging %s.\n", level ? "off" : "on");
+> +}
+> +
+> +static void spitz_misc_green_led(void *opaque, int n, int level)
+> +{
+> +    zaurus_printf("Green LED %s.\n", level ? "off" : "on");
+> +}
+> +
+> +static void spitz_misc_orange_led(void *opaque, int n, int level)
+> +{
+> +    zaurus_printf("Orange LED %s.\n", level ? "off" : "on");
+> +}
+> +
+> +static void spitz_misc_adc_temp(void *opaque, int n, int level)
+> +{
+> +    SpitzMiscGPIOState *s = SPITZ_MISC_GPIO(opaque);
+> +    int batt_temp = level ? SPITZ_BATTERY_TEMP : 0;
+> +
+> +    qemu_set_irq(s->adc_value, batt_temp);
+> +}
+> +
+> +static void spitz_misc_gpio_init(Object *obj)
+> +{
+> +    SpitzMiscGPIOState *s = SPITZ_MISC_GPIO(obj);
+> +    DeviceState *dev = DEVICE(obj);
+> +
+> +    qdev_init_gpio_in_named(dev, spitz_misc_charging, "charging", 1);
+> +    qdev_init_gpio_in_named(dev, spitz_misc_discharging, "discharging", 1);
+> +    qdev_init_gpio_in_named(dev, spitz_misc_green_led, "green-led", 1);
+> +    qdev_init_gpio_in_named(dev, spitz_misc_orange_led, "orange-led", 1);
+> +    qdev_init_gpio_in_named(dev, spitz_misc_adc_temp, "adc-temp-on", 1);
+> +
+> +    qdev_init_gpio_out_named(dev, &s->adc_value, "adc-temp", 1);
+>  }
+>  
+>  #define SPITZ_SCP_LED_GREEN             1
+> @@ -850,12 +875,22 @@ static void spitz_out_switch(void *opaque, int line, int level)
+>  
+>  static void spitz_scoop_gpio_setup(SpitzMachineState *sms)
+>  {
+> -    qemu_irq *outsignals = qemu_allocate_irqs(spitz_out_switch, sms->mpu, 8);
+> +    DeviceState *miscdev = sysbus_create_simple(TYPE_SPITZ_MISC_GPIO, -1, NULL);
+>  
+> -    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_CHRG_ON, outsignals[0]);
+> -    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_JK_B, outsignals[1]);
+> -    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_LED_GREEN, outsignals[2]);
+> -    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_LED_ORANGE, outsignals[3]);
+> +    sms->misc_gpio = miscdev;
+> +
+> +    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_CHRG_ON,
+> +                          qdev_get_gpio_in_named(miscdev, "charging", 0));
+> +    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_JK_B,
+> +                          qdev_get_gpio_in_named(miscdev, "discharging", 0));
+> +    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_LED_GREEN,
+> +                          qdev_get_gpio_in_named(miscdev, "green-led", 0));
+> +    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_LED_ORANGE,
+> +                          qdev_get_gpio_in_named(miscdev, "orange-led", 0));
+> +    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_ADC_TEMP_ON,
+> +                          qdev_get_gpio_in_named(miscdev, "adc-temp-on", 0));
+> +    qdev_connect_gpio_out_named(miscdev, "adc-temp", 0,
+> +                                qdev_get_gpio_in(sms->max1111, MAX1111_BATT_TEMP));
+>  
+>      if (sms->scp1) {
+>          qdev_connect_gpio_out(sms->scp1, SPITZ_SCP2_BACKLIGHT_CONT,
+> @@ -863,8 +898,6 @@ static void spitz_scoop_gpio_setup(SpitzMachineState *sms)
+>          qdev_connect_gpio_out(sms->scp1, SPITZ_SCP2_BACKLIGHT_ON,
+>                                qdev_get_gpio_in_named(sms->lcdtg, "bl_power", 0));
+>      }
+> -
+> -    qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_ADC_TEMP_ON, outsignals[6]);
+>  }
+>  
+>  #define SPITZ_GPIO_HSYNC                22
+> @@ -1217,12 +1250,24 @@ static const TypeInfo spitz_lcdtg_info = {
+>      .class_init    = spitz_lcdtg_class_init,
+>  };
+>  
+> +static const TypeInfo spitz_misc_gpio_info = {
+> +    .name = TYPE_SPITZ_MISC_GPIO,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(SpitzMiscGPIOState),
+> +    .instance_init = spitz_misc_gpio_init,
+> +    /*
+> +     * No class_init required: device has no internal state so does not
+> +     * need to set up reset or vmstate, and does not have a realize method.
+> +     */
+> +};
+> +
+>  static void spitz_register_types(void)
+>  {
+>      type_register_static(&corgi_ssp_info);
+>      type_register_static(&spitz_lcdtg_info);
+>      type_register_static(&spitz_keyboard_info);
+>      type_register_static(&sl_nand_info);
+> +    type_register_static(&spitz_misc_gpio_info);
+>  }
+>  
+>  type_init(spitz_register_types)
+> 
 
