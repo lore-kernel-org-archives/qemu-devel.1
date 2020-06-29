@@ -2,170 +2,83 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2704FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F65CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5A6823B32
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:32:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxaLjf0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A6823B32
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 455ED23B32
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:34:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455ED23B32
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpuq3-000426-3i
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:32:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45336)
+	id 1jpurZ-0005up-JC
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jpuoA-0002zG-Vj
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:30:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49023
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jpuo8-0007uK-2o
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:30:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593441051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=C9MS/b5KmGlwLsaI5WxhXTCh3ZJcbkYOtrAKqg+yD8M=;
- b=MxaLjf0GLuhHnwibrt38WZzheZ0iiCvVHQi78gNBEVSKly50i9wXhvk1w9ah//95ZLBdtR
- XkW5VBGKBewI9q2a0DHvL8uvK9WYvlhoFMsBj2VkqYiJ3KHvdUNp3aCxlHexRlg3SknvJe
- sSOstPUobQ0nLPCv4c/88keoGZk+DAU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-PJgoTqy1OMeZtoZkHXAJnA-1; Mon, 29 Jun 2020 10:30:33 -0400
-X-MC-Unique: PJgoTqy1OMeZtoZkHXAJnA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FC62879512;
- Mon, 29 Jun 2020 14:30:32 +0000 (UTC)
-Received: from [10.10.119.184] (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C83177166E;
- Mon, 29 Jun 2020 14:30:27 +0000 (UTC)
-Subject: Re: [PATCH v4 00/16] python: add mypy support to python/qemu
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
-References: <20200626204133.14500-1-jsnow@redhat.com>
- <f7c36cc7-e05c-65cc-b6be-9da8d136b295@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <1adf70db-e9d4-a5ab-d28b-f57956877956@redhat.com>
-Date: Mon, 29 Jun 2020 10:30:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpuo8-0002xq-P1
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:30:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55604)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpuo5-0007ra-WA
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:30:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jpuo2-00012e-7y
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C6BCD2E810C
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:30:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f7c36cc7-e05c-65cc-b6be-9da8d136b295@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- WEIRD_PORT=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2020 14:23:12 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1863333@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
+ assignee=philmd@redhat.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson mprivozn
+X-Launchpad-Bug-Reporter: =?utf-8?q?Michal_Pr=C3=ADvozn=C3=ADk_=28mprivozn?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158169737821.29590.14612222914203628319.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159344059349.3589.18045030163646637986.launchpad@wampee.canonical.com>
+Subject: [Bug 1863333] Re: Assigning NVMe disk to a domain causes VFIO_MAP_DMA
+ errors
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0dd8a9e1b3f22ff5bc2a0e1e4508dbddb89d5746
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -174,99 +87,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1863333 <1863333@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Philippe Mathieu-Daud=C3=A9 (philmd)
 
+-- =
 
-On 6/29/20 4:26 AM, Philippe Mathieu-Daudé wrote:
-> +Cleber/Wainer.
-> 
-> On 6/26/20 10:41 PM, John Snow wrote:
->> Based-on: 20200626202350.11060-1-jsnow@redhat.com
->>
->> This series modifies the python/qemu library to comply with mypy --strict.
->> This requires my "refactor shutdown" patch as a pre-requisite.
->>
->> v4:
->> 001/16:[----] [--] 'python/qmp.py: Define common types'
->> 002/16:[----] [--] 'iotests.py: use qemu.qmp type aliases'
->> 003/16:[----] [--] 'python/qmp.py: re-absorb MonitorResponseError'
->> 004/16:[----] [--] 'python/qmp.py: Do not return None from cmd_obj'
->> 005/16:[----] [--] 'python/qmp.py: add casts to JSON deserialization'
->> 006/16:[----] [--] 'python/qmp.py: add QMPProtocolError'
->> 007/16:[----] [--] 'python/machine.py: Fix monitor address typing'
->> 008/16:[----] [--] 'python/machine.py: reorder __init__'
->> 009/16:[----] [--] 'python/machine.py: Don't modify state in _base_args()'
->> 010/16:[----] [--] 'python/machine.py: Handle None events in events_wait'
->> 011/16:[----] [--] 'python/machine.py: use qmp.command'
->> 012/16:[0010] [FC] 'python/machine.py: Add _qmp access shim'
->> 013/16:[----] [-C] 'python/machine.py: fix _popen access'
->> 014/16:[----] [--] 'python/qemu: make 'args' style arguments immutable'
->> 015/16:[----] [--] 'iotests.py: Adjust HMP kwargs typing'
->> 016/16:[----] [-C] 'python/qemu: Add mypy type annotations'
->>
->>  - Rebased on "refactor shutdown" v4
->>  - Fixed _qmp access for scripts that disable QMP
-> 
-> See:
-> 
-> https://travis-ci.org/github/philmd/qemu/jobs/702507625#L5439
-> 
-> / # uname -a
-> Linux buildroot 4.5.0-2-4kc-malta #1 Debian 4.5.5-1 (2016-05-29) mips
-> GNU/Linux
-> / # reboot
-> / # reboot: Restarting system
->>>> {'execute': 'quit'}
-> qemu received signal 9; command: "mips-softmmu/qemu-system-mips -display
-> none -vga none -chardev
-> socket,id=mon,path=/tmp/tmpcojsc5u3/qemu-14540-monitor.sock -mon
-> chardev=mon,mode=control -machine malta -chardev
-> socket,id=console,path=/tmp/tmpcojsc5u3/qemu-14540-console.sock,server,nowait
-> -serial chardev:console -kernel
-> /tmp/avocado_xgmck2k5/avocado_job_83wkzs2f/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4kc-malta
-> -initrd
-> /tmp/avocado_xgmck2k5/avocado_job_83wkzs2f/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
-> -append printk.time=0 console=ttyS0 console=tty rdinit=/sbin/init
-> noreboot -no-reboot"
-> 
-> Reproduced traceback from:
-> /home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-packages/avocado/core/test.py:886
-> Traceback (most recent call last):
->   File
-> "/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
-> line 195, in tearDown
->     vm.shutdown()
->   File "/home/travis/build/philmd/qemu/python/qemu/machine.py", line
-> 457, in shutdown
->     self._do_shutdown(has_quit)
->   File "/home/travis/build/philmd/qemu/python/qemu/machine.py", line
-> 434, in _do_shutdown
->     self._soft_shutdown(has_quit, timeout)
->   File "/home/travis/build/philmd/qemu/python/qemu/machine.py", line
-> 414, in _soft_shutdown
->     self._qmp.cmd('quit')
->   File "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
->     return self.cmd_obj(qmp_cmd)
->   File "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in
-> cmd_obj
->     self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
-> BrokenPipeError: [Errno 32] Broken pipe
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863333
 
-Might be racing between QMP going away and Python not being aware that
-the process has closed yet. It's the only explanation I have left.
+Title:
+  Assigning NVMe disk to a domain causes VFIO_MAP_DMA errors
 
-I wish I could reproduce this, though. When I submit jobs to Travis I am
-not seeing these failures.
+Status in QEMU:
+  New
 
-I'll see what I can do, but at this point I'll not re-send the patch
-series until I can conclusively fix your build testing.
+Bug description:
+  I'm seeing some errors when assigning my NVMe disk to qemu. This is
+  the full command line:
 
---js
+  =
 
+  /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 \
+  -name guest=3Dfedora,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-2-fedora/master-key.aes \
+  -machine pc-i440fx-4.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+  -cpu host \
+  -m size=3D4194304k,slots=3D16,maxmem=3D1099511627776k \
+  -overcommit mem-lock=3Doff \
+  -smp 4,sockets=3D1,dies=3D1,cores=3D2,threads=3D2 \
+  -object iothread,id=3Diothread1 \
+  -object iothread,id=3Diothread2 \
+  -object iothread,id=3Diothread3 \
+  -object iothread,id=3Diothread4 \
+  -mem-prealloc \
+  -mem-path /hugepages2M/libvirt/qemu/2-fedora \
+  -numa node,nodeid=3D0,cpus=3D0,mem=3D4096 \
+  -uuid 63840878-0deb-4095-97e6-fc444d9bc9fa \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D31,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -global PIIX4_PM.disable_s3=3D0 \
+  -global PIIX4_PM.disable_s4=3D0 \
+  -boot menu=3Don,strict=3Don \
+  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x4 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 \
+  -blockdev '{"driver":"file","filename":"/var/lib/libvirt/images/fedora.qc=
+ow2","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap=
+"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
+nmap","driver":"qcow2","file":"libvirt-2-storage","backing":null}' \
+  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
+=3Ddrive-scsi0-0-0-0,drive=3Dlibvirt-2-format,id=3Dscsi0-0-0-0,bootindex=3D=
+1 \
+  -blockdev '{"driver":"nvme","device":"0000:02:00.0","namespace":1,"node-n=
+ame":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"ra=
+w","file":"libvirt-1-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x6,drive=3Dlibvirt-=
+1-format,id=3Dvirtio-disk0 \
+  -netdev tap,fd=3D33,id=3Dhostnet0,vhost=3Don,vhostfd=3D34 \
+  -device virtio-net-pci,host_mtu=3D9000,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+52:54:00:a4:6f:91,bus=3Dpci.0,addr=3D0x3 \
+  -chardev pty,id=3Dcharserial0 \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -chardev socket,id=3Dcharchannel0,fd=3D35,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -spice port=3D5900,addr=3D0.0.0.0,disable-ticketing,seamless-migration=3D=
+on \
+  -device virtio-vga,id=3Dvideo0,virgl=3Don,max_outputs=3D1,bus=3Dpci.0,add=
+r=3D0x2 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+
+  And these are the errors I see:
+
+  2020-02-14T09:06:18.183167Z qemu-system-x86_64: VFIO_MAP_DMA failed: Inva=
+lid argument
+  2020-02-14T09:10:49.753767Z qemu-system-x86_64: VFIO_MAP_DMA failed: Cann=
+ot allocate memory
+  2020-02-14T09:11:04.530344Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+  2020-02-14T09:11:04.531087Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+  2020-02-14T09:11:04.531230Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+
+  =
+
+  I'm doing nothing with the disk inside the guest, but:
+
+    # dd if=3D/dev/vda of=3D/dev/null status=3Dprogress
+
+  (the disk appears as /dev/vda in the guest). Surprisingly, I do not
+  see these errors when I use the traditional PCI assignment (-device
+  vfio-pci). My versions of kernel and qemu:
+
+  moe ~ # uname -r
+  5.4.15-gentoo
+  moe ~ # /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 =
+--version
+  QEMU emulator version 4.2.50 (v4.2.0-1439-g5d6542bea7-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863333/+subscriptions
 
