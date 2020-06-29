@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7ECC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD86C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 837AE23B84
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837AE23B84
+	by mail.kernel.org (Postfix) with ESMTPS id 0F9DE23B87
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F9DE23B87
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpsAS-0007Ds-Mz
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:41:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52926)
+	id 1jpsAU-0007GD-9e
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jps9h-0006QI-7j
+ id 1jps9h-0006QN-DY
  for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:40:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45090)
+Received: from indium.canonical.com ([91.189.90.7]:45102)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jps9e-0005Et-VC
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:40:56 -0400
+ id 1jps9e-0005Eu-Td
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:40:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jps9c-0002gd-Os
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:52 +0000
+ id 1jps9d-0002l8-9x
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B3B002E810B
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 3A1C92E810B
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 11:28:13 -0000
+Date: Mon, 29 Jun 2020 11:30:37 -0000
 From: Laurent Vivier <1884719@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: laurent-vivier martingrigorov stefanha
 X-Launchpad-Bug-Reporter: Martin Grigorov (martingrigorov)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
 References: <159289799812.6175.17000319886186623286.malonedeb@soybean.canonical.com>
-Message-Id: <159343009349.3336.8161987566905135659.malone@wampee.canonical.com>
+Message-Id: <159343023735.32564.10962842956618279449.malone@chaenomeles.canonical.com>
 Subject: [Bug 1884719] Re: Function not implemented when using libaio
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7ce2330853ec2f2249410e952761ebe0a24d71b2
+X-Launchpad-Hash: 0ecc9a14796c272672deec30cd4f394305c25471
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
@@ -88,18 +88,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ptrace() is not implemented,
+The not-implemented syscalls are:
 
-it's why we use gdb server rather than gdb and we use QEMU_STRACE
-variable rather than strace command.
-
-You can test it works with:
-
-  QEMU_STRACE=3D bash -c "echo Test"
-
-Could you try to execute your test program with it:
-
-  QEMU_STRACE=3D ./out
+...
+276 io_setup(10,274877981280,33,274877981296,274877981280,274877981184) =3D=
+ -1 errno=3D38 (Function not implemented)
+276 io_destroy(0,274877981280,33,274877981296,274877981280,274877981184) =
+=3D -1 errno=3D38 (Function not implemented)
+...
 
 -- =
 
