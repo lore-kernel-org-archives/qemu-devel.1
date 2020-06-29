@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F25FC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB12DC433E1
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F30C25598
+	by mail.kernel.org (Postfix) with ESMTPS id 9C1B925598
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:42:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+cLLAI9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F30C25598
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qq56aqrg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C1B925598
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpwrL-000288-Hv
+	id 1jpwrL-00025J-R7
 	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:42:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55934)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqI-0000I8-TG
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:14 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:46934)
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqJ-0000IY-Ck
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:15 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:45937)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqG-0007uu-QD
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:14 -0400
-Received: by mail-lf1-x144.google.com with SMTP id m26so9431708lfo.13
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:41:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <noh4hss@gmail.com>) id 1jpwqH-0007v3-PF
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:41:15 -0400
+Received: by mail-lj1-x244.google.com with SMTP id t25so14187343lji.12
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3sFtKalod1/786Y897d8w6b5nlz6uSa8s0Q6IXgOPjU=;
- b=K+cLLAI9ckD4KaKCQtho1A/a193zgTp0LDfrdTqXkGkjtRc564CFTo92cL4LmjqqOy
- D20FqwazQzKTkqPuBOuVYWwwBx3ECmLaMr74ipU+8vIm43e5zlu/Bl/yR6r1wyy3AV9c
- kUR/d7+nb4HXYFqqyZvFB7jsQEIkKpUNW7lHlqCIG3vSz6m7DajsHyKeQJiogcaOAPfC
- 40VsOZDA4hxwRn9A3NUyXeKVF44f9pD/4QzCnID9zSflvg9yVnpoy1x6ykZg5Ev9HN8E
- XHLhnlM+sVfJY2nByfsID6GXgQNbj49s6QNsUqr6qsu9gmg4zgtUhMAOmMTC1AzRFWn8
- 0L1A==
+ bh=qIOYbuvilU4Digqleh4xnQWueJUIUIR9yScgMm3N+yw=;
+ b=Qq56aqrgJSwHYHolUoT6MMfPYS41rRSJ5G8D7yc77fTOszfh6lmmoCfu2KwpwyIURY
+ eQmFG69KEOcxGPerD93wrOK87WTJGa1nH2SkOfdEDO+Igzm/JpGo42kbUzlv5PIyjG/w
+ guF+PtU2LuBsYp7eb6TCcweaJ515J9CxFbg/VaEfWTNgBydM88eI6sapsLx5TpJ5FlxM
+ T9FZSxjClZrptJfxpWz4bqVX80W42uVvTCx3OmTVCdk3rx5y7ZF4A95W/MZtUdx9VICq
+ Qi2t8i4dhQphn9PDvq6/swdDY7B7t67TUnhzTAS8Ac4fFJkMrkuEvq9ox0RG7NiSoh7q
+ jKoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3sFtKalod1/786Y897d8w6b5nlz6uSa8s0Q6IXgOPjU=;
- b=ByXiwUUtV2l1nh9MJexb2iQ/aBtBjEFMvRaF8U/h48lTGGPMDQDgruoz82alf7HFsj
- ckZF+i3G39r0RBeLUnjQ9bRsdNMDJJvgQmVo18GMTtZwYFHoqWuVheob37PdQLey74yA
- x7aGB/efs8zak+KsbFATrb9wtm5UsSMm622LK77LLX2tBllQY58/9y+YH3XEvBmtZ8+k
- BrelnTZ9cvVipSwMC8QIosFL4mEHhxI0NgMzrdOnI+WwIsLqcT0RIdWgeAjXd0TYGvVk
- XwPCmJS4JMXnnQ5vspEHE81BqnrEN9DtRiB+fFvuLaKPVE0Su6gB337GkqKjbF8kUDNt
- eA8Q==
-X-Gm-Message-State: AOAM5327RWTTXbURtyQLWzA+G8f60GoerddDGt+1Cjom9DBo4d72Ze5K
- ++KauCcaUuiwmw6uQiEskAySRRYT/yKJZA==
-X-Google-Smtp-Source: ABdhPJyOPBIHvEb/6X5armsEmWQP8YeD+LChofIXaJ4Yoo7bJpe1DoFYWChXR1+3MAhfBR6EcYDU3g==
-X-Received: by 2002:a19:2209:: with SMTP id i9mr9660299lfi.46.1593448870982;
- Mon, 29 Jun 2020 09:41:10 -0700 (PDT)
+ bh=qIOYbuvilU4Digqleh4xnQWueJUIUIR9yScgMm3N+yw=;
+ b=hCgThAjYV9tI+gW9buU4sK+Lb7YMyQkxfr+smBXvt5VsS06GxnuCYoOSoaASd5eGfY
+ rrHi/W44ek0BkW2dqtoir0q1sA+p1fp0I2UvbXaWm+xFyPOElIxAunjKd2s6RO42Y18P
+ +oncFCLwCPHLRvNXbDzuyAwiOHuFyYMTrXuGRj0rCyMwnw6Ans2VUyi21Az8HIAmzFuu
+ guDOoNxRdtTRXtvQLcc7zMjz4tioLoNvlKBQdoB515sKky1cpy7sBSL0nHq0+T92HiRl
+ jfRxCfnIRQ0AZ6p/ni5JtEDiqpwLRKmG7HJkhujVCiV+iMD2YZ3ukXsYgvsfJb64zsht
+ nfKA==
+X-Gm-Message-State: AOAM53086mi21kILOLpXGtPFlrjtOojB/y+B7QQ+sfqX29AoLz2Zo+sP
+ t7M4KfcPar3/b1PyEpWuLUQXrON9HiUYnw==
+X-Google-Smtp-Source: ABdhPJxIcoI6+rjA6UE46chYve5jNzwvXR8SibuIldCU5D3T/7ssoa6o4tZ5qzKuQxnNFCrVnVShHg==
+X-Received: by 2002:a2e:b0fa:: with SMTP id h26mr8076038ljl.148.1593448871855; 
+ Mon, 29 Jun 2020 09:41:11 -0700 (PDT)
 Received: from localhost.localdomain (193-239-39-51.ksi-system.net.
  [193.239.39.51])
- by smtp.gmail.com with ESMTPSA id o1sm37641lfi.92.2020.06.29.09.41.10
+ by smtp.gmail.com with ESMTPSA id o1sm37641lfi.92.2020.06.29.09.41.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 09:41:10 -0700 (PDT)
+ Mon, 29 Jun 2020 09:41:11 -0700 (PDT)
 From: Szymon Lukasz <noh4hss@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/9] chardev: add qemu_chr_resize()
-Date: Mon, 29 Jun 2020 18:40:35 +0200
-Message-Id: <20200629164041.472528-4-noh4hss@gmail.com>
+Subject: [PATCH v3 4/9] char-mux: add support for the terminal size
+Date: Mon, 29 Jun 2020 18:40:36 +0200
+Message-Id: <20200629164041.472528-5-noh4hss@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200629164041.472528-1-noh4hss@gmail.com>
 References: <20200629164041.472528-1-noh4hss@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=noh4hss@gmail.com; helo=mail-lf1-x144.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=noh4hss@gmail.com; helo=mail-lj1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,50 +106,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function should be called whenever we learn about a new size of
-the terminal connected to a chardev.
+The terminal size of a mux chardev should be the same as the real
+chardev, so listen for CHR_EVENT_RESIZE to be up to date.
+
+We forward CHR_EVENT_RESIZE only to the focused frontend. This means
+frontends should probably update their view of the terminal size on
+receiving CHR_EVENT_MUX_IN.
 
 Signed-off-by: Szymon Lukasz <noh4hss@gmail.com>
 ---
- chardev/char.c         | 11 +++++++++++
- include/chardev/char.h |  2 ++
- 2 files changed, 13 insertions(+)
+ chardev/char-mux.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 904f8bf6e3..1dc22aca95 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -354,6 +354,17 @@ int qemu_chr_wait_connected(Chardev *chr, Error **errp)
-     return 0;
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 46c44af67c..fa81f8341e 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -247,9 +247,24 @@ void mux_chr_send_all_event(Chardev *chr, QEMUChrEvent event)
+     }
  }
  
-+void qemu_chr_resize(Chardev *chr, uint16_t cols, uint16_t rows)
++static void mux_update_winsize(Chardev *chr)
 +{
-+    if (cols != chr->cols || rows != chr->rows) {
-+        chr->cols = cols;
-+        chr->rows = rows;
-+        if (chr->be_open) {
-+            qemu_chr_be_event(chr, CHR_EVENT_RESIZE);
-+        }
-+    }
++    MuxChardev *d = MUX_CHARDEV(chr);
++    uint16_t cols, rows;
++
++    qemu_chr_fe_get_winsize(&d->chr, &cols, &rows);
++    qemu_chr_resize(chr, cols, rows);
 +}
 +
- QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
-                                 bool permit_mux_mon)
+ static void mux_chr_event(void *opaque, QEMUChrEvent event)
  {
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 42203e9fa4..01099121f1 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -230,6 +230,8 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all);
- #define qemu_chr_write_all(s, buf, len) qemu_chr_write(s, buf, len, true)
- int qemu_chr_wait_connected(Chardev *chr, Error **errp);
- 
-+void qemu_chr_resize(Chardev *chr, uint16_t cols, uint16_t rows);
+-    mux_chr_send_all_event(CHARDEV(opaque), event);
++    Chardev *chr = CHARDEV(opaque);
 +
- #define TYPE_CHARDEV "chardev"
- #define CHARDEV(obj) OBJECT_CHECK(Chardev, (obj), TYPE_CHARDEV)
- #define CHARDEV_CLASS(klass) \
++    if (event == CHR_EVENT_RESIZE) {
++        mux_update_winsize(chr);
++    } else {
++        mux_chr_send_all_event(chr, event);
++    }
+ }
+ 
+ static GSource *mux_chr_add_watch(Chardev *s, GIOCondition cond)
+@@ -330,6 +345,7 @@ static void qemu_chr_open_mux(Chardev *chr,
+      */
+     *be_opened = machine_init_done;
+     qemu_chr_fe_init(&d->chr, drv, errp);
++    mux_update_winsize(chr);
+ }
+ 
+ static void qemu_chr_parse_mux(QemuOpts *opts, ChardevBackend *backend,
 -- 
 2.27.0
 
