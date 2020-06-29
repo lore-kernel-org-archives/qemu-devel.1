@@ -2,80 +2,93 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA94C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA2DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:20:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AE4C255A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:16:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE4C255A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 78A54255BC
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:20:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gp57YXXz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A54255BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpxOZ-0005n1-HB
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 13:16:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36646)
+	id 1jpxSe-0007Xi-Q5
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 13:20:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpxNz-0005NG-WE
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:16:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpxNx-0004uk-K1
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:16:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jpxNt-0005nm-Lp
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 17:15:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 535652E8142
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 17:15:56 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jpxRs-0006uq-Uu
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:20:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53245
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jpxRp-0005I5-Pm
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:20:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593451200;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DcXS2X0y/Q/T+/52yT84Ed4B2ufl8Vyvf+SOIInqpoo=;
+ b=gp57YXXzyUCOqomJtYvIRwHrlx9w1/JGNwNSPlzFzAz6JQ8BFv0/xAwQLMYgoSpp5uCryP
+ tY52enq9s+KPq3u5+TNfJzWbMziIQX7NBgmN0Z+3YRx0ryrrNIUa1OnVnaGnBSu46IBYQ8
+ nVH52DHbQS8deDxCPQGIDMluxMBicg8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-xLkzZKJHMV-SguNC1KowWQ-1; Mon, 29 Jun 2020 13:19:56 -0400
+X-MC-Unique: xLkzZKJHMV-SguNC1KowWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3711F107ACF4;
+ Mon, 29 Jun 2020 17:19:55 +0000 (UTC)
+Received: from titinator (ovpn-114-115.ams2.redhat.com [10.36.114.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8850B5BAEC;
+ Mon, 29 Jun 2020 17:19:43 +0000 (UTC)
+References: <20200626164307.3327380-1-dinechin@redhat.com>
+ <20200626164307.3327380-10-dinechin@redhat.com>
+ <20200626173538.GP1028934@redhat.com>
+User-agent: mu4e 1.5.2; emacs 26.3
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH 09/10] spice: Put spice functions in a separate load module
+In-reply-to: <20200626173538.GP1028934@redhat.com>
+Date: Mon, 29 Jun 2020 19:19:41 +0200
+Message-ID: <lyo8p1dc2a.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 17:09:13 -0000
-From: Langston <1885332@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: langston0
-X-Launchpad-Bug-Reporter: Langston (langston0)
-X-Launchpad-Bug-Modifier: Langston (langston0)
-References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
-Message-Id: <159345055359.3589.9013022342422430204.malone@wampee.canonical.com>
-Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
- AT_PHDR
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bf734eab6b2d59a0b64e8b6b8e7a9b0bbeafadef
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dinechin@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,167 +97,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Taking a peek at how Linux and QEMU calculate AT_PHDR for static
-binaries reveals the following. Both involve the program headers' offset
-(e_phoff) added to a value I'll call load_addr (as in the kernel).
 
-In the kernel, load_addr is
+On 2020-06-26 at 19:35 CEST, Daniel P. Berrang=C3=A9 wrote...
+> On Fri, Jun 26, 2020 at 06:43:06PM +0200, Christophe de Dinechin wrote:
+>> Use the MODIFACE and MODIMPL macros to to redirect the highest-level
+>> qemu_spice functions into the spice-app.so load module when SPICE is
+>> compiled as a module.
+>>
+>> With these changes, the following shared libraries are no longer
+>> necessary in the top-level qemu binary:
+>>
+>>  =09libspice-server.so.1 =3D> /lib64/libspice-server.so.1 (HEX)
+>>  =09libopus.so.0 =3D> /lib64/libopus.so.0 (HEX)
+>>  =09liblz4.so.1 =3D> /lib64/liblz4.so.1 (HEX)
+>>  =09libgstapp-1.0.so.0 =3D> /lib64/libgstapp-1.0.so.0 (HEX)
+>>  =09libgstvideo-1.0.so.0 =3D> /lib64/libgstvideo-1.0.so.0 (HEX)
+>>  =09libgstbase-1.0.so.0 =3D> /lib64/libgstbase-1.0.so.0 (HEX)
+>>  =09libgstreamer-1.0.so.0 =3D> /lib64/libgstreamer-1.0.so.0 (HEX)
+>>  =09libssl.so.1.1 =3D> /lib64/libssl.so.1.1 (HEX)
+>>  =09liborc-0.4.so.0 =3D> /lib64/liborc-0.4.so.0 (HEX)
+>>
+>> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+>> ---
+>>  include/ui/qemu-spice.h | 24 +++++++++++++++---------
+>>  monitor/hmp-cmds.c      |  6 ++++++
+>>  softmmu/vl.c            |  1 +
+>>  ui/spice-core.c         | 31 +++++++++++++++++++++----------
+>>  ui/spice-display.c      |  2 +-
+>>  5 files changed, 44 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+>> index 8c23dfe717..0f7e139da5 100644
+>> --- a/include/ui/qemu-spice.h
+>> +++ b/include/ui/qemu-spice.h
+>> @@ -24,22 +24,28 @@
+>>
+>>  #include <spice.h>
+>>  #include "qemu/config-file.h"
+>> +#include "qemu/module.h"
+>>
+>> -extern int using_spice;
+>> +#define using_spice     (qemu_is_using_spice())
+>>
+>> -void qemu_spice_init(void);
+>> +MODIFACE(bool, qemu_is_using_spice,(void));
+>> +MODIFACE(void, qemu_start_using_spice, (void));
+>> +MODIFACE(void, qemu_spice_init, (void));
+>>  void qemu_spice_input_init(void);
+>>  void qemu_spice_audio_init(void);
+>> -void qemu_spice_display_init(void);
+>> -int qemu_spice_display_add_client(int csock, int skipauth, int tls);
+>> +MODIFACE(void, qemu_spice_display_init, (void));
+>> +MODIFACE(int, qemu_spice_display_add_client, (int csock, int skipauth, =
+int tls));
+>>  int qemu_spice_add_interface(SpiceBaseInstance *sin);
+>>  bool qemu_spice_have_display_interface(QemuConsole *con);
+>>  int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *c=
+on);
+>> -int qemu_spice_set_passwd(const char *passwd,
+>> -                          bool fail_if_connected, bool disconnect_if_co=
+nnected);
+>> -int qemu_spice_set_pw_expire(time_t expires);
+>> -int qemu_spice_migrate_info(const char *hostname, int port, int tls_por=
+t,
+>> -                            const char *subject);
+>> +MODIFACE(int, qemu_spice_set_passwd, (const char *passwd,
+>> +                                      bool fail_if_connected,
+>> +                                      bool disconnect_if_connected));
+>> +MODIFACE(int, qemu_spice_set_pw_expire,(time_t expires));
+>> +MODIFACE(int, qemu_spice_migrate_info,(const char *hostname,
+>> +                                       int port, int tls_port,
+>> +                                       const char *subject));
+>> +MODIFACE(struct SpiceInfo *,qemu_spice_query, (Error **errp));
+>
+> This macro usage looks kind of unpleasant and its hard to understand
+> just what is going on, especially why some methods are changed but
+> others are not.
 
-  elf_ppnt->p_vaddr - elf_ppnt->p_offset
+The functions that are changed are the module interface between qemu and th=
+e
+DSO. For example, qemu_spice_init is called from vl.c, i.e. the main binary=
+,
+but qemu_spice_audio_init is called from ui/spice-core.c and
+ui/spice-input.c, which are both in the DSO after the commit.
 
-where elf_ppnt is the program header entry of the first segment with
-type LOAD:
-https://github.com/torvalds/linux/blob/242b23319809e05170b3cc0d44d3b4bd202b=
-b073/fs/binfmt_elf.c#L1120
+The existing function-based interface in qemu-spice.h was not really
+carefully designed for modularization, so this list was determined by
+following the initialization path. It may not be the smallest possible cut.
+It may be neat to add a patch to reorder functions based on whether they ar=
+e
+inside the DSO or exported from it.
 
-In QEMU, load_addr is set to an earlier value loaddr, which is set to
+As for the macro syntax, I see it as somewhat transient. I wanted to propos=
+e
+a working and scalable mechanism before adding some nice syntactic sugar
+tooling to it. I expect the syntax to turn into something like:
 
-  min_i(phdr[i].p_vaddr - phdr[i].p_offset)
+MODIFACE void  qemu_spice_display_init (void);
+MODIIMPL void  qemu_spice_display_init (void) { ... }
 
-where min_i is the minimum over indices "i" of LOAD segments.
-https://github.com/qemu/qemu/blob/9e7f1469b9994d910fc1b185c657778bde51639c
-/linux-user/elfload.c#L2407. If you perform this calculation by hand for
-the program headers posted at the beginning of this thread, you'll get
-ae000, as expected.
+But it feels a bit too early to do that. I prefer to experiment with a
+simple macro for now.
 
-The problem here is that QEMU takes a minimum where Linux just takes the
-first value. Presumably, changing QEMU's behavior to match that of the
-kernel wouldn't break anything that wouldn't be broken if it really ran
-on Linux. Unfortunately, Linux's ELF loader is much more picky than the
-ELF standard, but that's a whole other story...
+>
+> IIUC, the goal is to turn all these into weak symbols so they don't
+> need to be resolved immediately at startup, and instead have an
+> impl of them provided dynamically at runtime.
 
--- =
+My very first approach was indeed to use weak symbols, but then I learned
+that ld.so no longer deals with weak symbols, apparently for security
+reasons. See LD_DYNAMIC_WEAK in ld.so(8).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885332
+>
+> If so the more normal approach would be to have a struct defining
+> a set of callbacks, that can be registered. Or if there's a natural
+> fit with QOM, then a QOM interface that can then have a QOM object
+> impl registered as a singleton.
 
-Title:
-  Error in user-mode calculation of ELF aux vector's AT_PHDR
+That was my second attempt (after the weak symbols). I cleaned it up a bit
+and put it here: https://github.com/c3d/qemu/commits/spice-vtable.
 
-Status in QEMU:
-  New
+What made me switch to the approach in this series is the following
+considerations:
 
-Bug description:
-  =
+- A vtable is useful if there can be multiple values for a method, e.g. to
+  implement inheritance, or if you have multiple instances. This is not the
+  case here.
 
-  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
-t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
-but crashes before main in user-mode emulation. Specifically, it crashes wh=
-en initializing thread-local storage in glibc's _dl_aux_init, because it re=
-ads out a strange value from the AT_PHDR entry of the ELF aux vector.
+- A vtable adds one level of indirection, which does not seem to be
+  particularly useful or helpful for this particular use case.
 
-  The binary has these program headers:
+- Overloading QOM for that purpose looked more confusing than anything else=
+.
+  It looked like I was mixing unrelated concepts. Maybe that's just me.
 
-    Program Headers:
-      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
-gn
-      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
-      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
-0000
-      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
-0000
-      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
-      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
-      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
-      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
-      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
-000
-      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
-000
+- The required change with a vtable ends up being more extensive. Instead o=
+f
+  changing a single line to put an entry point in a DSO, you need to create
+  the vtable, add functions to it, add a register function, etc. I was
+  looking for an easier and more scalable way.
 
-  If I build the Linux kernel with the following patch to the very end
-  of create_elf_tables in fs/binfmt_elf.c
+- In particular, with a vtable, you cannot take advantage of the syntactic
+  trick I used here, which is that foo(x) is a shortcut for (*foo)(x).
+  So for a vtable, you need to manually write wrappers.
 
-    /* Put the elf_info on the stack in the right place.  */
-    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
-    int i;
-    for (i =3D 0; i < 15; i++) {
-      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
-    }
-    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
-        return -EFAULT;
-    return 0;
+This could be automated, of course, but so far I did not find any clear
+benefit, and many drawbacks to using the vtable approach. As a quantitative
+comparison point, the commit that does this same connection using the vtabl=
+e
+approach is:
 
-  and run it like this:
+ include/ui/qemu-spice.h | 104 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++++++++++++++++++++-----
+ monitor/hmp-cmds.c      |   6 +++++
+ softmmu/vl.c            |  10 +++++++
+ ui/spice-core.c         |  38 ++++++++++++++++++++++++---
+ 4 files changed, 148 insertions(+), 10 deletions(-)
 
-    qemu-system-arm \
-      -M versatilepb \
-      -nographic \
-      -dtb ./dts/versatile-pb.dtb \
-      -kernel zImage \
-      -M versatilepb \
-      -m 128M \
-      -append "earlyprintk=3Dvga,keep" \
-      -initrd initramfs
+as opposed to what is presented in this series:
 
-  after I've built the kernel initramfs like this (where "init" is the
-  binary in question):
+ include/ui/qemu-spice.h | 24 +++++++++++++++---------
+ monitor/hmp-cmds.c      |  6 ++++++
+ softmmu/vl.c            |  1 +
+ ui/spice-core.c         | 31 +++++++++++++++++++++----------
+ ui/spice-display.c      |  2 +-
+ 5 files changed, 44 insertions(+), 20 deletions(-)
 
-    make ARCH=3Darm versatile_defconfig
-    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
-    cp "$1" arch/arm/boot/init
-    cd arch/arm/boot
-    echo init | cpio -o --format=3Dnewc > initramfs
 
-  then I get the following output. This is the kernel's view of the aux
-  vector for this binary:
+>
+>>  #if !defined(SPICE_SERVER_VERSION) || (SPICE_SERVER_VERSION < 0xc06)
+>>  #define SPICE_NEEDS_SET_MM_TIME 1
+>> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+>> index 2b0b58a336..6bd9c52658 100644
+>> --- a/monitor/hmp-cmds.c
+>> +++ b/monitor/hmp-cmds.c
+>> @@ -56,6 +56,7 @@
+>>  #include "migration/misc.h"
+>>
+>>  #ifdef CONFIG_SPICE
+>> +#include "ui/qemu-spice.h"
+>>  #include <spice/enums.h>
+>>  #endif
+>>
+>> @@ -573,6 +574,11 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+>>  #endif
+>>
+>>  #ifdef CONFIG_SPICE
+>> +SpiceInfo *qmp_query_spice(Error **errp)
+>> +{
+>> +    return qemu_spice_query(errp);
+>> +}
+>> +
+>>  void hmp_info_spice(Monitor *mon, const QDict *qdict)
+>>  {
+>>      SpiceChannelList *chan;
+>> diff --git a/softmmu/vl.c b/softmmu/vl.c
+>> index 3e15ee2435..c94b4fa49b 100644
+>> --- a/softmmu/vl.c
+>> +++ b/softmmu/vl.c
+>> @@ -22,6 +22,7 @@
+>>   * THE SOFTWARE.
+>>   */
+>>
+>> +#define MODULE_STUBS
+>>  #include "qemu/osdep.h"
+>>  #include "qemu-common.h"
+>>  #include "qemu/units.h"
+>> diff --git a/ui/spice-core.c b/ui/spice-core.c
+>> index ecc2ec2c55..dbc1886b77 100644
+>> --- a/ui/spice-core.c
+>> +++ b/ui/spice-core.c
+>> @@ -48,7 +48,7 @@ static time_t auth_expires =3D TIME_MAX;
+>>  static int spice_migration_completed;
+>>  static int spice_display_is_running;
+>>  static int spice_have_target_host;
+>> -int using_spice =3D 0;
+>> +static int is_using_spice =3D 0;
+>>
+>>  static QemuThread me;
+>>
+>> @@ -503,7 +503,7 @@ static QemuOptsList qemu_spice_opts =3D {
+>>      },
+>>  };
+>>
+>> -SpiceInfo *qmp_query_spice(Error **errp)
+>> +MODIMPL(SpiceInfo *,qemu_spice_query,(Error **errp))
+>>  {
+>>      QemuOpts *opts =3D QTAILQ_FIRST(&qemu_spice_opts.head);
+>>      int port, tls_port;
+>> @@ -579,8 +579,9 @@ static void migration_state_notifier(Notifier *notif=
+ier, void *data)
+>>      }
+>>  }
+>>
+>> -int qemu_spice_migrate_info(const char *hostname, int port, int tls_por=
+t,
+>> -                            const char *subject)
+>> +MODIMPL(int, qemu_spice_migrate_info, (const char *hostname,
+>> +                                       int port, int tls_port,
+>> +                                       const char *subject))
+>>  {
+>>      int ret;
+>>
+>> @@ -634,7 +635,17 @@ static void vm_change_state_handler(void *opaque, i=
+nt running,
+>>      }
+>>  }
+>>
+>> -void qemu_spice_init(void)
+>> +MODIMPL(bool, qemu_is_using_spice, (void))
+>> +{
+>> +    return is_using_spice;
+>> +}
+>> +
+>> +MODIMPL(void, qemu_start_using_spice, (void))
+>> +{
+>> +    is_using_spice =3D 1;
+>> +}
+>> +
+>> +MODIMPL(void, qemu_spice_init, (void))
+>>  {
+>>      QemuOpts *opts =3D QTAILQ_FIRST(&qemu_spice_opts.head);
+>>      const char *password, *str, *x509_dir, *addr,
+>> @@ -796,7 +807,7 @@ void qemu_spice_init(void)
+>>          error_report("failed to initialize spice server");
+>>          exit(1);
+>>      };
+>> -    using_spice =3D 1;
+>> +    qemu_start_using_spice();
+>>
+>>      migration_state.notify =3D migration_state_notifier;
+>>      add_migration_state_change_notifier(&migration_state);
+>> @@ -945,8 +956,8 @@ static int qemu_spice_set_ticket(bool fail_if_conn, =
+bool disconnect_if_conn)
+>>                                     fail_if_conn, disconnect_if_conn);
+>>  }
+>>
+>> -int qemu_spice_set_passwd(const char *passwd,
+>> -                          bool fail_if_conn, bool disconnect_if_conn)
+>> +MODIMPL(int, qemu_spice_set_passwd,(const char *passwd,
+>> +                                    bool fail_if_conn, bool disconnect_=
+if_conn))
+>>  {
+>>      if (strcmp(auth, "spice") !=3D 0) {
+>>          return -1;
+>> @@ -957,13 +968,13 @@ int qemu_spice_set_passwd(const char *passwd,
+>>      return qemu_spice_set_ticket(fail_if_conn, disconnect_if_conn);
+>>  }
+>>
+>> -int qemu_spice_set_pw_expire(time_t expires)
+>> +MODIMPL(int, qemu_spice_set_pw_expire, (time_t expires))
+>>  {
+>>      auth_expires =3D expires;
+>>      return qemu_spice_set_ticket(false, false);
+>>  }
+>>
+>> -int qemu_spice_display_add_client(int csock, int skipauth, int tls)
+>> +MODIMPL(int, qemu_spice_display_add_client, (int csock, int skipauth, i=
+nt tls))
+>>  {
+>>      if (tls) {
+>>          return spice_server_add_ssl_client(spice_server, csock, skipaut=
+h);
+>> diff --git a/ui/spice-display.c b/ui/spice-display.c
+>> index 19632fdf6c..90529695fe 100644
+>> --- a/ui/spice-display.c
+>> +++ b/ui/spice-display.c
+>> @@ -1164,7 +1164,7 @@ static void qemu_spice_display_init_one(QemuConsol=
+e *con)
+>>      register_displaychangelistener(&ssd->dcl);
+>>  }
+>>
+>> -void qemu_spice_display_init(void)
+>> +MODIMPL(void, qemu_spice_display_init,(void))
+>>  {
+>>      QemuOptsList *olist =3D qemu_find_opts("spice");
+>>      QemuOpts *opts =3D QTAILQ_FIRST(&olist->head);
+>> --
+>> 2.26.2
+>>
+>>
+>
+> Regards,
+> Daniel
 
-    0x10 =3D 0x1d7
-    0x6 =3D 0x1000
-    0x11 =3D 0x64
-    0x3 =3D 0x900000
-    0x4 =3D 0x20
-    0x5 =3D 0xb
-    0x7 =3D 0x0
-    0x8 =3D 0x0
-    0x9 =3D 0x101b8
-    0xb =3D 0x0
-    0xc =3D 0x0
-    0xd =3D 0x0
-    0xe =3D 0x0
-    0x17 =3D 0x0
-    0x19 =3D 0xbec62fb5
 
-  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
-  the aux vector at the beginning of __libc_start_init (for example,
-  using this Python GDB API script: https://gist.github.com/langston-
-  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
-  values:
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
 
-    AT_PHDR =3D 0xae000
-    AT_PHENT =3D 0x20
-    AT_PHNUM =3D 0xb
-    AT_PAGESZ =3D 0x1000
-    AT_BASE =3D 0x0
-    AT_FLAGS =3D 0x0
-    AT_ENTRY =3D 0x10230
-    AT_UID =3D 0x3e9
-    AT_EUID =3D 0x3e9
-    AT_GID =3D 0x3e9
-    AT_EGID =3D 0x3e9
-    AT_HWCAP =3D 0x1fb8d7
-    AT_CLKTCK =3D 0x64
-    AT_RANDOM =3D -0x103c0
-    AT_HWCAP2 =3D 0x1f
-    AT_NULL =3D 0x0
-
-  The crucial difference is in AT_PHDR (0x3), which is indeed the
-  virtual address of the PHDR segment when the kernel calculates it, but
-  is not when QEMU calculates it.
-
-  qemu-arm --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
 
