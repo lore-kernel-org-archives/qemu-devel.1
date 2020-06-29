@@ -2,115 +2,101 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-4.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,TVD_SUBJ_WIPE_DEBT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC83C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2B9723E54
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DFDC23D4E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PvSFN6Kz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2B9723E54
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfoGEm+8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DFDC23D4E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpvJ2-0000NJ-0f
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 11:02:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54542)
+	id 1jpvNd-0002yu-K5
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 11:07:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jpvHm-0008Ax-5L
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:01:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26380
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jpvMY-0002En-Gh
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:06:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60981
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jpvHj-0004mT-27
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:01:29 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jpvMW-0006CP-4m
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:06:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593442872;
+ s=mimecast20190719; t=1593443183;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fiIs45L1BaaMySytovvzfbHFYwdZbWFS+HRYQuVrP9k=;
- b=PvSFN6KzUg1dwb8D6al2GvOn7Fc2kPNnfEdb88vHznPD4dndpuOyCx9TYyGIkiSxcY9zjG
- LmjfzW32S6OarpdLpKacNZTZsXq6a7sv9Ud+ycVOFriBXHfj8Ed7uzeX5Q/LV0vd4nuBuV
- 1FgSZPQnkeFOf8jVczcGrXHzTqG0Sqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-7Nr0dFmeOEOCgJkap3qlwQ-1; Mon, 29 Jun 2020 11:01:05 -0400
-X-MC-Unique: 7Nr0dFmeOEOCgJkap3qlwQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1645464;
- Mon, 29 Jun 2020 15:01:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-124.ams2.redhat.com
- [10.36.112.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3867571670;
- Mon, 29 Jun 2020 15:00:58 +0000 (UTC)
-Subject: Re: Properly quitting qemu immediately after failing migration
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
- <92ce741d-ef67-fbf9-a889-27d9ae218681@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9eecca93-e7d9-d1da-7fcd-ee60978ec460@redhat.com>
-Date: Mon, 29 Jun 2020 17:00:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=P71wirPiCaM59Ua8QEoG2At1u81AQQAwkL/F+klRUVo=;
+ b=DfoGEm+8kLjWz8NdP/rG4tzzPs7H3uXBFyptfOFRMwIO3QjbTx9xyWjDuxBTjc1gwk3nNi
+ krpGfskN9v1GmmOETE4XucVE9CKqpXTwFrs5t/vUjaIGFR91d14FhHQvdBAM4ioHB6cNuP
+ ZXNAYjyR5XeOikIC+GFwAphzRkfFOzU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-KK6EiFM1M76gcK1jrtzScw-1; Mon, 29 Jun 2020 11:06:21 -0400
+X-MC-Unique: KK6EiFM1M76gcK1jrtzScw-1
+Received: by mail-wm1-f70.google.com with SMTP id s134so18527107wme.6
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 08:06:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=P71wirPiCaM59Ua8QEoG2At1u81AQQAwkL/F+klRUVo=;
+ b=fqWXlrnI9VT8srDzlVIasgQRXBu4UJ710ALhYEr5AXeZ0WIAbERnQCAepK7VHLxHbd
+ +A0adpJKs0KJKYjrP4d8m09RuRh3D3Gkwlp5S8iY2dMwryyY5mntSQO3cOiS6AdzzjAn
+ wxt9fXx4LFHkm24tlM/yqykOz8KHNaTYdXUa/P4UIbaXq/dWGlUC14ek9r1xvWDwE3xu
+ RfVuBndXgLeunOralBpoJ0krPw4m/tPNnGT67OKi+pKb+yhd4N8nD3HsXDYQ47OeWn/r
+ a13qklX11sQhdD4i7V788ucG/ogfNSSOTRSLAtxHKpE9iY/ZZWUSkR+u/925QNXx0mhK
+ SxxA==
+X-Gm-Message-State: AOAM532sRR6I5AQTL5N1GsyXX5vkD49gN8+oPlPVEtEnd7FwtM9wQ+1/
+ KY3x2hPI3YkppFGDwJyXXxuGGsJsYfu3v3wbUTJYy239Wo0La9UYaF9uihy0hHWZ+O4AlHbQH+t
+ PesH2QqnoF37LtDg=
+X-Received: by 2002:a5d:4202:: with SMTP id n2mr16899210wrq.171.1593443179915; 
+ Mon, 29 Jun 2020 08:06:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwvK6rDr1RmusDMAm1NnBDxeIWOfHqtlaJG8Q0uHx60+RJHAQnk9x26NAcHC/EQzGPHCOR0Og==
+X-Received: by 2002:a5d:4202:: with SMTP id n2mr16899184wrq.171.1593443179717; 
+ Mon, 29 Jun 2020 08:06:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ z25sm65472wmk.28.2020.06.29.08.06.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 08:06:19 -0700 (PDT)
+Date: Mon, 29 Jun 2020 11:06:16 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 1/4] tests/acpi: remove stale allowed tables
+Message-ID: <20200629110443-mutt-send-email-mst@kernel.org>
+References: <20200629140938.17566-1-drjones@redhat.com>
+ <20200629140938.17566-2-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <92ce741d-ef67-fbf9-a889-27d9ae218681@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200629140938.17566-2-drjones@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KaxNwT54PM6akZLP0Gcngyx1lnvs1jwBS"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ TVD_SUBJ_WIPE_DEBT=1.004 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,131 +109,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, eric.auger@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ ard.biesheuvel@arm.com, imammedo@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KaxNwT54PM6akZLP0Gcngyx1lnvs1jwBS
-Content-Type: multipart/mixed; boundary="IcXWtQiHH4UK779pTbGphIRjpmEtA93ic"
-
---IcXWtQiHH4UK779pTbGphIRjpmEtA93ic
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 29.06.20 16:18, Vladimir Sementsov-Ogievskiy wrote:
-> 29.06.2020 16:48, Max Reitz wrote:
->> Hi,
->>
->> In an iotest, I=E2=80=99m trying to quit qemu immediately after a migrat=
-ion has
->> failed.=C2=A0 Unfortunately, that doesn=E2=80=99t seem to be possible in=
- a clean way:
->> migrate_fd_cleanup() runs only at some point after the migration state
->> is already =E2=80=9Cfailed=E2=80=9D, so if I just wait for that =E2=80=
-=9Cfailed=E2=80=9D state and
->> immediately quit, some cleanup functions may not have been run yet.
->>
->> This is a problem with dirty bitmap migration at least, because it
->> increases the refcount on all block devices that are to be migrated, so
->> if we don=E2=80=99t call the cleanup function before quitting, the refco=
-unt will
->> stay elevated and bdrv_close_all() will hit an assertion because those
->> block devices are still around after blk_remove_all_bs() and
->> blockdev_close_all_bdrv_states().
->>
->> In practice this particular issue might not be that big of a problem,
->> because it just means qemu aborts when the user intended to let it quit
->> anyway.=C2=A0 But on one hand I could imagine that there are other clean=
--up
->> paths that should definitely run before qemu quits (although I don=E2=80=
-=99t
->> know), and on the other, it=E2=80=99s a problem for my test.
->>
->> I tried working around the problem for my test by waiting on =E2=80=9CUn=
-able to
->> write=E2=80=9D appearing on stderr, because that indicates that
->> migrate_fd_cleanup()=E2=80=99s error_report_err() has been reached.=C2=
-=A0 But on one
->> hand, that isn=E2=80=99t really nice, and on the other, it doesn=E2=80=
-=99t even work
->> when the failure is on the source side (because then there is no
->> s->error for migrate_fd_cleanup() to report).
-
-(I=E2=80=99ve now managed to work around it by invoking blockdev-del on a n=
-ode
-affected by bitmap migration until it succeeds, because blockdev-del can
-only succeed once the bitmap migration code has dropped its reference to
-it.)
-
->> In all, I=E2=80=99m asking:
->> (1) Is there a nice solution for me now to delay quitting qemu until the
->> failed migration has been fully resolved, including the clean-up?
->>
->> (2) Isn=E2=80=99t it a problem if qemu crashes when you issue =E2=80=9Cq=
-uit=E2=80=9D via QMP at
->> the wrong time?=C2=A0 Like, maybe lingering subprocesses when using =E2=
-=80=9Cexec=E2=80=9D?
->>
->>
->=20
-> I'll look more closely tomorrow, but as a short answer: try my series
-> "[PATCH v2 00/22] Fix error handling during bitmap postcopy" it
-> handles different problems around migration failures & qemu shutdown,
-> probably it will help.
-
-Not, it doesn=E2=80=99t seem to.
-
-I=E2=80=99m not sure what exactly that series addresses, but FWIW I=E2=80=
-=99m hitting
-the problem in non-postcopy migration.  What my simplest reproducer does is=
-:
-
-On the source VM:
-
-blockdev-add node-name=3D'foo' driver=3D'null-co'
-block-dirty-bitmap-add node=3D'foo' name=3D'bmap0'
-
-(Launch destination VM with some -incoming, e.g.
--incoming 'exec: cat /tmp/mig_file')
-
-Both on source and destination:
-
-migrate-set-capabilities capabilities=3D[
-    {capability=3D'events', state=3Dtrue},
-    {capability=3D'dirty-bitmaps', state=3Dtrue}
-]
-
-On source:
-
-migrate uri=3D'exec: cat > /tmp/mig_file'
-
-Then wait for a MIGRATION event with data/status =3D=3D 'failed', and then
-issue 'quit'.
-
-Max
+On Mon, Jun 29, 2020 at 04:09:35PM +0200, Andrew Jones wrote:
+> Fixes: 93dd625f8bf7 ("tests/acpi: update expected data files")
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
 
---IcXWtQiHH4UK779pTbGphIRjpmEtA93ic--
+Ah yes. Thanks for fixing this! I will add something to the pull request
+script to catch this in the future.
 
---KaxNwT54PM6akZLP0Gcngyx1lnvs1jwBS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl76AikACgkQ9AfbAGHV
-z0AStggAul4nGQ9+rhXPMxBqCDCzBXhLenqnBGU1agNw+/gRPZzNwGNAB8d6tY7G
-Sof10XXOMyooN2pb5QviGpWyL5V6jqO+1QpLFgGHLZHzj5QZq/IqFT3D3JIRg4rg
-kKPjlnJI81uSOMy4HhL5+qrWJtBp1oG0gbrML+HbGOLawmfBtcIjOPoSL1LRFUyX
-JY1eLcRUE7hqD5NwL3Sd38vXD/dbteGf7/qrzejOr01KDMvlK73bq9MzcekTqkGZ
-id10UdNZcHQ89E92TgyExlqLakKe7L/nXJO2Hh2vKzHKZB9gn1lHKCLnT4akE88s
-vxbAaEZtOQMwquGM2xh/bynRnBC46g==
-=26nU
------END PGP SIGNATURE-----
-
---KaxNwT54PM6akZLP0Gcngyx1lnvs1jwBS--
+> ---
+>  tests/qtest/bios-tables-test-allowed-diff.h | 18 ------------------
+>  1 file changed, 18 deletions(-)
+> 
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index 8992f1f12b77..dfb8523c8bf4 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,19 +1 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/pc/DSDT",
+> -"tests/data/acpi/pc/DSDT.acpihmat",
+> -"tests/data/acpi/pc/DSDT.bridge",
+> -"tests/data/acpi/pc/DSDT.cphp",
+> -"tests/data/acpi/pc/DSDT.dimmpxm",
+> -"tests/data/acpi/pc/DSDT.ipmikcs",
+> -"tests/data/acpi/pc/DSDT.memhp",
+> -"tests/data/acpi/pc/DSDT.numamem",
+> -"tests/data/acpi/q35/DSDT",
+> -"tests/data/acpi/q35/DSDT.acpihmat",
+> -"tests/data/acpi/q35/DSDT.bridge",
+> -"tests/data/acpi/q35/DSDT.cphp",
+> -"tests/data/acpi/q35/DSDT.dimmpxm",
+> -"tests/data/acpi/q35/DSDT.ipmibt",
+> -"tests/data/acpi/q35/DSDT.memhp",
+> -"tests/data/acpi/q35/DSDT.mmio64",
+> -"tests/data/acpi/q35/DSDT.numamem",
+> -"tests/data/acpi/q35/DSDT.tis",
+> -- 
+> 2.25.4
 
 
