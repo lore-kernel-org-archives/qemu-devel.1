@@ -2,89 +2,87 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 126A5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD22C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:31:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1A77233F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9FB020857
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1F2DwM4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A77233F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OI7cwIma"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9FB020857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpq5k-0005dO-5P
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45824)
+	id 1jpq8h-000807-Qi
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:31:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jpq59-00057N-LT
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:28:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32432
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jpq57-000704-NA
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:28:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593422883;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iAiZkmlllUDU6Hf0ynFGHQpYtJ3oBZ1TUQASTXUy2VI=;
- b=J1F2DwM4cWhk1M2TDUwhYVXiELkuYltavpSr9HKU9MkRl2/4Am5MZjdIU/nz+7fQxYf302
- WpDmvWIBgwTgU78UlYA0w4F5kSZ6ZSTvdbasNbpzZJG4GJo9VzcelsEW7HPFPvIoQLAPlP
- ZZdSopGG2uAbgo5sZGu4ltmy/CXa3Vw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-2XS1eaGmNqSSer7wMYIfkw-1; Mon, 29 Jun 2020 05:28:00 -0400
-X-MC-Unique: 2XS1eaGmNqSSer7wMYIfkw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 130C2107B7C4;
- Mon, 29 Jun 2020 09:27:59 +0000 (UTC)
-Received: from titinator (ovpn-114-115.ams2.redhat.com [10.36.114.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7E882B472;
- Mon, 29 Jun 2020 09:27:47 +0000 (UTC)
-References: <20200626164307.3327380-1-dinechin@redhat.com>
- <20200626164307.3327380-9-dinechin@redhat.com>
- <20200626172613.GN1028934@redhat.com>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH 08/10] build: Add SPICE_CFLAGS and SPICE_LIBS to relevant
- files
-In-reply-to: <20200626172613.GN1028934@redhat.com>
-Date: Mon, 29 Jun 2020 11:27:46 +0200
-Message-ID: <lytuyucjcd.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpq7p-00077J-4k
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:30:53 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42139)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpq7n-0007Ki-8G
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:30:52 -0400
+Received: by mail-oi1-x244.google.com with SMTP id s21so13814871oic.9
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 02:30:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=wjK2dvgOn83MLXosC2akxLYDcXcgYuLXP0cI9yMca0g=;
+ b=OI7cwImaOQJlwRFnvgu2dINuhDxKVvych4gxUxmwpug5o8zkijH9TBa+cY80VzpoZY
+ +PXkudXHsU7gOj56phFtlE17mBSsqTc0haWSoYMHZJ6KggSCcolM7cKhfD0YhpvIRpSU
+ bNraAmoOjicmi+y+uFI4rTTbJisLM7NoBuI7ZY3aNIcXJg4PJNoEyEQYQ/o7QOj1UVEF
+ O/ceV0Vpzy21+MT4zXU97NgmVkWQNUtGjNmfW+O0MWNsEuH9FcXnRcgi+pgU9Htl67Fl
+ OzaeVboIx49tVGCefbD65kLULJB3DdxNo/RxF7N06oTlXFg61LFKJeRjLxY3R7m0Q+CX
+ dv3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=wjK2dvgOn83MLXosC2akxLYDcXcgYuLXP0cI9yMca0g=;
+ b=EcPgOYOewBnKiU1Koa1MulR9GGd99cG0nwf+8c1MqElyw2oLwHtgJVkFqkYnap7P3V
+ oe/oygSO67hrg6+t5jf9wIRwh2gpK1paiYX/PYuRt/IerUuA+itvu8Gj3hxw3zsK0O4C
+ 02NmfW11YzR8tVvmx0h2iruUkB+g3E6ORUpSryn1ERej/njatkSEotog9wDMqlFNU3SE
+ EFWLv3YvJOeJMnq8DTNcgRZT/KUK1/4k1kdX/YYiOaE0XlrwYpop9iE0BZJuiNoRnGy2
+ fBaSS/D2bpDtrQwhWeJdHrCMojTJv2+cH/g/FcnBONGpKQhgX63snBgLEjNv0FBS9/ek
+ SRvw==
+X-Gm-Message-State: AOAM531/nKOnIApZta0kAqw6bKoZJz3440xFb7SqLnY8Izm5EtkA07Ha
+ uqE5UGRdHCTFr2o401n1y5naQMucvO6NUunspSw=
+X-Google-Smtp-Source: ABdhPJyvv46DdA6ki7CgB0n82xF8oGpT5S3R3MXVtxtA/z7wtFn+RibGyh0vmAkhtKmeSFUoHfHh/BDGs0EXfglNBAo=
+X-Received: by 2002:aca:524c:: with SMTP id g73mr6350369oib.150.1593423049802; 
+ Mon, 29 Jun 2020 02:30:49 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-3-ppandit@redhat.com>
+In-Reply-To: <20200624185523.762240-3-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Jun 2020 17:30:13 +0800
+Message-ID: <CAKXe6SKEbi4hDquXYLOeKGcy9frcMhxd22QdUvqjutuHOkYd0g@mail.gmail.com>
+Subject: Re: [PATCH v2 2/9] pci-host: add pcie-msi read method
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,109 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020-06-26 at 19:26 CEST, Daniel P. Berrang=C3=A9 wrote...
-> On Fri, Jun 26, 2020 at 06:43:05PM +0200, Christophe de Dinechin wrote:
->> Instead of adding the spice build flags to the top-level build
->> options, add them where they are necessary. This is a step to move the
->> burden of linking with spice libraries away from the top-level qemu.
->>
->> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
->> ---
->>  configure                |  4 ++--
->>  hw/display/Makefile.objs |  1 +
->>  hw/i386/Makefile.objs    |  1 +
->>  monitor/Makefile.objs    |  3 +++
->>  softmmu/Makefile.objs    |  2 +-
->>  stubs/Makefile.objs      |  2 +-
->>  ui/Makefile.objs         |  4 ++--
->>  util/module.c            | 13 +++++++++++--
->>  8 files changed, 22 insertions(+), 8 deletions(-)
->
->> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
->> index f32b9e47a3..1df8bb3814 100644
->> --- a/stubs/Makefile.objs
->> +++ b/stubs/Makefile.objs
->> @@ -19,10 +19,10 @@ stub-obj-y +=3D replay.o
->>  stub-obj-y +=3D runstate-check.o
->>  stub-obj-$(CONFIG_SOFTMMU) +=3D semihost.o
->>  stub-obj-y +=3D set-fd-handler.o
->> -stub-obj-y +=3D vmgenid.o
->>  stub-obj-y +=3D sysbus.o
->>  stub-obj-y +=3D tpm.o
->>  stub-obj-y +=3D trace-control.o
->> +stub-obj-y +=3D vmgenid.o
->>  stub-obj-y +=3D vmstate.o
->>  stub-obj-$(CONFIG_SOFTMMU) +=3D win32-kbd-hook.o
->>
->
-> This looks unrelated to this series.
-
-I'll send a separate trivial patch to fix the alphabetical ordering.
-I used to have a spice.c stub here, which conflicted every time. This is ho=
-w
-I noticed the alphabetical order was not respected here.
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B46=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:59=E5=86=99=E9=81=93=EF=BC=9A
 
 >
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 >
+> Add pcie-msi mmio read method to avoid NULL pointer dereference
+> issue.
 >
->> diff --git a/util/module.c b/util/module.c
->> index 2fa93561fe..29b4806520 100644
->> --- a/util/module.c
->> +++ b/util/module.c
->> @@ -22,11 +22,11 @@
->>  #ifdef CONFIG_MODULE_UPGRADES
->>  #include "qemu-version.h"
->>  #endif
->> -#ifdef CONFIG_TRACE_RECORDER
->>  #include "trace/recorder.h"
->> -#endif
->>
->>
->> +RECORDER(modules, 16, "QEMU load modules");
->> +
->>  typedef struct ModuleEntry
->>  {
->>      void (*init)(void);
->> @@ -85,6 +85,15 @@ void register_dso_module_init(void (*fn)(void), modul=
-e_init_type type)
->>  {
->>      ModuleEntry *e;
->>
->> +#ifdef CONFIG_TRACE_RECORDER
->> +    static const char *name[] =3D {
->> +        "MIGRATION", "BLOCK", "OPTS", "QOM",
->> +        "TRACE", "XEN_BACKEND", "LIBQOS", "FUZZ_TARGET",
->> +        "MAX"
->> +    };
->> +#endif
->> +    record(modules, "Register DSO module init %p type %u %+s",
->> +           fn, type, name[type]);
->>      init_lists();
+> Reported-by: Lei Sun <slei.casper@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+> ---
+>  hw/pci-host/designware.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> This looks unrelated too, but in general debugging should go via QEMU's
-> standard trace backends.
+> diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+> index 8492c18991..82262bdfdf 100644
+> --- a/hw/pci-host/designware.c
+> +++ b/hw/pci-host/designware.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
+> +#include "qemu/log.h"
+>  #include "hw/pci/msi.h"
+>  #include "hw/pci/pci_bridge.h"
+>  #include "hw/pci/pci_host.h"
+> @@ -63,6 +64,13 @@ designware_pcie_root_to_host(DesignwarePCIERoot *root)
+>      return DESIGNWARE_PCIE_HOST(bus->parent);
+>  }
 >
-
-Yes. I apparently botched a fixup. That was supposed to be a private patch
-for my own use.
-
-
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
-
+> +static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr addr,
+> +                                              unsigned size)
+> +{
+> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
+> +    return 0;
+> +}
+> +
+>  static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+>                                             uint64_t val, unsigned len)
+>  {
+> @@ -77,6 +85,7 @@ static void designware_pcie_root_msi_write(void *opaque=
+, hwaddr addr,
+>  }
+>
+>  static const MemoryRegionOps designware_pci_host_msi_ops =3D {
+> +    .read =3D designware_pcie_root_msi_read,
+>      .write =3D designware_pcie_root_msi_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>      .valid =3D {
+> --
+> 2.26.2
+>
 
