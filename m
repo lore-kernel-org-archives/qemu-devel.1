@@ -2,81 +2,100 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C816C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22231C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:45:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F74D23E1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:43:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F74D23E1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E1EFF23E1F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:45:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K330bgeW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EFF23E1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpv0J-00042w-HP
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48356)
+	id 1jpv21-0006Vy-6X
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:45:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpuxn-0002l2-Iw
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:40:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57916)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jpuy5-00031T-QK
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:41:09 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52762)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpuxl-00014J-Jw
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:40:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jpuxj-0002cp-Gt
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7ECCF2E810C
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:40:47 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jpuy4-0001FI-1B
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:41:09 -0400
+Received: by mail-wm1-x344.google.com with SMTP id q15so15631648wmj.2
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 07:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ATLAiO8uoee8c66oqfYdT1Zfnhx9V+nSe7jkQWl7mV0=;
+ b=K330bgeW0TDh21sMdpaz5yV0p/OaAEHCzcgPusDNd/yVD5pFKIGY8krE7ignaTqVxm
+ 6wmnVtiAP2MwLAsDwIRPA2po76+sEQFRlire4wRnc6Um4oYejrpWJPxbDHG0YQKtNK4v
+ OXTMB+qw/CAoMPqf2brk/2Xl9oWXf0iQA5McKEVWnUdd2WdwQXRNCOg3yKImXmBZMcDK
+ 2zcd/DOjl7w+OAbYKQdnUXQty8FPyHcNsJnQcJQtiw1Htrn9o3v5nL8nw5eZFV8t46EQ
+ SC71jlrbP/910iHtZVzQu7sUdcdxtpXnwVyCiTFR2KmztHqkNkuAPi6DOxHEp7gVsNEp
+ bw5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ATLAiO8uoee8c66oqfYdT1Zfnhx9V+nSe7jkQWl7mV0=;
+ b=jpPzxGSjSLa6ZVxhNMRIv/dHOXIGkDBXHFW2TQ4dfsDYcagKv279Itp+Iif47BY5UJ
+ 8NV+XqXdTBEdVWPFxIuFMzlvldifCnt6c+f76Ad6Y+S6HkqrGAImO2do7K2g4NGPcm2n
+ JUupUOiO4FahJu3wGQSEK/zbYvpl/W9afCJFPwcY84HYfdD6YmZ/IPcMS2QcesAoSjYA
+ d0cb3Bsg9gTG19hJQfcKBVy+ASDaXksBtJOMXqtd7EWuJW9GznPbrgNs/PxAuZWyUoi7
+ EdlfalPLCOsn5XAGozNE7RtMTiRLNdowHvTyyRbjnrwtAdlTMA4dljBNzOo6RKtOLt0x
+ MiVA==
+X-Gm-Message-State: AOAM532cfXdcqbHMUtsjumxY/6ygPYSFnR0sqWY3x3KcVYPaRY09RQv7
+ tIyjX5MCQAYVYbtJ2EBpZoGQpA==
+X-Google-Smtp-Source: ABdhPJyKDPiOTqf8IoPlxFpFGDCXpSmmBVkchVNsjE3zGsrjZiNCVwRV8iTsB+65cykt09cD4hnOFw==
+X-Received: by 2002:a1c:cc12:: with SMTP id h18mr16199423wmb.3.1593441665122; 
+ Mon, 29 Jun 2020 07:41:05 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f14sm35907592wro.90.2020.06.29.07.41.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 07:41:03 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 248841FF7E;
+ Mon, 29 Jun 2020 15:41:02 +0100 (BST)
+References: <20200622143204.12921-1-alex.bennee@linaro.org>
+ <20200622143204.12921-13-alex.bennee@linaro.org>
+ <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v1 12/18] tests/vm: allow us to take advantage of MTTCG
+In-reply-to: <3ab77b68-9f5d-6b99-e226-df4abb186add@linaro.org>
+Date: Mon, 29 Jun 2020 15:41:02 +0100
+Message-ID: <87bll2rl35.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 14:30:49 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1882817@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd theartlav
-X-Launchpad-Bug-Reporter: Artyom (theartlav)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
-Message-Id: <159344104920.3046.17384387455354941160.malone@wampee.canonical.com>
-Subject: [Bug 1882817] Re: Segfault in audio_pcm_sw_write with audio over VNC
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 318542c82ae699b6a178a765a732b0de700b3ba6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,67 +104,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
+Cc: fam@euphon.net, berrange@redhat.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-commit cbaf25d1f59ee13fc7542a06ea70784f2e000c04.
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+Richard Henderson <richard.henderson@linaro.org> writes:
 
--- =
+> On 6/22/20 7:31 AM, Alex Benn=C3=A9e wrote:
+>>          if kvm_available(vmcls.arch):
+>>              return multiprocessing.cpu_count() // 2
+>> +        elif os.uname().machine =3D=3D "x86_64" and \
+>> +             vmcls.arch in ["aarch64", "x86_64", "i386"]:
+>> +            # MTTCG is available on these arches and we can allow more =
+cores.
+>> +            # But only up to a reasonable limit. User can always overri=
+de
+>> +            # these limits with --jobs.
+>> +            return min(multiprocessing.cpu_count() // 2, 8)
+>>          else:
+>
+> And if multiprocessing.cpu_count() =3D=3D 1?
+> Seems like we should add max(count, 1) as well.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882817
+As it also affects KVM:
 
-Title:
-  Segfault in audio_pcm_sw_write with audio over VNC
+    def get_default_jobs():
+        if multiprocessing.cpu_count > 1:
+            if kvm_available(vmcls.arch):
+                return multiprocessing.cpu_count() // 2
+            elif os.uname().machine =3D=3D "x86_64" and \
+                 vmcls.arch in ["aarch64", "x86_64", "i386"]:
+                # MTTCG is available on these arches and we can allow more =
+cores.
+                # But only up to a reasonable limit. User can always overri=
+de
+                # these limits with --jobs.
+                return min(multiprocessing.cpu_count() // 2, 8)
+        else:
+            return 1
 
-Status in QEMU:
-  Fix Committed
 
-Bug description:
-  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-  --enable-debug --disable-strip --disable-docs --disable-sdl
+>
+>
+> r~
 
-  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-  Guest is also Arch Linux, 64bit.
 
-  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
-   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
-
-  So, a headless VM is running on a server and is being connected to
-  over VNC. The virtual sound card is detected and speaker test is
-  running inside the VM. So far so good.
-
-  Then, i tell the VNC client to enable audio (QEMU Audio Client
-  Message, 255,1,0). QEMU responds with a "stream is about to start"
-  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
-  without sending anything else.
-
-  Running it in GDB produces a crash at audio/audio.c:739
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-  739             if (!sw->hw->pcm_ops->volume_out) {
-
-  The exact sequence of events does not matter - i can enable sound
-  before playing anything, and then it would say nothing and keep
-  working, but crash with the same message once anything sound-playing
-  is launched in the VM.
-
-  Using different soundhw or adding various audiodev options does not
-  seem to affect anything.
-
-  I can't quite figure out if the QEMU Audio VNC extension is supposed
-  to work at all or not, but it would be handy to me if it is.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
