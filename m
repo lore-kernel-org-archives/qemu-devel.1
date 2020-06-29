@@ -2,57 +2,85 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC93C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE1C6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C598E206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C598E206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id C1B72206A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:36:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iv3wTIQM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B72206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzXy-0000zt-3a
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51608)
+	id 1jpzZQ-0002ij-21
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRI-00084g-P0; Mon, 29 Jun 2020 15:27:36 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:42919)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRF-0002IL-OR; Mon, 29 Jun 2020 15:27:36 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id B60B2748DDB;
- Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 2289E748DC8; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
-Message-Id: <93758f65ef21d977fe835364bb1386fb4c03a6ce.1593456926.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1593456926.git.balaton@eik.bme.hu>
-References: <cover.1593456926.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [RFC PATCH v7 7/8] WIP macio/cuda: Attempt to add i2c support
-Date: Mon, 29 Jun 2020 20:55:26 +0200
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jpzY8-0001WD-F0
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 15:34:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41763
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jpzY6-0003GJ-KA
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 15:34:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593459277;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=B3yZwV4n/uIZvRqyNPD4IDCcs6cpedmKe0rRjeeh/Jw=;
+ b=Iv3wTIQM5hr/k0jcYOU3LScrG5ibRAX05E6dMLagYh5VhP2+S1ByjCwhXGHrtKn39mITpG
+ vZ5BjNFQNbnCjtDC2Sj+GoCN3ntj1NkyCE50kWjQQ5b3+8fKISqoBgkQ6zxB168FrCkOmf
+ LpnjbCaTvE5H5tenPiTPe98qTBg/m6I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-J0M966NUMQaqv6HrxhDHUQ-1; Mon, 29 Jun 2020 15:34:33 -0400
+X-MC-Unique: J0M966NUMQaqv6HrxhDHUQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC9071800D42;
+ Mon, 29 Jun 2020 19:34:32 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C5D85C220;
+ Mon, 29 Jun 2020 19:34:28 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ armbru@redhat.com
+Subject: [PATCH v5 0/3] Avoid abort on QMP attempt to add an object with
+ duplicate id
+Date: Mon, 29 Jun 2020 21:34:21 +0200
+Message-Id: <20200629193424.30280-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-To: qemu-devel@nongnu.org,
-    qemu-ppc@nongnu.org
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 15:27:18
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 15:34:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,160 +94,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not a final, RFC patch attempt to implement i2c bus in CUDA
-needed for firmware to access SPD data of installed RAM. The skeleton
-is there but actual implementation of I2C commands need to be refined
-because I don't know how this is supposed to work. In my understanding
-after an I2C command (at least for combined transfer) CUDA should
-enter a mode where reading subsequent values from VIA[SR] should
-return bytes received from the i2C device but not sure what ends this
-mode or how to model it correctly. So this patch just returns fixed
-amount of bytes expected by reading SPD eeproms just to make testing
-the firmware ROM possible. Help fixing and finishing this is welcome,
-I don't plan to spend more time with this so just submitted it for
-whoever picks this up.
+Attempting to add an object through QMP with an id that is
+already used leads to a qemu abort. This is a regression since
+d2623129a7de ("qom: Drop parameter @errp of object_property_add()
+& friends").
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/misc/macio/cuda.c         | 76 +++++++++++++++++++++++++++++++++++-
- include/hw/misc/macio/cuda.h |  1 +
- 2 files changed, 76 insertions(+), 1 deletion(-)
+The first patch fixes the issue and the second patch adds a test
+to check the error is gracefully returned to the QMP client.
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index 5bbc7770fa..3fc9773717 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -28,6 +28,7 @@
- #include "hw/ppc/mac.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "hw/i2c/i2c.h"
- #include "hw/input/adb.h"
- #include "hw/misc/mos6522.h"
- #include "hw/misc/macio/cuda.h"
-@@ -370,6 +371,75 @@ static bool cuda_cmd_set_time(CUDAState *s,
-     return true;
- }
- 
-+static bool cuda_cmd_get_set_iic(CUDAState *s,
-+                                 const uint8_t *in_data, int in_len,
-+                                 uint8_t *out_data, int *out_len)
-+{
-+    int i;
-+
-+    qemu_log_mask(LOG_UNIMP, "CUDA: unimplemented GET_SET_IIC %s 0x%x %d\n",
-+                  (in_data[0] & 1 ? "read" : "write"), in_data[0] >> 1,
-+                  in_len);
-+    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1)) {
-+        return false;
-+    }
-+    for (i = 0; i < in_len - 3; i++) {
-+        if (i2c_send(s->i2c_bus, in_data[i])) {
-+            i2c_end_transfer(s->i2c_bus);
-+            return false;
-+        }
-+    }
-+    return true;
-+}
-+
-+static bool cuda_cmd_combined_iic(CUDAState *s,
-+                                  const uint8_t *in_data, int in_len,
-+                                  uint8_t *out_data, int *out_len)
-+{
-+    int i;
-+
-+    if (in_len < 3) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CUDA: COMBINED_FORMAT_IIC too few input bytes\n");
-+        return false;
-+    }
-+    if ((in_data[0] & 0xfe) != (in_data[2] & 0xfe)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "CUDA: COMBINED_FORMAT_IIC address mismatch\n");
-+        return false;
-+    }
-+
-+    uint8_t data = in_data[1];
-+    if (i2c_start_transfer(s->i2c_bus, in_data[0] >> 1, in_data[0] & 1) ||
-+        i2c_send_recv(s->i2c_bus, &data, in_data[0] & 1)) {
-+        return false;
-+    }
-+    i2c_end_transfer(s->i2c_bus);
-+    if (in_data[2] & 1) {
-+        if (i2c_start_transfer(s->i2c_bus, in_data[2] >> 1, in_data[2] & 1)) {
-+            i2c_end_transfer(s->i2c_bus);
-+            return false;
-+        }
-+        for (i = 0; i < 5; i++) {
-+            if (i2c_send_recv(s->i2c_bus, &out_data[i], in_data[2] & 1)) {
-+                i2c_end_transfer(s->i2c_bus);
-+                return false;
-+            }
-+        }
-+        *out_len = i;
-+        i2c_end_transfer(s->i2c_bus);
-+    } else {
-+        for (i = 0; i < in_len - 3; i++) {
-+            data = in_data[3 + i];
-+            if (i2c_send_recv(s->i2c_bus, &data, in_data[2] & 1)) {
-+                i2c_end_transfer(s->i2c_bus);
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
- static const CudaCommand handlers[] = {
-     { CUDA_AUTOPOLL, "AUTOPOLL", cuda_cmd_autopoll },
-     { CUDA_SET_AUTO_RATE, "SET_AUTO_RATE",  cuda_cmd_set_autorate },
-@@ -382,6 +452,8 @@ static const CudaCommand handlers[] = {
-       cuda_cmd_set_power_message },
-     { CUDA_GET_TIME, "GET_TIME", cuda_cmd_get_time },
-     { CUDA_SET_TIME, "SET_TIME", cuda_cmd_set_time },
-+    { CUDA_GET_SET_IIC, "GET_SET_IIC", cuda_cmd_get_set_iic },
-+    { CUDA_COMBINED_FORMAT_IIC, "COMBINED_FORMAT_IIC", cuda_cmd_combined_iic },
- };
- 
- static void cuda_receive_packet(CUDAState *s,
-@@ -549,6 +621,7 @@ static void cuda_init(Object *obj)
- {
-     CUDAState *s = CUDA(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    DeviceState *dev = DEVICE(obj);
- 
-     object_initialize_child(obj, "mos6522-cuda", &s->mos6522_cuda,
-                             TYPE_MOS6522_CUDA);
-@@ -557,7 +630,8 @@ static void cuda_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->mem);
- 
-     qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
--                        DEVICE(obj), "adb.0");
-+                        dev, "adb.0");
-+    s->i2c_bus = i2c_init_bus(dev, "i2c");
- }
- 
- static Property cuda_properties[] = {
-diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
-index a8cf0be1ec..6856ed7704 100644
---- a/include/hw/misc/macio/cuda.h
-+++ b/include/hw/misc/macio/cuda.h
-@@ -79,6 +79,7 @@ typedef struct CUDAState {
- 
-     ADBBusState adb_bus;
-     MOS6522CUDAState mos6522_cuda;
-+    I2CBus *i2c_bus;
- 
-     uint32_t tick_offset;
-     uint64_t tb_frequency;
+The last patch can be considered independently. It merges all the
+object-add tests into a single test function and cover new failure
+cases.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/qom-graceful-v5
+
+History:
+
+- v4 -> v5:
+  - Use 1MB instead of 4GB as size in the hope it removes
+    the patchew error
+
+- v3 -> v4:
+  - addressed style comment from Markus
+  - added patch 3
+
+- v2 -> v3:
+  - don't take the object reference on failure in
+    object_property_try_add_child
+  - add g_assert_nonnull(resp) in 2/2 while keeping
+    Thomas A-b
+
+- v1 -> v2:
+  - use the try terminology.
+  - turn object_property_try_add() into a non-static function
+  - add the test
+
+
+Eric Auger (3):
+  qom: Introduce object_property_try_add_child()
+  tests/qmp-cmd-test: Add qmp/object-add-duplicate-id
+  tests/qmp-cmd-test: Add qmp/object-add-failure-modes
+
+ include/qom/object.h       |  26 ++++++++-
+ qom/object.c               |  21 +++++--
+ qom/object_interfaces.c    |   7 ++-
+ tests/qtest/qmp-cmd-test.c | 109 +++++++++++++++++++++++++++++++++++--
+ 4 files changed, 149 insertions(+), 14 deletions(-)
+
 -- 
-2.21.3
+2.20.1
 
 
