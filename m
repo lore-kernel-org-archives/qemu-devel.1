@@ -2,99 +2,79 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1BAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7ECC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8FE223AA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:38:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p9ni3KKW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8FE223AA9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 837AE23B84
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837AE23B84
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jps7h-0004k2-24
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:38:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51992)
+	id 1jpsAS-0007Ds-Mz
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jps6v-0004DW-Hd; Mon, 29 Jun 2020 07:38:05 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40040)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jps9h-0006QI-7j
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:40:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45090)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jps6t-0004e4-TR; Mon, 29 Jun 2020 07:38:05 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h5so16179627wrc.7;
- Mon, 29 Jun 2020 04:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ba/K5ALQXjenIjuBP8UpuRVrsp8eWE4BSwmJL4ZBh9A=;
- b=p9ni3KKWuevwHEMZjAzHLUo3rWuWDXNVWoFnH3K6Fgc+I+kA4eOTGxVq138sgYzGJn
- af6GK77dFBfAtSkaRCh/NX9VBypd8/anxrSHAZ6b3Tn3mJCRkaQPgIg+vKA0RBY7uBOb
- gEhBSgf0wZpeoXjSs9SJHlG1jOAoenje4qlSoHe9l6KyPfW9WAp/xEkdPs67ejICV00h
- euv1Uj9UMgIzN7ug8urZA1BbkPn4I2zk1MBZ+eGGDGYY9OYfdvmva+d311utUoi1A5ts
- 4HYgOLhXu16RwzaBGV0BVY1UGMtPM0XrVnEa/WqmGpa8c3JnmR6ZQLoTv+iwyNS1Uey0
- rjMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ba/K5ALQXjenIjuBP8UpuRVrsp8eWE4BSwmJL4ZBh9A=;
- b=KtTYj8m2mtIvIdODku99gi/0Qx3THVnb6nO8uu2DrYk2098APIbLTarRq2xG+Aw0iZ
- S08aKD5jETzPMn0Zc/eq6QIV9V8E9xz+9mLYLPD0H1r2BtERzBSpV/XH6tHcXaMDPepE
- /0napRlUZDOPGwfJeahzhNiERot3qnii639kyBjefgNkz22A24+cJHh+lHgQKgnp8puL
- C7zjMOLYpsDxvFCJaNWNX4dS8rRRV7FvimAovU/PmxnrmiTub6Zxw8U2WZN/A4hhWbC0
- y7KmLWz5hCY9+lsDq3smHfptR/aETOHbp9SoLI9Nf46V+i6z3dHCO3/MbTpXG7BdGiAc
- kUGQ==
-X-Gm-Message-State: AOAM530cPZox90Ve/+swZqO6dhAWgMESEUM2uD7nT1Hd3t2U3Bw3RP4K
- ZEAdLYvivzFBZUxDmIFgHfM=
-X-Google-Smtp-Source: ABdhPJygEIsTNnggVwvSkNqXna1keo8bnP7+QU+ChLuOTvQub40fcaNKmpV9qJ/2ZbvR3M9hRiF2gQ==
-X-Received: by 2002:a5d:5381:: with SMTP id d1mr16801613wrv.177.1593430681587; 
- Mon, 29 Jun 2020 04:38:01 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id f16sm21013351wmf.17.2020.06.29.04.38.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 29 Jun 2020 04:38:00 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/3] Use object_get_canonical_path_component to get
- child description
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200626102744.15053-1-f4bug@amsat.org>
- <87y2o9ro9c.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bdc55286-0f1c-c2fd-7358-5c923d0cb091@amsat.org>
-Date: Mon, 29 Jun 2020 13:38:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jps9e-0005Et-VC
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:40:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jps9c-0002gd-Os
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B3B002E810B
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:40:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87y2o9ro9c.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2020 11:28:13 -0000
+From: Laurent Vivier <1884719@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier martingrigorov stefanha
+X-Launchpad-Bug-Reporter: Martin Grigorov (martingrigorov)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <159289799812.6175.17000319886186623286.malonedeb@soybean.canonical.com>
+Message-Id: <159343009349.3336.8161987566905135659.malone@wampee.canonical.com>
+Subject: [Bug 1884719] Re: Function not implemented when using libaio
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7ce2330853ec2f2249410e952761ebe0a24d71b2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,35 +83,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1884719 <1884719@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/27/20 8:55 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> This RFC is simply a proof-of-concept to see if I correctly
->> understood Markus' suggestion, see the thread around:
->> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08652.html
-> 
-> Please show us output of "info qom-tree" before and after.  Feel free to
-> cut uninteresting parts.
-> 
+ptrace() is not implemented,
 
-For 'info qom-tree' this is a one-line change, because ram_memdev
-is not displayed in it:
+it's why we use gdb server rather than gdb and we use QEMU_STRACE
+variable rather than strace command.
 
- /machine (sam460ex-machine)
-   /peripheral (container)
-   /peripheral-anon (container)
-   /unattached (container)
--    /device[2] (smbus-eeprom)
+You can test it works with:
+
+  QEMU_STRACE=3D bash -c "echo Test"
+
+Could you try to execute your test program with it:
+
+  QEMU_STRACE=3D ./out
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1884719
+
+Title:
+  Function not implemented when using libaio
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello
+
+  I experience "Function not implemented" errors when trying to use
+  Linux libaio library in foreign architecture, e.g. aarch64.
+
+  I've faced this problem while using https://github.com/multiarch/qemu-use=
+r-static, i.e. Docker+QEMU. =
+
+  I understand that I do not use plain QEMU and you may count this report a=
+s a "distribution of QEMU"! Just let me know what are the steps to test it =
+with plain QEMU and I will test and update this ticket!
+
+  =
+
+  Here are the steps to reproduce the issue:
+
+  1) On x86_64 machine register QEMU:
+
+      `docker run -it --rm --privileged multiarch/qemu-user-static
+  --reset --credential yes --persistent yes`
+
+  2) Start a Docker image with foreign CPU architecture, e.g. aarch64
+
+      `docker run -it arm64v8/centos:8 bash`
+
+  3) Inside the Docker container install GCC and libaio
+
+      `yum install gcc libaio libaio-devel`
+
+  4) Compile the following C program
+
+  ```
+  #include <stdio.h>
+  #include <errno.h>
+  #include <libaio.h>
+  #include <stdlib.h>
+
+  struct io_control {
+      io_context_t ioContext;
+  };
+
+  int main() {
+      int queueSize =3D 10;
+
+      struct io_control * theControl =3D (struct io_control *) malloc(sizeo=
+f(struct io_control));
+      if (theControl =3D=3D NULL) {
+          printf("theControl is NULL");
+          return 123;
+      }
+
+      int res =3D io_queue_init(queueSize, &theControl->ioContext);
+      io_queue_release(theControl->ioContext);
+      free(theControl);
+      printf("res is: %d", res);
+  }
+  ```
+
+      ```
+      cat > test.c
+          [PASTE THE CODE ABOVE HERE]
+      ^D
+      ```
+
+      `gcc test.c -o out -laio && ./out`
+
+  =
+
+  When executed directly on aarch64 machine (i.e. without emulation) or on =
+x86_64 Docker image (e.g. centos:8) it prints `res is: 0`, i.e. it successf=
+ully initialized a LibAIO queue.
+
+  But when executed on Docker image with foreign/emulated CPU
+  architecture it prints `res is: -38` (ENOSYS). `man io_queue_init`
+  says that error ENOSYS is returned when "Not implemented."
+
+  Environment:
+
+  QEMU version: 5.0.0.2  (https://github.com/multiarch/qemu-user-static/blo=
+b/master/.travis.yml#L24-L28)
+  Container application: Docker
+  Output of `docker --version`:
+
+  ```
+  Client:
+   Version:           19.03.8
+   API version:       1.40
+   Go version:        go1.13.8
+   Git commit:        afacb8b7f0
+   Built:             Wed Mar 11 23:42:35 2020
+   OS/Arch:           linux/amd64
+   Experimental:      false
+
+  Server:
+   Engine:
+    Version:          19.03.8
+    API version:      1.40 (minimum version 1.12)
+    Go version:       go1.13.8
+    Git commit:       afacb8b7f0
+    Built:            Wed Mar 11 22:48:33 2020
+    OS/Arch:          linux/amd64
+    Experimental:     false
+   containerd:
+    Version:          1.3.3-0ubuntu2
+    GitCommit:        =
+
+   runc:
+    Version:          spec: 1.0.1-dev
+    GitCommit:        =
+
+   docker-init:
+    Version:          0.18.0
+    GitCommit:        =
+
+  ```
+
+  Same happens with Ubuntu (arm64v8/ubuntu:focal).
+
+  I've tried to `strace` it but :
+
+  ```
+  /usr/bin/strace: ptrace(PTRACE_TRACEME, ...): Function not implemented
+  /usr/bin/strace: PTRACE_SETOPTIONS: Function not implemented
+  /usr/bin/strace: detach: waitpid(112): No child processes
+  /usr/bin/strace: Process 112 detached
+  ```
+
+  Here are the steps to reproduce the problem with strace:
+
+       ```
+       docker run --rm -it --security-opt seccomp:unconfined --security-opt=
+ apparmor:unconfined --privileged --cap-add ALL arm64v8/centos:8 bash
+
+       yum install -y strace`
+
+       strace echo Test
+       ```
+
+  Note: I used --privileged, disabled seccomp and apparmor, and added
+  all capabilities
+
+  Disabling security solves the "Permission denied" problem but then
+  comes the "Not implemented" one.
+
+  =
+
+  Any idea what could be the problem and how to work it around ?
+  I've googled a lot but I wasn't able to find any problems related to liba=
+io on QEMU.
+
+  Thank you!
+  Martin
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1884719/+subscriptions
 
