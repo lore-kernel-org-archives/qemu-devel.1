@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F89C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D557C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:31:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33A782065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:30:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33A782065F
+	by mail.kernel.org (Postfix) with ESMTPS id 4C60A2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C60A2067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzUB-0003yW-Ck
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51600)
+	id 1jpzUa-0004ox-Gs
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:31:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRH-00082c-O1; Mon, 29 Jun 2020 15:27:35 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42918)
+ id 1jpzRJ-00086n-LR; Mon, 29 Jun 2020 15:27:37 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42921)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRF-0002IM-Ns; Mon, 29 Jun 2020 15:27:35 -0400
+ id 1jpzRG-0002IU-D4; Mon, 29 Jun 2020 15:27:37 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 87FD7748DDA;
+ by localhost (Postfix) with SMTP id C5608748DCA;
  Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0B6A47475F9; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
-Message-Id: <cf1ee4b79ff72d51e6e05027bb51439c2e6bbda1.1593456926.git.balaton@eik.bme.hu>
+ id 1E4B4748DCC; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
+Message-Id: <015adea83c4708c5ed32e561bc8d0691ef839764.1593456926.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1593456926.git.balaton@eik.bme.hu>
 References: <cover.1593456926.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v7 2/8] mac_newworld: Allow loading binary ROM image
+Subject: [PATCH v7 6/8] i2c: Match parameters of i2c_start_transfer and
+ i2c_send_recv
 Date: Mon, 29 Jun 2020 20:55:26 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,100 +74,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fall back to load binary ROM image if loading ELF fails. This also
-moves PROM_BASE and PROM_SIZE defines to board as these are matching
-the ROM size and address on this board and removes the now unused
-PROM_ADDR and BIOS_SIZE defines from common mac.h.
+These functions have a parameter that decides the direction of
+transfer but totally confusingly they don't match but inverted sense.
+To avoid frequent mistakes when using these functions change
+i2c_send_recv to match i2c_start_transfer. Also use bool in
+i2c_start_transfer instead of int to match i2c_send_recv.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
-Unlike mac_oldworld where the openbios-ppc image loads at end of ROM
-region here we only check size and assume ELF image is loaded from
-PROM_BASE, Checking the load addr here is tricky because this board is
-also be compiled both 64 and 32 bit and load_elf seems to always
-return 64 bit value so handling that could become a mess. If this is a
-problem then it's a preexisting one so should be fixed in a separate
-patch. This one just allows loading ROM binary too otherwise
-preserving previous behaviour.
+This probably won't be the solution accepted as Philippe has an
+alternative series fixing this problem here:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg07022.html
+but until that or something else is merged this will do for the next
+patch. When this gets sorted out I'll send a rebased version.
 
- hw/ppc/mac.h          |  2 --
- hw/ppc/mac_newworld.c | 22 ++++++++++++++--------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ hw/display/sm501.c   |  2 +-
+ hw/i2c/core.c        | 34 +++++++++++++++++-----------------
+ hw/i2c/ppc4xx_i2c.c  |  2 +-
+ include/hw/i2c/i2c.h |  4 ++--
+ 4 files changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 04e498bc57..195967facd 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -40,10 +40,8 @@
- /* SMP is not enabled, for now */
- #define MAX_CPUS 1
- 
--#define BIOS_SIZE        (1 * MiB)
- #define NVRAM_SIZE        0x2000
- #define PROM_FILENAME    "openbios-ppc"
--#define PROM_ADDR         0xfff00000
- 
- #define KERNEL_LOAD_ADDR 0x01000000
- #define KERNEL_GAP       0x00100000
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 828c5992ae..c88142af57 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -82,6 +82,8 @@
- 
- #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
- 
-+#define PROM_BASE 0xfff00000
-+#define PROM_SIZE (1 * MiB)
- 
- static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-                             Error **errp)
-@@ -100,7 +102,7 @@ static void ppc_core99_reset(void *opaque)
- 
-     cpu_reset(CPU(cpu));
-     /* 970 CPUs want to get their initial IP as part of their boot protocol */
--    cpu->env.nip = PROM_ADDR + 0x100;
-+    cpu->env.nip = PROM_BASE + 0x100;
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index a7fc08c52b..e714674681 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1041,7 +1041,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
+                                   s->i2c_byte_count + 1, s->i2c_addr >> 1);
+                     for (i = 0; i <= s->i2c_byte_count; i++) {
+                         res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
+-                                            !(s->i2c_addr & 1));
++                                            s->i2c_addr & 1);
+                         if (res) {
+                             SM501_DPRINTF("sm501 i2c : transfer failed"
+                                           " i=%d, res=%d\n", i, res);
+diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+index acf34a12d6..0303fefeaf 100644
+--- a/hw/i2c/core.c
++++ b/hw/i2c/core.c
+@@ -91,7 +91,7 @@ int i2c_bus_busy(I2CBus *bus)
+  * without releasing the bus.  If that fails, the bus is still
+  * in a transaction.
+  */
+-int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
++int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv)
+ {
+     BusChild *kid;
+     I2CSlaveClass *sc;
+@@ -175,26 +175,14 @@ void i2c_end_transfer(I2CBus *bus)
+     bus->broadcast = false;
  }
  
- /* PowerPC Mac99 hardware initialisation */
-@@ -153,25 +155,29 @@ static void ppc_core99_init(MachineState *machine)
-     /* allocate RAM */
-     memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+-int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
++int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv)
+ {
+     I2CSlaveClass *sc;
+     I2CSlave *s;
+     I2CNode *node;
+     int ret = 0;
  
--    /* allocate and load BIOS */
--    memory_region_init_rom(bios, NULL, "ppc_core99.bios", BIOS_SIZE,
-+    /* allocate and load firmware ROM */
-+    memory_region_init_rom(bios, NULL, "ppc_core99.bios", PROM_SIZE,
-                            &error_fatal);
-+    memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
- 
--    if (bios_name == NULL)
-+    if (!bios_name) {
-         bios_name = PROM_FILENAME;
-+    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
--    memory_region_add_subregion(get_system_memory(), PROM_ADDR, bios);
--
--    /* Load OpenBIOS (ELF) */
-     if (filename) {
-+        /* Load OpenBIOS (ELF) */
-         bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
-                              NULL, NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
- 
-+        if (bios_size <= 0) {
-+            /* or load binary ROM image */
-+            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
+-    if (send) {
+-        QLIST_FOREACH(node, &bus->current_devs, next) {
+-            s = node->elt;
+-            sc = I2C_SLAVE_GET_CLASS(s);
+-            if (sc->send) {
+-                trace_i2c_send(s->address, *data);
+-                ret = ret || sc->send(s, *data);
+-            } else {
+-                ret = -1;
+-            }
+-        }
+-        return ret ? -1 : 0;
+-    } else {
++    if (recv) {
+         ret = 0xff;
+         if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
+             sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+@@ -206,19 +194,31 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+         }
+         *data = ret;
+         return 0;
++    } else {
++        QLIST_FOREACH(node, &bus->current_devs, next) {
++            s = node->elt;
++            sc = I2C_SLAVE_GET_CLASS(s);
++            if (sc->send) {
++                trace_i2c_send(s->address, *data);
++                ret = ret || sc->send(s, *data);
++            } else {
++                ret = -1;
++            }
 +        }
-         g_free(filename);
-     } else {
-         bios_size = -1;
++        return ret ? -1 : 0;
      }
--    if (bios_size < 0 || bios_size > BIOS_SIZE) {
-+    if (bios_size < 0 || bios_size > PROM_SIZE) {
-         error_report("could not load PowerPC bios '%s'", bios_name);
-         exit(1);
-     }
+ }
+ 
+ int i2c_send(I2CBus *bus, uint8_t data)
+ {
+-    return i2c_send_recv(bus, &data, true);
++    return i2c_send_recv(bus, &data, false);
+ }
+ 
+ uint8_t i2c_recv(I2CBus *bus)
+ {
+     uint8_t data = 0xff;
+ 
+-    i2c_send_recv(bus, &data, false);
++    i2c_send_recv(bus, &data, true);
+     return data;
+ }
+ 
+diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+index c0a8e04567..d3899203a4 100644
+--- a/hw/i2c/ppc4xx_i2c.c
++++ b/hw/i2c/ppc4xx_i2c.c
+@@ -239,7 +239,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+                     }
+                 }
+                 if (!(i2c->sts & IIC_STS_ERR) &&
+-                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
++                    i2c_send_recv(i2c->bus, &i2c->mdata[i], recv)) {
+                     i2c->sts |= IIC_STS_ERR;
+                     i2c->extsts |= IIC_EXTSTS_XFRA;
+                     break;
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index d6e3d85faf..ad2475d6a2 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -72,10 +72,10 @@ struct I2CBus {
+ I2CBus *i2c_init_bus(DeviceState *parent, const char *name);
+ void i2c_set_slave_address(I2CSlave *dev, uint8_t address);
+ int i2c_bus_busy(I2CBus *bus);
+-int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv);
++int i2c_start_transfer(I2CBus *bus, uint8_t address, bool recv);
+ void i2c_end_transfer(I2CBus *bus);
+ void i2c_nack(I2CBus *bus);
+-int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
++int i2c_send_recv(I2CBus *bus, uint8_t *data, bool recv);
+ int i2c_send(I2CBus *bus, uint8_t data);
+ uint8_t i2c_recv(I2CBus *bus);
+ 
 -- 
 2.21.3
 
