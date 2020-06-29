@@ -1,85 +1,80 @@
 Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A5EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19956C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1041C23770
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D415423770
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:42:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WdsCCPlR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1041C23770
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCZ9z7hL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D415423770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jprDR-0003up-Bz
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:40:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35258)
+	id 1jprF7-0005ZP-3C
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:42:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jprCc-00034j-W5
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:39:55 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42749)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jprDI-0003vE-8O
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:40:36 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53480)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jprCb-0002JC-9W
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:39:54 -0400
-Received: by mail-wr1-x443.google.com with SMTP id o11so16014206wrv.9
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:39:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jprDG-0002Ss-GW
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:40:35 -0400
+Received: by mail-wm1-x331.google.com with SMTP id j18so14896053wmi.3
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:40:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=YB/qQRNxTkxp2uR5MWmEPE0Ri5A8mKb8LeF4giYfXvo=;
- b=WdsCCPlRcn4DKOuSucrud3+VzEKtdz6i+dOAicYd7hJJ5umoX05Ntqp4K4wroELFqc
- 3BGrHlREp7iJ9ljlho31ll1MGfUcS5P6fXsqTqM5jwno0UgWzuVYw1ZgPPEW1wLi6ZSK
- mniyEGBiBYMtTbYKTCnSjlfUquF1M0GLRXkWgKmb6yd4+3BBDMSTdg8v6dqmrjpk1Mde
- PGN5+Aofz/cYn6vlVr9VNFDOI1BdwDOdi/Nr2C4uhzR74gRZ1LoPE3NNXe5w6MD1znIO
- PP5mKxMqFMq5dnR9QBRdjXnCo9pGyHZvkARlIYBNrkbXMdICrbBOjF7vcWvweP40YLFN
- BeOA==
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=WvHySOHByyOqfiPucbdVL2c+sQMvouxzT9RzexWvpRk=;
+ b=cCZ9z7hLD5LXHc7eg7oU4TgtZ/gE8JY73Tp0Akwma034+SHWIigMYQWAq+eS8dGpCF
+ XCzPs+7IK1U9kFCPb8fgLyAYQ3ZiOIZROhFhZkolVt/xBqRbi9ERmGbsbIc3Is/OXz52
+ fB6i5FUqGgBLUHcLgZgdZCeE2h8Y7Gkty33Kpk8mQNtTjfEV7bsctg7eUzqUYafmgek7
+ bvmLf7DWBuiAhTBvmw/lVeZVAIo1vJvr6Z6AD/0JvSEBk1GvbqLijG9To4js13wvySyp
+ ypXvtrxhxr4oZHzch1VHbTkT/HGzz7JN++dXB12oqYLKQtHlqqZhRgqz5uYho0A9eqCR
+ LWBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=YB/qQRNxTkxp2uR5MWmEPE0Ri5A8mKb8LeF4giYfXvo=;
- b=M2E2hcaF0QcSaSnEd7Ran4CGWUHITX/VAbBNbLwBCZFsA3CrzvX9mACU6dgG0CE+NL
- gBxNjomdaO34X4IqiJzkHrCjznN9CfxWSFlzQ4sRSkNFT4BVjuSTPnyLT8wU1usRpQSF
- 8uXOMGTuQVsm53KYhQPXk8VL8/8ss8R9n7SOBPqBpM8NmufwSoxl4dms4KQeaq4ZJF5G
- r/N+QuNWSTRLwB5MN7+EdgdpgHHUUqjQk5z5ScMr/uY/6v1jEyAXfnyh8XTn4utQ1Bn3
- owcaHRD6dCndifamPJrbaxM7oZ1xk98WjTJFifINDjxP0Vn3ve1UsYvGCHsaDVX+2VL3
- 6k9A==
-X-Gm-Message-State: AOAM5312MEypb1eNYyhG5XY+wtpDNovUji2ESNSITmUEG3w6kQxwoOHN
- VS5tdCy6OqVEoFNtJoYiBMM=
-X-Google-Smtp-Source: ABdhPJzVxdeagA2gbeRjlKexVAAzfNP+jlIwxaU0ZzD/9QXbJJ2X/AGrtP91Ya152RDWdjfyjdPu6g==
-X-Received: by 2002:adf:e98f:: with SMTP id h15mr17834672wrm.25.1593427191585; 
- Mon, 29 Jun 2020 03:39:51 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id b23sm8335189wmd.37.2020.06.29.03.39.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 03:39:50 -0700 (PDT)
-Date: Mon, 29 Jun 2020 11:39:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Lin Ma <LMa@suse.com>
-Subject: Re: [PATCH v2 3/3] scsi-disk: Add support for the GET LBA STATUS 16
- command
-Message-ID: <20200629103948.GF31392@stefanha-x1.localdomain>
-References: <AM6PR04MB578290CA80CC6000756C4C0EC5920@AM6PR04MB5782.eurprd04.prod.outlook.com>
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=WvHySOHByyOqfiPucbdVL2c+sQMvouxzT9RzexWvpRk=;
+ b=RmFRKBbknSqZFfqum1/9QMh1PF7Mq0lSl5tdLjogTWxVYol1dU4wXN+0p+yY0NZFgT
+ qrhy6+NNoz/12jCBt4HjOt4ANJOzRvb6/6K+WowtxTBQZJWDrZSwecpWcyqi2jQugF/f
+ 18oMNkOZLeZyQJzym0xG1Z1hNkhj1p23wtK6BHwX0gUanNNF2N9cNVStP5bIsj6HgFJI
+ O6TLPreIoadOeDbOvwdrzU5zcYV5sPKtiOhMd5zy6md6paRCib5sSnO0dGjLZ3MASApR
+ epMqRKhrKSfGIl7Id9Nh0QeBZTdUBe+802yg2CVvz7puc1cJi5uag4si37ys1La+12ou
+ KFPg==
+X-Gm-Message-State: AOAM531LTbzFzh3mmy8tYeXdE9G7UNl6QiG6pi3ZflYSpi1IfnSvJtai
+ iHiVYuePb3E5pkulOOu011gCNeqvfD0ffhzmjHM=
+X-Google-Smtp-Source: ABdhPJzJsa6f8+IWsDws+YhrxdRbqVsbaUkVbCjA6CHwQp5w8uzdgUXsnlI9zHTFuiowaRErxAoVGvKdmBGUw//06gk=
+X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr17502052wmb.168.1593427232820; 
+ Mon, 29 Jun 2020 03:40:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Y/WcH0a6A93yCHGr"
-Content-Disposition: inline
-In-Reply-To: <AM6PR04MB578290CA80CC6000756C4C0EC5920@AM6PR04MB5782.eurprd04.prod.outlook.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x443.google.com
+Received: by 2002:a1c:b407:0:0:0:0:0 with HTTP; Mon, 29 Jun 2020 03:40:32
+ -0700 (PDT)
+In-Reply-To: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Mon, 29 Jun 2020 12:40:32 +0200
+Message-ID: <CAHiYmc561nFcHR-RxqgCt9V+tegqpDbKFuDTdOEZKd9xW6MATw@mail.gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000030104105a936b079"
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +82,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,125 +96,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---Y/WcH0a6A93yCHGr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--00000000000030104105a936b079
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 25, 2020 at 01:31:56PM +0000, Lin Ma wrote:
-> On 2020-06-25 21:25, Lin Ma wrote:
-> >> +    /*
-> >> +     * 8 + 16 is the length in bytes of response header and
-> >> +     * one LBA status descriptor
-> >> +     */
-> >> +    memset(outbuf, 0, 8 + 16);
-> >> +    outbuf[3] =3D 20;
-> >> +    outbuf[8] =3D (req->cmd.lba >> 56) & 0xff;
-> >> +    outbuf[9] =3D (req->cmd.lba >> 48) & 0xff;
-> >> +    outbuf[10] =3D (req->cmd.lba >> 40) & 0xff;
-> >> +    outbuf[11] =3D (req->cmd.lba >> 32) & 0xff;
-> >> +    outbuf[12] =3D (req->cmd.lba >> 24) & 0xff;
-> >> +    outbuf[13] =3D (req->cmd.lba >> 16) & 0xff;
-> >> +    outbuf[14] =3D (req->cmd.lba >> 8) & 0xff;
-> >> +    outbuf[15] =3D req->cmd.lba & 0xff;
-> >> +    outbuf[16] =3D (*num_blocks >> 24) & 0xff;
-> >> +    outbuf[17] =3D (*num_blocks >> 16) & 0xff;
-> >> +    outbuf[18] =3D (*num_blocks >> 8) & 0xff;
-> >> +    outbuf[19] =3D *num_blocks & 0xff;
-> >> +    outbuf[20] =3D *is_deallocated ? 1 : 0;
-> >=20
-> > SCSI defines 3 values and QEMU can represent all of them:
-> >=20
-> > 0 - mapped or unknown
-> > 1 - deallocated
-> > 2 - anchored
-> >=20
-> > See the BDRV_BLOCK_* constants in include/block/block.h. The
-> > is_deallocated boolean is not enough to represent this state, but the
-> > bdrv_block_status() return value can be used instead.
->=20
-> I don't know which one in BDRV_BLOCK_* can be used to represent 'anchored=
-'.
-> It seems that I need to use BDRV_BLOCK_* combination to recognized 'ancho=
-red',
->=20
-> I'd like to use these combinations to analyze the bdrv_block_status() ret=
-urn value:
-> 'deallocated': BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOC=
-K_ZERO
-> 'anchored':    BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_OFFSET_VALID | ! BDRV_BL=
-OCK_ZERO | ! BDRV_BLOCK_DATA
-> Am I right?
+=D0=BF=D0=BE=D0=BD=D0=B5=D0=B4=D0=B5=D1=99=D0=B0=D0=BA, 29. =D1=98=D1=83=D0=
+=BD 2020., Ahmed Karaman <ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 
-My understanding is that the SCSI status are mapped to QEMU block status
-as follows:
+> Hi,
+>
+> The second report of the TCG Continuous Benchmarking series builds
+> upon the QEMU performance metrics calculated in the previous report.
+> This report presents a method to dissect the number of instructions
+> executed by a QEMU invocation into three main phases:
+> - Code Generation
+> - JIT Execution
+> - Helpers Execution
+> It devises a Python script that automates this process.
+>
+> After that, the report presents an experiment for comparing the
+> output of running the script on 17 different targets. Many conclusions
+> can be drawn from the results and two of them are discussed in the
+> analysis section.
+>
+> Report link:
+> https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/
+> Dissecting-QEMU-Into-Three-Main-Parts/
+>
+> Previous reports:
+> Report 1 - Measuring Basic Performance Metrics of QEMU:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
+>
+>
+My sincere congratulations on the Report 2!!
 
-allocated: BDRV_BLOCK_DATA | !BDRV_BLOCK_ZERO | BDRV_BLOCK_OFFSET_VALID
-anchored: BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO | BDRV_BLOCK_OFFSET_VALID
-deallocated: !BDRV_BLOCK_DATA
+And, on top of that, this is an excellent idea to list previous reports, as
+you did in the paragraph above.
 
-I have CCed Eric Blake, who is familiar with block status.
+Keep reports coming!!
 
-> >> +}
-> >> +
-> >>  static int32_t scsi_disk_emulate_command(SCSIRequest *req, uint8_t *b=
-uf)
-> >>  {
-> >>      SCSIDiskReq *r =3D DO_UPCAST(SCSIDiskReq, req, req);
-> >> @@ -2076,6 +2159,13 @@ static int32_t scsi_disk_emulate_command(SCSIRe=
-quest *req, uint8_t *buf)
-> >>
-> >>              /* Protection, exponent and lowest lba field left blank. =
-*/
-> >>              break;
-> >> +        } else if ((req->cmd.buf[1] & 31) =3D=3D SAI_GET_LBA_STATUS) {
-> >> +            if (req->cmd.lba > s->qdev.max_lba) {
-> >> +                goto illegal_lba;
-> >> +            }
-> >> +            scsi_disk_emulate_get_lba_status(req, outbuf);
-> >> +            r->iov.iov_len =3D req->cmd.xfer;
-> >> +            return r->iov.iov_len;
-> >=20
-> > Is there something tricky going on here with iov_len that prevents us
-> > from using break here and sharing the functions normal return code path?
->=20
-> Using 'break' here and following the normal return code path cause the as=
-sertion
-> 'assert(!r->req.aiocb)'.
->=20
-> In fact, There is a 'return' statement in the 'case SYNCHRONIZE_CACHE' in=
- function
-> scsi_disk_emulate_command, It causes the same assertion if no this 'retur=
-n' statement.
-> I borrowed this idea to avoid the assertion.
+Aleksandar
 
-The assertion shows that this patch isn't asynchronous. I think the
-assertion will pass once you convert GET_LBA_STATUS to async and then
-a break statement will work.
 
---Y/WcH0a6A93yCHGr
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> Best regards,
+> Ahmed Karaman
+>
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl75xPQACgkQnKSrs4Gr
-c8gyqgf/S+uUrqCg1kzO7LvAyeaSs9GN62eUPqBf9976RGzI67AMyl35FivmBOom
-ZEQTGqmiJhbNXx4YzPsmhGBUenQoWy549RJkbuFijMAV0miC/tSFBSf/k7zzv1EF
-qZAMBQdXVKXQWKBvLuUQMYakX2/9g8zSXNMBs2KbG5x4zejOjxykYxlSvHJzkT2n
-chm4UbzC/EK6Iw9y8/VAhmT+Tw5ARX1242nMNR96DGXmiojrj+UxXCiwuuMZH++g
-/EaVSuArzcBx71tbah1/5/LwR/Bl3gA2PF465klK6UgmDtLTgSTCZzBeukRiJLtu
-n9H5hUEETOqc+8S5hnhCKA/0qSrBvA==
-=cUrv
------END PGP SIGNATURE-----
+--00000000000030104105a936b079
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---Y/WcH0a6A93yCHGr--
+<br><br>=D0=BF=D0=BE=D0=BD=D0=B5=D0=B4=D0=B5=D1=99=D0=B0=D0=BA, 29. =D1=98=
+=D1=83=D0=BD 2020., Ahmed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@=
+gmail.com">ahmedkhaledkaraman@gmail.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=
+=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br><blockquote class=3D"gmail_=
+quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1=
+ex"><div dir=3D"ltr">Hi,<br><br>The second report of the TCG Continuous Ben=
+chmarking series builds<br>upon the QEMU performance metrics calculated in =
+the previous=C2=A0report.<br>This report presents a method to dissect the n=
+umber of instructions<br>executed by a QEMU invocation into three main phas=
+es:<div>- Code Generation<div>- JIT Execution<br>- Helpers Execution<br>It =
+devises a Python script that automates this process.<br><br></div><div>Afte=
+r that, the report presents an experiment for comparing the<br>output of ru=
+nning the script on 17 different targets. Many conclusions</div><div>can be=
+ drawn from the results and two of them are discussed in the</div><div>anal=
+ysis section.<br></div><div><br></div><div>Report link:</div><div><a href=
+=3D"https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Dissecting-QEMU=
+-Into-Three-Main-Parts/" target=3D"_blank">https://ahmedkrmn.github.io/<wbr=
+>TCG-Continuous-Benchmarking/<wbr>Dissecting-QEMU-Into-Three-<wbr>Main-Part=
+s/</a><br></div><div><br>Previous reports:</div><div>Report 1 - Measuring B=
+asic Performance Metrics of QEMU:<br><a href=3D"https://lists.gnu.org/archi=
+ve/html/qemu-devel/2020-06/msg06692.html" target=3D"_blank">https://lists.g=
+nu.org/archive/<wbr>html/qemu-devel/2020-06/<wbr>msg06692.html</a><br></div=
+><div><br></div></div></div></blockquote><div><br></div><div>My sincere con=
+gratulations on the Report 2!!</div><div><br></div><div>And, on top of that=
+, this is an excellent idea to list previous reports, as you did in the par=
+agraph above.</div><div><br></div><div>Keep reports coming!!</div><div><br>=
+</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
+ding-left:1ex"><div dir=3D"ltr"><div><div>Best regards,<br>Ahmed Karaman</d=
+iv></div></div>
+</blockquote>
+
+--00000000000030104105a936b079--
 
