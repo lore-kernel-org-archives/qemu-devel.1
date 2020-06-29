@@ -4,118 +4,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FA4C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD06C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FCBF23359
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2666D23359
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:32:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbpZPTg7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCBF23359
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOPmthSd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2666D23359
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jppBI-0003pt-Iy
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 04:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53206)
+	id 1jppD0-0005OU-Dj
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 04:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jppAY-0002r9-01; Mon, 29 Jun 2020 04:29:38 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38857)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jppAW-0004A7-Bh; Mon, 29 Jun 2020 04:29:37 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z13so15614323wrw.5;
- Mon, 29 Jun 2020 01:29:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fYhoelT3nTUqSVB7h6Ql+6croT76pPN3cRxOuAgzR3M=;
- b=HbpZPTg7husWVuOvC+pDzzGwMsIUIHiQd0fetYT/OB+xHsWPAlOhpSCcojpza+Rip9
- +FpfBhd2zE2L0HbyKLnDE2AmVvox+NGmS0v+QWa70yQprCncAPLmVlRoE/OH4UHH/BWc
- T3h9I0Cfeyu/yMW9zUFq3UbMvXV9P0x0OLK465C6R3OQYFXnEuF83zr1xV50W50POELG
- XP6eJ8V8U/pCxERNEVtrLljrO835Tlj38jDdYrOmgawGlAD3XpUs2PCcOgYGC1y2K+Xd
- /vmGDE6xl6zjeLPnqd8rDFBaz3aJ1MxgcTz18F2VGWJzfA69BjkiyD8pke7of9C8gReN
- MSsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=fYhoelT3nTUqSVB7h6Ql+6croT76pPN3cRxOuAgzR3M=;
- b=GsVGreS1VLt8Xg6g646x/c4YK+7Me3rkqNDCEDuLH1HPzEg8WcaGpEOV5yqyg0hK6B
- JICTELT8Fboes12Vnzwoxb6eL1kiRsSiMb6qgGS701MrS1E3GFKms7KJA4OD5tnkxKle
- nzbNcaIowi0ibaRMGMb+VFznpQ9nDNCW4mRmimIkDxpSEjC6c4+IWMO727Mv0XuidUk1
- ELA4Go/0puedNg++ulPDvdYL5ffQPVVlBYZSGx1SBXc9yHLo+MoUsR5t02rnWJ9DAGOl
- H5DcNLCOCHFWPNOggEuM7gDJqrzVXNcKmU13Ovv/hhNy5cJo9P2LYKUuMs1ux/U4KZZo
- 2+BQ==
-X-Gm-Message-State: AOAM532ujNQTSf508ST+rEYKSD6RWDBThnYg/2uiI21c2Px8Tx1VdQD4
- riBh42w8HODBh6JeVUO2rkw=
-X-Google-Smtp-Source: ABdhPJw7LGhjpJwYseAINVWP8zxLvHI/iOeW9ezK8jAPzaKqZ7jGmidZtv+toT9VXQ1FxT2aarZ7SQ==
-X-Received: by 2002:a5d:554d:: with SMTP id g13mr15004117wrw.98.1593419374311; 
- Mon, 29 Jun 2020 01:29:34 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id 30sm44976031wrm.74.2020.06.29.01.29.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 29 Jun 2020 01:29:33 -0700 (PDT)
-Subject: Re: [PATCH 11/17] hw/misc/max111x: Create header file for
- documentation, TYPE_ macros
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200628142429.17111-1-peter.maydell@linaro.org>
- <20200628142429.17111-12-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <b1a56ac5-f2a7-ec88-0191-5324821f4916@amsat.org>
-Date: Mon, 29 Jun 2020 10:29:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jppCO-0004uw-0g
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 04:31:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50801
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jppCL-0004Yq-Lx
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 04:31:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593419488;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lTD+G4Z8+I/NoMc6jGPpDrPy9CXlN5rZ0Uk+ZlXI1O8=;
+ b=bOPmthSdoCOnsCd3frI6TaW+F+LCXKhCSBHiXC80qW7UCPvkU5BPVFygpXiSRsAiuC0zwG
+ Qyx6FNwIQUG1kwKNj0HNUNpX6Bc06f6SGmqEdU/KBFJRA9qhgsMgVBMIqbwTKXpZ6T0JEn
+ GMQOLVLIrvrcdRZDvkn8MuRsXURh8BQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-hvkPmHHoN-WIUuKQwCFHCQ-1; Mon, 29 Jun 2020 04:31:26 -0400
+X-MC-Unique: hvkPmHHoN-WIUuKQwCFHCQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73C8691136;
+ Mon, 29 Jun 2020 08:31:25 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE2D55D9CD;
+ Mon, 29 Jun 2020 08:31:23 +0000 (UTC)
+Subject: Re: [PATCH v3 1/2] qom: Introduce object_property_try_add_child()
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200624194809.26600-1-eric.auger@redhat.com>
+ <20200624194809.26600-2-eric.auger@redhat.com>
+ <87wo3v4hxa.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9e9f4998-211d-21bb-0978-1d3b8aea31c8@redhat.com>
+Date: Mon, 29 Jun 2020 10:31:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200628142429.17111-12-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87wo3v4hxa.fsf@dusky.pond.sub.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -129,181 +101,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>
+Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/28/20 4:24 PM, Peter Maydell wrote:
-> Create a header file for the hw/misc/max111x device, in the
-> usual modern style for QOM devices:
->  * definition of the TYPE_ constants and macros
->  * definition of the device's state struct so that it can
->    be embedded in other structs if desired
->  * documentation of the interface
+Hi Markus
+
+On 6/25/20 11:24 AM, Markus Armbruster wrote:
+> Eric Auger <eric.auger@redhat.com> writes:
 > 
-> This allows us to use TYPE_MAX_1111 in the spitz.c code rather
-> than the string "max1111".
+>> object_property_add() does not allow object_property_try_add()
+>> to gracefully fail as &error_abort is passed as an error handle.
+>>
+>> However such failure can easily be triggered from the QMP shell when,
+>> for instance, one attempts to create an object with an id that already
+>> exists. This is achived from the following call path:
+>>
+>> user_creatable_add_type -> object_property_add_child ->
+>> object_property_add
+>>
+>> For instance, call twice:
+>> object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
+>> and QEMU aborts.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> To be honest the main driver here is that I wanted a header
-> file to put the documentation comment in :-)
-> ---
->  include/hw/misc/max111x.h | 57 +++++++++++++++++++++++++++++++++++++++
->  hw/arm/spitz.c            |  3 ++-
->  hw/misc/max111x.c         | 25 +----------------
->  MAINTAINERS               |  1 +
->  4 files changed, 61 insertions(+), 25 deletions(-)
->  create mode 100644 include/hw/misc/max111x.h
+> qmp_object_add -> user_creatable_add_dict -> user_creatable_add_type ->
+> ...
+OK
 > 
-> diff --git a/include/hw/misc/max111x.h b/include/hw/misc/max111x.h
-> new file mode 100644
-> index 00000000000..337ba63d588
-> --- /dev/null
-> +++ b/include/hw/misc/max111x.h
-> @@ -0,0 +1,57 @@
-> +/*
-> + * Maxim MAX1110/1111 ADC chip emulation.
-> + *
-> + * Copyright (c) 2006 Openedhand Ltd.
-> + * Written by Andrzej Zaborowski <balrog@zabor.org>
-> + *
-> + * This code is licensed under the GNU GPLv2.
-> + *
-> + * Contributions after 2012-01-13 are licensed under the terms of the
-> + * GNU GPL, version 2 or (at your option) any later version.
-> + */
-> +
-> +#ifndef HW_MISC_MAX111X_H
-> +#define HW_MISC_MAX111X_H
-> +
-> +#include "hw/ssi/ssi.h"
-> +#include "hw/irq.h"
+>> This behavior is undesired as a user/management application mistake
+>> in reusing a property ID shouldn't result in loss of the VM and live
+>> data within.
+>>
+>> This patch introduces a new function, object_property_try_add_child()
+>> which takes an error handle and turn object_property_try_add() into
+>> a non-static one.
+>>
+>> Now the call path becomes:
+>>
+>> user_creatable_add_type -> object_property_try_add_child ->
+>> object_property_try_add
+>>
+>> and the error is returned gracefully to the QMP client.
+>>
+>> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+>> {"return": {}}
+>> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+>> {"error": {"class": "GenericError", "desc": "attempt to add duplicate property
+>> 'mem2' to object (type 'container')"}}
+> 
+> What's this?  qmp-shell?
+yes qmp-shell, I will add this info
+> 
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - don't take the object reference on failure in
+>>   object_property_try_add_child
+>> ---
+>>  include/qom/object.h    | 24 ++++++++++++++++++++++--
+>>  qom/object.c            | 21 ++++++++++++++++-----
+>>  qom/object_interfaces.c |  7 +++++--
+>>  3 files changed, 43 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/qom/object.h b/include/qom/object.h
+>> index 94a61ccc3f..91cf058d86 100644
+>> --- a/include/qom/object.h
+>> +++ b/include/qom/object.h
+>> @@ -1039,7 +1039,7 @@ Object *object_ref(Object *obj);
+>>  void object_unref(Object *obj);
+>>  
+>>  /**
+>> - * object_property_add:
+>> + * object_property_try_add:
+>>   * @obj: the object to add a property to
+>>   * @name: the name of the property.  This can contain any character except for
+>>   *  a forward slash.  In general, you should use hyphens '-' instead of
+>> @@ -1056,10 +1056,22 @@ void object_unref(Object *obj);
+>>   *   meant to allow a property to free its opaque upon object
+>>   *   destruction.  This may be NULL.
+>>   * @opaque: an opaque pointer to pass to the callbacks for the property
+>> + * @errp: error handle
+> 
+> We have several descriptions of @errp parameters in this file already,
+> and you're inventing a new one :)
+> 
+> Suggest to pick one of the existing ones instead:
+> 
+>     * @errp: a pointer to an Error that is filled if getting/setting fails.
+>     * @errp: If an error occurs, a pointer to an area to store the error
+>     * @errp: pointer to error object
+OK
+>     * @errp: returns an error if this function fails
+> 
+>>   *
+>>   * Returns: The #ObjectProperty; this can be used to set the @resolve
+>>   * callback for child and link properties.
+>>   */
+>> +ObjectProperty *object_property_try_add(Object *obj, const char *name,
+>> +                                        const char *type,
+>> +                                        ObjectPropertyAccessor *get,
+>> +                                        ObjectPropertyAccessor *set,
+>> +                                        ObjectPropertyRelease *release,
+>> +                                        void *opaque, Error **errp);
+>> +
+>> +/**
+>> + * object_property_add: same as object_property_try_add with
+>> + * errp hardcoded to &error_abort
+>> + */
+> 
+> Style:
+> 
+>    /**
+>     * object_property_add:
+>     * Same as object_property_try_add() with @errp hardcoded to
+>     * &error_abort.
+>     */
+> 
+> The line break after ':' matches the rest of the file (personally, I
+> think the whole line is a complete waste then, but let's go with the
+> flow).  The @ in @errp and the () in object_property_try_add() help
+> tools with highlighting and linking.  Sentences start with a capital
+> letter, and end with punctuation.
+OK
+> 
+>>  ObjectProperty *object_property_add(Object *obj, const char *name,
+>>                                      const char *type,
+>>                                      ObjectPropertyAccessor *get,
+>> @@ -1495,10 +1507,11 @@ Object *object_resolve_path_type(const char *path, const char *typename,
+>>  Object *object_resolve_path_component(Object *parent, const char *part);
+>>  
+>>  /**
+>> - * object_property_add_child:
+>> + * object_property_try_add_child:
+>>   * @obj: the object to add a property to
+>>   * @name: the name of the property
+>>   * @child: the child object
+>> + * @errp: error handle
+> 
+> Likewise.
+ok
+> 
+>>   *
+>>   * Child properties form the composition tree.  All objects need to be a child
+>>   * of another object.  Objects can only be a child of one object.
+>> @@ -1512,6 +1525,13 @@ Object *object_resolve_path_component(Object *parent, const char *part);
+>>   *
+>>   * Returns: The newly added property on success, or %NULL on failure.
+>>   */
+>> +ObjectProperty *object_property_try_add_child(Object *obj, const char *name,
+>> +                                              Object *child, Error **errp);
+>> +
+>> +/**
+>> + * object_property_add_child: same as object_property_try_add_child with
+>> + * errp hardcoded to &error_abort
+>> + */
+> 
+> Likewise.
+ok
+> 
+>>
+>>  ObjectProperty *object_property_add_child(Object *obj, const char *name,
+>>                                            Object *child);
+>>  
+>> diff --git a/qom/object.c b/qom/object.c
+>> index 6ece96bc2b..dc10bb1889 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -1132,7 +1132,7 @@ void object_unref(Object *obj)
+>>      }
+>>  }
+>>  
+>> -static ObjectProperty *
+>> +ObjectProperty *
+>>  object_property_try_add(Object *obj, const char *name, const char *type,
+>>                          ObjectPropertyAccessor *get,
+>>                          ObjectPropertyAccessor *set,
+>> @@ -1651,8 +1651,8 @@ static void object_finalize_child_property(Object *obj, const char *name,
+>>  }
+>>  
+>>  ObjectProperty *
+>> -object_property_add_child(Object *obj, const char *name,
+>> -                          Object *child)
+>> +object_property_try_add_child(Object *obj, const char *name,
+>> +                              Object *child, Error **errp)
+>>  {
+>>      g_autofree char *type = NULL;
+>>      ObjectProperty *op;
+>> @@ -1661,14 +1661,25 @@ object_property_add_child(Object *obj, const char *name,
+>>  
+>>      type = g_strdup_printf("child<%s>", object_get_typename(child));
+>>  
+>> -    op = object_property_add(obj, name, type, object_get_child_property, NULL,
+>> -                             object_finalize_child_property, child);
+>> +    op = object_property_try_add(obj, name, type, object_get_child_property,
+>> +                                 NULL, object_finalize_child_property,
+>> +                                 child, errp);
+>> +    if (!op) {
+>> +        return NULL;
+>> +    }
+>>      op->resolve = object_resolve_child_property;
+>>      object_ref(child);
+>>      child->parent = obj;
+>>      return op;
+>>  }
+>>  
+>> +ObjectProperty *
+>> +object_property_add_child(Object *obj, const char *name,
+>> +                          Object *child)
+>> +{
+>> +    return object_property_try_add_child(obj, name, child, &error_abort);
+>> +}
+>> +
+>>  void object_property_allow_set_link(const Object *obj, const char *name,
+>>                                      Object *val, Error **errp)
+>>  {
+>> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+>> index 7e26f86fa6..1e05e41d2f 100644
+>> --- a/qom/object_interfaces.c
+>> +++ b/qom/object_interfaces.c
+>> @@ -82,8 +82,11 @@ Object *user_creatable_add_type(const char *type, const char *id,
+>>      }
+>>  
+>>      if (id != NULL) {
+>> -        object_property_add_child(object_get_objects_root(),
+>> -                                  id, obj);
+>> +        object_property_try_add_child(object_get_objects_root(),
+>> +                                      id, obj, &local_err);
+>> +        if (local_err) {
+>> +            goto out;
+>> +        }
+>>      }
+>>  
+>>      user_creatable_complete(USER_CREATABLE(obj), &local_err);
+> 
+> Preferably with the comments touched up:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Thanks!
 
-"hw/irq.h" not needed as qemu_irq is forward-declared in
-"qemu/typedefs.h".
-
-> +
-> +/*
-> + * This is a model of the Maxim MAX1110/1111 ADC chip, which for QEMU
-> + * is an SSI slave device. It has either 4 (max1110) or 8 (max1111)
-> + * 8-bit ADC channels.
-> + *
-> + * QEMU interface:
-> + *  + GPIO inputs 0..3 (for max1110) or 0..7 (for max1111): set the value
-> + *    of each ADC input, as an unsigned 8-bit value
-> + *  + GPIO output 0: interrupt line
-> + *  + Properties "input0" to "input3" (max1110) or "input0" to "input7"
-> + *    (max1111): initial reset values for ADC inputs.
-> + *
-> + * Known bugs:
-> + *  + the interrupt line is not correctly implemented, and will never
-> + *    be lowered once it has been asserted.
-> + */
-> +typedef struct {
-> +    SSISlave parent_obj;
-> +
-> +    qemu_irq interrupt;
-> +    /* Values of inputs at system reset (settable by QOM property) */
-> +    uint8_t reset_input[8];
-> +
-> +    uint8_t tb1, rb2, rb3;
-> +    int cycle;
-> +
-> +    uint8_t input[8];
-> +    int inputs, com;
-> +} MAX111xState;
-> +
-> +#define TYPE_MAX_111X "max111x"
-> +
-> +#define MAX_111X(obj) \
-> +    OBJECT_CHECK(MAX111xState, (obj), TYPE_MAX_111X)
-
-Nitpick, we can keep MAX_111X() + MAX111xState in "hw/misc/max111x.c"
-until we get a consumer.
-
-> +
-> +#define TYPE_MAX_1110 "max1110"
-> +#define TYPE_MAX_1111 "max1111"
-> +
-> +#endif
-> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-> index fa592aad6d6..1400a56729d 100644
-> --- a/hw/arm/spitz.c
-> +++ b/hw/arm/spitz.c
-> @@ -29,6 +29,7 @@
->  #include "audio/audio.h"
->  #include "hw/boards.h"
->  #include "hw/sysbus.h"
-> +#include "hw/misc/max111x.h"
->  #include "migration/vmstate.h"
->  #include "exec/address-spaces.h"
->  #include "cpu.h"
-> @@ -732,7 +733,7 @@ static void spitz_ssp_attach(SpitzMachineState *sms)
->                            qdev_get_gpio_in(sms->mpu->gpio, SPITZ_GPIO_TP_INT));
->  
->      bus = qdev_get_child_bus(sms->mux, "ssi2");
-> -    sms->max1111 = qdev_new("max1111");
-> +    sms->max1111 = qdev_new(TYPE_MAX_1111);
->      max1111 = sms->max1111;
->      qdev_prop_set_uint8(sms->max1111, "input1" /* BATT_VOLT */,
->                          SPITZ_BATTERY_VOLT);
-> diff --git a/hw/misc/max111x.c b/hw/misc/max111x.c
-> index 3a5cb838445..d41cfd92a8d 100644
-> --- a/hw/misc/max111x.c
-> +++ b/hw/misc/max111x.c
-> @@ -11,34 +11,11 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include "hw/irq.h"
-
-You still need "hw/irq.h" for qemu_irq_raise().
-
-> -#include "hw/ssi/ssi.h"
-> +#include "hw/misc/max111x.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
->  #include "hw/qdev-properties.h"
->  
-> -typedef struct {
-> -    SSISlave parent_obj;
-> -
-> -    qemu_irq interrupt;
-> -    /* Values of inputs at system reset (settable by QOM property) */
-> -    uint8_t reset_input[8];
-> -
-> -    uint8_t tb1, rb2, rb3;
-> -    int cycle;
-> -
-> -    uint8_t input[8];
-> -    int inputs, com;
-> -} MAX111xState;
-> -
-> -#define TYPE_MAX_111X "max111x"
-> -
-> -#define MAX_111X(obj) \
-> -    OBJECT_CHECK(MAX111xState, (obj), TYPE_MAX_111X)
-> -
-> -#define TYPE_MAX_1110 "max1110"
-> -#define TYPE_MAX_1111 "max1111"
-> -
->  /* Control-byte bitfields */
->  #define CB_PD0		(1 << 0)
->  #define CB_PD1		(1 << 1)
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1b40446c739..550844d1514 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -787,6 +787,7 @@ F: hw/gpio/max7310.c
->  F: hw/gpio/zaurus.c
->  F: hw/misc/mst_fpga.c
->  F: hw/misc/max111x.c
-> +F: include/hw/misc/max111x.h
->  F: include/hw/arm/pxa.h
->  F: include/hw/arm/sharpsl.h
->  F: include/hw/display/tc6393xb.h
+Eric
 > 
 
 
