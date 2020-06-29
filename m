@@ -6,79 +6,78 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50337C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C31A4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1861B23884
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B80823884
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:09:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0VZkfFT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1861B23884
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIJDrRRb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B80823884
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpqhh-00062t-Bw
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:07:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54484)
+	id 1jpqit-0007fV-RP
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:09:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqeO-0002Wh-Uq
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:04:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58278
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqgp-0005HU-EF
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:07:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43236
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqeL-0004zh-Qn
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:04:32 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqgn-0005Nj-Jh
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:07:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593425069;
+ s=mimecast20190719; t=1593425221;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=77mumMWEClNJLgsvvTSg5hEWgscXx+ECnODYkbDJlRI=;
- b=L0VZkfFTESwl0dUXNpWmlg/oTZ+p6LX/cxjo8jBXavkMU5L9FDfNLkUQ8YICnCbrYD8s53
- SIQN31aHqzUrFo4a+35Lz3F52K1HPa6mialxM+UYgZcvT6qCcaiPsB7Ho6yBc5m+ofqUUd
- N+JfdzsJnA1iDIvXdJIVOKbtsY4WdVs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-Zs8j65HlNMqWEUHyAd6CFA-1; Mon, 29 Jun 2020 06:04:27 -0400
-X-MC-Unique: Zs8j65HlNMqWEUHyAd6CFA-1
-Received: by mail-wm1-f71.google.com with SMTP id g124so18253077wmg.6
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:04:27 -0700 (PDT)
+ bh=ebtbzuShKdFsnLEEnvlghxuCH/oUBzNFvOMFpJTb4PY=;
+ b=GIJDrRRbmhm6dj0FrAj/CtawC4vDOWcLKF9Q05C1kj4HjrHLoDN9X1e+C4l0qhXz+kekhq
+ eRjIjRMLLQkVYPSW8QGNgFSe4UjH0D8ES8OWp7eQjK5TqrX0H6wTNqvStFHTrwytuXTfDE
+ z0hbmycftp8OsHusfyLr8B0vj2v47DI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-aDj6HH4eOPOQNdCzEOwFDQ-1; Mon, 29 Jun 2020 06:06:57 -0400
+X-MC-Unique: aDj6HH4eOPOQNdCzEOwFDQ-1
+Received: by mail-wr1-f72.google.com with SMTP id z3so16303291wrr.7
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:06:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=77mumMWEClNJLgsvvTSg5hEWgscXx+ECnODYkbDJlRI=;
- b=uF4ZijuiJXROaYnTiG+nXFf6o4yyyaCYq7Gtq0jkMiCUie/jLhODF4YT2HWMaZsdl8
- OJf3vYpd0I2qIQxmJBPrzH2mXqFv0dsVIoBbpfeL3MfA0GzC9YU4oCZq08D5mguj3/HO
- x5rQxnNMy4yQwrXnV9D3Namm9y706OMg4ksxqyMbgW8jIzQ/tpXHdvnINDKWQKTGj0iC
- H1aWvuPplODU91GtzR2Z1q+Yo6FyC+QenHho7kCst88E9Qxd+Mhv8SkJoXqXylpv9z/A
- KR0agILsPEdnvKL9yae0fFfGv+/QoMHC7NoDoVemr69u/B+MVPB8jTKDnPzsb/zNmkKq
- sP6Q==
-X-Gm-Message-State: AOAM530VEJUhdHcVEZeeitssRfsN8b0elY9SQcoF9CvBkASb80QcMtv8
- tJHBTLvb9AYsJQCer6+PzS38+rnlBYkf1RKXjX6caAlWz+Sa5hLeh1cGFwkNhZpJtAmo8IqW9iL
- dBPVpxxoCG+bK7wY=
-X-Received: by 2002:a1c:6a01:: with SMTP id f1mr15527866wmc.52.1593425065973; 
- Mon, 29 Jun 2020 03:04:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzAqfYU9HGYc5BujuC82oiZNpbLFXSaBolnAqB+iDHvgdJYWV4NWKBzxVbunQhX+dX/mCH9mA==
-X-Received: by 2002:a1c:6a01:: with SMTP id f1mr15527844wmc.52.1593425065762; 
- Mon, 29 Jun 2020 03:04:25 -0700 (PDT)
+ bh=ebtbzuShKdFsnLEEnvlghxuCH/oUBzNFvOMFpJTb4PY=;
+ b=ePYEEO7ayeZa4yxFqRiTvEapEB8TvG6S40lHjO8zpAr7lwwnSICIfezirorht90oaH
+ IAyZ23tYsmMfhOHGbtM6CKbTs8gFLkDTn6aDop6KHAz3lUzyLGA7eL2cbiVzWp+oHkAB
+ WCNSKzUtpfv+bDXxzL3xIRaYSXKFhPCdE8mHn534KSpeeoBy1XgpOZYOILqm7EwmrbmK
+ jXqleV7UcBU+Etr2x11Vf8oEtiPrafXxV8UZKfPF1qXit+qIt+FNemHxeTPK7ahG7MZL
+ cSqFmmJeMJZCN21++hDEwehTcxMtowDZobBe+a9iX+iBCMVG0AD1XPjL3mfi8dy1glx7
+ f3kw==
+X-Gm-Message-State: AOAM531tWyLsAmlvvJTmfhZWKiCA1jcSAIZzYE8x5hMK4ikG9AUToLH0
+ 2M+8dicM/xwkLqb+cM5Wb5TTR/zn3WoODsHhu2FlPRoPjtlh0Psl7vihwxgxIQSV0y9Pi3IcxnF
+ tmisXyr3nR87q/Rk=
+X-Received: by 2002:a1c:2503:: with SMTP id l3mr15678852wml.188.1593425216101; 
+ Mon, 29 Jun 2020 03:06:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx75PigmuY4UP7EoMhNv7tgqxG6sDJA1dyvsFBMOHn9OQUAVEeDpti4jsyvAuNANRzbTt0LNw==
+X-Received: by 2002:a1c:2503:: with SMTP id l3mr15678841wml.188.1593425215920; 
+ Mon, 29 Jun 2020 03:06:55 -0700 (PDT)
 Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l1sm50119605wrb.31.2020.06.29.03.04.24
+ by smtp.gmail.com with ESMTPSA id q1sm33681268wro.82.2020.06.29.03.06.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 29 Jun 2020 03:04:25 -0700 (PDT)
-Subject: Re: [PATCH v3 15/30] tests/docker: change tag naming scheme of our
- images
+ Mon, 29 Jun 2020 03:06:55 -0700 (PDT)
+Subject: Re: [PATCH v3 09/30] tests/vm: change scripts to use self._config
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20200626181357.26211-1-alex.bennee@linaro.org>
- <20200626181357.26211-16-alex.bennee@linaro.org>
+ <20200626181357.26211-10-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,20 +102,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <d24808f8-118e-0ffe-44ed-8a5a859e6a55@redhat.com>
-Date: Mon, 29 Jun 2020 12:04:23 +0200
+Message-ID: <a58c1f3d-f877-588a-e0e5-738479248402@redhat.com>
+Date: Mon, 29 Jun 2020 12:06:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200626181357.26211-16-alex.bennee@linaro.org>
+In-Reply-To: <20200626181357.26211-10-alex.bennee@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -137,58 +136,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
+Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, cota@braap.org, aurelien@aurel32.net
+ richard.henderson@linaro.org, cota@braap.org,
+ Peter Puhov <peter.puhov@linaro.org>, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/26/20 8:13 PM, Alex Bennée wrote:
-> We've been misusing the tag naming scheme for some time by overloading
-> the post : section with the image type. Really it should be saved for
-> the revision of that particular build. Move the details to the other
-> side so we have:
+> From: Robert Foley <robert.foley@linaro.org>
 > 
->   qemu/image-name
+> This change converts existing scripts to using for example self.ROOT_PASS,
+> to self._config['root_pass'].
+> We made similar changes for GUEST_USER, and GUEST_PASS.
+> This allows us also to remove the change in basevm.py,
+> which adds __getattr__ for backwards compatibility.
 > 
-> with the implied :latest version added by the tooling.
-> 
-> Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
+> Message-Id: <20200601211421.1277-8-robert.foley@linaro.org>
 > ---
-> v2
->   - fix RUN invocation as well
->   - don't include :latest tag for debian-arm64-cross (implied)
-> ---
->  tests/docker/Makefile.include                           | 4 ++--
->  tests/docker/docker.py                                  | 2 +-
->  tests/docker/dockerfiles/debian-alpha-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-amd64-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-amd64.docker            | 2 +-
->  tests/docker/dockerfiles/debian-arm64-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-arm64-test-cross.docker | 2 +-
->  tests/docker/dockerfiles/debian-armel-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-armhf-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-hppa-cross.docker       | 2 +-
->  tests/docker/dockerfiles/debian-m68k-cross.docker       | 2 +-
->  tests/docker/dockerfiles/debian-mips-cross.docker       | 2 +-
->  tests/docker/dockerfiles/debian-mips64-cross.docker     | 2 +-
->  tests/docker/dockerfiles/debian-mips64el-cross.docker   | 2 +-
->  tests/docker/dockerfiles/debian-mipsel-cross.docker     | 2 +-
->  tests/docker/dockerfiles/debian-powerpc-cross.docker    | 2 +-
->  tests/docker/dockerfiles/debian-ppc64-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-ppc64el-cross.docker    | 2 +-
->  tests/docker/dockerfiles/debian-riscv64-cross.docker    | 2 +-
->  tests/docker/dockerfiles/debian-s390x-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-sh4-cross.docker        | 2 +-
->  tests/docker/dockerfiles/debian-sparc64-cross.docker    | 2 +-
->  tests/docker/dockerfiles/debian-tricore-cross.docker    | 2 +-
->  tests/docker/dockerfiles/debian-win32-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian-win64-cross.docker      | 2 +-
->  tests/docker/dockerfiles/debian9-mxe.docker             | 2 +-
->  26 files changed, 27 insertions(+), 27 deletions(-)
+>  tests/vm/basevm.py | 11 ++---------
+>  tests/vm/fedora    | 17 +++++++++--------
+>  tests/vm/freebsd   | 16 ++++++++--------
+>  tests/vm/netbsd    | 19 ++++++++++---------
+>  tests/vm/openbsd   | 17 +++++++++--------
+>  5 files changed, 38 insertions(+), 42 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
