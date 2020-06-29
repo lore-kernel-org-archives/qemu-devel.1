@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C127C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05849C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:32:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55B11206A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:31:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B99D9207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qIGxe6Hd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B11206A1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4u1NVmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B99D9207FF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq1Mv-0004TL-Hy
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:31:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55088)
+	id 1jq1OG-0006Bd-Vl
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
- id 1jq1LR-0002a8-BY; Mon, 29 Jun 2020 17:29:41 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45003)
+ id 1jq1Ld-0002yp-BM; Mon, 29 Jun 2020 17:29:53 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44313)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
- id 1jq1LP-0004rH-M9; Mon, 29 Jun 2020 17:29:41 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 5so14790294oty.11;
- Mon, 29 Jun 2020 14:29:38 -0700 (PDT)
+ id 1jq1La-0004s3-UC; Mon, 29 Jun 2020 17:29:52 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k6so11777296oij.11;
+ Mon, 29 Jun 2020 14:29:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:date:from:to:cc:subject:message-id:reply-to:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to:user-agent;
- bh=OB9q+hhY+jTbvys8ZF1UPkCVvSQdNiVrK4Mm5Ab4Dlk=;
- b=qIGxe6Hd0cS96yTh282TMcngjW7WP21xVJJqxtWip/cAHujTvexUHeE0RPCoYWY+l9
- SqErCWMdvve6uDzRAi6rOJMdj1mvRdVVNKLBvLwHVeHIjAc7IcIdVqm8M5js4XxStWFJ
- uhH/t7kIvhjGeR+h9dpkqW3QKPIH59IRv7Ti889D7jRQEbqTORsoMREkS8X3/aNMGIY/
- hdeKzBC0tXG2EP2FYsWSW7CIkttTpHTWDteKyqzbYMuHhFUbszQzhTv0T1gsjClNR27P
- hF5jjwFNew957hTUyri9DN9x8ODAhPeJBGjI1G+ywGMLEm3nPGjBez9grimXN7TrERUu
- jPOg==
+ bh=LGIWLY7MXE/xQjMuH67qCb39pb3MI3mrDMAARnwhdRI=;
+ b=l4u1NVmj5QIT5aouKLxfPogOlae6XcgRDKt/NsGmXpRK74JKv9S09ymhxQpVAhOvW6
+ m8Vqin2ya45nn9+MqC+EaqB47t4vLg+FbC3+3iRUYyN4OZfL8wPpzmE7cO8T/HWwmjMb
+ 8BWuOtJwlZ0QCSRELPYbo+GxXbw31wyDZJFdHqgLcA3TbawIhPKgpXhl2nrihALhnJnq
+ rkvcobdBx80wiOUExcqVpwlR5trxO2XzILAFvz75yBMuhOnUkzToWzdif/1liq9+efgK
+ jr1pGCFOdRqSU5Fbo+8/x+wecCHFOFRZli05o5IcrGypy1IFsvlnC8yTuwYqKzxNPTk3
+ A8jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
  :reply-to:references:mime-version:content-disposition
  :content-transfer-encoding:in-reply-to:user-agent;
- bh=OB9q+hhY+jTbvys8ZF1UPkCVvSQdNiVrK4Mm5Ab4Dlk=;
- b=eVsOQnuWpU6BRwrgDfEudzECK8ZHoHoO2+p6ctDM8ksl8lAGkpo2USgzObGwpI/tJW
- yk/bKGUCznuAxx1fPyHDJ/izaEt+Tkzck2DNuTQ1juyQoKLVDobaeBGMVblb+ePxZv16
- AE0Lt9uojGgauDHc5oBfrJbjAktlc/F7PvlrK3XmIcD+CepD8IpWT4mpxfuFDfpf0ek1
- Lvme4m982ElR0i0SFEPgkzvw0Q5dAj0lgjNKpMeOqJ84Ek3jVcb6MwXrURcoMI7Ej+DM
- FHpYMFwemavTwnFbl1/rRm/hs0GsmklhboEGr8kpNgU3h90Qreks6Jnnspy3FXSAtX5A
- szWw==
-X-Gm-Message-State: AOAM533zxJDydKyGHT6eOFS/mHv+cwTn4mFc2XfJD5gkGER+tH5DaKh9
- 0s6fXkojwk/Zp25o4JFhog==
-X-Google-Smtp-Source: ABdhPJxdw2DpxxXfOTgM1cQTiqKQXOIMkfodVfnYdC7CwDgiPQgdC3QycpIEZL555UqUMKqD3HSdQw==
-X-Received: by 2002:a9d:73c9:: with SMTP id m9mr5854491otk.94.1593466177753;
- Mon, 29 Jun 2020 14:29:37 -0700 (PDT)
-Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
- by smtp.gmail.com with ESMTPSA id m84sm214760oif.32.2020.06.29.14.29.36
+ bh=LGIWLY7MXE/xQjMuH67qCb39pb3MI3mrDMAARnwhdRI=;
+ b=ift3WzDS0gOka2qbY7ZRZ1Belv/JVS3HUi4o37l+hyn2hkh+tTQltDXI4o4iYdppQT
+ 5cWmInuNTAcj2NI5jNrADMy1NCkJVqM+ybyM5WFL7aNIH5V2if4BB0dLvB+Ds+xXv0KD
+ DE5hZFqy3C17PVX05bd5DTWS0bfCh0RIOnc2/h56QWA/pIFfkgStdcpOo/gF6b4lOG51
+ L1E++VjuKRrUNnPN5XrzWP5ZNRafHdtA730xSuFgpq4Q1uljd09EfWFZXneuw4HIPJS1
+ k94uY7CHTaV/XeJWuwLi4Zi2CfBL0SqO9J6tzXUEidpLh7ZL5i9TpTVgXrkd2L+a+elI
+ m7sQ==
+X-Gm-Message-State: AOAM533zvvmEYjOqf4zQY9qJBbVAH2u88CNdxtYGy+br6YkcKPeO61kd
+ gA8t8TI4xBlxA3e4DHaqvQ==
+X-Google-Smtp-Source: ABdhPJxXyWQjv4X4wS+KKrJzn+xFOBRWS1tTBIaZncfgynCQgOcHdmApL0gp2eQEFrZTTpnLaT2MGQ==
+X-Received: by 2002:aca:f3c5:: with SMTP id r188mr13856723oih.83.1593466188731; 
+ Mon, 29 Jun 2020 14:29:48 -0700 (PDT)
+Received: from serve.minyard.net ([47.184.146.204])
+ by smtp.gmail.com with ESMTPSA id w3sm280196otg.16.2020.06.29.14.29.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 14:29:37 -0700 (PDT)
+ Mon, 29 Jun 2020 14:29:48 -0700 (PDT)
 Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:9993:aaf8:7c5:309c])
- by serve.minyard.net (Postfix) with ESMTPSA id 6566E18003B;
- Mon, 29 Jun 2020 21:29:36 +0000 (UTC)
-Date: Mon, 29 Jun 2020 16:29:35 -0500
+ by serve.minyard.net (Postfix) with ESMTPSA id 3C02518003B;
+ Mon, 29 Jun 2020 21:29:47 +0000 (UTC)
+Date: Mon, 29 Jun 2020 16:29:46 -0500
 From: Corey Minyard <minyard@acm.org>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 3/5] hw/i2c: Rename i2c_realize_and_unref() as
- i2c_slave_realize_and_unref()
-Message-ID: <20200629212935.GS3235@minyard.net>
+Subject: Re: [PATCH 4/5] hw/i2c: Rename i2c_create_slave() as
+ i2c_slave_create_simple()
+Message-ID: <20200629212946.GT3235@minyard.net>
 References: <20200629173821.22037-1-f4bug@amsat.org>
- <20200629173821.22037-4-f4bug@amsat.org>
+ <20200629173821.22037-5-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200629173821.22037-4-f4bug@amsat.org>
+In-Reply-To: <20200629173821.22037-5-f4bug@amsat.org>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=tcminyard@gmail.com; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=tcminyard@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -118,9 +118,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 07:38:19PM +0200, Philippe Mathieu-Daudé wrote:
-> The other i2c functions are called i2c_slave_FOO(). Rename as
-> i2c_slave_realize_and_unref() to be consistent.
+On Mon, Jun 29, 2020 at 07:38:20PM +0200, Philippe Mathieu-Daudé wrote:
+> We use "create_simple" names for functions that allocate, initialize,
+> configure and realize device objects: pci_create_simple(),
+> isa_create_simple(), usb_create_simple(). For consistency, rename
+> i2c_create_slave() as i2c_slave_create_simple(). Since we have
+> to update all the callers, also let it return a I2CSlave object.
 
 Reviewed-by: Corey Minyard <cminyard@mvista.com>
 
@@ -129,75 +132,413 @@ Reviewed-by: Corey Minyard <cminyard@mvista.com>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
 >  include/hw/i2c/i2c.h |  2 +-
->  hw/arm/aspeed.c      | 10 ++++++----
->  hw/i2c/core.c        |  6 +++---
->  3 files changed, 10 insertions(+), 8 deletions(-)
+>  hw/arm/aspeed.c      | 58 ++++++++++++++++++++++----------------------
+>  hw/arm/musicpal.c    |  4 +--
+>  hw/arm/nseries.c     |  8 +++---
+>  hw/arm/pxa2xx.c      |  5 ++--
+>  hw/arm/realview.c    |  2 +-
+>  hw/arm/spitz.c       |  4 +--
+>  hw/arm/stellaris.c   |  2 +-
+>  hw/arm/tosa.c        |  2 +-
+>  hw/arm/versatilepb.c |  2 +-
+>  hw/arm/vexpress.c    |  2 +-
+>  hw/arm/z2.c          |  4 +--
+>  hw/display/sii9022.c |  2 +-
+>  hw/i2c/core.c        |  6 ++---
+>  hw/ppc/e500.c        |  2 +-
+>  hw/ppc/sam460ex.c    |  2 +-
+>  16 files changed, 54 insertions(+), 53 deletions(-)
 > 
 > diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> index 18efc668f1..cb7211f027 100644
+> index cb7211f027..c533058998 100644
 > --- a/include/hw/i2c/i2c.h
 > +++ b/include/hw/i2c/i2c.h
-> @@ -81,7 +81,7 @@ uint8_t i2c_recv(I2CBus *bus);
+> @@ -80,7 +80,7 @@ int i2c_send(I2CBus *bus, uint8_t data);
+>  uint8_t i2c_recv(I2CBus *bus);
 >  
 >  I2CSlave *i2c_slave_new(const char *name, uint8_t addr);
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
-> -bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
-> +bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp);
+> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
+> +I2CSlave *i2c_slave_create_simple(I2CBus *bus, const char *name, uint8_t addr);
+>  bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp);
 >  
 >  /* lm832x.c */
->  void lm832x_key_event(DeviceState *dev, int key, int state);
 > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 54ca36e0b6..ed14e79f57 100644
+> index ed14e79f57..5fa95f0f02 100644
 > --- a/hw/arm/aspeed.c
 > +++ b/hw/arm/aspeed.c
-> @@ -515,8 +515,9 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
->      /* Bus 3: TODO dps310@76 */
->      dev = DEVICE(i2c_slave_new(TYPE_PCA9552, 0x60));
->      qdev_prop_set_string(dev, "description", "pca1");
-> -    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(&soc->i2c, 3),
-> -                          &error_fatal);
-> +    i2c_slave_realize_and_unref(I2C_SLAVE(dev),
-> +                                aspeed_i2c_get_bus(&soc->i2c, 3),
-> +                                &error_fatal);
+> @@ -385,14 +385,14 @@ static void palmetto_bmc_i2c_init(AspeedMachineState *bmc)
 >  
->      i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 4), "tmp423", 0x4c);
->      i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 5), "tmp423", 0x4c);
-> @@ -533,8 +534,9 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>      /* The palmetto platform expects a ds3231 RTC but a ds1338 is
+>       * enough to provide basic RTC features. Alarms will be missing */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 0), "ds1338", 0x68);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 0), "ds1338", 0x68);
+>  
+>      smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 0), 0x50,
 >                            eeprom_buf);
->      dev = DEVICE(i2c_slave_new(TYPE_PCA9552, 0x60));
->      qdev_prop_set_string(dev, "description", "pca0");
-> -    i2c_realize_and_unref(dev, aspeed_i2c_get_bus(&soc->i2c, 11),
-> -                          &error_fatal);
-> +    i2c_slave_realize_and_unref(I2C_SLAVE(dev),
-> +                                aspeed_i2c_get_bus(&soc->i2c, 11),
-> +                                &error_fatal);
->      /* Bus 11: TODO ucd90160@64 */
+>  
+>      /* add a TMP423 temperature sensor */
+> -    dev = i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 2),
+> -                           "tmp423", 0x4c);
+> +    dev = DEVICE(i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 2),
+> +                                         "tmp423", 0x4c));
+>      object_property_set_int(OBJECT(dev), 31000, "temperature0", &error_abort);
+>      object_property_set_int(OBJECT(dev), 28000, "temperature1", &error_abort);
+>      object_property_set_int(OBJECT(dev), 20000, "temperature2", &error_abort);
+> @@ -408,12 +408,12 @@ static void ast2500_evb_i2c_init(AspeedMachineState *bmc)
+>                            eeprom_buf);
+>  
+>      /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 7),
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 7),
+>                       TYPE_TMP105, 0x4d);
+>  
+>      /* The AST2500 EVB does not have an RTC. Let's pretend that one is
+>       * plugged on the I2C bus header */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
 >  }
 >  
+>  static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
+> @@ -428,36 +428,36 @@ static void romulus_bmc_i2c_init(AspeedMachineState *bmc)
+>  
+>      /* The romulus board expects Epson RX8900 I2C RTC but a ds1338 is
+>       * good enough */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
+>  }
+>  
+>  static void swift_bmc_i2c_init(AspeedMachineState *bmc)
+>  {
+>      AspeedSoCState *soc = &bmc->soc;
+>  
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 3), "pca9552", 0x60);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 3), "pca9552", 0x60);
+>  
+>      /* The swift board expects a TMP275 but a TMP105 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 7), "tmp105", 0x48);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 7), "tmp105", 0x48);
+>      /* The swift board expects a pca9551 but a pca9552 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 7), "pca9552", 0x60);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 7), "pca9552", 0x60);
+>  
+>      /* The swift board expects an Epson RX8900 RTC but a ds1338 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 8), "ds1338", 0x32);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x60);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 8), "ds1338", 0x32);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x60);
+>  
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 9), "tmp423", 0x4c);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 9), "tmp423", 0x4c);
+>      /* The swift board expects a pca9539 but a pca9552 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 9), "pca9552", 0x74);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 9), "pca9552", 0x74);
+>  
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 10), "tmp423", 0x4c);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 10), "tmp423", 0x4c);
+>      /* The swift board expects a pca9539 but a pca9552 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 10), "pca9552",
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 10), "pca9552",
+>                       0x74);
+>  
+>      /* The swift board expects a TMP275 but a TMP105 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 12), "tmp105", 0x48);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 12), "tmp105", 0x4a);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 12), "tmp105", 0x48);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 12), "tmp105", 0x4a);
+>  }
+>  
+>  static void sonorapass_bmc_i2c_init(AspeedMachineState *bmc)
+> @@ -465,8 +465,8 @@ static void sonorapass_bmc_i2c_init(AspeedMachineState *bmc)
+>      AspeedSoCState *soc = &bmc->soc;
+>  
+>      /* bus 2 : */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 2), "tmp105", 0x48);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 2), "tmp105", 0x49);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 2), "tmp105", 0x48);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 2), "tmp105", 0x49);
+>      /* bus 2 : pca9546 @ 0x73 */
+>  
+>      /* bus 3 : pca9548 @ 0x70 */
+> @@ -476,21 +476,21 @@ static void sonorapass_bmc_i2c_init(AspeedMachineState *bmc)
+>      smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 4), 0x54,
+>                            eeprom4_54);
+>      /* PCA9539 @ 0x76, but PCA9552 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 4), "pca9552", 0x76);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 4), "pca9552", 0x76);
+>      /* PCA9539 @ 0x77, but PCA9552 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 4), "pca9552", 0x77);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 4), "pca9552", 0x77);
+>  
+>      /* bus 6 : */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 6), "tmp105", 0x48);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 6), "tmp105", 0x49);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 6), "tmp105", 0x48);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 6), "tmp105", 0x49);
+>      /* bus 6 : pca9546 @ 0x73 */
+>  
+>      /* bus 8 : */
+>      uint8_t *eeprom8_56 = g_malloc0(8 * 1024);
+>      smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 8), 0x56,
+>                            eeprom8_56);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x60);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x61);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x60);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 8), "pca9552", 0x61);
+>      /* bus 8 : adc128d818 @ 0x1d */
+>      /* bus 8 : adc128d818 @ 0x1f */
+>  
+> @@ -519,16 +519,16 @@ static void witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>                                  aspeed_i2c_get_bus(&soc->i2c, 3),
+>                                  &error_fatal);
+>  
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 4), "tmp423", 0x4c);
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 5), "tmp423", 0x4c);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 4), "tmp423", 0x4c);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 5), "tmp423", 0x4c);
+>  
+>      /* The Witherspoon expects a TMP275 but a TMP105 is compatible */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 9), TYPE_TMP105,
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 9), TYPE_TMP105,
+>                       0x4a);
+>  
+>      /* The witherspoon board expects Epson RX8900 I2C RTC but a ds1338 is
+>       * good enough */
+> -    i2c_create_slave(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
+> +    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 11), "ds1338", 0x32);
+>  
+>      smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 11), 0x51,
+>                            eeprom_buf);
+> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+> index 394a3345bd..bf7bd28b94 100644
+> --- a/hw/arm/musicpal.c
+> +++ b/hw/arm/musicpal.c
+> @@ -1584,7 +1584,7 @@ static void musicpal_init(MachineState *machine)
+>      DeviceState *i2c_dev;
+>      DeviceState *lcd_dev;
+>      DeviceState *key_dev;
+> -    DeviceState *wm8750_dev;
+> +    I2CSlave *wm8750_dev;
+>      SysBusDevice *s;
+>      I2CBus *i2c;
+>      int i;
+> @@ -1687,7 +1687,7 @@ static void musicpal_init(MachineState *machine)
+>          qdev_connect_gpio_out(key_dev, i, qdev_get_gpio_in(dev, i + 15));
+>      }
+>  
+> -    wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+> +    wm8750_dev = i2c_slave_create_simple(i2c, TYPE_WM8750, MP_WM_ADDR);
+>      dev = qdev_new(TYPE_MV88W8618_AUDIO);
+>      s = SYS_BUS_DEVICE(dev);
+>      object_property_set_link(OBJECT(dev), OBJECT(wm8750_dev),
+> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+> index 428a2a2c5a..e48092ca04 100644
+> --- a/hw/arm/nseries.c
+> +++ b/hw/arm/nseries.c
+> @@ -215,7 +215,7 @@ static void n8x0_i2c_setup(struct n800_s *s)
+>      I2CBus *i2c = omap_i2c_bus(s->mpu->i2c[0]);
+>  
+>      /* Attach a menelaus PM chip */
+> -    dev = i2c_create_slave(i2c, "twl92230", N8X0_MENELAUS_ADDR);
+> +    dev = DEVICE(i2c_slave_create_simple(i2c, "twl92230", N8X0_MENELAUS_ADDR));
+>      qdev_connect_gpio_out(dev, 3,
+>                            qdev_get_gpio_in(s->mpu->ih[0],
+>                                             OMAP_INT_24XX_SYS_NIRQ));
+> @@ -224,7 +224,7 @@ static void n8x0_i2c_setup(struct n800_s *s)
+>      qemu_register_powerdown_notifier(&n8x0_system_powerdown_notifier);
+>  
+>      /* Attach a TMP105 PM chip (A0 wired to ground) */
+> -    dev = i2c_create_slave(i2c, TYPE_TMP105, N8X0_TMP105_ADDR);
+> +    dev = DEVICE(i2c_slave_create_simple(i2c, TYPE_TMP105, N8X0_TMP105_ADDR));
+>      qdev_connect_gpio_out(dev, 0, tmp_irq);
+>  }
+>  
+> @@ -416,8 +416,8 @@ static void n810_kbd_setup(struct n800_s *s)
+>  
+>      /* Attach the LM8322 keyboard to the I2C bus,
+>       * should happen in n8x0_i2c_setup and s->kbd be initialised here.  */
+> -    s->kbd = i2c_create_slave(omap_i2c_bus(s->mpu->i2c[0]),
+> -                           "lm8323", N810_LM8323_ADDR);
+> +    s->kbd = DEVICE(i2c_slave_create_simple(omap_i2c_bus(s->mpu->i2c[0]),
+> +                                            "lm8323", N810_LM8323_ADDR));
+>      qdev_connect_gpio_out(s->kbd, 0, kbd_irq);
+>  }
+>  
+> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+> index f104a33463..6203c4cfe0 100644
+> --- a/hw/arm/pxa2xx.c
+> +++ b/hw/arm/pxa2xx.c
+> @@ -1522,8 +1522,9 @@ PXA2xxI2CState *pxa2xx_i2c_init(hwaddr base,
+>      s = PXA2XX_I2C(i2c_dev);
+>      /* FIXME: Should the slave device really be on a separate bus?  */
+>      i2cbus = i2c_init_bus(dev, "dummy");
+> -    dev = i2c_create_slave(i2cbus, TYPE_PXA2XX_I2C_SLAVE, 0);
+> -    s->slave = PXA2XX_I2C_SLAVE(dev);
+> +    s->slave = PXA2XX_I2C_SLAVE(i2c_slave_create_simple(i2cbus,
+> +                                                        TYPE_PXA2XX_I2C_SLAVE,
+> +                                                        0));
+>      s->slave->host = s;
+>  
+>      return s;
+> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+> index b6c0a1adb9..e105b6509f 100644
+> --- a/hw/arm/realview.c
+> +++ b/hw/arm/realview.c
+> @@ -285,7 +285,7 @@ static void realview_init(MachineState *machine,
+>  
+>      dev = sysbus_create_simple(TYPE_VERSATILE_I2C, 0x10002000, NULL);
+>      i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> -    i2c_create_slave(i2c, "ds1338", 0x68);
+> +    i2c_slave_create_simple(i2c, "ds1338", 0x68);
+>  
+>      /* Memory map for RealView Emulation Baseboard:  */
+>      /* 0x10000000 System registers.  */
+> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+> index fc18212e68..716ca3c7b6 100644
+> --- a/hw/arm/spitz.c
+> +++ b/hw/arm/spitz.c
+> @@ -758,7 +758,7 @@ static void spitz_i2c_setup(PXA2xxState *cpu)
+>      DeviceState *wm;
+>  
+>      /* Attach a WM8750 to the bus */
+> -    wm = i2c_create_slave(bus, TYPE_WM8750, 0);
+> +    wm = DEVICE(i2c_slave_create_simple(bus, TYPE_WM8750, 0));
+>  
+>      spitz_wm8750_addr(wm, 0, 0);
+>      qdev_connect_gpio_out(cpu->gpio, SPITZ_GPIO_WM,
+> @@ -773,7 +773,7 @@ static void spitz_i2c_setup(PXA2xxState *cpu)
+>  static void spitz_akita_i2c_setup(PXA2xxState *cpu)
+>  {
+>      /* Attach a Max7310 to Akita I2C bus.  */
+> -    i2c_create_slave(pxa2xx_i2c_bus(cpu->i2c[0]), "max7310",
+> +    i2c_slave_create_simple(pxa2xx_i2c_bus(cpu->i2c[0]), "max7310",
+>                       AKITA_MAX_ADDR);
+>  }
+>  
+> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+> index 97ef566c12..3f45550cf6 100644
+> --- a/hw/arm/stellaris.c
+> +++ b/hw/arm/stellaris.c
+> @@ -1380,7 +1380,7 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+>                                     qdev_get_gpio_in(nvic, 8));
+>          i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+>          if (board->peripherals & BP_OLED_I2C) {
+> -            i2c_create_slave(i2c, "ssd0303", 0x3d);
+> +            i2c_slave_create_simple(i2c, "ssd0303", 0x3d);
+>          }
+>      }
+>  
+> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+> index 5dee2d76c6..8c1ee0cdd1 100644
+> --- a/hw/arm/tosa.c
+> +++ b/hw/arm/tosa.c
+> @@ -206,7 +206,7 @@ static uint8_t tosa_dac_recv(I2CSlave *s)
+>  static void tosa_tg_init(PXA2xxState *cpu)
+>  {
+>      I2CBus *bus = pxa2xx_i2c_bus(cpu->i2c[0]);
+> -    i2c_create_slave(bus, TYPE_TOSA_DAC, DAC_BASE);
+> +    i2c_slave_create_simple(bus, TYPE_TOSA_DAC, DAC_BASE);
+>      ssi_create_slave(cpu->ssp[1], "tosa-ssp");
+>  }
+>  
+> diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+> index e596b8170f..34709afb32 100644
+> --- a/hw/arm/versatilepb.c
+> +++ b/hw/arm/versatilepb.c
+> @@ -317,7 +317,7 @@ static void versatile_init(MachineState *machine, int board_id)
+>  
+>      dev = sysbus_create_simple(TYPE_VERSATILE_I2C, 0x10002000, NULL);
+>      i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> -    i2c_create_slave(i2c, "ds1338", 0x68);
+> +    i2c_slave_create_simple(i2c, "ds1338", 0x68);
+>  
+>      /* Add PL041 AACI Interface to the LM4549 codec */
+>      pl041 = qdev_new("pl041");
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index 5bf9cff8a8..4f6a2b6ddd 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -642,7 +642,7 @@ static void vexpress_common_init(MachineState *machine)
+>  
+>      dev = sysbus_create_simple(TYPE_VERSATILE_I2C, map[VE_SERIALDVI], NULL);
+>      i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> -    i2c_create_slave(i2c, "sii9022", 0x39);
+> +    i2c_slave_create_simple(i2c, "sii9022", 0x39);
+>  
+>      sysbus_create_simple("pl031", map[VE_RTC], pic[4]); /* RTC */
+>  
+> diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+> index a0f4095990..8cf8189f6f 100644
+> --- a/hw/arm/z2.c
+> +++ b/hw/arm/z2.c
+> @@ -327,8 +327,8 @@ static void z2_init(MachineState *machine)
+>      type_register_static(&aer915_info);
+>      z2_lcd = ssi_create_slave(mpu->ssp[1], "zipit-lcd");
+>      bus = pxa2xx_i2c_bus(mpu->i2c[0]);
+> -    i2c_create_slave(bus, TYPE_AER915, 0x55);
+> -    wm = i2c_create_slave(bus, TYPE_WM8750, 0x1b);
+> +    i2c_slave_create_simple(bus, TYPE_AER915, 0x55);
+> +    wm = DEVICE(i2c_slave_create_simple(bus, TYPE_WM8750, 0x1b));
+>      mpu->i2s->opaque = wm;
+>      mpu->i2s->codec_out = wm8750_dac_dat;
+>      mpu->i2s->codec_in = wm8750_adc_dat;
+> diff --git a/hw/display/sii9022.c b/hw/display/sii9022.c
+> index 0710ce9de5..3b82a8567f 100644
+> --- a/hw/display/sii9022.c
+> +++ b/hw/display/sii9022.c
+> @@ -161,7 +161,7 @@ static void sii9022_realize(DeviceState *dev, Error **errp)
+>      I2CBus *bus;
+>  
+>      bus = I2C_BUS(qdev_get_parent_bus(dev));
+> -    i2c_create_slave(bus, TYPE_I2CDDC, 0x50);
+> +    i2c_slave_create_simple(bus, TYPE_I2CDDC, 0x50);
+>  }
+>  
+>  static void sii9022_class_init(ObjectClass *klass, void *data)
 > diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-> index 6eacb4a463..135ea56036 100644
+> index 135ea56036..21ec52ac5a 100644
 > --- a/hw/i2c/core.c
 > +++ b/hw/i2c/core.c
-> @@ -276,16 +276,16 @@ I2CSlave *i2c_slave_new(const char *name, uint8_t addr)
->      return I2C_SLAVE(dev);
+> @@ -281,11 +281,11 @@ bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp)
+>      return qdev_realize_and_unref(&dev->qdev, &bus->qbus, errp);
 >  }
 >  
-> -bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
-> +bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp)
+> -DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
+> +I2CSlave *i2c_slave_create_simple(I2CBus *bus, const char *name, uint8_t addr)
 >  {
-> -    return qdev_realize_and_unref(dev, &bus->qbus, errp);
-> +    return qdev_realize_and_unref(&dev->qdev, &bus->qbus, errp);
->  }
+> -    DeviceState *dev = DEVICE(i2c_slave_new(name, addr));
+> +    I2CSlave *dev = i2c_slave_new(name, addr);
 >  
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->  {
->      DeviceState *dev = DEVICE(i2c_slave_new(name, addr));
->  
-> -    i2c_realize_and_unref(I2C_SLAVE(dev), bus, &error_fatal);
-> +    i2c_slave_realize_and_unref(I2C_SLAVE(dev), bus, &error_fatal);
+> -    i2c_slave_realize_and_unref(I2C_SLAVE(dev), bus, &error_fatal);
+> +    i2c_slave_realize_and_unref(dev, bus, &error_abort);
 >  
 >      return dev;
 >  }
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 51bf95b303..67924915ae 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -944,7 +944,7 @@ void ppce500_init(MachineState *machine)
+>      memory_region_add_subregion(ccsr_addr_space, MPC8544_I2C_REGS_OFFSET,
+>                                  sysbus_mmio_get_region(s, 0));
+>      i2c = (I2CBus *)qdev_get_child_bus(dev, "i2c");
+> -    i2c_create_slave(i2c, "ds1338", RTC_REGS_OFFSET);
+> +    i2c_slave_create_simple(i2c, "ds1338", RTC_REGS_OFFSET);
+>  
+>  
+>      /* General Utility device */
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 1a106a68de..1702344c46 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -339,7 +339,7 @@ static void sam460ex_init(MachineState *machine)
+>      spd_data[20] = 4; /* SO-DIMM module */
+>      smbus_eeprom_init_one(i2c, 0x50, spd_data);
+>      /* RTC */
+> -    i2c_create_slave(i2c, "m41t80", 0x68);
+> +    i2c_slave_create_simple(i2c, "m41t80", 0x68);
+>  
+>      dev = sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600800, uic[0][3]);
+>  
 > -- 
 > 2.21.3
 > 
