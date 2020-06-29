@@ -2,91 +2,126 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE4CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFBEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:17:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA9FF23A32
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:14:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 679BE23A32
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:17:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KkGbrkE9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA9FF23A32
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lJsMheDp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 679BE23A32
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jprkX-0004Fl-3d
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:14:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43146)
+	id 1jprmv-00077z-M4
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:17:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jprjR-0003nY-E4
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:13:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40943
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jprjP-0008O5-BE
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:13:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593429226;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4LcQkw4Lb++/1a2TQi2E9whttLQ9KRbPjwDIuH7PtL4=;
- b=KkGbrkE9oEKezeZqQtT9KBXRaNx9nRc5uIYKfI3+PksQi6T5nlDwjjh7Iw4agQ/lu8+T/E
- u82q75odXOWV5C99O1JO4Qu2kOfDNk5zN8Ta+XM8k2DuXNLoFmckZ6KI0R2MM24ZMI19rU
- 8VBTuCqwd2Rr2CH0XLT2QphPz0LtXZ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-SLPBl8s6O--YpouSVj1rPw-1; Mon, 29 Jun 2020 07:13:02 -0400
-X-MC-Unique: SLPBl8s6O--YpouSVj1rPw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1C42106B247;
- Mon, 29 Jun 2020 11:13:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-140.ams2.redhat.com [10.36.112.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FE425C1D4;
- Mon, 29 Jun 2020 11:12:54 +0000 (UTC)
-Subject: Re: [PATCH v3 24/30] gitlab: add acceptance testing to system builds
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200626181357.26211-1-alex.bennee@linaro.org>
- <20200626181357.26211-25-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <60337384-7a08-86f9-0ddc-ab7e1c028e35@redhat.com>
-Date: Mon, 29 Jun 2020 13:12:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200626181357.26211-25-alex.bennee@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jprlU-0005pl-EG; Mon, 29 Jun 2020 07:15:57 -0400
+Received: from mail-eopbgr150114.outbound.protection.outlook.com
+ ([40.107.15.114]:49806 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jprlR-0000Za-KK; Mon, 29 Jun 2020 07:15:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iI/ydQ6gcONchVizv+hN4DI4Fj7fT9KHtOYx/o5g9GIRr6hvOvOqVexjq1Az3/D+eQfkegBcrMgdYly3UyzrK2wFngqTI588u04qI6S6xfCZjT3lVHBJpOMqSLaWIVqIZfDAxn0cUY58bMH76Gk0WEeC8g1CeaN5ibjgxweGgB/wFAM5xNXG2qq4FY8pBss2XMlLdGq7WYY5W5BKuAda4mvDty9XalRNM3DRiS/24ET5aM5FAsHYgJ42VH32k0XaI3vscLZRaaBYZlfhgnXI1tldYJV+9lTSE4E9k4/09ckl3omSkXvgftF2L6o2hIHcReal4HIitzZLbmI25htSiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6xRb+WMnJ+MuUnvWNqr2W3USpnc/Peprbyb619tRC1M=;
+ b=H2vEaLsipO0kE7cVuxSPXPL0zfMgxytB+uTkqcVmRf4/kfIBbpILwfNrxQaBFXcw1K8oWfucMQSDKVUoXB08V9bfAjWKIUho5VmWP6SerdpYXwaajVShJ/cQrAo2jwj/AMD8ROzLxyHdyJw4gb9k6iE4irE1+bDp31NLR9rVCSuRT3t4SLcY9mxe2sE5WH6x4JXlRF9JTXoI+YkniBP9fWpYIMUfaGr56EkghD8H6D2ESSwQCP7lxBc6FZ0v7LzkqKCSS7zn9sQU5jgLjLrQgahJyY6IFWgWmw0+Llga993m3APFeHeCm+IsdrWq0ndhjRb0GXBycWrQJWE4Sk/aXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6xRb+WMnJ+MuUnvWNqr2W3USpnc/Peprbyb619tRC1M=;
+ b=lJsMheDp48VK12Wb8gJNtgaOBxMiZz2LfpbYiVjKnC7psb6m927dHyM9UbhRyIS3ot3vpTcf2DwpDnjg5q1jrZstIKI1xg5y4G0WlUe6ntck6/KYM8ga/wpCSAe4CCJWj9DwamhEs72WgXO/MxbpHUFJ2RlLMA70Ipv7YHyo3Zw=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2610.eurprd08.prod.outlook.com (2603:10a6:203:97::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21; Mon, 29 Jun
+ 2020 11:15:50 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.026; Mon, 29 Jun 2020
+ 11:15:50 +0000
+Subject: Re: [PATCH 16/46] qemu-option: Make functions taking Error ** return
+ bool, not void
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-17-armbru@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <06e46718-238a-7a87-effe-eb2e0a3b3eac@virtuozzo.com>
+Date: Mon, 29 Jun 2020 14:15:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+In-Reply-To: <20200624164344.3778251-17-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR0902CA0022.eurprd09.prod.outlook.com
+ (2603:10a6:200:9b::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.28) by
+ AM4PR0902CA0022.eurprd09.prod.outlook.com (2603:10a6:200:9b::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20 via Frontend
+ Transport; Mon, 29 Jun 2020 11:15:49 +0000
+X-Originating-IP: [185.215.60.28]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e789e7ed-2fd1-490c-0ede-08d81c1dc76f
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2610:
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB2610B79524810FD007C62A7BC16E0@AM5PR0802MB2610.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:183;
+X-Forefront-PRVS: 044968D9E1
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CIaSDmbhGzm7wJIMqvDasGKaFbvG0PzpIjWiNq8tUPWHbYnO5l1CY4AzcqPJKw5PEZFAuWdq5VlFlKjdOaoojAo4ByJAv//VKcNWKluSHJzgz3ywUQuM3hhjMR85lAQr6Gi4eTCIp7OT9A+XmVgtWj56WKvVEntIoVoRLqYmRqoVtnaDVwJa0K+urTwoWtFo8H6p80aNenq84kZIcBJZU+NXMfr+csPJlUrsiX5uOOmkmtdoopBUEh+Sj3FoyH2TitFo5FRXnFRSA4qV34n7vNZtCHzAdEDB/MHUDzZy9WAYs0ukJ/m/b6Sue+iwVnDx1Twd+hZFZXWxgei+tnPomKJmD0jY3d7yFVNneJRinx2Dang6IxN3IIVBH+uvQ0DQ
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(376002)(366004)(396003)(39840400004)(5660300002)(316002)(16576012)(2906002)(186003)(558084003)(478600001)(86362001)(26005)(956004)(2616005)(31696002)(16526019)(36756003)(52116002)(8936002)(31686004)(4326008)(66556008)(6486002)(8676002)(66476007)(66946007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: aET7kkajqrHIfibDpMBw6ku0PptJ6rk+BmvPwP9ScHZbPqo/u/pUIid3r0Y81vPgi5/aquiorPbvNplUW1+d2UVt6XAHJdMVJP1/+s/74D3eNo65HO1tP08lLE7wp5R9IT7DGyvHJN1V7n2syhJsEqPe4fk/w+RUwy06KFpv9FpuUp1UgSgUh1RfCOCjNfAJSa1RvVC09d1tRt2AleYoB0s2k7YzF8wyd4cbfe6ziVW8DEVmrUG275aa21eA5LkQ4A5GSd/dzcEvbrTF3X9bFhXfhjNQ7uFhhU7VyRH11SBZh4D8I5Th8pZZBBOeRMOE/C2k9yq9IxiQ4Q+0ZxfrApu9WOuHdojROxhcOmXVG5M2JMY5wHfSvT7Ekvtbph2l5wTVF88rY8cjsbNWP48VwHySVslKbW11Sy97FPJwC4e3LMA5kZrQZSxpdm2aPyi6BnusQ+GcqxebvmySN7bLOvQhnpk4JvJsJ00W9lGEx3bU1FDu6rODc8X7nmFlQVCY
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e789e7ed-2fd1-490c-0ede-08d81c1dc76f
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2020 11:15:50.0051 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GBAr6w8KzW4ef1AdtyabjK27aSxlpxujaE1lcmP0mT24cc8xFeFTxlY1j8N9ln98EOV3YZCNIwnC7uqDb+wZ2ZAaARL1VPEUMyzWgVGdMVY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2610
+Received-SPF: pass client-ip=40.107.15.114;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 07:15:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,145 +134,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, richard.henderson@linaro.org,
- f4bug@amsat.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- cota@braap.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/06/2020 20.13, Alex Bennée wrote:
-> As part of migrating things from Travis to GitLab add the acceptance
-> tests. To do this:
+24.06.2020 19:43, Markus Armbruster wrote:
+> See recent commit "error: Document Error API usage rules" for
+> rationale.
 > 
->    - rename system1 to system-ubuntu-main
->    - rename system2 to system-fedora-misc
->    - split into build/check/acceptance
->    - remove -j from check stages
->    - use artifacts to save build stage
->    - add post acceptance template and use
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Message-Id: <20200622143204.12921-16-alex.bennee@linaro.org>
-> 
-> ---
-> v2
->    - updated with danp's docker changes
->    - use needs instead of dependancies
->    - touch all the build files to prevent rebuild
-> ---
->   .gitlab-ci.yml | 66 +++++++++++++++++++++++++++++++++++++++++++++++---
->   .travis.yml    | 23 ------------------
->   2 files changed, 63 insertions(+), 26 deletions(-)
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index a7abc55a5c6..5ae8130bd1a 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -1,8 +1,12 @@
-> +# Currently we have two build stages after our containers are built:
-> +#  - build (for traditional build and test or first stage build)
-> +#  - test (for test stages, using build artefacts from a build stage)
->   stages:
->     - containers
->     - containers-layer2
->     - containers-layer3
->     - build
-> +  - test
->   
->   include:
->     - local: '/.gitlab-ci.d/edk2.yml'
-> @@ -24,26 +28,82 @@ include:
->           ../configure --enable-werror $CONFIGURE_ARGS ;
->         fi
->       - make -j"$JOBS"
-> -    - make -j"$JOBS" $MAKE_CHECK_ARGS
-> +    - if test -n "$MAKE_CHECK_ARGS";
-> +      then
-> +        make $MAKE_CHECK_ARGS ;
-> +      fi
-> +
-> +.native_test_job_template: &native_test_job_definition
-> +  stage: test
-> +  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-> +  script:
-> +    - cd build
-> +    - find . -type f -exec touch {} +
-> +    - make $MAKE_CHECK_ARGS
-> +
-> +.post_acceptance_template: &post_acceptance
-> +  after_script:
-> +    - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-> +    - du -chs $HOME/avocado/data/cache
->   
-> -build-system1:
-> +build:system-ubuntu-main:
->     <<: *native_build_job_definition
->     variables:
->       IMAGE: ubuntu2004
->       TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu lm32-softmmu
->         moxie-softmmu microblazeel-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu
->         riscv64-softmmu sparc-softmmu
-> +  artifacts:
-> +    paths:
-> +      - build
-> +
-> +check:system-ubuntu-main:
-> +  <<: *native_test_job_definition
-> +  needs:
-> +    - job: build:system-ubuntu-main
-> +      artifacts: true
-> +  variables:
-> +    IMAGE: ubuntu2004
->       MAKE_CHECK_ARGS: check
->   
-> -build-system2:
-> +acceptance:system-ubuntu-main:
-> +  <<: *native_test_job_definition
-> +  needs:
-> +    - job: build:system-ubuntu-main
-> +      artifacts: true
-> +  variables:
-> +    IMAGE: ubuntu2004
-> +    MAKE_CHECK_ARGS: check-acceptance
-> +
-> +build:system-fedora-alt:
->     <<: *native_build_job_definition
->     variables:
->       IMAGE: fedora
->       TARGETS: tricore-softmmu unicore32-softmmu microblaze-softmmu mips-softmmu
->         riscv32-softmmu s390x-softmmu sh4-softmmu sparc64-softmmu x86_64-softmmu
->         xtensa-softmmu nios2-softmmu or1k-softmmu
-> +  artifacts:
-> +    paths:
-> +      - build
-> +
-> +check:system-fedora-alt:
-> +  <<: *native_test_job_definition
-> +  needs:
-> +    - job: build:system-fedora-alt
-> +      artifacts: true
-> +  variables:
-> +    IMAGE: fedora
->       MAKE_CHECK_ARGS: check
->   
-> +check:system-fedora-alt:
+> Signed-off-by: Markus Armbruster<armbru@redhat.com>
 
-Copy-n-paste bug: This should be "acceptance:..." instead. By the way, I 
-think the use of a colon after "check" or "acceptance" is a little bit 
-confusing here, since this is also a character used by the YML syntax.
-Could you name the jobs with a dash here instead? (check-system-fedora, 
-acceptance-system-fedora, ...)
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> +  <<: *native_test_job_definition
-> +  needs:
-> +    - job: build:system-fedora-alt
-> +      artifacts: true
-> +  variables:
-> +    IMAGE: fedora
-> +    MAKE_CHECK_ARGS: check-acceptance
 
-  Thomas
-
+-- 
+Best regards,
+Vladimir
 
