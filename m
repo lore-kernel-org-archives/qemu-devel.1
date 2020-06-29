@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED484C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE96C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7488206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7488206F1
+	by mail.kernel.org (Postfix) with ESMTPS id 9C5C32078C
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C5C32078C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzsv-0008NE-29
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:56:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57486)
+	id 1jpzt3-0000IO-Tb
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznU-00076c-91; Mon, 29 Jun 2020 15:50:32 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46166)
+ id 1jpznq-0007SI-Pk; Mon, 29 Jun 2020 15:50:54 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46206)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznS-0005wW-5i; Mon, 29 Jun 2020 15:50:31 -0400
+ id 1jpzno-0005z4-9H; Mon, 29 Jun 2020 15:50:54 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id C9E0FBF7F1;
- Mon, 29 Jun 2020 19:50:25 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 98239BF814;
+ Mon, 29 Jun 2020 19:50:28 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 05/17] hw/block/nvme: refactor dma read/write
-Date: Mon, 29 Jun 2020 21:50:05 +0200
-Message-Id: <20200629195017.1217056-6-its@irrelevant.dk>
+Subject: [PATCH 13/17] hw/block/nvme: consolidate qsg/iov clearing
+Date: Mon, 29 Jun 2020 21:50:13 +0200
+Message-Id: <20200629195017.1217056-14-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200629195017.1217056-1-its@irrelevant.dk>
 References: <20200629195017.1217056-1-its@irrelevant.dk>
@@ -75,196 +75,128 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Refactor the nvme_dma_{read,write}_prp functions into a common function
-taking a DMADirection parameter.
+Always destroy the request qsg/iov at the end of request use.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 88 ++++++++++++++++++++++++-------------------------
- 1 file changed, 43 insertions(+), 45 deletions(-)
+ hw/block/nvme.c | 48 +++++++++++++++++-------------------------------
+ 1 file changed, 17 insertions(+), 31 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ded78a2301a6..86d35547b752 100644
+index 3d38f61b61e5..c6c2c4670f7d 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -326,55 +326,50 @@ unmap:
-     return status;
+@@ -178,6 +178,14 @@ static void nvme_req_clear(NvmeRequest *req)
+ {
+     req->ns = NULL;
+     memset(&req->cqe, 0x0, sizeof(req->cqe));
++
++    if (req->qsg.sg) {
++        qemu_sglist_destroy(&req->qsg);
++    }
++
++    if (req->iov.iov) {
++        qemu_iovec_destroy(&req->iov);
++    }
  }
  
--static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
--                                   uint64_t prp1, uint64_t prp2)
-+static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
-+                             uint64_t prp1, uint64_t prp2, DMADirection dir)
- {
-     QEMUSGList qsg;
-     QEMUIOVector iov;
-     uint16_t status = NVME_SUCCESS;
+ static uint16_t nvme_map_addr_cmb(NvmeCtrl *n, QEMUIOVector *iov, hwaddr addr,
+@@ -262,15 +270,14 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
  
--    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
--        return NVME_INVALID_FIELD | NVME_DNR;
-+    status = nvme_map_prp(&qsg, &iov, prp1, prp2, len, n);
-+    if (status) {
+     status = nvme_map_addr(n, qsg, iov, prp1, trans_len);
+     if (status) {
+-        goto unmap;
 +        return status;
      }
-+
-     if (qsg.nsg > 0) {
--        if (dma_buf_write(ptr, len, &qsg)) {
+ 
+     len -= trans_len;
+     if (len) {
+         if (unlikely(!prp2)) {
+             trace_pci_nvme_err_invalid_prp2_missing();
 -            status = NVME_INVALID_FIELD | NVME_DNR;
-+        uint64_t residual;
-+
-+        if (dir == DMA_DIRECTION_TO_DEVICE) {
-+            residual = dma_buf_write(ptr, len, &qsg);
-+        } else {
-+            residual = dma_buf_read(ptr, len, &qsg);
+-            goto unmap;
++            return NVME_INVALID_FIELD | NVME_DNR;
          }
--        qemu_sglist_destroy(&qsg);
--    } else {
--        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
--            status = NVME_INVALID_FIELD | NVME_DNR;
--        }
--        qemu_iovec_destroy(&iov);
+ 
+         if (len > n->page_size) {
+@@ -291,13 +298,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+                 if (i == n->max_prp_ents - 1 && len > n->page_size) {
+                     if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+                         trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
+-                        status = NVME_INVALID_FIELD | NVME_DNR;
+-                        goto unmap;
++                        return NVME_INVALID_FIELD | NVME_DNR;
+                     }
+ 
+                     if (prp_list_in_cmb != nvme_addr_is_cmb(n, prp_ent)) {
+-                        status = NVME_INVALID_USE_OF_CMB | NVME_DNR;
+-                        goto unmap;
++                        return NVME_INVALID_USE_OF_CMB | NVME_DNR;
+                     }
+ 
+                     i = 0;
+@@ -310,14 +315,13 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+ 
+                 if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+                     trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
+-                    status = NVME_INVALID_FIELD | NVME_DNR;
+-                    goto unmap;
++                    return NVME_INVALID_FIELD | NVME_DNR;
+                 }
+ 
+                 trans_len = MIN(len, n->page_size);
+                 status = nvme_map_addr(n, qsg, iov, prp_ent, trans_len);
+                 if (status) {
+-                    goto unmap;
++                    return status;
+                 }
+ 
+                 len -= trans_len;
+@@ -326,27 +330,16 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+         } else {
+             if (unlikely(prp2 & (n->page_size - 1))) {
+                 trace_pci_nvme_err_invalid_prp2_align(prp2);
+-                status = NVME_INVALID_FIELD | NVME_DNR;
+-                goto unmap;
++                return NVME_INVALID_FIELD | NVME_DNR;
+             }
+             status = nvme_map_addr(n, qsg, iov, prp2, len);
+             if (status) {
+-                goto unmap;
++                return status;
+             }
+         }
+     }
++
+     return NVME_SUCCESS;
+-
+-unmap:
+-    if (iov && iov->iov) {
+-        qemu_iovec_destroy(iov);
 -    }
+-
+-    if (qsg && qsg->sg) {
+-        qemu_sglist_destroy(qsg);
+-    }
+-
 -    return status;
--}
+ }
  
--static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
--    uint64_t prp1, uint64_t prp2)
--{
--    QEMUSGList qsg;
--    QEMUIOVector iov;
--    uint16_t status = NVME_SUCCESS;
--
--    trace_pci_nvme_dma_read(prp1, prp2);
--
--    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
--        return NVME_INVALID_FIELD | NVME_DNR;
+ static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+@@ -566,13 +559,6 @@ static void nvme_rw_cb(void *opaque, int ret)
+         req->status = NVME_INTERNAL_DEV_ERROR;
+     }
+ 
+-    if (req->qsg.nalloc) {
+-        qemu_sglist_destroy(&req->qsg);
 -    }
--    if (qsg.nsg > 0) {
--        if (unlikely(dma_buf_read(ptr, len, &qsg))) {
-+        if (unlikely(residual)) {
-             trace_pci_nvme_err_invalid_dma();
-             status = NVME_INVALID_FIELD | NVME_DNR;
-         }
-+
-         qemu_sglist_destroy(&qsg);
-     } else {
--        if (unlikely(qemu_iovec_from_buf(&iov, 0, ptr, len) != len)) {
-+        size_t bytes;
-+
-+        if (dir == DMA_DIRECTION_TO_DEVICE) {
-+            bytes = qemu_iovec_to_buf(&iov, 0, ptr, len);
-+        } else {
-+            bytes = qemu_iovec_from_buf(&iov, 0, ptr, len);
-+        }
-+
-+        if (unlikely(bytes != len)) {
-             trace_pci_nvme_err_invalid_dma();
-             status = NVME_INVALID_FIELD | NVME_DNR;
-         }
-+
-         qemu_iovec_destroy(&iov);
-     }
-+
-     return status;
+-    if (req->iov.nalloc) {
+-        qemu_iovec_destroy(&req->iov);
+-    }
+-
+     nvme_enqueue_req_completion(cq, req);
  }
  
-@@ -806,8 +801,8 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
-         nvme_clear_events(n, NVME_AER_TYPE_SMART);
-     }
- 
--    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
--                             prp2);
-+    return nvme_dma_prp(n, (uint8_t *) &smart + off, trans_len, prp1, prp2,
-+                        DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-@@ -828,8 +823,8 @@ static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
- 
-     trans_len = MIN(sizeof(fw_log) - off, buf_len);
- 
--    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1,
--                             prp2);
-+    return nvme_dma_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1, prp2,
-+                        DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
-@@ -853,7 +848,8 @@ static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
- 
-     trans_len = MIN(sizeof(errlog) - off, buf_len);
- 
--    return nvme_dma_read_prp(n, (uint8_t *)&errlog, trans_len, prp1, prp2);
-+    return nvme_dma_prp(n, (uint8_t *)&errlog, trans_len, prp1, prp2,
-+                        DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-@@ -1008,8 +1004,8 @@ static uint16_t nvme_identify_ctrl(NvmeCtrl *n, NvmeIdentify *c)
- 
-     trace_pci_nvme_identify_ctrl();
- 
--    return nvme_dma_read_prp(n, (uint8_t *)&n->id_ctrl, sizeof(n->id_ctrl),
--        prp1, prp2);
-+    return nvme_dma_prp(n, (uint8_t *)&n->id_ctrl, sizeof(n->id_ctrl), prp1,
-+                        prp2, DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
-@@ -1028,8 +1024,8 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
- 
-     ns = &n->namespaces[nsid - 1];
- 
--    return nvme_dma_read_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
--        prp1, prp2);
-+    return nvme_dma_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns), prp1,
-+                        prp2, DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
-@@ -1054,7 +1050,8 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
-             break;
-         }
-     }
--    ret = nvme_dma_read_prp(n, (uint8_t *)list, data_len, prp1, prp2);
-+    ret = nvme_dma_prp(n, (uint8_t *)list, data_len, prp1, prp2,
-+                       DMA_DIRECTION_FROM_DEVICE);
-     g_free(list);
-     return ret;
- }
-@@ -1095,7 +1092,8 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeIdentify *c)
-     ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
-     stl_be_p(&ns_descrs->uuid.v, nsid);
- 
--    return nvme_dma_read_prp(n, list, NVME_IDENTIFY_DATA_SIZE, prp1, prp2);
-+    return nvme_dma_prp(n, list, NVME_IDENTIFY_DATA_SIZE, prp1, prp2,
-+                        DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
-@@ -1176,8 +1174,8 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
- 
-     uint64_t timestamp = nvme_get_timestamp(n);
- 
--    return nvme_dma_read_prp(n, (uint8_t *)&timestamp,
--                                 sizeof(timestamp), prp1, prp2);
-+    return nvme_dma_prp(n, (uint8_t *)&timestamp, sizeof(timestamp), prp1,
-+                        prp2, DMA_DIRECTION_FROM_DEVICE);
- }
- 
- static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-@@ -1305,8 +1303,8 @@ static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
-     uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-     uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
- 
--    ret = nvme_dma_write_prp(n, (uint8_t *)&timestamp,
--                                sizeof(timestamp), prp1, prp2);
-+    ret = nvme_dma_prp(n, (uint8_t *)&timestamp, sizeof(timestamp), prp1,
-+                       prp2, DMA_DIRECTION_TO_DEVICE);
-     if (ret != NVME_SUCCESS) {
-         return ret;
-     }
 -- 
 2.27.0
 
