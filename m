@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BA5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F030C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59ED123CD5
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FD1923D20
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 11:56:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdU9EvSp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59ED123CD5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSY6y1Qh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD1923D20
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpsNp-0001Vk-JH
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56934)
+	id 1jpsOJ-0002o0-Ay
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 07:56:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpsMt-00004x-J0
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:54:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42643
+ id 1jpsMv-00009o-Sy
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:54:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47969
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpsMr-0007GG-S3
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:54:35 -0400
+ id 1jpsMu-0007Gj-0P
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 07:54:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593431672;
+ s=mimecast20190719; t=1593431675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8XnErx6ZAeEnolYIe84nUUnWLaj+8UOqElaNNo0W5Rg=;
- b=BdU9EvSpvxZQItEBajuqcBJ0bgs5GR5P9yfuahe0cmPmKBpdgsEkAC65ACx/+5+KbDilGz
- mqC04cAm4jgBI4AkbR3adMh3M4FG7icy1SXeNf8qO9KAQF2CrTUXBldXkHAvj3JMLMdjW2
- Ieii0cvHJb3+UnH1kO51ThVh3xkuHUk=
+ bh=DR2V2BBHsG+LGIjl5IOmfZkGDo12TCocbWRIyagf6LU=;
+ b=NSY6y1Qh52iAW0vcbIf9HSzcBt4OV3Pyd+fxQ8j/aH3/p+gXWoV+lhZO065KhWSFBOfxLU
+ +0iyPUUtk2ZkROh8CC2DDQkc8CVPuB5eBQPTCRLps5+Zs8M5QXJ5haIyo4W5zsK0Q+GVpM
+ z9X2VwL2MFx6StB6+8ebsXg3HxkR6gc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-BFR1Fn0UNcCI6ixDtK-E9A-1; Mon, 29 Jun 2020 07:54:31 -0400
-X-MC-Unique: BFR1Fn0UNcCI6ixDtK-E9A-1
+ us-mta-351-2IH-sa_AN866NuLaFNULGQ-1; Mon, 29 Jun 2020 07:54:33 -0400
+X-MC-Unique: 2IH-sa_AN866NuLaFNULGQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DBFD464
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:54:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB71E107ACF6
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 11:54:32 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-210.ams2.redhat.com
  [10.36.114.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54D0B9CFD1;
- Mon, 29 Jun 2020 11:54:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ECB0D96B8F;
+ Mon, 29 Jun 2020 11:54:31 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, virtio-fs@redhat.com, stefanha@redhat.com,
  vgoyal@redhat.com
-Subject: [PATCH v2 1/3] virtiofsd: Terminate capability list
-Date: Mon, 29 Jun 2020 12:54:18 +0100
-Message-Id: <20200629115420.98443-2-dgilbert@redhat.com>
+Subject: [PATCH v2 3/3] virtiofsd: Allow addition or removal of capabilities
+Date: Mon, 29 Jun 2020 12:54:20 +0100
+Message-Id: <20200629115420.98443-4-dgilbert@redhat.com>
 In-Reply-To: <20200629115420.98443-1-dgilbert@redhat.com>
 References: <20200629115420.98443-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,36 +102,153 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-capng_updatev is a varargs function that needs a -1 to terminate it,
-but it was missing.
+Allow capabilities to be added or removed from the allowed set for the
+daemon; e.g.
 
-In practice what seems to have been happening is that it's added the
-capabilities we asked for, then runs into junk on the stack, so if
-we're unlucky it might be adding some more, but in reality it's
-failing - but after adding the capabilities we asked for.
+default:
+CapPrm: 00000000880000df
+CapEff: 00000000880000df
 
-Fixes: a59feb483b8 ("virtiofsd: only retain file system capabilities")
+-o modcaps=+sys_admin
+
+CapPrm: 00000000882000df
+CapEff: 00000000882000df
+
+-o modcaps=+sys_admin:-chown
+
+CapPrm: 00000000882000de
+CapEff: 00000000882000de
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ docs/tools/virtiofsd.rst         |  5 +++
+ tools/virtiofsd/helper.c         |  2 ++
+ tools/virtiofsd/passthrough_ll.c | 53 ++++++++++++++++++++++++++++++--
+ 3 files changed, 58 insertions(+), 2 deletions(-)
 
+diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+index 378594c422..824e713491 100644
+--- a/docs/tools/virtiofsd.rst
++++ b/docs/tools/virtiofsd.rst
+@@ -54,6 +54,11 @@ Options
+   * flock|no_flock -
+     Enable/disable flock.  The default is ``no_flock``.
+ 
++  * modcaps=CAPLIST
++    Modify the list of capabilities allowed; CAPLIST is a colon separated
++    list of capabilities, each preceded by either + or -, e.g.
++    ''+sys_admin:-chown''.
++
+   * log_level=LEVEL -
+     Print only log messages matching LEVEL or more severe.  LEVEL is one of
+     ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 00a1ef666a..3105b6c23a 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -174,6 +174,8 @@ void fuse_cmdline_help(void)
+            "                               default: no_writeback\n"
+            "    -o xattr|no_xattr          enable/disable xattr\n"
+            "                               default: no_xattr\n"
++           "    -o modcaps=CAPLIST         Modify the list of capabilities\n"
++           "                               e.g. -o modcaps=+sys_admin:-chown\n"
+            "    --rlimit-nofile=<num>      set maximum number of file descriptors\n"
+            "                               (0 leaves rlimit unchanged)\n"
+            "                               default: min(1000000, fs.file-max - 16384)\n"
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 2ce7c96085..e373e3b36e 100644
+index 99d562046a..94e0de2d2b 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -2598,7 +2598,9 @@ static void setup_capabilities(void)
-             CAP_SETGID,
-             CAP_SETUID,
-             CAP_MKNOD,
--            CAP_SETFCAP);
-+            CAP_SETFCAP,
-+            -1);
-+
-     capng_apply(CAPNG_SELECT_BOTH);
+@@ -145,6 +145,7 @@ struct lo_data {
+     int posix_lock;
+     int xattr;
+     char *source;
++    char *modcaps;
+     double timeout;
+     int cache;
+     int timeout_set;
+@@ -170,6 +171,7 @@ static const struct fuse_opt lo_opts[] = {
+     { "no_posix_lock", offsetof(struct lo_data, posix_lock), 0 },
+     { "xattr", offsetof(struct lo_data, xattr), 1 },
+     { "no_xattr", offsetof(struct lo_data, xattr), 0 },
++    { "modcaps=%s", offsetof(struct lo_data, modcaps), 0 },
+     { "timeout=%lf", offsetof(struct lo_data, timeout), 0 },
+     { "timeout=", offsetof(struct lo_data, timeout_set), 1 },
+     { "cache=none", offsetof(struct lo_data, cache), CACHE_NONE },
+@@ -2570,9 +2572,11 @@ static void setup_mounts(const char *source)
  
-     cap.saved = capng_save_state();
+ /*
+  * Only keep whitelisted capabilities that are needed for file system operation
++ * The (possibly NULL) modcaps_in string passed in is free'd before exit.
+  */
+-static void setup_capabilities(void)
++static void setup_capabilities(char *modcaps_in)
+ {
++    char *modcaps = modcaps_in;
+     pthread_mutex_lock(&cap.mutex);
+     capng_restore_state(&cap.saved);
+ 
+@@ -2604,6 +2608,51 @@ static void setup_capabilities(void)
+         exit(1);
+     }
+ 
++    /*
++     * The modcaps option is a colon separated list of caps,
++     * each preceded by either + or -.
++     */
++    while (modcaps) {
++        capng_act_t action;
++        int cap;
++
++        char *next = strchr(modcaps, ':');
++        if (next) {
++            *next = '\0';
++            next++;
++        }
++
++        switch (modcaps[0]) {
++        case '+':
++            action = CAPNG_ADD;
++            break;
++
++        case '-':
++            action = CAPNG_DROP;
++            break;
++
++        default:
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Expecting '+'/'-' in modcaps but found '%c'\n",
++                     __func__, modcaps[0]);
++            exit(1);
++        }
++        cap = capng_name_to_capability(modcaps + 1);
++        if (cap < 0) {
++            fuse_log(FUSE_LOG_ERR, "%s: Unknown capability '%s'\n", __func__,
++                     modcaps);
++            exit(1);
++        }
++        if (capng_update(action, CAPNG_PERMITTED | CAPNG_EFFECTIVE, cap)) {
++            fuse_log(FUSE_LOG_ERR, "%s: capng_update failed for '%s'\n",
++                     __func__, modcaps);
++            exit(1);
++        }
++
++        modcaps = next;
++    }
++    g_free(modcaps_in);
++
+     if (capng_apply(CAPNG_SELECT_BOTH)) {
+         fuse_log(FUSE_LOG_ERR, "%s: capng_apply failed\n", __func__);
+         exit(1);
+@@ -2627,7 +2676,7 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+     setup_namespaces(lo, se);
+     setup_mounts(lo->source);
+     setup_seccomp(enable_syslog);
+-    setup_capabilities();
++    setup_capabilities(g_strdup(lo->modcaps));
+ }
+ 
+ /* Set the maximum number of open file descriptors */
 -- 
 2.26.2
 
