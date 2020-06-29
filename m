@@ -2,43 +2,46 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FAFC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE63EC433DF
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B1FF20759
+	by mail.kernel.org (Postfix) with ESMTPS id 88F6F20674
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B1FF20759
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88F6F20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzox-0000SV-NJ
+	id 1jpzox-0000QN-HS
 	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57436)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznR-00075C-Rd; Mon, 29 Jun 2020 15:50:29 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46088)
+ id 1jpznR-00074x-DR; Mon, 29 Jun 2020 15:50:29 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznO-0005uK-U6; Mon, 29 Jun 2020 15:50:29 -0400
+ id 1jpznP-0005uO-2o; Mon, 29 Jun 2020 15:50:29 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id D49D2BF450;
- Mon, 29 Jun 2020 19:50:23 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 5EB7FBF724;
+ Mon, 29 Jun 2020 19:50:24 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 00/17] hw/block/nvme: AIO and address mapping refactoring
-Date: Mon, 29 Jun 2020 21:50:00 +0200
-Message-Id: <20200629195017.1217056-1-its@irrelevant.dk>
+Subject: [PATCH 01/17] hw/block/nvme: memset preallocated requests structures
+Date: Mon, 29 Jun 2020 21:50:01 +0200
+Message-Id: <20200629195017.1217056-2-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200629195017.1217056-1-its@irrelevant.dk>
+References: <20200629195017.1217056-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
@@ -72,44 +75,29 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-This series is based on "[PATCH 00/17] hw/block/nvme: bump to v1.3" and
-mostly consists of patches that refactors and clean up dma/cmb address
-mappings.
+This is preparatory to subsequent patches that change how QSGs/IOVs are
+handled. It is important that the qsg and iov members of the NvmeRequest
+are initially zeroed.
 
-The "hw/block/nvme: allow multiple aios per command" patch does what it
-says on the tin and is in preparation for metadata, dulbe, write
-uncorrectable and any upcoming feature that requires additional
-persistent state to be modified per command in an asynchronous manner.
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ hw/block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Based-on: <20200629182642.1170387-1-its@irrelevant.dk>
-([PATCH 00/17] hw/block/nvme: bump to v1.3)
-
-Klaus Jensen (17):
-  hw/block/nvme: memset preallocated requests structures
-  hw/block/nvme: add mapping helpers
-  hw/block/nvme: replace dma_acct with blk_acct equivalent
-  hw/block/nvme: remove redundant has_sg member
-  hw/block/nvme: refactor dma read/write
-  hw/block/nvme: pass request along for tracing
-  hw/block/nvme: add request mapping helper
-  hw/block/nvme: verify validity of prp lists in the cmb
-  hw/block/nvme: refactor request bounds checking
-  hw/block/nvme: add check for mdts
-  hw/block/nvme: be consistent about zeros vs zeroes
-  hw/block/nvme: refactor NvmeRequest clearing
-  hw/block/nvme: consolidate qsg/iov clearing
-  hw/block/nvme: remove NvmeCmd parameter
-  hw/block/nvme: allow multiple aios per command
-  hw/block/nvme: add nvme_check_rw helper
-  hw/block/nvme: use preallocated qsg/iov in nvme_dma_prp
-
- block/nvme.c          |   4 +-
- hw/block/nvme.c       | 834 ++++++++++++++++++++++++++++++------------
- hw/block/nvme.h       | 104 +++++-
- hw/block/trace-events |   7 +
- include/block/nvme.h  |   4 +-
- 5 files changed, 699 insertions(+), 254 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index fbe9b2d50895..3dbce536456c 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -618,7 +618,7 @@ static void nvme_init_sq(NvmeSQueue *sq, NvmeCtrl *n, uint64_t dma_addr,
+     sq->size = size;
+     sq->cqid = cqid;
+     sq->head = sq->tail = 0;
+-    sq->io_req = g_new(NvmeRequest, sq->size);
++    sq->io_req = g_new0(NvmeRequest, sq->size);
+ 
+     QTAILQ_INIT(&sq->req_list);
+     QTAILQ_INIT(&sq->out_req_list);
 -- 
 2.27.0
 
