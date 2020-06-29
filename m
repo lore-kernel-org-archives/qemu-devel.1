@@ -2,84 +2,81 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E09C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AF4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33CED253E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7730525407
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 15:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TD01g0UK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33CED253E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OB/DFPqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7730525407
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpvv0-0003r7-Fe
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 11:42:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36284)
+	id 1jpvvT-0004Iv-Pi
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 11:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jpvpt-000797-Jw
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:36:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20895
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jpvuI-0003PL-Ax
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:41:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22719
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jpvpr-00041e-NE
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:36:45 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jpvuF-0004hq-Es
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 11:41:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593445002;
+ s=mimecast20190719; t=1593445274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2/WA4OLWyPhsjGIuu/Mzu7YoNI9FT5n1iXf1VvBRcbo=;
- b=TD01g0UKOYoM/xsFFV6JxJypvusA90gWEK69QTFOOfk4zBxDMur6rIAOOfEzCfn8rnwK5F
- oNUljd3x1JR/417ttl80qrWG06f692VLF/9wH9w7bXBQepV6H7ZPglpkTQI8yDwDQgkMR1
- kL6jQtBUwJLF34f6+6IoBtHhePofAD0=
+ bh=+FN6IQuSjKdpjy/d+UT0a03n55FN0SkUz5mdWRzX69g=;
+ b=OB/DFPqzgl8YKJu1cWGc822h62+yvbpJb9hcnZ5w7bSYbR13dPJBVuhhHBC3nDfw5uRmvk
+ DjccqJ+CYn8rU/To+bKKJQNPZznB9HsOvz/hPGLPrNuq5WoRHQ7scheXfxaJohwl08bAfn
+ J4gdj9eGxpS2YlsvoYig0GUyrCnPccw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-nCZsfD8NMBilci3sGHaqGw-1; Mon, 29 Jun 2020 11:36:40 -0400
-X-MC-Unique: nCZsfD8NMBilci3sGHaqGw-1
+ us-mta-48-PVbP2JHnMzGFZlfLfEep-A-1; Mon, 29 Jun 2020 11:41:09 -0400
+X-MC-Unique: PVbP2JHnMzGFZlfLfEep-A-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69E16805EF0;
- Mon, 29 Jun 2020 15:36:39 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 236F85D98A;
- Mon, 29 Jun 2020 15:36:39 +0000 (UTC)
-Subject: Re: [PATCH] coverity: provide Coverity-friendly MIN_CONST and
- MAX_CONST
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200629151642.11974-1-pbonzini@redhat.com>
- <aaa5f004-e500-5510-bf70-435b5c0f9383@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <766059d5-614a-33e0-6068-68066110493c@redhat.com>
-Date: Mon, 29 Jun 2020 10:36:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40480800C60;
+ Mon, 29 Jun 2020 15:41:08 +0000 (UTC)
+Received: from work-vm (ovpn-114-210.ams2.redhat.com [10.36.114.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F7705D9C9;
+ Mon, 29 Jun 2020 15:41:06 +0000 (UTC)
+Date: Mon, 29 Jun 2020 16:41:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: Properly quitting qemu immediately after failing migration
+Message-ID: <20200629154104.GK2908@work-vm>
+References: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <aaa5f004-e500-5510-bf70-435b5c0f9383@redhat.com>
-Content-Language: en-US
+In-Reply-To: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,58 +97,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 10:34 AM, Eric Blake wrote:
-> On 6/29/20 10:16 AM, Paolo Bonzini wrote:
->> Coverity's parser chokes on __builtin_choose_expr inside a constant
->> expression.  Since it is used only to raise compilation errors for
->> non-constant arguments, we can just assume there are no such errors
->> in the Coverity runs, and define MIN_CONST and MAX_CONST to the
->> "classic" ternary-operator-based definitions of minimum and maximum.
->>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   include/qemu/osdep.h | 17 ++++++++++++-----
->>   1 file changed, 12 insertions(+), 5 deletions(-)
+* Max Reitz (mreitz@redhat.com) wrote:
+> Hi,
 > 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> In an iotest, I’m trying to quit qemu immediately after a migration has
+> failed.  Unfortunately, that doesn’t seem to be possible in a clean way:
+> migrate_fd_cleanup() runs only at some point after the migration state
+> is already “failed”, so if I just wait for that “failed” state and
+> immediately quit, some cleanup functions may not have been run yet.
+
+Yeh this is hard; I always take the end of migrate_fd_cleanup to be the
+real end.
+It always happens on the main thread I think (it's done as a bh in some
+cases).
+
+> This is a problem with dirty bitmap migration at least, because it
+> increases the refcount on all block devices that are to be migrated, so
+> if we don’t call the cleanup function before quitting, the refcount will
+> stay elevated and bdrv_close_all() will hit an assertion because those
+> block devices are still around after blk_remove_all_bs() and
+> blockdev_close_all_bdrv_states().
 > 
-> I wrote a variant in the meantime, and in comparing the two, the only 
-> major difference was that I added a line:
+> In practice this particular issue might not be that big of a problem,
+> because it just means qemu aborts when the user intended to let it quit
+> anyway.  But on one hand I could imagine that there are other clean-up
+> paths that should definitely run before qemu quits (although I don’t
+> know), and on the other, it’s a problem for my test.
+
+'quit' varies - there are a lot of incoming failures that just assert;
+very few of them cause a clean exit (I think there are more clean ones
+after Peter's work on restartable postcopy a year or two ago).
+
+I do see the end of migrate_fd_cleanup calls the notifier list; but it's
+not clear to me that it's alwyas going to see the first transition to
+'failed' at that point.
+
+> I tried working around the problem for my test by waiting on “Unable to
+> write” appearing on stderr, because that indicates that
+> migrate_fd_cleanup()’s error_report_err() has been reached.  But on one
+> hand, that isn’t really nice, and on the other, it doesn’t even work
+> when the failure is on the source side (because then there is no
+> s->error for migrate_fd_cleanup() to report).
 > 
->      Fixes: CID 1429992, CID 1429995, CID 1429997, CID 1429999
+> In all, I’m asking:
+> (1) Is there a nice solution for me now to delay quitting qemu until the
+> failed migration has been fully resolved, including the clean-up?
+
+In vl.c, I added a call to migration_shutdown in qemu_cleanup - although
+that seems to be mostly about cleaning up the *outgoing* side; you could
+add some incoming cleanup there.
+
+> (2) Isn’t it a problem if qemu crashes when you issue “quit” via QMP at
+> the wrong time?  Like, maybe lingering subprocesses when using “exec”?
+
+Yeh that should be cleaner, but isn't.
+
+Dave
+
 > 
-> in the commit message, as well as a comment in osdep.h:
+> Thanks,
 > 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 0d26a1b9bd07..98bc7156fa9b 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -250,7 +250,8 @@ extern int daemon(int, int);
->    * Note that neither form is usable as an #if condition; if you truly
->    * need to write conditional code that depends on a minimum or maximum
->    * determined by the pre-processor instead of the compiler, you'll
-> - * have to open-code it.
-> + * have to open-code it.  Sadly, Coverity is severely confused by the
-> + * constant variants, so we have to dumb things down there.
->    */
->   #undef MIN
->   #define MIN(a, b)                                       \
-> 
+> Max
 > 
 
-Oh, and the more significant difference that the syntax checker is 
-right: we want the fallback definition to be enclosed in an outer (). 
-Looks like we need v2.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
