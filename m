@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 07:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC430C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 07:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C8123329
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 07:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B90CB23329
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 07:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDn8hN7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C8123329
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KyOetenV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B90CB23329
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpntB-000163-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 03:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60076)
+	id 1jpntZ-0001tq-1t
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 03:08:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jpnqo-000672-PY
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 03:05:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34430
+ id 1jpnqm-00065s-Ql
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 03:05:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34266
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jpnql-0007vP-L7
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 03:05:09 -0400
+ id 1jpnqj-0007vJ-QI
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 03:05:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593414305;
+ s=mimecast20190719; t=1593414304;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sqRv0ZP/VzFRlEsLx09LPYtqW9f8zgJ+lDb9Jukz1xs=;
- b=LDn8hN7NX2x3Su3FVynu75soD6mxRky6wiGWDBy0ofnJLfEUV+u8uZLMPKE9OVBOeXk2f7
- He0A7rwm2+JPPDxw45Diet89ogS1k3YzP/wO9/2L6/eDgYmu7oZLygT5tCAxA/SKoMxdee
- etHxUF/IjbRwMUd5Ny/UEHK/CTH0Kcw=
+ bh=m18OtvO+pwwl+9y2p967SeZ8hr3gDW4LkN6LcVLKgFI=;
+ b=KyOetenVA0DHm2c4L0TRarbXhoWupaEUD6yAJX2TcRtWmD3hlNVJhzScEZApcgzYJVkYeC
+ QiycTYymiSYuB/AH/zpghCuCPcHqNxxy0b9SlkyMs0gbagOm5F5b//3TDhNu8GooOQq0Gv
+ lg/tu7O+EeFPRQ7IV493uFnGMeIJPV8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-kahjRtgbPRi_hld-8BlKLw-1; Mon, 29 Jun 2020 03:05:03 -0400
-X-MC-Unique: kahjRtgbPRi_hld-8BlKLw-1
+ us-mta-59-z_3fmZ-gOISSL__WxgSedg-1; Mon, 29 Jun 2020 03:05:01 -0400
+X-MC-Unique: z_3fmZ-gOISSL__WxgSedg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA47B881D68;
- Mon, 29 Jun 2020 07:04:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFADA881D69;
+ Mon, 29 Jun 2020 07:04:39 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BA5F90341;
- Mon, 29 Jun 2020 07:04:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36BCC12974C;
+ Mon, 29 Jun 2020 07:04:27 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
  armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
  bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v7 2/5] virtio-iommu: Implement RESV_MEM probe request
-Date: Mon, 29 Jun 2020 09:04:01 +0200
-Message-Id: <20200629070404.10969-3-eric.auger@redhat.com>
+Subject: [PATCH v7 1/5] qdev: Introduce DEFINE_PROP_RESERVED_REGION
+Date: Mon, 29 Jun 2020 09:04:00 +0200
+Message-Id: <20200629070404.10969-2-eric.auger@redhat.com>
 In-Reply-To: <20200629070404.10969-1-eric.auger@redhat.com>
 References: <20200629070404.10969-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -103,234 +103,203 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements the PROBE request. At the moment,
-only THE RESV_MEM property is handled. The first goal is
-to report iommu wide reserved regions such as the MSI regions
-set by the machine code. On x86 this will be the IOAPIC MSI
-region, [0xFEE00000 - 0xFEEFFFFF], on ARM this may be the ITS
-doorbell.
+Introduce a new property defining a reserved region:
+<low address>:<high address>:<type>.
 
-In the future we may introduce per device reserved regions.
-This will be useful when protecting host assigned devices
-which may expose their own reserved regions
+This will be used to encode reserved IOVA regions.
+
+For instance, in virtio-iommu use case, reserved IOVA regions
+will be passed by the machine code to the virtio-iommu-pci
+device (an array of those). The type of the reserved region
+will match the virtio_iommu_probe_resv_mem subtype value:
+- VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+- VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
+
+on PC/Q35 machine, this will be used to inform the
+virtio-iommu-pci device it should bypass the MSI region.
+The reserved region will be: 0xfee00000:0xfeefffff:1.
+
+On ARM, we can declare the ITS MSI doorbell as an MSI
+region to prevent MSIs from being mapped on guest side.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
 ---
-
-v6 -> v7:
-- put the assert again to make it clear there is no risk
-  of truncation
-
-v5 -> v6:
-- removed validation of s->reserved_regions[i].type in the
-  probe request as it should rather happen in the realize()
 
 v4 -> v5:
-- assert if reserved region type is different from RESERVED or
-  MSI
+- type becomes an unsigned + comment/error rewording
 
 v3 -> v4:
-- removed any reference to the NONE property that does not
-  exist anymore.
-
-v2 -> v3:
-- on probe, do not fill the reminder of the buffer with zeroes
-  as the buffer was already zero initialized (Bharat)
-
-v1 -> v2:
-- move the unlock back to the same place
-- remove the push label and factorize the code after the out label
-- fix a bunch of cpu_to_leX according to the latest spec revision
-- do not remove sizeof(last) from free space
-- check the ep exists
+- use ':' instead of commas as separators.
+- rearrange error messages
+- check snprintf returned value
+- dared to keep Markus' R-b despite those changes
 ---
- include/hw/virtio/virtio-iommu.h |  2 +
- hw/virtio/virtio-iommu.c         | 94 ++++++++++++++++++++++++++++++--
- hw/virtio/trace-events           |  1 +
- 3 files changed, 93 insertions(+), 4 deletions(-)
+ include/exec/memory.h        |  6 +++
+ include/hw/qdev-properties.h |  3 ++
+ include/qemu/typedefs.h      |  1 +
+ hw/core/qdev-properties.c    | 89 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 99 insertions(+)
 
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index e653004d7c..49eb105cd8 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -53,6 +53,8 @@ typedef struct VirtIOIOMMU {
-     GHashTable *as_by_busptr;
-     IOMMUPciBus *iommu_pcibus_by_bus_num[PCI_BUS_MAX];
-     PCIBus *primary_bus;
-+    ReservedRegion *reserved_regions;
-+    uint32_t nb_reserved_regions;
-     GTree *domains;
-     QemuMutex mutex;
-     GTree *endpoints;
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 483883ec1d..2cdaa1969b 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -38,6 +38,7 @@
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 7207025bd4..84ee5b7a01 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -51,6 +51,12 @@ extern bool global_dirty_log;
  
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
-+#define VIOMMU_PROBE_SIZE 512
+ typedef struct MemoryRegionOps MemoryRegionOps;
  
- typedef struct VirtIOIOMMUDomain {
-     uint32_t id;
-@@ -378,6 +379,65 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     return ret;
- }
++struct ReservedRegion {
++    hwaddr low;
++    hwaddr high;
++    unsigned type;
++};
++
+ typedef struct IOMMUTLBEntry IOMMUTLBEntry;
  
-+static ssize_t virtio_iommu_fill_resv_mem_prop(VirtIOIOMMU *s, uint32_t ep,
-+                                               uint8_t *buf, size_t free)
-+{
-+    struct virtio_iommu_probe_resv_mem prop = {};
-+    size_t size = sizeof(prop), length = size - sizeof(prop.head), total;
-+    int i;
+ /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 49c6cd2460..944e3f2e0c 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -19,6 +19,7 @@ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
+ extern const PropertyInfo qdev_prop_tpm;
+ extern const PropertyInfo qdev_prop_macaddr;
++extern const PropertyInfo qdev_prop_reserved_region;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+ extern const PropertyInfo qdev_prop_multifd_compression;
+ extern const PropertyInfo qdev_prop_losttickpolicy;
+@@ -184,6 +185,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+     DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
+ #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
++#define DEFINE_PROP_RESERVED_REGION(_n, _s, _f)         \
++    DEFINE_PROP(_n, _s, _f, qdev_prop_reserved_region, ReservedRegion)
+ #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+ #define DEFINE_PROP_MULTIFD_COMPRESSION(_n, _s, _f, _d) \
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index ce4a78b687..15f5047bf1 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -58,6 +58,7 @@ typedef struct ISABus ISABus;
+ typedef struct ISADevice ISADevice;
+ typedef struct IsaDma IsaDma;
+ typedef struct MACAddr MACAddr;
++typedef struct ReservedRegion ReservedRegion;
+ typedef struct MachineClass MachineClass;
+ typedef struct MachineState MachineState;
+ typedef struct MemoryListener MemoryListener;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 71f8aca7c6..ca7771f307 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -15,6 +15,7 @@
+ #include "chardev/char.h"
+ #include "qemu/uuid.h"
+ #include "qemu/units.h"
++#include "qemu/cutils.h"
+ 
+ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+                                   Error **errp)
+@@ -578,6 +579,94 @@ const PropertyInfo qdev_prop_macaddr = {
+     .set   = set_mac,
+ };
+ 
++/* --- Reserved Region --- */
 +
-+    total = size * s->nb_reserved_regions;
-+
-+    if (total > free) {
-+        return -ENOSPC;
-+    }
-+
-+    for (i = 0; i < s->nb_reserved_regions; i++) {
-+        unsigned subtype = s->reserved_regions[i].type;
-+
-+        assert(subtype == VIRTIO_IOMMU_RESV_MEM_T_RESERVED ||
-+               subtype == VIRTIO_IOMMU_RESV_MEM_T_MSI);
-+        prop.head.type = cpu_to_le16(VIRTIO_IOMMU_PROBE_T_RESV_MEM);
-+        prop.head.length = cpu_to_le16(length);
-+        prop.subtype = subtype;
-+        prop.start = cpu_to_le64(s->reserved_regions[i].low);
-+        prop.end = cpu_to_le64(s->reserved_regions[i].high);
-+
-+        memcpy(buf, &prop, size);
-+
-+        trace_virtio_iommu_fill_resv_property(ep, prop.subtype,
-+                                              prop.start, prop.end);
-+        buf += size;
-+    }
-+    return total;
-+}
-+
-+/**
-+ * virtio_iommu_probe - Fill the probe request buffer with
-+ * the properties the device is able to return
++/*
++ * Accepted syntax:
++ *   <low address>:<high address>:<type>
++ *   where low/high addresses are uint64_t in hexadecimal
++ *   and type is a non-negative decimal integer
 + */
-+static int virtio_iommu_probe(VirtIOIOMMU *s,
-+                              struct virtio_iommu_req_probe *req,
-+                              uint8_t *buf)
++static void get_reserved_region(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
 +{
-+    uint32_t ep_id = le32_to_cpu(req->endpoint);
-+    size_t free = VIOMMU_PROBE_SIZE;
-+    ssize_t count;
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
++    char buffer[64];
++    char *p = buffer;
++    int rc;
 +
-+    if (!virtio_iommu_mr(s, ep_id)) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
++    rc = snprintf(buffer, sizeof(buffer), "0x%"PRIx64":0x%"PRIx64":%u",
++                  rr->low, rr->high, rr->type);
++    assert(rc < sizeof(buffer));
 +
-+    count = virtio_iommu_fill_resv_mem_prop(s, ep_id, buf, free);
-+    if (count < 0) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    buf += count;
-+    free -= count;
-+
-+    return VIRTIO_IOMMU_S_OK;
++    visit_type_str(v, name, &p, errp);
 +}
 +
- static int virtio_iommu_iov_to_req(struct iovec *iov,
-                                    unsigned int iov_cnt,
-                                    void *req, size_t req_sz)
-@@ -407,15 +467,27 @@ virtio_iommu_handle_req(detach)
- virtio_iommu_handle_req(map)
- virtio_iommu_handle_req(unmap)
- 
-+static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
-+                                     struct iovec *iov,
-+                                     unsigned int iov_cnt,
-+                                     uint8_t *buf)
++static void set_reserved_region(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
 +{
-+    struct virtio_iommu_req_probe req;
-+    int ret = virtio_iommu_iov_to_req(iov, iov_cnt, &req, sizeof(req));
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    ReservedRegion *rr = qdev_get_prop_ptr(dev, prop);
++    Error *local_err = NULL;
++    const char *endptr;
++    char *str;
++    int ret;
 +
-+    return ret ? ret : virtio_iommu_probe(s, &req, buf);
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_str(v, name, &str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    ret = qemu_strtou64(str, &endptr, 16, &rr->low);
++    if (ret) {
++        error_setg(errp, "start address of '%s'"
++                   " must be a hexadecimal integer", name);
++        goto out;
++    }
++    if (*endptr != ':') {
++        goto separator_error;
++    }
++
++    ret = qemu_strtou64(endptr + 1, &endptr, 16, &rr->high);
++    if (ret) {
++        error_setg(errp, "end address of '%s'"
++                   " must be a hexadecimal integer", name);
++        goto out;
++    }
++    if (*endptr != ':') {
++        goto separator_error;
++    }
++
++    ret = qemu_strtoui(endptr + 1, &endptr, 10, &rr->type);
++    if (ret) {
++        error_setg(errp, "type of '%s'"
++                   " must be a non-negative decimal integer", name);
++    }
++    goto out;
++
++separator_error:
++    error_setg(errp, "reserved region fields must be separated with ':'");
++out:
++    g_free(str);
++    return;
 +}
 +
- static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
-     struct virtio_iommu_req_head head;
-     struct virtio_iommu_req_tail tail = {};
-+    size_t output_size = sizeof(tail), sz;
-     VirtQueueElement *elem;
-     unsigned int iov_cnt;
-     struct iovec *iov;
--    size_t sz;
-+    void *buf = NULL;
- 
-     for (;;) {
-         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-@@ -452,6 +524,17 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-         case VIRTIO_IOMMU_T_UNMAP:
-             tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
-             break;
-+        case VIRTIO_IOMMU_T_PROBE:
-+        {
-+            struct virtio_iommu_req_tail *ptail;
++const PropertyInfo qdev_prop_reserved_region = {
++    .name  = "reserved_region",
++    .description = "Reserved Region, example: 0xFEE00000:0xFEEFFFFF:0",
++    .get   = get_reserved_region,
++    .set   = set_reserved_region,
++};
 +
-+            output_size = s->config.probe_size + sizeof(tail);
-+            buf = g_malloc0(output_size);
-+
-+            ptail = (struct virtio_iommu_req_tail *)
-+                        (buf + s->config.probe_size);
-+            ptail->status = virtio_iommu_handle_probe(s, iov, iov_cnt, buf);
-+        }
-         default:
-             tail.status = VIRTIO_IOMMU_S_UNSUPP;
-         }
-@@ -459,12 +542,13 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
+ /* --- on/off/auto --- */
  
- out:
-         sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
--                          &tail, sizeof(tail));
--        assert(sz == sizeof(tail));
-+                          buf ? buf : &tail, output_size);
-+        assert(sz == output_size);
- 
--        virtqueue_push(vq, elem, sizeof(tail));
-+        virtqueue_push(vq, elem, sz);
-         virtio_notify(vdev, vq);
-         g_free(elem);
-+        g_free(buf);
-     }
- }
- 
-@@ -667,6 +751,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     s->config.page_size_mask = TARGET_PAGE_MASK;
-     s->config.input_range.end = -1UL;
-     s->config.domain_range.end = 32;
-+    s->config.probe_size = VIOMMU_PROBE_SIZE;
- 
-     virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
-     virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
-@@ -676,6 +761,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
-+    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
- 
-     qemu_mutex_init(&s->mutex);
- 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 6427a0047d..23109f69bb 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -74,3 +74,4 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-+virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64" end=0x%"PRIx64
+ const PropertyInfo qdev_prop_on_off_auto = {
 -- 
 2.20.1
 
