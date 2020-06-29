@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A662FC433E3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC974C433E4
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86E2420663
+	by mail.kernel.org (Postfix) with ESMTPS id 84AFB2065F
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:28:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E2420663
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84AFB2065F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzSI-0001Bc-OP
+	id 1jpzSI-0001CE-Gx
 	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:28:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51530)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRE-00080u-TA; Mon, 29 Jun 2020 15:27:32 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:42896)
+ id 1jpzRH-00082A-Aw; Mon, 29 Jun 2020 15:27:35 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:42890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jpzRC-0002Ga-Cs; Mon, 29 Jun 2020 15:27:32 -0400
+ id 1jpzRC-0002GY-NQ; Mon, 29 Jun 2020 15:27:35 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 866A2748DCD;
+ by localhost (Postfix) with SMTP id 686BC748DD8;
  Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 1004E7482CD; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
-Message-Id: <8ece4381702aa5d5f004616e1818dd9b33dab620.1593456926.git.balaton@eik.bme.hu>
+ id 19782748DCA; Mon, 29 Jun 2020 21:27:18 +0200 (CEST)
+Message-Id: <aa3087554703e0849c3d6582cdefb265cc444403.1593456926.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1593456926.git.balaton@eik.bme.hu>
 References: <cover.1593456926.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v7 3/8] mac_oldworld: Drop a variable, use get_system_memory()
- directly
+Subject: [PATCH v7 5/8] mac_oldworld: Change PCI address of macio to match
+ real hardware
 Date: Mon, 29 Jun 2020 20:55:26 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,44 +74,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Half of the occurances already use get_system_memory() directly
-instead of sysmem variable, convert the two other uses to
-get_system_memory() too which seems to be more common and drop the
-variable.
+The board firmware expect these to be at fixed addresses and programs
+them without probing, this patch puts the macio device at the expected
+PCI address.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/mac_oldworld.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/ppc/mac_oldworld.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index baf3da6f90..d1c4244b1e 100644
+index 4200008851..6276973c95 100644
 --- a/hw/ppc/mac_oldworld.c
 +++ b/hw/ppc/mac_oldworld.c
-@@ -87,7 +87,6 @@ static void ppc_heathrow_init(MachineState *machine)
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-     const char *boot_device = machine->boot_order;
--    MemoryRegion *sysmem = get_system_memory();
-     PowerPCCPU *cpu = NULL;
-     CPUPPCState *env = NULL;
-     char *filename;
-@@ -128,12 +127,12 @@ static void ppc_heathrow_init(MachineState *machine)
-         exit(1);
-     }
+@@ -286,7 +286,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
  
--    memory_region_add_subregion(sysmem, 0, machine->ram);
-+    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
- 
-     /* allocate and load firmware ROM */
-     memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
-                            &error_fatal);
--    memory_region_add_subregion(sysmem, PROM_BASE, bios);
-+    memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
- 
-     if (!bios_name) {
-         bios_name = PROM_FILENAME;
+     /* MacIO */
+-    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
++    macio = pci_new(PCI_DEVFN(16, 0), TYPE_OLDWORLD_MACIO);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
 -- 
 2.21.3
 
