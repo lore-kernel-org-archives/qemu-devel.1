@@ -2,90 +2,97 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A36C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF818C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:30:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5734A20724
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81AA8208DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:30:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dm5C9+V9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5734A20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="odgyflXw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81AA8208DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq1Ag-0007cE-Gf
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:18:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52400)
+	id 1jq1Ls-0002x1-Rd
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jq19K-0006bf-N0
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:17:10 -0400
-Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:41192)
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jq1Ks-0001sO-Lh; Mon, 29 Jun 2020 17:29:06 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39985)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jq19I-0003B9-N6
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:17:10 -0400
-Received: by mail-lj1-x232.google.com with SMTP id 9so19934957ljc.8
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:17:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jq1Kr-0004p6-4j; Mon, 29 Jun 2020 17:29:06 -0400
+Received: by mail-oi1-x243.google.com with SMTP id t198so3118397oie.7;
+ Mon, 29 Jun 2020 14:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Cor3noOZv309F5AD2DQpc2DUTU6UE2LakDF6OM9CAcU=;
- b=dm5C9+V9pa3Ta0Ciy+fOmhsMu7wPsWqBWpOWOTcSkLrmc2o6S/01kIBq57P6LJ1PKN
- YPdRLx3HCC0ePNhAH5rnV7sUVJEUUfDMdAwL3lPSjjwwod1AkWiCW8iTYXbRe7s8uTqE
- nAjjrg2v54iJQf+2CohczqkS/Ixdv//HK4WCAyuWaUwbSypH0xPcSDP4rcz0D2uxhEoS
- v2zYE2U39OX17QZrk8Zk7ZPH7eY6UAABmBTuIhJqKXQHn3hxhBq0v/bZouRVUcGiVA9j
- Wl//6UgHROh/5bRoRTYjpyeP96YkQ95CEVMahrf5AvaOzIWWNjhrS5k0WN9y30dsBCKu
- AODA==
+ h=sender:date:from:to:cc:subject:message-id:reply-to:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=fXPp17oZmNt4iplEnqEV89hAH1HlrlZCaBNO43DqXlY=;
+ b=odgyflXwmn9oq9+sx5rxBdQtvBgHM8rAnei9g0sFEidCWrO3wrm6o1lUQ/7HCVQa5p
+ C0mhJxmHtWjh+bxQLiFSL1vW71lAsz6g1MjlBp5+D2/VRmWPzewHVlVy18+hLio/fQqK
+ +Il5620vQdKBHbv3fIyvoP+NUTLr/LU2+baVJttG8oMDCRhOUPIaA4qChpRCeUnh9R1I
+ wBByI5iVe8yqjLr2PNFakYLDd8t+HOG59Kvdfx9MSXk8PWQ00mrKQUK4JjjoFVQcja/Y
+ qV/QFcCidnF0FPTtgRFmwdP/zcueTfJwQd+H7hYVPY6xBJwBatUFK/tqG+dZOwSWuBZ/
+ dFRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Cor3noOZv309F5AD2DQpc2DUTU6UE2LakDF6OM9CAcU=;
- b=dm2T1ycoFJJS9K6R4l/baTDadvM4M5PTp2dtxx9d7326LAY1en9BQJKRG4OcnzNIiz
- M5vPltWLxShKId2XOUAsWRO+ZuW8T6xXSH/NQ9y+R7WFUPtu9qOJPC4VPtrKocwZXciw
- MQWfWrm2khCYR12MBvVmVytiBz5QIU3q3iYRvzrL7EGHcxtyScYDFaj3tbbEwCU3hHkx
- cv+tkRHwmpR4L60mMrw8xxDW0VU+cJqHaICdWI3jaZ6Jo6oo9uJ9rs9Lxzk7aOESz7Kj
- 1C2c/Nv1AhOEHFeLKpzaPHmvhqTZB+GMdT1w2+nw+QQ+0I+yeYXbchPNUGLnJ0qvbcJg
- uwHw==
-X-Gm-Message-State: AOAM53001FO+Ku4QaPnFR/R0LzBOnEqedDIKvy/EwlwhXPVyESEPgBeV
- f9pi8fsGvY/iCNZib1pOMnEz2yjZzFYxQrB0rQY=
-X-Google-Smtp-Source: ABdhPJxaoVN3e0FviRClfajJueiGW4gjI6fig+6GGTi4p3ezIk3iDcEh++4RTSyR9Wqbh3xhJIUupHnZGdVLrC2WISU=
-X-Received: by 2002:a2e:9b87:: with SMTP id z7mr4741227lji.80.1593465426218;
- Mon, 29 Jun 2020 14:17:06 -0700 (PDT)
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :reply-to:references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=fXPp17oZmNt4iplEnqEV89hAH1HlrlZCaBNO43DqXlY=;
+ b=og2aMxw0t3VHB+IhTwAfnroS1UBx/FS8k+Dh0SKcq5LCyMt3GVpwFXN59W1MkNpe6J
+ uTr9yySaHt02mw8YpCmzMk3Jcgs2GYctzxaBCm5XiYtClJSLkpvEuf5FhpAFJ5oa8UDi
+ 5Dwy5gXd+h7BlaQ3zwdpgJJpTJLm474PuMFXn1HC0KLv4p+BKRMdPZJ8eioT4wVp9f20
+ a3/0mHHwHk16W4M8S9hXbh0cuqL80MPWqmfVvPdaTABL8c3QLC9FTMb27X9hecOlxTVl
+ beSY7596P/UaosbLue0BhxMyN9C0nRmeCCQLs+UGHwFSYb6x8hC1Oi4RwtX441U9vvnh
+ 2wQQ==
+X-Gm-Message-State: AOAM531lMZPuRQ/VdEc9+zwT1skKYGbWbnsohf4bwcn11PGxA06Ucq2e
+ s95JP4KMxrVfZ4jekgydQw==
+X-Google-Smtp-Source: ABdhPJwmhOTFQEHME37sEYpysq8NpWQyqVZrlt+Jp9UwjfVbVY9xLVKFnOQUqzj1wwJmd4Q2LGgDQQ==
+X-Received: by 2002:aca:d889:: with SMTP id
+ p131mr14145118oig.170.1593466142699; 
+ Mon, 29 Jun 2020 14:29:02 -0700 (PDT)
+Received: from serve.minyard.net ([47.184.146.204])
+ by smtp.gmail.com with ESMTPSA id a3sm217917oif.38.2020.06.29.14.28.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 14:29:01 -0700 (PDT)
+Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:9993:aaf8:7c5:309c])
+ by serve.minyard.net (Postfix) with ESMTPSA id 743E818003B;
+ Mon, 29 Jun 2020 21:28:58 +0000 (UTC)
+Date: Mon, 29 Jun 2020 16:28:52 -0500
+From: Corey Minyard <minyard@acm.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 0/5] hw/i2c: Rename method names for consistency and add
+ documentation
+Message-ID: <20200629212852.GQ3235@minyard.net>
+References: <20200629173821.22037-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
- <878sg5svu5.fsf@linaro.org>
-In-Reply-To: <878sg5svu5.fsf@linaro.org>
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Date: Mon, 29 Jun 2020 23:16:27 +0200
-Message-ID: <CALTWKrWkaN3LX5aHwz2-dO04_puh7RqQa3_NfEG4KH5xBeV3Rw@mail.gmail.com>
-Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
- QEMU Into Three Main Parts
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::232;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x232.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200629173821.22037-1-f4bug@amsat.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=tcminyard@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,96 +105,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Reply-To: minyard@acm.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 6:03 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
->
-> > Hi,
-> >
-> > The second report of the TCG Continuous Benchmarking series builds
-> > upon the QEMU performance metrics calculated in the previous report.
-> > This report presents a method to dissect the number of instructions
-> > executed by a QEMU invocation into three main phases:
-> > - Code Generation
-> > - JIT Execution
-> > - Helpers Execution
-> > It devises a Python script that automates this process.
-> >
-> > After that, the report presents an experiment for comparing the
-> > output of running the script on 17 different targets. Many conclusions
-> > can be drawn from the results and two of them are discussed in the
-> > analysis section.
->
-> A couple of comments. One think I think is missing from your analysis is
-> the total number of guest instructions being emulated. As you point out
-> each guest will have different code efficiency in terms of it's
-> generated code.
->
-> Assuming your test case is constant execution (i.e. runs the same each
-> time)
-Yes indeed, the report utilizes Callgrind in the measurements so the
-results are very stable.
->you could run in through a plugins build to extract the number of
-> guest instructions, e.g.:
->
->   ./aarch64-linux-user/qemu-aarch64 -plugin tests/plugin/libinsn.so -d pl=
-ugin ./tests/tcg/aarch64-linux-user/sha1
->   SHA1=3D15dd99a1991e0b3826fede3deffc1feba42278e6
->   insns: 158603512
->
-That's a very nice suggestion. Maybe this will be the idea of a whole
-new report. I'll try to execute the provided command and will let you
-know if I have any questions.
-> I should have also pointed out in your last report that running FP heavy
-> code will always be biased towards helper/softfloat code to the
-> detriment of everything else. I think you need more of a mix of
-> benchmarks to get a better view.
->
-> When Emilio did the last set of analysis he used a suite he built out of
-> nbench and a perl benchmark:
->
->   https://github.com/cota/dbt-bench
->
-> As he quoted in his README:
->
->   NBench programs are small, with execution time dominated by small code
->   loops. Thus, when run under a DBT engine, the resulting performance
->   depends almost entirely on the quality of the output code.
->
->   The Perl benchmarks compile Perl code. As is common for compilation
->   workloads, they execute large amounts of code and show no particular
->   code execution hotspots. Thus, the resulting DBT performance depends
->   largely on code translation speed.
->
-> by only having one benchmark you are going to miss out on the envelope
-> of use cases.
->
-Future reports will introduce a variety of benchmarks. This report -
-and the previous one - are introductory reports. The benchmark used
-was to only demonstrate the report ideas. It was not used as a strict
-benchmarking program.
-> >
-> > Report link:
-> >https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Dissecting-QEMU-=
-Into-Three-Main-Parts/
-> >
-> > Previous reports:
-> > Report 1 - Measuring Basic Performance Metrics of QEMU:
-> > https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
-> >
-> > Best regards,
-> > Ahmed Karaman
->
->
-> --
-> Alex Benn=C3=A9e
+On Mon, Jun 29, 2020 at 07:38:16PM +0200, Philippe Mathieu-Daudé wrote:
+> In commit d88c42ff2c we added 2 methods: i2c_try_create_slave()
+> and i2c_realize_and_unref().
+> Markus noted their name could be improved for consistency [1],
+> and Peter reported the lack of documentation [2]. Fix that now.
+
+Looking over these, I don't see an issue.  I didn't review the aspeed
+device changes (patch 1); that's probably better for the aspeed
+maintainer to review.
+
+But I do like the improvement in consistency.
+
+-corey
+
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg07060.html
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08997.html
+> 
+> Philippe Mathieu-Daudé (5):
+>   hw/i2c/aspeed_i2c: Simplify aspeed_i2c_get_bus()
+>   hw/i2c: Rename i2c_try_create_slave() as i2c_slave_new()
+>   hw/i2c: Rename i2c_realize_and_unref() as
+>     i2c_slave_realize_and_unref()
+>   hw/i2c: Rename i2c_create_slave() as i2c_slave_create_simple()
+>   hw/i2c: Document the I2C qdev helpers
+> 
+>  include/hw/i2c/aspeed_i2c.h |  2 +-
+>  include/hw/i2c/i2c.h        | 54 ++++++++++++++++++++++--
+>  hw/arm/aspeed.c             | 82 +++++++++++++++++++------------------
+>  hw/arm/musicpal.c           |  4 +-
+>  hw/arm/nseries.c            |  8 ++--
+>  hw/arm/pxa2xx.c             |  5 ++-
+>  hw/arm/realview.c           |  2 +-
+>  hw/arm/spitz.c              |  4 +-
+>  hw/arm/stellaris.c          |  2 +-
+>  hw/arm/tosa.c               |  2 +-
+>  hw/arm/versatilepb.c        |  2 +-
+>  hw/arm/vexpress.c           |  2 +-
+>  hw/arm/z2.c                 |  4 +-
+>  hw/display/sii9022.c        |  2 +-
+>  hw/i2c/aspeed_i2c.c         |  3 +-
+>  hw/i2c/core.c               | 15 ++++---
+>  hw/ppc/e500.c               |  2 +-
+>  hw/ppc/sam460ex.c           |  2 +-
+>  18 files changed, 123 insertions(+), 74 deletions(-)
+> 
+> -- 
+> 2.21.3
+> 
+> 
 
