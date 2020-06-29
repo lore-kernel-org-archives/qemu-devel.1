@@ -2,64 +2,86 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C311C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB94C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 216E923341
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:37:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216E923341
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id CC48223403
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 09:38:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tm+yyl+J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC48223403
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpqEN-00042G-Cy
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:37:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47214)
+	id 1jpqEq-0004oS-55
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 05:38:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jpqCS-0000JJ-GR
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:35:40 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jpqCP-00082p-0E
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:35:40 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 76306AE6D;
- Mon, 29 Jun 2020 09:35:34 +0000 (UTC)
-From: Claudio Fontana <cfontana@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 2/3] cpu-throttle: new module, extracted from cpus.c
-Date: Mon, 29 Jun 2020 11:35:03 +0200
-Message-Id: <20200629093504.3228-3-cfontana@suse.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200629093504.3228-1-cfontana@suse.de>
-References: <20200629093504.3228-1-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpqDw-0003Sh-8J
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:37:12 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43784)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jpqDu-0000WG-Jk
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 05:37:11 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 95so4218543otw.10
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 02:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=CVQLX/Q43gxKRSua6KV/iIELe5WcNb8SgU6lwCP/quc=;
+ b=Tm+yyl+JTezsvFovgBwpJP4lWces89bHfT1Q2G/eu76v6TbU/mtu6XeAW/U3LlDdfo
+ /78zW5LviAR4b3FxK8sks6E2HzU3ECb+eGFRs08NwKEm6mNdTDixruaptRdyv3zHCZaG
+ U9g7AZ4kxbh+eiwKeUx0AW3IgL+h7tXw2o2oACVrgwew58pLgy1HauGuy0u+7gwnMGlj
+ F0mkf84mar5YaVmrLxqhmDgdPIayvs2lSBlS6BvjN3MohIRKhz96IK2tRbdiuNYWebxW
+ bmcrUXI2GeT7wxbOjK6k2TsvaC9gACe8kgXDn9TNHTUc6HwLdyG2gwm+xKQnOdZgXPE2
+ T9BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=CVQLX/Q43gxKRSua6KV/iIELe5WcNb8SgU6lwCP/quc=;
+ b=nzzhZ3COr1dkjRlDEK+BxFLNJrNZy7b8deiLeRSLxJ+tlV+iHwYr3J6cprnQwCBBOZ
+ F3E7grlb2pXOx3MulmTJbh61781/sG+sEyVTsp6hMSAcWHU1pZS06KO8lIwifHppdHPx
+ pjk/gC3jE8u8S+bMaIFyXdxvBrqdkIRUPoKw6KOMgDHd5oyHTLu5Wtf7r45k0zgrHrv1
+ tLxpK+u+kiaIpGjzSEgimBBt4fnaYx83xKmuqrp2OnaMShV1HTaUqSb2lmU4Hk5+SMwh
+ Kufz+ro+d0gcHCM9FcP0fGiR5ejHQX5jjfDOQ4O8b4RlcNXypUsmAR9cDWisSx7Rwyl7
+ VWng==
+X-Gm-Message-State: AOAM531PzQD12UpNdIM7iJGBRtB9K+H+2K9zfmJfmTJSLDbI9b5eIA3P
+ JJhaO7S+b0eme8b09NP2IMrAqv6eGooQtieQTco=
+X-Google-Smtp-Source: ABdhPJxhPU0d8a16XstTWb3kn+evaH/hIdGglmhhwPv3kCJuwSdhVnItbB6MGNS4dQcaWh2XML8v/kPBDkTZKw9PPE4=
+X-Received: by 2002:a9d:787:: with SMTP id 7mr338483oto.333.1593423429650;
+ Mon, 29 Jun 2020 02:37:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 22:46:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-4-ppandit@redhat.com>
+In-Reply-To: <20200624185523.762240-4-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Jun 2020 17:36:33 +0800
+Message-ID: <CAKXe6S+QpdhjHi6sT4CdPzeB9sBE1y33ri5jEZd=w1MWOjo7dQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/9] vfio: add quirk device write method
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,494 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
- Claudio Fontana <cfontana@suse.de>, Colin Xu <colin.xu@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-move the vcpu throttling functionality into its own module.
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B46=E6=9C=8825=E6=97=A5=E5=
+=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:59=E5=86=99=E9=81=93=EF=BC=9A
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Add vfio quirk device mmio write method to avoid NULL pointer
+> dereference issue.
+>
+> Reported-by: Lei Sun <slei.casper@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-This functionality is not specific to any accelerator,
-and it is used currently by migration to slow down guests to try to
-have migrations converge, and by the cocoa MacOS UI to throttle speed.
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-cpu-throttle contains the controls to adjust and inspect throttle
-settings, start (set) and stop vcpu throttling, and the throttling
-function itself that is run periodically on vcpus to make them take a nap.
-
-Execution of the throttling function on all vcpus is triggered by a timer,
-registered at module initialization.
-
-No functionality change.
-
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
----
- MAINTAINERS                   |   1 +
- include/hw/core/cpu.h         |  37 -------------
- include/qemu/main-loop.h      |   5 ++
- include/sysemu/cpu-throttle.h |  68 +++++++++++++++++++++++
- migration/migration.c         |   1 +
- migration/ram.c               |   1 +
- softmmu/Makefile.objs         |   1 +
- softmmu/cpu-throttle.c        | 122 ++++++++++++++++++++++++++++++++++++++++++
- softmmu/cpus.c                |  95 +++-----------------------------
- 9 files changed, 207 insertions(+), 124 deletions(-)
- create mode 100644 include/sysemu/cpu-throttle.h
- create mode 100644 softmmu/cpu-throttle.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7214f59383..827668fa8a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2221,6 +2221,7 @@ F: util/qemu-timer.c
- F: softmmu/vl.c
- F: softmmu/main.c
- F: softmmu/cpus.c
-+F: softmmu/cpu-throttle.c
- F: qapi/run-state.json
- 
- Human Monitor (HMP)
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index b3f4b79318..5542577d2b 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -822,43 +822,6 @@ bool cpu_exists(int64_t id);
-  */
- CPUState *cpu_by_arch_id(int64_t id);
- 
--/**
-- * cpu_throttle_set:
-- * @new_throttle_pct: Percent of sleep time. Valid range is 1 to 99.
-- *
-- * Throttles all vcpus by forcing them to sleep for the given percentage of
-- * time. A throttle_percentage of 25 corresponds to a 75% duty cycle roughly.
-- * (example: 10ms sleep for every 30ms awake).
-- *
-- * cpu_throttle_set can be called as needed to adjust new_throttle_pct.
-- * Once the throttling starts, it will remain in effect until cpu_throttle_stop
-- * is called.
-- */
--void cpu_throttle_set(int new_throttle_pct);
--
--/**
-- * cpu_throttle_stop:
-- *
-- * Stops the vcpu throttling started by cpu_throttle_set.
-- */
--void cpu_throttle_stop(void);
--
--/**
-- * cpu_throttle_active:
-- *
-- * Returns: %true if the vcpus are currently being throttled, %false otherwise.
-- */
--bool cpu_throttle_active(void);
--
--/**
-- * cpu_throttle_get_percentage:
-- *
-- * Returns the vcpu throttle percentage. See cpu_throttle_set for details.
-- *
-- * Returns: The throttle percentage in range 1 to 99.
-- */
--int cpu_throttle_get_percentage(void);
--
- #ifndef CONFIG_USER_ONLY
- 
- typedef void (*CPUInterruptHandler)(CPUState *, int);
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index a6d20b0719..8e98613656 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -303,6 +303,11 @@ void qemu_mutex_unlock_iothread(void);
-  */
- void qemu_cond_wait_iothread(QemuCond *cond);
- 
-+/*
-+ * qemu_cond_timedwait_iothread: like the previous, but with timeout
-+ */
-+void qemu_cond_timedwait_iothread(QemuCond *cond, int ms);
-+
- /* internal interfaces */
- 
- void qemu_fd_register(int fd);
-diff --git a/include/sysemu/cpu-throttle.h b/include/sysemu/cpu-throttle.h
-new file mode 100644
-index 0000000000..d65bdef6d0
---- /dev/null
-+++ b/include/sysemu/cpu-throttle.h
-@@ -0,0 +1,68 @@
-+/*
-+ * Copyright (c) 2012 SUSE LINUX Products GmbH
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see
-+ * <http://www.gnu.org/licenses/gpl-2.0.html>
-+ */
-+
-+#ifndef SYSEMU_CPU_THROTTLE_H
-+#define SYSEMU_CPU_THROTTLE_H
-+
-+#include "qemu/timer.h"
-+
-+/**
-+ * cpu_throttle_init:
-+ *
-+ * Initialize the CPU throttling API.
-+ */
-+void cpu_throttle_init(void);
-+
-+/**
-+ * cpu_throttle_set:
-+ * @new_throttle_pct: Percent of sleep time. Valid range is 1 to 99.
-+ *
-+ * Throttles all vcpus by forcing them to sleep for the given percentage of
-+ * time. A throttle_percentage of 25 corresponds to a 75% duty cycle roughly.
-+ * (example: 10ms sleep for every 30ms awake).
-+ *
-+ * cpu_throttle_set can be called as needed to adjust new_throttle_pct.
-+ * Once the throttling starts, it will remain in effect until cpu_throttle_stop
-+ * is called.
-+ */
-+void cpu_throttle_set(int new_throttle_pct);
-+
-+/**
-+ * cpu_throttle_stop:
-+ *
-+ * Stops the vcpu throttling started by cpu_throttle_set.
-+ */
-+void cpu_throttle_stop(void);
-+
-+/**
-+ * cpu_throttle_active:
-+ *
-+ * Returns: %true if the vcpus are currently being throttled, %false otherwise.
-+ */
-+bool cpu_throttle_active(void);
-+
-+/**
-+ * cpu_throttle_get_percentage:
-+ *
-+ * Returns the vcpu throttle percentage. See cpu_throttle_set for details.
-+ *
-+ * Returns: The throttle percentage in range 1 to 99.
-+ */
-+int cpu_throttle_get_percentage(void);
-+
-+#endif /* SYSEMU_CPU_THROTTLE_H */
-diff --git a/migration/migration.c b/migration/migration.c
-index 481a590f72..676fb6084e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -23,6 +23,7 @@
- #include "socket.h"
- #include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/cpu-throttle.h"
- #include "rdma.h"
- #include "ram.h"
- #include "migration/global_state.h"
-diff --git a/migration/ram.c b/migration/ram.c
-index 069b6e30bc..9ef1e63cb6 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -52,6 +52,7 @@
- #include "migration/colo.h"
- #include "block.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/cpu-throttle.h"
- #include "savevm.h"
- #include "qemu/iov.h"
- #include "multifd.h"
-diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
-index a4bd9f2f52..a414a74c50 100644
---- a/softmmu/Makefile.objs
-+++ b/softmmu/Makefile.objs
-@@ -2,6 +2,7 @@ softmmu-main-y = softmmu/main.o
- 
- obj-y += arch_init.o
- obj-y += cpus.o
-+obj-y += cpu-throttle.o
- obj-y += balloon.o
- obj-y += ioport.o
- obj-y += memory.o
-diff --git a/softmmu/cpu-throttle.c b/softmmu/cpu-throttle.c
-new file mode 100644
-index 0000000000..4e6b2818ca
---- /dev/null
-+++ b/softmmu/cpu-throttle.c
-@@ -0,0 +1,122 @@
-+/*
-+ * QEMU System Emulator
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/thread.h"
-+#include "hw/core/cpu.h"
-+#include "qemu/main-loop.h"
-+#include "sysemu/cpus.h"
-+#include "sysemu/cpu-throttle.h"
-+
-+/* vcpu throttling controls */
-+static QEMUTimer *throttle_timer;
-+static unsigned int throttle_percentage;
-+
-+#define CPU_THROTTLE_PCT_MIN 1
-+#define CPU_THROTTLE_PCT_MAX 99
-+#define CPU_THROTTLE_TIMESLICE_NS 10000000
-+
-+static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
-+{
-+    double pct;
-+    double throttle_ratio;
-+    int64_t sleeptime_ns, endtime_ns;
-+
-+    if (!cpu_throttle_get_percentage()) {
-+        return;
-+    }
-+
-+    pct = (double)cpu_throttle_get_percentage() / 100;
-+    throttle_ratio = pct / (1 - pct);
-+    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
-+    sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
-+    endtime_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
-+    while (sleeptime_ns > 0 && !cpu->stop) {
-+        if (sleeptime_ns > SCALE_MS) {
-+            qemu_cond_timedwait_iothread(cpu->halt_cond,
-+                                         sleeptime_ns / SCALE_MS);
-+        } else {
-+            qemu_mutex_unlock_iothread();
-+            g_usleep(sleeptime_ns / SCALE_US);
-+            qemu_mutex_lock_iothread();
-+        }
-+        sleeptime_ns = endtime_ns - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+    }
-+    atomic_set(&cpu->throttle_thread_scheduled, 0);
-+}
-+
-+static void cpu_throttle_timer_tick(void *opaque)
-+{
-+    CPUState *cpu;
-+    double pct;
-+
-+    /* Stop the timer if needed */
-+    if (!cpu_throttle_get_percentage()) {
-+        return;
-+    }
-+    CPU_FOREACH(cpu) {
-+        if (!atomic_xchg(&cpu->throttle_thread_scheduled, 1)) {
-+            async_run_on_cpu(cpu, cpu_throttle_thread,
-+                             RUN_ON_CPU_NULL);
-+        }
-+    }
-+
-+    pct = (double)cpu_throttle_get_percentage() / 100;
-+    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
-+                                   CPU_THROTTLE_TIMESLICE_NS / (1 - pct));
-+}
-+
-+void cpu_throttle_set(int new_throttle_pct)
-+{
-+    /* Ensure throttle percentage is within valid range */
-+    new_throttle_pct = MIN(new_throttle_pct, CPU_THROTTLE_PCT_MAX);
-+    new_throttle_pct = MAX(new_throttle_pct, CPU_THROTTLE_PCT_MIN);
-+
-+    atomic_set(&throttle_percentage, new_throttle_pct);
-+
-+    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
-+                                       CPU_THROTTLE_TIMESLICE_NS);
-+}
-+
-+void cpu_throttle_stop(void)
-+{
-+    atomic_set(&throttle_percentage, 0);
-+}
-+
-+bool cpu_throttle_active(void)
-+{
-+    return (cpu_throttle_get_percentage() != 0);
-+}
-+
-+int cpu_throttle_get_percentage(void)
-+{
-+    return atomic_read(&throttle_percentage);
-+}
-+
-+void cpu_throttle_init(void)
-+{
-+    throttle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
-+                                  cpu_throttle_timer_tick, NULL);
-+}
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 41d1c5099f..f446536b88 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -61,6 +61,8 @@
- #include "hw/boards.h"
- #include "hw/hw.h"
- 
-+#include "sysemu/cpu-throttle.h"
-+
- #ifdef CONFIG_LINUX
- 
- #include <sys/prctl.h>
-@@ -84,14 +86,6 @@ static QemuMutex qemu_global_mutex;
- int64_t max_delay;
- int64_t max_advance;
- 
--/* vcpu throttling controls */
--static QEMUTimer *throttle_timer;
--static unsigned int throttle_percentage;
--
--#define CPU_THROTTLE_PCT_MIN 1
--#define CPU_THROTTLE_PCT_MAX 99
--#define CPU_THROTTLE_TIMESLICE_NS 10000000
--
- bool cpu_is_stopped(CPUState *cpu)
- {
-     return cpu->stopped || !runstate_is_running();
-@@ -738,90 +732,12 @@ static const VMStateDescription vmstate_timers = {
-     }
- };
- 
--static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
--{
--    double pct;
--    double throttle_ratio;
--    int64_t sleeptime_ns, endtime_ns;
--
--    if (!cpu_throttle_get_percentage()) {
--        return;
--    }
--
--    pct = (double)cpu_throttle_get_percentage()/100;
--    throttle_ratio = pct / (1 - pct);
--    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
--    sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
--    endtime_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
--    while (sleeptime_ns > 0 && !cpu->stop) {
--        if (sleeptime_ns > SCALE_MS) {
--            qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
--                                sleeptime_ns / SCALE_MS);
--        } else {
--            qemu_mutex_unlock_iothread();
--            g_usleep(sleeptime_ns / SCALE_US);
--            qemu_mutex_lock_iothread();
--        }
--        sleeptime_ns = endtime_ns - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--    }
--    atomic_set(&cpu->throttle_thread_scheduled, 0);
--}
--
--static void cpu_throttle_timer_tick(void *opaque)
--{
--    CPUState *cpu;
--    double pct;
--
--    /* Stop the timer if needed */
--    if (!cpu_throttle_get_percentage()) {
--        return;
--    }
--    CPU_FOREACH(cpu) {
--        if (!atomic_xchg(&cpu->throttle_thread_scheduled, 1)) {
--            async_run_on_cpu(cpu, cpu_throttle_thread,
--                             RUN_ON_CPU_NULL);
--        }
--    }
--
--    pct = (double)cpu_throttle_get_percentage()/100;
--    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
--                                   CPU_THROTTLE_TIMESLICE_NS / (1-pct));
--}
--
--void cpu_throttle_set(int new_throttle_pct)
--{
--    /* Ensure throttle percentage is within valid range */
--    new_throttle_pct = MIN(new_throttle_pct, CPU_THROTTLE_PCT_MAX);
--    new_throttle_pct = MAX(new_throttle_pct, CPU_THROTTLE_PCT_MIN);
--
--    atomic_set(&throttle_percentage, new_throttle_pct);
--
--    timer_mod(throttle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT) +
--                                       CPU_THROTTLE_TIMESLICE_NS);
--}
--
--void cpu_throttle_stop(void)
--{
--    atomic_set(&throttle_percentage, 0);
--}
--
--bool cpu_throttle_active(void)
--{
--    return (cpu_throttle_get_percentage() != 0);
--}
--
--int cpu_throttle_get_percentage(void)
--{
--    return atomic_read(&throttle_percentage);
--}
--
- void cpu_ticks_init(void)
- {
-     seqlock_init(&timers_state.vm_clock_seqlock);
-     qemu_spin_init(&timers_state.vm_clock_lock);
-     vmstate_register(NULL, 0, &vmstate_timers, &timers_state);
--    throttle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
--                                           cpu_throttle_timer_tick, NULL);
-+    cpu_throttle_init();
- }
- 
- void configure_icount(QemuOpts *opts, Error **errp)
-@@ -1891,6 +1807,11 @@ void qemu_cond_wait_iothread(QemuCond *cond)
-     qemu_cond_wait(cond, &qemu_global_mutex);
- }
- 
-+void qemu_cond_timedwait_iothread(QemuCond *cond, int ms)
-+{
-+    qemu_cond_timedwait(cond, &qemu_global_mutex, ms);
-+}
-+
- static bool all_vcpus_paused(void)
- {
-     CPUState *cpu;
--- 
-2.16.4
-
+> ---
+>  hw/vfio/pci-quirks.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> Update v2: use LOG_GUEST_ERROR
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg04962.html
+>
+> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+> index d304c81148..cc6d5dbc23 100644
+> --- a/hw/vfio/pci-quirks.c
+> +++ b/hw/vfio/pci-quirks.c
+> @@ -14,6 +14,7 @@
+>  #include "config-devices.h"
+>  #include "exec/memop.h"
+>  #include "qemu/units.h"
+> +#include "qemu/log.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/main-loop.h"
+>  #include "qemu/module.h"
+> @@ -264,8 +265,15 @@ static uint64_t vfio_ati_3c3_quirk_read(void *opaque=
+,
+>      return data;
+>  }
+>
+> +static void vfio_ati_3c3_quirk_write(void *opaque, hwaddr addr,
+> +                                        uint64_t data, unsigned size)
+> +{
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s not implemented\n", __func__);
+> +}
+> +
+>  static const MemoryRegionOps vfio_ati_3c3_quirk =3D {
+>      .read =3D vfio_ati_3c3_quirk_read,
+> +    .write =3D vfio_ati_3c3_quirk_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>  };
+>
+> --
+> 2.26.2
+>
 
