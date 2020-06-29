@@ -2,91 +2,80 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156D5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA94C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4215255A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:06:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkgnrSTG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4215255A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3AE4C255A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 17:16:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE4C255A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpxEl-0002UX-Qp
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 13:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34402)
+	id 1jpxOZ-0005n1-HB
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 13:16:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpxDs-0001jA-Rs
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:05:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33206
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpxDq-0003IB-8D
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:05:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593450332;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=8UDDMCnqTV30z6QPivwS8VQyKr17DzN4HDVxw//U6UM=;
- b=UkgnrSTGrs+5XgXN0MhDQWJX95z9pnfsmMFzDN5LkhGSaY15ng3U0SahKWiiycOxk1ZIXs
- Rf2ZFM5ZWnxw/lDRxLyEskVKR2BmJ/df4I3dNPoryFV9b7c5Homk9qYgmqdXvJmSj/qC5i
- 5PnLY8Nqbu79ckTe8rrrY8uc20eZ88o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-_aBoKONuNoy4E7FzIl_CbQ-1; Mon, 29 Jun 2020 13:05:29 -0400
-X-MC-Unique: _aBoKONuNoy4E7FzIl_CbQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A53B618B6388
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 17:05:28 +0000 (UTC)
-Received: from work-vm (ovpn-114-210.ams2.redhat.com [10.36.114.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFA0E5D9DA;
- Mon, 29 Jun 2020 17:05:22 +0000 (UTC)
-Date: Mon, 29 Jun 2020 18:05:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
-Message-ID: <20200629170519.GM2908@work-vm>
-References: <20200629102758.421552-1-cohuck@redhat.com>
- <20200629104948-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpxNz-0005NG-WE
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:16:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35350)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jpxNx-0004uk-K1
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 13:16:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jpxNt-0005nm-Lp
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 17:15:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 535652E8142
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 17:15:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200629104948-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2020 17:09:13 -0000
+From: Langston <1885332@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: langston0
+X-Launchpad-Bug-Reporter: Langston (langston0)
+X-Launchpad-Bug-Modifier: Langston (langston0)
+References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
+Message-Id: <159345055359.3589.9013022342422430204.malone@wampee.canonical.com>
+Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
+ AT_PHDR
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bf734eab6b2d59a0b64e8b6b8e7a9b0bbeafadef
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,74 +84,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:
-> > virtio-fs devices are only specified for virtio-1, so it is unclear
-> > how a legacy or transitional device should behave.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > Forcing off legacy now (after the virtio-fs device has already been
-> > available) may have unintended consequences, therefore RFC.
-> > 
-> > By default, a virtio-pci device uses 'AUTO' for disable_legacy, which
-> > will resolve to different values based upon which bus the device has
-> > been plugged. Therefore, forcing disable_legacy may result in the same
-> > device or a quite different one.
-> > 
-> > Even though pre-virtio-1 behaviour of virtio-fs devices is simply not
-> > specified, toggling disable_legacy will have implications for the BAR
-> > layout, IIRC, and therefore a guest might end up getting a different
-> > device, even if it always used it with virtio-1 anyway.
-> > 
-> > Not sure what the best way to solve this problem is. Adding a compat
-> > property for disable_legacy=AUTO may be the right thing to do, but I'm
-> > not quite clear if there are any further implications here.
-> 
-> Well I notice that this device is not migrateable.
-> So I think that we can just switch it over and be done with it.
+Taking a peek at how Linux and QEMU calculate AT_PHDR for static
+binaries reveals the following. Both involve the program headers' offset
+(e_phoff) added to a value I'll call load_addr (as in the kernel).
 
-Yes, I think I'm OK with that - although you could add the compat
-flag in the machine type I guess.
+In the kernel, load_addr is
 
-Dave
+  elf_ppnt->p_vaddr - elf_ppnt->p_offset
 
-> 
-> > Whatever we do here, we should make sure that the ccw incarnation of
-> > this device indeed forces virtio-1.
-> 
-> I agree. I notice that the API virtio_pci_force_virtio_1 turned out
-> to be too fragile. I propose that instead we have a whitelist of
-> devices which can be legacy or transitional. Force rest to modern.
-> 
-> 
-> > ---
-> >  hw/virtio/vhost-user-fs-pci.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
-> > index e11c889d82b3..244205edf765 100644
-> > --- a/hw/virtio/vhost-user-fs-pci.c
-> > +++ b/hw/virtio/vhost-user-fs-pci.c
-> > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> >          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
-> >      }
-> >  
-> > +    virtio_pci_force_virtio_1(vpci_dev);
-> >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
-> >  }
-> >  
-> > -- 
-> > 2.25.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+where elf_ppnt is the program header entry of the first segment with
+type LOAD:
+https://github.com/torvalds/linux/blob/242b23319809e05170b3cc0d44d3b4bd202b=
+b073/fs/binfmt_elf.c#L1120
 
+In QEMU, load_addr is set to an earlier value loaddr, which is set to
+
+  min_i(phdr[i].p_vaddr - phdr[i].p_offset)
+
+where min_i is the minimum over indices "i" of LOAD segments.
+https://github.com/qemu/qemu/blob/9e7f1469b9994d910fc1b185c657778bde51639c
+/linux-user/elfload.c#L2407. If you perform this calculation by hand for
+the program headers posted at the beginning of this thread, you'll get
+ae000, as expected.
+
+The problem here is that QEMU takes a minimum where Linux just takes the
+first value. Presumably, changing QEMU's behavior to match that of the
+kernel wouldn't break anything that wouldn't be broken if it really ran
+on Linux. Unfortunately, Linux's ELF loader is much more picky than the
+ELF standard, but that's a whole other story...
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885332
+
+Title:
+  Error in user-mode calculation of ELF aux vector's AT_PHDR
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
+t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
+but crashes before main in user-mode emulation. Specifically, it crashes wh=
+en initializing thread-local storage in glibc's _dl_aux_init, because it re=
+ads out a strange value from the AT_PHDR entry of the ELF aux vector.
+
+  The binary has these program headers:
+
+    Program Headers:
+      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
+gn
+      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
+      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
+000
+      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
+000
+      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
+0000
+      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
+0000
+      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
+      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
+      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
+      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
+      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
+000
+      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
+000
+
+  If I build the Linux kernel with the following patch to the very end
+  of create_elf_tables in fs/binfmt_elf.c
+
+    /* Put the elf_info on the stack in the right place.  */
+    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
+    int i;
+    for (i =3D 0; i < 15; i++) {
+      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
+    }
+    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
+        return -EFAULT;
+    return 0;
+
+  and run it like this:
+
+    qemu-system-arm \
+      -M versatilepb \
+      -nographic \
+      -dtb ./dts/versatile-pb.dtb \
+      -kernel zImage \
+      -M versatilepb \
+      -m 128M \
+      -append "earlyprintk=3Dvga,keep" \
+      -initrd initramfs
+
+  after I've built the kernel initramfs like this (where "init" is the
+  binary in question):
+
+    make ARCH=3Darm versatile_defconfig
+    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
+    cp "$1" arch/arm/boot/init
+    cd arch/arm/boot
+    echo init | cpio -o --format=3Dnewc > initramfs
+
+  then I get the following output. This is the kernel's view of the aux
+  vector for this binary:
+
+    0x10 =3D 0x1d7
+    0x6 =3D 0x1000
+    0x11 =3D 0x64
+    0x3 =3D 0x900000
+    0x4 =3D 0x20
+    0x5 =3D 0xb
+    0x7 =3D 0x0
+    0x8 =3D 0x0
+    0x9 =3D 0x101b8
+    0xb =3D 0x0
+    0xc =3D 0x0
+    0xd =3D 0x0
+    0xe =3D 0x0
+    0x17 =3D 0x0
+    0x19 =3D 0xbec62fb5
+
+  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
+  the aux vector at the beginning of __libc_start_init (for example,
+  using this Python GDB API script: https://gist.github.com/langston-
+  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
+  values:
+
+    AT_PHDR =3D 0xae000
+    AT_PHENT =3D 0x20
+    AT_PHNUM =3D 0xb
+    AT_PAGESZ =3D 0x1000
+    AT_BASE =3D 0x0
+    AT_FLAGS =3D 0x0
+    AT_ENTRY =3D 0x10230
+    AT_UID =3D 0x3e9
+    AT_EUID =3D 0x3e9
+    AT_GID =3D 0x3e9
+    AT_EGID =3D 0x3e9
+    AT_HWCAP =3D 0x1fb8d7
+    AT_CLKTCK =3D 0x64
+    AT_RANDOM =3D -0x103c0
+    AT_HWCAP2 =3D 0x1f
+    AT_NULL =3D 0x0
+
+  The crucial difference is in AT_PHDR (0x3), which is indeed the
+  virtual address of the PHDR segment when the kernel calculates it, but
+  is not when QEMU calculates it.
+
+  qemu-arm --version
+  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
 
