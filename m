@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A87C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28508C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:45:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E61920720
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:35:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E61920720
+	by mail.kernel.org (Postfix) with ESMTPS id E6F1820663
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 20:45:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6F1820663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq0VF-000880-IZ
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 16:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40030)
+	id 1jq0eD-0004Bi-4d
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 16:45:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jq0S0-0004BL-4I; Mon, 29 Jun 2020 16:32:24 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46332)
+ id 1jq0ct-0002ko-54; Mon, 29 Jun 2020 16:43:39 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46378)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jq0Rt-000480-N3; Mon, 29 Jun 2020 16:32:23 -0400
+ id 1jq0cr-000633-4i; Mon, 29 Jun 2020 16:43:38 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 0F411BF724;
- Mon, 29 Jun 2020 20:32:14 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 9123EBF724;
+ Mon, 29 Jun 2020 20:43:34 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 1/3] hw/block/nvme: harden cmb access
-Date: Mon, 29 Jun 2020 22:31:53 +0200
-Message-Id: <20200629203155.1236860-2-its@irrelevant.dk>
+Subject: [PATCH 1/4] hw/block/nvme: refactor identify active namespace id list
+Date: Mon, 29 Jun 2020 22:43:24 +0200
+Message-Id: <20200629204327.1239520-2-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200629203155.1236860-1-its@irrelevant.dk>
-References: <20200629203155.1236860-1-its@irrelevant.dk>
+In-Reply-To: <20200629204327.1239520-1-its@irrelevant.dk>
+References: <20200629204327.1239520-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
@@ -75,36 +75,39 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Since the controller has only supported PRPs so far it has not been
-required to check the ending address (addr + len - 1) of the CMB access
-for validity since it has been guaranteed to be in range of the CMB.
-
-This changes when the controller adds support for SGLs (next patch), so
-add that check.
+Prepare to support inactive namespaces.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 94f5bf2a815f..191732692248 100644
+index 4bcd114f76b1..eaee420219fd 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -91,7 +91,12 @@ static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
+@@ -1573,16 +1573,16 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+     uint32_t min_nsid = le32_to_cpu(c->nsid);
+     uint32_t *list;
+     uint16_t ret;
+-    int i, j = 0;
++    int j = 0;
  
- static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
- {
--    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-+    hwaddr hi = addr + size - 1;
-+    if (hi < addr) {
-+        return 1;
-+    }
-+
-+    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr) && nvme_addr_is_cmb(n, hi)) {
-         memcpy(buf, nvme_addr_to_cmb(n, addr), size);
-         return 0;
-     }
+     trace_pci_nvme_identify_nslist(min_nsid);
+ 
+     list = g_malloc0(data_len);
+-    for (i = 0; i < n->num_namespaces; i++) {
+-        if (i < min_nsid) {
++    for (int i = 1; i <= n->num_namespaces; i++) {
++        if (i <= min_nsid) {
+             continue;
+         }
+-        list[j++] = cpu_to_le32(i + 1);
++        list[j++] = cpu_to_le32(i);
+         if (j == data_len / sizeof(uint32_t)) {
+             break;
+         }
 -- 
 2.27.0
 
