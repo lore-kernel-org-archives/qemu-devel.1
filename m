@@ -2,130 +2,128 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4732FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A540C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:19:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10E4923D99
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:19:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35B5E23D9B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:19:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LgRSuGC8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E4923D99
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VF/ze6Uw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B5E23D9B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpudO-0006m7-Aj
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:19:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
+	id 1jpudT-0006sh-Fd
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:19:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpubu-0005rZ-HV
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:18:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25783
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpubs-0005jk-6Z
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:18:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593440291;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=wheRM/SSsdNvONw5lhy+729M8lShBDgLLRoerkCT+ds=;
- b=LgRSuGC8TpXxmaLrZaS+mvd0w6ySteC+psZHv487fxrSBwuLvbnXeNFXjC0/wjUxvFE25v
- DC/AMrQ0dic2q3e+a5RKUY+A6JWSB5N5T807i++jJaWfmYM1esMFi5WJzjAPT/JWGn8z8g
- OqorIbCgJ6UzYWVojsHG8rTTi2GZs1g=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-1KVWf59_MFahDAJ4RH-2Gw-1; Mon, 29 Jun 2020 10:18:09 -0400
-X-MC-Unique: 1KVWf59_MFahDAJ4RH-2Gw-1
-Received: by mail-ej1-f71.google.com with SMTP id do21so11043548ejc.2
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 07:18:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=wheRM/SSsdNvONw5lhy+729M8lShBDgLLRoerkCT+ds=;
- b=q1RHf5LQyIVpTkuqjzgFpDv6vapPY3D8zodLMDNhIXe+awlaHjJTjUbb9dh5cT4fs1
- YXs8J2nvkrV5sZfUeK1LJQICQcSy97i05ii45YJnc0hTHxv7QwheOjx6gJkxcwWUK2Zx
- lgsV0GtRjFp2XMBbt/WzgPnkWtFgamBcN6ifBSG4Yy9GRD5wUe5TMMlajL2ae2NQl5yL
- XA6D28LV0jJA5uMjanVJ8lxhV4TcB5XQe+n3rI1D2Bf9Y2+x7yHT3Oe+nw5+13Eu5GwU
- N3rbdVBRTVkgXI7fuSLQ+gCIvDS+6KBQvH4J6TqDEVarrWc/iAxITL22ZXD8aTDuecQt
- wRBA==
-X-Gm-Message-State: AOAM531rhe79MPYEP/6wYuShcyaZQPxoSO1jeLxITEhpHni6+tNnC/xp
- aV3rqHqUsKhFAcekjEOr275o8X5cmNRnIS/WzIVibpT4DHWC2LsHoygC7WI7Cpc/1y3JJKBKg4Q
- M8xxqHaQlC9pMJQ0=
-X-Received: by 2002:a50:e3c9:: with SMTP id c9mr18490893edm.90.1593440288459; 
- Mon, 29 Jun 2020 07:18:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwm/INK2Dx8p0S6iCaHNnBojYGsB6KGlfzKuikqnIHTfOcdEXpM5m9tz4rgzHc1j44v5zUYAw==
-X-Received: by 2002:a50:e3c9:: with SMTP id c9mr18490870edm.90.1593440288277; 
- Mon, 29 Jun 2020 07:18:08 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id o8sm16274943ejj.102.2020.06.29.07.18.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 29 Jun 2020 07:18:07 -0700 (PDT)
-Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
- machine types
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20200629140938.17566-1-drjones@redhat.com>
- <20200629140938.17566-4-drjones@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <053462ec-0299-99fb-001b-93f31d668b0d@redhat.com>
-Date: Mon, 29 Jun 2020 16:18:05 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jpubz-0005uS-6T
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:18:19 -0400
+Received: from mail-eopbgr80117.outbound.protection.outlook.com
+ ([40.107.8.117]:47904 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jpubv-0005jw-Dw
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:18:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HMRLM6CGE4bdhkoQww+Y7971hHCcSpKx5m0CDTWU4d1hoLGI6bI2QucUIW8VuIYmCRa1b9aXtvt2JLhnd4eZaZRbRGGHcekOiAXxiJjuACCbGgPSpIlZr3mJBehkdzq/W8OVWb36h+QLyst+mFZtLmLb+R8cDgkIGZsQBzXoJ+m94rcZGSSTccrjyrCerNPN8DC+ssb8JiuJkXvlGbh3IdqNyV3LJi4xTUut4bzQow9MVQvz7Mt/bvTSoWF7cUajLg9YHkwEPq5ieWOqzblfei/XpKYD2im+6loC4PlITQG4Rp4bmS1FLqQMluwXjoshqXGVLfpnMzAYgCPZSYKKdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZIygvcGneGQh/0oNJ5VXzhygioOa5+2xC9sm50R3Q1E=;
+ b=aWftnHKxDftUdo+sS2pvB1pQBmB6bVeDlF/fMYDw6IWrn5Qv/HIYpH/hGpwVWOoXkXJVJFAQZ3WLoZUifnuNAr6EHhll3+eTmatj+lk02mBwssCj2FyDNPddadXTnHtztlGViSyJnKCR1asyWRvLnJ+kSskzVOhjCKUHJF8y95NwGbMHIdDFiHOp/v5UnbCLzuOjITVChIHZPtFR7pU1EQPB+N8gLSilzge6x7+oWGr5lCoZD5sR1JFdZvd8peOgGc1TkPfsjuT8Iqmg0SjSgLhBpMJInez9aGC/29Z/kaUH5/MewP5JftXUR/6VNxykjvZVWXi875YraoZH+wMigQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZIygvcGneGQh/0oNJ5VXzhygioOa5+2xC9sm50R3Q1E=;
+ b=VF/ze6UwzFmpEmqvg8/C6HR8Cp8+831SBg4usjbX470U8Mm4mD5gi/j4uWbX2VZmKop2NQKWSVQuWtRE9Dn0XTZ52mVwYu+SX3lOmvU4THvCcQTQuZW7bM0fU0P5L82MFn/St9m0cgWKQI0p/Z2ibUcy2bruYUObAdtWK0fIWW8=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4852.eurprd08.prod.outlook.com (2603:10a6:20b:cc::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.26; Mon, 29 Jun
+ 2020 14:18:12 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.026; Mon, 29 Jun 2020
+ 14:18:12 +0000
+Subject: Re: Properly quitting qemu immediately after failing migration
+To: Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <92ce741d-ef67-fbf9-a889-27d9ae218681@virtuozzo.com>
+Date: Mon, 29 Jun 2020 17:18:10 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200629140938.17566-4-drjones@redhat.com>
+ Thunderbird/68.9.0
+In-Reply-To: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-ClientProxiedBy: AM0PR10CA0095.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:15::48) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.28) by
+ AM0PR10CA0095.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:15::48) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3131.21 via Frontend Transport; Mon, 29 Jun 2020 14:18:11 +0000
+X-Originating-IP: [185.215.60.28]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 744cb642-9070-4b93-daa8-08d81c374184
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4852:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB48527EC47518B5671E2B0AFBC16E0@AM6PR08MB4852.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 044968D9E1
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4KTdL1RKqgzpXcQQkxDP/K8ixvHoWJwHvWyyJhlY46JTNNOuJzOTYWnEGhRyXUPYZkeanEfMCY9APnltGOCM08hO9UBUz+Z2jdetCBaiyFjtxIQOrMPDzBA80Li5P2wbhw/RnP35kEQzpabRFGeoHUaaGz+7GJ/bZBsVdsCnZN7iWuKPD9N+0Pc7/fazazCVHKu3H8oRqerZP/ltKVka+EmPICgFX5I9rqReTB2S0Yo1CnV221oetynVXPgKia0UNRCyYWLJhrrdE6Z8j0dS4PsPwccOQbfd4d0i/VxErWaRMoDk7psSK7P4M/4ta4flNyTfnQvz/5Ih6Vjo2YsTXIwH7bFmcd98h29pVTwsyInhfedSUGzKJhvvHbKYLFuJrk1n42VRXfvYhrBspY+wPA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(396003)(366004)(346002)(39840400004)(376002)(316002)(83380400001)(31696002)(478600001)(86362001)(16576012)(31686004)(66946007)(66556008)(66476007)(110136005)(6486002)(5660300002)(956004)(2616005)(26005)(8676002)(52116002)(186003)(16526019)(8936002)(36756003)(2906002)(14773001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: nkrYWYD78/yYUKa3ki1EQPY6PGGuITlKIMkVMQz4O83MRSFbA9oPKnnKRTuFikepOlbi4SGT3EOTZvdDcQsCn7ekAnPKgU9FRWTx1PUxJSEe/mr8vEr8SRldssFyh1RjCCv21kw5NuMovHbv2aiMHrrRN4zgU20dLMhhkeaXNCQCnoCNVgtYW7il7Kn9l3OPudQuan2d1MAPxW+w5kIG05jFfYPXhGf0tel0xrUwc1hK6Usk3QtwSbTF/9ZequKOhVBfl/68kqQCzHNho8rJNm8FOm5VTEbszmWqJSQBZJ8vchoAPudzCVKvO4gsrPGu63+bCLrztXU9DvJc5V1YX+QsCNZiJYE1TsmMVUu2/juRqgll2ykwCyA0tjY1une3OboMbfVn6SO59QQO82uRb/fxGV2qn/DVeBrsTCIDmTBIJ45HAFFrCVmHqZFRwwMkN7JV1R5aqDjr/r4J52ysU5FuU3JYpzdxlYfv323YlUNNeDDuZkOHz6cP7Wz2vlUH
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 744cb642-9070-4b93-daa8-08d81c374184
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2020 14:18:12.1716 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vi06nQmx4xvjV66RhPvOo2mazUfHFEZfUILYFjtJulDaKqpcu/KNk65M2BnhhFlDGLhj1rLET1aTl8ImS5+dRL72uoWfgFeu3RjGS6wIAvs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4852
+Received-SPF: pass client-ip=40.107.8.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 10:18:13
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,92 +136,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, shannon.zhaosl@gmail.com,
- ard.biesheuvel@arm.com, imammedo@redhat.com, lersek@redhat.com,
- eric.auger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 4:09 PM, Andrew Jones wrote:
-> The flash device is exclusively for the host-controlled firmware, so
-> we should not expose it to the OS. Exposing it risks the OS messing
-> with it, which could break firmware runtime services and surprise the
-> OS when all its changes disappear after reboot.
+29.06.2020 16:48, Max Reitz wrote:
+> Hi,
 > 
-> As firmware needs the device and uses DT, we leave the device exposed
-> there. It's up to firmware to remove the nodes from DT before sending
-> it on to the OS. However, there's no need to force firmware to remove
-> tables from ACPI (which it doesn't know how to do anyway), so we
-> simply don't add the tables in the first place. But, as we've been
-> adding the tables for quite some time and don't want to change the
-> default hardware exposed to versioned machines, then we only stop
-> exposing the flash device tables for 5.1 and later machine types.
+> In an iotest, I’m trying to quit qemu immediately after a migration has
+> failed.  Unfortunately, that doesn’t seem to be possible in a clean way:
+> migrate_fd_cleanup() runs only at some point after the migration state
+> is already “failed”, so if I just wait for that “failed” state and
+> immediately quit, some cleanup functions may not have been run yet.
 > 
-> Suggested-by: Ard Biesheuvel <ard.biesheuvel@arm.com>
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/arm/virt-acpi-build.c | 5 ++++-
->  hw/arm/virt.c            | 3 +++
->  include/hw/arm/virt.h    | 1 +
->  3 files changed, 8 insertions(+), 1 deletion(-)
+> This is a problem with dirty bitmap migration at least, because it
+> increases the refcount on all block devices that are to be migrated, so
+> if we don’t call the cleanup function before quitting, the refcount will
+> stay elevated and bdrv_close_all() will hit an assertion because those
+> block devices are still around after blk_remove_all_bs() and
+> blockdev_close_all_bdrv_states().
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 1384a2cf2ab4..91f0df7b13a3 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -749,6 +749,7 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
->  static void
->  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->      Aml *scope, *dsdt;
->      MachineState *ms = MACHINE(vms);
->      const MemMapEntry *memmap = vms->memmap;
-> @@ -767,7 +768,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
->      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
->                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> -    acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> +    if (vmc->acpi_expose_flash) {
-> +        acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> +    }
->      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
->      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index cd0834ce7faf..5adc9ff799ef 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2482,9 +2482,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
->  
->  static void virt_machine_5_0_options(MachineClass *mc)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
->      virt_machine_5_1_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
->      mc->numa_mem_supported = true;
-> +    vmc->acpi_expose_flash = true;
->  }
->  DEFINE_VIRT_MACHINE(5, 0)
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 31878ddc7223..c65be5fe0bb6 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -119,6 +119,7 @@ typedef struct {
->      bool no_highmem_ecam;
->      bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
->      bool kvm_no_adjvtime;
-> +    bool acpi_expose_flash;
->  } VirtMachineClass;
->  
->  typedef struct {
+> In practice this particular issue might not be that big of a problem,
+> because it just means qemu aborts when the user intended to let it quit
+> anyway.  But on one hand I could imagine that there are other clean-up
+> paths that should definitely run before qemu quits (although I don’t
+> know), and on the other, it’s a problem for my test.
+> 
+> I tried working around the problem for my test by waiting on “Unable to
+> write” appearing on stderr, because that indicates that
+> migrate_fd_cleanup()’s error_report_err() has been reached.  But on one
+> hand, that isn’t really nice, and on the other, it doesn’t even work
+> when the failure is on the source side (because then there is no
+> s->error for migrate_fd_cleanup() to report).
+> 
+> In all, I’m asking:
+> (1) Is there a nice solution for me now to delay quitting qemu until the
+> failed migration has been fully resolved, including the clean-up?
+> 
+> (2) Isn’t it a problem if qemu crashes when you issue “quit” via QMP at
+> the wrong time?  Like, maybe lingering subprocesses when using “exec”?
+> 
 > 
 
+I'll look more closely tomorrow, but as a short answer: try my series
+"[PATCH v2 00/22] Fix error handling during bitmap postcopy" it
+handles different problems around migration failures & qemu shutdown,
+probably it will help.
+
+
+-- 
+Best regards,
+Vladimir
 
