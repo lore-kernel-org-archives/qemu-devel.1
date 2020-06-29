@@ -2,98 +2,98 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F9ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 302D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A37B2337F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED2BE23E24
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 14:58:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BbbUrDU+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A37B2337F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sggrn/cE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED2BE23E24
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpvB8-0004rp-Cy
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:54:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52442)
+	id 1jpvEa-0006J3-91
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 10:58:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jpvA9-0004Pz-P3
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:53:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33015
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jpvA3-0003OK-Tm
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 10:53:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593442410;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XemuANQiAmEssS0829iSqZwMA1GM/3thXXsBgjhpjRk=;
- b=BbbUrDU+FCqngCyQ7DvQ2dGQk55hczbViAMrW8e5ExZJZumH4OdsLJmzjXWR9KMUSDcSLb
- EIZjjY/WuzatpI0S9A8R44kyMAoUnNtIf3hhkvcCGuxH6zwNPs429RRAtrEBhS30ci8gRf
- kWiTpLfEiO3MoE034mZzHz6NVZhdxlc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-uqzqaTqEPb-xpkhWCap1dA-1; Mon, 29 Jun 2020 10:53:27 -0400
-X-MC-Unique: uqzqaTqEPb-xpkhWCap1dA-1
-Received: by mail-wr1-f71.google.com with SMTP id g14so16640026wrp.8
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 07:53:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jpvDg-0005kR-PA; Mon, 29 Jun 2020 10:57:16 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:43905)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jpvDf-00040a-Ai; Mon, 29 Jun 2020 10:57:16 -0400
+Received: by mail-ej1-x643.google.com with SMTP id l12so16851284ejn.10;
+ Mon, 29 Jun 2020 07:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JSy1xaQbw0L8ARiM5VBYS1D7X0v2qiWg8jPvKnzhMt0=;
+ b=sggrn/cElpuSF011BeOT6VQrdxmVewce/xmQ6+4CpPKYEczOeGfQFVEx53hydi6w/H
+ TKZwshd6rcRwinsJ7TwYx78umu6y7z+Eib8uVnN0G5DcKmCnCSVKKfzFqHfuf2eRCESQ
+ KWMe1QNgCP97/aA157nDouH3yyxnrCeyhl4DGneqgDfaknjN2moZNOzPMJN9YyhB2QBo
+ g9+PxTC3i8QsahdR4x5vTt+JgtCswA2/wJHl5b2juYwwDORYXgZOTVWfpYt3h3PUxKDg
+ ZIPrge4TKXlHoUGfSLf6+59W/BKAj0FEvIYIroPq4ZDGtwkJFUlKxxVg1wjqt7st/vGn
+ Rn/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XemuANQiAmEssS0829iSqZwMA1GM/3thXXsBgjhpjRk=;
- b=AWw/m8vAIB+zqwNrWNX3X5dYPBcitcTKYbiAmAmeaOS7S2/fd+PxpSkWPgMfa0vwKC
- qXN/lAqcRE9fKZtEzPxz1hjMFklBJLbuvltvQ10IK5XCcuemu0+V72muTh5yOtOgYxXE
- OI1x926YvdkT1SMIUXctDsYwdHRe1x+BwjGCvE0HsUDQ0mE4BQvKvudBlI+V0qBUffsE
- Q937qJHyEg2pfMbDMRNaywNG40Dmw5GBuySUWjioijpEvVs9d2DTDOxes+0gDHCoRl2h
- ej2enap8xhl2IfqKELVEn1NZ0Jv/JE9HESTRnBR9hX6DrSOtiLeCsqUjMT68qtXnW+P1
- JEHg==
-X-Gm-Message-State: AOAM533JS/NxJ/JR6GjfsWOdwu1LanqscR/dRwziq5iEZKkKPDxB9aAp
- i+694l2xt7hSc4RnRR3gOVJUXq+uaqWZ/KPy4PdGKMSbDS5ZgBPY6GeKDePTymFiCAkngyCHPN2
- n9EaRfhTDLOdqopg=
-X-Received: by 2002:adf:8b50:: with SMTP id v16mr18170957wra.188.1593442406482; 
- Mon, 29 Jun 2020 07:53:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyD72bWfiytC94LOBqy6O+WRMnyZHdE3uVnRUtSk7YV+nrELEEFmr64Db/KTH/vNOJLorxrkw==
-X-Received: by 2002:adf:8b50:: with SMTP id v16mr18170941wra.188.1593442406271; 
- Mon, 29 Jun 2020 07:53:26 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- u74sm16381wmu.31.2020.06.29.07.53.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Jun 2020 07:53:25 -0700 (PDT)
-Date: Mon, 29 Jun 2020 10:53:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
-Message-ID: <20200629104948-mutt-send-email-mst@kernel.org>
-References: <20200629102758.421552-1-cohuck@redhat.com>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JSy1xaQbw0L8ARiM5VBYS1D7X0v2qiWg8jPvKnzhMt0=;
+ b=EfaddoGPZrCOHuEypZHYEm7BYkP14Rbq33xRBVHVvuS5IxCG/PiqK5eYLsDhHCe/VY
+ tYPXtjPCPsXiURDwpk54+xtBTs2OUm3EGyhOIHxFPbrRjkwMnMYM1p034xYX/XzVtIC8
+ QPmwQAOnlT8PQ2ii7Gr2jh+LWZrbe1g+thn7t6mEusBb+zyCa3vSvZNn8mGkt3eiY8uD
+ meKp0GpiyDm4Us1dS5dfsNpfYWct0O6vrVJENC0WSP4yXTunBxb6bOgUUZL1QxZd4U08
+ cSSVIrSR3cIHBp3balrl9tgp48qdMPSPTR+mFttOzbzaGf8y6nBcWYORWWkSJ2YMtGfu
+ 8W8w==
+X-Gm-Message-State: AOAM533mE1g5IZImZDdISeQ3V0wY1fq5dE3SkVUoqJojzA8K9rd2rAE7
+ DjR8dHu7fXyyikKhxBoB/XTEXAeOHvg=
+X-Google-Smtp-Source: ABdhPJwF55oildBnVYssfYweFizOfb9NUxG0DEM8pJpWpc9myWB2SBh63LNZaG2UPtWtUmoVtmgTVg==
+X-Received: by 2002:a17:907:395:: with SMTP id
+ ss21mr14203042ejb.181.1593442633574; 
+ Mon, 29 Jun 2020 07:57:13 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id d13sm98900edv.12.2020.06.29.07.57.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 29 Jun 2020 07:57:12 -0700 (PDT)
+Subject: Re: [PATCH 11/17] hw/misc/max111x: Create header file for
+ documentation, TYPE_ macros
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200628142429.17111-1-peter.maydell@linaro.org>
+ <20200628142429.17111-12-peter.maydell@linaro.org>
+ <b1a56ac5-f2a7-ec88-0191-5324821f4916@amsat.org>
+ <CAFEAcA83LqH0dUZfk-yjmdEX_o4VNuDqAgSxe2hj9nGmAxs9Xw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <128760db-266b-092b-297c-d7c766174ced@amsat.org>
+Date: Mon, 29 Jun 2020 16:57:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200629102758.421552-1-cohuck@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:06:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+In-Reply-To: <CAFEAcA83LqH0dUZfk-yjmdEX_o4VNuDqAgSxe2hj9nGmAxs9Xw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,65 +107,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:
-> virtio-fs devices are only specified for virtio-1, so it is unclear
-> how a legacy or transitional device should behave.
+On 6/29/20 2:07 PM, Peter Maydell wrote:
+> On Mon, 29 Jun 2020 at 09:29, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 6/28/20 4:24 PM, Peter Maydell wrote:
+>>> Create a header file for the hw/misc/max111x device, in the
+>>> usual modern style for QOM devices:
+>>>  * definition of the TYPE_ constants and macros
+>>>  * definition of the device's state struct so that it can
+>>>    be embedded in other structs if desired
+
+Ah, fine.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>>>  * documentation of the interface
+>>>
+>>> This allows us to use TYPE_MAX_1111 in the spitz.c code rather
+>>> than the string "max1111".
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
+>> Nitpick, we can keep MAX_111X() + MAX111xState in "hw/misc/max111x.c"
+>> until we get a consumer.
 > 
-> Forcing off legacy now (after the virtio-fs device has already been
-> available) may have unintended consequences, therefore RFC.
+> This is deliberate, as noted in the commit message.
 > 
-> By default, a virtio-pci device uses 'AUTO' for disable_legacy, which
-> will resolve to different values based upon which bus the device has
-> been plugged. Therefore, forcing disable_legacy may result in the same
-> device or a quite different one.
+> thanks
+> -- PMM
 > 
-> Even though pre-virtio-1 behaviour of virtio-fs devices is simply not
-> specified, toggling disable_legacy will have implications for the BAR
-> layout, IIRC, and therefore a guest might end up getting a different
-> device, even if it always used it with virtio-1 anyway.
-> 
-> Not sure what the best way to solve this problem is. Adding a compat
-> property for disable_legacy=AUTO may be the right thing to do, but I'm
-> not quite clear if there are any further implications here.
-
-Well I notice that this device is not migrateable.
-So I think that we can just switch it over and be done with it.
-
-
-> Whatever we do here, we should make sure that the ccw incarnation of
-> this device indeed forces virtio-1.
-
-I agree. I notice that the API virtio_pci_force_virtio_1 turned out
-to be too fragile. I propose that instead we have a whitelist of
-devices which can be legacy or transitional. Force rest to modern.
-
-
-> ---
->  hw/virtio/vhost-user-fs-pci.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
-> index e11c889d82b3..244205edf765 100644
-> --- a/hw/virtio/vhost-user-fs-pci.c
-> +++ b/hw/virtio/vhost-user-fs-pci.c
-> @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
->      }
->  
-> +    virtio_pci_force_virtio_1(vpci_dev);
->      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
->  }
->  
-> -- 
-> 2.25.4
-
 
