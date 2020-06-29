@@ -2,62 +2,90 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BBFC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E3FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C2E423D4D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2E423D4D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id EDBEF23D4D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 13:13:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pjJtuD9Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBEF23D4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jptZH-0004JI-PT
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 09:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50598)
+	id 1jptbO-0006Go-8j
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 09:13:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jptVk-0008EH-0F; Mon, 29 Jun 2020 09:07:48 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42935)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jptVf-0003Y9-Ts; Mon, 29 Jun 2020 09:07:47 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07438486|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_alarm|0.0520955-0.00143157-0.946473;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HucVN.U_1593436054; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HucVN.U_1593436054)
- by smtp.aliyun-inc.com(10.147.44.145);
- Mon, 29 Jun 2020 21:07:35 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH 2/2] target/riscv: Do amo*.w insns operate with 32 bits
-Date: Mon, 29 Jun 2020 21:07:31 +0800
-Message-Id: <20200629130731.1080-3-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200629130731.1080-1-zhiwei_liu@c-sky.com>
-References: <20200629130731.1080-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jptaP-0005Po-IJ; Mon, 29 Jun 2020 09:12:37 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:35147)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jptaL-0004KD-Ln; Mon, 29 Jun 2020 09:12:36 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id g18so16534150wrm.2;
+ Mon, 29 Jun 2020 06:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=fGgL79MyZGaqgLG+bNfpXx7msHKeI8CD8GrITmN73+M=;
+ b=pjJtuD9YEaCQEehDiMay0SkIOnQEW6KEmY+WPk//SG0osJPo57zHxbAQifaOq1Ye33
+ XX3ZowvvfDzuN2RXU3eF4hUi0qhuESxp39Zq6h5E6XiKhluWxTIQxPhONpr8Mkzgs6GT
+ osUpmFKI6F2kEodKWWTSCirQUV3wb8PD9RT8JHpPlz3Nx9P2wo2eYWNsRnBYCdEdo3Ba
+ NR3iO7hWvbehkY+UElYzHhoca2DRzO4e8SFk0ROrIMo84qrsz7N6CU5021SFWWUBB1BU
+ IgZ4/7PIqGjO2QA5s9wIkDYFTwdOjWg/H6Nj1TxwN+2HVQ609BTsGnKE/xb7CRz0fi5J
+ 38kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=fGgL79MyZGaqgLG+bNfpXx7msHKeI8CD8GrITmN73+M=;
+ b=SCFP5+YM4xCNbO/hxITH3U/vR62/H3Hu39D4zwx7Vzjx1yelpZyvfB4Mg32BgG3FvA
+ /Q38b24Ykrk5ftlpBoqDVrqTAZcNdgzhXrWlEuoLx9Hi7YYof51U2xaSuirHpz1vH/gj
+ KN9kcRYjx5w1zOno6YPVkhJC1BClm/wOzYzfXLIUWLFTjddWi9OrdjZxYY5nmJjybT5H
+ G27CqPh13MaaW8/TmZi8EwcGRVxqh0MTmASN0lBaf3Ggc67fsLJteNNA/IJltEHBg9CH
+ uglNe7T9SqwNSmlYuNQJz3xL21ZdE6jQWdLh9x/QISq5yF8M3sF1KujHtP1D00ru7g0I
+ 2eRA==
+X-Gm-Message-State: AOAM532rlh456oVkwMRThTfpYoaTf7W0PxJKN2VzcoCh8UuouSAHM7Dl
+ oehVrziaK3TVa/nBeJ4hPWY=
+X-Google-Smtp-Source: ABdhPJz/WJ6nQRrB/gq4vcIVuvUwRa14eUMmAUihewUD1nigMGamG+aWJJLSF/kZufBBPCDhT9rjCw==
+X-Received: by 2002:adf:f04c:: with SMTP id t12mr15475502wro.382.1593436350547; 
+ Mon, 29 Jun 2020 06:12:30 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id b18sm19331470wmb.18.2020.06.29.06.12.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 06:12:29 -0700 (PDT)
+Date: Mon, 29 Jun 2020 14:12:27 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Asmita Jha <asmita.jha82@gmail.com>
+Subject: Re: Qemu installation error from source
+Message-ID: <20200629131227.GL31392@stefanha-x1.localdomain>
+References: <CAKKBCQoBmk3rA=Ht=AVZkOUc0zDVJCVyX1GLbEWK97hodOfqDA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 09:07:36
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="bPg9NdpM9EETxvqt"
+Content-Disposition: inline
+In-Reply-To: <CAKKBCQoBmk3rA=Ht=AVZkOUc0zDVJCVyX1GLbEWK97hodOfqDA@mail.gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x42e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,153 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For amo*.w insns, we should only calculate on the 32 bits data either from the
-register or the memory.
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/insn_trans/trans_rva.inc.c | 60 +++++++++++++++++++------
- 1 file changed, 47 insertions(+), 13 deletions(-)
+--bPg9NdpM9EETxvqt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
-index be8a9f06dd..6b3fc14436 100644
---- a/target/riscv/insn_trans/trans_rva.inc.c
-+++ b/target/riscv/insn_trans/trans_rva.inc.c
-@@ -81,19 +81,26 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, MemOp mop)
-     return true;
- }
- 
--static bool gen_amo(DisasContext *ctx, arg_atomic *a,
--                    void(*func)(TCGv, TCGv, TCGv, TCGArg, MemOp),
--                    MemOp mop)
-+static bool
-+gen_amo_w(DisasContext *ctx, arg_atomic *a,
-+          void(*func)(TCGv, TCGv, TCGv, TCGArg, MemOp),
-+          MemOp mop, bool sign)
- {
-     TCGv src1 = tcg_temp_new();
-     TCGv src2 = tcg_temp_new();
- 
-     gen_get_gpr(src1, a->rs1);
-     gen_get_gpr(src2, a->rs2);
-+    if (sign) {
-+        tcg_gen_ext32s_tl(src2, src2);
-+    } else {
-+        tcg_gen_ext32u_tl(src2, src2);
-+    }
- 
-     (*func)(src2, src1, src2, ctx->mem_idx, mop);
--
-+    tcg_gen_ext32s_tl(src2, src2);
-     gen_set_gpr(a->rd, src2);
-+
-     tcg_temp_free(src1);
-     tcg_temp_free(src2);
-     return true;
-@@ -114,59 +121,86 @@ static bool trans_sc_w(DisasContext *ctx, arg_sc_w *a)
- static bool trans_amoswap_w(DisasContext *ctx, arg_amoswap_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_xchg_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_xchg_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amoadd_w(DisasContext *ctx, arg_amoadd_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_add_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_add_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amoxor_w(DisasContext *ctx, arg_amoxor_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_xor_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_xor_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amoand_w(DisasContext *ctx, arg_amoand_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_and_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_and_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amoor_w(DisasContext *ctx, arg_amoor_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_or_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_or_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amomin_w(DisasContext *ctx, arg_amomin_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smin_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_smin_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amomax_w(DisasContext *ctx, arg_amomax_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_smax_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_smax_tl,
-+                     (MO_ALIGN | MO_TESL), true);
- }
- 
- static bool trans_amominu_w(DisasContext *ctx, arg_amominu_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umin_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_umin_tl,
-+                     (MO_ALIGN | MO_TEUL), false);
- }
- 
- static bool trans_amomaxu_w(DisasContext *ctx, arg_amomaxu_w *a)
- {
-     REQUIRE_EXT(ctx, RVA);
--    return gen_amo(ctx, a, &tcg_gen_atomic_fetch_umax_tl, (MO_ALIGN | MO_TESL));
-+    return gen_amo_w(ctx, a, &tcg_gen_atomic_fetch_umax_tl,
-+                     (MO_ALIGN | MO_TEUL), false);
- }
- 
- #ifdef TARGET_RISCV64
- 
-+static bool gen_amo(DisasContext *ctx, arg_atomic *a,
-+                    void(*func)(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, MemOp),
-+                    MemOp mop)
-+{
-+    TCGv src1 = tcg_temp_new();
-+    TCGv src2 = tcg_temp_new();
-+
-+    gen_get_gpr(src1, a->rs1);
-+    gen_get_gpr(src2, a->rs2);
-+
-+    (*func)(src2, src1, src2, ctx->mem_idx, mop);
-+
-+    gen_set_gpr(a->rd, src2);
-+    tcg_temp_free(src1);
-+    tcg_temp_free(src2);
-+    return true;
-+}
-+
- static bool trans_lr_d(DisasContext *ctx, arg_lr_d *a)
- {
-     return gen_lr(ctx, a, MO_ALIGN | MO_TEQ);
--- 
-2.23.0
+On Fri, Jun 26, 2020 at 06:17:06AM +0530, Asmita Jha wrote:
+> Greetings,
+> I had been trying to install qemu from the source. I tried both the metho=
+ds
+> given on https://www.qemu.org/downloads/#source
+> And also as given on https://wiki.qemu.org/Hosts/Linux
+>=20
+> But in all cases ,I am getting same error every time. Screenshot attached.
+> Request you all to kindly look into this.
 
+Could it be that you have a statically compiled libbz2 but are building
+a dynamically linked QEMU?
+
+Does QEMU ./configure --static ... help?
+
+Stefan
+
+--bPg9NdpM9EETxvqt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl756LsACgkQnKSrs4Gr
+c8jEuQgAhzS9SX90zFyNSqeyNmN39+nOvfh8ErrkPvITUsHo5V1po6OBTc7Zgb6E
+lqjp56tqo94IBEAgY/SFXdto0AXRVNlU8052SqlS5S9OqzB09tR1GzT6m+Xg5YCN
++WholQxxB0I7XIbk33GjprNJLGucZeQiQ4I0pZNkzDWA3QYs59henTn0orv6rfB5
+9Ca5/L81oEYXiLl5jN6Rf64j83uQmnGkFVmL6/aV1LwoFLwc5Alwv0xyCyG34Y54
+HQS70d8yznDciN4pCnD3BmEHzdGP0AdNWymifG4ukHogaw0y6pue9CMIF12eXEpK
+cPaOn6WpCItjmtoIu/Xx/mg2kmnotw==
+=q0Y7
+-----END PGP SIGNATURE-----
+
+--bPg9NdpM9EETxvqt--
 
