@@ -2,43 +2,46 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F3DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1E4C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:49:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38A3720760
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:49:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38A3720760
+	by mail.kernel.org (Postfix) with ESMTPS id ED6402076C
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:49:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6402076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq1eu-0000Gc-EY
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:49:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59728)
+	id 1jq1ew-0000KF-6E
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:49:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1de-0007IW-Ih
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:30 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46550)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dg-0007LE-DI
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:32 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46558)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dc-00084s-84
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:30 -0400
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dc-00085A-L0
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:32 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 861E3BF450
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 21:48:26 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 4E3B0BF7EC
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 21:48:27 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/4] hw/block/nvme: support multiple namespaces
-Date: Mon, 29 Jun 2020 23:48:21 +0200
-Message-Id: <20200629214825.1283673-1-its@irrelevant.dk>
+Subject: [PATCH v2 4/4] hw/block/nvme: change controller pci id
+Date: Mon, 29 Jun 2020 23:48:25 +0200
+Message-Id: <20200629214825.1283673-5-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200629214825.1283673-1-its@irrelevant.dk>
+References: <20200629214825.1283673-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
@@ -68,43 +71,92 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-v2: bummer, v1 didn't apply cleanly to master (it applied to Kevin's
-block tree); rebased to make patchew happy
+There are two reasons for changing this:
 
+  1. The nvme device currently uses an internal Intel device id.
 
-This adds a new 'nvme-ns' device that attaches to the nvme device
-through a bus. This decouples the nvme controller and nvme namespaces
-such that multiple namespaces may be attached to the controller.
+  2. Since commits "nvme: fix write zeroes offset and count" and "nvme:
+     support multiple namespaces" the controller device no longer has
+     the quirks that the Linux kernel think it has.
 
-With this in place, we can allocate a fresh pci vendor/device id and get
-rid of the Intel id pair that causes the Linux kernel to apply a bunch
-of quirks that the device no longer has.
+     As the quirks are applied based on pci vendor and device id, change
+     them to get rid of the quirks.
 
-Based-on: <20200629203155.1236860-1-its@irrelevant.dk>
-("[PATCH 0/3] hw/block/nvme: support scatter gather lists")
+To keep backward compatibility, add a new 'x-use-intel-id' parameter to
+the nvme device to force use of the Intel vendor and device id. This is
+off by default but add a compat property to set this for machines 5.0
+and older.
 
-Klaus Jensen (4):
-  hw/block/nvme: refactor identify active namespace id list
-  hw/block/nvme: support multiple namespaces
-  pci: allocate pci id for nvme
-  hw/block/nvme: change controller pci id
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ hw/block/nvme.c   | 12 ++++++++++--
+ hw/block/nvme.h   |  1 +
+ hw/core/machine.c |  1 +
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
- MAINTAINERS            |   1 +
- docs/specs/nvme.txt    |  23 ++++
- docs/specs/pci-ids.txt |   1 +
- hw/block/Makefile.objs |   2 +-
- hw/block/nvme-ns.c     | 172 ++++++++++++++++++++++++++
- hw/block/nvme-ns.h     |  66 ++++++++++
- hw/block/nvme.c        | 273 +++++++++++++++++++++++++++--------------
- hw/block/nvme.h        |  45 +++----
- hw/block/trace-events  |   8 +-
- hw/core/machine.c      |   1 +
- include/hw/pci/pci.h   |   1 +
- 11 files changed, 472 insertions(+), 121 deletions(-)
- create mode 100644 docs/specs/nvme.txt
- create mode 100644 hw/block/nvme-ns.c
- create mode 100644 hw/block/nvme-ns.h
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9db8e4811433..164c5e294d06 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -2756,6 +2756,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev, Error **errp)
+ 
+     pci_conf[PCI_INTERRUPT_PIN] = 1;
+     pci_config_set_prog_interface(pci_conf, 0x2);
++
++    if (n->params.use_intel_id) {
++        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
++        pci_config_set_device_id(pci_conf, 0x5846);
++    } else {
++        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_REDHAT);
++        pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_REDHAT_NVME);
++    }
++
+     pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
+     pcie_endpoint_cap_init(pci_dev, 0x80);
+ 
+@@ -2908,6 +2917,7 @@ static Property nvme_props[] = {
+     DEFINE_PROP_UINT8("aerl", NvmeCtrl, params.aerl, 3),
+     DEFINE_PROP_UINT32("aer_max_queued", NvmeCtrl, params.aer_max_queued, 64),
+     DEFINE_PROP_UINT8("mdts", NvmeCtrl, params.mdts, 7),
++    DEFINE_PROP_BOOL("x-use-intel-id", NvmeCtrl, params.use_intel_id, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -2924,8 +2934,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+     pc->realize = nvme_realize;
+     pc->exit = nvme_exit;
+     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
+-    pc->vendor_id = PCI_VENDOR_ID_INTEL;
+-    pc->device_id = 0x5845;
+     pc->revision = 2;
+ 
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 8d7610477e7d..8bf1a050497e 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -15,6 +15,7 @@ typedef struct NvmeParams {
+     uint8_t  aerl;
+     uint32_t aer_max_queued;
+     uint8_t  mdts;
++    bool     use_intel_id;
+ } NvmeParams;
+ 
+ typedef struct NvmeAsyncEvent {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 211b4e077aca..827f054ac29d 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -34,6 +34,7 @@ GlobalProperty hw_compat_5_0[] = {
+     { "vmport", "x-signal-unsupported-cmd", "off" },
+     { "vmport", "x-report-vmx-type", "off" },
+     { "vmport", "x-cmds-v2", "off" },
++    { "nvme", "x-use-intel-id", "on"},
+ };
+ const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+ 
 -- 
 2.27.0
 
