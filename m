@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7459FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 516FD20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:55:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 516FD20674
+	by mail.kernel.org (Postfix) with ESMTPS id AF4012076C
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 19:56:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF4012076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpzsc-0007YM-Hw
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:55:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57504)
+	id 1jpzst-0008KH-UZ
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 15:56:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznV-00078z-Il; Mon, 29 Jun 2020 15:50:33 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46174)
+ id 1jpznq-0007Ru-IY; Mon, 29 Jun 2020 15:50:54 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jpznS-0005wy-MC; Mon, 29 Jun 2020 15:50:33 -0400
+ id 1jpznn-0005xi-7M; Mon, 29 Jun 2020 15:50:54 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id C9774BF804;
- Mon, 29 Jun 2020 19:50:26 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id C1130BF80E;
+ Mon, 29 Jun 2020 19:50:27 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 08/17] hw/block/nvme: verify validity of prp lists in the cmb
-Date: Mon, 29 Jun 2020 21:50:08 +0200
-Message-Id: <20200629195017.1217056-9-its@irrelevant.dk>
+Subject: [PATCH 11/17] hw/block/nvme: be consistent about zeros vs zeroes
+Date: Mon, 29 Jun 2020 21:50:11 +0200
+Message-Id: <20200629195017.1217056-12-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200629195017.1217056-1-its@irrelevant.dk>
 References: <20200629195017.1217056-1-its@irrelevant.dk>
@@ -75,78 +75,93 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Before this patch the device already supported PRP lists in the CMB, but
-it did not check for the validity of it nor announced the support in the
-Identify Controller data structure LISTS field.
-
-If some of the PRPs in a PRP list are in the CMB, then ALL entries must
-be there. This patch makes sure that requirement is verified as well as
-properly announcing support for PRP lists in the CMB.
+The NVM Express specification generally uses 'zeroes' and not 'zeros'.
+It might very well be wrong, but let us align with it.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ block/nvme.c         | 4 ++--
+ hw/block/nvme.c      | 8 ++++----
+ include/block/nvme.h | 4 ++--
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/block/nvme.c b/block/nvme.c
+index 29e90557c428..bee0878dec71 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -465,7 +465,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+                           s->page_size / sizeof(uint64_t) * s->page_size);
+ 
+     oncs = le16_to_cpu(idctrl->oncs);
+-    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROS);
++    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROES);
+     s->supports_discard = !!(oncs & NVME_ONCS_DSM);
+ 
+     memset(resp, 0, 4096);
+@@ -1117,7 +1117,7 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
+     }
+ 
+     NvmeCmd cmd = {
+-        .opcode = NVME_CMD_WRITE_ZEROS,
++        .opcode = NVME_CMD_WRITE_ZEROES,
+         .nsid = cpu_to_le32(s->nsid),
+         .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
+         .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d236a3cdee54..55b305458152 100644
+index d5dff6869b69..12f1b6331c43 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -237,6 +237,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-     trans_len = MIN(len, trans_len);
-     int num_prps = (len >> n->page_bits) + 1;
-     uint16_t status;
-+    bool prp_list_in_cmb = false;
+@@ -579,7 +579,7 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     return NVME_NO_COMPLETE;
+ }
  
-     trace_pci_nvme_map_prp(nvme_cid(req), trans_len, len, prp1, prp2,
-                            num_prps);
-@@ -264,11 +265,16 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-             status = NVME_INVALID_FIELD | NVME_DNR;
-             goto unmap;
-         }
-+
-         if (len > n->page_size) {
-             uint64_t prp_list[n->max_prp_ents];
-             uint32_t nents, prp_trans;
-             int i = 0;
+-static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
++static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     NvmeRequest *req)
+ {
+     NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
+@@ -679,8 +679,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+     switch (cmd->opcode) {
+     case NVME_CMD_FLUSH:
+         return nvme_flush(n, ns, cmd, req);
+-    case NVME_CMD_WRITE_ZEROS:
+-        return nvme_write_zeros(n, ns, cmd, req);
++    case NVME_CMD_WRITE_ZEROES:
++        return nvme_write_zeroes(n, ns, cmd, req);
+     case NVME_CMD_WRITE:
+     case NVME_CMD_READ:
+         return nvme_rw(n, ns, cmd, req);
+@@ -2280,7 +2280,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     id->sqes = (0x6 << 4) | 0x6;
+     id->cqes = (0x4 << 4) | 0x4;
+     id->nn = cpu_to_le32(n->num_namespaces);
+-    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP |
++    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP |
+                            NVME_ONCS_FEATURES);
  
-+            if (nvme_addr_is_cmb(n, prp2)) {
-+                prp_list_in_cmb = true;
-+            }
-+
-             nents = (len + n->page_size - 1) >> n->page_bits;
-             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
-             nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-@@ -282,6 +288,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-                         goto unmap;
-                     }
+     pstrcpy((char *) id->subnqn, sizeof(id->subnqn), "nqn.2019-08.org.qemu:");
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 60833039a6c5..91456255ffa7 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -459,7 +459,7 @@ enum NvmeIoCommands {
+     NVME_CMD_READ               = 0x02,
+     NVME_CMD_WRITE_UNCOR        = 0x04,
+     NVME_CMD_COMPARE            = 0x05,
+-    NVME_CMD_WRITE_ZEROS        = 0x08,
++    NVME_CMD_WRITE_ZEROES       = 0x08,
+     NVME_CMD_DSM                = 0x09,
+ };
  
-+                    if (prp_list_in_cmb != nvme_addr_is_cmb(n, prp_ent)) {
-+                        status = NVME_INVALID_USE_OF_CMB | NVME_DNR;
-+                        goto unmap;
-+                    }
-+
-                     i = 0;
-                     nents = (len + n->page_size - 1) >> n->page_bits;
-                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
-@@ -301,6 +312,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-                 if (status) {
-                     goto unmap;
-                 }
-+
-                 len -= trans_len;
-                 i++;
-             }
-@@ -2097,7 +2109,7 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
- 
-     NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
--    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-+    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+@@ -837,7 +837,7 @@ enum NvmeIdCtrlOncs {
+     NVME_ONCS_COMPARE       = 1 << 0,
+     NVME_ONCS_WRITE_UNCORR  = 1 << 1,
+     NVME_ONCS_DSM           = 1 << 2,
+-    NVME_ONCS_WRITE_ZEROS   = 1 << 3,
++    NVME_ONCS_WRITE_ZEROES  = 1 << 3,
+     NVME_ONCS_FEATURES      = 1 << 4,
+     NVME_ONCS_RESRVATIONS   = 1 << 5,
+     NVME_ONCS_TIMESTAMP     = 1 << 6,
 -- 
 2.27.0
 
