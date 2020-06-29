@@ -2,88 +2,96 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 565ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FA0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:50:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 205A82313B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F30522241
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 08:50:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPskwKqD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 205A82313B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oT9bGc1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F30522241
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jppR4-0002bP-EN
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 04:46:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59252)
+	id 1jppUg-0004Oo-Hc
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 04:50:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jppQ2-00020N-8V
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 04:45:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30700
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jppQ0-0007Lr-4n
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 04:45:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593420335;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wUXqON7CYcfsOjwwP+BaoAX+hgo8rEMNaogUH8DU078=;
- b=fPskwKqDEgrurRc37C0bhjPwyEQ41O4SG7mIYL1vcXH+vTbVzg1MpFKiDK2Ws67gvPLorc
- JzKkIYBIbeD1Y4pnyy3x+d4nD4gZHH9YJ8QflNrJUcYe3nOlfRsjBIoKJgzQ26aGLYKacR
- X2ll4jxZGgAJeyF3q5Bc7vzCn73VkCA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-107QygohNOCwK9JtiNHGBA-1; Mon, 29 Jun 2020 04:45:31 -0400
-X-MC-Unique: 107QygohNOCwK9JtiNHGBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F317B80058A;
- Mon, 29 Jun 2020 08:45:30 +0000 (UTC)
-Received: from starship (unknown [10.35.206.100])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C8125DAB8;
- Mon, 29 Jun 2020 08:45:29 +0000 (UTC)
-Message-ID: <595d2734b47ec58fb59ef45ccef1e3807e673b06.camel@redhat.com>
-Subject: Re: [PATCH 04/19] iotests.py: Add qemu_img_pipe_and_status()
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Mon, 29 Jun 2020 11:45:28 +0300
-In-Reply-To: <20200625125548.870061-5-mreitz@redhat.com>
-References: <20200625125548.870061-1-mreitz@redhat.com>
- <20200625125548.870061-5-mreitz@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jppTj-0003qo-Bn; Mon, 29 Jun 2020 04:49:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40594)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jppTi-00086y-1y; Mon, 29 Jun 2020 04:49:27 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h5so15659181wrc.7;
+ Mon, 29 Jun 2020 01:49:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WCSzq2VykjhePinNV6eYWl2enEGW52iXVRVhf0PKJ8E=;
+ b=oT9bGc1pDcKEQx85pR6AYO2VhKVuk9bl7zqG9GkpP4lTjqHkKsoRvW9rA9xbfwTPaH
+ ikd2GEmjc4Is8+imtle8rgwRc25VQ+ggjY6W4vvjjki9cUCVwyhfZRupr7D6d/umkbSy
+ MpJ4F0g8MZ5cVe7iPMZqd/L0LlKSUwPiWZfB89ZU2tn87kkjHG5lk2PPaw9Ezg2793fG
+ 96U0/7nJo9rfQn5+JMtdtlSaqBtFIdBF8eBx7yO6abKZ4fthCTyvnlE5J7NA5Z/CT6kJ
+ 7TgPa3UI4MxGgIx1cXOyPyu/8WXYEdnc5hqwJdYQlb1KuYPg+yQgm5s1lzQU6X9CnJbE
+ U07w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WCSzq2VykjhePinNV6eYWl2enEGW52iXVRVhf0PKJ8E=;
+ b=CbyDJdpqY+kMPFd6qcLuKO7nPNFazAX4Bxhv5hTZRKwb7zTq8kpcZL89X4W9oDt2Ks
+ XDp39eayjcH17DkrVrOZl7JsuzqSyH/zVdX1DQ8EjH+iMzvj27MA1lYOemvpd/yDxPkd
+ FyzEW9IMjFpOarQ37V00b2gFyL/o3Np8bMzn8Ynije6grOzuEpRt7O54YTudNvVojRR8
+ 2CHnYZjyrUrtzdjoGgW5KObbAcW1CmQ7EMjLsRFNPJhu2rqNC4jws91wmiEDbqRZN5Rp
+ xpugvluUi9ivMVFcSR6RtrmzTW9oCrFuBy96Gfa3kNn5G5kZDnQxNQE81b4ShBt309YJ
+ 1yng==
+X-Gm-Message-State: AOAM531jtABUtIfwuSF8RFJfwuIKukJ4yyfu5hZfwEtRulOwhiWK5c23
+ 1Yc0sEUc9nnHSf2G6Ikuf5A=
+X-Google-Smtp-Source: ABdhPJzHJi7rIjep4fvB6+SzyESENE4rxBFde0Dq29JT9Pw/McdRHDiOF5ucRmdgssbqFr7d+6c6cA==
+X-Received: by 2002:a5d:658a:: with SMTP id q10mr11170185wru.220.1593420564164; 
+ Mon, 29 Jun 2020 01:49:24 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id r3sm16181629wmh.36.2020.06.29.01.49.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 29 Jun 2020 01:49:23 -0700 (PDT)
+Subject: Re: [PATCH 01/17] hw/arm/spitz: Detabify
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200628142429.17111-1-peter.maydell@linaro.org>
+ <20200628142429.17111-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d9c6869e-6df4-c1cc-8078-bcfe2d5442cf@amsat.org>
+Date: Mon, 29 Jun 2020 10:49:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:10:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200628142429.17111-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,90 +104,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-06-25 at 14:55 +0200, Max Reitz wrote:
-> This function will be used by the next patch, which intends to check
-> both the exit code and qemu-img's output.
+On 6/28/20 4:24 PM, Peter Maydell wrote:
+> The spitz board has been around a long time, and still has a fair number
+> of hard-coded tab characters in it. We're about to do some work on
+> this source file, so start out by expanding out the tabs.
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> This commit is a pure whitespace only change.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  tests/qemu-iotests/iotests.py | 34 +++++++++++++++++-----------------
->  1 file changed, 17 insertions(+), 17 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 5ea4c4df8b..eee94e18cc 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -29,7 +29,7 @@ import struct
->  import subprocess
->  import sys
->  from typing import (Any, Callable, Dict, Iterable,
-> -                    List, Optional, Sequence, TypeVar)
-> +                    List, Optional, Sequence, Tuple, TypeVar)
->  import unittest
->  
->  # pylint: disable=import-error, wrong-import-position
-> @@ -90,15 +90,23 @@ luks_default_secret_object = 'secret,id=keysec0,data=' + \
->  luks_default_key_secret_opt = 'key-secret=keysec0'
->  
->  
-> -def qemu_img(*args):
-> -    '''Run qemu-img and return the exit code'''
-> -    devnull = open('/dev/null', 'r+')
-> -    exitcode = subprocess.call(qemu_img_args + list(args),
-> -                               stdin=devnull, stdout=devnull)
-> +def qemu_img_pipe_and_status(*args: str) -> Tuple[str, int]:
-> +    """
-> +    Run qemu-img and return both its output and its exit code
-> +    """
-> +    subp = subprocess.Popen(qemu_img_args + list(args),
-> +                            stdout=subprocess.PIPE,
-> +                            stderr=subprocess.STDOUT,
-> +                            universal_newlines=True)
-> +    exitcode = subp.wait()
->      if exitcode < 0:
->          sys.stderr.write('qemu-img received signal %i: %s\n'
->                           % (-exitcode, ' '.join(qemu_img_args + list(args))))
-> -    return exitcode
-> +    return (subp.communicate()[0], exitcode)
-> +
-> +def qemu_img(*args: str) -> int:
-> +    '''Run qemu-img and return the exit code'''
-> +    return qemu_img_pipe_and_status(*args)[1]
->  
->  def ordered_qmp(qmsg, conv_keys=True):
->      # Dictionaries are not ordered prior to 3.6, therefore:
-> @@ -140,17 +148,9 @@ def qemu_img_verbose(*args):
->                           % (-exitcode, ' '.join(qemu_img_args + list(args))))
->      return exitcode
->  
-> -def qemu_img_pipe(*args):
-> +def qemu_img_pipe(*args: str) -> str:
->      '''Run qemu-img and return its output'''
-> -    subp = subprocess.Popen(qemu_img_args + list(args),
-> -                            stdout=subprocess.PIPE,
-> -                            stderr=subprocess.STDOUT,
-> -                            universal_newlines=True)
-> -    exitcode = subp.wait()
-> -    if exitcode < 0:
-> -        sys.stderr.write('qemu-img received signal %i: %s\n'
-> -                         % (-exitcode, ' '.join(qemu_img_args + list(args))))
-> -    return subp.communicate()[0]
-> +    return qemu_img_pipe_and_status(*args)[0]
->  
->  def qemu_img_log(*args):
->      result = qemu_img_pipe(*args)
+> Couple of checkpatch errors due to the QUEUE_KEY macro which can
+> be ignored as this is just a detabify.
+> ---
+>  hw/arm/spitz.c | 156 ++++++++++++++++++++++++-------------------------
+>  1 file changed, 78 insertions(+), 78 deletions(-)
 
-You made me learn a bit about python type hints, and I don't regret it :-)
-Looks OK.
+'git-diff -w' -> no change.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
