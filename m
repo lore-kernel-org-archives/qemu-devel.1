@@ -2,130 +2,92 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B288EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFBEC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:21:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D05B235F7
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82909235FC
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:21:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GFKDnYQw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D05B235F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noGUIWCC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82909235FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpqtY-0002hN-Og
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:20:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58078)
+	id 1jpqv9-0003zA-Ql
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:21:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqsu-00021o-N8
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:19:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28807
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jpqst-0007Fm-5B
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:19:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593425970;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=gIOmuVUTz4GJvqnXTsn4KGEXLAhzbgDObg5/V7YiM7k=;
- b=GFKDnYQwF8ORckVWYn0Ir3nLW/3pV1lwJ1HDrCI5H1Jd73LBhwsIhDznz1VEcOUjvqrnX1
- AkVrwAJXGW0Ebb3Z1ouKIUgspnETjmyglBW6jhxYD44PP5Jbp7fBtpiz/gNNqHogRskUDJ
- gKe10qJs6gnhrJBL7QHkyWGAj3gJS+4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-gx1hlgq0Pf-IIYpEWJLfHg-1; Mon, 29 Jun 2020 06:19:29 -0400
-X-MC-Unique: gx1hlgq0Pf-IIYpEWJLfHg-1
-Received: by mail-wr1-f72.google.com with SMTP id y13so16380763wrp.13
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:19:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jpquJ-0003WD-TP
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:20:59 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33492)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jpquI-0007jE-FS
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:20:59 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f18so7909953wrs.0
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:20:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=D5eORhEFT/IzOxlqS7OiER5RHHIG68a7QP0BT4+g8R4=;
+ b=noGUIWCCddbePqXaJlpaiOM7Mg89H35Th/qTbjjElDyjwsUSCMpWqu13G3OOxuezjX
+ RAkyCSeS5rIMjmX/xn18fL8osruv7EUYQ3IDFTsxx0CmrZcmoVlxqqU3net/bx4GbhsV
+ P8V9hnIy00GtqISsavawoiIZPfmGlr9NtcHb5ABvn9fTNbMkpZxF/Mj44vOIneEKqrCl
+ kscN3JNHhHIllhsbIjPBDrMCshSn60yl/KdnVm80BQBOCOESK4Tya0TPI9YNhfNJ4Ekk
+ g1widJo5IdjQEtHZYNlAZWhGuPronNPy8LlgReay/dmPyuei4XYjhp0tFMt4veXg5u7L
+ 9gog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=gIOmuVUTz4GJvqnXTsn4KGEXLAhzbgDObg5/V7YiM7k=;
- b=s/AgYaVLYUYE3NiSWdweUv2TSONUV+vwsjxS5StBuVrciHrPZKZs8TNihhatJ04O/C
- KnawFVUly9I8NTEyWjo389WSheWm2k6w2zg+Niq7yUaNeXY/SByKiBy3wyLy4JSFXRE0
- dZvAIsK+K6SdPSmTn3zfMG0p8jmzYSHnw7Uvp3+ZtxbwCELT67s9pUlCGc4Q4R2fSutd
- d/dubCAkqGJi+MJRgb1h+rWSRi/rb/UZkDt0R30FZsH/XNppt4ybQlqUsm4vKeTUJQD6
- 3CG65oZNErmIds7uYZZ39iJN3fqhmZwFjwAq8CQ4tT6TdqanxJ/OE4oZ6lOESitYAzPR
- kkgQ==
-X-Gm-Message-State: AOAM531jLgHjGvFXzk/ydROZqXf/4I3fqFiRuHxlyUa1LiWPxd0sbRez
- KCFqrTKyu7vSzZ/nHTR1ZU8xrnPg6+0vG7xFZwu0DU+w0M4ITPtTPU9WyMim2Wv2wbJmkSIzLw6
- RpRtwP8De2OFcOp8=
-X-Received: by 2002:a5d:4051:: with SMTP id w17mr15615885wrp.183.1593425968004; 
- Mon, 29 Jun 2020 03:19:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZIfn7yRazt6qQwzRA6wcX5a8IcEe3G8Ltgxdn5U63PZeKL2dQ4croMZjyOWv2NyRUW7vW3w==
-X-Received: by 2002:a5d:4051:: with SMTP id w17mr15615862wrp.183.1593425967778; 
- Mon, 29 Jun 2020 03:19:27 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l190sm27380731wml.12.2020.06.29.03.19.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 29 Jun 2020 03:19:27 -0700 (PDT)
-Subject: Re: [PATCH] trivial: Respect alphabetical order of .o files in
- Makefile.objs
-To: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-References: <20200629094934.2081180-1-dinechin@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <6e396bb1-ecc9-8f2b-f1b5-68f78b0b156f@redhat.com>
-Date: Mon, 29 Jun 2020 12:19:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=D5eORhEFT/IzOxlqS7OiER5RHHIG68a7QP0BT4+g8R4=;
+ b=R7bqSTAfzeeC8P4sICqfRIxsRbCSiv0OWJwJTPHxgQ29GsGed7CNCia4r2IxTwLaKE
+ Ah9GNfYYVGH0lfsz2WjZRS6lpmpM8Q/fxAxfKL93jWrDVhBdOo6mvK89Miu0yLL/ruwR
+ p172jRSVYsNDQb+ukFfKVu8osDQsgroMLhY5pteKdLMs4k3Kha+fciqw1SHB1Q+XuFkA
+ 340bMeroBHaJljRhrOCa/r9iAbOZfGoUxw9KC71ORROHwQ7jpsdIgdE+/tf8BYf6Tsac
+ pIXo2g6NA/x9CE6Qs/pPZ+bBrCIC7pv64q5xU/j5WeicGztYV2fiI8S5CbGNGecO9FYA
+ 4WHw==
+X-Gm-Message-State: AOAM5311CsCwPCigTG5rNge6Wa8Iq9dJ03G4WfyJUPuKSJjLT1dh1ual
+ JZFQIzrWusqpE6R8dLE0S3IQtG6THfc=
+X-Google-Smtp-Source: ABdhPJy0PUQVdorAhgSesjPsx1YWXd5m2n6EO+DxOmVneQloBFBwTVSVz231k+ott3bl3X3QQ4HBLQ==
+X-Received: by 2002:adf:aad3:: with SMTP id i19mr16482107wrc.359.1593426056877; 
+ Mon, 29 Jun 2020 03:20:56 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id 125sm29648757wmc.23.2020.06.29.03.20.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 03:20:56 -0700 (PDT)
+Date: Mon, 29 Jun 2020 11:20:54 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Lin Ma <LMa@suse.com>
+Subject: Re: [PATCH v2 1/3] block: Add bdrv_co_get_lba_status
+Message-ID: <20200629102054.GE31392@stefanha-x1.localdomain>
+References: <AM6PR04MB57820B6AA7FCB70AB82D4EA9C5920@AM6PR04MB5782.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200629094934.2081180-1-dinechin@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="0H629O+sVkh21xTi"
+Content-Disposition: inline
+In-Reply-To: <AM6PR04MB57820B6AA7FCB70AB82D4EA9C5920@AM6PR04MB5782.eurprd04.prod.outlook.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,38 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 11:49 AM, Christophe de Dinechin wrote:
-> The vmgenid.o is the only file that is not in alphabetical order.
-> 
-> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
-> ---
->  stubs/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index f32b9e47a3..1df8bb3814 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -19,10 +19,10 @@ stub-obj-y += replay.o
->  stub-obj-y += runstate-check.o
->  stub-obj-$(CONFIG_SOFTMMU) += semihost.o
->  stub-obj-y += set-fd-handler.o
-> -stub-obj-y += vmgenid.o
->  stub-obj-y += sysbus.o
->  stub-obj-y += tpm.o
->  stub-obj-y += trace-control.o
-> +stub-obj-y += vmgenid.o
->  stub-obj-y += vmstate.o
->  stub-obj-$(CONFIG_SOFTMMU) += win32-kbd-hook.o
->  
-> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+--0H629O+sVkh21xTi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jun 25, 2020 at 01:07:14PM +0000, Lin Ma wrote:
+> On 2020-06-25 20:59, Lin Ma wrote:
+> > Please initialize is_deallocated to false at the beginning of the
+> > function to avoid accidental uninitialized variable accesses in the
+> > caller.
+>=20
+> It has already been initialized to 0 by 'data =3D g_new0(GetLbaStatusCBDa=
+ta, 1);'
+> in function scsi_disk_emulate_get_lba_status of patch 3/3, Do I still nee=
+d to
+> initialize it at the beginning of this function?
+
+It's safer to set output arguments in all code paths. That way callers
+don't need to remember to initialize the variable to a specific value
+(false in this case).
+
+You can leave this assumptnion but please include it in the doc comment
+so it's clear that callers are responsible for setting it to false.
+
+Stefan
+
+--0H629O+sVkh21xTi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl75wIYACgkQnKSrs4Gr
+c8hmOgf+I2orgxYuq87bFRJNql1C6YarEfTccLe6KZq2jCC3DQCiaHmm3VT34+dS
+9qYkhvpRQRMW2rYRtxHUa1CCiRmduuyt1hVZl85zXQwi7cFgxYuofIy0l+hgESO7
+uvYRltc/QDH2yUnBLUrjYw8/rC/lpgfvwCBSrAAZ5i6RiXDP9FYhDDyR59jst1yh
+CYYU1sVxY0FJmkekdiEJ3pkaY7y3bchHYEhvcvUcMUkDS6PUFqe/j8M2K0P9x76j
+jCl1p2R6la7V4puNC/9XBtnpPM2BrXODWKRfBGfifAkOmLErOUhOBeikGj9ihZte
+rLgEXPLUXVVkVn3RTgbuCb3sCvBEmg==
+=dDZz
+-----END PGP SIGNATURE-----
+
+--0H629O+sVkh21xTi--
 
