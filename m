@@ -2,89 +2,90 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAF2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4804C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:45:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B908A23770
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E55123787
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 10:45:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cRwbeRyl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B908A23770
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pdl1wE4N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E55123787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jprH4-00088G-1I
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:44:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35934)
+	id 1jprIQ-0001Fd-Of
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 06:45:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jprF4-0005lk-SR
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:42:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29829
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jprF2-0002nv-TD
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:42:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593427342;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tPDS8QkkO6FT+RCP1Mm+gPn5DvMtX+ARZiMcXqWUGWQ=;
- b=cRwbeRylrJ5vHcy3nZWNUUC2CYAFwpD2JVQDEfNsOrPEL+jBGq5ntXKN7Wyw0i0KthRJRn
- ntLOVOk+T0uE8tN+Y2Uz0fAZTQjv5TldJRngMeFssQrk5CT2rZ6Ex3tZFQJrb9Ym7KZHmh
- buSTYis5Iurlqryz1BNIqlVnW0juvCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-Ze12C2PSNbKxubBYIN9ebg-1; Mon, 29 Jun 2020 06:42:19 -0400
-X-MC-Unique: Ze12C2PSNbKxubBYIN9ebg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADBA5800D5C;
- Mon, 29 Jun 2020 10:42:17 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-140.ams2.redhat.com [10.36.112.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3CEC5D9CD;
- Mon, 29 Jun 2020 10:42:12 +0000 (UTC)
-Subject: Re: [PATCH v3 26/30] gitlab: enable check-tcg for linux-user tests
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200626181357.26211-1-alex.bennee@linaro.org>
- <20200626181357.26211-27-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <80c18d72-f0eb-2623-1fd1-0205f4c42995@redhat.com>
-Date: Mon, 29 Jun 2020 12:42:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jprHS-0000Qu-6l
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:44:54 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44918)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jprHP-0003BU-70
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 06:44:53 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 5so13014624oty.11
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 03:44:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=H++5/gUeSQbzk2qIpP5YH4q4Yy3WRFaFB4PEMrTFYJk=;
+ b=Pdl1wE4NbpRJTYtny+RI06jUpWndkN1x8mEUJelZOqZfInLInhnXR+el3X1/TKGwSZ
+ VsmGJ8vwNN0oelRcvGgW6vcnj3MUx7tqy4wCSoV1LLyy2r0kJOJPRYkh/f35oeIeNM7z
+ tkOFUpPuKGTPNtWn9tnIB5LfNJvkPDgmat9vw1pQ62y2ufLBfKKSxP/3CztY+bgiQgS4
+ QhZUp9yxhInSw5KyhTpTvZUvA/iMz7Jc8aQZ43MwuuohhozFEIap+OZJaosPIthw0oQ9
+ 4jEketZ75eKAQ82y02y55RkuOVnl7/J44dHX7BbLcFQRouIScQ2OgqEFHNbEwrMw95FO
+ 7IPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=H++5/gUeSQbzk2qIpP5YH4q4Yy3WRFaFB4PEMrTFYJk=;
+ b=dz4lmeEFYZWC7Hg4SevX3bd/H0fMdjfZ87TxxAVPZgFk7hfsLAMiSItR8WpaElBbhV
+ hUDOfvF9XAlxzMuJYtG27Ak58k5q4wv5EyoUutityBo6/7ote16hPNjz5JmcL0wBdMq+
+ Mk9GPfwuu6TLbv3xfDbhyyG8iAPhJ1wPw5uROJytu0dFI/n8fV5d3mOZDHJvfEzWt49U
+ J/NvHpuaLCtPO10YqZkgHo8mZZnBtqLk7q9pA3ZpZKGgCKgL14DD0Fq5gVQXJxiOWEl7
+ hKp4uGcAiRC134ejj2UUyYCwCnSNGFkGoN25nl47j53nySnIooj2PffvnrmQak0kcZdb
+ NsVQ==
+X-Gm-Message-State: AOAM530voU6bvLTdm3WnuIJcyMSEaGIFVJ3Msr6QvrvOK7h82KSLsRW5
+ 4sm1cNUwZrPg0BOS27NIqysZ2mpG8H6a8XiTPLM=
+X-Google-Smtp-Source: ABdhPJyw11jbhQGOt3GYvlunv6Ntz5tQcL8tKPhkdbZJJVwdp6ssON158qx5tI0YA+HDkCEUs6Gk802DSZZ0Y4YuQ10=
+X-Received: by 2002:a05:6830:1ad5:: with SMTP id
+ r21mr9177669otc.181.1593427490013; 
+ Mon, 29 Jun 2020 03:44:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200626181357.26211-27-alex.bennee@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-8-ppandit@redhat.com>
+ <7ffe6cd9-fc23-3fdf-6c57-7bb0af0dd030@redhat.com>
+ <nycvar.YSQ.7.77.849.2006251427210.92950@xnncv>
+ <CAFEAcA9yP=y9nzvqs_GZF=n9EXz7SPY4kiR6ZqHF+T+f7mnV5g@mail.gmail.com>
+In-Reply-To: <CAFEAcA9yP=y9nzvqs_GZF=n9EXz7SPY4kiR6ZqHF+T+f7mnV5g@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 29 Jun 2020 18:44:14 +0800
+Message-ID: <CAKXe6S+E2gnqmSnPbDkj+Dh-KAHvPwSCw+jSb7QmgxWzTO=wyA@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] tz-ppc: add dummy read/write methods
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +98,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, richard.henderson@linaro.org,
- f4bug@amsat.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- cota@braap.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/06/2020 20.13, Alex Bennée wrote:
-> Switch to building in the new debian-all-test-cross image which has
-> most of the cross compilers inline.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->   .gitlab-ci.yml | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 5ae8130bd1a..17c3349dd9e 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -140,10 +140,9 @@ build-tcg-disabled:
->   build-user:
->     <<: *native_build_job_definition
->     variables:
-> -    IMAGE: ubuntu2004
-> -    CONFIGURE_ARGS: --disable-system --disable-guest-agent
-> -      --disable-capstone --disable-slirp --disable-fdt
-> -    MAKE_CHECK_ARGS:  run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
-> +    IMAGE: debian-all-test-cross
-> +    CONFIGURE_ARGS: --disable-tools --disable-system
-> +    MAKE_CHECK_ARGS: check-tcg
->   
->   build-clang:
->     <<: *native_build_job_definition
-> 
+Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B46=E6=9C=8825=
+=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:22=E5=86=99=E9=81=93=EF=BC=
+=9A
+>
+> On Thu, 25 Jun 2020 at 10:18, P J P <ppandit@redhat.com> wrote:
+> >
+> > +-- On Thu, 25 Jun 2020, Philippe Mathieu-Daud=C3=A9 wrote --+
+> > | > @@ -196,7 +196,22 @@ static bool tz_ppc_dummy_accepts(void *opaque,=
+ hwaddr addr,
+> > | >      g_assert_not_reached();
+> > |
+> > | This is a shame we now have to fill the read/write handlers for
+> > | unreachable code :(
+> > |
+> > | > +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsig=
+ned size)
+> > |
+> > | I'd instead use a clearer:
+> > |        g_assert_not_reached();
+> > |
+> > | > +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
+> > |
+> > | Ditto:
+> > |        g_assert_not_reached();
+> >
+> > This will likely be called in tz_ppc_dummy_accepts() above. Do we still=
+ want
+> > to revise this patch? considering read/write callbacks are unreachable.
+>
+> The point of g_assert_not_reached() is that it documents and
+> asserts that the code is not reachable. If the read and write
+> callbacks are unreachable (which they are) then having their
+> bodies just be a call to g_assert_not_reached() is the best
+> way to document that.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I agree with this.
 
+Thanks,
+Li Qiang
+
+>
+> thanks
+> -- PMM
 
