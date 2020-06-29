@@ -2,69 +2,57 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4542DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC00C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BCCF206A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:36:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BCCF206A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 308B7206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308B7206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq1Rl-0000Cr-Bx
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:36:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55882)
+	id 1jq1TJ-0001LG-Ff
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:37:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jq1Nf-0005hj-7Y; Mon, 29 Jun 2020 17:31:59 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:39586)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jq1Q5-0007ja-3S; Mon, 29 Jun 2020 17:34:29 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46488)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jq1Nb-0005Sr-87; Mon, 29 Jun 2020 17:31:58 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 4151D74594E;
- Mon, 29 Jun 2020 23:31:52 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D41CF745712; Mon, 29 Jun 2020 23:31:51 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id D1D907456F8;
- Mon, 29 Jun 2020 23:31:51 +0200 (CEST)
-Date: Mon, 29 Jun 2020 23:31:51 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 2/4] smbus: Fix spd_data_generate() error API violation
-In-Reply-To: <731e8765-4886-3bfe-b877-06078d0e977d@amsat.org>
-Message-ID: <alpine.BSF.2.22.395.2006292127520.63145@zero.eik.bme.hu>
-References: <20200422134815.1584-1-armbru@redhat.com>
- <20200422134815.1584-3-armbru@redhat.com>
- <alpine.BSF.2.22.395.2004221622140.19234@zero.eik.bme.hu>
- <0af0e0f0-8127-da83-d9d2-89a3fe28f778@redhat.com>
- <alpine.BSF.2.22.395.2004222053070.22480@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2006261315070.94870@zero.eik.bme.hu>
- <87k0ztrn9m.fsf@dusky.pond.sub.org>
- <731e8765-4886-3bfe-b877-06078d0e977d@amsat.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jq1Q2-0005py-IB; Mon, 29 Jun 2020 17:34:28 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 92469BF450;
+ Mon, 29 Jun 2020 21:34:23 +0000 (UTC)
+Date: Mon, 29 Jun 2020 23:34:16 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 0/2] hw/block/nvme: handle transient dma errors
+Message-ID: <20200629213408.qlehce2mtgqodqd6@apples.localdomain>
+References: <20200629202053.1223342-1-its@irrelevant.dk>
+ <159346486377.15477.6186679362319226240@d1fd068a5071>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- BOUNDARY="3866299591-312647824-1593462711=:63145"
-Content-ID: <alpine.BSF.2.22.395.2006292249390.63145@zero.eik.bme.hu>
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 17:31:52
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <159346486377.15477.6186679362319226240@d1fd068a5071>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 14:26:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,283 +65,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, k.jensen@samsung.com, kbusch@kernel.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Jun 29 14:07, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200629202053.1223342-1-its@irrelevant.dk/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+> --- /tmp/qemu-test/src/tests/qemu-iotests/040.out       2020-06-29 20:12:10.000000000 +0000
+> +++ /tmp/qemu-test/build/tests/qemu-iotests/040.out.bad 2020-06-29 20:58:48.288790818 +0000
+> @@ -1,3 +1,5 @@
+> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
+> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
 
---3866299591-312647824-1593462711=:63145
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
-Content-ID: <alpine.BSF.2.22.395.2006292249391.63145@zero.eik.bme.hu>
 
-On Mon, 29 Jun 2020, Philippe Mathieu-Daud� wrote:
-> On 6/27/20 9:17 AM, Markus Armbruster wrote:
->> BALATON Zoltan <balaton@eik.bme.hu> writes:
->>> On Wed, 22 Apr 2020, BALATON Zoltan wrote:
->>>> On Wed, 22 Apr 2020, Philippe Mathieu-Daudé wrote:
->>>>> On 4/22/20 4:27 PM, BALATON Zoltan wrote:
->>>>>> On Wed, 22 Apr 2020, Markus Armbruster wrote:
->>>>>>> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
->>>>>>> pointer to a variable containing NULL.  Passing an argument of the
->>>>>>> latter kind twice without clearing it in between is wrong: if the
->>>>>>> first call sets an error, it no longer points to NULL for the second
->>>>>>> call.
->>>>>>>
->>>>>>> spd_data_generate() can pass @errp to error_setg() more than once when
->>>>>>> it adjusts both memory size and type.  Harmless, because no caller
->>>>>>> passes anything that needs adjusting.  Until the previous commit,
->>>>>>> sam460ex passed types that needed adjusting, but not sizes.
->>>>>>>
->>>>>>> spd_data_generate()'s contract is rather awkward:
->>>>>>>
->>>>>>>    If everything's fine, return non-null and don't set an error.
->>>>>>>
->>>>>>>    Else, if memory size or type need adjusting, return non-null and
->>>>>>>    set an error describing the adjustment.
->>>>>>>
->>>>>>>    Else, return null and set an error reporting why no data can be
->>>>>>>    generated.
->>>>>>>
->>>>>>> Its callers treat the error as a warning even when null is returned.
->>>>>>> They don't create the "smbus-eeprom" device then.  Suspicious.
->>>>>>>
->>>>>>> Since the previous commit, only "everything's fine" can actually
->>>>>>> happen.  Drop the unused code and simplify the callers.  This gets rid
->>>>>>> of the error API violation.
->>>>>>
->>>>>> This leaves board code no chance to recover from values given by
->>>>>> user that won't fit without duplicating checks that this function
->>>>>> does. Also this will abort without giving meaningful errors if an
->>>>>> invalid value does get through and result in a crash which is not
->>>>>> used friendly. So I don't like this but if others think this is
->>>>>> acceptable maybe at least unit test should be adjusted to make
->>>>>> sure aborts cannot be triggered by user for values that are not
->>>>>> usually tested during development.
->>>>>
->>>>> Agreed. Do you have an example (or more) to better show Markus this
->>>>> code use? So we can add tests.
->>>>
->>>> After Markus's patches probably nothing uses it any more but this
->>>> comes with the result that previously giving some random value such
->>>> as -m 100 did produce a working sam460ex machine after some warnings
->>>> but now it just thows back some errors to the user which may or may
->>>> not be helpful to them.
->>>>
->>>>> Personally I'd use a script to generate a dumb static array of all
->>>>> possible sizes...
->>>>
->>>> Maybe testing with the biggest valid value such as -m 2048 (that's
->>>> commonly used probably) and an invalid value such as -m 100 might be
->>>> enough. Testing all possible values might take too long and would
->>>> not test what happens with invalid values. Ideally those invalud
->>>> values should also work like before a0258e4afa but should at least
->>>> give a meaningful warning so the user can fix the command line
->>>> without too much head scratching. Actually that commit was from Igor
->>>> not from Marcus so sorry for attributing that to Marcus too, I
->>>> remembered wrong.
->>>>
->>>> By the way you could argue that on real machine you cannot plug
->>>> certain combinations of memory modules so it's enough to model that
->>>> but I think QEMU does not have to be that strict and also support
->>>> configs that cannot happen on real hadware but would work. This
->>>> might be useful for example if you have some ammount of memory to
->>>> set aside for a VM on a host but that's not a size that exists in
->>>> memory modules on real hardware. This also works on pc machine in
->>>> qemu-system-i386 for example: it accepts -m 100 and does its best to
->>>> create a machine with such unrealistic size. The sam460ex did the
->>>> same (within SoC's limits) and before a0258e4afa -m 100 was fixed up
->>>> to 96 MB which is now not possible due to change in QEMU internal
->>>> APIs. This probably isn't important enough to worth the extra effort
->>>> to support but would have been nice to preserve.
->>>
->>> Besides the above here's another use case of the fix ups that I wanted
->>> to keep:
->>>
->>> https://patchew.org/QEMU/cover.1592315226.git.balaton@eik.bme.hu/b5f4598529a77f15f554c593e9be2d0ff9e5fab3.1592315226.git.balaton@eik.bme.hu/
->>>
->>> This board normally uses OpenBIOS which gets RAM size from fw_cfg and
->>> so works with whatever amount of RAM (also Linux booted with -kernel
->>> probably does not care) so any -memory value is valid. However some
->>> may want to also use original firmware ROM for compatibility which
->>> detects RAM reading SPD eeproms (the i2c emulation needed for that is
->>> not working yet but once that's fixed this will be the case). I want
->>> to add smbus_eeproms for this but do not want to just abort for cases
->>> where -memory given by user cannot be covered with SPD data. Instead a
->>> warning and covering as much RAM as possible should be enough (the ROM
->>> will detect less RAM than given with -m
->>> but that's OK and better than just bailing out without a message
->>> tripping an assert). But I don't want to replicate in board code the
->>> calculation and checks the spd_data_generate() function does anyway
->>> (that would just puzzle reviewers for every use of this functions).
->>>
->>> Previously this was possible with my original spd_data_generate()
->>> implementation. What's your suggestion to bring that functionality
->>> back without breaking Error API? Maybe adding new parameters to tell
->>> the spd_data_generate() which fixups are allowed?
->>
->> Quick reply without having thought through the issues at all: I'm not
->> opposed to you doing work to enable additional or even arbitrary memory
->> sizes where these actually work.  I'm first and foremost opposed to me
->> wasting time on "improving" code that is not used for anything.  That's
->> why I dumbed down spd_data_generate().
->
-> I'm starting to understand Zoltan point. What I'm seeing is Zoltan using
-> a hobbyist code, that just happens to work for hobbyists, but get in the
-> way of enterprise quality standards.
+Hmm, I can't seem to reproduce this locally and the test succeeded on
+the next series[1] that is based on this.
 
-This is not necessarily a conflict between hobbyist vs enterprise but more 
-like different view on what the qemu-system-* CLI should be. I think the 
-CLI is the main human interface of QEMU as it does not really provide a 
-GUI for configuring or running VMs (as for example VirtualBox does, QEMU 
-only has minimal GUI to view and control running VMs) so users are forced 
-to use either the command line or maybe an external management frontend, 
-but for simple things (like hobbyist use) that's an overkill and also not 
-a good match as those are designed for enterprise use. (Also these 
-hobbyist are on Windows or macOS where these management apps are not 
-available and getting a working QEMU binary is already a challenge.)
+Is this a flaky test? Or a bad test runner? I'm of course worried when
+a qcow2 test fails and I touch something else than the nvme device ;)
 
-The problem is that these management frontends don't have a proper API to 
-control QEMU but abuse the CLI and QEMU monitor for this which are 
-supposed to be human interfaces at the first place but changing the 
-commands for the needs of management apps result in arcane command lines. 
-Note that humans and management apps likely have different requirements so 
-if you mean hobbyist = human and enterprise = management frontend then 
-that's about what my problem is. I think humans and management apps could 
-coexist using the same interfaces if these cannot be cleanly separated (as 
-that would need either changing management apps to use something else than 
-the main human interface or providing proper GUI or CLI frontend for 
-humans) but if they use the same CLI then allowing some convenience 
-commands to make the life of humans easier should not be forbidden. 
-Running a VM should be simple and not require typing multiple lines of 
-options just to result in an error that something is not what QEMU thinks 
-is acceptable even though it could work and could be fixed. That's really 
-annoying for a human but may be desirable for a management app so it does 
-not need to check it got what it think it specified.
 
-> Zoltan doesn't have the skills/time/motivation to rework its working
-> code to meet the enterprise quality level. Enterprise developers tried
-> to understand twice (first Igor, then Markus) the hobbyist use to get
-> it done safer, so it can stay maintained.
-
-Of course I don't have time or motivation to make it enterprise quality 
-when I work unpayed on this in my free time and for fun. I already spend 
-too much time with this so while I try to make it good enough to be 
-included upstream the direction is clearly different than what enterprise 
-users need. But that's OK as the machines I work with are not really used 
-in an enterprise setting and mostly used by hobbyists, but if some of the 
-components or machines could be useful to enterprise people I expect them 
-to put in the effort to get them to enterprise level.
-
-But this probably does not apply to the very problem discussed here. When 
-I've added new machines (apart from sam460ex also pegasos2 which is not 
-upstream yet and now hopefully Mac machines soon too) these needed SPD 
-eeproms because their firmwares detected RAM based on it. There were some 
-already existing boards which emulated SPD but these were ad-hoc 
-implementations without any commonality. To avoid increasing the mess by 
-adding a few more independent SPD emulations that would get out of sync 
-I've spent some time to come up with a common function that could be used 
-by all these boards and the new ones I wanted to add. The goal of this 
-function was to put SPD emulation in a single place and make it easy for 
-board code to use it without needing to duplicate code.
-
-Also Marcus mentioned uniformity between machines: Most machines, like pc 
-ones accept any memory size such as -m 100 even though on real hardware 
-it's not possible but can work with the firmware in QEMU that usually take 
-this info from FW_CFG or something else and not resticted by SPD data. I 
-wanted to do the same in sam460ex and allow it to use any memory size 
-exactly for uniformity besides used convenience, even though that machine 
-has some constraints so it required to fix up RAM size to meet those 
-constraints. So -m 100 would result in 96 MB of RAM that the SoC and 
-firmware can handle and is closest to what the user intended. This worked 
-well until Igor changed memory allocation to memdev (which I don't even 
-know what it is: some enterprise stuff not really needed for hobbyists but 
-maybe could be useful e.g. to save guest memory image so why not) but this 
-required getting rid of fix ups of memory size in boards (sam460ex wasn't 
-the only one) beacuse memdev could not support this for some reason and 
-Igor did not want to add that (even though I've proposed some designs, you 
-can look up in patch review). So this broke fix ups, then Marcus noticed 
-that errors reporting via err object cannot be used for warnings as I've 
-tried to use so to fix it he just removed all the reamaining traces of it 
-thereby making it more difficult to add SPD eeproms to mac_oldworld 
-without duplicating the removed checks in board code which I wanted to 
-avoid because:
-
-1. This is knowledge about SPD eeproms that should be in that func
-2. Would duplicate non-trivial code in boards that would puzzle reviewers 
-and is error prone too.
-
-> Zoltan, I guess I understood your use and have an idea to rework it in
-> a way that everybody is happy, but as Markus said, since the freeze is
-> next week, I won't have time to get it done in this short amount of
-> time.
-
-It's not urgent but if we can agree on something that's acceptable for 
-everyone I may be able to submit a patch but don't want to put in effort 
-if it will be turned down anyway due to nothing else than the current 
-solution being acceptable based on principles over convenience. Arguing 
-with Markus about it before got me that impression so I'd rather ask 
-before wasting time with it.
-
-> From the PPC460EX-NUB800T-AMCC-datasheet-11553412.pdf datasheet I
-> understand the 460EX can support "Up to 8 GB in four external banks",
-> but the SAM 460ex board only wires a single bank (to the SODIMM
-> connector). You want to use a virtual board with up-to 4 banks in
-> use, right?
-
-No, the firmware won't check additional banks because it only checks the 
-one wired. So what we need is to put as much RAM as possible on that 
-SODIMM (and we can use that SoC can handle both DDR and DDR2) but since 
-it's already broken and limited to valid SODIMM sizes due to memdev not 
-supporting memory size fix ups fixing this again is not high priority.
-
-What I'd like is reverting f26740c61a57f and fix that some other way so I 
-don't have to duplicate size check in board code as can be seen in the 
-patchew link above but could just call spd_data_generate() to do its job. 
-This was discussed at the time that patch was in review you can read it 
-here:
-
-http://patchwork.ozlabs.org/project/qemu-devel/patch/20200420132826.8879-3-armbru@redhat.com/
-
-My points were not really considered then, now that I have another use 
-case maybe it could be revisited and fixed. What I want is to be able to 
-call spd_data_generate() from board code with whatever siz� (the board 
-does not need to know about SPD limits and so cannot pre-check the size) 
-and the function should return the largest possible size SPD and some 
-indication if the size was not used completely. If Error cannot be used 
-for this, return the message or error some other way but let the board 
-code decide if it wants to abort or it can use the smaller SPD. Do not 
-assert in the helper function. Maybe the DIMM type fix up can be dropped 
-and only keep the size fix up so then we don't need to use error twice, 
-the board could call the function again if a different type is also 
-acceptable, since only sam460ex would need this I can do that there for 
-type fixup and call spd_data_generate() again with DDR2 if first one with 
-DDR could not fit all ram. But at least the asserts should be dropped for 
-this and the size check brought back. Then adding SPD to mac_oldworld 
-could also be done by calling spd_data_generate() instead of duplicating 
-the checks this function does anyway. This board has three slots so if 
-user says -m 1400 it would call spd_data_generate() with 1400 first, get 
-back 512 SPD that it adds to first slot then calls spd_data_generate() 
-again with 888, gets 512 again that it adds to 2nd slot and calls 
-spd_data_generate() for last slot with 376 which would give 256 and 120 
-remaining that it may warn the user about but still continue because the 
-SPD data is only used by a ROM from real hardware (that may be used for 
-compatibility with some software) but the default OpenBIOS disregards SPD 
-data and would still use 1400 so it's not an error to abort on. Simply if 
-using a firmare ROM then only 1280 MB of the 1400 will be available due to 
-its limitations but that's not a reason to force users to change their 
-command line. Printing a warning is enough to hint they may use different 
-value but aborting without an error message on an assert which is the 
-current situation is not really a user friendly way.
-
-Hopefully at least somebody will read it up to this point, sorry for 
-writing that much but hopefully this explains my point of view.
-
-Regards,
-BALATON Zoltan
---3866299591-312647824-1593462711=:63145--
+  [1]: https://patchew.org/QEMU/20200629203155.1236860-1-its@irrelevant.dk/
 
