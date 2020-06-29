@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B111FC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B79EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 896AD2076C
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:50:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 896AD2076C
+	by mail.kernel.org (Postfix) with ESMTPS id 64153206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:51:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64153206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq1f8-0000hV-QH
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59742)
+	id 1jq1gc-0002qE-NQ
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:51:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1df-0007JK-2x
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46552)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dg-0007Kk-31
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:32 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46556)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dc-00084t-8j
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:30 -0400
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1jq1dc-000855-De
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:48:31 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id BB9CFBF724
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 21:48:26 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 2D919BF783
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 21:48:27 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] hw/block/nvme: refactor identify active namespace id
- list
-Date: Mon, 29 Jun 2020 23:48:22 +0200
-Message-Id: <20200629214825.1283673-2-its@irrelevant.dk>
+Subject: [PATCH v2 3/4] pci: allocate pci id for nvme
+Date: Mon, 29 Jun 2020 23:48:24 +0200
+Message-Id: <20200629214825.1283673-4-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200629214825.1283673-1-its@irrelevant.dk>
 References: <20200629214825.1283673-1-its@irrelevant.dk>
@@ -53,7 +52,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,39 +71,89 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Prepare to support inactive namespaces.
+The emulated nvme device (hw/block/nvme.c) is currently using an
+internal Intel device id.
+
+Prepare to change that by allocating a device id under the 1b36 (Red
+Hat, Inc.) vendor id.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Acked-by: Keith Busch <kbusch@kernel.org>
+Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ MAINTAINERS            |  1 +
+ docs/specs/nvme.txt    | 23 +++++++++++++++++++++++
+ docs/specs/pci-ids.txt |  1 +
+ include/hw/pci/pci.h   |  1 +
+ 4 files changed, 26 insertions(+)
+ create mode 100644 docs/specs/nvme.txt
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 4bcd114f76b1..eaee420219fd 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1573,16 +1573,16 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
-     uint32_t min_nsid = le32_to_cpu(c->nsid);
-     uint32_t *list;
-     uint16_t ret;
--    int i, j = 0;
-+    int j = 0;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dec252f38b1d..7d190ae364e1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1796,6 +1796,7 @@ L: qemu-block@nongnu.org
+ S: Supported
+ F: hw/block/nvme*
+ F: tests/qtest/nvme-test.c
++F: docs/specs/nvme.txt
  
-     trace_pci_nvme_identify_nslist(min_nsid);
+ megasas
+ M: Hannes Reinecke <hare@suse.com>
+diff --git a/docs/specs/nvme.txt b/docs/specs/nvme.txt
+new file mode 100644
+index 000000000000..56d393884e7a
+--- /dev/null
++++ b/docs/specs/nvme.txt
+@@ -0,0 +1,23 @@
++NVM Express Controller
++======================
++
++The nvme device (-device nvme) emulates an NVM Express Controller.
++
++
++Reference Specifications
++------------------------
++
++The device currently implements most mandatory features of NVMe v1.3d, see
++
++  https://nvmexpress.org/resources/specifications/
++
++for the specification.
++
++
++Known issues
++------------
++
++* The accounting numbers in the SMART/Health are reset across power cycles
++
++* Interrupt Coalescing is not supported and is disabled by default in volation
++  of the specification.
+diff --git a/docs/specs/pci-ids.txt b/docs/specs/pci-ids.txt
+index 4d53e5c7d9d5..abbdbca6be38 100644
+--- a/docs/specs/pci-ids.txt
++++ b/docs/specs/pci-ids.txt
+@@ -63,6 +63,7 @@ PCI devices (other than virtio):
+ 1b36:000b  PCIe Expander Bridge (-device pxb-pcie)
+ 1b36:000d  PCI xhci usb host adapter
+ 1b36:000f  mdpy (mdev sample device), linux/samples/vfio-mdev/mdpy.c
++1b36:0010  PCIe NVMe device (-device nvme)
  
-     list = g_malloc0(data_len);
--    for (i = 0; i < n->num_namespaces; i++) {
--        if (i < min_nsid) {
-+    for (int i = 1; i <= n->num_namespaces; i++) {
-+        if (i <= min_nsid) {
-             continue;
-         }
--        list[j++] = cpu_to_le32(i + 1);
-+        list[j++] = cpu_to_le32(i);
-         if (j == data_len / sizeof(uint32_t)) {
-             break;
-         }
+ All these devices are documented in docs/specs.
+ 
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 2347dc36bfb5..7e565ba03262 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -104,6 +104,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
+ #define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
+ #define PCI_DEVICE_ID_REDHAT_MDPY        0x000f
++#define PCI_DEVICE_ID_REDHAT_NVME        0x0010
+ #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+ 
+ #define FMT_PCIBUS                      PRIx64
 -- 
 2.27.0
 
