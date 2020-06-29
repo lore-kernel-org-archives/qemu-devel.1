@@ -2,87 +2,90 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BACEDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 12:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 715A2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 12:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8645423B23
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 12:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 395EA23B23
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 12:16:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixKimUjt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8645423B23
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tkRr1fBG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 395EA23B23
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpsdK-0007Ia-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 08:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34124)
+	id 1jpsiR-0001BM-Ge
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 08:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpsbk-0006Q9-9H
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 08:09:56 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36195
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpsbh-0001WR-6m
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 08:09:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593432591;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=fQnOtbN1Nslzs6MCLRwR9Rwoe28FDZGyTzzZtbcw+/I=;
- b=ixKimUjtcV1233nPoW7MquKy/E4fCx9aS9pXkxqyNO82eIg7+cz/nY6586nijibfggVU5u
- l6fUIvYQu5cZR0PN+3I53u4N+FCW39DNYYFPZGg+qDkYwfHvd98EDDnVH6Opo2sC0ihFGW
- YTToGpvBk8M/Lk1D1slL9QRL+kJup4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-Y6GNt4e0OUGLwf_vweoWKg-1; Mon, 29 Jun 2020 08:09:49 -0400
-X-MC-Unique: Y6GNt4e0OUGLwf_vweoWKg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AB87804002;
- Mon, 29 Jun 2020 12:09:48 +0000 (UTC)
-Received: from work-vm (ovpn-114-210.ams2.redhat.com [10.36.114.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8487C7CAC5;
- Mon, 29 Jun 2020 12:09:41 +0000 (UTC)
-Date: Mon, 29 Jun 2020 13:09:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 08/14] migration: add new migration state wait-unplug
-Message-ID: <20200629120939.GI2908@work-vm>
-References: <20191029225932.14585-1-mst@redhat.com>
- <20191029225932.14585-9-mst@redhat.com>
- <CAFEAcA8uSbC80a+yB4_DFtCB1_-sXW5R3ugTX6H9XDeBZV-mQQ@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpsga-0008AI-2T
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 08:14:56 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42303)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jpsgW-0002Y1-16
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 08:14:55 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 76so813474otu.9
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 05:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=hW7yJXdhX/RvTJ5BItP5eRGZZ96HIYQvPLkD9KDjX3M=;
+ b=tkRr1fBGDeuePD3eNQxMULwrOxOuDeoeB2o6LC4Mlsv0dhDXWv/u7fYm5bf6lyif/G
+ PVTup3xkx7HM6OPTVue+MWMOvzU6OcQpVs6ZopL6GMAtj4UxAo+YhRjs3jogqdf/z6qw
+ qZmCZ8ebn4CPnUGVMpFpO5n6WwqVf/cVrbEpxqR2rPTDJeLRoxPr/nEwBK1WwamhCf3M
+ VENHwoaDh8rUPglx+4pgXO346GK/frrApsD28ONT4j1uGbA2NOukielXQFZoGOc/oUzM
+ QfxWGWP+jCufaiqIRNqwl3ODHYshaHfBEB+l0o24fMwGHiGXhX7c4uroca1u4APp47Ul
+ XUqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=hW7yJXdhX/RvTJ5BItP5eRGZZ96HIYQvPLkD9KDjX3M=;
+ b=cxKXNjVBGlenDwi9kSrmze1TbZKf2LaU+L1Hy7uhRc2WnJYbOFBieQh7N3GZm93abP
+ Qdfs/rMi8vuZMylZ91nocRLteX4342+I5hCbUqSKM/abseuNPKa4BbrFVOkGVLrbH0+k
+ mNsKqe0k47+txGctFFG0yCOGMe0XB4zezM2ha4D+vtdTIq0Bj7+pe4cGSK+56F2JYNGN
+ B7S/QBfna1UTbOGQoNZNguerv/xPRtN5k6uAe5aBvAGLBrLuqgGsWXFyJRPW0Ta30Gt0
+ 90zQ22aEoa8lJZ2HSJZtNgpzBJ0MCTxPZvttAxRjQAzYatgCtWS240Jhh1O+o/jA+bL1
+ O1yA==
+X-Gm-Message-State: AOAM530p6ZJK+efMkE5mOxIoL362v2Q+Lf6FXtG5Jovs+F65ZCCbSmG2
+ reTY35ZRkwAEC9tE2gEFB8mQnpcb0WN+PIpwHA4LTw==
+X-Google-Smtp-Source: ABdhPJw4byIb72KCeF2z0Bnxc5hvm2/yMr+8E+L+hL68w+CCTuYDGzAtPYt54jCayZzfqC0zpzg6WZpve9FwSWPDQ1A=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr10451838ota.91.1593432890691; 
+ Mon, 29 Jun 2020 05:14:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8uSbC80a+yB4_DFtCB1_-sXW5R3ugTX6H9XDeBZV-mQQ@mail.gmail.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:03:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200628203748.14250-1-peter.maydell@linaro.org>
+ <20200628203748.14250-3-peter.maydell@linaro.org>
+ <bdc37753-de8e-eba4-75e0-32eada401b24@amsat.org>
+In-Reply-To: <bdc37753-de8e-eba4-75e0-32eada401b24@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jun 2020 13:14:39 +0100
+Message-ID: <CAFEAcA-qwjBwxF61NWuDhQACkvGa3TkjWWEbnMX+Uu+J7orzZg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/arm/tosa: Encapsulate misc GPIO handling in a
+ device
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,71 +98,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Tue, 29 Oct 2019 at 23:00, Michael S. Tsirkin <mst@redhat.com> wrote:
+On Mon, 29 Jun 2020 at 10:39, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> Hi Peter,
+>
+> On 6/28/20 10:37 PM, Peter Maydell wrote:
+> > Currently we have a free-floating set of IRQs and a function
+> > tosa_out_switch() which handle the GPIO lines on the tosa board which
+> > connect to LEDs, and another free-floating IRQ and tosa_reset()
+> > function to handle the GPIO line that resets the system.  Encapsulate
+> > this behaviour in a simple QOM device.
 > >
-> > From: Jens Freimann <jfreimann@redhat.com>
+> > This commit fixes Coverity issue CID 1421929 (which pointed out that
+> > the 'outsignals' in tosa_gpio_setup() were leaked), because it
+> > removes the use of the qemu_allocate_irqs() API from this code
+> > entirely.
 > >
-> > This patch adds a new migration state called wait-unplug.  It is entered
-> > after the SETUP state if failover devices are present. It will transition
-> > into ACTIVE once all devices were succesfully unplugged from the guest.
-> >
-> > So if a guest doesn't respond or takes long to honor the unplug request
-> > the user will see the migration state 'wait-unplug'.
-> >
-> > In the migration thread we query failover devices if they're are still
-> > pending the guest unplug. When all are unplugged the migration
-> > continues. If one device won't unplug migration will stay in wait_unplug
-> > state.
-> >
-> > Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Message-Id: <20191029114905.6856-9-jfreimann@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > > ---
-> 
-> Hi; Coverity has just (rather belatedly) noticed a possible
-> issue in this code (CID 1429995):
-> 
-> > @@ -3264,6 +3270,19 @@ static void *migration_thread(void *opaque)
-> >
-> >      qemu_savevm_state_setup(s->to_dst_file);
-> >
-> > +    if (qemu_savevm_nr_failover_devices()) {
-> > +        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> > +                          MIGRATION_STATUS_WAIT_UNPLUG);
+> > This is simpler than the spitz changes because the new device
+> > doesn't need to refer to any of the other devices on the board.
+> > ---
+
+> > +#define TYPE_TOSA_MISC_GPIO "tosa-misc-gpio"
+> > +#define TOSA_MISC_GPIO(obj) \
+> > +    OBJECT_CHECK(TosaMiscGPIOState, (obj), TYPE_TOSA_MISC_GPIO)
 > > +
-> > +        while (s->state == MIGRATION_STATUS_WAIT_UNPLUG &&
-> > +               qemu_savevm_state_guest_unplug_pending()) {
-> > +            qemu_sem_timedwait(&s->wait_unplug_sem, 250);
-> 
-> Here we call qemu_sem_timedwait() but ignore the return value,
-> whereas all the other callsites for that function do something
-> with the return value. Is the code correct? (This is just a
-> heuristic Coverity has, and it's wrong a fair amount of the
-> time, so if it's wrong here too I can just mark it as a
-> false-positive in the Coverity UI.)
+> > +typedef struct TosaMiscGPIOState {
+> > +    SysBusDevice parent_obj;
+> > +} TosaMiscGPIOState;
+>
+> Since we don't really use this type, can we avoid declaring it?
 
-Hmm it's OK; that semaphore isn't really used at the moment,
-so it's pretty much just a sleep. And the loop always
-calls the qemu_savevm_state_guest_unplug_pending() before
-it goes around again; so it doesn't care if the return
-value indicates timeout or not.
+I prefer to be consistent. QOM's implementation allows this kind
+of shortcut where you don't provide everything that a typical
+leaf class provides if you don't need all of it, but then it
+gets confusing if later on somebody wants to add something
+to that leaf class. I think it's less confusing to have
+just two standard patterns:
+ * leaf class, no subclasses
+ * a class that will be subclassed
+and then always provide the same set of TYPE_*, cast macros,
+structs, etc for whichever of the patterns you're following,
+even if it happens that these aren't all needed.
+(https://wiki.qemu.org/Documentation/QOMConventions
+does a reasonable job of saying what the standard pattern
+is for the subclassed-class case, but is a bit less clear
+on the leaf-class case.)
 
-Dave
 
-> thanks
-> -- PMM
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > +static void tosa_misc_gpio_init(Object *obj)
+> > +{
+> > +    DeviceState *dev =3D DEVICE(obj);
+> > +
+>
+> Ah, MachineClass does not inherit from DeviceClass, so we can use
+> it to create GPIOs.
+>
+> Something is bugging me here, similar with the LEDs series I sent
+> recently.
+>
+> GPIOs are not specific to a bus. I see ResettableClass takes Object
+> arguments.
+>
+> We should be able to wire GPIO lines to generic Objects like LEDs.
+> Parents don't have to be qdev.
 
+Yes, this is awkward. You pretty much have to inherit from
+SysBusDevice assuming you want to get reset (the few cases
+we have which directly inherit from Device like CPUs then
+end up needing special handling).
+
+> Having to create a container to wire GPIOs or hold a reference
+> to a MemoryRegion sounds wrong.
+
+I agree that it would be nicer if MachineState inherited from
+Device (and if Device got reset properly). But that's a huge
+amount of rework. For this series I'm just trying to improve
+the setup for the spitz board, and "logic that's more than
+just wiring up devices to each other needs to live inside some
+device, and can't be in the board itself" is the system we have today.
+
+thanks
+-- PMM
 
