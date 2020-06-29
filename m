@@ -2,80 +2,86 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82374C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6D1C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49F0B2559E
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8486A255A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 16:59:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGkEqEg5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F0B2559E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhrdTlnZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8486A255A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpwx9-0001dl-IE
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:48:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57244)
+	id 1jpx8K-0007Ep-O9
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 12:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpwvN-0000Is-R6
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:46:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47369
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jpx7h-0006o9-Qw
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:59:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33467
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jpwvK-00007I-KX
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:46:29 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jpx7e-00020n-OU
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 12:59:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593449185;
+ s=mimecast20190719; t=1593449942;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=D2ydEmJtS74dkGgWip283hz9yt3By0IcMIvsD9bpTDg=;
- b=IGkEqEg5bqEuSpKLCEMfcxoCcLfe3xIevsigd857bbej5aEhyqCvZFBKDJsKu2O/HtS943
- Yvt7hGVtHTKzy6Uqf6MS7Vq0Z7qWiUiQKX+0JbfQzYFP4ogiSwUKQYOOXqN5P+CjJsfmTi
- XDlmfEnxButNtnmYbzUjYwCHUkF6Y4E=
+ bh=aJy6iouKigApIWu6D46+NKM9SfoXQvXddGr8lsXdF+8=;
+ b=FhrdTlnZZphec++mYZAMdMrOYHnBBAC+7gNXXyvjE3oL+QS74apgFhRd+WqMHcmd7vo+4k
+ j18r0HqnLE14Dd3R9yehTjgXl4hQ9NOBJzidvmHssFR699Rtt7b88C3zPNJhlOmnxpiL61
+ msgDfgbyOBY/lyt8i+pX4GDeooDs4/c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-cmLMNBy-PYq7UppDLNz0Ug-1; Mon, 29 Jun 2020 12:46:23 -0400
-X-MC-Unique: cmLMNBy-PYq7UppDLNz0Ug-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-27-bWorfDkWNKG1p-g59i_Qng-1; Mon, 29 Jun 2020 12:58:59 -0400
+X-MC-Unique: bWorfDkWNKG1p-g59i_Qng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CECD80183C;
- Mon, 29 Jun 2020 16:46:22 +0000 (UTC)
-Received: from work-vm (ovpn-114-210.ams2.redhat.com [10.36.114.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C37F60BF3;
- Mon, 29 Jun 2020 16:46:20 +0000 (UTC)
-Date: Mon, 29 Jun 2020 17:46:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: Properly quitting qemu immediately after failing migration
-Message-ID: <20200629164618.GL2908@work-vm>
-References: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
- <20200629154104.GK2908@work-vm>
- <fb611d49-4fd9-ef1a-1383-1d15137f658d@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED8548015F4;
+ Mon, 29 Jun 2020 16:58:57 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F82A10013C1;
+ Mon, 29 Jun 2020 16:58:53 +0000 (UTC)
+Subject: Re: [PATCH v4 0/3] Avoid abort on QMP attempt to add an object with
+ duplicate id
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, berrange@redhat.com, ehabkost@redhat.com,
+ armbru@redhat.com, patchew-devel@redhat.com
+References: <20200629112329.27611-1-eric.auger@redhat.com>
+ <8bd5b010-1c58-1a38-f234-d7669cd72d35@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <79214005-6b94-24d8-5bfa-c765863a0b35@redhat.com>
+Date: Mon, 29 Jun 2020 18:58:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <fb611d49-4fd9-ef1a-1383-1d15137f658d@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <8bd5b010-1c58-1a38-f234-d7669cd72d35@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:37:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -97,126 +103,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Max Reitz (mreitz@redhat.com) wrote:
-> On 29.06.20 17:41, Dr. David Alan Gilbert wrote:
-> > * Max Reitz (mreitz@redhat.com) wrote:
-> >> Hi,
-> >>
-> >> In an iotest, I’m trying to quit qemu immediately after a migration has
-> >> failed.  Unfortunately, that doesn’t seem to be possible in a clean way:
-> >> migrate_fd_cleanup() runs only at some point after the migration state
-> >> is already “failed”, so if I just wait for that “failed” state and
-> >> immediately quit, some cleanup functions may not have been run yet.
-> > 
-> > Yeh this is hard; I always take the end of migrate_fd_cleanup to be the
-> > real end.
+Hi Paolo,
+
+On 6/29/20 5:30 PM, Paolo Bonzini wrote:
+> On 29/06/20 13:23, Eric Auger wrote:
+>> Attempting to add an object through QMP with an id that is
+>> already used leads to a qemu abort. This is a regression since
+>> d2623129a7de ("qom: Drop parameter @errp of object_property_add()
+>> & friends").
+>>
+>> The first patch fixes the issue and the second patch adds a test
+>> to check the error is gracefully returned to the QMP client.
+>>
+>> The last patch can be considered independently. It merges all the
+>> object-add tests into a single test function and cover new failure
+>> cases.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/qemu/tree/qom-graceful-v4
+>>
+>> History:
+>> - v3 -> v4:
+>>   - addressed style comment from Markus
+>>   - added patch 3
+>>
+>> - v2 -> v3:
+>>   - don't take the object reference on failure in
+>>     object_property_try_add_child
+>>   - add g_assert_nonnull(resp) in 2/2 while keeping
+>>     Thomas A-b
+>>
+>> - v1 -> v2:
+>>   - use the try terminology.
+>>   - turn object_property_try_add() into a non-static function
+>>   - add the test
+>>
+>>
+>> Eric Auger (3):
+>>   qom: Introduce object_property_try_add_child()
+>>   tests/qmp-cmd-test: Add qmp/object-add-duplicate-id
+>>   tests/qmp-cmd-test: Add qmp/object-add-failure-modes
+>>
+>>  include/qom/object.h       | 26 +++++++++-
+>>  qom/object.c               | 21 ++++++--
+>>  qom/object_interfaces.c    |  7 ++-
+>>  tests/qtest/qmp-cmd-test.c | 99 ++++++++++++++++++++++++++++++++++++--
+>>  4 files changed, 140 insertions(+), 13 deletions(-)
+>>
 > 
-> Yes, unfortunately I don’t seem to have a way to look for that end. :(
+> Very nice.  I see a failure reported by Patchew, I'll look into it as
+> well if you don't have time.
+
+As I reported earlier, I am no able to reproduce on my end with both
+
+sudo time make docker-test-mingw@fedora SHOW_ENV=1 J=14 NETWORK=1
+sudo time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+
+It fails on the first memory-backend-ram object-add that should be valid.
+
+resp = qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1',
+'props': {'size': 4294967296 } } }");
+
+Could it be that the size is too large (4GB)?
+
+Thanks
+
+Eric
+
+
+
 > 
-> > It always happens on the main thread I think (it's done as a bh in some
-> > cases).
-> > 
-> >> This is a problem with dirty bitmap migration at least, because it
-> >> increases the refcount on all block devices that are to be migrated, so
-> >> if we don’t call the cleanup function before quitting, the refcount will
-> >> stay elevated and bdrv_close_all() will hit an assertion because those
-> >> block devices are still around after blk_remove_all_bs() and
-> >> blockdev_close_all_bdrv_states().
-> >>
-> >> In practice this particular issue might not be that big of a problem,
-> >> because it just means qemu aborts when the user intended to let it quit
-> >> anyway.  But on one hand I could imagine that there are other clean-up
-> >> paths that should definitely run before qemu quits (although I don’t
-> >> know), and on the other, it’s a problem for my test.
-> > 
-> > 'quit' varies - there are a lot of incoming failures that just assert;
-> > very few of them cause a clean exit (I think there are more clean ones
-> > after Peter's work on restartable postcopy a year or two ago).
+> Paolo
 > 
-> Well, my problem is about the source side, where there is still a VM
-> running that I would expect to be in a sane state even after a failed
-> migration.
-
-Oh! Source side; the source side I worry much more about; if the
-destination implodes after a failed migration I'm not too worried - but
-the source side *shall not* fail.
-
-> > I do see the end of migrate_fd_cleanup calls the notifier list; but it's
-> > not clear to me that it's alwyas going to see the first transition to
-> > 'failed' at that point.
 > 
-> What exactly do you mean?  It appears to me that both query-status and
-> the MIGRATION events signal the failed state before migrate_fd_cleanup()
-> is invoked.
-
-OK, I was getting confused between event sending and the notifiers; the
-event happens a bit before.  The state gets set to failed and then we
-call fd_cleanup in most cases; the state is what query-status is keyed
-off, and is also what causes the event to be sent.
-
-> If you mean I could add a notifier to that list to do something™, I’m
-> not sure what exactly it is I’d so.
-
-Yeh, that's why the notifiers are there....
-However, if you need to do some cleanup at the end of a migration, then
-I think adding a call inside migrate_fd_cleanup is perfectly fine.
-
->  My test can’t do it, because it’s
-> an iotest, and even if it could, I suppose I’d want to wait until even
-> after all notifiers have been invoked (which isn’t guaranteed if I’d add
-> a notifier myself).
-> 
-> >> I tried working around the problem for my test by waiting on “Unable to
-> >> write” appearing on stderr, because that indicates that
-> >> migrate_fd_cleanup()’s error_report_err() has been reached.  But on one
-> >> hand, that isn’t really nice, and on the other, it doesn’t even work
-> >> when the failure is on the source side (because then there is no
-> >> s->error for migrate_fd_cleanup() to report).
-> >>
-> >> In all, I’m asking:
-> >> (1) Is there a nice solution for me now to delay quitting qemu until the
-> >> failed migration has been fully resolved, including the clean-up?
-> > 
-> > In vl.c, I added a call to migration_shutdown in qemu_cleanup - although
-> > that seems to be mostly about cleaning up the *outgoing* side; you could
-> > add some incoming cleanup there.
-> 
-> So you mean waiting until migrate_fd_cleanup() has run?  Maybe I’ll try
-> that tomorrow, although I’d hoped I could get this done without having
-> to modify the code base...  (I.e., I’d hoped there would be some
-> QMP-queriable flag somewhere that could tell me whether the
-> migrate_fd_cleanup() has run)
-
-Please be a little careful around there; i.e. try as far as possible not
-to hang on dead block devices.
-
-> >> (2) Isn’t it a problem if qemu crashes when you issue “quit” via QMP at
-> >> the wrong time?  Like, maybe lingering subprocesses when using “exec”?
-> > 
-> > Yeh that should be cleaner, but isn't.
-> 
-> :(
-
-Randomly quitting is safer than it used to be (again that qemu_cleanup
-code is what should make it so).
-
-Dave
-
-> OK then.  Thanks for your insights!
-> 
-> Max
-> 
-
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
