@@ -2,71 +2,90 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58358C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A36C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:18:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 303AD20775
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 303AD20775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5734A20724
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 21:18:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dm5C9+V9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5734A20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq11d-0004OH-FJ
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49690)
+	id 1jq1Ag-0007cE-Gf
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 17:18:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jq10h-0003Tp-17; Mon, 29 Jun 2020 17:08:15 -0400
-Resent-Date: Mon, 29 Jun 2020 17:08:15 -0400
-Resent-Message-Id: <E1jq10h-0003Tp-17@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21781)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jq10e-0001b1-6P; Mon, 29 Jun 2020 17:08:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593464868; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ks6Wb9dEZk3UdH7R7/ZTEv6VTxDJBRNRD1OYaZT4LZEX2xfNx09CPws/dI9WmAczC2AYxVAx87TrUxvAEft51YngjsPP3kZRNbIKPDo29//YoLWT1xRD8dBrwPVn+MkjjwR7YC0Njq4b3oHbna7I5urj+9Z3av0MOzndkksytec=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593464868;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=g39ADZMg4ekgRTxMudU+HvzPsWPxhrh8RK82x1/YQ9g=; 
- b=DsfdK8DBNPl8lQ4BaxzLD9U96PnufvPXedEzloy+Iyp9/wVxQ1QLvErhmuPlRGsQj81RuvScmQy6YhmCFkxD4xfaDEiOLsNjG/ZqQxrpuTp4Gc5ktt/dv6+EsK8p3jmo3sWG8oAVqnDwfftnJLHpK8mLqBC0U/ZFXQKvo6nR5ik=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593464865372403.2697800705854;
- Mon, 29 Jun 2020 14:07:45 -0700 (PDT)
-Message-ID: <159346486377.15477.6186679362319226240@d1fd068a5071>
-Subject: Re: [PATCH 0/2] hw/block/nvme: handle transient dma errors
-In-Reply-To: <20200629202053.1223342-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jq19K-0006bf-N0
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:17:10 -0400
+Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:41192)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jq19I-0003B9-N6
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 17:17:10 -0400
+Received: by mail-lj1-x232.google.com with SMTP id 9so19934957ljc.8
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 14:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Cor3noOZv309F5AD2DQpc2DUTU6UE2LakDF6OM9CAcU=;
+ b=dm5C9+V9pa3Ta0Ciy+fOmhsMu7wPsWqBWpOWOTcSkLrmc2o6S/01kIBq57P6LJ1PKN
+ YPdRLx3HCC0ePNhAH5rnV7sUVJEUUfDMdAwL3lPSjjwwod1AkWiCW8iTYXbRe7s8uTqE
+ nAjjrg2v54iJQf+2CohczqkS/Ixdv//HK4WCAyuWaUwbSypH0xPcSDP4rcz0D2uxhEoS
+ v2zYE2U39OX17QZrk8Zk7ZPH7eY6UAABmBTuIhJqKXQHn3hxhBq0v/bZouRVUcGiVA9j
+ Wl//6UgHROh/5bRoRTYjpyeP96YkQ95CEVMahrf5AvaOzIWWNjhrS5k0WN9y30dsBCKu
+ AODA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Cor3noOZv309F5AD2DQpc2DUTU6UE2LakDF6OM9CAcU=;
+ b=dm2T1ycoFJJS9K6R4l/baTDadvM4M5PTp2dtxx9d7326LAY1en9BQJKRG4OcnzNIiz
+ M5vPltWLxShKId2XOUAsWRO+ZuW8T6xXSH/NQ9y+R7WFUPtu9qOJPC4VPtrKocwZXciw
+ MQWfWrm2khCYR12MBvVmVytiBz5QIU3q3iYRvzrL7EGHcxtyScYDFaj3tbbEwCU3hHkx
+ cv+tkRHwmpR4L60mMrw8xxDW0VU+cJqHaICdWI3jaZ6Jo6oo9uJ9rs9Lxzk7aOESz7Kj
+ 1C2c/Nv1AhOEHFeLKpzaPHmvhqTZB+GMdT1w2+nw+QQ+0I+yeYXbchPNUGLnJ0qvbcJg
+ uwHw==
+X-Gm-Message-State: AOAM53001FO+Ku4QaPnFR/R0LzBOnEqedDIKvy/EwlwhXPVyESEPgBeV
+ f9pi8fsGvY/iCNZib1pOMnEz2yjZzFYxQrB0rQY=
+X-Google-Smtp-Source: ABdhPJxaoVN3e0FviRClfajJueiGW4gjI6fig+6GGTi4p3ezIk3iDcEh++4RTSyR9Wqbh3xhJIUupHnZGdVLrC2WISU=
+X-Received: by 2002:a2e:9b87:: with SMTP id z7mr4741227lji.80.1593465426218;
+ Mon, 29 Jun 2020 14:17:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Mon, 29 Jun 2020 14:07:45 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 17:08:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+ <878sg5svu5.fsf@linaro.org>
+In-Reply-To: <878sg5svu5.fsf@linaro.org>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Mon, 29 Jun 2020 23:16:27 +0200
+Message-ID: <CALTWKrWkaN3LX5aHwz2-dO04_puh7RqQa3_NfEG4KH5xBeV3Rw@mail.gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::232;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x232.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,64 +98,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, k.jensen@samsung.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, kbusch@kernel.org, its@irrelevant.dk,
- mlevitsk@redhat.com
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYyOTIwMjA1My4xMjIz
-MzQyLTEtaXRzQGlycmVsZXZhbnQuZGsvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
-RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
-PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKLS0tIC90bXAvcWVtdS10ZXN0
-L3NyYy90ZXN0cy9xZW11LWlvdGVzdHMvMDQwLm91dCAgICAgICAyMDIwLTA2LTI5IDIwOjEyOjEw
-LjAwMDAwMDAwMCArMDAwMAorKysgL3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMvcWVtdS1pb3Rl
-c3RzLzA0MC5vdXQuYmFkIDIwMjAtMDYtMjkgMjA6NTg6NDguMjg4NzkwODE4ICswMDAwCkBAIC0x
-LDMgKzEsNSBAQAorV0FSTklORzpxZW11Lm1hY2hpbmU6cWVtdSByZWNlaXZlZCBzaWduYWwgOTog
-L3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzLy4uLy4uL3g4Nl82NC1zb2Z0
-bW11L3FlbXUtc3lzdGVtLXg4Nl82NCAtZGlzcGxheSBub25lIC12Z2Egbm9uZSAtY2hhcmRldiBz
-b2NrZXQsaWQ9bW9uLHBhdGg9L3RtcC90bXAuSmRvbDBmUFNjUS9xZW11LTIxNzQ5LW1vbml0b3Iu
-c29jayAtbW9uIGNoYXJkZXY9bW9uLG1vZGU9Y29udHJvbCAtcXRlc3QgdW5peDpwYXRoPS90bXAv
-dG1wLkpkb2wwZlBTY1EvcWVtdS0yMTc0OS1xdGVzdC5zb2NrIC1hY2NlbCBxdGVzdCAtbm9kZWZh
-dWx0cyAtZGlzcGxheSBub25lIC1hY2NlbCBxdGVzdAorV0FSTklORzpxZW11Lm1hY2hpbmU6cWVt
-dSByZWNlaXZlZCBzaWduYWwgOTogL3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMvcWVtdS1pb3Rl
-c3RzLy4uLy4uL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLXg4Nl82NCAtZGlzcGxheSBub25l
-IC12Z2Egbm9uZSAtY2hhcmRldiBzb2NrZXQsaWQ9bW9uLHBhdGg9L3RtcC90bXAuSmRvbDBmUFNj
-US9xZW11LTIxNzQ5LW1vbml0b3Iuc29jayAtbW9uIGNoYXJkZXY9bW9uLG1vZGU9Y29udHJvbCAt
-cXRlc3QgdW5peDpwYXRoPS90bXAvdG1wLkpkb2wwZlBTY1EvcWVtdS0yMTc0OS1xdGVzdC5zb2Nr
-IC1hY2NlbCBxdGVzdCAtbm9kZWZhdWx0cyAtZGlzcGxheSBub25lIC1hY2NlbCBxdGVzdAogLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4K
-IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0KIFJhbiA1OSB0ZXN0cwotLS0KTm90IHJ1bjogMjU5CkZhaWx1cmVzOiAw
-NDAKRmFpbGVkIDEgb2YgMTE5IGlvdGVzdHMKbWFrZTogKioqIFtjaGVjay10ZXN0cy9jaGVjay1i
-bG9jay5zaF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
-LgogIFRFU1QgICAgY2hlY2stcXRlc3QtYWFyY2g2NDogdGVzdHMvcXRlc3QvcW9zLXRlc3QKVHJh
-Y2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nl
-c3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21t
-YW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11
-Lmluc3RhbmNlLnV1aWQ9ZGEyNWVhYThiZGQwNGNiNzgzZTJjNDI3YzZhNWFhOTQnLCAnLXUnLCAn
-MTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICct
-ZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywg
-J1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAn
-LWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8u
-Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC05OGw3a295Mi9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTI5
-LTE2LjUxLjQ2LjIwNzQyOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zh
-ci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
-YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1kYTI1
-ZWFhOGJkZDA0Y2I3ODNlMmM0MjdjNmE1YWE5NAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
-cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
-LXRtcC05OGw3a295Mi9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRv
-czddIEVycm9yIDIKCnJlYWwgICAgMTVtNTcuNTkwcwp1c2VyICAgIDBtOS4yNDBzCgoKVGhlIGZ1
-bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYyOTIw
-MjA1My4xMjIzMzQyLTEtaXRzQGlycmVsZXZhbnQuZGsvdGVzdGluZy5kb2NrZXItcXVpY2tAY2Vu
-dG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Mon, Jun 29, 2020 at 6:03 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+>
+> Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
+>
+> > Hi,
+> >
+> > The second report of the TCG Continuous Benchmarking series builds
+> > upon the QEMU performance metrics calculated in the previous report.
+> > This report presents a method to dissect the number of instructions
+> > executed by a QEMU invocation into three main phases:
+> > - Code Generation
+> > - JIT Execution
+> > - Helpers Execution
+> > It devises a Python script that automates this process.
+> >
+> > After that, the report presents an experiment for comparing the
+> > output of running the script on 17 different targets. Many conclusions
+> > can be drawn from the results and two of them are discussed in the
+> > analysis section.
+>
+> A couple of comments. One think I think is missing from your analysis is
+> the total number of guest instructions being emulated. As you point out
+> each guest will have different code efficiency in terms of it's
+> generated code.
+>
+> Assuming your test case is constant execution (i.e. runs the same each
+> time)
+Yes indeed, the report utilizes Callgrind in the measurements so the
+results are very stable.
+>you could run in through a plugins build to extract the number of
+> guest instructions, e.g.:
+>
+>   ./aarch64-linux-user/qemu-aarch64 -plugin tests/plugin/libinsn.so -d pl=
+ugin ./tests/tcg/aarch64-linux-user/sha1
+>   SHA1=3D15dd99a1991e0b3826fede3deffc1feba42278e6
+>   insns: 158603512
+>
+That's a very nice suggestion. Maybe this will be the idea of a whole
+new report. I'll try to execute the provided command and will let you
+know if I have any questions.
+> I should have also pointed out in your last report that running FP heavy
+> code will always be biased towards helper/softfloat code to the
+> detriment of everything else. I think you need more of a mix of
+> benchmarks to get a better view.
+>
+> When Emilio did the last set of analysis he used a suite he built out of
+> nbench and a perl benchmark:
+>
+>   https://github.com/cota/dbt-bench
+>
+> As he quoted in his README:
+>
+>   NBench programs are small, with execution time dominated by small code
+>   loops. Thus, when run under a DBT engine, the resulting performance
+>   depends almost entirely on the quality of the output code.
+>
+>   The Perl benchmarks compile Perl code. As is common for compilation
+>   workloads, they execute large amounts of code and show no particular
+>   code execution hotspots. Thus, the resulting DBT performance depends
+>   largely on code translation speed.
+>
+> by only having one benchmark you are going to miss out on the envelope
+> of use cases.
+>
+Future reports will introduce a variety of benchmarks. This report -
+and the previous one - are introductory reports. The benchmark used
+was to only demonstrate the report ideas. It was not used as a strict
+benchmarking program.
+> >
+> > Report link:
+> >https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Dissecting-QEMU-=
+Into-Three-Main-Parts/
+> >
+> > Previous reports:
+> > Report 1 - Measuring Basic Performance Metrics of QEMU:
+> > https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
+> >
+> > Best regards,
+> > Ahmed Karaman
+>
+>
+> --
+> Alex Benn=C3=A9e
 
