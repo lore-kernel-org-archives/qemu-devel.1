@@ -2,80 +2,66 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68378C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DB5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 459222078A
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 459222078A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5F58323D6C
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 18:20:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F58323D6C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpyBD-0002AN-FM
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 14:06:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56872)
+	id 1jpyO0-0005ai-MT
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 14:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpyA2-0001EY-79
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 14:05:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46248)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jpyA0-0005Xe-7I
- for qemu-devel@nongnu.org; Mon, 29 Jun 2020 14:05:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jpy9y-0004tt-Lq
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 18:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9DDED2E810A
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 18:05:38 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpyNP-00052P-PT; Mon, 29 Jun 2020 14:19:31 -0400
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:60615)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jpyNN-0007bg-58; Mon, 29 Jun 2020 14:19:31 -0400
+X-Originating-IP: 82.252.130.88
+Received: from [192.168.1.155] (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 8F17A6000A;
+ Mon, 29 Jun 2020 18:19:19 +0000 (UTC)
+Subject: Re: [PATCH] hw/misc/pca9552: Add missing TypeInfo::class_size field
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200629074704.23028-1-f4bug@amsat.org>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <302e63b8-6bd4-00c0-d7e1-7d938902bb7e@tribudubois.net>
+Date: Mon, 29 Jun 2020 20:19:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jun 2020 17:57:45 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878645@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159345346552.32564.13490190049268847800.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1878645] Re: null-ptr dereference in ich9_apm_ctrl_changed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8f92d5885660f36d68e6c89bc30b7f1d66686472
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 06:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200629074704.23028-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.195; envelope-from=jcd@tribudubois.net;
+ helo=relay3-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 14:19:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,110 +70,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Summary changed:
+Le 29/06/2020 à 09:47, Philippe Mathieu-Daudé a écrit :
+> When adding the generic PCA955xClass in commit 736132e455, we
+> forgot to set the class_size field. Fill it now to avoid:
+>
+>    (gdb) run -machine mcimx6ul-evk -m 128M -display none -serial stdio -kernel ./OS.elf
+>    Starting program: ../../qemu/qemu/arm-softmmu/qemu-system-arm -machine mcimx6ul-evk -m 128M -display none -serial stdio -kernel ./OS.elf
+>    double free or corruption (!prev)
+>    Thread 1 "qemu-system-arm" received signal SIGABRT, Aborted.
+>    __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+>    (gdb) where
+>    #0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
+>    #1  0x00007ffff75d8859 in __GI_abort () at abort.c:79
+>    #2  0x00007ffff76433ee in __libc_message
+>        (action=action@entry=do_abort, fmt=fmt@entry=0x7ffff776d285 "%s\n")
+>        at ../sysdeps/posix/libc_fatal.c:155
+>    #3  0x00007ffff764b47c in malloc_printerr
+>        (str=str@entry=0x7ffff776f690 "double free or corruption (!prev)")
+>        at malloc.c:5347
+>    #4  0x00007ffff764d12c in _int_free
+>        (av=0x7ffff779eb80 <main_arena>, p=0x5555567a3990, have_lock=<optimized out>) at malloc.c:4317
+>    #5  0x0000555555c906c3 in type_initialize_interface
+>        (ti=ti@entry=0x5555565b8f40, interface_type=0x555556597ad0, parent_type=0x55555662ca10) at qom/object.c:259
+>    #6  0x0000555555c902da in type_initialize (ti=ti@entry=0x5555565b8f40)
+>        at qom/object.c:323
+>    #7  0x0000555555c90d20 in type_initialize (ti=0x5555565b8f40)
+>        at qom/object.c:1028
+>
+>    $ valgrind --track-origins=yes qemu-system-arm -M mcimx6ul-evk -m 128M -display none -serial stdio -kernel ./OS.elf
+>    ==77479== Memcheck, a memory error detector
+>    ==77479== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+>    ==77479== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+>    ==77479== Command: qemu-system-arm -M mcimx6ul-evk -m 128M -display none -serial stdio -kernel ./OS.elf
+>    ==77479==
+>    ==77479== Invalid write of size 2
+>    ==77479==    at 0x6D8322: pca9552_class_init (pca9552.c:424)
+>    ==77479==    by 0x844D1F: type_initialize (object.c:1029)
+>    ==77479==    by 0x844D1F: object_class_foreach_tramp (object.c:1016)
+>    ==77479==    by 0x4AE1057: g_hash_table_foreach (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>    ==77479==    by 0x8453A4: object_class_foreach (object.c:1038)
+>    ==77479==    by 0x8453A4: object_class_get_list (object.c:1095)
+>    ==77479==    by 0x556194: select_machine (vl.c:2416)
+>    ==77479==    by 0x556194: qemu_init (vl.c:3828)
+>    ==77479==    by 0x40AF9C: main (main.c:48)
+>    ==77479==  Address 0x583f108 is 0 bytes after a block of size 200 alloc'd
+>    ==77479==    at 0x483DD99: calloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+>    ==77479==    by 0x4AF8D30: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>    ==77479==    by 0x844258: type_initialize.part.0 (object.c:306)
+>    ==77479==    by 0x844D1F: type_initialize (object.c:1029)
+>    ==77479==    by 0x844D1F: object_class_foreach_tramp (object.c:1016)
+>    ==77479==    by 0x4AE1057: g_hash_table_foreach (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.2)
+>    ==77479==    by 0x8453A4: object_class_foreach (object.c:1038)
+>    ==77479==    by 0x8453A4: object_class_get_list (object.c:1095)
+>    ==77479==    by 0x556194: select_machine (vl.c:2416)
+>    ==77479==    by 0x556194: qemu_init (vl.c:3828)
+>    ==77479==    by 0x40AF9C: main (main.c:48)
+>
+> Fixes: 736132e455 ("hw/misc/pca9552: Add generic PCA955xClass")
+> Reported-by: Jean-Christophe DUBOIS <jcd@tribudubois.net>
 
-- null-ptr dereference in tcg_handle_interrupt
-+ null-ptr dereference in ich9_apm_ctrl_changed
+Tested-by: Jean-Christophe DUBOIS <jcd@tribudubois.net>
 
--- =
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   hw/misc/pca9552.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+> index 80caa9ec8f..68b574d084 100644
+> --- a/hw/misc/pca9552.c
+> +++ b/hw/misc/pca9552.c
+> @@ -410,6 +410,7 @@ static const TypeInfo pca955x_info = {
+>       .instance_init = pca955x_initfn,
+>       .instance_size = sizeof(PCA955xState),
+>       .class_init    = pca955x_class_init,
+> +    .class_size    = sizeof(PCA955xClass),
+>       .abstract      = true,
+>   };
+>   
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878645
 
-Title:
-  null-ptr dereference in ich9_apm_ctrl_changed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input which triggers a NULL pointer dereference=
- in
-  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
-is bug
-  is specific to QTest?
-
-  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
-00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
-  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
-  =3D=3D23862=3D=3DHint: address points to the zero page.
-      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
-mu/accel/tcg/tcg-all.c:57:21
-      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
-ude/hw/core/cpu.h:872:5
-      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
-emu/hw/isa/lpc_ich9.c:442:13
-      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
-hw/isa/apm.c:50:13
-      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
-pment/qemu/memory.c:483:5
-      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/memory.c:544:18
-      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/memory.c:1476:16
-      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
-/qemu/exec.c:3137:23
-      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
-c.c:3177:14
-      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
-u/exec.c:3268:18
-      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
-:60:5
-      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
-qemu/qtest.c:392:13
-      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
-mu/qtest.c:710:9
-      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
-c:722:5
-      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
-/qemu/chardev/char.c:183:9
-      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
-/chardev/char.c:195:9
-      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
-ev/char-fd.c:68:9
-      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
-elopment/qemu/io/channel-watch.c:84:12
-      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0xc9c819)
-
-  =
-
-  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
-qtest commands:
-
-  cat << EOF | ./qemu-system-i386 \
-  -qtest stdio -nographic -monitor none -serial none \
-  -M pc-q35-5.0
-  outl 0xcf8 0x8400f841
-  outl 0xcfc 0xaa215d6d
-  outl 0x6d30 0x2ef8ffbe
-  outb 0xb2 0x20
-  EOF
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
