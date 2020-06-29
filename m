@@ -2,74 +2,80 @@ Return-Path: <SRS0=SHB2=AK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90200C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 01:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A12FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 05:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 642CE206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 01:59:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642CE206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6ECF22311E
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jun 2020 05:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ECF22311E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jpj54-0006Ht-Ly
-	for qemu-devel@archiver.kernel.org; Sun, 28 Jun 2020 21:59:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41822)
+	id 1jplzi-0007CI-Jt
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 01:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <oscar.zhangbo@huawei.com>)
- id 1jpj4W-0005sN-9w
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 21:59:00 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2470 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <oscar.zhangbo@huawei.com>)
- id 1jpj4T-0007pA-OE
- for qemu-devel@nongnu.org; Sun, 28 Jun 2020 21:59:00 -0400
-Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 729BFD0BA9580B1CD82D
- for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 09:58:45 +0800 (CST)
-Received: from DGGEML424-HUB.china.huawei.com (10.1.199.41) by
- DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 29 Jun 2020 09:58:45 +0800
-Received: from DGGEML509-MBX.china.huawei.com ([169.254.1.116]) by
- dggeml424-hub.china.huawei.com ([10.1.199.41]) with mapi id 14.03.0487.000;
- Mon, 29 Jun 2020 09:58:39 +0800
-From: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [RFC] secure boot: is it necessary to let qemu verify EDK2 efi file
-Thread-Topic: [RFC] secure boot: is it necessary to let qemu verify EDK2 efi
- file
-Thread-Index: AdZNt6N6CpC/vlOZTGa5JPRml6k69Q==
-Date: Mon, 29 Jun 2020 01:58:38 +0000
-Message-ID: <0259E1C966E8C54AA93AA2B1240828E673155F7E@dggeml509-mbx.china.huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.186.77]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jplz8-0006mQ-NG
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 01:05:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53004)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jplz6-0000kO-Hf
+ for qemu-devel@nongnu.org; Mon, 29 Jun 2020 01:05:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jplz4-0004dm-FO
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 05:05:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 738342E802E
+ for <qemu-devel@nongnu.org>; Mon, 29 Jun 2020 05:05:34 +0000 (UTC)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.187;
- envelope-from=oscar.zhangbo@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/28 21:58:46
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jun 2020 04:57:20 -0000
+From: Hajin Jang <1882123@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm armhf debian regression
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: joveler pmaydell
+X-Launchpad-Bug-Reporter: Hajin Jang (joveler)
+X-Launchpad-Bug-Modifier: Hajin Jang (joveler)
+References: <159129432300.4081.5698403082350753204.malonedeb@soybean.canonical.com>
+Message-Id: <159340664100.1124.15035384668902011219.malone@chaenomeles.canonical.com>
+Subject: [Bug 1882123] Re: ARM cpu emulation regression on QEMU 4.2.0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a024a01a018fb1abb69a9c4f39765bc4e168bcb3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 01:05:34
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,103 +84,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Libin \(venvu\)" <venvu.li@huawei.com>,
- "wujing \(O\)" <wujing42@huawei.com>, jiangfangjie <jiangfangjie@huawei.com>
+Reply-To: Bug 1882123 <1882123@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgYWxsOg0KwqDCoMKgIFNlY3VyZSBib290IGZvciB2aXJ0dWFsIG1hY2hpbmUgTk9XQURBWVMg
-c3RhcnRzIGZyb20gZWRrMuKAmXMgdkJJT1MsIHdoaWNoIHZlcmlmaWVzIGd1ZXN0IE9T4oCZcyBz
-aGltL2dydWIyLiBUaGVuIGdydWIyIHZlcmlmaWVzIGd1ZXN0IE9T4oCZcyBrZXJuZWwuDQrjgIDj
-gIBGcm9tIHRoZSB2aWV3IG9mIHRoZSB3aG9sZSBjb21wbGV0ZSB0cnVzdCBjaGFpbiwgdGhlIEdV
-RVNUIHBhcnQgaXMgZGlzY29ubmVjdGVkIGZyb20gdGhlIEhPU1QgcGFydCwgYXMgdGhlIHZlcmlm
-aWNhdGlvbiBvZiB2QklPUyBpcyBtaXNzaW5nLCB0aGF0IGlzIHRvIHNheSwgbm8gb25lIHZlcmlm
-aWVzIHZCSU9TIGltYWdlIGZpbGUoUUVNVV9FRkkuZmQpLg0KIyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgIF9f
-X19fX19fXyAgICAgICBfX19fX19fX19fICAgICBfX19fX19fX19fXyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgfCAgICAgICAgIHxfX19fX3wg
-ICAgICAgICAgfF9fX3wgICAgICAgICAgIHwgICAgICAgIEhPU1QgcGFydCAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIA0KIyAgICAgfF9SVE1fX19fX3wgICAgIHxfQklPU19fX19ffCAgIHxf
-a2VybmVsX19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgX19f
-X19fX19fXyAgICBfX19fX19fX19fXyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICB8ICAgICAgICAgIHxfX3wgICAg
-ICAgICAgIHwgICAgICAgICBHVUVTVCBwYXJ0ICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0K
-IyAgICAgICAgICAgICAgICAgICAgICB8X3ZCSU9TX19fX3wgIHxndWVzdCBrZXJuZWwgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIA0K44CA44CAVGh1cywgd2UgaGF2ZSB0byB2ZXJpZnkgdkJJT1MgaW4gb3JkZXIg
-dG8gY29tcGxldGUgdGhlIHRydXN0IGNoYWluLCBjb25uZWN0aW5nIHRoZSBob3N0IHBhcnQgd2l0
-aCB0aGUgZ3Vlc3QgcGFydC4gDQrjgIDjgIBPbmUgc29sdXRpb24gaXMgdXNpbmcgSU1BIHRvIHZl
-cmlmeSB0aGUgbGlidmlydC9xZW11IGJpbmFyaWVzIGFuZCB2QklPUyBpbWFnZSBmaWxlKFFFTVVf
-RUZJLmZkKS4NCuOAgOOAgFRoZSBvdGhlciBpcyBsZXQgSU1BIHZlcmlmeSBsaWJ2aXJ0L3FlbXUs
-IGJ1dCBsZXQgcWVtdSB2ZXJpZnkgdkJJT1MgaW1hZ2UgZmlsZSBhZnRlcndhcmRzLg0KDQrjgIDj
-gIBTb2x1dGlvbiAxOg0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0K
-IyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgIF9fX19fX19fXyAgICAgICBfX19fX19f
-X19fICAgICBfX19fX19fX19fXyAgICAgX19fX19fX19fXyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIA0KIyAgICAgfCAgICAgICAgIHxfX19fX3wgICAgICAgICAgfF9fX3wgICAgICAg
-ICAgIHxfX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAg
-ICAgfF9SVE1fX19fX3wgICAgIHxfQklPU19fX19ffCAgIHxfa2VybmVsX19fX3wgICB8X19saWJ2
-aXJ0X3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgX19fX19fX19fXyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHxfX19fX19fX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAg
-ICAgICB8X19xZW11X19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgX19fX19fX19fXyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHxfX19fX19fX198ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIA0KIyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICB8X3ZCSU9TX19fX3wgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IA0KCVNvbHV0aW9uIDI6DQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-DQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgX19fX19fX19fICAgICAgIF9fX19f
-X19fX18gICAgIF9fX19fX19fX19fICAgICBfX19fX19fX19fICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgDQojICAgICB8ICAgICAgICAgfF9fX19ffCAgICAgICAgICB8X19ffCAgICAg
-ICAgICAgfF9fX3wgICAgICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQoj
-ICAgICB8X1JUTV9fX19ffCAgICAgfF9CSU9TX19fX198ICAgfF9rZXJuZWxfX19ffCAgIHxfX2xp
-YnZpcnRffCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAgICAgICBfX19fX19fX19fICAgICAgIF9f
-X19fX19fX18gICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfF9fX19fX19fX3wgICAgICAgICAgfF9fX19ffCAgICAgICAgICB8ICAgICAg
-ICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHxfX3FlbXVfX19ffCAgICAgfF92QklPU19fX198ICAgICAgICAgICAgICAgDQojICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgDQojICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQoNCsKgwqDC
-oCBXaGljaCBzb2x1dGlvbiBzaG91bGUgd2UgY2hvb3NlPyANCuOAgOOAgFNvbHV0aW9uIDEgc2Vl
-bXMgbXVjaCBlYXNpZXIuDQrjgIDjgIBCdXQgd2hlbiB3ZSBjb25zaWRlciBUUlVTVCBCT09UIGlu
-LCBpbiB0aGF0IHNpdHVhdGlvbiwgcWVtdSBIQVMgdG8gbWVhc3VyZSB2QklPUyBpbWFnZSwgYW5k
-IHB1dCB0aGUgbWVhc3VyZWQgdmFsdWUgaW50byB2VFBNJ3MgUENSLCB0aGF0IG1lYW5zLA0K44CA
-44CAcWVtdSBpcyByZXNwb25zaWJsZSBmb3IgbWVhc3VyaW5nIHRoZSB2QklPUyBkdXJpbmcgVFJV
-U1QgQk9PVCwgaXQgcGxheXMgYSByb2xlIHRoZXJlLg0K44CA44CAU28sIGFzIGxvbmcgYXMgcWVt
-dSBoYXMgdG8gcGxheSBhIHJvbGUgaW4gVFJVU1QgQk9PVCwgc2hhbGwgd2UgbGV0IHFlbXUgcGxh
-eSBhIHJvbGUgaW4gU0VDVVJFIEJPT1QgYXMgd2VsbD8gVXNpbmcgc29sdXNpb24gMj8NCuOAgOOA
-gA0K44CA44CAT3Igb3RoZXIgc3VnZ2VzdGlvbnM/IFRoYW5rcyENCg0K
+Dear Peter Maydell (@pmaydell), is there any update on this bug?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882123
+
+Title:
+  ARM cpu emulation regression on QEMU 4.2.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  [*] Summary
+
+  Latest QEMU has an ARM CPU emulation regression.
+  Regression is reproducible by building any C# project with .NET Core SDK =
+3.1.300 on Debian 10 armhf guest OS.
+
+  Releases affected: QEMU 4.2.0, 5.0.0
+  Releases not affected: QEMU 4.1.0, QEMU 4.1.1
+
+  [*] Detail
+
+  .NET Core SDK 3.1 fails to run on Debian 10 emulated by qemu-system-
+  arm.
+
+  I occasionally test my C# projects on the virtual armhf/arm64 system
+  emulated by QEMU. MSBuild, a build engine of the .NET Core SDK,
+  crashes on QEMU 4.2.0 or later. The crash only happens when MSBuild
+  tries to do any JIT compiling (dotnet build / dotnet test).
+
+  I attached the MSBuild crash logs. MSBuild always crashes with
+  SEHException, which means it tried to call C binary from .NET binary.
+
+  I think the ARM CPU emulation regression happened between QEMU 4.1.1 ~
+  4.2.0. The issue affects QEMU 4.2.0 and 5.0.0. QEMU 4.1.0, 4.1.1, and
+  real Raspberry Pi 2 are not affected by this issue, and .NET Core SDK
+  works completely fine.
+
+  [*] Environment
+
+  [Host OS]
+  Distribution: Linux Mint 19.3 amd64
+  CPU: AMD Ryzen 5 3600
+  Kernel: Ubuntu 5.3.0-51-generic
+
+  [QEMU Guest OS]
+  Distribution: Debian 10 Buster armhf
+  Kernel: Debian 4.19.0-9-armmp-lpae
+  .NET Core SDK: 3.1.300
+
+  [Raspberry Pi 2]
+  Distribution: Raspberry Pi OS Buster armhf
+  Kernel: 4.19.118-v7+
+
+  [Tested C# Projects]
+  This is a list of C# projects I have tested on QEMU and RPI2.
+  - https://github.com/ied206/Joveler.DynLoader
+  - https://github.com/ied206/Joveler.Compression
+  - https://github.com/ied206/ManagedWimLib
+
+  [QEMU Launch Arguments]
+  qemu-system-arm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 3 -M virt -m 4096 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-kernel vmlinuz-4.19.0-9-armmp-lpae \
+  =C2=A0=C2=A0=C2=A0=C2=A0-initrd initrd.img-4.19.0-9-armmp-lpae \
+  =C2=A0=C2=A0=C2=A0=C2=A0-append "root=3D/dev/vda2" \
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive if=3Dnone,file=3Ddebian_arm.qcow2,format=
+=3Dqcow2,id=3Dhd \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-blk-device,drive=3Dhd \
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev user,id=3Dmynet,hostfwd=3Dtcp::<PORT>-:22=
+ \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-device,netdev=3Dmynet \
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-rng-device
+
+  [QEMU Configure Arguments]
+  ./configure --enable-spice --enable-gtk --enable-vnc-jpeg --enable-vnc-pn=
+g --enable-avx2 --enable-libusb --enable-opengl --enable-virglrenderer --en=
+able-kvm --enable-system --enable-modules --audio-drv-list=3Dpa
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882123/+subscriptions
 
