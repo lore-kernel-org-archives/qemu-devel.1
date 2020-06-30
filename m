@@ -2,58 +2,88 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20116C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 04:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC71C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 05:11:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC5F5206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 04:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC5F5206A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 498FD20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 05:11:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTJsRShG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498FD20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq8LJ-000816-7A
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 00:58:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48608)
+	id 1jq8Yd-0001UN-Jc
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 01:11:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jq8Kj-0007Xe-74; Tue, 30 Jun 2020 00:57:25 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47142)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jq8Kg-00089G-5T; Tue, 30 Jun 2020 00:57:24 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 9EA21BF670;
- Tue, 30 Jun 2020 04:57:19 +0000 (UTC)
-Date: Tue, 30 Jun 2020 06:57:16 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v2 05/18] hw/block/nvme: Introduce the Namespace Types
- definitions
-Message-ID: <20200630045716.btz2mxxmtzs4k27v@apples.localdomain>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-6-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jq8Xz-000151-Kg
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 01:11:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37465
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jq8Xx-0001cR-8a
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 01:11:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593493863;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=R3VAJZf12THaUJQL5rMZNLXGkDtJhvbNsNbvlpuReTw=;
+ b=QTJsRShGykYhyGOph7LzGBlyGtuyEfes7Qfaucar+Oon8xZ+cRn4/MCG+4LdOsJPzmncLg
+ pilcY/g3P+nLIJPvSBjFp7T1/IWEDzo1lpVYWz638ynDGhbC2HOf85CwiM6QOMkgT+Af//
+ DgbZlkvkAB47GJp7CjQw+HDbIbQ6NgA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-olP40-u3P5KAWOmhtWLatA-1; Tue, 30 Jun 2020 01:11:01 -0400
+X-MC-Unique: olP40-u3P5KAWOmhtWLatA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2463A8031F6;
+ Tue, 30 Jun 2020 05:11:00 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-46.ams2.redhat.com [10.36.112.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C043310013D7;
+ Tue, 30 Jun 2020 05:10:58 +0000 (UTC)
+Subject: Re: Building in Solaris 11.4
+To: Michele Denber <mdenber@gmx.com>, qemu-devel@nongnu.org
+References: <5EF3C648.4060506@gmx.com> <5EF772B6.2010901@gmx.com>
+ <fcdd4b6c-eec5-2bfd-1004-8ac86e80bf0e@redhat.com> <5EFA4E46.3090101@gmx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ee1672f3-d42f-c9c7-5648-3e4a036b4da8@redhat.com>
+Date: Tue, 30 Jun 2020 07:10:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200617213415.22417-6-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:09:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <5EFA4E46.3090101@gmx.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,190 +96,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Peter Tribble <peter.tribble@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 18 06:34, Dmitry Fomichev wrote:
-> From: Niklas Cassel <niklas.cassel@wdc.com>
+On 29/06/2020 22.25, Michele Denber wrote:
+> On 06-29-2020 8:12 AM, Thomas Huth wrote:
+>> ...
+>> It's not the same bug as last year, but a new one: Seems like newer 
+>> versions of Solaris now have this functions in their libraries!
+> Yes - I just checked. Solaris 10 does not have openpty, but Solaris 11.4 
+> indeed does have it
+>> So what you want is something like this (completely untested):
 > 
-> Define the structures and constants required to implement
-> Namespace Types support.
-> 
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  hw/block/nvme.h      |  3 ++
->  include/block/nvme.h | 75 +++++++++++++++++++++++++++++++++++++++++---
->  2 files changed, 73 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 4f0dac39ae..4fd155c409 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -63,6 +63,9 @@ typedef struct NvmeCQueue {
->  
->  typedef struct NvmeNamespace {
->      NvmeIdNs        id_ns;
-> +    uint32_t        nsid;
-> +    uint8_t         csi;
-> +    QemuUUID        uuid;
->  } NvmeNamespace;
->  
->  static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 6a58bac0c2..5a1e5e137c 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -50,6 +50,11 @@ enum NvmeCapMask {
->      CAP_PMR_MASK       = 0x1,
->  };
->  
-> +enum NvmeCapCssBits {
-> +    CAP_CSS_NVM        = 0x01,
-> +    CAP_CSS_CSI_SUPP   = 0x40,
-> +};
-> +
->  #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
->  #define NVME_CAP_CQR(cap)   (((cap) >> CAP_CQR_SHIFT)    & CAP_CQR_MASK)
->  #define NVME_CAP_AMS(cap)   (((cap) >> CAP_AMS_SHIFT)    & CAP_AMS_MASK)
-> @@ -101,6 +106,12 @@ enum NvmeCcMask {
->      CC_IOCQES_MASK  = 0xf,
->  };
->  
-> +enum NvmeCcCss {
-> +    CSS_NVM_ONLY        = 0,
-> +    CSS_ALL_NSTYPES     = 6,
+> So just to make sure I have this right - I save that code into a patch 
+> file and then apply it where?  At the qemu-5.0.0 level?
 
-Maybe we could call this CSS_CSI, since it just specifies that one or
-more command sets are supported, not that ALL namespace types are
-supported.
+Yes. I used the current git master branch, but I assume that it will 
+also still apply to the 5.0 release.
 
-Otherwise,
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+>  Then run  configure again?
 
-> +    CSS_ADMIN_ONLY      = 7,
-> +};
-> +
->  #define NVME_CC_EN(cc)     ((cc >> CC_EN_SHIFT)     & CC_EN_MASK)
->  #define NVME_CC_CSS(cc)    ((cc >> CC_CSS_SHIFT)    & CC_CSS_MASK)
->  #define NVME_CC_MPS(cc)    ((cc >> CC_MPS_SHIFT)    & CC_MPS_MASK)
-> @@ -109,6 +120,21 @@ enum NvmeCcMask {
->  #define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
->  #define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
->  
-> +#define NVME_SET_CC_EN(cc, val)     \
-> +    (cc |= (uint32_t)((val) & CC_EN_MASK) << CC_EN_SHIFT)
-> +#define NVME_SET_CC_CSS(cc, val)    \
-> +    (cc |= (uint32_t)((val) & CC_CSS_MASK) << CC_CSS_SHIFT)
-> +#define NVME_SET_CC_MPS(cc, val)    \
-> +    (cc |= (uint32_t)((val) & CC_MPS_MASK) << CC_MPS_SHIFT)
-> +#define NVME_SET_CC_AMS(cc, val)    \
-> +    (cc |= (uint32_t)((val) & CC_AMS_MASK) << CC_AMS_SHIFT)
-> +#define NVME_SET_CC_SHN(cc, val)    \
-> +    (cc |= (uint32_t)((val) & CC_SHN_MASK) << CC_SHN_SHIFT)
-> +#define NVME_SET_CC_IOSQES(cc, val) \
-> +    (cc |= (uint32_t)((val) & CC_IOSQES_MASK) << CC_IOSQES_SHIFT)
-> +#define NVME_SET_CC_IOCQES(cc, val) \
-> +    (cc |= (uint32_t)((val) & CC_IOCQES_MASK) << CC_IOCQES_SHIFT)
-> +
->  enum NvmeCstsShift {
->      CSTS_RDY_SHIFT      = 0,
->      CSTS_CFS_SHIFT      = 1,
-> @@ -482,10 +508,41 @@ typedef struct NvmeIdentify {
->      uint64_t    rsvd2[2];
->      uint64_t    prp1;
->      uint64_t    prp2;
-> -    uint32_t    cns;
-> -    uint32_t    rsvd11[5];
-> +    uint8_t     cns;
-> +    uint8_t     rsvd4;
-> +    uint16_t    ctrlid;
-> +    uint16_t    nvmsetid;
-> +    uint8_t     rsvd3;
-> +    uint8_t     csi;
-> +    uint32_t    rsvd12[4];
->  } NvmeIdentify;
->  
-> +typedef struct NvmeNsIdDesc {
-> +    uint8_t     nidt;
-> +    uint8_t     nidl;
-> +    uint16_t    rsvd2;
-> +} NvmeNsIdDesc;
-> +
-> +enum NvmeNidType {
-> +    NVME_NIDT_EUI64             = 0x01,
-> +    NVME_NIDT_NGUID             = 0x02,
-> +    NVME_NIDT_UUID              = 0x03,
-> +    NVME_NIDT_CSI               = 0x04,
-> +};
-> +
-> +enum NvmeNidLength {
-> +    NVME_NIDL_EUI64             = 8,
-> +    NVME_NIDL_NGUID             = 16,
-> +    NVME_NIDL_UUID              = 16,
-> +    NVME_NIDL_CSI               = 1,
-> +};
-> +
-> +enum NvmeCsi {
-> +    NVME_CSI_NVM                = 0x00,
-> +};
-> +
-> +#define NVME_SET_CSI(vec, csi) (vec |= (uint8_t)(1 << (csi)))
-> +
->  typedef struct NvmeRwCmd {
->      uint8_t     opcode;
->      uint8_t     flags;
-> @@ -603,6 +660,7 @@ enum NvmeStatusCodes {
->      NVME_CMD_ABORT_MISSING_FUSE = 0x000a,
->      NVME_INVALID_NSID           = 0x000b,
->      NVME_CMD_SEQ_ERROR          = 0x000c,
-> +    NVME_CMD_SET_CMB_REJECTED   = 0x002b,
->      NVME_LBA_RANGE              = 0x0080,
->      NVME_CAP_EXCEEDED           = 0x0081,
->      NVME_NS_NOT_READY           = 0x0082,
-> @@ -729,9 +787,14 @@ typedef struct NvmePSD {
->  #define NVME_IDENTIFY_DATA_SIZE 4096
->  
->  enum {
-> -    NVME_ID_CNS_NS             = 0x0,
-> -    NVME_ID_CNS_CTRL           = 0x1,
-> -    NVME_ID_CNS_NS_ACTIVE_LIST = 0x2,
-> +    NVME_ID_CNS_NS                = 0x0,
-> +    NVME_ID_CNS_CTRL              = 0x1,
-> +    NVME_ID_CNS_NS_ACTIVE_LIST    = 0x2,
-> +    NVME_ID_CNS_NS_DESC_LIST      = 0x03,
-> +    NVME_ID_CNS_CS_NS             = 0x05,
-> +    NVME_ID_CNS_CS_CTRL           = 0x06,
-> +    NVME_ID_CNS_CS_NS_ACTIVE_LIST = 0x07,
-> +    NVME_ID_CNS_IO_COMMAND_SET    = 0x1c,
->  };
->  
->  typedef struct NvmeIdCtrl {
-> @@ -825,6 +888,7 @@ enum NvmeFeatureIds {
->      NVME_WRITE_ATOMICITY            = 0xa,
->      NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
->      NVME_TIMESTAMP                  = 0xe,
-> +    NVME_COMMAND_SET_PROFILE        = 0x19,
->      NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
->  };
->  
-> @@ -914,6 +978,7 @@ static inline void _nvme_check_size(void)
->      QEMU_BUILD_BUG_ON(sizeof(NvmeFwSlotInfoLog) != 512);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
-> +    QEMU_BUILD_BUG_ON(sizeof(NvmeNsIdDesc) != 4);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
->  }
-> -- 
-> 2.21.0
-> 
-> 
+Yes. Please let me know if it works, then I can try to get the patch 
+submitted.
+
+  HTH,
+   Thomas
+
 
