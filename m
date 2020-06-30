@@ -2,86 +2,68 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4154C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA48C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:31:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D38820780
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:11:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRQeESsm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D38820780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02ABB2078A
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:31:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02ABB2078A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq4nd-0005vj-SS
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:11:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40960)
+	id 1jq57h-0008SO-AM
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:31:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jq4ma-0005Lj-Ra; Mon, 29 Jun 2020 21:09:56 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34164)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jq4mY-0004gt-QW; Mon, 29 Jun 2020 21:09:56 -0400
-Received: by mail-io1-xd44.google.com with SMTP id m81so19282708ioa.1;
- Mon, 29 Jun 2020 18:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SHz87V7dIZrshDxwiNROVV+HaOi4iIKGHix/vBfscjQ=;
- b=DRQeESsmidoxpYq0Y6o9GXe57TDd5t0o3VZ1TlueROGgQ6dYsuaIP/lKR6OlAVONBe
- o7GIzcvDsmN6N6q76yAGBK4IfrCi+u6CF7kdpspW3tfGhPLXq/PaJj68+e4WNNKLKMRx
- tlxOtqKstuFV02aB3zyliOUCNwomozF8R3hDP4g1wMPmpqqkuzoSkaYMoDtaA1AWShXK
- 5C93ua1ATFvMQcSynia+oNcG2rGKjWbaFlngG5tsvlIVRchXrPTWcaDq82i1PKkYAybe
- 0pGtuxAWFixQR17PHbFF3Tk7XdB3ld3zCeRpTBv1solPu/dPefvxYJudsy67k4MDUTcU
- Qpqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SHz87V7dIZrshDxwiNROVV+HaOi4iIKGHix/vBfscjQ=;
- b=DzalJeKnF5hTM/wOmckfuk+QyIksX+Qu5fHX5mkOgtFVub5lUB7ZekTs/HBUoLyGPY
- RQoBtk/Qgow7nHZ0CjwhkuN4VEylzUds9qOVVf9vd4uU/ZQ21/oXLAMQAiNW5MH3aZSt
- EideH7y/Ef5ZizGtoiRxAOITQ6s2kdiZb9iwcWpKl8lEQPohzUvNKf+NBSIyimw+ShmZ
- JSHdWAbdN6kIZiq0x9EFxt6QqggRzgmqFsmBwAZYADEn3JjYSsQ4gXef2Tx10LbqVQ5m
- JEw1UaPBUm05PmwhD9OIhQQ8Mma0URQ1+U1y/OWl20vk2MBkr4zAAJhyXlVYpi60hzZn
- nbmw==
-X-Gm-Message-State: AOAM5335veTs6kkSJ1ovmffOITuI+RI3rr1HqOec555ku6Jra+OU3Tei
- jv9UWrYqokfrYGI6TTqG2/xpztecpJIEqc0wQ2w=
-X-Google-Smtp-Source: ABdhPJybcu9h85IqWYf6kpVHcY6V9+vKNW0TPkFgDDHtcE3VGB1lI//PDdyU6IfBnFrnA8kjcdZbq18kSe9guJq/a7E=
-X-Received: by 2002:a02:1a06:: with SMTP id 6mr21248521jai.8.1593479393502;
- Mon, 29 Jun 2020 18:09:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jq56l-0007v2-7r; Mon, 29 Jun 2020 21:30:47 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:20981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jq56i-0007dV-H0; Mon, 29 Jun 2020 21:30:46 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 4B8C974594E;
+ Tue, 30 Jun 2020 03:30:40 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 1BD3D745712; Tue, 30 Jun 2020 03:30:40 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 1876D7456F8;
+ Tue, 30 Jun 2020 03:30:40 +0200 (CEST)
+Date: Tue, 30 Jun 2020 03:30:40 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 2/4] smbus: Fix spd_data_generate() error API violation
+In-Reply-To: <87lfk5n9vp.fsf@dusky.pond.sub.org>
+Message-ID: <alpine.BSF.2.22.395.2006300310570.32453@zero.eik.bme.hu>
+References: <20200422134815.1584-1-armbru@redhat.com>
+ <20200422134815.1584-3-armbru@redhat.com>
+ <alpine.BSF.2.22.395.2004221622140.19234@zero.eik.bme.hu>
+ <0af0e0f0-8127-da83-d9d2-89a3fe28f778@redhat.com>
+ <alpine.BSF.2.22.395.2004222053070.22480@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2006261315070.94870@zero.eik.bme.hu>
+ <87k0ztrn9m.fsf@dusky.pond.sub.org>
+ <alpine.BSF.2.22.395.2006271320590.53209@zero.eik.bme.hu>
+ <87lfk5n9vp.fsf@dusky.pond.sub.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-4-dmitry.fomichev@wdc.com>
-In-Reply-To: <20200617213415.22417-4-dmitry.fomichev@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 29 Jun 2020 18:00:11 -0700
-Message-ID: <CAKmqyKPc1J+D5Yih0SamWD40GrVhyV75ogG5D5W8dv9ywaA3=g@mail.gmail.com>
-Subject: Re: [PATCH v2 03/18] hw/block/nvme: Clean up unused AER definitions
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/29 21:30:40
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,115 +76,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Keith Busch <kbusch@kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 2:48 PM Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
+On Mon, 29 Jun 2020, Markus Armbruster wrote:
+> BALATON Zoltan <balaton@eik.bme.hu> writes:
+>> On Sat, 27 Jun 2020, Markus Armbruster wrote:
+>>> Quick reply without having thought through the issues at all: I'm not
+>>
+>> Does that mean you'll reply later with more detail or this is all you
+>> had to say about this? (Just to know if I should wait for another
+>> reply.)
 >
-> Removed unused struct NvmeAerResult and SMART-related async event
-> codes. All other event codes are now categorized by their type.
-> This avoids having to define the same values in a single enum,
-> NvmeAsyncEventRequest, that is now removed.
->
-> Later commits in this series will define additional values in some
-> of these enums. No functional change.
->
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> Not sure I can find the time before the soft freeze.  Best not to wait
+> for me.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+OK I'm not sure my mac_oldworld patches can be finished or would be merged 
+before the freeze anyway and this was already broken in 5.0 so it's not 
+that urgent now but I'll need this in the future so eventually should 
+find some way to come to an agreement.
 
-Alistair
+>>> opposed to you doing work to enable additional or even arbitrary memory
+>>> sizes where these actually work.  I'm first and foremost opposed to me
+>>> wasting time on "improving" code that is not used for anything.  That's
+>>> why I dumbed down spd_data_generate().
+>>
+>> It was used by sam460ex until moving ram allocation to memdev broke it.
+>>
+>>> Secondly, I'm opposed to QEMU "correcting" user configuration.  I want
+>>> QEMU do exactly what it's told, and fail with a clear error message when
+>>> that is not possible.  The error message may include hints for the user
+>>> on how to correct the configuration.
+>>
+>> I don't agree with that. It's already hard enough for non-expert users
+>> to figure out the needed command line switches, making that even
+>> harder by throwing back an error for everything that could work just
+>> not exactly specified is needlessly annoying them further. To the
+>> point of chasing them away from using QEMU. A lot of people prefer
+>> VMWare or VirtualBox for this reason and only try QEMU if there's no
+>> other way.
+>
+> We don't have to agree on everything.  I'm not the QEMU CLI dictator.
+> The status quo is pretty clear, though:
+>
+>    $ qemu-system-ppc64 -help
+>    [...]
+>    -m [size=]megs[,slots=n,maxmem=size]
+>                    configure guest RAM
+>                    size: initial amount of guest memory
+>    [...]
+>
+> It says "Initial amount of guest memory", not "Approximate amount of
+> guest memory" or something like that.
+>
+> If we decide we want to change it from "Initial amount of guest memory"
+> to some "do what I mean" behavior, then that behavior needs to be
+> documented.
 
-> ---
->  hw/block/nvme.h      |  1 -
->  include/block/nvme.h | 43 ++++++++++++++++++++++---------------------
->  2 files changed, 22 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 0460cc0e62..4f0dac39ae 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -13,7 +13,6 @@ typedef struct NvmeParams {
->
->  typedef struct NvmeAsyncEvent {
->      QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
-> -    NvmeAerResult result;
->  } NvmeAsyncEvent;
->
->  enum NvmeRequestFlags {
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 9c3a04dcd7..3099df99eb 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -553,28 +553,30 @@ typedef struct NvmeDsmRange {
->      uint64_t    slba;
->  } NvmeDsmRange;
->
-> -enum NvmeAsyncEventRequest {
-> -    NVME_AER_TYPE_ERROR                     = 0,
-> -    NVME_AER_TYPE_SMART                     = 1,
-> -    NVME_AER_TYPE_IO_SPECIFIC               = 6,
-> -    NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
-> -    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
-> -    NVME_AER_INFO_ERR_INVALID_DB            = 1,
-> -    NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
-> -    NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
-> -    NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
-> -    NVME_AER_INFO_ERR_FW_IMG_LOAD_ERR       = 5,
-> -    NVME_AER_INFO_SMART_RELIABILITY         = 0,
-> -    NVME_AER_INFO_SMART_TEMP_THRESH         = 1,
-> -    NVME_AER_INFO_SMART_SPARE_THRESH        = 2,
-> +enum NvmeAsyncEventType {
-> +    NVME_AER_TYPE_ERROR                     = 0x00,
-> +    NVME_AER_TYPE_SMART                     = 0x01,
-> +    NVME_AER_TYPE_NOTICE                    = 0x02,
-> +    NVME_AER_TYPE_CMDSET_SPECIFIC           = 0x06,
-> +    NVME_AER_TYPE_VENDOR_SPECIFIC           = 0x07,
->  };
->
-> -typedef struct NvmeAerResult {
-> -    uint8_t event_type;
-> -    uint8_t event_info;
-> -    uint8_t log_page;
-> -    uint8_t resv;
-> -} NvmeAerResult;
-> +enum NvmeAsyncErrorInfo {
-> +    NVME_AER_ERR_INVALID_SQ                 = 0x00,
-> +    NVME_AER_ERR_INVALID_DB                 = 0x01,
-> +    NVME_AER_ERR_DIAG_FAIL                  = 0x02,
-> +    NVME_AER_ERR_PERS_INTERNAL_ERR          = 0x03,
-> +    NVME_AER_ERR_TRANS_INTERNAL_ERR         = 0x04,
-> +    NVME_AER_ERR_FW_IMG_LOAD_ERR            = 0x05,
-> +};
-> +
-> +enum NvmeAsyncNoticeInfo {
-> +    NVME_AER_NOTICE_NS_CHANGED              = 0x00,
-> +};
-> +
-> +enum NvmeAsyncEventCfg {
-> +    NVME_AEN_CFG_NS_ATTR                    = 1 << 8,
-> +};
->
->  typedef struct NvmeCqe {
->      union {
-> @@ -881,7 +883,6 @@ enum NvmeIdNsDps {
->
->  static inline void _nvme_check_size(void)
->  {
-> -    QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
->      QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
-> --
-> 2.21.0
->
->
+This is sufficiently vague that it says "initial" which to me means it's 
+not absolute and can change while the VM is running so a change due to fix 
+up fits in that in my opinion :-)
+
+> Moreover, if DWIM is appropriate for one machine, it's probably
+> appropriate for all of them.  The CLI should be as consistent as we can
+> make it across machines.
+
+That's the point. Rummimg e.g. qemu-system-x86_64 -m 1000 does not abort 
+but runs the VM with an odd RAM size even though that's not possible on 
+real hardware. Other machines should behave the same, within their limits: 
+for sam460ex that means we need to truncate memory size to largest valid 
+value becuause of SoC limits, for mac_oldworld that means with OpenBIOS it 
+will see all RAM and with firmware ROM somewhat less. I've implemented 
+that originally both for consistency and user convenience but this was 
+"cleaned up" afterwrds and also made impossible to implement again without 
+duplicating code in boards or reverting to some previous state and fixing 
+the problems in a way that allows my use case as well.
+
+Regards,
+BALATON Zoltan
 
