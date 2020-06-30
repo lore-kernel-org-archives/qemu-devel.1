@@ -6,115 +6,58 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1C9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1269420663
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1269420663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 712412074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:46:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712412074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqNhX-0003DS-3i
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46162)
+	id 1jqO5I-00035X-MY
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:46:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jqNgd-0002k2-5X
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 17:21:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:49399)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jqO4b-0002Mu-8q; Tue, 30 Jun 2020 17:45:49 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:57946)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jqNgb-0000UP-8J
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 17:21:02 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mf0Jg-1j9uFv23VS-00gXuO; Tue, 30 Jun 2020 23:20:57 +0200
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-References: <20200630112752.31134-1-mark.cave-ayland@ilande.co.uk>
- <20200630112752.31134-3-mark.cave-ayland@ilande.co.uk>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH v3 2/2] target/m68k: consolidate physical translation
- offset into get_physical_address()
-Message-ID: <3da2bd06-b7fe-5b02-d35a-d57edc1a7989@vivier.eu>
-Date: Tue, 30 Jun 2020 23:20:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jqO4Y-0005K4-9W; Tue, 30 Jun 2020 17:45:48 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 7B55174633E;
+ Tue, 30 Jun 2020 23:45:42 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 4CF3F746333; Tue, 30 Jun 2020 23:45:42 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 4BAD6746331;
+ Tue, 30 Jun 2020 23:45:42 +0200 (CEST)
+Date: Tue, 30 Jun 2020 23:45:42 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v7 1/8] mac_oldworld: Allow loading binary ROM image
+In-Reply-To: <ad28ac08-160d-0bde-7856-483308d164cb@ilande.co.uk>
+Message-ID: <alpine.BSF.2.22.395.2006302249091.46417@zero.eik.bme.hu>
+References: <cover.1593456926.git.balaton@eik.bme.hu>
+ <c69a791c7cad1246f3f34b3993dee4f549b75aa2.1593456926.git.balaton@eik.bme.hu>
+ <ad28ac08-160d-0bde-7856-483308d164cb@ilande.co.uk>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200630112752.31134-3-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZY2hDJARYs/9sicgPvtSCy0vxKq8slU6CqFnB+vGXQzCYAKtQcX
- lorpiGZJ9HWzcnd8FX2w8UTUjPW/SoN/dJ5ps4BXLK7tAXo3RbiRf5jFCQ7+l3n23l+JSz4
- 3m4hJrBuyOgXrGN9dpoh6kkMD/3HsZlVqNn+ZNRoml3VE74KsjibzbM+YA3YhU4Caz+56kB
- ooRJMvYrIDJ47ebIpBQfQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:thVP2dZu5do=:L5252Oe4iMF7jUhTpj56wU
- plheKaxOuORvpnSdvM2UdvdG/uhtAYIQt3whNV7gg93Laa6WkHdq8mic9seMtRAX8cnWYCmu2
- 1InflihrgOHYvPJcGYpv6/v/sBcHLURrfwZTPA3qWa1dTnzQ2Inz8aSaQSR5BFTWSVMg0Fdny
- tY1gnTAI2159vhCIW8bVBXvNNw+WTD4xlPUDtEA0A+ceZaFX6E27nZJjPI1g7rNx7TsB40eXn
- uNZKWFap9pmZiTIZok3mIT8ifk4WvdqS/HnZjWcDOb/vCgaBRhCYwSN0vT6+oBQPBA0m7or3c
- OR10y1X4eoCvfplckDs0UYaY+iFB5zZWHjw109on9jM1GZ176iPP1iHETEDELUKsb/h+jUWkz
- W2XcG/cIJyDQjp14qs2KqpMRJPd/hq6vunvjtQdaO7pigs+ZWPnUa/wOfOG66Re98bi/pZrBr
- NFkl06FyJUKFGTA6t/lJU/9kWjZzbdlW9eDHjHvDn4mJndzVpAVJr6JwEqO/Rp5ZG0PKmCgNn
- ljh3c6mBmxW9y+j5ZsTEtMogL1Ud9PfjJOnHFecgSF36usUafbZG++8vpRBxKyGM5U9FYanBB
- cA3SOiMmc0GlVzqiuTRWWrBuCbCexUXXrYywxRujAXWP7kNIvlBBKfAM/MhEqgS+F6bNu0KkT
- uJTizAo0ku+iDRvD7rAyU+9KJFYsz8ykWa40Uda2yctRYYjnsDBYsfnBgUx6aGs49uFEfHpaI
- yumsv85nFleQ7g33DXKaKG6rqHMwnWTaxNSjVFPH8QKClR37H0/XuBRKTmLarFIrzVj/uwsvO
- qYBtC/saUWpwMgaQbLszF/8J/joriZiPgv5LBHNYtWc6R6cHpQ=
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 17:20:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 17:45:42
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,80 +70,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/06/2020 à 13:27, Mark Cave-Ayland a écrit :
-> Since all callers to get_physical_address() now apply the same page offset to
-> the translation result, move the logic into get_physical_address() itself to
-> avoid duplication.
-> 
-> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/m68k/helper.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index 631eab7774..71c2376910 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -643,7 +643,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->                  /* Transparent Translation Register bit */
->                  env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
->              }
-> -            *physical = address & TARGET_PAGE_MASK;
-> +            *physical = address;
->              *page_size = TARGET_PAGE_SIZE;
->              return 0;
->          }
-> @@ -771,7 +771,8 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->      }
->      *page_size = 1 << page_bits;
->      page_mask = ~(*page_size - 1);
-> -    *physical = next & page_mask;
-> +    address &= TARGET_PAGE_MASK;
+On Tue, 30 Jun 2020, Mark Cave-Ayland wrote:
+> On 29/06/2020 19:55, BALATON Zoltan wrote:
+>> The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
+>> the rom region and fall back to loading a binary image with -bios if
+>> loading ELF image failed. This allows testing emulation with a ROM
+>> image from real hardware as well as using an ELF OpenBIOS image.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>> v4: use load address from ELF to check if ROM is too big
+>>
+>>  hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
+>>  1 file changed, 20 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>> index f8c204ead7..baf3da6f90 100644
+>> --- a/hw/ppc/mac_oldworld.c
+>> +++ b/hw/ppc/mac_oldworld.c
+>> @@ -59,6 +59,8 @@
+>>  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+>>
+>>  #define GRACKLE_BASE 0xfec00000
+>> +#define PROM_BASE 0xffc00000
+>> +#define PROM_SIZE (4 * MiB)
+>>
+>>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>>                              Error **errp)
+>> @@ -99,6 +101,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>>      SysBusDevice *s;
+>>      DeviceState *dev, *pic_dev;
+>>      BusState *adb_bus;
+>> +    uint64_t bios_addr;
+>>      int bios_size;
+>>      unsigned int smp_cpus = machine->smp.cpus;
+>>      uint16_t ppc_boot_device;
+>> @@ -127,24 +130,32 @@ static void ppc_heathrow_init(MachineState *machine)
+>>
+>>      memory_region_add_subregion(sysmem, 0, machine->ram);
+>>
+>> -    /* allocate and load BIOS */
+>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+>> +    /* allocate and load firmware ROM */
+>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+>>                             &error_fatal);
+>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
+>>
+>> -    if (bios_name == NULL)
+>> +    if (!bios_name) {
+>>          bios_name = PROM_FILENAME;
+>> +    }
+>>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
+>> -
+>> -    /* Load OpenBIOS (ELF) */
+>>      if (filename) {
+>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, NULL,
+>> -                             1, PPC_ELF_MACHINE, 0, 0);
+>> +        /* Load OpenBIOS (ELF) */
+>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, &bios_addr,
+>> +                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>> +        if (bios_size <= 0) {
+>> +            /* or load binary ROM image */
+>> +            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
+>> +            bios_addr = PROM_BASE;
+>> +        } else {
+>> +            /* load_elf sets high 32 bits for some reason, strip those */
+>> +            bios_addr &= 0xffffffffULL;
+>
+> Repeating my earlier comment from v5: something is wrong here if you need to manually
+> strip the high bits. If you compare with SPARC32 which uses the same approach, there
+> is no such strip required - have a look there to try and figure out what's going on here.
 
-I don't think you need TARGET_PAGE_MASK here:
-- TARGET_PAGE_MASK is 4096
-- page_mask is either 4096 or 8192
+OK, the problem here is this:
 
-> +    *physical = (next & page_mask) + (address & (*page_size - 1));
->  
->      if (access_type & ACCESS_PTEST) {
->          env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-> @@ -826,8 +827,6 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->          return -1;
->      }
->  
-> -    addr &= TARGET_PAGE_MASK;
-> -    phys_addr += addr & (page_size - 1);
->      return phys_addr;
->  }
->  
-> @@ -891,10 +890,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      ret = get_physical_address(&cpu->env, &physical, &prot,
->                                 address, access_type, &page_size);
->      if (likely(ret == 0)) {
-> -        address &= TARGET_PAGE_MASK;
-> -        physical += address & (page_size - 1);
-> -        tlb_set_page(cs, address, physical,
-> -                     prot, mmu_idx, TARGET_PAGE_SIZE);
-> +        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
+$ gdb qemu-system-ppc
+(gdb) b mac_oldworld.c:146
+Breakpoint 1 at 0x416770: file hw/ppc/mac_oldworld.c, line 146.
+(gdb) r
+Thread 1 "qemu-system-ppc" hit Breakpoint 1, ppc_heathrow_init (machine=0x555556863800) at hw/ppc/mac_oldworld.c:146
+146	    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+(gdb) n
+147	    if (filename) {
+149	        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, &bios_addr,
+151	        if (bios_size <= 0) {
+(gdb) p bios_size
+$1 = 755500
+(gdb) p/x bios_addr
+$2 = 0xfffffffffff00000
 
-I had a look to tl_set_page() to see how it manages the entry when the
-addresses are not aligned to page_size, and it calls
-tlb_set_page_with_attrs() where we have a comment:
+this happens within load_elf that I don't feel like wanting to debug but 
+causes problem when we use it to calculate bios size later here:
 
-/* Add a new TLB entry. At most one entry for a given virtual address
- * is permitted. Only a single TARGET_PAGE_SIZE region is mapped, the
- * supplied size is only used by tlb_flush_page.
-...
+-    if (bios_size < 0 || bios_size > BIOS_SIZE) {
++    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > PROM_SIZE) {
 
-So I think it's correct to use TARGET_PAGE_MASK and page_size.
+unless we strip it down to expected 32 bits. This could be some unwanted 
+size extension or whatnot but I don't have time to dig deeper.
 
-Thanks,
-Laurent
+Now lets see what sun4m does:
+
+$ gdb qemu-system-sparc
+(gdb) b sun4m.c:721
+Breakpoint 1 at 0x1fc0e6: file hw/sparc/sun4m.c, line 721.
+(gdb) r
+Thread 1 "qemu-system-spa" hit Breakpoint 1, prom_init (addr=1879048192, bios_name=0x555555b3c60d "openbios-sparc32") at hw/sparc/sun4m.c:721
+721	    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+(gdb) p/x addr
+$1 = 0x70000000
+(gdb) n
+722	    if (filename) {
+723	        ret = load_elf(filename, NULL,
+726	        if (ret < 0 || ret > PROM_SIZE_MAX) {
+(gdb) p ret
+$2 = 847872
+(gdb) p/x addr
+$3 = 0x70000000
+
+Hmm, does not happen here, the difference is that this calls load_elf with 
+addr already initialised so maybe load_elf only sets low 32 bits? By the 
+way, sun4m does not use the returned addr so even if it was wrong it would 
+not be noticed,
+
+Maybe initialising addr before calling load_elf in mac_oldworld,c could 
+fix this so we can get rid of the fix up? Unfortunately not:
+
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -98,7 +98,7 @@ static void ppc_heathrow_init(MachineState *machine)
+      SysBusDevice *s;
+      DeviceState *dev, *pic_dev;
+      BusState *adb_bus;
+-    uint64_t bios_addr;
++    uint64_t bios_addr = 0;
+      int bios_size;
+      unsigned int smp_cpus = machine->smp.cpus;
+      uint16_t ppc_boot_device;
+
+$ gdb qemu-system-ppc
+[...]
+Thread 1 "qemu-system-ppc" hit Breakpoint 1, ppc_heathrow_init (machine=0x555556863800) at hw/ppc/mac_oldworld.c:146
+146	    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+(gdb) p bios_addr
+$1 = 0
+(gdb) n
+147	    if (filename) {
+149	        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, &bios_addr,
+151	        if (bios_size <= 0) {
+(gdb) p/x bios_addr
+$2 = 0xfffffffffff00000
+
+Could this be something about openbios-ppc? I don't know. I give up 
+investigating further at this point and let someone else find out.
+Any ideas?
+
+Regards,
+BALATON Zoltan
 
