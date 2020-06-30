@@ -2,89 +2,96 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993C4C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44360C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:15:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 616BA206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0D34206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:15:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9Z5jkDz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 616BA206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPjmTkFG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D34206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqCLU-0006QL-LC
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:14:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40274)
+	id 1jqCM4-0007OA-OQ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:15:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBh-0002wz-ES
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43021
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBQ-0002yd-Or
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593507844;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OcxBdk1yR0L0NGPCwHLwfbasPaqRo7Vbg5ITcMbllEc=;
- b=M9Z5jkDzHjMMC6WWiZsOlNas8A7zzkngdP0KPO6Y/hf/XNu9VMrUyQMrVJkPdy8CUUxvQu
- koLkfzMuMZHCx03tpw1KMPCgq/NfmHN/g1+1xPfQ94eO0cOvpbrfONbgY6UKj/04RG3XSU
- SBrIpbgZqaL2+JgAjHposXrgC7Rp+TM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-UB7F9aXdNhWsl7eGaxuNFw-1; Tue, 30 Jun 2020 05:04:01 -0400
-X-MC-Unique: UB7F9aXdNhWsl7eGaxuNFw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE93883DE30;
- Tue, 30 Jun 2020 09:03:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43E885C1B0;
- Tue, 30 Jun 2020 09:03:53 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A0D1C11384D4; Tue, 30 Jun 2020 11:03:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/26] net/virtio: Fix failover_replug_primary() return
- value regression
-Date: Tue, 30 Jun 2020 11:03:26 +0200
-Message-Id: <20200630090351.1247703-2-armbru@redhat.com>
-In-Reply-To: <20200630090351.1247703-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqCJ1-0001Tt-Ne; Tue, 30 Jun 2020 05:11:56 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:46890)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqCIz-0004CX-Q2; Tue, 30 Jun 2020 05:11:55 -0400
+Received: by mail-ej1-x644.google.com with SMTP id p20so19705681ejd.13;
+ Tue, 30 Jun 2020 02:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=D9mdRQwdC5EeawapV6J9Zhfd1oXOQ1bzYAweYGrslB0=;
+ b=mPjmTkFGyKcqjBGHNQL/ybRic2qOU7jfupN2hoPT6OiXntJtBmGobch5q6ddaofksM
+ 0S8ov06nGUcdaVb49fwF2BaKpQU6hjwMI6ARFyfE5ajPIRK7AHG+GgZOydThtAQJlWgK
+ nOKxVft8dYCzDbA1ttNazCXSZ/jlSkcWBsTSFYu+wHFol+b/hS05A+FnFiD2lejG9UN3
+ 49BLFBhozBbhxpdfe/wI94YLsgWi8r+8SeaXLDKfN3WBhfWlJmIBYpLhbINR3xVfgbep
+ kEooP91hGH37d9PptFdxsd3Yt7E+VEhD1Yflk+1IOMCPADLL+Q4UOhOdGCkxdqqzqH4L
+ zZBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=D9mdRQwdC5EeawapV6J9Zhfd1oXOQ1bzYAweYGrslB0=;
+ b=s8aVdO+0SVGTczEOaqDqDh1m/r1+89XEouaTwOlWyHQX9zBFCk/NxmbsJHvz8oIHOo
+ iM7frlM9z+bmhvn6NYcRsoelM4gUnKJgyRTIWtJaKICXChBzhtpIc1uWqer6wVatYn1o
+ EPhOgw8AURagnaWZ9MLTC0NegcySGucDpLHwLEYsY5WvGgehWdFMo2kL4JvJ0u4+/kLY
+ seomwCpL6TbvGf4jC0t43zhrwt1XZGwNSCYwVZzKmVhMTSsknjkEMNs0VYUX6rJKPqvz
+ iJQupfYAhlOooRfV2awngVV7bflRiJcIpNYEnnq8gmyDR2bMCKeIc+4094+vuw5oGAav
+ L8tw==
+X-Gm-Message-State: AOAM533MkiQsx/zYP8xyOQQqLvjTdiDVjCAVjKrwIu8I71MZP0Kk2O2q
+ T8tOzKW+y2WKZFcVb3LOk/cyrpouy+M=
+X-Google-Smtp-Source: ABdhPJx4IUyki2vnUYKTEG1SxAtDntt9j4qZwsf0KDgrt64egUoVkWbBipSoM3e6LhEIbgIpsbyWFQ==
+X-Received: by 2002:a17:906:1499:: with SMTP id
+ x25mr17153476ejc.406.1593508311814; 
+ Tue, 30 Jun 2020 02:11:51 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id v5sm1562164eje.88.2020.06.30.02.11.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 02:11:51 -0700 (PDT)
+Subject: Re: [PATCH v3 24/26] hw/arm/armsse: Fix armsse_realize() error API
+ violation
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200630090351.1247703-1-armbru@redhat.com>
+ <20200630090351.1247703-25-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <943dbf9e-71fd-c53d-46d6-c19e7e4a000b@amsat.org>
+Date: Tue, 30 Jun 2020 11:11:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200630090351.1247703-25-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,44 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jens Freimann <jfreimann@redhat.com>, qemu-stable@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 150ab54aa6 "net/virtio: fix re-plugging of primary device"
-fixed failover_replug_primary() to return false on failure.  Commit
-5a0948d36c "net/virtio: Fix failover error handling crash bugs" broke
-it again for hotplug_handler_plug() failure.  Unbreak it.
+On 6/30/20 11:03 AM, Markus Armbruster wrote:
+> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+> pointer to a variable containing NULL.  Passing an argument of the
+> latter kind twice without clearing it in between is wrong: if the
+> first call sets an error, it no longer points to NULL for the second
+> call.
+> 
+> armsse_realize() is wrong that way: it passes &err to
+> object_property_set_int() multiple times without checking it, and then
+> to sysbus_realize().  Harmless, because the former can't actually fail
+> here.
+> 
+> Fix by passing &error_abort instead.
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Commit 5a0948d36c4cbc1c5534afac6fee99de55245d12
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Fixes: 5a0948d36c4cbc1c5534afac6fee99de55245d12
-Cc: Jens Freimann <jfreimann@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/net/virtio-net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index aff67a92df..9bb5578e5d 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3129,7 +3129,7 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
-         if (err) {
-             goto out;
-         }
--        hotplug_handler_plug(hotplug_ctrl, n->primary_dev, errp);
-+        hotplug_handler_plug(hotplug_ctrl, n->primary_dev, &err);
-     }
- 
- out:
--- 
-2.26.2
+> ---
+>  hw/arm/armsse.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+> index c73cc6badf..e2cf43ee0b 100644
+> --- a/hw/arm/armsse.c
+> +++ b/hw/arm/armsse.c
+> @@ -991,13 +991,13 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysinfo), 0, 0x40020000);
+>      /* System control registers */
+>      object_property_set_int(OBJECT(&s->sysctl), info->sys_version,
+> -                            "SYS_VERSION", &err);
+> +                            "SYS_VERSION", &error_abort);
+>      object_property_set_int(OBJECT(&s->sysctl), info->cpuwait_rst,
+> -                            "CPUWAIT_RST", &err);
+> +                            "CPUWAIT_RST", &error_abort);
+>      object_property_set_int(OBJECT(&s->sysctl), s->init_svtor,
+> -                            "INITSVTOR0_RST", &err);
+> +                            "INITSVTOR0_RST", &error_abort);
+>      object_property_set_int(OBJECT(&s->sysctl), s->init_svtor,
+> -                            "INITSVTOR1_RST", &err);
+> +                            "INITSVTOR1_RST", &error_abort);
+>      sysbus_realize(SYS_BUS_DEVICE(&s->sysctl), &err);
+>      if (err) {
+>          error_propagate(errp, err);
+> 
 
 
