@@ -2,93 +2,129 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75582C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8971EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D97820760
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:21:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1308B20760
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:22:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="opem8ZSb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D97820760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/WqxBhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1308B20760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDOR-0005hc-I1
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:21:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58842)
+	id 1jqDPh-0007B8-4F
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:22:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7W-0002pJ-HS; Tue, 30 Jun 2020 06:04:06 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:33016)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7R-0004il-Ay; Tue, 30 Jun 2020 06:04:06 -0400
-Received: by mail-ej1-x641.google.com with SMTP id n26so5957808ejx.0;
- Tue, 30 Jun 2020 03:04:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=JRZNazdov+ee3WL2ncAzmR+/lQC5nrG6ZQMKrWySSrg=;
- b=opem8ZSbKmF91giGiCi7MDWnSBjvr5NhKBZu3dLGJzSwKth19+fxzUM8nxyNaKhDka
- 3kSw3F0+hxAvBEKoxBvlSXb6HuYPQQHmji0/+ISPKYQIS5mzO8qkqLFHNoGMA4mxyeHQ
- ZTi9uT3tcgfmyl4LVHZOjVnDMRJbwr/a8w1aMojJqNn+0eddxeuViqVeE+bXXgd7atYO
- s6f6akl9r+xOJMUP8XI3EM2jMv6VEiIZAY0jWyEJd4g8F87Z+EoMenWZl+BiA84LoLY1
- 92j4C/3EVaBZ2hHM0xHPxwWUqdg3CdDiXa9ZTtFsIWyhpTuwzxXaAQLoUNXzWdf1IDyR
- zrdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JRZNazdov+ee3WL2ncAzmR+/lQC5nrG6ZQMKrWySSrg=;
- b=PpZRkjMxhD9j2S5tt9Q2aMSXDJ6UkjK70VhbRnrZQNDHSxUQsGoOImMV6G9P2Fh3rQ
- y2yvIbYMJ9xnmhj0KB+zSl8Gcf22ENdrA3Edke0A4H1UXoOnAwEaXntFUWQnVrx6sih+
- Fwb8zBLsgt9olcoZX2KEfzZxXsd7EnSskLIgjKTaOpeUREdCee8zD+UZw54TZPWi5ujf
- nU68lk9IsEyqPJlgbGY2+vmOmgIDyaTN43G/Of6zVjiDzfpV54iQG1/5oRJBNdYFhogv
- LT0PIvllUQcMNec5DVEscqYW1BkEs3IlBiVSSfPPNH1+G1zAKxfp/V9WRk/feyvzYB75
- pwXw==
-X-Gm-Message-State: AOAM5301EGlL3RpybjvDthSRvDpKvhPKn6Uf931CFfXWnSIKLxz1R16g
- ejUyGqVYULCoAoFmjRiPe0FFdVm7x8E=
-X-Google-Smtp-Source: ABdhPJwmYGAmIHsHUQXZQT2Ou3B9aIXP3KImTenN0WBqFnhgt3Z+6Iog1FuicQOK6txP6o1JxsCX4w==
-X-Received: by 2002:a17:907:7294:: with SMTP id
- dt20mr17178564ejc.355.1593511439610; 
- Tue, 30 Jun 2020 03:03:59 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 03:03:59 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 14/15] hw/sd/sdcard: Display offset in read/write_data()
- trace events
-Date: Tue, 30 Jun 2020 12:03:41 +0200
-Message-Id: <20200630100342.27625-15-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200630100342.27625-1-f4bug@amsat.org>
-References: <20200630100342.27625-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jqDOq-0006LM-EH
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:22:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45958
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jqDOl-0007iV-IM
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:22:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593512514;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=QUKiASrudGULEksuLA4TxDL6wwCUQXyEbK7iHKlUsbk=;
+ b=I/WqxBhXdscadRK1d9RU8HVen+o8udDB0AHMq4FIsS+DQc7RiS34tohaDZEURLfU2UcKyF
+ Z88p95k3JWbnUwSpWotJ1mbGXj0cGAnX+AgEotDF4Uf1hqziXL66HMOMGl7JthS8ROEX8G
+ iLAFD/udvfMRXmL3hOtseg0LYcU+otU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-2SObc8QXPciJRMItTBE3wg-1; Tue, 30 Jun 2020 06:21:52 -0400
+X-MC-Unique: 2SObc8QXPciJRMItTBE3wg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EBA5805EF1;
+ Tue, 30 Jun 2020 10:21:51 +0000 (UTC)
+Received: from [10.36.114.56] (ovpn-114-56.ams2.redhat.com [10.36.114.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 52C3D5C1C5;
+ Tue, 30 Jun 2020 10:21:46 +0000 (UTC)
+Subject: Re: [PATCH v5 10/21] virtio-mem: Paravirtualized memory hot(un)plug
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200626072248.78761-1-david@redhat.com>
+ <20200626072248.78761-11-david@redhat.com>
+ <20200630060405-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <b18557dc-d434-8951-f6a3-11e3a4195ddc@redhat.com>
+Date: Tue, 30 Jun 2020 12:21:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20200630060405-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,66 +138,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Having 'base address' and 'relative offset' displayed
-separately is more helpful than the absolute address.
+On 30.06.20 12:06, Michael S. Tsirkin wrote:
+> On Fri, Jun 26, 2020 at 09:22:37AM +0200, David Hildenbrand wrote:
+>> This is the very basic/initial version of virtio-mem. An introduction to
+>> virtio-mem can be found in the Linux kernel driver [1]. While it can be
+>> used in the current state for hotplug of a smaller amount of memory, it
+>> will heavily benefit from resizeable memory regions in the future.
+>>
+>> Each virtio-mem device manages a memory region (provided via a memory
+>> backend). After requested by the hypervisor ("requested-size"), the
+>> guest can try to plug/unplug blocks of memory within that region, in order
+>> to reach the requested size. Initially, and after a reboot, all memory is
+>> unplugged (except in special cases - reboot during postcopy).
+>>
+>> The guest may only try to plug/unplug blocks of memory within the usable
+>> region size. The usable region size is a little bigger than the
+>> requested size, to give the device driver some flexibility. The usable
+>> region size will only grow, except on reboots or when all memory is
+>> requested to get unplugged. The guest can never plug more memory than
+>> requested. Unplugged memory will get zapped/discarded, similar to in a
+>> balloon device.
+>>
+>> The block size is variable, however, it is always chosen in a way such that
+>> THP splits are avoided (e.g., 2MB). The state of each block
+>> (plugged/unplugged) is tracked in a bitmap.
+>>
+>> As virtio-mem devices (e.g., virtio-mem-pci) will be memory devices, we now
+>> expose "VirtioMEMDeviceInfo" via "query-memory-devices".
+>>
+>> --------------------------------------------------------------------------
+>>
+>> There are two important follow-up items that are in the works:
+>> 1. Resizeable memory regions: Use resizeable allocations/RAM blocks to
+>>    grow/shrink along with the usable region size. This avoids creating
+>>    initially very big VMAs, RAM blocks, and KVM slots.
+>> 2. Protection of unplugged memory: Make sure the gust cannot actually
+>>    make use of unplugged memory.
+>>
+>> Other follow-up items that are in the works:
+>> 1. Exclude unplugged memory during migration (via precopy notifier).
+>> 2. Handle remapping of memory.
+>> 3. Support for other architectures.
+> 
+> Question: I see that this does not check qemu_balloon_is_inhibited -
+> is that because this works with VFIO, somehow?
+> Or is this an oversight?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sd.c         | 8 ++++----
- hw/sd/trace-events | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+I use the new
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index de194841a7..7f973f6763 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1841,8 +1841,8 @@ void sd_write_data(SDState *sd, uint8_t value)
-         return;
- 
-     trace_sdcard_write_data(sd->proto_name,
--                            sd_current_cmd_name(sd),
--                            sd->current_cmd, value);
-+                            sd_current_cmd_name(sd), sd->current_cmd,
-+                            sd->data_start, sd->data_offset, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-         sd->data[sd->data_offset ++] = value;
-@@ -1995,8 +1995,8 @@ uint8_t sd_read_data(SDState *sd)
-     io_len = (sd->ocr & (1 << 30)) ? HWBLOCK_SIZE : sd->blk_len;
- 
-     trace_sdcard_read_data(sd->proto_name,
--                           sd_current_cmd_name(sd),
--                           sd->current_cmd, io_len);
-+                           sd_current_cmd_name(sd), sd->current_cmd,
-+                           sd->data_start, sd->data_offset, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
-         ret = sd->data[sd->data_offset ++];
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index d0cd7c6ec4..946923223b 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -51,8 +51,8 @@ sdcard_lock(void) ""
- sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
--sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
--sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint32_t length) "%s %20s/ CMD%02d len %" PRIu32
-+sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, uint8_t value) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " val 0x%02x"
-+sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, uint32_t length) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " len %" PRIu32
- sdcard_set_voltage(uint16_t millivolts) "%u mV"
- 
- # milkymist-memcard.c
+if (ram_block_discard_require(true)) {
+	error_setg(errp, "Discarding RAM is disabled");
+	return;
+}
+
+in virtio_mem_device_realize. This will assure that incompatible
+technologies (esp. VFIO) are inhibited and are not able to become active
+as long as virtio-mem is around.
+
+virtio_mem_is_busy() handles migration/postcopy, indicating "busy" while
+migration is temporarily active.
+
+(qemu_balloon_is_inhibited() is no more since "[PATCH v5 06/21]
+virtio-balloon: Rip out qemu_balloon_inhibit()")
+
 -- 
-2.21.3
+Thanks,
+
+David / dhildenb
 
 
