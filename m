@@ -2,95 +2,104 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9E0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14B1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C4302065F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89B712065F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bm3psvMN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4302065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OgFl8eOn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B712065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDnG-0008UN-5T
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:47:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42108)
+	id 1jqDnK-00007c-S7
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:47:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqDla-00072z-2t; Tue, 30 Jun 2020 06:45:30 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35437)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqDlY-0003WD-8k; Tue, 30 Jun 2020 06:45:29 -0400
-Received: by mail-ej1-x641.google.com with SMTP id rk21so20036687ejb.2;
- Tue, 30 Jun 2020 03:45:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xWW3S9JbFqbF/WDaHtuTcZJtixpKk+BO6FbGx3kUnLI=;
- b=bm3psvMNTmSW0Z7/1cNLpn0EuURvc/8NPcxoCdaUGoXNP10ktMucUNEqt3B3y6kz3C
- qjBa+dpAaRCIAW4JFA+93MxzpuAdfS07sVUKSCu00oT738sXXiRVFcnal/jt+TT/y6cK
- J+P7XiW5LdwH91zydtHNTp2Gji065P0UaheiDG9/lSdhsxmaUrPHJ4xtwtdOehjVEgP5
- cQe0dJ7GscTjtANEneCFD+v3tT4uOarMU8ITomH8BkLTn6Rp14/P6EGNHFe/afRDs2gn
- 7gMY8VYR29jVHpZoIHV1MAEm0nk/Vs/MOar22lTiZ0VUjq5L5IOL2P7jrW2fuNPzHqs0
- WXqA==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqDlw-0007b6-Lt
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:45:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41053
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqDlu-0003d2-L1
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:45:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593513949;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=YgosO+KfR8Z/7cfpTkqpd5jpWU4AhjoFyqymwA8LozI=;
+ b=OgFl8eOnjxQ8Glg14UpXW3mEkYcxdwbhf2Wp2fJPWxFF9bKABG77SlJQV4H/5ng8NiAyqn
+ b3lMIYDt4GRd5M4yG0KN7Ep4Qa/bL62pHWtyKkhKPiz9lsbgj6FmgBbfRB6ALMHVKfCzbs
+ wRSesiSnjYpx3UAa496z9e0pUKymwSw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-TaBYO3IjPLSw-GJrVZovFA-1; Tue, 30 Jun 2020 06:45:48 -0400
+X-MC-Unique: TaBYO3IjPLSw-GJrVZovFA-1
+Received: by mail-wr1-f69.google.com with SMTP id d11so1162542wrw.12
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 03:45:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xWW3S9JbFqbF/WDaHtuTcZJtixpKk+BO6FbGx3kUnLI=;
- b=uapuoc4chheN8dIoEWKXxM32DXaomHrXkex0ToCzcxujPAjKWhs5G+R5al1/YHhLHm
- o0MADJ6xfhmAw5mh+lSLCxbg7Vj9hW2YeDgj5HqjLlxf8+iIVzfkNGUtTZG522ad236b
- rDzPKInRMAohO6mAIQPZclDEwwGRhV7PYeaoqTSWphPlccFKLNeOza+5IBcFodLyPL5l
- LrI/5MbuInRMHAUVIuZj8Dt6oauIX2ukyY2OKnXW3mY9anVPfTzod/CK0BuSuVCsROuk
- iO81I24PN4osiMT7rkJbkT1napb5jfvLwmneDNPseEYU1+36InEjrK+61fg3jjFDxku/
- bZwA==
-X-Gm-Message-State: AOAM530hLQLaAfLtXCjvypfIund6WhO3siTYGcuY3+UrolJWxhVcwDK5
- M6kGUV61gh7xRfksGQ28RVA=
-X-Google-Smtp-Source: ABdhPJxqLQCqK4RSP2fo8IdzSeQNHc7fKOrj/EWa6d2YJm136DHU3+K0KaK16FgOmO0kSCg6MhNRWg==
-X-Received: by 2002:a17:906:538a:: with SMTP id
- g10mr18685060ejo.354.1593513925420; 
- Tue, 30 Jun 2020 03:45:25 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r19sm2388690edp.79.2020.06.30.03.45.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 03:45:24 -0700 (PDT)
-Subject: Re: [PATCH 5/5] hw/i2c: Document the I2C qdev helpers
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200629173821.22037-1-f4bug@amsat.org>
- <20200629173821.22037-6-f4bug@amsat.org> <87zh8kg8qu.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4f3eff51-57b0-f1c9-9d1d-f7d6eddcec80@amsat.org>
-Date: Tue, 30 Jun 2020 12:45:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=YgosO+KfR8Z/7cfpTkqpd5jpWU4AhjoFyqymwA8LozI=;
+ b=KB6sO1KaxrNTj9IT+j4Q0e+exNDKxltqnmPQd5ciWOK+/APfwMixT1ePgIxT6yFTbT
+ IMp/4HY56szM1dXUogmxXwZmSUWNBa8cy/3agkFGepwc6Vh/sPx+twDMzjzBAOZ4zqJ0
+ GrTfZBr1LAlQVp6GwdYaf3LgxHfSO0rTp6XfzGOODTDZ11s5VKGC0JoUe85cux/FwrP1
+ 3CEYXZBSuhp5mOJN0n6hOEbdT/PJBzn8tEv0DD7AWbh0fFQoEdIV45WzKKiPjJCju9Yd
+ YO2nh6HX07a1tucxGDYvJbXrftLijf58pf+tFVo85aKPhp6sqpsTZVEnU4ki4e/z2M0M
+ +f3Q==
+X-Gm-Message-State: AOAM532SXeXGjtvF8/wpNO5DT5ROS9GerNU0oDXxF+L95xlIynvfUW7i
+ j8Wxirhy/Scbtc2O7woDUsAwfjv36GqZyDVdK3sfpEAa8o4NyqR4+EQWPk+zu+kQBMD5ZuuRr0b
+ 9CQmeZJwzGnjjGBw=
+X-Received: by 2002:a5d:43d0:: with SMTP id v16mr22244854wrr.296.1593513946882; 
+ Tue, 30 Jun 2020 03:45:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwqfbTJsgNbL2aJBQUXvYi3RHfedtN4jrNnjlZQ7hTHUrMzEFjJuHJ6ZWqsgDhasvhsXqq4Fw==
+X-Received: by 2002:a5d:43d0:: with SMTP id v16mr22244829wrr.296.1593513946611; 
+ Tue, 30 Jun 2020 03:45:46 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ r11sm3083458wmh.1.2020.06.30.03.45.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 03:45:45 -0700 (PDT)
+Date: Tue, 30 Jun 2020 06:45:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
+Message-ID: <20200630064227-mutt-send-email-mst@kernel.org>
+References: <20200629102758.421552-1-cohuck@redhat.com>
+ <20200629104948-mutt-send-email-mst@kernel.org>
+ <20200629173933.35cea40f.cohuck@redhat.com>
+ <20200629114515-mutt-send-email-mst@kernel.org>
+ <20200630113527.7b27f34f.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zh8kg8qu.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20200630113527.7b27f34f.cohuck@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,179 +113,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 12:15 PM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+On Tue, Jun 30, 2020 at 11:35:27AM +0200, Cornelia Huck wrote:
+> On Mon, 29 Jun 2020 11:45:35 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
->> In commit d88c42ff2c we added new prototype but neglected to
->> add their documentation. Fix that.
->>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  include/hw/i2c/i2c.h | 48 ++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 48 insertions(+)
->>
->> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
->> index c533058998..fcc61e509b 100644
->> --- a/include/hw/i2c/i2c.h
->> +++ b/include/hw/i2c/i2c.h
->> @@ -79,8 +79,56 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
->>  int i2c_send(I2CBus *bus, uint8_t data);
->>  uint8_t i2c_recv(I2CBus *bus);
->>  
->> +/**
->> + * Create an I2C slave device on the heap.
->> + * @name: a device type name
->> + * @addr: I2C address of the slave when put on a bus
->> + *
->> + * This only initializes the device state structure and allows
->> + * properties to be set. Type @name must exist. The device still
->> + * needs to be realized. See qdev-core.h.
->> + */
->>  I2CSlave *i2c_slave_new(const char *name, uint8_t addr);
->> +
->> +/**
->> + * Create an I2C slave device on the heap.
+> > On Mon, Jun 29, 2020 at 05:39:33PM +0200, Cornelia Huck wrote:
+> > > On Mon, 29 Jun 2020 10:53:23 -0400
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:  
+> > > > > virtio-fs devices are only specified for virtio-1, so it is unclear
+> > > > > how a legacy or transitional device should behave.
+> > > > > 
+> > > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > > > ---
+> > > > > 
+> > > > > Forcing off legacy now (after the virtio-fs device has already been
+> > > > > available) may have unintended consequences, therefore RFC.
+> > > > > 
+> > > > > By default, a virtio-pci device uses 'AUTO' for disable_legacy, which
+> > > > > will resolve to different values based upon which bus the device has
+> > > > > been plugged. Therefore, forcing disable_legacy may result in the same
+> > > > > device or a quite different one.
+> > > > > 
+> > > > > Even though pre-virtio-1 behaviour of virtio-fs devices is simply not
+> > > > > specified, toggling disable_legacy will have implications for the BAR
+> > > > > layout, IIRC, and therefore a guest might end up getting a different
+> > > > > device, even if it always used it with virtio-1 anyway.
+> > > > > 
+> > > > > Not sure what the best way to solve this problem is. Adding a compat
+> > > > > property for disable_legacy=AUTO may be the right thing to do, but I'm
+> > > > > not quite clear if there are any further implications here.   
 > 
-> Suggest "Create and realize ..."
-> 
->> + * @bus: I2C bus to put it on
->> + * @name: I2C slave device type name
->> + * @addr: I2C address of the slave when put on a bus
->> + *
->> + * Create the device state structure, initialize it, put it on the
->> + * specified @bus, and drop the reference to it (the device is realized).
->> + * Any error aborts the process.
-> 
-> Stick to imperative mood: Abort on error.
-> 
-> Do we need the sentence?  Doc comments of object_new(), qdev_new() and
-> i2c_slave_new() don't have it, they document *preconditions* instead,
-> using "must", and rely on the tacit understanding that a function may
-> abort or crash when its documented preconditions aren't met.  Matter of
-> taste, I guess.
-> 
->> + */
->>  I2CSlave *i2c_slave_create_simple(I2CBus *bus, const char *name, uint8_t addr);
->> +
->> +/**
->> + * i2c_slave_realize_and_unref: realize and unref an I2C slave device
-> 
-> Either consistently waste space for repeating the function name at the
-> beginning of its doc comment, or consistently don't :)
-> 
-> qdev_realize_and_unref()'s doc comment says "and drop a reference"
-> instead of "unref", because "unref" is not a word.
-> 
->> + * @dev: I2C slave device to realize
->> + * @bus: I2C bus to put it on
->> + * @addr: I2C address of the slave on the bus
->> + * @errp: error pointer
-> 
-> $ git-grep -h "@errp:" | sort -u
->  *  @errp: pointer to Error*, to store an error if it happens
->  * @errp:   error object
->  * @errp: Error object
->  * @errp: Error object which may be set by job_complete(); this is not
->  * @errp: Error object.
->  * @errp: If an error occurs, a pointer to an area to store the error
->  * @errp: Output pointer for error information. Can be NULL.
->  * @errp: Pointer for reporting an #Error.
->  * @errp: Populated with an error in failure cases
->  * @errp: a pointer to an Error that is filled if getting/setting fails.
->  * @errp: a pointer to return the #Error object if an error occurs.
->  * @errp: an error indicator
->  * @errp: error
->  * @errp: error object
->  * @errp: error object handle
->  * @errp: handle to an error object
->  * @errp: if an error occurs, a pointer to an area to store the error
->  * @errp: indirect pointer to Error to be set
->  * @errp: location to store error
->  * @errp: location to store error information
->  * @errp: location to store error information.
->  * @errp: location to store error, will be set only for exception
->  * @errp: pointer to Error*, to store an error if it happens.
->  * @errp: pointer to NULL initialized error object
->  * @errp: pointer to a NULL initialized error object
->  * @errp: pointer to a NULL-initialized error object
->  * @errp: pointer to an error
->  * @errp: pointer to error object
->  * @errp: pointer to initialized error object
->  * @errp: pointer to uninitialized error object
-> 
-> Aside: gotta love these two.
-> 
->  * @errp: returns an error if this function fails
->  * @errp: set *errp if the check failed, with reason
->  * @errp: set in case of an error
->  * @errp: set on error
->  * @errp: unused
->  * @errp: where to put errors
-> 
-> Plenty of choice, recommend not to invent another one :)
-> 
->> + *
->> + * Call 'realize' on @dev, put it on the specified @bus, and drop the
->> + * reference to it. Errors are reported via @errp and by returning
->> + * false.
-> 
-> Recommend to use a separate paragraph for the return value.  Since your
-> comment style resembles GTK-Doc style[*], you may just as well use it
-> for the return value, like this:
-> 
->       Returns: %true on success, %false on failure.
-> 
-> By convention, it goes after the function description.
+> Hnm, I'm a bit confused where to actually set this property...
 
-OK, I'll use whatever you prefer. Maybe the shorter the easier.
 
-I will see if I can find to spend more time on this during the
-week-end, but I can't promise anything. Anyway since it is
-documentation it can be integrated during soft freeze.
+Not a property, just some flag that I'd set in the core,
+and then teach all transports to take that into account.
 
-Thanks for your detailed review.
+> > > > 
+> > > > Well I notice that this device is not migrateable.
+> > > > So I think that we can just switch it over and be done with it.  
+> > > 
+> > > Oh, that makes things easier. (I'm wondering if libvirt already
+> > > configures this correctly?)
+> > >   
+> > > > 
+> > > >   
+> > > > > Whatever we do here, we should make sure that the ccw incarnation of
+> > > > > this device indeed forces virtio-1.    
+> > > > 
+> > > > I agree. I notice that the API virtio_pci_force_virtio_1 turned out
+> > > > to be too fragile. I propose that instead we have a whitelist of
+> > > > devices which can be legacy or transitional. Force rest to modern.  
+> > > 
+> > > Also, there are further complications because the mechanism is per
+> > > transport, and therefore easy to miss.
+> > > 
+> > > bool virtio_legacy_allowed(VirtIODevice *vdev)
+> > > {
+> > >     switch (vdev->device_id) {
+> > >     case <...>:
+> > >     <list of legacy-capable devices>
+> > >         return true;
+> > >     default:
+> > >         return false;
+> > > }
+> > > 
+> > > Seems straightforward enough.  
+> > 
+> > 
+> > Agreed. virtio spec has the list.
+> 
+> Ok, I've been staring at this a bit, and it's a bit messy for other
+> reasons.
+> 
+> First, I noticed that virtio-iommu does not force virtio-1, either; I
+> think it should? Eric?
+> 
+> Then, there's the mechanism using different names for transitional and
+> non-transitional devices. Devices that support both usually define both
+> names (with disable_legacy and disable_modern set appropriately) and a
+> base name (where the properties can be set manually for the desired
+> effect). Most virtio-1 only devices set neither the non-transitional
+> nor the transitional name and rely on virtio_pci_force_virtio_1() to
+> disable legacy support. But there are outliers:
+> 
+> * this device: it has only a non-transitional name
+>   ("vhost-user-fs-pci"), which means we automatically get the correct
+>   configuration; in order to define a transitional/legacy device, you
+>   would need to use the base name "vhost-user-fs-pci-base" explicitly,
+>   and it's unlikely that someone has been doing that.
+> * virtio-iommu (which I *think* is a virtio-1 only device): it defines
+>   the full set of transitional, non-transitional, and base names.
+> 
+> How should we proceed?
+> * With this patch here, we can fence off the very unlikely possibility
+>   of somebody configuring a non-modern virtio-fs device for pci. We
+>   probably should do it, but I don't think we need compat handling.
+> * For virtio-iommu, we should get an agreement what the desired state
+>   is. If it really should be modern only, we need compat handling, as
+>   the device had been added in 5.0. (And we need to figure out how to
+>   apply that compat handling.)
 
+
+Well I know it's not really used on x86 yet, so no problem there.
+
+Which machines are actually affected?
+
+
+> * What is the preferred way to express 'this virtio-pci device is
+>   modern only'? Using virtio_pci_force_virtio_1()? Setting the
+>   non-transitional name to the obvious name? Both?
+> * We probably still want to have a 'central authority' for whether a
+>   device is virtio-1 only or not, so all transports can refer to it.
 > 
->> + *
->> + * This function is useful if you have created @dev via qdev_new(),
->> + * i2c_slave_new() or i2c_slave_try_new() (which take a reference to
->> + * the device it returns to you), so that you can set properties on it
->> + * before realizing it. If you don't need to set properties then
->> + * i2c_slave_create_simple() is probably better (as it does the create,
->> + * init and realize in one step).
->> + *
->> + * If you are embedding the I2C slave into another QOM device and
->> + * initialized it via some variant on object_initialize_child() then
->> + * do not use this function, because that family of functions arrange
->> + * for the only reference to the child device to be held by the parent
->> + * via the child<> property, and so the reference-count-drop done here
->> + * would be incorrect.  (Instead you would want i2c_slave_realize(),
->> + * which doesn't currently exist but would be trivial to create if we
->> + * had any code that wanted it.)
->> + */
-> 
-> The advice on use is more elaborate qdev_realize_and_unref()'s.  That
-> one simply shows intended use.  I doubt we need more.  But as the person
-> who wrote qdev_realize_and_unref(), I'm singularly unqualified judging
-> the need ;)
-> 
->>  bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp);
->>  
->>  /* lm832x.c */
-> 
-> 
-> [*] A style I dislike, but it's common in QEMU, so you're certainly
-> entitled to use it.
-> 
-> 
+> Thoughts?
+
+
+I still think that for the above the best approach is a whitelist
+of legacy virtio IDs.
+
+> > 
+> > > > 
+> > > >   
+> > > > > ---
+> > > > >  hw/virtio/vhost-user-fs-pci.c | 1 +
+> > > > >  1 file changed, 1 insertion(+)
+> > > > > 
+> > > > > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
+> > > > > index e11c889d82b3..244205edf765 100644
+> > > > > --- a/hw/virtio/vhost-user-fs-pci.c
+> > > > > +++ b/hw/virtio/vhost-user-fs-pci.c
+> > > > > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> > > > >          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
+> > > > >      }
+> > > > >  
+> > > > > +    virtio_pci_force_virtio_1(vpci_dev);
+> > > > >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+> > > > >  }
+> > > > >  
+> > > > > -- 
+> > > > > 2.25.4    
+> > > >   
+> > 
+
 
