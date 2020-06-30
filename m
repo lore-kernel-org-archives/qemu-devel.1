@@ -2,92 +2,57 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA18DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71B53206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:32:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEp0vy2U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B53206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70EEF206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EEF206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqEVD-0006RA-2q
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53778)
+	id 1jqEVX-0006pK-Nl
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:32:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqETg-0005hO-Mb
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:31:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45486
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqETd-0002Mf-Kn
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:31:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593516660;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SypkcHwTgaHIYnPoZ5HiVYmK3K4+/4Fwx3jxhr7PcvU=;
- b=eEp0vy2UlNukza2fbKBmlPt8WcucwKuFpYQuNgOgZZhhP/0VgXIGubXdPgp4uYft1XdpMC
- Vi31BdS61FXMhMXUFUKzc6uVsI/C15d2+yJu3cVgu7XPjoyVUL7S3H6I4pHc5Sw1og9MRI
- 6BXsc4+LeWQTi26+mrwhqNhV+7I5Uw4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-HAGjvsR0MaqwEvIvhU42ow-1; Tue, 30 Jun 2020 07:30:58 -0400
-X-MC-Unique: HAGjvsR0MaqwEvIvhU42ow-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894178015F6
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 11:30:57 +0000 (UTC)
-Received: from gondolin (ovpn-113-12.ams2.redhat.com [10.36.113.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACE9A2B583;
- Tue, 30 Jun 2020 11:30:46 +0000 (UTC)
-Date: Tue, 30 Jun 2020 13:30:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
-Message-ID: <20200630133043.2be1d209.cohuck@redhat.com>
-In-Reply-To: <20200630064227-mutt-send-email-mst@kernel.org>
-References: <20200629102758.421552-1-cohuck@redhat.com>
- <20200629104948-mutt-send-email-mst@kernel.org>
- <20200629173933.35cea40f.cohuck@redhat.com>
- <20200629114515-mutt-send-email-mst@kernel.org>
- <20200630113527.7b27f34f.cohuck@redhat.com>
- <20200630064227-mutt-send-email-mst@kernel.org>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqEU1-0005ra-RM; Tue, 30 Jun 2020 07:31:25 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47802)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqETy-0002T9-G1; Tue, 30 Jun 2020 07:31:25 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 8DDEDBF676;
+ Tue, 30 Jun 2020 11:31:16 +0000 (UTC)
+Date: Tue, 30 Jun 2020 13:31:08 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v2 07/18] hw/block/nvme: Add support for Namespace Types
+Message-ID: <20200630113108.2g6jpa2pwfxumjqh@apples.localdomain>
+References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ <20200617213415.22417-8-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200617213415.22417-8-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 04:46:49
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,173 +65,384 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 06:45:42 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Jun 18 06:34, Dmitry Fomichev wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+> 
+> Namespace Types introduce a new command set, "I/O Command Sets",
+> that allows the host to retrieve the command sets associated with
+> a namespace. Introduce support for the command set, and enable
+> detection for the NVM Command Set.
+> 
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme.c | 210 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/block/nvme.h |  11 +++
+>  2 files changed, 216 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 03b8deee85..453f4747a5 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -686,6 +686,26 @@ static uint16_t nvme_identify_ctrl(NvmeCtrl *n, NvmeIdentify *c)
+>          prp1, prp2);
+>  }
+>  
+> +static uint16_t nvme_identify_ctrl_csi(NvmeCtrl *n, NvmeIdentify *c)
+> +{
+> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> +    uint32_t *list;
+> +    uint16_t ret;
+> +
+> +    trace_pci_nvme_identify_ctrl_csi(c->csi);
+> +
+> +    if (c->csi == NVME_CSI_NVM) {
+> +        list = g_malloc0(data_len);
+> +        ret = nvme_dma_read_prp(n, (uint8_t *)list, data_len, prp1, prp2);
+> +        g_free(list);
+> +        return ret;
+> +    } else {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +}
+> +
+>  static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
+>  {
+>      NvmeNamespace *ns;
+> @@ -701,11 +721,42 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
+>      }
+>  
+>      ns = &n->namespaces[nsid - 1];
+> +    assert(nsid == ns->nsid);
+>  
+>      return nvme_dma_read_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
+>          prp1, prp2);
+>  }
+>  
+> +static uint16_t nvme_identify_ns_csi(NvmeCtrl *n, NvmeIdentify *c)
+> +{
+> +    NvmeNamespace *ns;
+> +    uint32_t nsid = le32_to_cpu(c->nsid);
+> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> +    uint32_t *list;
+> +    uint16_t ret;
+> +
+> +    trace_pci_nvme_identify_ns_csi(nsid, c->csi);
+> +
+> +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> +        trace_pci_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> +        return NVME_INVALID_NSID | NVME_DNR;
+> +    }
+> +
+> +    ns = &n->namespaces[nsid - 1];
+> +    assert(nsid == ns->nsid);
+> +
+> +    if (c->csi == NVME_CSI_NVM) {
+> +        list = g_malloc0(data_len);
+> +        ret = nvme_dma_read_prp(n, (uint8_t *)list, data_len, prp1, prp2);
+> +        g_free(list);
+> +        return ret;
+> +    } else {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +}
+> +
+>  static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+>  {
+>      static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> @@ -733,6 +784,99 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+>      return ret;
+>  }
+>  
+> +static uint16_t nvme_identify_nslist_csi(NvmeCtrl *n, NvmeIdentify *c)
+> +{
+> +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> +    uint32_t min_nsid = le32_to_cpu(c->nsid);
+> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> +    uint32_t *list;
+> +    uint16_t ret;
+> +    int i, j = 0;
+> +
+> +    trace_pci_nvme_identify_nslist_csi(min_nsid, c->csi);
+> +
+> +    if (c->csi != NVME_CSI_NVM) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    list = g_malloc0(data_len);
+> +    for (i = 0; i < n->num_namespaces; i++) {
+> +        if (i < min_nsid) {
+> +            continue;
+> +        }
+> +        list[j++] = cpu_to_le32(i + 1);
+> +        if (j == data_len / sizeof(uint32_t)) {
+> +            break;
+> +        }
+> +    }
+> +    ret = nvme_dma_read_prp(n, (uint8_t *)list, data_len, prp1, prp2);
+> +    g_free(list);
+> +    return ret;
+> +}
+> +
+> +static uint16_t nvme_list_ns_descriptors(NvmeCtrl *n, NvmeIdentify *c)
+> +{
+> +    NvmeNamespace *ns;
+> +    uint32_t nsid = le32_to_cpu(c->nsid);
+> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> +    void *buf_ptr;
+> +    NvmeNsIdDesc *desc;
+> +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> +    uint8_t *buf;
+> +    uint16_t status;
+> +
+> +    trace_pci_nvme_list_ns_descriptors();
+> +
+> +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> +        trace_pci_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> +        return NVME_INVALID_NSID | NVME_DNR;
+> +    }
+> +
+> +    ns = &n->namespaces[nsid - 1];
+> +    assert(nsid == ns->nsid);
+> +
+> +    buf = g_malloc0(data_len);
+> +    buf_ptr = buf;
+> +
+> +    desc = buf_ptr;
+> +    desc->nidt = NVME_NIDT_UUID;
+> +    desc->nidl = NVME_NIDL_UUID;
+> +    buf_ptr += sizeof(*desc);
+> +    memcpy(buf_ptr, ns->uuid.data, NVME_NIDL_UUID);
+> +    buf_ptr += NVME_NIDL_UUID;
+> +
+> +    desc = buf_ptr;
+> +    desc->nidt = NVME_NIDT_CSI;
+> +    desc->nidl = NVME_NIDL_CSI;
+> +    buf_ptr += sizeof(*desc);
+> +    *(uint8_t *)buf_ptr = NVME_CSI_NVM;
+> +
+> +    status = nvme_dma_read_prp(n, buf, data_len, prp1, prp2);
+> +    g_free(buf);
+> +    return status;
+> +}
+> +
+> +static uint16_t nvme_identify_cmd_set(NvmeCtrl *n, NvmeIdentify *c)
+> +{
+> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> +    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+> +    uint32_t *list;
+> +    uint8_t *ptr;
+> +    uint16_t status;
+> +
+> +    trace_pci_nvme_identify_cmd_set();
+> +
+> +    list = g_malloc0(data_len);
+> +    ptr = (uint8_t *)list;
+> +    NVME_SET_CSI(*ptr, NVME_CSI_NVM);
+> +    status = nvme_dma_read_prp(n, (uint8_t *)list, data_len, prp1, prp2);
+> +    g_free(list);
+> +    return status;
+> +}
+> +
+>  static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+>  {
+>      NvmeIdentify *c = (NvmeIdentify *)cmd;
+> @@ -740,10 +884,20 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+>      switch (le32_to_cpu(c->cns)) {
+>      case NVME_ID_CNS_NS:
+>          return nvme_identify_ns(n, c);
+> +    case NVME_ID_CNS_CS_NS:
+> +        return nvme_identify_ns_csi(n, c);
+>      case NVME_ID_CNS_CTRL:
+>          return nvme_identify_ctrl(n, c);
+> +    case NVME_ID_CNS_CS_CTRL:
+> +        return nvme_identify_ctrl_csi(n, c);
+>      case NVME_ID_CNS_NS_ACTIVE_LIST:
+>          return nvme_identify_nslist(n, c);
+> +    case NVME_ID_CNS_CS_NS_ACTIVE_LIST:
+> +        return nvme_identify_nslist_csi(n, c);
+> +    case NVME_ID_CNS_NS_DESC_LIST:
+> +        return nvme_list_ns_descriptors(n, c);
+> +    case NVME_ID_CNS_IO_COMMAND_SET:
+> +        return nvme_identify_cmd_set(n, c);
+>      default:
+>          trace_pci_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+>          return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -818,6 +972,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_get_feature_timestamp(n, cmd);
+> +    case NVME_COMMAND_SET_PROFILE:
+> +        result = 0;
+> +        break;
+>      default:
+>          trace_pci_nvme_err_invalid_getfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -864,6 +1021,15 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_set_feature_timestamp(n, cmd);
+> +        break;
+> +
+> +    case NVME_COMMAND_SET_PROFILE:
+> +        if (dw11 & 0x1ff) {
+> +            trace_pci_nvme_err_invalid_iocsci(dw11 & 0x1ff);
+> +            return NVME_CMD_SET_CMB_REJECTED | NVME_DNR;
+> +        }
+> +        break;
+> +
+>      default:
+>          trace_pci_nvme_err_invalid_setfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -1149,6 +1315,29 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+>          break;
+>      case 0x14:  /* CC */
+>          trace_pci_nvme_mmio_cfg(data & 0xffffffff);
+> +
+> +        if (NVME_CC_CSS(data) != NVME_CC_CSS(n->bar.cc)) {
+> +            if (NVME_CC_EN(n->bar.cc)) {
+> +                NVME_GUEST_ERR(pci_nvme_err_change_css_when_enabled,
+> +                               "changing selected command set when enabled");
+> +                break;
+> +            }
+> +            switch (NVME_CC_CSS(data)) {
+> +            case CSS_NVM_ONLY:
+> +                trace_pci_nvme_css_nvm_cset_selected_by_host(data & 0xffffffff);
+> +                break;
+> +            case CSS_ALL_NSTYPES:
+> +                NVME_SET_CC_CSS(n->bar.cc, CSS_ALL_NSTYPES);
+> +                trace_pci_nvme_css_all_csets_sel_by_host(data & 0xffffffff);
+> +                break;
+> +            case CSS_ADMIN_ONLY:
+> +                break;
+> +            default:
+> +                NVME_GUEST_ERR(pci_nvme_ub_unknown_css_value,
+> +                               "unknown value in CC.CSS field");
+> +            }
+> +        }
+> +
+>          /* Windows first sends data, then sends enable bit */
+>          if (!NVME_CC_EN(data) && !NVME_CC_EN(n->bar.cc) &&
+>              !NVME_CC_SHN(data) && !NVME_CC_SHN(n->bar.cc))
+> @@ -1496,6 +1685,7 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+>  {
+>      int64_t bs_size;
+>      NvmeIdNs *id_ns = &ns->id_ns;
+> +    int lba_index;
+>  
+>      bs_size = blk_getlength(n->conf.blk);
+>      if (bs_size < 0) {
+> @@ -1505,7 +1695,10 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+>  
+>      n->ns_size = bs_size;
+>  
+> -    id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
+> +    ns->csi = NVME_CSI_NVM;
+> +    qemu_uuid_generate(&ns->uuid); /* TODO make UUIDs persistent */
+> +    lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
 
-> On Tue, Jun 30, 2020 at 11:35:27AM +0200, Cornelia Huck wrote:
-> > On Mon, 29 Jun 2020 11:45:35 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Mon, Jun 29, 2020 at 05:39:33PM +0200, Cornelia Huck wrote:  
-> > > > On Mon, 29 Jun 2020 10:53:23 -0400
-> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > >     
-> > > > > On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:    
-> > > > > > virtio-fs devices are only specified for virtio-1, so it is unclear
-> > > > > > how a legacy or transitional device should behave.
-> > > > > > 
-> > > > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > > > > ---
-> > > > > > 
-> > > > > > Forcing off legacy now (after the virtio-fs device has already been
-> > > > > > available) may have unintended consequences, therefore RFC.
-> > > > > > 
-> > > > > > By default, a virtio-pci device uses 'AUTO' for disable_legacy, which
-> > > > > > will resolve to different values based upon which bus the device has
-> > > > > > been plugged. Therefore, forcing disable_legacy may result in the same
-> > > > > > device or a quite different one.
-> > > > > > 
-> > > > > > Even though pre-virtio-1 behaviour of virtio-fs devices is simply not
-> > > > > > specified, toggling disable_legacy will have implications for the BAR
-> > > > > > layout, IIRC, and therefore a guest might end up getting a different
-> > > > > > device, even if it always used it with virtio-1 anyway.
-> > > > > > 
-> > > > > > Not sure what the best way to solve this problem is. Adding a compat
-> > > > > > property for disable_legacy=AUTO may be the right thing to do, but I'm
-> > > > > > not quite clear if there are any further implications here.     
-> > 
-> > Hnm, I'm a bit confused where to actually set this property...  
-> 
-> 
-> Not a property, just some flag that I'd set in the core,
-> and then teach all transports to take that into account.
+There is only one LBA format at this point anyway, so I don't think this
+is needed.
 
-I was thinking about compat handling for the disable-legacy property
-(struggling a bit with it).
+> +    id_ns->lbaf[lba_index].ds = nvme_ilog2(n->conf.logical_block_size);
 
-> 
-> > > > > 
-> > > > > Well I notice that this device is not migrateable.
-> > > > > So I think that we can just switch it over and be done with it.    
-> > > > 
-> > > > Oh, that makes things easier. (I'm wondering if libvirt already
-> > > > configures this correctly?)
-> > > >     
-> > > > > 
-> > > > >     
-> > > > > > Whatever we do here, we should make sure that the ccw incarnation of
-> > > > > > this device indeed forces virtio-1.      
-> > > > > 
-> > > > > I agree. I notice that the API virtio_pci_force_virtio_1 turned out
-> > > > > to be too fragile. I propose that instead we have a whitelist of
-> > > > > devices which can be legacy or transitional. Force rest to modern.    
-> > > > 
-> > > > Also, there are further complications because the mechanism is per
-> > > > transport, and therefore easy to miss.
-> > > > 
-> > > > bool virtio_legacy_allowed(VirtIODevice *vdev)
-> > > > {
-> > > >     switch (vdev->device_id) {
-> > > >     case <...>:
-> > > >     <list of legacy-capable devices>
-> > > >         return true;
-> > > >     default:
-> > > >         return false;
-> > > > }
-> > > > 
-> > > > Seems straightforward enough.    
-> > > 
-> > > 
-> > > Agreed. virtio spec has the list.  
-> > 
-> > Ok, I've been staring at this a bit, and it's a bit messy for other
-> > reasons.
-> > 
-> > First, I noticed that virtio-iommu does not force virtio-1, either; I
-> > think it should? Eric?
-> > 
-> > Then, there's the mechanism using different names for transitional and
-> > non-transitional devices. Devices that support both usually define both
-> > names (with disable_legacy and disable_modern set appropriately) and a
-> > base name (where the properties can be set manually for the desired
-> > effect). Most virtio-1 only devices set neither the non-transitional
-> > nor the transitional name and rely on virtio_pci_force_virtio_1() to
-> > disable legacy support. But there are outliers:
-> > 
-> > * this device: it has only a non-transitional name
-> >   ("vhost-user-fs-pci"), which means we automatically get the correct
-> >   configuration; in order to define a transitional/legacy device, you
-> >   would need to use the base name "vhost-user-fs-pci-base" explicitly,
-> >   and it's unlikely that someone has been doing that.
-> > * virtio-iommu (which I *think* is a virtio-1 only device): it defines
-> >   the full set of transitional, non-transitional, and base names.
-> > 
-> > How should we proceed?
-> > * With this patch here, we can fence off the very unlikely possibility
-> >   of somebody configuring a non-modern virtio-fs device for pci. We
-> >   probably should do it, but I don't think we need compat handling.
-> > * For virtio-iommu, we should get an agreement what the desired state
-> >   is. If it really should be modern only, we need compat handling, as
-> >   the device had been added in 5.0. (And we need to figure out how to
-> >   apply that compat handling.)  
-> 
-> 
-> Well I know it's not really used on x86 yet, so no problem there.
-> 
-> Which machines are actually affected?
+Would be nice to have this in a separate patch.
 
-I'd suspect ARM, but breaking even a subset is not nice.
+>      id_ns->nsze = cpu_to_le64(nvme_ns_nlbas(n, ns));
+>  
+>      /* no thin provisioning */
+> @@ -1616,7 +1809,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+>      id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+>      id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
+>      strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+> -    strpadcpy((char *)id->fr, sizeof(id->fr), "1.0", ' ');
+> +    strpadcpy((char *)id->fr, sizeof(id->fr), "2.0", ' ');
 
-> 
-> 
-> > * What is the preferred way to express 'this virtio-pci device is
-> >   modern only'? Using virtio_pci_force_virtio_1()? Setting the
-> >   non-transitional name to the obvious name? Both?
-> > * We probably still want to have a 'central authority' for whether a
-> >   device is virtio-1 only or not, so all transports can refer to it.
-> > 
-> > Thoughts?  
-> 
-> 
-> I still think that for the above the best approach is a whitelist
-> of legacy virtio IDs.
+Out of curiosity, any specific reason for bumping the firmware revision?
 
-I agree, a list of the device types that actually support legacy seems
-like the way to go. Making it accessible at the right point in the
-device instantiation process is the fiddly bit; but maybe I just need a
-break from staring at this.
+>      strpadcpy((char *)id->sn, sizeof(id->sn), n->params.serial, ' ');
+>      id->rab = 6;
+>      id->ieee[0] = 0x00;
+> @@ -1640,7 +1833,11 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+>      NVME_CAP_SET_MQES(n->bar.cap, 0x7ff);
+>      NVME_CAP_SET_CQR(n->bar.cap, 1);
+>      NVME_CAP_SET_TO(n->bar.cap, 0xf);
+> -    NVME_CAP_SET_CSS(n->bar.cap, 1);
+> +    /*
+> +     * The driver now always supports NS Types, but all commands that
 
-> 
-> > >   
-> > > > > 
-> > > > >     
-> > > > > > ---
-> > > > > >  hw/virtio/vhost-user-fs-pci.c | 1 +
-> > > > > >  1 file changed, 1 insertion(+)
-> > > > > > 
-> > > > > > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
-> > > > > > index e11c889d82b3..244205edf765 100644
-> > > > > > --- a/hw/virtio/vhost-user-fs-pci.c
-> > > > > > +++ b/hw/virtio/vhost-user-fs-pci.c
-> > > > > > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> > > > > >          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
-> > > > > >      }
-> > > > > >  
-> > > > > > +    virtio_pci_force_virtio_1(vpci_dev);
-> > > > > >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
-> > > > > >  }
-> > > > > >  
-> > > > > > -- 
-> > > > > > 2.25.4      
-> > > > >     
-> > >   
-> 
+s/driver/device
 
+> +     * support CSI field will only handle NVM Command Set.
+> +     */
+> +    NVME_CAP_SET_CSS(n->bar.cap, (CAP_CSS_NVM | CAP_CSS_CSI_SUPP));
+>      NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
+>  
+>      n->bar.vs = 0x00010200;
+> @@ -1650,6 +1847,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+>  static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+>      NvmeCtrl *n = NVME(pci_dev);
+> +    NvmeNamespace *ns;
+>      Error *local_err = NULL;
+>  
+>      int i;
+> @@ -1675,8 +1873,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>  
+>      nvme_init_ctrl(n, pci_dev);
+>  
+> -    for (i = 0; i < n->num_namespaces; i++) {
+> -        nvme_init_namespace(n, &n->namespaces[i], &local_err);
+> +    ns = n->namespaces;
+> +    for (i = 0; i < n->num_namespaces; i++, ns++) {
+> +        ns->nsid = i + 1;
+
+n->num_namespaces is hardcoded to 1, so no real need for this change,
+but cleanup is always nice I guess :)
+
+> +        nvme_init_namespace(n, ns, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              return;
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 4fd155c409..0d29f75475 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -121,4 +121,15 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+>      return n->ns_size >> nvme_ns_lbads(ns);
+>  }
+>  
+> +static inline int nvme_ilog2(uint64_t i)
+> +{
+> +    int log = -1;
+> +
+> +    while (i) {
+> +        i >>= 1;
+> +        log++;
+> +    }
+> +    return log;
+> +}
+> +
+>  #endif /* HW_NVME_H */
+> -- 
+> 2.21.0
+> 
+> 
 
