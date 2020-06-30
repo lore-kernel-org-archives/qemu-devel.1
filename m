@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5BBC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7D9C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95E9020760
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:16:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83DA520760
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:16:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWiXplJb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E9020760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="si8Dl69Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83DA520760
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDJ4-0006YS-No
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:16:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58746)
+	id 1jqDJn-0007Fh-P7
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:16:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7S-0002kL-3Z; Tue, 30 Jun 2020 06:04:02 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34124)
+ id 1jqD7M-0002Zt-Eq; Tue, 30 Jun 2020 06:03:56 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:45170)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7Q-0004iW-Ht; Tue, 30 Jun 2020 06:04:01 -0400
-Received: by mail-ed1-x543.google.com with SMTP id a8so14393323edy.1;
- Tue, 30 Jun 2020 03:03:59 -0700 (PDT)
+ id 1jqD7K-0004et-Pb; Tue, 30 Jun 2020 06:03:56 -0400
+Received: by mail-ej1-x643.google.com with SMTP id a1so19887048ejg.12;
+ Tue, 30 Jun 2020 03:03:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Z/EZxVt2E3A6jt6L/KxP/rTE9weJvxlOwG4iw6dyfbk=;
- b=QWiXplJbI/URaKRP9pw689O73qPEwYUGPfAMXoorVNbDHe6LogbMgQKGEd6n2/zhQf
- adw6jFT6dsSORXyJgAkxKVFzAqEK9pxPUXC4eX9PIon8qlBnwsLknBu/Gj/hKwNjfySl
- F2HV6quoAgXKnXlmmLwTAQdpAAgtNeHHe1/IbQJBSO30ZVbXcYbSw24EWDaQdd4ZoeYz
- Q6BxPDsLdtN9HmDsNIF//MNdDXbWlFwfpZ5WKv2pXvZ2j261REr51zHmOFCT7vNEc4Pp
- Nw53tYjBgYy6PtZo2/x+KDu5Wh9J4tRhwcRkvU81rhqGypJyoWBDKornMUVrFL6vC4bp
- lojA==
+ bh=Xe1kf7UAPTm1mbg2PINnk48fL4iH0z/PWyqjOaU27f0=;
+ b=si8Dl69ZBhDWLRVxPcnx7qt4/4umv0F5TdNW9H7hh21e3zFtTlF5ZPW05z/UH4tNjl
+ zXUluJW1ZWnqTUWVezcrJ1iRlvqnwrfmzkqdD88O/CM+3akaaOSFBsjOGdoGpjmOZM3R
+ jul/XHjoGj66wwB2N3LuQgw0Y6QVDvCSRbzxOE4zRjOw06zGiYZYNX6jT4A9dtTQcSnP
+ tva3J99wrtFEVfVa0vmphoTs+UDaAiZ55AA32TFZqRCohhUJvSt4J2LyLCbPTWQ8J5pg
+ 4TEI+Fk1SbJX5+E5m1gJpkm9+RZam5QwFrQja06O2vKWH6fPwOAEgEBuUvd5bewZO7AH
+ 99PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Z/EZxVt2E3A6jt6L/KxP/rTE9weJvxlOwG4iw6dyfbk=;
- b=FbIm7C1EnjqiEvekqrXc+8WT15MhoSCwS/Gr7swfIcOpYB2y89zFCW25LO6C7nxvrK
- jmgCZQ0kSkEWnAXeJVDcqoiDgJdADqfXUwfB2FdGsDzEtxO02rgStIYa2hO8d1tFEoQK
- n/GkFDDhGs4FT07Xl6iOt449Cg19DeXm8Bvee55u28lPK4lkQyyxI9IbPsRgWsljAh6B
- qimeaqi9AHAhqIJer87avL472+R53kw9qSvb2jiZyWcqrGyZaEBJAZVGoxwNhpq6cBxU
- uZL4jNLZgLWYybAWoO4oUja3B4my8UVi4PhkFwm6Yx39v0TxsIb5sg7wcwTD4SkUmHOM
- b5QA==
-X-Gm-Message-State: AOAM531js5unr9qSqNX+zJKx4LJJOePZXBdFx2ztstUjXS8kb+3sDYtK
- ZyPK+iTrVzj1ZB+pieZYGVlRZrxqeHk=
-X-Google-Smtp-Source: ABdhPJzVmMIxh8hIO0/AJBnb8fF4vHAWlEcO0TpZSx9IJvmFmFFAE75BNE9ZonaLMMObgsxKNpBOgA==
-X-Received: by 2002:a50:ee07:: with SMTP id g7mr6485568eds.320.1593511438592; 
- Tue, 30 Jun 2020 03:03:58 -0700 (PDT)
+ bh=Xe1kf7UAPTm1mbg2PINnk48fL4iH0z/PWyqjOaU27f0=;
+ b=j+Wmb5/HwaTiiJIz4vOApRpa2zg63dnYlf9diQEpD3v9UOuPQMTlCFLMZAz2fkoO1x
+ I1ssdtT0mpcq5fUXFLKmQSEEfQyzdYJsxaQylKBPUiUnlOeSjirfQTInQYVJ5EuUzs2P
+ 6EiZYIwJjxEQTItoDmOB5nuLt9GqestZBH0U5HDwFzomNQi+dLtyPoN30Pmz+DsPqvjK
+ Dvp/PiTpPADp68abe0/GSDspYnoEoNPioSCiojjW/YoE7UCQz3/DXiBG/LgamkCiEqcO
+ k0aJmoeEs9HJlGgDmJVQcCQJCnv7xbZkB4JQrKAT40U/xzk0aFhSpQRK+CMk6834zdh3
+ CAsw==
+X-Gm-Message-State: AOAM531uSPtIF4GlWm+PAb6QMiJ4v8x6lu9xGkJ/gS8j+BQDspVrVMt2
+ 5axjESGSXUk26h97ZGr9TZ/8K5xvO0w=
+X-Google-Smtp-Source: ABdhPJx8lEnH8z9a9zDaZjAs2+RQJL6Tp3qGpm0z+/+jzpIWVal8jEuahJ7u0KuwTxIt58FI7D6LSQ==
+X-Received: by 2002:a17:906:8542:: with SMTP id
+ h2mr17225994ejy.517.1593511432963; 
+ Tue, 30 Jun 2020 03:03:52 -0700 (PDT)
 Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.57
+ by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 03:03:58 -0700 (PDT)
+ Tue, 30 Jun 2020 03:03:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 13/15] hw/sd/sdcard: Correctly display the command name in
- trace events
-Date: Tue, 30 Jun 2020 12:03:40 +0200
-Message-Id: <20200630100342.27625-14-f4bug@amsat.org>
+Subject: [PATCH v6 08/15] hw/sd/sdcard: Check address is in range
+Date: Tue, 30 Jun 2020 12:03:35 +0200
+Message-Id: <20200630100342.27625-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200630100342.27625-1-f4bug@amsat.org>
 References: <20200630100342.27625-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -109,79 +109,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some ACMD were incorrectly displayed. Fix by remembering if we
-are processing a ACMD (with current_cmd_is_acmd) and add the
-sd_current_cmd_name() helper, which display to correct name
-regardless it is a CMD or ACMD.
+As a defense, assert if the requested address is out of the card area.
 
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+v6: call sd_addr_to_wpnum on 'size - 1' in reset()
+---
+ hw/sd/sd.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 504228198e..de194841a7 100644
+index 22392e5084..c6742c884d 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -125,6 +125,7 @@ struct SDState {
-     uint8_t pwd[16];
-     uint32_t pwd_len;
-     uint8_t function_group[6];
-+    bool current_cmd_is_acmd;
-     uint8_t current_cmd;
-     /* True if we will handle the next command as an ACMD. Note that this does
-      * *not* track the APP_CMD status bit!
-@@ -1704,6 +1705,8 @@ int sd_do_command(SDState *sd, SDRequest *req,
-                       req->cmd);
-         req->cmd &= 0x3f;
-     }
-+    sd->current_cmd = req->cmd;
-+    sd->current_cmd_is_acmd = sd->expecting_acmd;
- 
-     if (sd->card_status & CARD_IS_LOCKED) {
-         if (!cmd_valid_while_locked(sd, req->cmd)) {
-@@ -1731,7 +1734,6 @@ int sd_do_command(SDState *sd, SDRequest *req,
-         /* Valid command, we can update the 'state before command' bits.
-          * (Do this now so they appear in r1 responses.)
-          */
--        sd->current_cmd = req->cmd;
-         sd->card_status &= ~CURRENT_STATE;
-         sd->card_status |= (last_state << 9);
-     }
-@@ -1792,6 +1794,15 @@ send_response:
-     return rsplen;
+@@ -537,8 +537,10 @@ static void sd_response_r7_make(SDState *sd, uint8_t *response)
+     stl_be_p(response, sd->vhs);
  }
  
-+static const char *sd_current_cmd_name(SDState *sd)
-+{
-+    if (sd->current_cmd_is_acmd) {
-+        return sd_acmd_name(sd->current_cmd);
-+    } else {
-+        return sd_cmd_name(sd->current_cmd);
-+    }
-+}
-+
- static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
+-static inline uint64_t sd_addr_to_wpnum(uint64_t addr)
++static uint64_t sd_addr_to_wpnum(SDState *sd, uint64_t addr)
  {
-     trace_sdcard_read_block(addr, len);
-@@ -1830,7 +1841,7 @@ void sd_write_data(SDState *sd, uint8_t value)
-         return;
++    assert(addr <= sd->size);
++
+     return addr >> (HWBLOCK_SHIFT + SECTOR_SHIFT + WPGROUP_SHIFT);
+ }
  
-     trace_sdcard_write_data(sd->proto_name,
--                            sd_acmd_name(sd->current_cmd),
-+                            sd_current_cmd_name(sd),
-                             sd->current_cmd, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-@@ -1984,7 +1995,7 @@ uint8_t sd_read_data(SDState *sd)
-     io_len = (sd->ocr & (1 << 30)) ? HWBLOCK_SIZE : sd->blk_len;
+@@ -575,7 +577,7 @@ static void sd_reset(DeviceState *dev)
+     sd_set_cardstatus(sd);
+     sd_set_sdstatus(sd);
  
-     trace_sdcard_read_data(sd->proto_name,
--                           sd_acmd_name(sd->current_cmd),
-+                           sd_current_cmd_name(sd),
-                            sd->current_cmd, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
+-    sect = sd_addr_to_wpnum(size) + 1;
++    sect = sd_addr_to_wpnum(sd, size - 1) + 1;
+     g_free(sd->wp_groups);
+     sd->wp_switch = sd->blk ? blk_is_read_only(sd->blk) : false;
+     sd->wpgrps_size = sect;
+@@ -759,8 +761,8 @@ static void sd_erase(SDState *sd)
+         erase_end *= HWBLOCK_SIZE;
+     }
+ 
+-    erase_start = sd_addr_to_wpnum(erase_start);
+-    erase_end = sd_addr_to_wpnum(erase_end);
++    erase_start = sd_addr_to_wpnum(sd, erase_start);
++    erase_end = sd_addr_to_wpnum(sd, erase_end);
+     sd->erase_start = 0;
+     sd->erase_end = 0;
+     sd->csd[14] |= 0x40;
+@@ -777,7 +779,7 @@ static uint32_t sd_wpbits(SDState *sd, uint64_t addr)
+     uint32_t i, wpnum;
+     uint32_t ret = 0;
+ 
+-    wpnum = sd_addr_to_wpnum(addr);
++    wpnum = sd_addr_to_wpnum(sd, addr);
+ 
+     for (i = 0; i < 32; i++, wpnum++, addr += WPGROUP_SIZE) {
+         if (addr < sd->size && test_bit(wpnum, sd->wp_groups)) {
+@@ -819,7 +821,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+ 
+ static inline bool sd_wp_addr(SDState *sd, uint64_t addr)
+ {
+-    return test_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
++    return test_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
+ }
+ 
+ static void sd_lock_command(SDState *sd)
+@@ -1331,7 +1333,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+             }
+ 
+             sd->state = sd_programming_state;
+-            set_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
++            set_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
+             /* Bzzzzzzztt .... Operation complete.  */
+             sd->state = sd_transfer_state;
+             return sd_r1b;
+@@ -1350,7 +1352,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+             }
+ 
+             sd->state = sd_programming_state;
+-            clear_bit(sd_addr_to_wpnum(addr), sd->wp_groups);
++            clear_bit(sd_addr_to_wpnum(sd, addr), sd->wp_groups);
+             /* Bzzzzzzztt .... Operation complete.  */
+             sd->state = sd_transfer_state;
+             return sd_r1b;
 -- 
 2.21.3
 
