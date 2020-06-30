@@ -2,109 +2,88 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FED2C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDBFC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C65320724
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28BB120724
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhtoBpkE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C65320724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pfty3Mmn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BB120724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqIN1-0006gZ-E2
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:40:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42930)
+	id 1jqINP-0007Ol-Cv
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:40:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqIM6-0005F6-KI
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:39:30 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33878
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqIM4-0003M9-Lw
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:39:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593531568;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HG2LXqLNK+K2Yvy9ZHJ7MpukWzVaOXe4pBY0xpd20yw=;
- b=YhtoBpkE+NUHOiGYHRWIcji4ErlaR5vXUoudmhM2X9ufwhIq5EP3f5A9VsGhTieMoWZaNQ
- 9URmLTxNeKPQSMv1sDp6K3X9UZYJXn79ir9xigOUHRvfRHKYLl4XF988fWIwiXtgMlr4/u
- P5eADMw3rXaH2u04Co1zXv1rfC9uHSc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-wJNKYDDXNYCVcvtVYpHKow-1; Tue, 30 Jun 2020 11:39:18 -0400
-X-MC-Unique: wJNKYDDXNYCVcvtVYpHKow-1
-Received: by mail-wr1-f71.google.com with SMTP id p9so18942813wrx.10
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:39:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqILJ-0003yV-N5
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:38:41 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35537)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqILI-0003Fr-2w
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:38:41 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g18so20704549wrm.2
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:38:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=1GbJ3qR8DbeArfmr/fgMB2nbWQEYgRsT+hJBwHxLbKY=;
+ b=pfty3Mmn0wpkMG1+vuXJazh3KcumB9EsESuEuaTUYL4VIA72QUlAX20MQ9XOKdvZxu
+ evodc3bS/zh4OiYw5jog3ziLsqHiKwe6mH77axBKKI6hybLYH9t1K1ZwiXxkIo1Ewxpz
+ 0MLAqXzUh9XdpeKIcfoDJHOs5xGh0gFMUhYpc/mfrmfykeIFuEQubcKTYTRsGvWd3mU4
+ 4WcgaPRs4i8E7TURMy0gcN74zb9Thk9sqCKMLTcBuHFcLIqMsv49aTLmd1mtBUr+R6bp
+ LoAFqnwAKbM/aQnmcY2fFeyhyIegPUagm3/1Xpv4GFc4+0Vp3ivcmCQZTH6nVijJyAPy
+ 87Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HG2LXqLNK+K2Yvy9ZHJ7MpukWzVaOXe4pBY0xpd20yw=;
- b=QtgtN09aMtNCE/uQ2w2v6HS6by6ZXNaBKxGI5Upx3BdSXj608M/Ob7OnlOk1mLN5p5
- 1+ps5ZXiv/r0FtALRf1gmeGjq25UyWkZicrOkfeiOPyiJiR2/TYfxo2ICbeqq5igz5q0
- JtpnX9kkufrAMTzB8vwA5LV5/+R/97maSH5dQnXV11NNnX3+eoqCG/ZdbzHmcsp8MjAS
- +sZmHbJLSH7V28ymMchHyWkWmlHRCnJ9t7Mv2cPeSsfAoNMW2SyhODq5rpBMy2DilcQa
- OY49d8Gvf8nv2lmG8GWnqFiSjFnUDFEHh52Ki2KpSL3rwRfY8tFcsZrZlpM+gcqeTqps
- 8THA==
-X-Gm-Message-State: AOAM533ZnC8JVrpJ6e0IwMaZmObq7UjhYQgXjCrisXC0+qXNYNznXXQK
- YQZbugxpA5vD1Ign298Jb2bcF28lw6phkzcSVKGFzy/5Lfin/ngjD0yfLUuPOWvtZr4Ug8Pvctc
- oxUeYwMw3hEnW0gs=
-X-Received: by 2002:adf:f6cb:: with SMTP id y11mr21687134wrp.100.1593531556755; 
- Tue, 30 Jun 2020 08:39:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw0W1BqBQYRgnPEXlBUZdqrR1b9R7djo5iNDARWlN+xK7/rd+QjWE9JjIeOKeuyaNq/FpPeJA==
-X-Received: by 2002:adf:f6cb:: with SMTP id y11mr21687122wrp.100.1593531556484; 
- Tue, 30 Jun 2020 08:39:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:acad:d1d4:42b8:23e4?
- ([2001:b07:6468:f312:acad:d1d4:42b8:23e4])
- by smtp.gmail.com with ESMTPSA id n16sm3667346wmc.40.2020.06.30.08.39.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 08:39:15 -0700 (PDT)
-Subject: Re: [PATCH v2] coverity: provide Coverity-friendly MIN_CONST and
- MAX_CONST
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200629162804.1096180-1-eblake@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bd658081-ca05-9d22-7486-46379b7577e2@redhat.com>
-Date: Tue, 30 Jun 2020 17:39:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=1GbJ3qR8DbeArfmr/fgMB2nbWQEYgRsT+hJBwHxLbKY=;
+ b=grXv2oD0hTzo+4xhq0Vmrj7NsbMdR3URMBN9u6CVGdOvTfEDGfl0RrawX2YB4F35Gy
+ KQKLfyZ7SXhRHNTJ21hasnjdp7KvE8j1MnDk7M73JaNb/Up0u07UYKhKG1BXk4Rx21Ok
+ 6kGQ3uKYkVB0cpIi4UjhFzGHT2bz6WKTiQHQ23LyKiHTb6MnS3CwI2AMgBngIBDySluO
+ G0LgIcQ9zZ4huNjupFChX++hfRk5uJEXMDCPz9Kz2KxFtE3twpDR7Z55sVN7JlMUarLk
+ wiZw1sUMJXi4rtXNXpUkUFVDxyhWSxS3wvLbsVW9K+dSttW5wfPQ1vQ9BzWCNFTz/O74
+ EyeQ==
+X-Gm-Message-State: AOAM533io9VZRi+Itqt9rBh1AW5PEe2JvAIwDvip7c+RrjGqH9cqL2gQ
+ hxkSlrpN8+Iv02wP2uLXtQ9aNpSoG7IjLt87cY4=
+X-Google-Smtp-Source: ABdhPJz0gm2HZ9DsOqVgr1PrEUNoVoUfRyoq5lD0Gs5uOB912TgHE1ZA0bmHRqRdRwpc+wul+ZdMPevCO2iy7Mdo5ek=
+X-Received: by 2002:a5d:6907:: with SMTP id t7mr22303156wru.329.1593531518419; 
+ Tue, 30 Jun 2020 08:38:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200629162804.1096180-1-eblake@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200630145236.27529-1-f4bug@amsat.org>
+In-Reply-To: <20200630145236.27529-1-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 30 Jun 2020 17:38:25 +0200
+Message-ID: <CAHiYmc4=pmzEyhVTHaqxBnCotE8V+vaptMFincyurvAyDHNn6g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] hw/mips/malta: Add the 'malta-strict' machine,
+ matching Malta hardware
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,90 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yunqiang Su <ysu@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/06/20 18:28, Eric Blake wrote:
-> Coverity has problems seeing through __builtin_choose_expr, which
-> result in it abandoning analysis of later functions that utilize a
-> definition that used MIN_CONST or MAX_CONST, such as in qemu-file.c:
-> 
->  50    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
-> 
-> CID 1429992 (#1 of 1): Unrecoverable parse warning (PARSE_ERROR)1.
-> expr_not_constant: expression must have a constant value
-> 
-> As has been done in the past (see 07d66672), it's okay to dumb things
-> down when compiling for static analyzers.  (Of course, now the
-> syntax-checker has a false positive on our reference to
-> __COVERITY__...)
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: CID 1429992, CID 1429995, CID 1429997, CID 1429999
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> Improvements over Paolo's v1:
-> - proper use of ()
-> - add comment explaining the COVERITY section
-> - add indentation for easier read of #if/#else flow
-> 
->  include/qemu/osdep.h | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 0d26a1b9bd07..0fc206ae6154 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -250,7 +250,8 @@ extern int daemon(int, int);
->   * Note that neither form is usable as an #if condition; if you truly
->   * need to write conditional code that depends on a minimum or maximum
->   * determined by the pre-processor instead of the compiler, you'll
-> - * have to open-code it.
-> + * have to open-code it.  Sadly, Coverity is severely confused by the
-> + * constant variants, so we have to dumb things down there.
->   */
->  #undef MIN
->  #define MIN(a, b)                                       \
-> @@ -258,22 +259,28 @@ extern int daemon(int, int);
->          typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
->          _a < _b ? _a : _b;                              \
->      })
-> -#define MIN_CONST(a, b)                                         \
-> -    __builtin_choose_expr(                                      \
-> -        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> -        (a) < (b) ? (a) : (b),                                  \
-> -        ((void)0))
->  #undef MAX
->  #define MAX(a, b)                                       \
->      ({                                                  \
->          typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
->          _a > _b ? _a : _b;                              \
->      })
-> -#define MAX_CONST(a, b)                                         \
-> +
-> +#ifdef __COVERITY__
-> +# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))
-> +# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))
-> +#else
-> +# define MIN_CONST(a, b)                                        \
-> +    __builtin_choose_expr(                                      \
-> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> +        (a) < (b) ? (a) : (b),                                  \
-> +        ((void)0))
-> +# define MAX_CONST(a, b)                                        \
->      __builtin_choose_expr(                                      \
->          __builtin_constant_p(a) && __builtin_constant_p(b),     \
->          (a) > (b) ? (a) : (b),                                  \
->          ((void)0))
-> +#endif
-> 
->  /*
->   * Minimum function that returns zero only if both values are zero.
-> 
+=D1=83=D1=82=D0=BE, 30. =D1=98=D1=83=D0=BD 2020. =D1=83 16:52 Philippe Math=
+ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Hi,
+>
+> This series add a new 'malta-strict' machine, that aims to properly
+> model the real hardware (which is not what the current 'malta'
+> machine models).
+>
+> As a bonus for Debian builders, a 'malta-unleashed' machine RFC
+> patch is included. This might start another endless discussion
+> upstream, but this is not the point of, so I still include it
+> for people to test. The rest of the series is candidate for merging
+> in mainstream QEMU.
+>
+> Philippe Mathieu-Daud=C3=A9 (6):
+>   hw/mips/malta: Trivial code movement
+>   hw/mips/malta: Register the machine as a TypeInfo
+>   hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
+>   hw/mips/malta: Introduce the 'malta-strict' machine
+>   hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
+>   hw/mips/malta: Introduce the 'malta-unleashed' 64-bit machine
+>
+>  hw/mips/malta.c | 125 ++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 111 insertions(+), 14 deletions(-)
+>
+> --
 
-Queued, thanks.
+This whole series is based on idea of emulating physically
+non-existing feature, and as such violates the fundamental principles
+of QEMU.
 
+As such, not acceptable for upstreaming.
+
+I don't see the point of sending again the same series, in just
+cosmetically different form, if it was said to you that the concept is
+wrong.
+
+Regards,
+Aleksandar
+
+
+> 2.21.3
+>
 
