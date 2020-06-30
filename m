@@ -8,71 +8,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22342C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21674C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:08:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDAD620722
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:07:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0D0120722
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:08:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7Y7jrMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDAD620722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOCK0Mx3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D0120722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq4js-0003M3-88
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:07:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40264)
+	id 1jq4lH-0004j9-8c
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:08:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jq4jD-0002o3-0o; Mon, 29 Jun 2020 21:06:27 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:33603)
+ id 1jq4kh-00049a-LG; Mon, 29 Jun 2020 21:07:59 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:44900)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jq4jB-0004MG-Ax; Mon, 29 Jun 2020 21:06:26 -0400
-Received: by mail-il1-x142.google.com with SMTP id a11so7952433ilk.0;
- Mon, 29 Jun 2020 18:06:24 -0700 (PDT)
+ id 1jq4kf-0004Wy-Ts; Mon, 29 Jun 2020 21:07:59 -0400
+Received: by mail-io1-xd43.google.com with SMTP id i4so19220603iov.11;
+ Mon, 29 Jun 2020 18:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=eIU80hlctrgIzFpuS/p6L91OX1lAyxmRaOAi6fIdWjk=;
- b=Y7Y7jrMr+o7eak4U5+JywYz1vHT5/byGg2fm1AlyvXy1qDdZxB027mrEBrk9Fg0a1U
- mnuy40OSGoKCBp5W+WJqCQd4jWGmC2tUTQw1HJxQHRlAeLM1g+Lx0HtnIiWUAt7bWhjo
- 2galgNyzIzJ6aZvdPmXxGqenFQKu+IcisTFX+63p0rpZHAJ1VwChQ9VKziCLzNcgNdql
- LKrCSQ2BuXI/eSmH4s2vKFvW/36N7Rc/iG/NwaTpesD4aH638h9xI1QzDorwHZb6W4b6
- wpKxzQI85spn6lRUXroOh2AI2F4Nz3mzXCUUJ3jo678MjtLc1HozRQ7QQ2piWzDN3Bod
- 1RSg==
+ :cc; bh=nun2uaMcMQvAStzkFVl0tUJwb5W1cvk9IIAHhRV9s6s=;
+ b=DOCK0Mx3JfvVm6wXwjrNT/8QepqkE6Iul2UZIbBQGvrMb/2tzkAglbXokNZA2esXmN
+ qvWSgX9kyCtr3cOvS9qSnt+4YVDxkFQFgib5ouyRZ4pG9mDJd2ODhc1IdhBZio3KRTHi
+ H+zfL1mdO2zJ8jxFttA3HnbMp3eKH3iW2E0dSwXLd9IeL/8/qGMkZIyhA4R/HWiM7VGH
+ 2FrBkBuNYWTzExIREKcgS/MosT3nmh0UOq9futbi05iKVUoyqRHG67NRsSf6/c6+8pVe
+ UJW9jLbHWzx0IHo92qOYMHYs4iJsCp5BpWUhdirSJf4wBNaFKe2XEUsFppo1gDaTM17U
+ 1PAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=eIU80hlctrgIzFpuS/p6L91OX1lAyxmRaOAi6fIdWjk=;
- b=Xo5UB8mwVvhV6b6IKZYlihhTDk4sUBU1KJMkxAPvIBpWldoa8lzrn8Aw7CTUJzraau
- fmLytdD3iAzQR/y8Mz9pGYoo0GqUh8r6hpNgbL9WmYH2EhOUfunmfU5lwaIQRIlW55FX
- j4DFHwHE/xiuHF1cyCoxej3HGeKBvZrJbBzwY0nP9bYrLc4fI+hygIHYvV8nLj1vkNGv
- 7RMOFy4J2ziB3zoQdGTKIgAyNp3/DoetPSD+vEkBbIwpt9C9PmWs+3xTY9a7nVgs90Zf
- XOp1UXGnV+BCsFLRnWGh/mQGYyFj1Z0KfL84EYObrqh/q9EAggPlm1LnUUImULAFQe93
- F7xA==
-X-Gm-Message-State: AOAM530SozV+KKeUCrlnlbGPgC++rE/fLwf3MDUHgNF6Lk/ss5rgCp2V
- HTec/CxXGddFhcyDC3F9YUp5qLkdadNhHmF4Oas=
-X-Google-Smtp-Source: ABdhPJy+n2p3ZIdtKB0nU3+YDkRaRIX4p1StDTXa8IoQ4DZWxwoj20/SbOcPHc3hSXaPM6OKRKTyl56tKvAiLhV7o2w=
-X-Received: by 2002:a92:5f12:: with SMTP id t18mr226558ilb.267.1593479182906; 
- Mon, 29 Jun 2020 18:06:22 -0700 (PDT)
+ bh=nun2uaMcMQvAStzkFVl0tUJwb5W1cvk9IIAHhRV9s6s=;
+ b=m6PPcpD6rS4SkShqX/Oyp5b+SFy6+tE4f1jJTA6SRtVv2iwU0pUYp10wTPmVCo6b5/
+ +U7CFQYe4g+TYX0y/oQnxbYfTAEZqBuNz9eMXlC+Z9Cfdj83VvOinNu5Ap/nQPqrI6nz
+ vGLb0vRqC8MLqaXgRDkXo5bmAj6QyB9Tgdc6bs2Bz9mo6DMpt987bX53BkXArvcvkYcP
+ vmv1YoXbRMZKh1dFM4zerDq0nfxQPMXe+HikeLLef3+ZRkC9wg9T/hM0knmRcgiV+K3F
+ ZcC9YDZ4Mks12jni8uMUMu8Ryhvye3wtC6y9MFGfUPZCL1oSXqeVujLYqVJHpVns7HPd
+ rSkA==
+X-Gm-Message-State: AOAM53382veotACaHkmbF1sGRcsF9cLJw2PoMCvWZwa6mHt4FLJ/pob7
+ yGaTqYrUpYg3FVsGq28kx79HIWFxCI2fW5EX3Mo=
+X-Google-Smtp-Source: ABdhPJzJIjj2D8/LQIU07uGsziPgblnGp4r7Y7JV+QEWybGdbkLh8zBl62w5PbB4ac9aRmzjJNw6cKXt5+SJgzvkfxY=
+X-Received: by 2002:a5d:8407:: with SMTP id i7mr13058319ion.175.1593479276529; 
+ Mon, 29 Jun 2020 18:07:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-2-dmitry.fomichev@wdc.com>
-In-Reply-To: <20200617213415.22417-2-dmitry.fomichev@wdc.com>
+ <20200617213415.22417-3-dmitry.fomichev@wdc.com>
+In-Reply-To: <20200617213415.22417-3-dmitry.fomichev@wdc.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 29 Jun 2020 17:56:40 -0700
-Message-ID: <CAKmqyKMH+cPCSwb_3jPAmy5=bz7idTeYYkNatij8xRiJO9jTmA@mail.gmail.com>
-Subject: Re: [PATCH v2 01/18] hw/block/nvme: Move NvmeRequest has_sg field to
- a bit flag
+Date: Mon, 29 Jun 2020 17:58:14 -0700
+Message-ID: <CAKmqyKMAYqqDjGRxdg3-b=yZXyMiZaroYk2mkJ2p5KCEGUT9sA@mail.gmail.com>
+Subject: Re: [PATCH v2 02/18] hw/block/nvme: Define 64 bit cqe.result
 To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -106,13 +105,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 2:43 PM Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
+On Wed, Jun 17, 2020 at 2:44 PM Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
 >
-> In addition to the existing has_sg flag, a few more Boolean
-> NvmeRequest flags are going to be introduced in subsequent patches.
-> Convert "has_sg" variable to "flags" and define NvmeRequestFlags
-> enum for individual flag values.
+> From: Ajay Joshi <ajay.joshi@wdc.com>
 >
+> A new write command, Zone Append, is added as a part of Zoned
+> Namespace Command Set. Upon successful completion of this command,
+> the controller returns the start LBA of the performed write operation
+> in cqe.result field. Therefore, the maximum size of this variable
+> needs to be changed from 32 to 64 bit, consuming the reserved 32 bit
+> field that follows the result in CQE struct. Since the existing
+> commands are expected to return a 32 bit LE value, two separate
+> variables, result32 and result64, are now kept in a union.
+>
+> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
 > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -120,84 +126,79 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/block/nvme.c | 8 +++-----
->  hw/block/nvme.h | 6 +++++-
->  2 files changed, 8 insertions(+), 6 deletions(-)
+>  block/nvme.c         | 2 +-
+>  block/trace-events   | 2 +-
+>  hw/block/nvme.c      | 6 +++---
+>  include/block/nvme.h | 6 ++++--
+>  4 files changed, 9 insertions(+), 7 deletions(-)
 >
+> diff --git a/block/nvme.c b/block/nvme.c
+> index eb2f54dd9d..ca245ec574 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -287,7 +287,7 @@ static inline int nvme_translate_error(const NvmeCqe *c)
+>  {
+>      uint16_t status = (le16_to_cpu(c->status) >> 1) & 0xFF;
+>      if (status) {
+> -        trace_nvme_error(le32_to_cpu(c->result),
+> +        trace_nvme_error(le64_to_cpu(c->result64),
+>                           le16_to_cpu(c->sq_head),
+>                           le16_to_cpu(c->sq_id),
+>                           le16_to_cpu(c->cid),
+> diff --git a/block/trace-events b/block/trace-events
+> index 29dff8881c..05c1393943 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -156,7 +156,7 @@ vxhs_get_creds(const char *cacert, const char *client_key, const char *client_ce
+>  # nvme.c
+>  nvme_kick(void *s, int queue) "s %p queue %d"
+>  nvme_dma_flush_queue_wait(void *s) "s %p"
+> -nvme_error(int cmd_specific, int sq_head, int sqid, int cid, int status) "cmd_specific %d sq_head %d sqid %d cid %d status 0x%x"
+> +nvme_error(uint64_t cmd_specific, int sq_head, int sqid, int cid, int status) "cmd_specific %ld sq_head %d sqid %d cid %d status 0x%x"
+>  nvme_process_completion(void *s, int index, int inflight) "s %p queue %d inflight %d"
+>  nvme_process_completion_queue_busy(void *s, int index) "s %p queue %d"
+>  nvme_complete_command(void *s, int index, int cid) "s %p queue %d cid %d"
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 1aee042d4c..3ed9f3d321 100644
+> index 3ed9f3d321..a1bbc9acde 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -350,7 +350,7 @@ static void nvme_rw_cb(void *opaque, int ret)
->          block_acct_failed(blk_get_stats(n->conf.blk), &req->acct);
->          req->status = NVME_INTERNAL_DEV_ERROR;
->      }
-> -    if (req->has_sg) {
-> +    if (req->flags & NVME_REQ_FLG_HAS_SG) {
->          qemu_sglist_destroy(&req->qsg);
->      }
->      nvme_enqueue_req_completion(cq, req);
-> @@ -359,7 +359,6 @@ static void nvme_rw_cb(void *opaque, int ret)
->  static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->      NvmeRequest *req)
->  {
-> -    req->has_sg = false;
->      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
->           BLOCK_ACCT_FLUSH);
->      req->aiocb = blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
-> @@ -383,7 +382,6 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->          return NVME_LBA_RANGE | NVME_DNR;
+> @@ -823,7 +823,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return NVME_INVALID_FIELD | NVME_DNR;
 >      }
 >
-> -    req->has_sg = false;
->      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
->                       BLOCK_ACCT_WRITE);
->      req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
-> @@ -422,14 +420,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+> -    req->cqe.result = result;
+> +    req->cqe.result32 = result;
+>      return NVME_SUCCESS;
+>  }
 >
->      dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
->      if (req->qsg.nsg > 0) {
-> -        req->has_sg = true;
-> +        req->flags |= NVME_REQ_FLG_HAS_SG;
->          req->aiocb = is_write ?
->              dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
->                            nvme_rw_cb, req) :
->              dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
->                           nvme_rw_cb, req);
->      } else {
-> -        req->has_sg = false;
->          req->aiocb = is_write ?
->              blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
->                              req) :
-> @@ -917,6 +914,7 @@ static void nvme_process_sq(void *opaque)
->          QTAILQ_REMOVE(&sq->req_list, req, entry);
->          QTAILQ_INSERT_TAIL(&sq->out_req_list, req, entry);
->          memset(&req->cqe, 0, sizeof(req->cqe));
-> +        req->flags = 0;
->          req->cqe.cid = cmd.cid;
+> @@ -859,8 +859,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>                                      ((dw11 >> 16) & 0xFFFF) + 1,
+>                                      n->params.max_ioqpairs,
+>                                      n->params.max_ioqpairs);
+> -        req->cqe.result = cpu_to_le32((n->params.max_ioqpairs - 1) |
+> -                                      ((n->params.max_ioqpairs - 1) << 16));
+> +        req->cqe.result32 = cpu_to_le32((n->params.max_ioqpairs - 1) |
+> +                                        ((n->params.max_ioqpairs - 1) << 16));
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_set_feature_timestamp(n, cmd);
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 1720ee1d51..9c3a04dcd7 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -577,8 +577,10 @@ typedef struct NvmeAerResult {
+>  } NvmeAerResult;
 >
->          status = sq->sqid ? nvme_io_cmd(n, &cmd, req) :
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 1d30c0bca2..0460cc0e62 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -16,11 +16,15 @@ typedef struct NvmeAsyncEvent {
->      NvmeAerResult result;
->  } NvmeAsyncEvent;
->
-> +enum NvmeRequestFlags {
-> +    NVME_REQ_FLG_HAS_SG   = 1 << 0,
-> +};
-> +
->  typedef struct NvmeRequest {
->      struct NvmeSQueue       *sq;
->      BlockAIOCB              *aiocb;
->      uint16_t                status;
-> -    bool                    has_sg;
-> +    uint16_t                flags;
->      NvmeCqe                 cqe;
->      BlockAcctCookie         acct;
->      QEMUSGList              qsg;
+>  typedef struct NvmeCqe {
+> -    uint32_t    result;
+> -    uint32_t    rsvd;
+> +    union {
+> +        uint64_t     result64;
+> +        uint32_t     result32;
+> +    };
+>      uint16_t    sq_head;
+>      uint16_t    sq_id;
+>      uint16_t    cid;
 > --
 > 2.21.0
 >
