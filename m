@@ -2,81 +2,96 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9D4C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39275C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:05:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C572068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:04:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03A4A20672
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:05:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XLiJX5bf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C572068F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpxSIVjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A4A20672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFvj-0002CR-I2
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:04:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54296)
+	id 1jqFx7-0003QY-9i
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:05:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqFv3-0001QV-AV
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:03:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40476
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqFwN-0002fV-OX
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:04:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25050
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqFv1-0000n4-HQ
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:03:25 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqFwM-0000wH-2q
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:04:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593522202;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=tcyFQ/3OOmzgDduD4M6R95G6K4AD0YENT6gDYfzC+fg=;
- b=XLiJX5bfQftGLO0rWcgEqMxCV1yo9XsxhHDxRdT5bQrRasdVthJz1eDEXz0sFJ00HMWZTs
- ktNurXcw4jaDYR2uLQUPhCmM9G7eLN3PQsvcyZgg9CPJc7axyPSrDhElevcC2JsnTd0hya
- NderADfRxHprOZm62MHs3OfGrS6WuHU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-XNcYTsTIN7uOZwVDYAm0Zw-1; Tue, 30 Jun 2020 09:03:13 -0400
-X-MC-Unique: XNcYTsTIN7uOZwVDYAm0Zw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5472106B217;
- Tue, 30 Jun 2020 13:03:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C05082B472;
- Tue, 30 Jun 2020 13:03:00 +0000 (UTC)
-Date: Tue, 30 Jun 2020 14:02:57 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH v2 2/3] trace: Add support for recorder back-end
-Message-ID: <20200630130257.GP1370404@redhat.com>
-References: <20200626162706.3304357-1-dinechin@redhat.com>
- <20200626162706.3304357-3-dinechin@redhat.com>
+ s=mimecast20190719; t=1593522285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0alwRRzyGCKebQet1n1G3H+hWlOOajMrH45ykiClIBg=;
+ b=VpxSIVjUaR4kwKQR5iuap2KqHLEdiGnQRpni3gJ2pJw2T3irDtGxqHgR2lqqBHTidxhUhR
+ YzcEn6ius4uAxdM+PK9l4slOZlGrB43pjtf/9mhNNj5LKkAYUUEpCL4xVPve1kervJUwcO
+ Gv0Wj9nT12XSnYvr0LgtYxD1L/d2lZU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-TZi2H-0_Nua4L5laWdKeWQ-1; Tue, 30 Jun 2020 09:04:43 -0400
+X-MC-Unique: TZi2H-0_Nua4L5laWdKeWQ-1
+Received: by mail-wr1-f70.google.com with SMTP id b8so4658175wro.19
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 06:04:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=0alwRRzyGCKebQet1n1G3H+hWlOOajMrH45ykiClIBg=;
+ b=i3lXYsWkxsBBloeL/HtSQkAvBTDVP5oWrkvk5w7Vmvxf/PkzPz1L0ub0UBUyeC7mDq
+ arvbp5iS6S2cQStrg5EHVwZrp5TgcdX3CjuLb9WSZHwTUVIIMgHh3991Z4ujBUKFnb/W
+ cvoNf6MppVsYqFY5o3hVi75ocAaTxxFStHLKdqAwwoYsq/BlRBNs8cS0hG0kDlnCQ04A
+ QJ+MJOiDeLJPg/miZh3PPbFhEdRqyN8TtJjjlqHI3BsT/2/KMagxtBm85DSGEiPjieYO
+ 9x0anCyYIqXkH3wAqLIm16C8LHB0zKBQZOVBsyJjxshGYjDQqkQxl34Izkv6Re+ea2Y2
+ vUzA==
+X-Gm-Message-State: AOAM533YYzkjpkOGLFwW//HEMq3CQ1Fw0KwMrPZz10GmEL/gT1ajg/kE
+ UrFddU8uabV41A/wzJfaGRFQa0P27PgYstJdHNfW9228aqgEvK5yCJDs4PzgFZsBEi/O958ibrx
+ /BnfibVn6eGr3eGw=
+X-Received: by 2002:a1c:80d3:: with SMTP id
+ b202mr22038222wmd.111.1593522282502; 
+ Tue, 30 Jun 2020 06:04:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwgmO9XTwMWDT4QT8JVCQU55ksXXLfh8uMPCOzcg5J6+nNH1U3PMC9N6wgJFFF8Y192XIMX3Q==
+X-Received: by 2002:a1c:80d3:: with SMTP id
+ b202mr22038202wmd.111.1593522282295; 
+ Tue, 30 Jun 2020 06:04:42 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ 2sm3419700wmo.44.2020.06.30.06.04.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 06:04:41 -0700 (PDT)
+Date: Tue, 30 Jun 2020 09:04:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
+Message-ID: <20200630090327-mutt-send-email-mst@kernel.org>
+References: <20200629102758.421552-1-cohuck@redhat.com>
+ <20200630121037.GC91444@stefanha-x1.localdomain>
+ <20200630142504.688aa989.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200626162706.3304357-3-dinechin@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200630142504.688aa989.cohuck@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -84,7 +99,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,91 +112,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 26, 2020 at 06:27:05PM +0200, Christophe de Dinechin wrote:
-> The recorder library provides support for low-cost continuous
-> recording of events, which can then be replayed. This makes it
-> possible to collect data "after the fact",for example to show the
-> events that led to a crash.
+On Tue, Jun 30, 2020 at 02:25:04PM +0200, Cornelia Huck wrote:
+> On Tue, 30 Jun 2020 13:10:37 +0100
+> Stefan Hajnoczi <stefanha@redhat.com> wrote:
 > 
-> Recorder support in qemu is implemented using the existing tracing
-> interface. In addition, it is possible to individually enable
-> recorders that are not traces, although this is probably not
-> recommended.
+> > On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:
+> > > virtio-fs devices are only specified for virtio-1, so it is unclear
+> > > how a legacy or transitional device should behave.
+> > > 
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > ---  
+> > 
+> > I thought that the following already forced VIRTIO 1.0 because it
+> > doesn't advertize Legacy or Transitional devices:
+> > 
+> >   static const VirtioPCIDeviceTypeInfo vhost_user_fs_pci_info = {
+> >       .base_name             = TYPE_VHOST_USER_FS_PCI,
+> >       .non_transitional_name = "vhost-user-fs-pci",
+> >       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >       .instance_size = sizeof(VHostUserFSPCI),
+> >       .instance_init = vhost_user_fs_pci_instance_init,
+> >       .class_init    = vhost_user_fs_pci_class_init,
+> >   };
 > 
-> HMP COMMAND:
-> The 'recorder' hmp command has been added, which supports two
-> sub-commands:
-> - recorder dump: Dump the current state of the recorder. You can
-> - recorder trace: Set traces using the recorder_trace_set() syntax.
->   You can use "recorder trace help" to list all available recorders.
+> This indeed makes vhost-user-fs-pci modern-only, I had not spotted that
+> when I wrote the patch. Other modern-only devices do not go down this
+> route and use the virtio_pci_force_virtio_1() approach.
 > 
-> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
-> ---
->  configure                             |  5 +++
->  hmp-commands.hx                       | 19 ++++++++--
->  monitor/misc.c                        | 27 ++++++++++++++
->  scripts/tracetool/backend/recorder.py | 51 +++++++++++++++++++++++++++
->  trace/Makefile.objs                   |  2 ++
->  trace/control.c                       |  7 ++++
->  trace/recorder.c                      | 22 ++++++++++++
->  trace/recorder.h                      | 34 ++++++++++++++++++
->  util/module.c                         |  8 +++++
->  9 files changed, 173 insertions(+), 2 deletions(-)
->  create mode 100644 scripts/tracetool/backend/recorder.py
->  create mode 100644 trace/recorder.c
->  create mode 100644 trace/recorder.h
+> > 
+> > Do you have a guest that sees this VIRTIO 1.0 device and still fails to
+> > negotiate the VERSION_1 feature bit?
+> > 
+> > > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
+> > > index e11c889d82b3..244205edf765 100644
+> > > --- a/hw/virtio/vhost-user-fs-pci.c
+> > > +++ b/hw/virtio/vhost-user-fs-pci.c
+> > > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> > >          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
+> > >      }
+> > >  
+> > > +    virtio_pci_force_virtio_1(vpci_dev);  
+> > 
+> > Can this be moved to virtio_pci_types_register() so that it
+> > automatically happens for .non_transitional_name devices?
+> 
+> There are several existing modern-only devices that don't use that kind
+> of naming scheme...
+> 
+> What bothers me most is that you need to explicitly request a device to
+> be modern-only, while that should be the default for any newly added
+> device. Hence the approach with the centralized list of device types
+> mentioned in a parallel thread. The main problem with that is that the
+> proxy device starts getting realized before the virtio device with its
+> id is present... I failed to find a solution so far. But I'd really
+> like an approach that can work for all transports.
 
-> +RECORDER_CONSTRUCTOR
-> +void recorder_trace_init(void)
-> +{
-> +    recorder_trace_set(getenv("RECORDER_TRACES"));
-> +
-> +    // Allow a dump in case we receive some unhandled signal
-> +    // For example, send USR2 to a hung process to get a dump
-> +    if (getenv("RECORDER_TRACES"))
-> +        recorder_dump_on_common_signals(0,0);
-> +}
+So how about simply validating that the device is modern only,
+unless it's one of the whitelist?
 
-What is the syntax of this RECORDER_TRACES env variable, and perhaps
-more importantly should we have this modelled as a command line arg
-instead of an env variable. We've generally been aiming to get rid
-of env variables and have QAPI modelled CLI. QAPI modelling would be
-particularly important if we want to expose the ablity to change
-settings on the fly via QMP.
-
-
-> diff --git a/trace/recorder.h b/trace/recorder.h
-> new file mode 100644
-> index 0000000000..00b11a2d2f
-> --- /dev/null
-> +++ b/trace/recorder.h
-> @@ -0,0 +1,34 @@
-> +/*
-> + * Recorder-based trace backend
-> + *
-> + * Copyright Red Hat 2020
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-
-Why "version 2" (only), instead of "version 2 or later" ? QEMU generally
-expects the latter for any new code, unless it is derived from existing
-v2-only code in QEMU.
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+MST
 
 
