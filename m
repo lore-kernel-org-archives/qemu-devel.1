@@ -8,83 +8,79 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0628C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22342C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:07:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49DD120722
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDAD620722
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 01:07:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="StA1JdZU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49DD120722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7Y7jrMr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDAD620722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq4is-0002NP-Fo
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:06:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39980)
+	id 1jq4js-0003M3-88
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jun 2020 21:07:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jq4hg-0001Xn-FK; Mon, 29 Jun 2020 21:04:53 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:34169)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jq4jD-0002o3-0o; Mon, 29 Jun 2020 21:06:27 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:33603)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jq4hc-000449-TP; Mon, 29 Jun 2020 21:04:50 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id j19so6254564ybj.1;
- Mon, 29 Jun 2020 18:04:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jq4jB-0004MG-Ax; Mon, 29 Jun 2020 21:06:26 -0400
+Received: by mail-il1-x142.google.com with SMTP id a11so7952433ilk.0;
+ Mon, 29 Jun 2020 18:06:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2gloZ1BcqS3npr+OTl9aFg3Kcknp3tiU9+fhtRKt120=;
- b=StA1JdZUwDrAX5ViC6Os7mgpcPj7P2Dur+H8V7BNkMbatclxVq4lDig6Re/5Pb7BfI
- cOFWFSQN4cVHWhF8cKInLgxRpdQUfe89V5JNNcCJWlHWuDoK3JBq8n7yINARxSzmId88
- sryDAl3QbzcgSCng1rtMvwrtNtRi0wEUjlACXhO50Ehf0nD5ncm+Od2yfhYBCYpY3DgZ
- 3Z69cShB3Ve2frUAt45o1X+LzyPN2pXHzWeIHfowow8nwL/nFpA8ZVLxxrKs1vZc0WXb
- hPQw3Btv9LVEfrT3csg2lI1aA7HyJK2ENBZfXqhGa+hSjbhWuZmdgypJzBGDj27FLEcC
- 7t+Q==
+ :cc; bh=eIU80hlctrgIzFpuS/p6L91OX1lAyxmRaOAi6fIdWjk=;
+ b=Y7Y7jrMr+o7eak4U5+JywYz1vHT5/byGg2fm1AlyvXy1qDdZxB027mrEBrk9Fg0a1U
+ mnuy40OSGoKCBp5W+WJqCQd4jWGmC2tUTQw1HJxQHRlAeLM1g+Lx0HtnIiWUAt7bWhjo
+ 2galgNyzIzJ6aZvdPmXxGqenFQKu+IcisTFX+63p0rpZHAJ1VwChQ9VKziCLzNcgNdql
+ LKrCSQ2BuXI/eSmH4s2vKFvW/36N7Rc/iG/NwaTpesD4aH638h9xI1QzDorwHZb6W4b6
+ wpKxzQI85spn6lRUXroOh2AI2F4Nz3mzXCUUJ3jo678MjtLc1HozRQ7QQ2piWzDN3Bod
+ 1RSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2gloZ1BcqS3npr+OTl9aFg3Kcknp3tiU9+fhtRKt120=;
- b=Idia7WeNaKH0cuURdU6UhFHgUYOlc0swL/ChQOrR9GRqmt9z1AX25koCOriBJ1A/mP
- NRkbFdG3pfSr1AXt1ZS6K7DinrrAXNtQVsnF3lVTfF5sOcp9BmFahLjFHechloDqU93J
- HXknZQXw1MquK0D0wcHclYPA54DFa+cSSrlr+0A0yMciIjxQCZwRxcpNQ8UK8bTeQf7R
- FbsmiXGvSTKqiFohO+YnjBIuHnUxggj1U2hD7rNAFHkWz34VWICiBx3cNmmcYjP4hOAg
- PTvoj933vJqXr0zVxpMtJ7UFubdXN0hHSyDY7yhnBqIqXSFhCSdRD1gV6Zz7oRasuwfQ
- C/Qw==
-X-Gm-Message-State: AOAM531UBIRJm6VDvaTKRl+8nMt8aRIq6VxqyG2X1Lkd7w54WJJTWwAy
- j/mr81L+sg5BzgfDJZVWpcPmppYEDy3KrHEirMM=
-X-Google-Smtp-Source: ABdhPJwr+X+uQIJQAF6r1S4JLSeua7S122A5p8sKCnq0xVvwll5x9YFD9rUND2DTpBmAs1Wive/nLegaItBTv2Htb0g=
-X-Received: by 2002:a25:5806:: with SMTP id m6mr999839ybb.152.1593479087085;
- Mon, 29 Jun 2020 18:04:47 -0700 (PDT)
+ bh=eIU80hlctrgIzFpuS/p6L91OX1lAyxmRaOAi6fIdWjk=;
+ b=Xo5UB8mwVvhV6b6IKZYlihhTDk4sUBU1KJMkxAPvIBpWldoa8lzrn8Aw7CTUJzraau
+ fmLytdD3iAzQR/y8Mz9pGYoo0GqUh8r6hpNgbL9WmYH2EhOUfunmfU5lwaIQRIlW55FX
+ j4DFHwHE/xiuHF1cyCoxej3HGeKBvZrJbBzwY0nP9bYrLc4fI+hygIHYvV8nLj1vkNGv
+ 7RMOFy4J2ziB3zoQdGTKIgAyNp3/DoetPSD+vEkBbIwpt9C9PmWs+3xTY9a7nVgs90Zf
+ XOp1UXGnV+BCsFLRnWGh/mQGYyFj1Z0KfL84EYObrqh/q9EAggPlm1LnUUImULAFQe93
+ F7xA==
+X-Gm-Message-State: AOAM530SozV+KKeUCrlnlbGPgC++rE/fLwf3MDUHgNF6Lk/ss5rgCp2V
+ HTec/CxXGddFhcyDC3F9YUp5qLkdadNhHmF4Oas=
+X-Google-Smtp-Source: ABdhPJy+n2p3ZIdtKB0nU3+YDkRaRIX4p1StDTXa8IoQ4DZWxwoj20/SbOcPHc3hSXaPM6OKRKTyl56tKvAiLhV7o2w=
+X-Received: by 2002:a92:5f12:: with SMTP id t18mr226558ilb.267.1593479182906; 
+ Mon, 29 Jun 2020 18:06:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200626003313.715355-1-atish.patra@wdc.com>
- <20200626003313.715355-3-atish.patra@wdc.com>
- <CAEUhbmUCJcosvYd44qPMXdkE+Bj2MUcFBvz1VWSZL2w-6Z3d6g@mail.gmail.com>
- <CAOnJCUKr5XXga5B02WDOeiyvEjgpAfcqp_VN-y2AAD0vXsn2Uw@mail.gmail.com>
- <CAEUhbmVH9RauXydanCv6OpVAMi9cKP4OaJetgNx3vaVSoPSQBw@mail.gmail.com>
- <CAOnJCUJzF0rBEqUFCjgwFQ36m-WO3yuvUY9BD8N6SCTTeLKZ3Q@mail.gmail.com>
- <CAEUhbmXjyBa_Ejn+2joL5w7qOC08eub1zOktDfMTGrFa46PJ6Q@mail.gmail.com>
- <CAOnJCU+VtjnaN=3wVNZMdBMjrj3ag1gnA6okfROA85um8pKqsA@mail.gmail.com>
-In-Reply-To: <CAOnJCU+VtjnaN=3wVNZMdBMjrj3ag1gnA6okfROA85um8pKqsA@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Tue, 30 Jun 2020 09:04:35 +0800
-Message-ID: <CAEUhbmVG=rT2qZ8x=cpBQOg8my3n4cuG98xGPjVqyLgpx-aT+A@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] RISC-V: Copy the fdt in dram instead of ROM
-To: Atish Patra <atishp@atishpatra.org>
+References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ <20200617213415.22417-2-dmitry.fomichev@wdc.com>
+In-Reply-To: <20200617213415.22417-2-dmitry.fomichev@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 29 Jun 2020 17:56:40 -0700
+Message-ID: <CAKmqyKMH+cPCSwb_3jPAmy5=bz7idTeYYkNatij8xRiJO9jTmA@mail.gmail.com>
+Subject: Re: [PATCH v2 01/18] hw/block/nvme: Move NvmeRequest has_sg field to
+ a bit flag
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -99,224 +95,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, Qemu-block <qemu-block@nongnu.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- Alistair Francis <alistair.francis@wdc.com>
+ Keith Busch <kbusch@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 30, 2020 at 2:50 AM Atish Patra <atishp@atishpatra.org> wrote:
+On Wed, Jun 17, 2020 at 2:43 PM Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
 >
-> On Sat, Jun 27, 2020 at 2:55 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > On Sat, Jun 27, 2020 at 12:37 PM Atish Patra <atishp@atishpatra.org> wrote:
-> > >
-> > > On Fri, Jun 26, 2020 at 7:54 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > >
-> > > > Hi Atish,
-> > > >
-> > > > On Sat, Jun 27, 2020 at 12:58 AM Atish Patra <atishp@atishpatra.org> wrote:
-> > > > >
-> > > > > On Fri, Jun 26, 2020 at 4:50 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Atish,
-> > > > > >
-> > > > > > On Fri, Jun 26, 2020 at 8:33 AM Atish Patra <atish.patra@wdc.com> wrote:
-> > > > > > >
-> > > > > > > Currently, the fdt is copied to the ROM after the reset vector. The firmware
-> > > > > > > has to copy it to DRAM. Instead of this, directly copy the device tree to a
-> > > > > > > pre-computed dram address. The device tree load address should be as far as
-> > > > > > > possible from kernel and initrd images. That's why it is kept at the end of
-> > > > > > > the DRAM or 4GB whichever is lesser.
-> > > > > > >
-> > > > > > > Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> > > > > > > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> > > > > > > ---
-> > > > > > >  hw/riscv/boot.c         | 57 +++++++++++++++++++++++++++++------------
-> > > > > > >  hw/riscv/sifive_u.c     | 32 +++++++++++------------
-> > > > > > >  hw/riscv/spike.c        |  7 ++++-
-> > > > > > >  hw/riscv/virt.c         |  7 ++++-
-> > > > > > >  include/hw/riscv/boot.h |  5 +++-
-> > > > > > >  5 files changed, 71 insertions(+), 37 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-> > > > > > > index 482b78147993..02c4018a8105 100644
-> > > > > > > --- a/hw/riscv/boot.c
-> > > > > > > +++ b/hw/riscv/boot.c
-> > > > > > > @@ -159,44 +159,67 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-> > > > > > >      return *start + size;
-> > > > > > >  }
-> > > > > > >
-> > > > > > > +hwaddr riscv_load_fdt(hwaddr dram_base, uint64_t mem_size, void *fdt)
-> > > > > >
-> > > > > > I think we should use uint32_t for the return value type, since it is
-> > > > > > always below 4GiB
-> > > > > >
-> > > > >
-> > > > > You are correct. I will update it. Thanks.
-> > > > > > > +{
-> > > > > > > +    hwaddr temp, fdt_addr;
-> > > > > > > +    hwaddr dram_end = dram_base + mem_size;
-> > > > > > > +    int fdtsize = fdt_totalsize(fdt);
-> > > > > > > +
-> > > > > > > +    if (fdtsize <= 0) {
-> > > > > > > +        error_report("invalid device-tree");
-> > > > > > > +        exit(1);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    /*
-> > > > > > > +     * We should put fdt as far as possible to avoid kernel/initrd overwriting
-> > > > > > > +     * its content. But it should be addressable by 32 bit system as well.
-> > > > > > > +     * Thus, put it at an aligned address that less than fdt size from end of
-> > > > > > > +     * dram or 4GB whichever is lesser.
-> > > > > > > +     */
-> > > > > > > +    temp = MIN(dram_end, 4096 * MiB);
-> > > > > > > +    fdt_addr = QEMU_ALIGN_DOWN(temp - fdtsize, 2 * MiB);
-> > > > > > > +
-> > > > > > > +    fdt_pack(fdt);
-> > > > > > > +    /* copy in the device tree */
-> > > > > > > +    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
-> > > > > >
-> > > > > > Use fdtsize
-> > > > > >
-> > > > >
-> > > > > Sure.
-> > > > > > > +
-> > > > > > > +    rom_add_blob_fixed_as("fdt", fdt, fdtsize, fdt_addr,
-> > > > > > > +                          &address_space_memory);
-> > > > > > > +
-> > > > > > > +    return fdt_addr;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > >  void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
-> > > > > > > -                               hwaddr rom_size, void *fdt)
-> > > > > > > +                               hwaddr rom_size,
-> > > > > > > +                               hwaddr fdt_load_addr, void *fdt)
-> > > > > > >  {
-> > > > > > >      int i;
-> > > > > > >      /* reset vector */
-> > > > > > > -    uint32_t reset_vec[8] = {
-> > > > > > > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
-> > > > > > > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
-> > > > > > > +    uint32_t reset_vec[10] = {
-> > > > > > > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
-> > > > > >
-> > > > > > fw_dync should be introduced in the next patch, so this line should be
-> > > > > > kept unchanged in this patch
-> > > > > >
-> > > > > As we have fdt_laddr, keeping it unchanged may create confusion with
-> > > > > another dtb label.
-> > > > > I will change the label to "end" in the next version.
-> > > > >
-> > > > > > >          0xf1402573,                  /*     csrr   a0, mhartid  */
-> > > > > > >  #if defined(TARGET_RISCV32)
-> > > > > > > +        0x0202a583,                  /*     lw     a1, 32(t0) */
-> > > > > > >          0x0182a283,                  /*     lw     t0, 24(t0) */
-> > > > > > >  #elif defined(TARGET_RISCV64)
-> > > > > > > +        0x0202b583,                  /*     ld     a1, 32(t0) */
-> > > > > > >          0x0182b283,                  /*     ld     t0, 24(t0) */
-> > > > > > >  #endif
-> > > > > > >          0x00028067,                  /*     jr     t0 */
-> > > > > > >          0x00000000,
-> > > > > > >          start_addr,                  /* start: .dword */
-> > > > > > >          0x00000000,
-> > > > > > > -                                     /* dtb: */
-> > > > > > > +        fdt_load_addr,               /* fdt_laddr: .dword */
-> > > > > > > +        0x00000000,
-> > > > > > > +                                     /* fw_dyn: */
-> > > > > > >      };
-> > > > > > >
-> > > > > > >      /* copy in the reset vector in little_endian byte order */
-> > > > > > > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
-> > > > > > > +    for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
-> > > > > > >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
-> > > > > > >      }
-> > > > > > >      rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-> > > > > > >                            rom_base, &address_space_memory);
-> > > > > > >
-> > > > > > > -    /* copy in the device tree */
-> > > > > > > -    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
-> > > > > > > -        rom_size - sizeof(reset_vec)) {
-> > > > > > > -        error_report("not enough space to store device-tree");
-> > > > > > > -        exit(1);
-> > > > > > > -    }
-> > > > > > > -    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
-> > > > > > > -    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
-> > > > > > > -                           rom_base + sizeof(reset_vec),
-> > > > > > > -                           &address_space_memory);
-> > > > > > > -
-> > > > > > >      return;
-> > > > > > >  }
-> > > > > > > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> > > > > > > index 395b21703ab4..7d39a4e4ec6d 100644
-> > > > > > > --- a/hw/riscv/sifive_u.c
-> > > > > > > +++ b/hw/riscv/sifive_u.c
-> > > > > > > @@ -379,6 +379,7 @@ static void sifive_u_machine_init(MachineState *machine)
-> > > > > > >      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
-> > > > > > >      target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
-> > > > > > >      int i;
-> > > > > > > +    hwaddr fdt_load_addr;
-> > > > > > >
-> > > > > > >      /* Initialize SoC */
-> > > > > > >      object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
-> > > > > > > @@ -450,40 +451,37 @@ static void sifive_u_machine_init(MachineState *machine)
-> > > > > > >          }
-> > > > > > >      }
-> > > > > > >
-> > > > > > > +    /* Compute the fdt load address in dram */
-> > > > > > > +    fdt_load_addr = riscv_load_fdt(memmap[SIFIVE_U_DRAM].base,
-> > > > > > > +                                   machine->ram_size, s->fdt);
-> > > > > > > +
-> > > > > > >      /* reset vector */
-> > > > > > > -    uint32_t reset_vec[8] = {
-> > > > > > > +    uint32_t reset_vec[11] = {
-> > > > > > >          s->msel,                       /* MSEL pin state */
-> > > > > > > -        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
-> > > > > > > -        0x01c28593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
-> > > > > > > +        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
-> > > > > > >          0xf1402573,                    /*     csrr   a0, mhartid  */
-> > > > > > >  #if defined(TARGET_RISCV32)
-> > > > > > > +        0x0202a583,                    /*     lw     a1, 32(t0) */
-> > > > > > >          0x0182a283,                    /*     lw     t0, 24(t0) */
-> > > > > > >  #elif defined(TARGET_RISCV64)
-> > > > > > > -        0x0182e283,                    /*     lwu    t0, 24(t0) */
-> > > > > > > +        0x0202b583,                    /*     ld     a1, 32(t0) */
-> > > > > > > +        0x0182b283,                    /*     ld     t0, 24(t0) */
-> > > > > >
-> > > > > > This change (lwu => ld) is unnecessary.
-> > > > > >
-> > > > > start_addr is a dword. Currently, the start address is within 32 bits.
-> > > > > But it can be changed to more than 32 bits. No ?
-> > > >
-> > > > For RV32, only 32-bit can be used here. For Rv64, I am not sure
-> > > > whether it is a big value to support jumping directly to 4GiB address
-> > > > above in QEMU. For FU540 SoC, all possible boot adddresses are below
-> > > > 4GiB so I think there is no need to support that in QEMU.
-> > > >
-> > >
-> > > That's true only for hifive unleashed. But that may change for future
-> > > generations of sifive socs.
-> > > But I was trying to say that it is confusing to use a lwu for a dword
-> > > (as per the comment section).
-> > > If you prefer to use lwu only, we should cast it to a 32 bit value,
-> > > update the comment and use lwu.
-> > >
-> > > I prefer ld because it is not ambiguous and future proof as well.
-> >
-> > If we use ld, then please fix the 0x00000000 entry, so that it becomes
-> > the high 32-bit of start_addr.
-> >
+> In addition to the existing has_sg flag, a few more Boolean
+> NvmeRequest flags are going to be introduced in subsequent patches.
+> Convert "has_sg" variable to "flags" and define NvmeRequestFlags
+> enum for individual flag values.
 >
-> I am bit confused. It is already happening. Otherwise, it won't boot.
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 
-Currently all machines are using 32-bit start_addr. Because the high
-32-bit of the start_addr is hardcoded to zero, as I mentioned.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Regards,
-Bin
+Alistair
+
+> ---
+>  hw/block/nvme.c | 8 +++-----
+>  hw/block/nvme.h | 6 +++++-
+>  2 files changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 1aee042d4c..3ed9f3d321 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -350,7 +350,7 @@ static void nvme_rw_cb(void *opaque, int ret)
+>          block_acct_failed(blk_get_stats(n->conf.blk), &req->acct);
+>          req->status = NVME_INTERNAL_DEV_ERROR;
+>      }
+> -    if (req->has_sg) {
+> +    if (req->flags & NVME_REQ_FLG_HAS_SG) {
+>          qemu_sglist_destroy(&req->qsg);
+>      }
+>      nvme_enqueue_req_completion(cq, req);
+> @@ -359,7 +359,6 @@ static void nvme_rw_cb(void *opaque, int ret)
+>  static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      NvmeRequest *req)
+>  {
+> -    req->has_sg = false;
+>      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+>           BLOCK_ACCT_FLUSH);
+>      req->aiocb = blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
+> @@ -383,7 +382,6 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>          return NVME_LBA_RANGE | NVME_DNR;
+>      }
+>
+> -    req->has_sg = false;
+>      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+>                       BLOCK_ACCT_WRITE);
+>      req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
+> @@ -422,14 +420,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>
+>      dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
+>      if (req->qsg.nsg > 0) {
+> -        req->has_sg = true;
+> +        req->flags |= NVME_REQ_FLG_HAS_SG;
+>          req->aiocb = is_write ?
+>              dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+>                            nvme_rw_cb, req) :
+>              dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
+>                           nvme_rw_cb, req);
+>      } else {
+> -        req->has_sg = false;
+>          req->aiocb = is_write ?
+>              blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
+>                              req) :
+> @@ -917,6 +914,7 @@ static void nvme_process_sq(void *opaque)
+>          QTAILQ_REMOVE(&sq->req_list, req, entry);
+>          QTAILQ_INSERT_TAIL(&sq->out_req_list, req, entry);
+>          memset(&req->cqe, 0, sizeof(req->cqe));
+> +        req->flags = 0;
+>          req->cqe.cid = cmd.cid;
+>
+>          status = sq->sqid ? nvme_io_cmd(n, &cmd, req) :
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 1d30c0bca2..0460cc0e62 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -16,11 +16,15 @@ typedef struct NvmeAsyncEvent {
+>      NvmeAerResult result;
+>  } NvmeAsyncEvent;
+>
+> +enum NvmeRequestFlags {
+> +    NVME_REQ_FLG_HAS_SG   = 1 << 0,
+> +};
+> +
+>  typedef struct NvmeRequest {
+>      struct NvmeSQueue       *sq;
+>      BlockAIOCB              *aiocb;
+>      uint16_t                status;
+> -    bool                    has_sg;
+> +    uint16_t                flags;
+>      NvmeCqe                 cqe;
+>      BlockAcctCookie         acct;
+>      QEMUSGList              qsg;
+> --
+> 2.21.0
+>
+>
 
