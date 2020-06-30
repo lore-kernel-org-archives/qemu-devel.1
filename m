@@ -2,93 +2,89 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E73B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7BCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EDE3206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7432F20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:53:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhvSE6Ro"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDE3206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drVsLQCd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7432F20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqCtO-0002F5-Rw
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:49:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54712)
+	id 1jqCwx-0004ap-PK
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCsm-0001Z3-4Y
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:48:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45047
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCsj-0002FS-SV
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:48:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593510528;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5shugc/0Pw5KRRK2mAOwr6B4D5oaAihLEKPTgQLlG+0=;
- b=LhvSE6Ro9XOButxxEoG0kOv9f5weRfZwZoi5zLD5KzLwVu2w1wtPmmCXAzcpwIcpVJzqzP
- I2skmNaMl7fsPR7iQ3J6qfk2MV9sp8gnfLs0gwcgZjhFeVYbZZJ6gXdSScJq878LyL9GBw
- 1RLvjppnC01pdNmtkfOdMBh2chCmWTU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-2jyt7VLUMmy18v2-hDG1ig-1; Tue, 30 Jun 2020 05:48:46 -0400
-X-MC-Unique: 2jyt7VLUMmy18v2-hDG1ig-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1DB5107ACCD;
- Tue, 30 Jun 2020 09:48:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8650EB3A61;
- Tue, 30 Jun 2020 09:48:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1402811384A6; Tue, 30 Jun 2020 11:48:43 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 4/5] hw/i2c: Rename i2c_create_slave() as
- i2c_slave_create_simple()
-References: <20200629173821.22037-1-f4bug@amsat.org>
- <20200629173821.22037-5-f4bug@amsat.org>
-Date: Tue, 30 Jun 2020 11:48:43 +0200
-In-Reply-To: <20200629173821.22037-5-f4bug@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 29 Jun 2020 19:38:20
- +0200")
-Message-ID: <87eepwhojo.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqCwJ-0003nB-QS
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:52:31 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39406)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqCwH-0002tS-T7
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:52:31 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id q5so19446383wru.6
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 02:52:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yDNR7CzmXvERlP2gCS61TUUtFQynsCcwyJZGFLksrr8=;
+ b=drVsLQCdmCos/3CvKKqZvpAfjMp0KNmD5njGQPAsWeI3xYp71RgRRWHI4ZFZDcxfGb
+ StwKqA7kE47HGLJg6pgZGp0ssx+Psx4isLVQlcZ9XI5hOJcj2xrt6ZOU6+AqtL158cC3
+ ov/0SM3DB03BtlHOeZJKCzh+80ZfS/hPn/I0p5ZWRj3q+bx3f34V0oztZ+zUBzJTBZWe
+ lb5GTOGIznt9m4pqf9NVgqkOjlacbioq5M6DjPDZdviloVu58ftl2ki5G83N2lVoG7Mb
+ mQPupGhT23BPVEuBO/tY7kqTo0JWRaL6+zNn76E+/vXh1QfdS4EaeIOhm2s9cdqyH3Ev
+ lFmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yDNR7CzmXvERlP2gCS61TUUtFQynsCcwyJZGFLksrr8=;
+ b=aKoTm+g5ULf+neYk5ngi0oETd0g3jnb0vv5vFs/+NuayzGmKpCCovK6jkNpu+0KjM3
+ cSPTkNiuiqB4Ji1Mjju9sX8kBkUUDb2A4X71nia6gGuKA/n/+1R0Hn/BoqELR+6Gx120
+ q/crWg1aPJZrE5R9BF5/8dSroLoi+OLA1KWqjBlIOA3NGf20R7M7aBXGctVhwDGUmST2
+ DA8azXtob+hCvWy3Egneq/vtZsVKLYRzENOkEYyQn3ZZA1MTew0cV7K6HWvcXiDhOqgo
+ tfxpuRcVk+eMCbtW2suCbdi4sOoJvTpKc80/0hz4QBWGw5pNXuiPvYIcnu5451M04FWW
+ dkhA==
+X-Gm-Message-State: AOAM533JEiYiF6yrmlUS5hV0HMZLpi/CJlynCFrDRJMsOSg60sYZe01Y
+ xmzb5BMO457o+LmQm4PRy/RFNl4dRppl0cyHTrY=
+X-Google-Smtp-Source: ABdhPJzGZOsyP/6LXyMaTqsMRPfRWaZDL5EJGjt5jIw8y4YiamUN+6lUO24DaM0dGDhMdEJSTR/Ga3N/1beCBORaX74=
+X-Received: by 2002:adf:f885:: with SMTP id u5mr20668789wrp.402.1593510748428; 
+ Tue, 30 Jun 2020 02:52:28 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+ <CAE2XoE-dOHGtJO5f0xXA7r4hEeL5LDOPB1TDNPjWNC+hf9Qyew@mail.gmail.com>
+ <CALTWKrVwRhQEEjMEq444fNgBp1Dv_XyJAV7suXCEmeS40raaEQ@mail.gmail.com>
+ <CAHiYmc5Em7zaVZzBZdp-13Mw2MnM_-nxZ=g+_ePnDCcBiwJrRg@mail.gmail.com>
+In-Reply-To: <CAHiYmc5Em7zaVZzBZdp-13Mw2MnM_-nxZ=g+_ePnDCcBiwJrRg@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 30 Jun 2020 11:52:16 +0200
+Message-ID: <CAHiYmc6cr4_q35106ZTPdAXG5geKChu7XUiKVLkDPRVhZM3Z_A@mail.gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,27 +97,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>,
- Joel Stanley <joel@jms.id.au>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, luoyonggang@gmail.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> We use "create_simple" names for functions that allocate, initialize,
-> configure and realize device objects: pci_create_simple(),
-> isa_create_simple(), usb_create_simple(). For consistency, rename
-> i2c_create_slave() as i2c_slave_create_simple(). Since we have
-> to update all the callers, also let it return a I2CSlave object.
+> As far as I know, this is how Ahmed test bed is setup:
 >
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> 1) Fresh installation on Ubuntu 18.04 on an Inter 64-bit host.
+> 2) Install QEMU build prerequisite packages.
+> 3) Install perf (this step is not necessary for Report 2, but it is
+> for Report 1).
+> 4) Install vallgrind.
+> 5) Install 16 gcc cross-compilers. (which, together with native
+> comipler, will sum up to the 17 possible QEMU targets)
+>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+The following commands install cross-compilers needed for creating
+table in the second part or Ahmed's Report 2:
 
+sudo apt-get install g++
+sudo apt-get install g++-aarch64-linux-gnu
+sudo apt-get install g++-alpha-linux-gnu
+sudo apt-get install g++-arm-linux-gnueabi
+sudo apt-get install g++-hppa-linux-gnu
+sudo apt-get install g++-m68k-linux-gnu
+sudo apt-get install g++-mips-linux-gnu
+sudo apt-get install g++-mips64-linux-gnuabi64
+sudo apt-get install g++-mips64el-linux-gnuabi64
+sudo apt-get install g++-mipsel-linux-gnu
+sudo apt-get install g++-powerpc-linux-gnu
+sudo apt-get install g++-powerpc64-linux-gnu
+sudo apt-get install g++-powerpc64le-linux-gnu
+sudo apt-get install g++-riscv64-linux-gnu
+sudo apt-get install g++-s390x-linux-gnu
+sudo apt-get install g++-sh4-linux-gnu
+sudo apt-get install g++-sparc64-linux-gnu
+
+Ahmed, I think this should be in an Appendix section of Report 2.
+
+Sincerely,
+Aleksandar
+
+> That is all fine if Mr. Yongang is able to do the above, or if he
+> already have similar system.
+>
+> I am fairly convinced that the setup for any Debian-based Linux
+> distribution will be almost identical as described above
+>
+> However, let's say Mr.Yongang system is Suse-bases distribution (SUSE
+> Linux Enterprise, openSUSE Leap, openSUSE Tumbleweed, Gecko). He could
+> do steps 2), 3), 4) in a fairly similar manner. But, step 5) will be
+> difficult. I know that support for cross-compilers is relatively poor
+> for Suse-based distributions. I think Mr. Yongang could run experiment
+> from the second part of Report 2 only for 5 or 6 targets, rather than
+> 17 as you did.
+>
+> The bottom line for Report 2:
+>
+> I think there should be an "Appendix" note on installing
+> cross-compilers. And some general note on your test bed, as well as
+> some guideline for all people like Mr. Yongang who wish to repro the
+> results on their own systems.
+>
+> Sincerely,
+> Aleksandar
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> 2)
+>
+>
+> > Best Regards,
+> > Ahmed Karaman
 
