@@ -2,134 +2,92 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5B0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B9BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 637D6206C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D16582074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:29:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLCJnRon"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 637D6206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbVtPF5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16582074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqK3T-0005dM-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43306)
+	id 1jqK4i-0006bR-5D
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqK2d-0004wX-WC
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:27:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58260
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqK2b-0005ax-5j
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:27:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593538047;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=oqaF53js116BFuwCtw9OPfpHPGSljyERaOiFUdX/2cY=;
- b=JLCJnRonvLSBEU+mhg/euJC4KbxMq+pI8SX2pkT+9LRUbRMnSFVX0Ry7b3vZdRcggnWSjw
- vojhap1ndNdJJFSEOIF3ukiNmLsj7SEOyvupW3iCHSMWealSF4QR12sspZRNSoktL744/a
- EIm075fJFJzBHT4bdDzSrf/QorVvEa0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-yt5sy562OTiDwIMs7YMh3g-1; Tue, 30 Jun 2020 13:27:25 -0400
-X-MC-Unique: yt5sy562OTiDwIMs7YMh3g-1
-Received: by mail-ed1-f69.google.com with SMTP id y92so13035008eda.12
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 10:27:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqK3q-00064S-Vs
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:28:47 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46198)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jqK3p-0005hj-6S
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:28:46 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r12so20940771wrj.13
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 10:28:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OFDTVqurqeWRpPa66n3t+wBAy9jxAJmER0Aw+M9687s=;
+ b=QbVtPF5eK/PTURaRncqZkUUGYZwEeAnVkyKjmCn4Uadoj9qUX9dADFPiypKTmhXfqX
+ F7beQDBAN7d/e3P7Uxe99VV7ixgyD3bWRytiytavMFQIZ/Un/xvB6Lobg/qr9OpDT04j
+ MkWkCtjyZTWiBL63c9pvWRxWMjAKpp8TcITRKvzgt8tKYwTPhGoMiNEfBeiOMUC/Ip3+
+ A6mnh55xqUnPe6SkbAO9QHn9Jil1FS+cCM8nUWs1lhNM4PZeEk48/KDxy7SaIWvnOxpY
+ 3QWb4DFSuhZupAf3pXjId0tGQSJNkTJjy+zLXs736TFaEMqMqP2ld06QSU0iiGQqtJce
+ ND4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=oqaF53js116BFuwCtw9OPfpHPGSljyERaOiFUdX/2cY=;
- b=D80daQ4N/pGh78WT85V4K5Gb7gugo59o6ZiQYqCwiyARfig2qQCQDu2+Cetf9/S8Ow
- MJsvIaBjh2xuHVUMg0HZeVwFtAoFd7Kn7Ov5GHaNIF5aFWBfKU3x9Go3052ee50/xYLg
- V3yy2ibq/D9Cs8KyOEaDeDg79tvHam6vRxLNUSUwPnsudR/cbHr4QtE9R3r+DVKAMeWo
- n5HUgwomaNHPX0eqde1sRUEzd7ik3+BcuY0q8xwdjIVqvGkt5NwiCK2HJ1CXyBHliz1s
- ykTaUK7XJEE1pnpGde/rgA49z2oqPrLMEjTPzVmOD81trrErNplpZqy0YXGQfsNHYRc+
- lyqA==
-X-Gm-Message-State: AOAM532e9swr0daWkaD6v2aptFczL91kkBLXGEtAnkbEbIYJne+ANNph
- 9JagpWoP+szotWoUzBpyN1MoB6g7p3v64xHt3nSaS3Y9+5Ioh9y9lTNSy7ZFjcul/b7v0kZtf61
- t7PMkXJHzUgt2b7I=
-X-Received: by 2002:a17:906:d9c4:: with SMTP id
- qk4mr20323095ejb.100.1593538044402; 
- Tue, 30 Jun 2020 10:27:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTRshH+tCbYqBRZoSrP2wOTHAhNfEEVSe9WoaeIdjWw3EP94byVU+BJoJjNvqHzssgxk8aLQ==
-X-Received: by 2002:a17:906:d9c4:: with SMTP id
- qk4mr20323075ejb.100.1593538044167; 
- Tue, 30 Jun 2020 10:27:24 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id g21sm3546337edu.2.2020.06.30.10.27.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 10:27:23 -0700 (PDT)
-Subject: Re: [PATCH 2/2] xen: cleanup unrealized flash devices
-To: paul@xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-References: <20200624121841.17971-1-paul@xen.org>
- <20200624121841.17971-3-paul@xen.org>
- <33e594dd-dbfa-7c57-1cf5-0852e8fc8e1d@redhat.com>
- <000701d64ef5$6568f660$303ae320$@xen.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <9e591254-d215-d5af-38d2-fd5b65f84a43@redhat.com>
-Date: Tue, 30 Jun 2020 19:27:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OFDTVqurqeWRpPa66n3t+wBAy9jxAJmER0Aw+M9687s=;
+ b=t4KzNnP5DwI5fWheUuJzMcRhVw01SWjBzxAKexp8jAcQXvhaIpxRkODf4Ldf5Pq8/A
+ VAIVvjHD2u+IobDy1CPFAzDDZKxlpPZ+NGI2uhvUTsA3tdfaZ/rlhFhse8kFmtI2aK4i
+ k6EJpMxf43mOmzLfWdnC13b4/7ar+nXobg21EKfW1PxPhI4j4LNlUZXoCwLrHb1CfZ2c
+ vgiTTjnyboGzl9FCT+vwsU8bmfXlxzjSAfcxnkhpqKvUQSMbIGfDxb15D5x8oZ8bX4Tr
+ /Hmte3WUDmaWvL1WnwN6Ik5y1S+5nw1Obu05kOJe5qj5ReQadTr50IpvGp1do+EtMsAp
+ e6Bg==
+X-Gm-Message-State: AOAM532dhjHaMyIQ3wsrMO+6+IThlZEgtiu9gcifVhWSp71B/JXcPUDZ
+ BrVqaQmFWTLc6AFx5QL1DvNy1+zZrgvxwOfexAo=
+X-Google-Smtp-Source: ABdhPJyYdzgzE8Fj0sdmi38sAQFSRfDC5geWB9VhyGpcIEvh0PgekliDhRrzoe9g6//R2NNlhIN0WhL07m5gw/UihNg=
+X-Received: by 2002:a5d:62d1:: with SMTP id o17mr22190829wrv.162.1593538121459; 
+ Tue, 30 Jun 2020 10:28:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <000701d64ef5$6568f660$303ae320$@xen.org>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200630145236.27529-1-f4bug@amsat.org>
+ <CAHiYmc4=pmzEyhVTHaqxBnCotE8V+vaptMFincyurvAyDHNn6g@mail.gmail.com>
+ <5725b99b-b524-ab40-c74d-a615bb28d363@amsat.org>
+ <CAHiYmc7AoJd7TMX_Beo3A2f3R1M=yrpe2ZydbsSysREf4Cx3Vw@mail.gmail.com>
+ <a503201a-ed9f-dff6-6e3d-4729ed31ad98@amsat.org>
+In-Reply-To: <a503201a-ed9f-dff6-6e3d-4729ed31ad98@amsat.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 30 Jun 2020 19:28:29 +0200
+Message-ID: <CAHiYmc6tp9k9eSOKiSWaQjmaTyvJXi3k+RmLWqLmhTHY9_KDnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] hw/mips/malta: Add the 'malta-strict' machine,
+ matching Malta hardware
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,167 +100,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Eduardo Habkost' <ehabkost@redhat.com>,
- 'Jason Andryuk' <jandryuk@gmail.com>, 'Paul Durrant' <pdurrant@amazon.com>,
- "'Michael S. Tsirkin'" <mst@redhat.com>, 'Paolo Bonzini' <pbonzini@redhat.com>,
- 'Richard Henderson' <rth@twiddle.net>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yunqiang Su <ysu@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 5:44 PM, Paul Durrant wrote:
->> -----Original Message-----
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Sent: 30 June 2020 16:26
->> To: Paul Durrant <paul@xen.org>; xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
->> Cc: Eduardo Habkost <ehabkost@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Paul Durrant
->> <pdurrant@amazon.com>; Jason Andryuk <jandryuk@gmail.com>; Paolo Bonzini <pbonzini@redhat.com>;
->> Richard Henderson <rth@twiddle.net>
->> Subject: Re: [PATCH 2/2] xen: cleanup unrealized flash devices
->>
->> On 6/24/20 2:18 PM, Paul Durrant wrote:
->>> From: Paul Durrant <pdurrant@amazon.com>
->>>
->>> The generic pc_machine_initfn() calls pc_system_flash_create() which creates
->>> 'system.flash0' and 'system.flash1' devices. These devices are then realized
->>> by pc_system_flash_map() which is called from pc_system_firmware_init() which
->>> itself is called via pc_memory_init(). The latter however is not called when
->>> xen_enable() is true and hence the following assertion fails:
->>>
->>> qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
->>> Assertion `dev->realized' failed
->>>
->>> These flash devices are unneeded when using Xen so this patch avoids the
->>> assertion by simply removing them using pc_system_flash_cleanup_unused().
->>>
->>> Reported-by: Jason Andryuk <jandryuk@gmail.com>
->>> Fixes: ebc29e1beab0 ("pc: Support firmware configuration with -blockdev")
->>> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
->>> Tested-by: Jason Andryuk <jandryuk@gmail.com>
->>> ---
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Richard Henderson <rth@twiddle.net>
->>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>> ---
->>>  hw/i386/pc_piix.c    | 9 ++++++---
->>>  hw/i386/pc_sysfw.c   | 2 +-
->>>  include/hw/i386/pc.h | 1 +
->>>  3 files changed, 8 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->>> index 1497d0e4ae..977d40afb8 100644
->>> --- a/hw/i386/pc_piix.c
->>> +++ b/hw/i386/pc_piix.c
->>> @@ -186,9 +186,12 @@ static void pc_init1(MachineState *machine,
->>>      if (!xen_enabled()) {
->>>          pc_memory_init(pcms, system_memory,
->>>                         rom_memory, &ram_memory);
->>> -    } else if (machine->kernel_filename != NULL) {
->>> -        /* For xen HVM direct kernel boot, load linux here */
->>> -        xen_load_linux(pcms);
->>> +    } else {
->>> +        pc_system_flash_cleanup_unused(pcms);
->>
->> TIL pc_system_flash_cleanup_unused().
->>
->> What about restricting at the source?
->>
-> 
-> And leave the devices in place? They are not relevant for Xen, so why not clean up?
+=D1=83=D1=82=D0=BE, 30. =D1=98=D1=83=D0=BD 2020. =D1=83 19:16 Philippe Math=
+ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On 6/30/20 6:55 PM, Aleksandar Markovic wrote:
+> > =D1=83=D1=82=D0=BE, 30. =D1=98=D1=83=D0=BD 2020. =D1=83 18:46 Philippe =
+Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >>
+> >> On 6/30/20 5:38 PM, Aleksandar Markovic wrote:
+> >>> =D1=83=D1=82=D0=BE, 30. =D1=98=D1=83=D0=BD 2020. =D1=83 16:52 Philipp=
+e Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+> >>> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >>>>
+> >>>> Hi,
+> >>>>
+> >>>> This series add a new 'malta-strict' machine, that aims to properly
+> >>>> model the real hardware (which is not what the current 'malta'
+> >>>> machine models).
+> >>>>
+> >>>> As a bonus for Debian builders, a 'malta-unleashed' machine RFC
+> >>>> patch is included. This might start another endless discussion
+> >>>> upstream, but this is not the point of, so I still include it
+> >>>> for people to test. The rest of the series is candidate for merging
+> >>>> in mainstream QEMU.
+> >>>>
+> >>>> Philippe Mathieu-Daud=C3=A9 (6):
+> >>>>   hw/mips/malta: Trivial code movement
+> >>>>   hw/mips/malta: Register the machine as a TypeInfo
+> >>>>   hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
+> >>>>   hw/mips/malta: Introduce the 'malta-strict' machine
+> >>>>   hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
+> >>>>   hw/mips/malta: Introduce the 'malta-unleashed' 64-bit machine
+> >>>>
+> >>>>  hw/mips/malta.c | 125 ++++++++++++++++++++++++++++++++++++++++++---=
+---
+> >>>>  1 file changed, 111 insertions(+), 14 deletions(-)
+> >>>>
+> >>>> --
+> >>>
+> >>> This whole series is based on idea of emulating physically
+> >>> non-existing feature, and as such violates the fundamental principles
+> >>> of QEMU.
+> >>>
+> >>> As such, not acceptable for upstreaming.
+> >>>
+> >>> I don't see the point of sending again the same series, in just
+> >>> cosmetically different form, if it was said to you that the concept i=
+s
+> >>> wrong.
+> >>
+> >> Have you looked at the patches? What "violates the fundamental
+> >> principles of QEMU" is the code currently in mainstream. Should
+> >> we remove it? I can send a patch for it if it pleases you, but
+> >> you will make QEMU unuseful for many distribution users.
+> >>
+> >
+> > Past mistakes are past mistakes. We have to live with them. And not
+> > make them in the future.
+> >
+> > I see the whole series as a precursor for your change that repeats
+> > past mistakes, a "wolf in sheep clothing".
+> >
+> > That's why I reject the series as a whole.
+>
+> As a co-maintainer I don't accept that.
+>
 
-No, I meant to not create them in the first place, instead of
-create+destroy.
+I offered you the full maintainership for Malta.
 
-Anyway what you did works, so I don't have any problem.
+You said you can proveide only "Odd fiexes".
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I had to jump in to provide "Maintained" status.
 
-> 
->   Paul
->  
->> -- >8 --
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1004,24 +1004,26 @@ void pc_memory_init(PCMachineState *pcms,
->>                                      &machine->device_memory->mr);
->>      }
->>
->> -    /* Initialize PC system firmware */
->> -    pc_system_firmware_init(pcms, rom_memory);
->> -
->> -    option_rom_mr = g_malloc(sizeof(*option_rom_mr));
->> -    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
->> -                           &error_fatal);
->> -    if (pcmc->pci_enabled) {
->> -        memory_region_set_readonly(option_rom_mr, true);
->> -    }
->> -    memory_region_add_subregion_overlap(rom_memory,
->> -                                        PC_ROM_MIN_VGA,
->> -                                        option_rom_mr,
->> -                                        1);
->> -
->>      fw_cfg = fw_cfg_arch_create(machine,
->>                                  x86ms->boot_cpus, x86ms->apic_id_limit);
->>
->> -    rom_set_fw(fw_cfg);
->> +    /* Initialize PC system firmware */
->> +    if (!xen_enabled()) {
->> +        pc_system_firmware_init(pcms, rom_memory);
->> +
->> +        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
->> +        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
->> +                               &error_fatal);
->> +        if (pcmc->pci_enabled) {
->> +            memory_region_set_readonly(option_rom_mr, true);
->> +        }
->> +        memory_region_add_subregion_overlap(rom_memory,
->> +                                            PC_ROM_MIN_VGA,
->> +                                            option_rom_mr,
->> +                                            1);
->> +
->> +        rom_set_fw(fw_cfg);
->> +    }
->>
->>      if (pcmc->has_reserved_memory && machine->device_memory->base) {
->>          uint64_t *val = g_malloc(sizeof(*val));
->> ---
->>
->>> +        if (machine->kernel_filename != NULL) {
->>> +            /* For xen HVM direct kernel boot, load linux here */
->>> +            xen_load_linux(pcms);
->>> +        }
->>>      }
->>>
->>>      gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
->>> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->>> index ec2a3b3e7e..0ff47a4b59 100644
->>> --- a/hw/i386/pc_sysfw.c
->>> +++ b/hw/i386/pc_sysfw.c
->>> @@ -108,7 +108,7 @@ void pc_system_flash_create(PCMachineState *pcms)
->>>      }
->>>  }
->>>
->>> -static void pc_system_flash_cleanup_unused(PCMachineState *pcms)
->>> +void pc_system_flash_cleanup_unused(PCMachineState *pcms)
->>>  {
->>>      char *prop_name;
->>>      int i;
->>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->>> index e6135c34d6..497f2b7ab7 100644
->>> --- a/include/hw/i386/pc.h
->>> +++ b/include/hw/i386/pc.h
->>> @@ -187,6 +187,7 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
->>>
->>>  /* pc_sysfw.c */
->>>  void pc_system_flash_create(PCMachineState *pcms);
->>> +void pc_system_flash_cleanup_unused(PCMachineState *pcms);
->>>  void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->>>
->>>  /* acpi-build.c */
->>>
-> 
-> 
+Therefore, I provide the higher level of maintainership, and you have
+to respect that. But you don't.
 
+Regards,
+Aleksandar
+
+> The 'malta' machine is not changed, the series adds the 'malta-strict'
+> machine which check the RAM restriction:
+>
+> $ qemu-system-mips -M malta-strict -bios /dev/null -m 512
+> qemu-system-mips: Too much memory for this machine: 512 MiB, maximum 256 =
+MiB
+>
+> $ qemu-system-mips -M malta-strict -bios /dev/null -m 252
+> qemu-system-mips: RAM size must be the combination of 4 powers of 2
+>
+> $ qemu-system-mips -M malta-strict -monitor stdio -S -bios /dev/null -m 1=
+00
+> QEMU 5.0.50 monitor - type 'help' for more information
+> (qemu) info mtree
+> address-space: memory
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>     0000000000000000-00000000063fffff (prio 0, ram): alias
+> mips_malta_low_preio.ram @mips_malta.ram 0000000000000000-00000000063ffff=
+f
+>
+> 100 =3D 64 + 32 + 2 + 2
+>
+> >
+> > Yours,
+> > Aleksandar
+> >
+> >> What this series does is emulate the physically existing feature
+> >> that are not yet emulated in QEMU.
+> >>
+> >> Please refer to the datasheet 'MIPS Document Number: MD00051
+> >> Revision 01.07' before rejecting this series, and find the
+> >> correct arguments.
+> >>
+> >> Thanks.
+> >>
+> >>>
+> >>> Regards,
+> >>> Aleksandar
+> >>>
+> >>>
+> >>>> 2.21.3
+> >>>>
+> >>>
+> >
 
