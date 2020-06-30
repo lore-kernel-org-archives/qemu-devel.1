@@ -2,91 +2,90 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD343C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054B8C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:20:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DEFE20772
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:17:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C45CD2068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:20:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg0nvEeY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DEFE20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqwHFMnt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C45CD2068F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqJtE-0006pp-KZ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40892)
+	id 1jqJvo-0000Xc-Is
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:20:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqJsA-0006BX-2v
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:16:42 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:37006)
+ id 1jqJtU-0007U1-1R
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:18:04 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:36538)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqJs8-0004DO-5c
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:16:41 -0400
-Received: by mail-ej1-x643.google.com with SMTP id lx13so2768870ejb.4
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 10:16:39 -0700 (PDT)
+ id 1jqJtQ-0004NH-Vl
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:18:03 -0400
+Received: by mail-ed1-x543.google.com with SMTP id dg28so16945021edb.3
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 10:18:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9qHC4kqad8EJGR8w0LXs043fEXWkj1yg8TTpj4uagFU=;
- b=kg0nvEeYrI3DbqltfXH99+9B+EeynrzdYHTXRkSeJMfSoTAbrcn7eocWtrxl5bxstB
- zVYnKb8fWAtiV3529WumcLlZ/jszjQVZMMBwJudZC+gmV7cGa8msCdFpMNp7/38m38IK
- wffFN+wgSIJ4oBkaIrGO7e7W0qtVauPEGRb5U5rqTR7OuzVSgEmabLAtF9kivveNM027
- 1vjPglZl0qZNy9w9/aqrfl9K9iZNXPnewNb5xlyrQ+mAaYHs9MNcMaMQ6C8lk2RnWXA/
- kOg4FiyLeRDVCZpo0CuJPg0zhilmYn8X4sq3mNNDXHeOLAtxk7iYsrTJ8umpNn8/a0hq
- rfUw==
+ bh=R6c2p9VTzVDyF3kXn15e71U6b2Oi4e574jYXAVPFnHU=;
+ b=YqwHFMnt153CDThYOZZppFKdOS4E6M/zqDNQJZ0g+25uuqlSh6mxw9t/mlcALPUScj
+ vCy1rIxnz6AOrnlG5sPfiCqPcO1SUfxykL9Lt5dMAy4XwkTrjMz2+5mk0hlsWBCcnRpU
+ 28HS9ThJaLEFWhUWIMBIbOEfH2S1y9/1ttpiaUjzLoRkfjLCzbDvCsVERW1Qp6RlSPEK
+ AU8WE0jsVIorA2XX+nA++Nh8LWEE/l9zM5tMRx7AxH7ptcFRr5xr43c8aVC0HoOZQHJB
+ MM1C6wRoSVKHpWVQOl5UFARcVSVr+U7dMoO0w2syVdK+atEIGhmmFaYHW/pXUPCBO4GE
+ 4iuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=9qHC4kqad8EJGR8w0LXs043fEXWkj1yg8TTpj4uagFU=;
- b=Fl/S817avR594ZdblMvBbvRVM1XWUxg4NwGQxPUH4ftYdt26DSFJdsg30jFIJScqO9
- 5KW4KhGV/rfUcxXKAAa7i17LvimU8rzRZihhrbkkmWSAJS+28ia/s682xHWI6zbCQP5/
- GeV/IcvDhisw8uWL0l+YhHAFjnuRS1A1bX88QUecjJsRSIvZ3JaE1YIyYrizwcqF66Ra
- yru1ui3kjP94ODlAYkO3KTnomuFPrHimIXxQxmpV210GiTQVKs9nyyh9Bk1+cNcxITKc
- uvdGDl/BoRcTgCNjOqKE6erwRo49SObi+WMB4ut3DpWZinV0xfxnr2G8ZiSK4bkd3lEn
- qWoQ==
-X-Gm-Message-State: AOAM530aKKLUh46dvbYR4n5137wryLZcAWDK8+XbaQaWdGClaPrPKEts
- iu5gCTL8GnESj8EbEIk0uNY=
-X-Google-Smtp-Source: ABdhPJzGOgq7vUgB8zZ1qWB2OGif2gqHFtiGy1W5Qad2DbREgx/W9tj//6qHsuxC2YobVETdDCUQEg==
-X-Received: by 2002:a17:906:a28b:: with SMTP id
- i11mr19005366ejz.524.1593537398577; 
- Tue, 30 Jun 2020 10:16:38 -0700 (PDT)
+ bh=R6c2p9VTzVDyF3kXn15e71U6b2Oi4e574jYXAVPFnHU=;
+ b=m+N2f2EuofNPFXv/WhVSUcgCB1ecxAyRea77p+g5BBdJRhs3WccEc2KSGGptC9uubD
+ DxJDIxzAgFzAXrdfnkvhvYPtEGQcfvGHrKm8CFkqcrikPx83WXRQvNHXAKXATqo6LWXb
+ T5WYnHayUNxeN8mjmlqyVlCEWeytb3aD6nPiGPMLcA9HxCGGYqpnE5Xz55pzKkMstMvX
+ KcLl2NzKc6VfGqYyxWnxV5QGZccJ7l9DzWmgjsuek0O5QzNCN4l1ZG6uEt6SBxZztyaq
+ 2VVY4vYGff4YUB6pt5wiZC+HE9uCEcdQrHQWmi4OPY8x0dlFNt7UUsa6lv49cJ7w2Meg
+ p+ng==
+X-Gm-Message-State: AOAM5332C30KnoAFVUbbxClz1jDbOwfpXNaNhnZuAJ9NcF8/k3fXKNAo
+ TJPZX9bn3CcqdY6rZMll2KM=
+X-Google-Smtp-Source: ABdhPJxnAg+2E8CVYNQbXVyOV9aWTTPavd5OBa6b+mPEKh4bQIGoz8ZtNIoZfu0WWTytCUYilt4j6A==
+X-Received: by 2002:aa7:d70f:: with SMTP id t15mr23467024edq.237.1593537478901; 
+ Tue, 30 Jun 2020 10:17:58 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x10sm2582255ejc.46.2020.06.30.10.16.36
+ by smtp.gmail.com with ESMTPSA id w18sm3554582edv.11.2020.06.30.10.17.57
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 10:16:37 -0700 (PDT)
-Subject: Re: [PATCH v2 0/6] hw/mips/malta: Add the 'malta-strict' machine,
- matching Malta hardware
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+ Tue, 30 Jun 2020 10:17:58 -0700 (PDT)
+Subject: Re: [PATCH v2 3/6] hw/mips/malta: Introduce
+ MaltaMachineClass::max_ramsize
+To: Aurelien Jarno <aurelien@aurel32.net>, Yunqiang Su <ysu@wavecomp.com>,
+ qemu-devel@nongnu.org
 References: <20200630145236.27529-1-f4bug@amsat.org>
- <CAHiYmc4=pmzEyhVTHaqxBnCotE8V+vaptMFincyurvAyDHNn6g@mail.gmail.com>
- <5725b99b-b524-ab40-c74d-a615bb28d363@amsat.org>
- <CAHiYmc7AoJd7TMX_Beo3A2f3R1M=yrpe2ZydbsSysREf4Cx3Vw@mail.gmail.com>
+ <20200630145236.27529-4-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a503201a-ed9f-dff6-6e3d-4729ed31ad98@amsat.org>
-Date: Tue, 30 Jun 2020 19:16:36 +0200
+Message-ID: <8720fc1e-c4ab-9841-3422-d7419ddb6a17@amsat.org>
+Date: Tue, 30 Jun 2020 19:17:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc7AoJd7TMX_Beo3A2f3R1M=yrpe2ZydbsSysREf4Cx3Vw@mail.gmail.com>
+In-Reply-To: <20200630145236.27529-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -108,112 +107,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yunqiang Su <ysu@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 6:55 PM, Aleksandar Markovic wrote:
-> уто, 30. јун 2020. у 18:46 Philippe Mathieu-Daudé <f4bug@amsat.org> је
-> написао/ла:
->>
->> On 6/30/20 5:38 PM, Aleksandar Markovic wrote:
->>> уто, 30. јун 2020. у 16:52 Philippe Mathieu-Daudé <f4bug@amsat.org> је
->>> написао/ла:
->>>>
->>>> Hi,
->>>>
->>>> This series add a new 'malta-strict' machine, that aims to properly
->>>> model the real hardware (which is not what the current 'malta'
->>>> machine models).
->>>>
->>>> As a bonus for Debian builders, a 'malta-unleashed' machine RFC
->>>> patch is included. This might start another endless discussion
->>>> upstream, but this is not the point of, so I still include it
->>>> for people to test. The rest of the series is candidate for merging
->>>> in mainstream QEMU.
->>>>
->>>> Philippe Mathieu-Daudé (6):
->>>>   hw/mips/malta: Trivial code movement
->>>>   hw/mips/malta: Register the machine as a TypeInfo
->>>>   hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
->>>>   hw/mips/malta: Introduce the 'malta-strict' machine
->>>>   hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
->>>>   hw/mips/malta: Introduce the 'malta-unleashed' 64-bit machine
->>>>
->>>>  hw/mips/malta.c | 125 ++++++++++++++++++++++++++++++++++++++++++------
->>>>  1 file changed, 111 insertions(+), 14 deletions(-)
->>>>
->>>> --
->>>
->>> This whole series is based on idea of emulating physically
->>> non-existing feature, and as such violates the fundamental principles
->>> of QEMU.
->>>
->>> As such, not acceptable for upstreaming.
->>>
->>> I don't see the point of sending again the same series, in just
->>> cosmetically different form, if it was said to you that the concept is
->>> wrong.
->>
->> Have you looked at the patches? What "violates the fundamental
->> principles of QEMU" is the code currently in mainstream. Should
->> we remove it? I can send a patch for it if it pleases you, but
->> you will make QEMU unuseful for many distribution users.
->>
+On 6/30/20 4:52 PM, Philippe Mathieu-Daudé wrote:
+> The maximum RAM size is tied to the machine. First add the
+> MaltaMachineClass, and add 'max_ramsize' to it. Set it to
+> the current value of 2 GB, and adapt the code checking for
+> the requested RAM is usable by the machine.
 > 
-> Past mistakes are past mistakes. We have to live with them. And not
-> make them in the future.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/mips/malta.c | 30 +++++++++++++++++++++++++-----
+>  1 file changed, 25 insertions(+), 5 deletions(-)
 > 
-> I see the whole series as a precursor for your change that repeats
-> past mistakes, a "wolf in sheep clothing".
+> diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+> index 2c363fe099..17a1c0d1c4 100644
+> --- a/hw/mips/malta.c
+> +++ b/hw/mips/malta.c
+> @@ -56,6 +56,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "hw/semihosting/semihost.h"
+>  #include "hw/mips/cps.h"
+> +#include "qemu/cutils.h"
+>  
+>  #define ENVP_ADDR           0x80002000l
+>  #define ENVP_NB_ENTRIES     16
+> @@ -71,6 +72,17 @@
+>  #define MAX_IDE_BUS         2
+>  
+>  #define TYPE_MALTA_MACHINE       MACHINE_TYPE_NAME("malta-base")
+> +#define MALTA_MACHINE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(MaltaMachineClass, (klass), TYPE_MALTA_MACHINE)
+> +#define MALTA_MACHINE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(MaltaMachineClass, (obj), TYPE_MALTA_MACHINE)
+> +
+> +typedef struct MaltaMachineClass {
+> +    /* Private */
+> +    MachineClass parent_obj;
+> +    /* Public */
+> +    ram_addr_t max_ramsize;
+> +} MaltaMachineClass;
+>  
+>  typedef struct {
+>      MemoryRegion iomem;
+> @@ -1232,7 +1244,7 @@ void mips_malta_init(MachineState *machine)
+>      DriveInfo *dinfo;
+>      int fl_idx = 0;
+>      int be;
+> -
+> +    MaltaMachineClass *mmc = MALTA_MACHINE_GET_CLASS(machine);
+>      DeviceState *dev = qdev_new(TYPE_MIPS_MALTA);
+>      MaltaState *s = MIPS_MALTA(dev);
+>  
+> @@ -1248,10 +1260,16 @@ void mips_malta_init(MachineState *machine)
+>      /* create CPU */
+>      mips_create_cpu(machine, s, &cbus_irq, &i8259_irq);
+>  
+> -    /* allocate RAM */
+> -    if (ram_size > 2 * GiB) {
+> -        error_report("Too much memory for this machine: %" PRId64 "MB,"
+> -                     " maximum 2048MB", ram_size / MiB);
+> +    /*
+> +     * The GT-64120A north bridge accepts at most 256 MiB per SCS for
+> +     * address decoding, so we have a maximum of 1 GiB. We deliberately
+> +     * ignore this physical limitation.
+> +     */
+> +    if (ram_size > mmc->max_ramsize) {
+> +        char *maxsize_str = size_to_str(mmc->max_ramsize);
+> +        error_report("Too much memory for this machine: %" PRId64 " MiB,"
+> +                     " maximum %s", ram_size / MiB, maxsize_str);
+> +        g_free(maxsize_str);
+>          exit(1);
+>      }
+>  
+> @@ -1446,6 +1464,7 @@ static void malta_machine_common_class_init(ObjectClass *oc, void *data)
+>  static void malta_machine_default_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> +    MaltaMachineClass *mmc = MALTA_MACHINE_CLASS(oc);
+>  
+>      mc->desc = "MIPS Malta Core LV";
+>      mc->block_default_type = IF_IDE;
+> @@ -1456,6 +1475,7 @@ static void malta_machine_default_class_init(ObjectClass *oc, void *data)
+>  #else
+>      mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
+>  #endif
+> +    mmc->max_ramsize = 2 * GiB;
+>  }
+>  
+>  static const TypeInfo malta_machine_types[] = {
 > 
-> That's why I reject the series as a whole.
 
-As a co-maintainer I don't accept that.
+Missing:
 
-The 'malta' machine is not changed, the series adds the 'malta-strict'
-machine which check the RAM restriction:
-
-$ qemu-system-mips -M malta-strict -bios /dev/null -m 512
-qemu-system-mips: Too much memory for this machine: 512 MiB, maximum 256 MiB
-
-$ qemu-system-mips -M malta-strict -bios /dev/null -m 252
-qemu-system-mips: RAM size must be the combination of 4 powers of 2
-
-$ qemu-system-mips -M malta-strict -monitor stdio -S -bios /dev/null -m 100
-QEMU 5.0.50 monitor - type 'help' for more information
-(qemu) info mtree
-address-space: memory
-  0000000000000000-ffffffffffffffff (prio 0, i/o): system
-    0000000000000000-00000000063fffff (prio 0, ram): alias
-mips_malta_low_preio.ram @mips_malta.ram 0000000000000000-00000000063fffff
-
-100 = 64 + 32 + 2 + 2
-
-> 
-> Yours,
-> Aleksandar
-> 
->> What this series does is emulate the physically existing feature
->> that are not yet emulated in QEMU.
->>
->> Please refer to the datasheet 'MIPS Document Number: MD00051
->> Revision 01.07' before rejecting this series, and find the
->> correct arguments.
->>
->> Thanks.
->>
->>>
->>> Regards,
->>> Aleksandar
->>>
->>>
->>>> 2.21.3
->>>>
->>>
-> 
+-- >8 --
+--- a/hw/mips/malta.c
++++ b/hw/mips/malta.c
+@@ -1541,6 +1541,7 @@ static const TypeInfo malta_machine_types[] = {
+         .name          = TYPE_MALTA_MACHINE,
+         .parent        = TYPE_MACHINE,
+         .class_init    = malta_machine_common_class_init,
++        .class_size    = sizeof(MaltaMachineClass),
+         .abstract      = true,
+     }
+ };
+---
 
