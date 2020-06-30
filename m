@@ -2,103 +2,58 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D980AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CD8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:45:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9930F20759
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:35:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJ92HP1I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9930F20759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 89A6220702
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:45:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A6220702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqEY0-0000Ok-Th
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:35:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54784)
+	id 1jqEhp-0003GZ-OU
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:45:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqEXM-0008OS-Jb
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:34:52 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39128)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqEXK-00031q-Nk
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:34:52 -0400
-Received: by mail-ej1-x644.google.com with SMTP id w6so20174965ejq.6
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 04:34:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=JUrnK9o60wyHkWjD2KQ+VcdKf+nmHOumpN3FKBEanRI=;
- b=FJ92HP1I0jNqNXXFiPS5z5NdiuXt7BryYjWVtDqICsk/UNkc4wL3J0+uOfkDb3ui0A
- 2IuBgLk8HlBncrK055sRaMPbTaPUwHgkzrWMzyKwUWwleaXyQzl9n6yAiMXx3A37f1A/
- sFkMTKv3aqWZfT9eed5ZUb8Ikmu7I3D5dYvlQtRdmNPDdiyTc8bOyzZbTUiUTFRbpOMP
- wkCWMiOZKVfAYjUO7nTxX4lryjIMtZA6NaTg7OU72eROLSB/d1rQaOUyTxyqEyPQNAmH
- Zy4QkZ9gil8DuTUay40X9GBsg5NKOvW3Xq+Ax7H/Lafgwc3EYckKdFP+4rxRZqdjsrN8
- Tt5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JUrnK9o60wyHkWjD2KQ+VcdKf+nmHOumpN3FKBEanRI=;
- b=H+RbvBdh1YWnsd2AlO5wT12nKy7GVh7zKGoxXakIKX/KjI///Fe3VWJNP0teVHrMkZ
- ST/22dXvbSJ7atHUnymxpcoq69ChKqUz3OAiCvCwhz/fhhZ3ESGvo4KZNX2hCK60Bv2P
- fsH6fXQINVAyDsYO/ZcZb/jBANqQSDJ1RZKozsfsC3mNfsRKWRYM6rXzx/Yc2LOY3c6p
- q9fUd2sG1663A2bcMUrzx3SU9bkYj0ZMDB3YLlR0obPcgJg9FUAXdYziFQKpUXYsuoCN
- K8MpS1dz2VTVhKCGWgZLVwkG2RxNUZjGicyze0eMTL/dLztOlyhKMSTX+2AgnFkv1FgT
- vKRA==
-X-Gm-Message-State: AOAM532ynL6RUXe8YEhNq7LhN4fXGGUWYqq1PdZz33OchyEfYyMGksd2
- fno2y4eMvPlnNaBNCZVrdkQ=
-X-Google-Smtp-Source: ABdhPJwGsBIaq5d36NRueTvasxIRzI9mV7LlbCYli5f4Bsc6c7fPVMJD4QmAoA0+eyu9mSArHzDDHw==
-X-Received: by 2002:a17:906:ca0e:: with SMTP id
- jt14mr17444595ejb.325.1593516889196; 
- Tue, 30 Jun 2020 04:34:49 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e16sm1793328ejt.14.2020.06.30.04.34.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 04:34:48 -0700 (PDT)
-Subject: Re: [PATCH 0/7] hw/mips/malta: Rework to allow more than 2GB of RAM
- on 64-bit
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200630081322.19146-1-f4bug@amsat.org>
- <CAHiYmc6coeBBOvCAs+=Ccw2aXfw0m3gTdSM1Pc8AQvJ4QNBhow@mail.gmail.com>
- <da6c2f55-b8b7-3492-37b3-d24a25106d72@amsat.org>
- <CAAdtpL7MObRjk77ZFsNF4Xoghdj33mwufZ9s3L8fAC3XxkJCqA@mail.gmail.com>
- <CAHiYmc59Ahpii2dvhVD8EPK4qzc8y2RNTwTbp4L1d2Mjun+Phg@mail.gmail.com>
- <3b75d15d-9195-bcd5-87aa-e243547552e5@amsat.org>
- <CAHiYmc4NOrG-ETX_rLGGR=Cac_Q_hNfjAsS3mF6PpAFFjLDHGw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2514e774-ade4-cd91-8d45-e4402c36c27f@amsat.org>
-Date: Tue, 30 Jun 2020 13:34:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqEh7-0002Wi-UA; Tue, 30 Jun 2020 07:44:57 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47828)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqEh4-0004lI-9d; Tue, 30 Jun 2020 07:44:57 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 2F2FBBF676;
+ Tue, 30 Jun 2020 11:44:51 +0000 (UTC)
+Date: Tue, 30 Jun 2020 13:44:48 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v2 08/18] hw/block/nvme: Make Zoned NS Command Set
+ definitions
+Message-ID: <20200630114448.pspldgtlxrzjxps3@apples.localdomain>
+References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ <20200617213415.22417-9-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc4NOrG-ETX_rLGGR=Cac_Q_hNfjAsS3mF6PpAFFjLDHGw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+In-Reply-To: <20200617213415.22417-9-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 04:46:49
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,174 +66,460 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yunqiang Su <ysu@wavecomp.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 1:17 PM, Aleksandar Markovic wrote:
-> уторак, 30. јун 2020., Philippe Mathieu-Daudé <f4bug@amsat.org
-> <mailto:f4bug@amsat.org>> је написао/ла:
+On Jun 18 06:34, Dmitry Fomichev wrote:
+> Define values and structures that are needed to support Zoned
+> Namespace Command Set (NVMe TP 4053) in PCI NVMe controller emulator.
 > 
->     On 6/30/20 1:01 PM, Aleksandar Markovic wrote:
->     >
->     >
->     > уторак, 30. јун 2020., Philippe Mathieu-Daudé <f4bug@amsat.org
->     <mailto:f4bug@amsat.org>
->     > <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>>> је написао/ла:
->     >
->     >     On Tue, Jun 30, 2020 at 12:52 PM Philippe Mathieu-Daudé
->     >     <f4bug@amsat.org <mailto:f4bug@amsat.org>
->     <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>>> wrote:
->     >     >
->     >     > On 6/30/20 12:48 PM, Aleksandar Markovic wrote:
->     >     > >
->     >     > >
->     >     > > уторак, 30. јун 2020., Philippe Mathieu-Daudé
->     <f4bug@amsat.org <mailto:f4bug@amsat.org>
->     >     <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>>
->     >     > > <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>
->     <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>>>> је написао/ла:
->     >     > >
->     >     > >     Hi,
->     >     > >
->     >     > >     Following Jiaxun Yang's patch and discussion:
->     >     > >     https://patchwork.kernel.org/patch/11416915/
->     <https://patchwork.kernel.org/patch/11416915/>
->     >     <https://patchwork.kernel.org/patch/11416915/
->     <https://patchwork.kernel.org/patch/11416915/>>
->     >     > >     <https://patchwork.kernel.org/patch/11416915/
->     <https://patchwork.kernel.org/patch/11416915/>
->     >     <https://patchwork.kernel.org/patch/11416915/
->     <https://patchwork.kernel.org/patch/11416915/>>>
->     >     > >
->     >     > >     - Rename the current machine as 'malta-virt' (keeping
->     >     'malta' aliased)
->     >     > >       Suggestions for better names are welcome, maybe
->     >     'malta-unreal' or
->     >     > >       'malta-unleashed' instead?
->     >     > >     - Add 'malta-phys' which respects hardware
->     restrictions (on
->     >     RAM so far)
->     >     > >     - Unleash 'malta-virt' to allow more than 2GB on 64-bit
->     >     > >
->     >     > >     Philippe Mathieu-Daudé (7):
->     >     > >       hw/mips/malta: Trivial code movement
->     >     > >       hw/mips/malta: Register the machine as a TypeInfo
->     >     > >       hw/mips/malta: Rename 'malta' machine as 'malta-virt'
->     >     > >       hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
->     >     > >       hw/mips/malta: Introduce the 'malta-phys' machine
->     >     > >       hw/mips/malta: Verify malta-phys machine uses
->     correct DIMM
->     >     sizes
->     >     > >       hw/mips/malta: Allow more than 2GB on 64-bit malta-virt
->     >     > >
->     >     > >      hw/mips/malta.c | 121
->     >     +++++++++++++++++++++++++++++++++++++++---------
->     >     > >      1 file changed, 99 insertions(+), 22 deletions(-)
->     >     > >
->     >     > >     --
->     >     > >
->     >     > >
->     >     > >
->     >     > > Thank you, Philippe, for providing this series.
->     >     > >
->     >     > > However, in previous discussion on the patch you mention
->     above, I
->     >     > > already expressed serious reservations on the approach
->     taken in that
->     >     > > patch. These reservations stay today too.
->     >     > >
->     >     > > There is nothing qualitatively different between the original
->     >     patch and
->     >     > > this series. Naming and related stuff are just cosmetic
->     issues.
->     >     >
->     >     > OK, what about considering all patches except the last one?
->     >     > So we can run firmware on a real Malta board, not the QEMU
->     >     > imaginary one (in the discussion you said QEMU should respect
->     >     > real hardware, which I agree).
->     >     >
->     >     > >
->     >     > > The good thing about this series is that one can apply it
->     >     dowstream, if
->     >     > > one finds it useful. However, it is not suitable for
->     upstreaming
->     >
->     >     IOW, what is missing to have this series (except the last patch)
->     >     accepted upstream?
->     >
->     >
->     > It is not what is missing, but was already is in the series that makes
->     > it not suitable for upstreaming. The very concept of the series is
->     > problematic.
+> All new protocol definitions are located in include/block/nvme.h
+> and everything added that is specific to this implementation is kept
+> in hw/block/nvme.h.
 > 
->     What is the series is not suitable for upstream? Can you point to
->     patch and code please? How would you conceptually resolve the
->     problem?
+> In order to improve scalability, all open, closed and full zones
+> are organized in separate linked lists. Consequently, almost all
+> zone operations don't require scanning of the entire zone array
+> (which potentially can be quite large) - it is only necessary to
+> enumerate one or more zone lists. Zone lists are designed to be
+> position-independent as they can be persisted to the backing file
+> as a part of zone metadata. NvmeZoneList struct defined in this patch
+> serves as a head of every zone list.
 > 
+> NvmeZone structure encapsulates NvmeZoneDescriptor defined in Zoned
+> Command Set specification and adds a few more fields that are
+> internal to this implementation.
 > 
-> The answer is already in the original thread on the original patch.
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
+> Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Signed-off-by: Alexey Bogoslavsky <alexey.bogoslavsky@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme.h      | 130 +++++++++++++++++++++++++++++++++++++++++++
+>  include/block/nvme.h | 119 ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 248 insertions(+), 1 deletion(-)
 > 
-> The problem is artificialy imposed:
-> 
-> One needs a feature not present in the physical system. The solution is
-> not in creating "virtual" upgrade - this violates the basic foundation
-> if QEMU.
-> 
-> If the feature is missing, the optimal solution would be emulating the
-> physical solution that has that feature.
-> 
-> In some rare cases (that should be avoided as mush as possible), and for
-> really good reasons, we can create an emulation of some imagined
-> hardware that was never designed let alone built - there are a couple of
-> examples in other targets.
-> 
-> But extending the emulation of existing physical system with
-> non-existing features is not acceptable.
-> 
-> Hopefuly everything is clear now to you. :)
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 0d29f75475..2c932b5e29 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -3,12 +3,22 @@
+>  
+>  #include "block/nvme.h"
+>  
+> +#define NVME_DEFAULT_ZONE_SIZE   128 /* MiB */
+> +#define NVME_DEFAULT_MAX_ZA_SIZE 128 /* KiB */
+> +
+>  typedef struct NvmeParams {
+>      char     *serial;
+>      uint32_t num_queues; /* deprecated since 5.1 */
+>      uint32_t max_ioqpairs;
+>      uint16_t msix_qsize;
+>      uint32_t cmb_size_mb;
+> +
+> +    bool        zoned;
+> +    bool        cross_zone_read;
+> +    uint8_t     fill_pattern;
+> +    uint32_t    zamds_bs;
 
-I guess I understand a bit. I was confused by your use of "upstream".
-It seems you use it the wrong way, so for you "upstream" is what the
-MIPS enterprise world wants/needs, while "downstream" is what the
-open-source community wants/needs.
+Rename to zasl.
 
-If MIPS enterprise doesn't want a Malta machine model with 3GB of RAM,
-they can disable it in their downstream.
-If it helps the upstream community, the model is wrong anyway by using
-2GB. It would be disastrous for all user to restrict the malta machine
-to 1GB upstream.
+> +    uint64_t    zone_size;
+> +    uint64_t    zone_capacity;
+>  } NvmeParams;
+>  
+>  typedef struct NvmeAsyncEvent {
+> @@ -17,6 +27,8 @@ typedef struct NvmeAsyncEvent {
+>  
+>  enum NvmeRequestFlags {
+>      NVME_REQ_FLG_HAS_SG   = 1 << 0,
+> +    NVME_REQ_FLG_FILL     = 1 << 1,
+> +    NVME_REQ_FLG_APPEND   = 1 << 2,
+>  };
+>  
+>  typedef struct NvmeRequest {
+> @@ -24,6 +36,7 @@ typedef struct NvmeRequest {
+>      BlockAIOCB              *aiocb;
+>      uint16_t                status;
+>      uint16_t                flags;
+> +    uint64_t                fill_ofs;
+>      NvmeCqe                 cqe;
+>      BlockAcctCookie         acct;
+>      QEMUSGList              qsg;
+> @@ -61,11 +74,35 @@ typedef struct NvmeCQueue {
+>      QTAILQ_HEAD(, NvmeRequest) req_list;
+>  } NvmeCQueue;
+>  
+> +typedef struct NvmeZone {
+> +    NvmeZoneDescr   d;
+> +    uint64_t        tstamp;
+> +    uint32_t        next;
+> +    uint32_t        prev;
+> +    uint8_t         rsvd80[8];
+> +} NvmeZone;
+> +
+> +#define NVME_ZONE_LIST_NIL    UINT_MAX
+> +
+> +typedef struct NvmeZoneList {
+> +    uint32_t        head;
+> +    uint32_t        tail;
+> +    uint32_t        size;
+> +    uint8_t         rsvd12[4];
+> +} NvmeZoneList;
+> +
+>  typedef struct NvmeNamespace {
+>      NvmeIdNs        id_ns;
+>      uint32_t        nsid;
+>      uint8_t         csi;
+>      QemuUUID        uuid;
+> +
+> +    NvmeIdNsZoned   *id_ns_zoned;
+> +    NvmeZone        *zone_array;
+> +    NvmeZoneList    *exp_open_zones;
+> +    NvmeZoneList    *imp_open_zones;
+> +    NvmeZoneList    *closed_zones;
+> +    NvmeZoneList    *full_zones;
+>  } NvmeNamespace;
+>  
+>  static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
+> @@ -100,6 +137,7 @@ typedef struct NvmeCtrl {
+>      uint32_t    num_namespaces;
+>      uint32_t    max_q_ents;
+>      uint64_t    ns_size;
+> +
+>      uint8_t     *cmbuf;
+>      uint32_t    irq_status;
+>      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+> @@ -107,6 +145,12 @@ typedef struct NvmeCtrl {
+>  
+>      HostMemoryBackend *pmrdev;
+>  
+> +    int             zone_file_fd;
+> +    uint32_t        num_zones;
+> +    uint64_t        zone_size_bs;
+> +    uint64_t        zone_array_size;
+> +    uint8_t         zamds;
 
+Rename to zasl.
+
+> +
+>      NvmeNamespace   *namespaces;
+>      NvmeSQueue      **sq;
+>      NvmeCQueue      **cq;
+> @@ -121,6 +165,86 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+>      return n->ns_size >> nvme_ns_lbads(ns);
+>  }
+>  
+> +static inline uint8_t nvme_get_zone_state(NvmeZone *zone)
+> +{
+> +    return zone->d.zs >> 4;
+> +}
+> +
+> +static inline void nvme_set_zone_state(NvmeZone *zone, enum NvmeZoneState state)
+> +{
+> +    zone->d.zs = state << 4;
+> +}
+> +
+> +static inline uint64_t nvme_zone_rd_boundary(NvmeCtrl *n, NvmeZone *zone)
+> +{
+> +    return zone->d.zslba + n->params.zone_size;
+> +}
+> +
+> +static inline uint64_t nvme_zone_wr_boundary(NvmeZone *zone)
+> +{
+> +    return zone->d.zslba + zone->d.zcap;
+> +}
+
+Everything working on zone->d needs leXX_to_cpu() conversions.
+
+> +
+> +static inline bool nvme_wp_is_valid(NvmeZone *zone)
+> +{
+> +    uint8_t st = nvme_get_zone_state(zone);
+> +
+> +    return st != NVME_ZONE_STATE_FULL &&
+> +           st != NVME_ZONE_STATE_READ_ONLY &&
+> +           st != NVME_ZONE_STATE_OFFLINE;
+> +}
+> +
+> +/*
+> + * Initialize a zone list head.
+> + */
+> +static inline void nvme_init_zone_list(NvmeZoneList *zl)
+> +{
+> +    zl->head = NVME_ZONE_LIST_NIL;
+> +    zl->tail = NVME_ZONE_LIST_NIL;
+> +    zl->size = 0;
+> +}
+> +
+> +/*
+> + * Initialize the number of entries contained in a zone list.
+> + */
+> +static inline uint32_t nvme_zone_list_size(NvmeZoneList *zl)
+> +{
+> +    return zl->size;
+> +}
+> +
+> +/*
+> + * Check if the zone is not currently included into any zone list.
+> + */
+> +static inline bool nvme_zone_not_in_list(NvmeZone *zone)
+> +{
+> +    return (bool)(zone->prev == 0 && zone->next == 0);
+> +}
+> +
+> +/*
+> + * Return the zone at the head of zone list or NULL if the list is empty.
+> + */
+> +static inline NvmeZone *nvme_peek_zone_head(NvmeNamespace *ns, NvmeZoneList *zl)
+> +{
+> +    if (zl->head == NVME_ZONE_LIST_NIL) {
+> +        return NULL;
+> +    }
+> +    return &ns->zone_array[zl->head];
+> +}
+> +
+> +/*
+> + * Return the next zone in the list.
+> + */
+> +static inline NvmeZone *nvme_next_zone_in_list(NvmeNamespace *ns, NvmeZone *z,
+> +    NvmeZoneList *zl)
+> +{
+> +    assert(!nvme_zone_not_in_list(z));
+> +
+> +    if (z->next == NVME_ZONE_LIST_NIL) {
+> +        return NULL;
+> +    }
+> +    return &ns->zone_array[z->next];
+> +}
+> +
+>  static inline int nvme_ilog2(uint64_t i)
+>  {
+>      int log = -1;
+> @@ -132,4 +256,10 @@ static inline int nvme_ilog2(uint64_t i)
+>      return log;
+>  }
+>  
+> +static inline void _hw_nvme_check_size(void)
+> +{
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeZoneList) != 16);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeZone) != 88);
+> +}
+> +
+>  #endif /* HW_NVME_H */
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 5a1e5e137c..596c39162b 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -446,6 +446,9 @@ enum NvmeIoCommands {
+>      NVME_CMD_COMPARE            = 0x05,
+>      NVME_CMD_WRITE_ZEROS        = 0x08,
+>      NVME_CMD_DSM                = 0x09,
+> +    NVME_CMD_ZONE_MGMT_SEND     = 0x79,
+> +    NVME_CMD_ZONE_MGMT_RECV     = 0x7a,
+> +    NVME_CMD_ZONE_APND          = 0x7d,
+>  };
+>  
+>  typedef struct NvmeDeleteQ {
+> @@ -539,6 +542,7 @@ enum NvmeNidLength {
+>  
+>  enum NvmeCsi {
+>      NVME_CSI_NVM                = 0x00,
+> +    NVME_CSI_ZONED              = 0x02,
+>  };
+>  
+>  #define NVME_SET_CSI(vec, csi) (vec |= (uint8_t)(1 << (csi)))
+> @@ -661,6 +665,7 @@ enum NvmeStatusCodes {
+>      NVME_INVALID_NSID           = 0x000b,
+>      NVME_CMD_SEQ_ERROR          = 0x000c,
+>      NVME_CMD_SET_CMB_REJECTED   = 0x002b,
+> +    NVME_INVALID_CMD_SET        = 0x002c,
+>      NVME_LBA_RANGE              = 0x0080,
+>      NVME_CAP_EXCEEDED           = 0x0081,
+>      NVME_NS_NOT_READY           = 0x0082,
+> @@ -684,6 +689,14 @@ enum NvmeStatusCodes {
+>      NVME_CONFLICTING_ATTRS      = 0x0180,
+>      NVME_INVALID_PROT_INFO      = 0x0181,
+>      NVME_WRITE_TO_RO            = 0x0182,
+> +    NVME_ZONE_BOUNDARY_ERROR    = 0x01b8,
+> +    NVME_ZONE_FULL              = 0x01b9,
+> +    NVME_ZONE_READ_ONLY         = 0x01ba,
+> +    NVME_ZONE_OFFLINE           = 0x01bb,
+> +    NVME_ZONE_INVALID_WRITE     = 0x01bc,
+> +    NVME_ZONE_TOO_MANY_ACTIVE   = 0x01bd,
+> +    NVME_ZONE_TOO_MANY_OPEN     = 0x01be,
+> +    NVME_ZONE_INVAL_TRANSITION  = 0x01bf,
+>      NVME_WRITE_FAULT            = 0x0280,
+>      NVME_UNRECOVERED_READ       = 0x0281,
+>      NVME_E2E_GUARD_ERROR        = 0x0282,
+> @@ -807,7 +820,17 @@ typedef struct NvmeIdCtrl {
+>      uint8_t     ieee[3];
+>      uint8_t     cmic;
+>      uint8_t     mdts;
+> -    uint8_t     rsvd255[178];
+> +    uint16_t    cntlid;
+> +    uint32_t    ver;
+> +    uint32_t    rtd3r;
+> +    uint32_t    rtd3e;
+> +    uint32_t    oaes;
+> +    uint32_t    ctratt;
+> +    uint8_t     rsvd100[28];
+> +    uint16_t    crdt1;
+> +    uint16_t    crdt2;
+> +    uint16_t    crdt3;
+> +    uint8_t     rsvd134[122];
+
+Would be nice in a separate patch, see my "bump to ..." patches.
+
+>      uint16_t    oacs;
+>      uint8_t     acl;
+>      uint8_t     aerl;
+> @@ -832,6 +855,11 @@ typedef struct NvmeIdCtrl {
+>      uint8_t     vs[1024];
+>  } NvmeIdCtrl;
+>  
+> +typedef struct NvmeIdCtrlZoned {
+> +    uint8_t     zamds;
+
+zasl.
+
+> +    uint8_t     rsvd1[4095];
+> +} NvmeIdCtrlZoned;
+> +
+>  enum NvmeIdCtrlOacs {
+>      NVME_OACS_SECURITY  = 1 << 0,
+>      NVME_OACS_FORMAT    = 1 << 1,
+> @@ -908,6 +936,12 @@ typedef struct NvmeLBAF {
+>      uint8_t     rp;
+>  } NvmeLBAF;
+>  
+> +typedef struct NvmeLBAFE {
+> +    uint64_t    zsze;
+> +    uint8_t     zdes;
+> +    uint8_t     rsvd9[7];
+> +} NvmeLBAFE;
+> +
+>  typedef struct NvmeIdNs {
+>      uint64_t    nsze;
+>      uint64_t    ncap;
+> @@ -930,6 +964,19 @@ typedef struct NvmeIdNs {
+>      uint8_t     vs[3712];
+>  } NvmeIdNs;
+>  
+> +typedef struct NvmeIdNsZoned {
+> +    uint16_t    zoc;
+> +    uint16_t    ozcs;
+> +    uint32_t    mar;
+> +    uint32_t    mor;
+> +    uint32_t    rrl;
+> +    uint32_t    frl;
+> +    uint8_t     rsvd20[2796];
+> +    NvmeLBAFE   lbafe[16];
+> +    uint8_t     rsvd3072[768];
+> +    uint8_t     vs[256];
+> +} NvmeIdNsZoned;
+> +
+>  
+>  /*Deallocate Logical Block Features*/
+>  #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
+> @@ -962,6 +1009,71 @@ enum NvmeIdNsDps {
+>      DPS_FIRST_EIGHT = 8,
+>  };
+>  
+> +enum NvmeZoneAttr {
+> +    NVME_ZA_FINISHED_BY_CTLR         = 1 << 0,
+> +    NVME_ZA_FINISH_RECOMMENDED       = 1 << 1,
+> +    NVME_ZA_RESET_RECOMMENDED        = 1 << 2,
+> +    NVME_ZA_ZD_EXT_VALID             = 1 << 7,
+> +};
+> +
+> +typedef struct NvmeZoneReportHeader {
+> +    uint64_t    nr_zones;
+> +    uint8_t     rsvd[56];
+> +} NvmeZoneReportHeader;
+> +
+> +enum NvmeZoneReceiveAction {
+> +    NVME_ZONE_REPORT                 = 0,
+> +    NVME_ZONE_REPORT_EXTENDED        = 1,
+> +};
+> +
+> +enum NvmeZoneReportType {
+> +    NVME_ZONE_REPORT_ALL             = 0,
+> +    NVME_ZONE_REPORT_EMPTY           = 1,
+> +    NVME_ZONE_REPORT_IMPLICITLY_OPEN = 2,
+> +    NVME_ZONE_REPORT_EXPLICITLY_OPEN = 3,
+> +    NVME_ZONE_REPORT_CLOSED          = 4,
+> +    NVME_ZONE_REPORT_FULL            = 5,
+> +    NVME_ZONE_REPORT_READ_ONLY       = 6,
+> +    NVME_ZONE_REPORT_OFFLINE         = 7,
+> +};
+> +
+> +typedef struct NvmeZoneDescr {
+> +    uint8_t     zt;
+> +    uint8_t     zs;
+> +    uint8_t     za;
+> +    uint8_t     rsvd3[5];
+> +    uint64_t    zcap;
+> +    uint64_t    zslba;
+> +    uint64_t    wp;
+> +    uint8_t     rsvd32[32];
+> +} NvmeZoneDescr;
+> +
+> +enum NvmeZoneState {
+> +    NVME_ZONE_STATE_RESERVED         = 0x00,
+> +    NVME_ZONE_STATE_EMPTY            = 0x01,
+> +    NVME_ZONE_STATE_IMPLICITLY_OPEN  = 0x02,
+> +    NVME_ZONE_STATE_EXPLICITLY_OPEN  = 0x03,
+> +    NVME_ZONE_STATE_CLOSED           = 0x04,
+> +    NVME_ZONE_STATE_READ_ONLY        = 0x0D,
+> +    NVME_ZONE_STATE_FULL             = 0x0E,
+> +    NVME_ZONE_STATE_OFFLINE          = 0x0F,
+> +};
+> +
+> +enum NvmeZoneType {
+> +    NVME_ZONE_TYPE_RESERVED          = 0x00,
+> +    NVME_ZONE_TYPE_SEQ_WRITE         = 0x02,
+> +};
+> +
+> +enum NvmeZoneSendAction {
+> +    NVME_ZONE_ACTION_RSD             = 0x00,
+> +    NVME_ZONE_ACTION_CLOSE           = 0x01,
+> +    NVME_ZONE_ACTION_FINISH          = 0x02,
+> +    NVME_ZONE_ACTION_OPEN            = 0x03,
+> +    NVME_ZONE_ACTION_RESET           = 0x04,
+> +    NVME_ZONE_ACTION_OFFLINE         = 0x05,
+> +    NVME_ZONE_ACTION_SET_ZD_EXT      = 0x10,
+> +};
+> +
+>  static inline void _nvme_check_size(void)
+>  {
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
+> @@ -978,8 +1090,13 @@ static inline void _nvme_check_size(void)
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeFwSlotInfoLog) != 512);
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrlZoned) != 4096);
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeNsIdDesc) != 4);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAF) != 4);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAFE) != 16);
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsZoned) != 4096);
+>      QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
+> +    QEMU_BUILD_BUG_ON(sizeof(NvmeZoneDescr) != 64);
+>  }
+>  #endif
+> -- 
+> 2.21.0
 > 
-> Regards,
-> Aleksandar
-> 
->  
-> 
->     >
->     > Regards,
->     > Aleksandar
->     >
->     >
->     >
->     >
->     >
->     >  
->     >
->     >     > >
->     >     > > Regards,
->     >     > > Aleksandar
->     >     > >
->     >     > >
->     >     > >
->     >     > >     2.21.3
->     >     > >
->     >
 > 
 
