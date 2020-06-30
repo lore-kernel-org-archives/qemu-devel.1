@@ -2,133 +2,137 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAF3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 14:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C46C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 14:23:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4687A20672
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 14:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8678720672
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 14:23:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="C7uDkT8o";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="u7lxj4dK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4687A20672
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FmRMNeAi";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="rYy707MP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8678720672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqHAw-0001Ut-IG
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 10:23:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52032)
+	id 1jqHAx-0001Vb-2D
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 10:23:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=44341d4e9=Niklas.Cassel@wdc.com>)
- id 1jqFrW-0006ZE-8g; Tue, 30 Jun 2020 08:59:46 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:14644)
+ id 1jqD5u-0008IE-NO; Tue, 30 Jun 2020 06:02:27 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:46894)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <prvs=44341d4e9=Niklas.Cassel@wdc.com>)
- id 1jqFrS-0008IB-RZ; Tue, 30 Jun 2020 08:59:45 -0400
+ id 1jqD5r-0004Oc-5G; Tue, 30 Jun 2020 06:02:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593521984; x=1625057984;
+ t=1593511344; x=1625047344;
  h=from:to:cc:subject:date:message-id:references:
  in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=aeBK6SiDAg1vx1dOnPPf1enXjRTroS/bBlbyIWSw7D0=;
- b=C7uDkT8oFpb5L7NWaImH9QkUiV2UJ7ht9y5X6F1Hd3beedNWxafsu5pu
- EY23pBu1o7/72SMYo8z6lEqXjuir/PMo2qJV2dzgDW/q4FyiyncvZdNGP
- HOzD0ZeCCUDpMzx4ui75aTFQOyBNHWBnLpygpd1OEANdOuidKKSzXGa2o
- 5Hx3Svrf+ITEixZ+ME7Zp2xsQj1kgkv+NNZ/GTCWpKK156QHwuT9vOYvw
- Aa50IsNNesuaIGGJwzUN/kKFBXN8nscAaNQcyAdVKhcPb9i8AM6TWO2aN
- y2ustmrYtZIYzdain5/xewHZh3SXpMMn391M7McqQ+nnB5TqvJ4qb2RRP g==;
-IronPort-SDR: ALLaE3sfsr0OuFhEWYzx7Eaio905BWate0Lc1O6/nVH5oVe6TcMP6FOG3seY6Iv39MTa0a1K06
- FDKg9E6gSdXTSwBw434tODaioW7a+zNLZxYX2sj7ujCPKgKHSDUgX/2CyBE/vwEhDec3DeTQw0
- zlQ9JA9ZxMKeSXmrxQa0ZM2TFgwy2B+AoNN2KwfbR58+8IRKBfvA8t0gQnzbaZQb4VvJyqb66b
- K+DefnTLU+K5hOE8KIhjYbiEIvQ7APM/teB4/DP5CEFKph0/k8wACLTVHcwPDsKmGbKKe8TMnk
- QvI=
-X-IronPort-AV: E=Sophos;i="5.75,297,1589212800"; d="scan'208";a="145597051"
-Received: from mail-bn8nam11lp2172.outbound.protection.outlook.com (HELO
- NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.172])
- by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2020 20:59:38 +0800
+ bh=PC/yUkXFXylLgRhfaEj7LJNASPXFvl8YnfQUUXcBHQ8=;
+ b=FmRMNeAiszez6uN0+JzwwzjWcFMKnDueY3lhV3K4mit4TLoVxwYuJyAV
+ hqltfqoYOoWdnw4HdJJsR6vvVpbdPYbnbyG7yI0a47te4YW7cRGHxpdeq
+ 8WpwJM4dANgcUT8nHrxHR7kas6RU4CKLoU1EO6f57YTfdyDVrHcd8KEDa
+ W4aw+LJ/uXd1hXOk6IONC5AwwipBxHzewiZEjLniqL+weq8I5FEmRKr1C
+ WtkkaZsAM5eJ36EYwqWwQ3bPePsnAksXnGzC6qM5s/eNCPKML7VFejD6P
+ gvMj5z3oLG+aRDzH4+/8cPK6m0AJaVQ/UejRBys04R4qpwEqHqz1WFEhV Q==;
+IronPort-SDR: dCLezdW9GvqIJX8k+cqSlLW4qp/PbdLp7cTnE/NoLvuLCMjHK++4MgwSlwdV815Pa76sENNGAO
+ uIUz3MTR4LQ0xxGQ6RUlUJHDZ6XtalQOlhGUdJFdiYJ861sR3IPDdCHB/8fYpGQMl9qwYNvF+m
+ NvVekMIXg2IQ0rbxFXYH1E21yRM1SRFaz8UnW0hqZ6PX8gpCtuL+z14Kl/Zn8PjMBAAVza2zLg
+ u3e+EHNIfesDgOUAcSXu7U290gjKkphaS8HSh308l9ucSdZPiZZQuu2qxZ0BEIm0fhr/QHfCb4
+ Ktk=
+X-IronPort-AV: E=Sophos;i="5.75,297,1589212800"; d="scan'208";a="145586924"
+Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO
+ NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.40])
+ by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2020 18:02:19 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ns1D2/zHa+ByUwqjiZ79VUo4opVRxV3i5/Q8HWlq5QTFymKg0nXeVUSK9O+LY7+oeZpUw32XJHU/Pv1NStwtIl4V1TORPLxCsyQJocDOpOByj+33FdArsj9IWQhI0ePdWNwXgzCKZ23TdTUddx/6oYbJuvolwtC4NTYjLGts1EqWtFBAJhXXVLVHRIjZwT4+XmNMZjxQ+jCC0g5I/9D7xvfQbKGKF12GINDahHKe85nQCpk3LWDqC5SQ62/rFViuY5zPIfY+mzKO6kz4PZ7CGXX7Kqdwf076lD6Fi7VRsSoYhD27udJYSs4/mBOy4xxP04llQ9Cv5uCIg02jBYIIyA==
+ b=JJNdG7zpjFi1RWw96W68ZnaIby8GXEHlCNOv28zZVUzy4nmge2kprb8fr5XWUew4r4wK/QNDWH7uegkdJjLhFJaUTPNZRGiAKxN2VWU3FyLUSISc39IKtJLyY72h90GkPrMss9uzz4rsj5Fplh6l7IsyokmDwgYfZNmzMB7Y6JFdZEEVc0JR/+ctWlAvtCF6iruekUp8TcPGWoeGStvxBF5K3zRdpyNZFYtPArg246J6vEOqWzKsKOYUAwBExpZ22H1clhM7hi3OdfCFdjDwbBOeWnoFf2qkxZ3jYYzGIxAF/xpZ8U9OI7xMPfnjwzqobIG0/fqUxltPChyiAHdoqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sFm7V0HGdzjXos2dLjB2DraQhtOd1e34Z9RIWH+rlQk=;
- b=cmgSx3mqNGWW55J2+rwfxcTtFBvnkxqA9lUdCbo2Th2VqmOyfKfLbRlW5uoB3MRzFDL30CqLtJdH/lSiW0HrGd2+qR22BApJLI3Ect3CfNFiqtSoRt4teoa332vfkWB6IyOs+21hlJCbCig7SIHZ65FXja5AoWEyrtIcQdLnINKqAqLBvsnC75htGmAeVqzIh97kImO41I5mvsaUj2SZrlajMj30bh3Vgy3+0IVcNBCuVvT3DPjrAkabq9XQtKcj9X+Wvse49za2Pm24nj/AzrNR5uhGzRWVfzQ7Ts7sG6vOTF5ZrfM5sqXe7BUlPRyTWfEkpIu0hwntPefFuyiO5g==
+ bh=JOi3FHgUaz1LWVJ9H4+4JEbrQhgWUzUfFg3gmdiOuRY=;
+ b=AwzsL3NtPFt1+j11tjSpCMqX+wGvfDzTQ1yu941ZdEH/FyBzw1ipsJ1/hPUFa+72I+H0JyxolT7c182B0rNkv822Py4jURRYE71Uf4UI5U/c9ivs8nGNt6+YB4+btV6Y7JIc1MIj0LckFP8E+PtcT9e8oNePIPPaBYpI2aMrYfZ1DNc+KdvHCzaCRSD64u09RPHNDOofARx9Rno+1HT+UijAgvzUEkNEiuMYLfZd1tx9NPHaOdc3f6zWYPCzguhmg91Kw6wkKLpwT0kv8mm3z+byw5i63+lGGNYGnIcV29mhZzXTqGJkN+00wQ9RyTUDtCju3l/mQYo7l/4RpcXKaQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sFm7V0HGdzjXos2dLjB2DraQhtOd1e34Z9RIWH+rlQk=;
- b=u7lxj4dK9iyqGnLxCC97kEuV/HS8fe/Ru2dL8BN4qE4LAyF2hnPcmKfzYNa0WiPYc5RnJvwDO3LBNOCAWmASLuId+gQBaQ6xBdT59v14W9l2R3RThvB1WgqiR7WrdZ/XJ1A31cScRIOjLvLjDWfULHepoquEsuzrKSnH/+uDwNI=
+ bh=JOi3FHgUaz1LWVJ9H4+4JEbrQhgWUzUfFg3gmdiOuRY=;
+ b=rYy707MP1wwb+jtO5uZepzSfMLjX+SeS17xdDonmHbZH1lxzKWMncSasTsqDDkko8+QjgI0+TrCMoF2X0MOdyeUmp1AUG4Ol5TH8ajhexTcizNP0OMK3n3cVM1fzXvmAyGin3MfsptqE57/Mjd5pvt/RfUAzbJV3lHEvlZCTjtU=
 Received: from BYAPR04MB5112.namprd04.prod.outlook.com (2603:10b6:a03:45::10)
- by BYAPR04MB4776.namprd04.prod.outlook.com (2603:10b6:a03:11::19)
+ by BYAPR04MB5494.namprd04.prod.outlook.com (2603:10b6:a03:e6::27)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20; Tue, 30 Jun
- 2020 12:59:33 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.23; Tue, 30 Jun
+ 2020 10:02:16 +0000
 Received: from BYAPR04MB5112.namprd04.prod.outlook.com
  ([fe80::a442:4836:baba:c84b]) by BYAPR04MB5112.namprd04.prod.outlook.com
  ([fe80::a442:4836:baba:c84b%6]) with mapi id 15.20.3131.027; Tue, 30 Jun 2020
- 12:59:33 +0000
+ 10:02:16 +0000
 From: Niklas Cassel <Niklas.Cassel@wdc.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH 00/10] hw/block/nvme: namespace types and zoned namespaces
-Thread-Topic: [PATCH 00/10] hw/block/nvme: namespace types and zoned namespaces
-Thread-Index: AQHWTsV/pjwwjyRMkUSo9H5IUgtdGqjxHw0A
-Date: Tue, 30 Jun 2020 12:59:33 +0000
-Message-ID: <20200630125932.GA553472@localhost.localdomain>
-References: <20200630100139.1483002-1-its@irrelevant.dk>
-In-Reply-To: <20200630100139.1483002-1-its@irrelevant.dk>
+To: Alistair Francis <alistair23@gmail.com>
+Subject: Re: [PATCH v2 05/18] hw/block/nvme: Introduce the Namespace Types
+ definitions
+Thread-Topic: [PATCH v2 05/18] hw/block/nvme: Introduce the Namespace Types
+ definitions
+Thread-Index: AQHWRO8bQ1sdANlR30yceHLn7+/JoqjwfgaAgACDKgA=
+Date: Tue, 30 Jun 2020 10:02:15 +0000
+Message-ID: <20200630100214.GA548602@localhost.localdomain>
+References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ <20200617213415.22417-6-dmitry.fomichev@wdc.com>
+ <CAKmqyKO-O5kVkb-mKmBeCCtmaS8uR+0oau=5FfS_gYrXXX0nHA@mail.gmail.com>
+In-Reply-To: <CAKmqyKO-O5kVkb-mKmBeCCtmaS8uR+0oau=5FfS_gYrXXX0nHA@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: irrelevant.dk; dkim=none (message not signed)
- header.d=none;irrelevant.dk; dmarc=none action=none header.from=wdc.com;
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [85.224.200.150]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 891daf93-3af4-4a7b-449d-08d81cf56fac
-x-ms-traffictypediagnostic: BYAPR04MB4776:
+x-ms-office365-filtering-correlation-id: 9a2daaff-db17-4bf1-59a3-08d81cdcab10
+x-ms-traffictypediagnostic: BYAPR04MB5494:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB4776EA0C7958D713252E178EF26F0@BYAPR04MB4776.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <BYAPR04MB54943F09E716D81D9F50E2F3F26F0@BYAPR04MB5494.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 0450A714CB
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PmLcf4GgPQpJW1zlWCZgHRxQhxhSoluTOEwMbg+hj2CjbQ0hcUVgxlA1FjCU/Cv4aPeRltXfYzkylMcKBv0wrx+8qIpTfXU7e4t/sZmtAeF8UKm4bs44azFeqj5PQ1pH9Q1tysYE3boEZDgzldzpeH9z5nZPx783Wacn9+ylbA9FbQ9B/Gr7Q0imVtsv85AtRxSw5Y3dkN6ihJu0UdTJfITE2bLV2xyyjGIuiUavCBxXs9xJv2lSq4xAMm0ccvFRcw65uiGN+kRDQir2rXXLUwKxRldVs/A7/1hc7PlpqAdo6rnt2dS0wqtZfs/bwVrw94/5NYwNTofNQv8atRHUWXrY4uFrEkoZYHnydFs8PwCuuKXnrpLd+vOEaD+lGGV5hkcVmsH2us+aHdrjH1iH2A==
+x-microsoft-antispam-message-info: c36xtkk6E75HROHdFwlx7jrs+jn1V6002/L4IdtrsskyprqSTDyGnCbOndoxg0128rxy+bTrUckjRt9Zt1e4wmE6D1nj/J6HZNLQCLdkXri1Vt294yynA8Mw3G9UNY58EvXxLLLHTTx2KV/vqsedNae6cmS+2csKQX9yNNRtjtSnRXoqZL0+9DfmWxuIJArmiN1Nxp3tm/p/7UVHWTjoMzxqJaR4zqbTqYyD8mPVCMX8/ZUkZvTi5mGj+I7+56NhYrjFcyjATnQNU0y1RgPeUr0z2IJODWuSVYb5jxQ+E899YMbfBXlzIH8oEdCHbAELKJDMXqp+irVpoXKLBW1hn9R5ofAaOiRHolwhh1+ZXGcm+Hy+1s3xhhaAn/rwCSKjXtyd3XBY4fSf/fSE8n7Fjo8K4PoO/o7jUpk4QB4gtLHWOn5EFCdZ/TSWUPtw55khh/lQ1VnhdOl1rfgaIMyuM7+k6ZnjAuTxymkvPOHlCqc=
 x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:BYAPR04MB5112.namprd04.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(396003)(376002)(346002)(366004)(39860400002)(1076003)(6916009)(6506007)(9686003)(6512007)(54906003)(316002)(4326008)(186003)(26005)(966005)(83380400001)(66556008)(64756008)(478600001)(86362001)(8936002)(2906002)(7416002)(71200400001)(66946007)(8676002)(33656002)(5660300002)(76116006)(91956017)(66446008)(66476007)(6486002);
+ SFS:(4636009)(39860400002)(396003)(136003)(346002)(366004)(376002)(186003)(66446008)(478600001)(966005)(4326008)(66556008)(66476007)(86362001)(8676002)(6486002)(5660300002)(66946007)(76116006)(1076003)(91956017)(2906002)(26005)(8936002)(9686003)(83380400001)(64756008)(53546011)(33656002)(6512007)(316002)(54906003)(71200400001)(6506007)(6916009)(43620500001)(15398625002);
  DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: GgtWlzTcPqPniLiSFkQk58nVbp+nB8zzbxzt1m2tf/aq/BR25ivnwNFULPEAprF86YyQUzoDNE505yiHXeV4FWQy6IQYDunsWdw32EHjXsHfDXIjyqoAibQj508p7ggTlL50HCL99IIU/KX+09PmVk3ftUofsRgklvqFRtGIZcv34jh0gG42II1eaAiU63Mdbq2I9fgd4GWMQCfcyCsZ1Jpc9+ps4YOlHbzNTeDwCGFt87l8Jk1aC4ePj0GpPlid9lFDRO9CoXrVU0W5PDE7xzU3eX8G18OpflQVQzUL2OAi26NsPEM/OQ42NaL7knTRyDTr7OPFfIQDmCL4NE/KveIBIT2PNa4La6cM4IcZtMXzIXolA2/Y9ZqoRUd07zigaFCtTS7MRrf8BE+rm3N7qvKTaM/uPCQBedwPW4dr1SVu4WuFNn0AyK8LD8lpugls7ouKqTKK7q1KCoscrcnsS380J0igDHPqnrAfUtkncvbM68MnscfDnidrzxP1dejC
+x-ms-exchange-antispam-messagedata: HLn0OeA17ZOLay5UVvG7vFEU8yEw67xRg2u3oQbAWlaDE2MbKkjdSPuGIq8DOiQpJERpdZ762vu3i5mbVZl+uhzSG1C1N8+Wbbfo8l4dkL2rJ4xPcmnX0ZYaLk/2KQDXrT156VCHGPk2nEPg0/MXDQ6VMxcFpwSpCqrsorwQZXS/vqRFmuh+7fv8Z5iU6Z4doLAYoTmVuAim8H1uUvTuG+7aagiabSSbv8SNvzmLDN5gadCQVAOl3qeE/OYs55x4JgKLslcd1R+8B92nvURpfBsSC6YjZhLUg7/Jk+VP+eKQ4SYcMAsVLpC9HqTxNh6DJjWO0lyGK01g+r8bewKypc6bRp7yiczeDhINu8ye9gmMf0KmZh4wwMBgO9CIw2xC4iKqvgxPy4BwXrQeREWLU6c+oz8lh+4/x3RrUzEdjpKWEpvcF1jus3Ml/uztcEczfEe4QJjfoXKh5DFSLeXQrhT1RrOLp+GO8v+UfIxuNPiqaGQKJ7g24wTI/XDjBLoy
 Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <C0DCD4E4CDAA4543B4616C07E7E6B1AB@namprd04.prod.outlook.com>
+Content-ID: <2FCD5A0D25932347B8E1E8FB20B75E08@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB5112.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 891daf93-3af4-4a7b-449d-08d81cf56fac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2020 12:59:33.7162 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a2daaff-db17-4bf1-59a3-08d81cdcab10
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2020 10:02:16.0364 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dnko55gkzwkTtFZO85+SLvMtcck/2V6tWrQ2qcryJdBkJKMC8c9uuxELiDCg3OsSyC9vPZJy8HsySaFzJc6qdQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4776
+X-MS-Exchange-CrossTenant-userprincipalname: icKWj8mHidaURlEx26A8tFRBjbWnpn4e/yX6hufatkL1r/3jduOWw8EaZLO0dap1RnEzlRhgjQJ/Vey71zmj5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5494
 Received-SPF: pass client-ip=216.71.153.141;
  envelope-from=prvs=44341d4e9=Niklas.Cassel@wdc.com; helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 08:59:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 06:02:18
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -151,184 +155,226 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Keith Busch <kbusch@kernel.org>,
  =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>,
  Matias Bjorling <Matias.Bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 30, 2020 at 12:01:29PM +0200, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+On Mon, Jun 29, 2020 at 07:12:47PM -0700, Alistair Francis wrote:
+> On Wed, Jun 17, 2020 at 2:47 PM Dmitry Fomichev <dmitry.fomichev@wdc.com>=
+ wrote:
+> >
+> > From: Niklas Cassel <niklas.cassel@wdc.com>
+> >
+> > Define the structures and constants required to implement
+> > Namespace Types support.
+> >
+> > Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> > ---
+> >  hw/block/nvme.h      |  3 ++
+> >  include/block/nvme.h | 75 +++++++++++++++++++++++++++++++++++++++++---
+> >  2 files changed, 73 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> > index 4f0dac39ae..4fd155c409 100644
+> > --- a/hw/block/nvme.h
+> > +++ b/hw/block/nvme.h
+> > @@ -63,6 +63,9 @@ typedef struct NvmeCQueue {
+> >
+> >  typedef struct NvmeNamespace {
+> >      NvmeIdNs        id_ns;
+> > +    uint32_t        nsid;
+> > +    uint8_t         csi;
+> > +    QemuUUID        uuid;
+> >  } NvmeNamespace;
+> >
+> >  static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
+> > diff --git a/include/block/nvme.h b/include/block/nvme.h
+> > index 6a58bac0c2..5a1e5e137c 100644
+> > --- a/include/block/nvme.h
+> > +++ b/include/block/nvme.h
+> > @@ -50,6 +50,11 @@ enum NvmeCapMask {
+> >      CAP_PMR_MASK       =3D 0x1,
+> >  };
+> >
+> > +enum NvmeCapCssBits {
+> > +    CAP_CSS_NVM        =3D 0x01,
+> > +    CAP_CSS_CSI_SUPP   =3D 0x40,
+> > +};
+> > +
+> >  #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MA=
+SK)
+> >  #define NVME_CAP_CQR(cap)   (((cap) >> CAP_CQR_SHIFT)    & CAP_CQR_MAS=
+K)
+> >  #define NVME_CAP_AMS(cap)   (((cap) >> CAP_AMS_SHIFT)    & CAP_AMS_MAS=
+K)
+> > @@ -101,6 +106,12 @@ enum NvmeCcMask {
+> >      CC_IOCQES_MASK  =3D 0xf,
+> >  };
+> >
+> > +enum NvmeCcCss {
+> > +    CSS_NVM_ONLY        =3D 0,
+> > +    CSS_ALL_NSTYPES     =3D 6,
+> > +    CSS_ADMIN_ONLY      =3D 7,
+> > +};
+> > +
+> >  #define NVME_CC_EN(cc)     ((cc >> CC_EN_SHIFT)     & CC_EN_MASK)
+> >  #define NVME_CC_CSS(cc)    ((cc >> CC_CSS_SHIFT)    & CC_CSS_MASK)
+> >  #define NVME_CC_MPS(cc)    ((cc >> CC_MPS_SHIFT)    & CC_MPS_MASK)
+> > @@ -109,6 +120,21 @@ enum NvmeCcMask {
+> >  #define NVME_CC_IOSQES(cc) ((cc >> CC_IOSQES_SHIFT) & CC_IOSQES_MASK)
+> >  #define NVME_CC_IOCQES(cc) ((cc >> CC_IOCQES_SHIFT) & CC_IOCQES_MASK)
+> >
+> > +#define NVME_SET_CC_EN(cc, val)     \
+> > +    (cc |=3D (uint32_t)((val) & CC_EN_MASK) << CC_EN_SHIFT)
+> > +#define NVME_SET_CC_CSS(cc, val)    \
+> > +    (cc |=3D (uint32_t)((val) & CC_CSS_MASK) << CC_CSS_SHIFT)
+> > +#define NVME_SET_CC_MPS(cc, val)    \
+> > +    (cc |=3D (uint32_t)((val) & CC_MPS_MASK) << CC_MPS_SHIFT)
+> > +#define NVME_SET_CC_AMS(cc, val)    \
+> > +    (cc |=3D (uint32_t)((val) & CC_AMS_MASK) << CC_AMS_SHIFT)
+> > +#define NVME_SET_CC_SHN(cc, val)    \
+> > +    (cc |=3D (uint32_t)((val) & CC_SHN_MASK) << CC_SHN_SHIFT)
+> > +#define NVME_SET_CC_IOSQES(cc, val) \
+> > +    (cc |=3D (uint32_t)((val) & CC_IOSQES_MASK) << CC_IOSQES_SHIFT)
+> > +#define NVME_SET_CC_IOCQES(cc, val) \
+> > +    (cc |=3D (uint32_t)((val) & CC_IOCQES_MASK) << CC_IOCQES_SHIFT)
+> > +
+> >  enum NvmeCstsShift {
+> >      CSTS_RDY_SHIFT      =3D 0,
+> >      CSTS_CFS_SHIFT      =3D 1,
+> > @@ -482,10 +508,41 @@ typedef struct NvmeIdentify {
+> >      uint64_t    rsvd2[2];
+> >      uint64_t    prp1;
+> >      uint64_t    prp2;
+> > -    uint32_t    cns;
+> > -    uint32_t    rsvd11[5];
+> > +    uint8_t     cns;
+> > +    uint8_t     rsvd4;
+> > +    uint16_t    ctrlid;
 >=20
-> Hi all,
+> Shouldn't this be CNTID?
 
-Hello Klaus,
+From the NVMe spec:
+https://nvmexpress.org/wp-content/uploads/NVM-Express-1_4-2019.06.10-Ratifi=
+ed.pdf
 
->=20
-> This series adds support for TP 4056 ("Namespace Types") and TP 4053
-> ("Zoned Namespaces") and is an alternative implementation to the one
-> submitted by Dmitry[1].
->=20
-> While I don't want this to end up as a discussion about the merits of
-> each version, I want to point out a couple of differences from Dmitry's
-> version. At a glance, my version
->=20
->   * builds on my patch series that adds fairly complete NVMe v1.4
->     mandatory support, as well as nice-to-have feature such as SGLs,
->     multiple namespaces and mostly just overall clean up. This finally
->     brings the nvme device into a fairly compliant state on which we can
->     add new features. I've tried hard to get these compliance and
->     clean-up patches merged for a long time (in parallel with developing
->     the emulation of NST and ZNS) and I would be really sad to see them
->     by-passed since they have already been through many iterations and
->     already carries Acked- and Reviewed-by's for the bulk of the
->     patches. I think the nvme device is already in a "frankenstate" wrt.
->     the implemented nvme version and the features it currently supports,
->     so I think this kind of cleanup is long overdue.
->=20
->   * uses an attached blockdev and standard blk_aio for persistent zone
->     info. This is the same method used in our patches for Write
->     Uncorrectable and (separate and extended lba) metadata support, but
->     I've left those optional features out for now to ease the review
->     process.
->=20
->   * relies on the universal dulbe support added in ("hw/block/nvme: add
->     support for dulbe") and sparse images for handling reads in gaps
->     (above write pointer and below ZSZE); that is - the size of the
->     underlying blockdev is in terms of ZSZE, not ZCAP
->=20
->   * the controller uses timers to autonomously finish zones (wrt. FRL)
+Figure 241:
+Controller  Identifier  (CNTID)
 
-AFAICT, Dmitry's patches does this as well.
+So you are correct, this is the official abbreviation.
 
->=20
-> I've been on paternity leave for a month, so I havn't been around to
-> review Dmitry's patches, but I have started that process now. I would
-> also be happy to work with Dmitry & Friends on merging our versions to
-> get the best of both worlds if it makes sense.
->=20
-> This series and all preparatory patch sets (the ones I've been posting
-> yesterday and today) are available on my GitHub[2]. Unfortunately
-> Patchew got screwed up in the middle of me sending patches and it never
-> picked up v2 of "hw/block/nvme: support multiple namespaces" because it
-> was getting late and I made a mistake with the CC's. So my posted series
-> don't apply according to Patchew, but they actually do if you follow the
-> Based-on's (... or just grab [2]).
->=20
->=20
->   [1]: Message-Id: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
->   [2]: https://github.com/birkelund/qemu/tree/for-master/nvme
->=20
->=20
-> Based-on: <20200630043122.1307043-1-its@irrelevant.dk>
-> ("[PATCH 0/3] hw/block/nvme: bump to v1.4")
+I guess that I tried wanted to keep it in sync with Linux:
+https://github.com/torvalds/linux/blob/master/include/linux/nvme.h#L974
 
-Is this the only patch series that this series depends on?
-
-In the beginning of the cover letter, you mentioned
-"NVMe v1.4 mandatory support", "SGLs", "multiple namespaces",
-and "and mostly just overall clean up".
-
->=20
-> Klaus Jensen (10):
->   hw/block/nvme: support I/O Command Sets
->   hw/block/nvme: add zns specific fields and types
->   hw/block/nvme: add basic read/write for zoned namespaces
->   hw/block/nvme: add the zone management receive command
->   hw/block/nvme: add the zone management send command
->   hw/block/nvme: add the zone append command
->   hw/block/nvme: track and enforce zone resources
->   hw/block/nvme: allow open to close transitions by controller
->   hw/block/nvme: allow zone excursions
->   hw/block/nvme: support reset/finish recommended limits
->=20
->  block/nvme.c          |    6 +-
->  hw/block/nvme-ns.c    |  397 +++++++++-
->  hw/block/nvme-ns.h    |  148 +++-
->  hw/block/nvme.c       | 1676 +++++++++++++++++++++++++++++++++++++++--
->  hw/block/nvme.h       |   76 +-
->  hw/block/trace-events |   43 +-
->  include/block/nvme.h  |  252 ++++++-
->  7 files changed, 2469 insertions(+), 129 deletions(-)
->=20
-> --=20
-> 2.27.0
->=20
-
-I think that you have done a great job getting the NVMe
-driver out of a frankenstate, and made it compliant with
-a proper spec (NVMe 1.4).
-
-I'm also a big fan of the refactoring so that the driver
-handles more than one namespace, and the new bus model.
-
-I know that you first sent your
-"nvme: support NVMe v1.3d, SGLs and multiple namespaces"
-patch series July, last year.
-
-Looking at your outstanding patch series on patchwork:
-https://patchwork.kernel.org/project/qemu-devel/list/?submitter=3D188679
-
-(Feel free to correct me if I have misunderstood anything.)
-
-I see that these are related to your patch series from July last year:
-hw/block/nvme: bump to v1.3
-hw/block/nvme: support scatter gather lists
-hw/block/nvme: support multiple namespaces
-hw/block/nvme: bump to v1.4
+Which uses ctrlid.
 
 
-This patch series seems minor and could probably be merged immediately:
-hw/block/nvme: handle transient dma errors
+Looking further at the NVMe spec:
+In Figure 247 (Identify Controller Data Structure) they use other names
+for fields:
 
+Controller  ID  (CNTLID)
+Controller Attributes (CTRATT)
 
-This patch series looks a bit weird:
-hw/block/nvme: AIO and address mapping refactoring
+I can understand if they want to have unique names for fields, but it
+seems like they have trouble deciding how to abbreviate controller :)
 
-Since it looks like a V1 post, and was first posted yesterday.
-However, 2 out of the 17 patches in are Acked-by: Keith.
-(Perhaps some of your previously posted patches was put inside
-this new patch series?)
-
-
-This patch series:
-hw/block/nvme: namespace types and zoned namespaces
-
-Which was first posted today. Up until earlier today, we haven't seen
-any patches from you related to ZNS (only overall NVMe cleanups).
-Dmitry's ZNS patches have been on the list since 2020-06-16.
-
-
-Just a friendly suggestion, how about:
-
-1) We get your
-
-hw/block/nvme: bump to v1.3
-hw/block/nvme: support scatter gather lists
-hw/block/nvme: support multiple namespaces
-hw/block/nvme: bump to v1.4
-
-patch series merged.
-
-2) We get Dmitry's patch series merged.
-
-Shared 4:th) If there is any feature that you miss in Dmitry's patch series=
-,
-perhaps you could send patches to add what you are missing.
-
-Shared 4:th) Your other patch series:
-hw/block/nvme: AIO and address mapping refactoring could get merged.
-
-
-Please don't take this suggestion the wrong way, I'm simply trying
-to come up with a way to move forward from here.
+Personally I think that ctrlid is more obvious that we are talking about
+a controller and not a count. But I'm fine regardless.
 
 
 Kind regards,
-Niklas=
+Niklas
+
+>=20
+> Alistair
+>=20
+> > +    uint16_t    nvmsetid;
+> > +    uint8_t     rsvd3;
+> > +    uint8_t     csi;
+> > +    uint32_t    rsvd12[4];
+> >  } NvmeIdentify;
+> >
+> > +typedef struct NvmeNsIdDesc {
+> > +    uint8_t     nidt;
+> > +    uint8_t     nidl;
+> > +    uint16_t    rsvd2;
+> > +} NvmeNsIdDesc;
+> > +
+> > +enum NvmeNidType {
+> > +    NVME_NIDT_EUI64             =3D 0x01,
+> > +    NVME_NIDT_NGUID             =3D 0x02,
+> > +    NVME_NIDT_UUID              =3D 0x03,
+> > +    NVME_NIDT_CSI               =3D 0x04,
+> > +};
+> > +
+> > +enum NvmeNidLength {
+> > +    NVME_NIDL_EUI64             =3D 8,
+> > +    NVME_NIDL_NGUID             =3D 16,
+> > +    NVME_NIDL_UUID              =3D 16,
+> > +    NVME_NIDL_CSI               =3D 1,
+> > +};
+> > +
+> > +enum NvmeCsi {
+> > +    NVME_CSI_NVM                =3D 0x00,
+> > +};
+> > +
+> > +#define NVME_SET_CSI(vec, csi) (vec |=3D (uint8_t)(1 << (csi)))
+> > +
+> >  typedef struct NvmeRwCmd {
+> >      uint8_t     opcode;
+> >      uint8_t     flags;
+> > @@ -603,6 +660,7 @@ enum NvmeStatusCodes {
+> >      NVME_CMD_ABORT_MISSING_FUSE =3D 0x000a,
+> >      NVME_INVALID_NSID           =3D 0x000b,
+> >      NVME_CMD_SEQ_ERROR          =3D 0x000c,
+> > +    NVME_CMD_SET_CMB_REJECTED   =3D 0x002b,
+> >      NVME_LBA_RANGE              =3D 0x0080,
+> >      NVME_CAP_EXCEEDED           =3D 0x0081,
+> >      NVME_NS_NOT_READY           =3D 0x0082,
+> > @@ -729,9 +787,14 @@ typedef struct NvmePSD {
+> >  #define NVME_IDENTIFY_DATA_SIZE 4096
+> >
+> >  enum {
+> > -    NVME_ID_CNS_NS             =3D 0x0,
+> > -    NVME_ID_CNS_CTRL           =3D 0x1,
+> > -    NVME_ID_CNS_NS_ACTIVE_LIST =3D 0x2,
+> > +    NVME_ID_CNS_NS                =3D 0x0,
+> > +    NVME_ID_CNS_CTRL              =3D 0x1,
+> > +    NVME_ID_CNS_NS_ACTIVE_LIST    =3D 0x2,
+> > +    NVME_ID_CNS_NS_DESC_LIST      =3D 0x03,
+> > +    NVME_ID_CNS_CS_NS             =3D 0x05,
+> > +    NVME_ID_CNS_CS_CTRL           =3D 0x06,
+> > +    NVME_ID_CNS_CS_NS_ACTIVE_LIST =3D 0x07,
+> > +    NVME_ID_CNS_IO_COMMAND_SET    =3D 0x1c,
+> >  };
+> >
+> >  typedef struct NvmeIdCtrl {
+> > @@ -825,6 +888,7 @@ enum NvmeFeatureIds {
+> >      NVME_WRITE_ATOMICITY            =3D 0xa,
+> >      NVME_ASYNCHRONOUS_EVENT_CONF    =3D 0xb,
+> >      NVME_TIMESTAMP                  =3D 0xe,
+> > +    NVME_COMMAND_SET_PROFILE        =3D 0x19,
+> >      NVME_SOFTWARE_PROGRESS_MARKER   =3D 0x80
+> >  };
+> >
+> > @@ -914,6 +978,7 @@ static inline void _nvme_check_size(void)
+> >      QEMU_BUILD_BUG_ON(sizeof(NvmeFwSlotInfoLog) !=3D 512);
+> >      QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) !=3D 512);
+> >      QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) !=3D 4096);
+> > +    QEMU_BUILD_BUG_ON(sizeof(NvmeNsIdDesc) !=3D 4);
+> >      QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) !=3D 4096);
+> >      QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) !=3D 4096);
+> >  }
+> > --
+> > 2.21.0
+> >
+> >=
 
