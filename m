@@ -2,86 +2,56 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 557CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 560FFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:30:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EDCC20772
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:28:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gmQh2pdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDCC20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A95D20768
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:30:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A95D20768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqMs6-00039n-ED
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 16:28:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60394)
+	id 1jqMtw-0004Xp-GB
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 16:30:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqMrQ-0002gA-6w; Tue, 30 Jun 2020 16:28:08 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:40045)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqMrO-0000IV-GW; Tue, 30 Jun 2020 16:28:07 -0400
-Received: by mail-il1-x144.google.com with SMTP id e18so8305099ilr.7;
- Tue, 30 Jun 2020 13:28:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FHrHcTzze7zQdyxECIXPNcwUxE2Nx2ychXxykp9UAbI=;
- b=gmQh2pdOXnvyBSKnIGKKXUQCYxJcJRbQnoE9JOvo/5ZjKcHv9jUUupdvGOqt8MoAAQ
- m9cF628thIvRQUFCyBUApLZ+Q2fUiHJevCMQTG+zCLHd+IK0T33HTOt/p/8QyXc0eAL7
- UmlGbWdAFjGHmbk+2ynL+zYUELTyF7vpNN3S/db84ujWk5+UDNCyrXkhp9DQ/f0M4/d5
- hCue3an7Yx5RGScakItQuzFMpLCH8fHYnsNuDPHCnc9MU6UWz/5DRk6HlCEB3QbCY3gk
- npxuslz1fAuv+Ev03uHImGcb7zURSpvypFuUdJwtxYo8sRIXxS05E0FMIo39w4L2zYEd
- 0ZmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FHrHcTzze7zQdyxECIXPNcwUxE2Nx2ychXxykp9UAbI=;
- b=r3Y96dQJQGNHQl44ZJ6ZYz2EfwBvn7Mv5vh7jI08z9V+r0U/sarbSoXi9xWwMgEzH6
- vbDQezSIvGzosWd/0GTxWWbCbq6TF29WQa6zg9sBanB90/KRPfvcJ5RuAoC2kLdTwK61
- OOgTV0FWPqOOrEtMLJTMIChyBAQsHToTb2g9cnQUQrdXkUEkgdMninRTwtAo6XhnAFCR
- YrhKV0W7s/NacjgIXP48l8Ck+y4kbZ212vt0okCHj+/Q8Z68LT99xn2BLQ3E6J05CUjt
- SISwm+YffiPOLWisGupMvh5Vv/qeDNLLLcU3rHStjHDohFCBbEU26to9DJgq80VLhICU
- QWRw==
-X-Gm-Message-State: AOAM532Xbh4bk/cH3KuTbWik48ZlbWPiGxujMhBXakNMW/MsfQ1PhB1l
- j6Un8+0D/64lYnahnRa/OaO8dLh83jhDe3Ea4fc=
-X-Google-Smtp-Source: ABdhPJzTqgfrczWUhw0lDvlcd0U0JYjHY5ggg3AhHv38T4UXrJ4CB1yZZV3NUR4QaDSBwbR/LGs82aelCd4974dA9NA=
-X-Received: by 2002:a92:5f12:: with SMTP id t18mr4506499ilb.267.1593548885135; 
- Tue, 30 Jun 2020 13:28:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqMsw-0003vZ-H7; Tue, 30 Jun 2020 16:29:42 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48506)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jqMss-0000PM-NA; Tue, 30 Jun 2020 16:29:42 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 8533EBF676;
+ Tue, 30 Jun 2020 20:29:33 +0000 (UTC)
+Date: Tue, 30 Jun 2020 22:29:30 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Niklas Cassel <Niklas.Cassel@wdc.com>
+Subject: Re: [PATCH 00/10] hw/block/nvme: namespace types and zoned namespaces
+Message-ID: <20200630202754.bleks4kxagaflg7y@apples.localdomain>
+References: <20200630100139.1483002-1-its@irrelevant.dk>
+ <20200630125932.GA553472@localhost.localdomain>
 MIME-Version: 1.0
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-7-dmitry.fomichev@wdc.com>
-In-Reply-To: <20200617213415.22417-7-dmitry.fomichev@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jun 2020 13:18:21 -0700
-Message-ID: <CAKmqyKObR_cW_MZ4O3JRNf5DcVosdHA0iMkpnAWpXRQeW+MTQw@mail.gmail.com>
-Subject: Re: [PATCH v2 06/18] hw/block/nvme: Define trace events related to NS
- Types
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200630125932.GA553472@localhost.localdomain>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 16:29:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,79 +65,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Keith Busch <kbusch@kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Damien Le Moal <Damien.LeMoal@wdc.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <Matias.Bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 2:46 PM Dmitry Fomichev <dmitry.fomichev@wdc.com> wrote:
->
-> A few trace events are defined that are relevant to implementing
-> Namespace Types (NVMe TP 4056).
->
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+On Jun 30 12:59, Niklas Cassel wrote:
+> On Tue, Jun 30, 2020 at 12:01:29PM +0200, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> > 
+> > Hi all,
+> 
+> Hello Klaus,
+> 
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Hi Niklas,
 
-Alistair
+> > 
+> >   * the controller uses timers to autonomously finish zones (wrt. FRL)
+> 
+> AFAICT, Dmitry's patches does this as well.
+> 
 
-> ---
->  hw/block/trace-events | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+Hmm, yeah. Something is going on at least. It's not really clear to me
+why it works or what is happening with that admin completion queue
+timer, but I'll dig through it.
+
+> > 
+> > I've been on paternity leave for a month, so I havn't been around to
+> > review Dmitry's patches, but I have started that process now. I would
+> > also be happy to work with Dmitry & Friends on merging our versions to
+> > get the best of both worlds if it makes sense.
+> > 
+> > This series and all preparatory patch sets (the ones I've been posting
+> > yesterday and today) are available on my GitHub[2]. Unfortunately
+> > Patchew got screwed up in the middle of me sending patches and it never
+> > picked up v2 of "hw/block/nvme: support multiple namespaces" because it
+> > was getting late and I made a mistake with the CC's. So my posted series
+> > don't apply according to Patchew, but they actually do if you follow the
+> > Based-on's (... or just grab [2]).
+> > 
+> > 
+> >   [1]: Message-Id: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+> >   [2]: https://github.com/birkelund/qemu/tree/for-master/nvme
+> > 
+> > 
+> > Based-on: <20200630043122.1307043-1-its@irrelevant.dk>
+> > ("[PATCH 0/3] hw/block/nvme: bump to v1.4")
+> 
+> Is this the only patch series that this series depends on?
+> 
+> In the beginning of the cover letter, you mentioned
+> "NVMe v1.4 mandatory support", "SGLs", "multiple namespaces",
+> and "and mostly just overall clean up".
+> 
+
+No, its a string of series that all has a Based-on tag (that is, "[PATCH
+0/3] hw/block/nvme: bump to v1.4" has another Based-on tag that points
+to the dependency of that). The point was to have patchew nicely apply
+everything, but it broke midway...
+
+As Philippe pointed out, all of the patch sets are integrated in the
+GitHub tree, applied to QEMU master.
+
+> 
+> I think that you have done a great job getting the NVMe
+> driver out of a frankenstate, and made it compliant with
+> a proper spec (NVMe 1.4).
+> 
+> I'm also a big fan of the refactoring so that the driver
+> handles more than one namespace, and the new bus model.
+> 
+
+Well, thanks! :)
+
+> I know that you first sent your
+> "nvme: support NVMe v1.3d, SGLs and multiple namespaces"
+> patch series July, last year.
+> 
+> Looking at your outstanding patch series on patchwork:
+> https://patchwork.kernel.org/project/qemu-devel/list/?submitter=188679
+> 
+> (Feel free to correct me if I have misunderstood anything.)
+> 
+> I see that these are related to your patch series from July last year:
+> hw/block/nvme: bump to v1.3
+> hw/block/nvme: support scatter gather lists
+> hw/block/nvme: support multiple namespaces
+> hw/block/nvme: bump to v1.4
+> 
+
+Yeah this stuff has been around for a while so the history on patchwork
+is a mess.
+
+> 
+> This patch series seems minor and could probably be merged immediately:
+> hw/block/nvme: handle transient dma errors
+> 
+
+Sure, but it's nicer in combination with the previous series
+("hw/block/nvme: AIO and address mapping refactoring"). What I /can/ do
+is rip out "hw/block/nvme: allow multiple aios per command" as that
+patch might require more time for reviews. The rest of that series are
+clean ups and a couple of bug fixes.
+
+> 
+> This patch series looks a bit weird:
+> hw/block/nvme: AIO and address mapping refactoring
+> 
+> Since it looks like a V1 post, and was first posted yesterday.
+> However, 2 out of the 17 patches in are Acked-by: Keith.
+> (Perhaps some of your previously posted patches was put inside
+> this new patch series?)
+> 
+
+Yes that and reviewers requested a lot of separation, so basically the
+patch set ballooned.
+
+> 
+> This patch series:
+> hw/block/nvme: namespace types and zoned namespaces
+> 
+> Which was first posted today. Up until earlier today, we haven't seen
+> any patches from you related to ZNS (only overall NVMe cleanups).
+> Dmitry's ZNS patches have been on the list since 2020-06-16.
+> 
+
+Yeah, as I mentioned in my cover letter, I was on leave, so I wasn't
+around for the big ZNS release day either. But, honestly, I think this
+is irrelevant - code should be merged based on technical reasons (not
+technicalities).
+
+> 
+> Just a friendly suggestion, how about:
+> 
+> 1) We get your
+> 
+> hw/block/nvme: bump to v1.3
+> hw/block/nvme: support scatter gather lists
+> hw/block/nvme: support multiple namespaces
+> hw/block/nvme: bump to v1.4
+> 
+> patch series merged.
+> 
+
+Blowing my own horn here, but yeah, it seems like everyone would like to
+see this merged.
+
+> 2) We get Dmitry's patch series merged.
+> 
+> Shared 4:th) If there is any feature that you miss in Dmitry's patch series,
+> perhaps you could send patches to add what you are missing.
 >
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 423d491e27..3f3323fe38 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -39,8 +39,13 @@ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size,
->  pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
->  pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
->  pci_nvme_identify_ctrl(void) "identify controller"
-> +pci_nvme_identify_ctrl_csi(uint8_t csi) "identify controller, csi=0x%"PRIx8""
->  pci_nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
-> +pci_nvme_identify_ns_csi(uint16_t ns, uint8_t csi) "identify namespace, nsid=%"PRIu16", csi=0x%"PRIx8""
->  pci_nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
-> +pci_nvme_identify_nslist_csi(uint16_t ns, uint8_t csi) "identify namespace list, nsid=%"PRIu16", csi=0x%"PRIx8""
-> +pci_nvme_list_ns_descriptors(void) "identify namespace descriptors"
-> +pci_nvme_identify_cmd_set(void) "identify i/o command set"
->  pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
->  pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
->  pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
-> @@ -59,6 +64,8 @@ pci_nvme_mmio_stopped(void) "cleared controller enable bit"
->  pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
->  pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
->  pci_nvme_cmd_supp_and_effects_log_read(void) "commands supported and effects log read"
-> +pci_nvme_css_nvm_cset_selected_by_host(uint32_t cc) "NVM command set selected by host, bar.cc=0x%"PRIx32""
-> +pci_nvme_css_all_csets_sel_by_host(uint32_t cc) "all supported command sets selected by host, bar.cc=0x%"PRIx32""
->
->  # nvme traces for error conditions
->  pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
-> @@ -72,6 +79,9 @@ pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
->  pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
->  pci_nvme_err_invalid_effects_log_offset(uint64_t ofs) "commands supported and effects log offset must be 0, got %"PRIu64""
->  pci_nvme_err_invalid_effects_log_len(uint32_t len) "commands supported and effects log size is 4096, got %"PRIu32""
-> +pci_nvme_err_change_css_when_enabled(void) "changing CC.CSS while controller is enabled"
-> +pci_nvme_err_only_nvm_cmd_set_avail(void) "setting 110b CC.CSS, but only NVM command set is enabled"
-> +pci_nvme_err_invalid_iocsci(uint32_t idx) "unsupported command set combination index %"PRIu32""
->  pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
->  pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
->  pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
-> @@ -127,6 +137,7 @@ pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion qu
->  pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
->  pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
->  pci_nvme_unsupported_log_page(uint16_t lid) "unsupported log page 0x%"PRIx16""
-> +pci_nvme_ub_unknown_css_value(void) "unknown value in cc.css field"
->
->  # xen-block.c
->  xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-> --
-> 2.21.0
->
->
+
+Looks like the two version are pretty much on par in terms of features.
+
+> Shared 4:th) Your other patch series:
+> hw/block/nvme: AIO and address mapping refactoring could get merged.
+> 
+
+As stated above I think its only a single commit ("hw/block/nvme: allow
+multiple aios per command") that is controversial in that series.
+
+> 
+> Please don't take this suggestion the wrong way, I'm simply trying
+> to come up with a way to move forward from here.
+> 
+
+Absolutely - I totally get that you want to move forward with Dmitry's
+series, but I'd like to finish my review before committing to anything.
+
+
+Cheers,
+Klaus
 
