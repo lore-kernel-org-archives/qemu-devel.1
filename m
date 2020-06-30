@@ -2,126 +2,90 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFDDC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 18:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7649C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 18:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CCB20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 18:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A86AF2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 18:33:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="AjUfvb7j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CCB20722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6eIWyZ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A86AF2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqKio-0005Z4-Pp
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 14:11:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55850)
+	id 1jqL4F-00036o-Qf
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 14:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jqKi0-000547-TW
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 14:10:17 -0400
-Received: from mail-co1nam11on2041.outbound.protection.outlook.com
- ([40.107.220.41]:53505 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jqKhx-0004Ei-M1
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 14:10:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iwK2snhdCRJbuptks0lICZmUy72g+DpIBI1HoQpFHoZG6KFyGtLFwR/q7VJ1rjLv2ZtGmsIt0HZuSCqI6l6Ar9yLI90SHRh8x3iXbczcdqROXkYydfcEWVZLjM+sOVqsJzeQ4SfumhlexbMAL1FSoNUREIBukNcBQykDHcbMS139R+FMJt+W1uyLijZ8z/50MJov1Qd0LcP4ml+yx4Fwu1f+fm7JpK4tEeJuH3VCZd2+PwnALSHYgrYrPyPKusuktCC+MKMsYiCWxc3qvbOUGhwqC5Q5aDjL/XQeeFFPRCB2Li/8faIG8Y4dpYICTaUBieAZBe4Zeu5wzZduyMrcZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mx/LezBkXY7Zg6llLKewtwV2RG671dpwawQl/H35oL0=;
- b=DY1pPVtqFB24G5LEKsg0S/5acnDgHF4dCrPTr7HlwX79RSRfLtOFh0WPm4OZXr7kqQcjWXwgyIu9jO2c/sKMzWF+M4a0DMJ4ZMJVpSmHtbre9rIEefVPsazzSbViKEa+1eeF/+LQlACKCtVFKhziIUghx9tzAE0QVLwj3gmdBTwPuYH/pvqyu/kARsB6C5c3KwDdbciZAWIsa+6pfLqGcfhoUpby42wF4MxYpbqgEFW9dkcV4qm5fOCY7W1bDGnYf2ma2lzsJzRBds1dgJaAc2FrrtBmyX3/QktS83BiscMCM9uM05cB9cErydHx7a6gvK59TgsrXeyhB0X4JgwmLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mx/LezBkXY7Zg6llLKewtwV2RG671dpwawQl/H35oL0=;
- b=AjUfvb7jASIKjfCp/xOc1xrTmyStYcF11VhV799Y+eYkDlbNlry8xFYamMB1YfEa573oNXDbxPx0gpkhIi6jj4x2RunFVlX4KdLRNUP0+JxmihS8d1yANdzpMmzh9dB0yi4WcBnzrK88dp7st29tk81qpJwQmolkg7COfLSNBkw=
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
- by BYAPR02MB5542.namprd02.prod.outlook.com (2603:10b6:a03:96::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.26; Tue, 30 Jun
- 2020 17:55:07 +0000
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828]) by BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828%3]) with mapi id 15.20.3131.027; Tue, 30 Jun 2020
- 17:55:07 +0000
-From: Sai Pavan Boddu <saipava@xilinx.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: RE: [PATCH v2 3/3] usb/hcd-xhci: Split pci wrapper for xhci base model
-Thread-Topic: [PATCH v2 3/3] usb/hcd-xhci: Split pci wrapper for xhci base
- model
-Thread-Index: AQHWSshDrYoefVt0mk6gEfaCZTEJaajpoDjAgADLyH+AAAVdsIAFkt2AgAF0QGA=
-Date: Tue, 30 Jun 2020 17:55:07 +0000
-Message-ID: <BY5PR02MB677235DB4A77059EC3F3D8D7CA6F0@BY5PR02MB6772.namprd02.prod.outlook.com>
-References: <1593008176-9629-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1593008176-9629-4-git-send-email-sai.pavan.boddu@xilinx.com>
- <87y2obzhsc.fsf@dusky.pond.sub.org>
- <BY5PR02MB67723A0D247E4D2BC60A0710CA920@BY5PR02MB6772.namprd02.prod.outlook.com>
- <871rm2tkxn.fsf@dusky.pond.sub.org>
- <BY5PR02MB6772B9C9031FD35A9FA8A969CA930@BY5PR02MB6772.namprd02.prod.outlook.com>
- <20200629193843.fufoicpgkpkes6sv@sirius.home.kraxel.org>
-In-Reply-To: <20200629193843.fufoicpgkpkes6sv@sirius.home.kraxel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=xilinx.com;
-x-originating-ip: [149.199.50.128]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: d874a959-25c5-4229-0ec4-08d81d1eb9bb
-x-ms-traffictypediagnostic: BYAPR02MB5542:
-x-microsoft-antispam-prvs: <BYAPR02MB55427ED27CBD82EE2A4F5A53CA6F0@BYAPR02MB5542.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 0450A714CB
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: AJSB9oanbkwYRglz2iCa9ADfZzK+OrY/46NI/yiRWkRbTuBDP5VscQdjeuuDYBjj7JsBdzxFglc7YYOC20umWpoARlznbVY+OYMVnbsZG/wpiPtBkvhLtFf9dlB9Fmudea8mdreSxGE3RJjjY5MxCzVkKlALR2RoyusGI9TIS4D/FQGQvWH5E2/sioKdy1E0xbyFhILRbVoVbI9uCBXTE8u4jtJ1/00shYjOLRcNZOICE5v6jae3A3UK6rZrKAqYRv5JaH5NCRIHyxaun4p4njXAr4Z0DV02RmtE4On3wPzTEVcZAA0ZvsrKSGmMjuc2CXRyeAk4yUuWOlMgsOVITQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(396003)(39860400002)(376002)(366004)(136003)(346002)(86362001)(2906002)(83380400001)(71200400001)(33656002)(7696005)(9686003)(53546011)(55016002)(7416002)(6506007)(4326008)(52536014)(478600001)(54906003)(66476007)(6916009)(8936002)(66946007)(66446008)(186003)(64756008)(8676002)(66556008)(5660300002)(26005)(76116006)(316002);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: 1XxfbrxQpmkeQ4Uco7ryYEubbScmvJrNcSxNXafsvscnEKTysC4UNw9xWZf+0BHomm12OAuhZ+x8wb5zpRGJaV8P4SbLnB1gi+Yc8CRcS/XOnMQTbTZVkwJU7qsTiH6OibVOrVgmk/bNr7yCLCLzw7elpyQr+Y+dzbdxZoCE/VO4bbHf1On5JDl/JPuIH8OVH1jTjiWHbDrQw/mMT73HXMwRWD1DLtQKklxOhPdyZ+y5UetOm0HLfuxuSiF1/9MolLXU40zYayrA76kjzMYN3FOmfMuTStWAhlVd3pWKsC940uBAE0asKzQIz6pCbonmZP2Zb22UeYbMGSCJcUUh1DgbmBquqLaa5w4Nn+FIbAs0RUwN/iKkdpcz4hRkW/Dn/rZ7SY5wZslR4ZVDyjIwOLGMJ/djzpdjQxYrPY89SEHysVbeGBjBeNdMYaGmZbP0jT3kaNYo+nMncgaluGdacib1N+hfAqTXSQ4cnggsrHgVLK1179lOvaZ36HDXarMJ
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqL3E-0002d2-2L
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 14:32:12 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55994
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqL3B-0007O0-4G
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 14:32:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593541925;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=P05tAodN1Xip3ZXeHeuWJtzG6B+gTD8OmmFBWdJQzBw=;
+ b=h6eIWyZ4SRzIhc51fm4K8fCxzVxeDbw+XXNeN2VgA+dsOYzpLWcfbJPW4VF5KzjTvq+aEt
+ CXG5Oceb+E9KlyL1kWs7fe8gSgLjW/fOBePZUsS6p0JOFfExrI0TOPoDyBfwQut/OUPc61
+ 5E2dz7BiYrwEGYRkzHhOflJ2KljW64U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-tpWV5a2JPOeupzw6vK7a3w-1; Tue, 30 Jun 2020 14:31:57 -0400
+X-MC-Unique: tpWV5a2JPOeupzw6vK7a3w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF356804003;
+ Tue, 30 Jun 2020 18:31:54 +0000 (UTC)
+Received: from localhost (ovpn-112-113.ams2.redhat.com [10.36.112.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 947A97BED1;
+ Tue, 30 Jun 2020 18:31:48 +0000 (UTC)
+Date: Tue, 30 Jun 2020 19:31:47 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v7 07/21] multi-process: add co-routines to communicate
+ with remote
+Message-ID: <20200630183147.GA111989@stefanha-x1.localdomain>
+References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+ <d7013c71ba09fb73bc61a725088bebd91f0fda30.1593273671.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR02MB6772.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d874a959-25c5-4229-0ec4-08d81d1eb9bb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2020 17:55:07.3660 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lPUgWDGVVGc6xRP1Yx1K6DljT9ZayEZ3ZzIo6X2HeAnyo+iWBuI2UJZvQ7qV4iv58GIlBu6DU4v2fdgUZK3c/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5542
-Received-SPF: pass client-ip=40.107.220.41; envelope-from=saipava@xilinx.com;
- helo=NAM11-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 14:10:11
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <d7013c71ba09fb73bc61a725088bebd91f0fda30.1593273671.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="J2SCkAp4GZ/dPZZf"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,97 +98,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?iso-8859-1?Q?=27Marc-Andr=E9_Lureau=27?= <marcandre.lureau@redhat.com>,
- Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?=27Philippe_Mathieu-Daud=E9=27?= <philmd@redhat.com>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gred,
+--J2SCkAp4GZ/dPZZf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Gerd Hoffmann <kraxel@redhat.com>
-> Sent: Tuesday, June 30, 2020 1:09 AM
-> To: Sai Pavan Boddu <saipava@xilinx.com>
-> Cc: Markus Armbruster <armbru@redhat.com>; Peter Maydell
-> <peter.maydell@linaro.org>; Thomas Huth <thuth@redhat.com>; Eduardo
-> Habkost <ehabkost@redhat.com>; qemu-devel@nongnu.org; Alistair Francis
-> <alistair.francis@wdc.com>; Paolo Bonzini <pbonzini@redhat.com>; Ying
-> Fang <fangying1@huawei.com>; 'Marc-Andr=E9 Lureau'
-> <marcandre.lureau@redhat.com>; 'Philippe Mathieu-Daud=E9'
-> <philmd@redhat.com>
-> Subject: Re: [PATCH v2 3/3] usb/hcd-xhci: Split pci wrapper for xhci base
-> model
+On Sat, Jun 27, 2020 at 10:09:29AM -0700, elena.ufimtseva@oracle.com wrote:
+> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 >=20
->   Hi,
->=20
-> > > >> Do you intend to add a "sysbus model" in a future patch?
-> > > > [Sai Pavan Boddu]  Yes. I would be sending it along with that a
-> > > > device which would be using it. (i.e for zynqmp soc ) Let me know,
-> > > > if its good to
-> > > include hcd-xhci-sysbus.c here ?
->=20
-> I think this would be useful, to see how the code separation plays out on=
- the
-> sysbus side.
->=20
-> > > Here's a clean way to provide different bus connectors (say PCI and
-> > > sysbus) for the same core device:
-> > >
-> > > Make the core device a TYPE_DEVICE.
-> > >
-> > > For each desired bus, have a bus-specific device that contains a core
-> device.
-> > > Use object_initialize_child() for the component.
->=20
-> > This was my V1 implementation.
-> > Changed it to non-qom structure after some feedback from @Gred. Felt
-> like XHCIState will not be used standalone.
->=20
-> > > Example: core device TYPE_SERIAL, PCI device TYPE_PCI_SERIAL, ISA
-> > > device TYPE_ISA_SERIAL, sysbus devices TYPE_SERIAL_IO.
-> TYPE_SERIAL_MM.
->=20
-> /me goes check out the serial code ...
->=20
-> For reference: commit which transforms serial into the structure above is
-> this:
->=20
->     commit 7781b88ee458ff933459503ade0b0a6ddaad08de
->     Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->     Date:   Mon Oct 21 23:32:12 2019 +0200
->=20
->         serial: initial qom-ification
->=20
-> Note that this patch doesn't change structs, so ISASerialState still look=
-s this
-> way:
->=20
-> struct ISASerialState {
->     ISADevice parent_obj;
->     [ ... ]
->     SerialState state;
-> };
->=20
-> So you can likewise keep your current "struct XHCIPciState" struct layout=
- and
-> still turn XHCIState into a device object.  Which is nice to have as it b=
-etter
-> models the hardware (xhci core behind pci connector).
-[Sai Pavan Boddu] Ok, as marcus pointed. We might be able to use it just as=
-, child of a pci/sysbus based controller. Rather than using it standalone. =
-I agree it looks nice that way.
+> process to avoid blocking the main loop during the message exchanges.
+> To be used by proxy device.
 
-Thanks,
-Sai Pavan
+The nested aio_poll() in this patch could be a problem. I've highlighted
+it here so that others skimming through this series can join the
+discussion without reading all my review comments:
+
+  qemu_coroutine_enter(req.co);
+  while (!req.finished) {
+      aio_poll(qemu_get_aio_context(), false);
+
+This is called from the proxy device, which means the vCPU thread. The
+QEMU global mutex is held here.
+
+aio_poll() does not release the mutex, so other vCPU threads will not be
+able to run QEMU code until mpqemu_msg_send_reply_co() completes and the
+QEMU global mutex has been released again.
+
+Our goal is to do blocking socket I/O here since our vCPU thread cannot
+make progress until the remote device replies. This means we can forget
+about QEMU's event loop and simply do blocking I/O from the vCPU thread.
+The QEMU global mutex can be dropped around the send/recv but a
+per-socket mutex is needed to protect against multiple vCPU threads
+interleaving requests.
+
+I think this boils down to:
+
+  /*
+   * Blocking version of send+recv for the proxy device. Called from
+   * vCPU thread where we cannot make progress until the remote device
+   * has replied. Releases and re-acquires the QEMU global mutex.
+   */
+  uint64_t mpqemu_msg_send_and_await_reply(MPQemuMsg *msg, QIOChannel *ioc,
+                                           Error **errp)
+  {
+      uint64_t ret;
+
+      qemu_mutex_unlock_iothread();
+
+      qemu_mutex_lock(&mplink->io_mutex);
+      blocking_send(ioc, msg);
+      ret =3D blocking_recv(ioc);
+      qemu_mutex_unlock(&mplink->io_mutex);
+
+      qemu_mutex_lock_iothread();
+
+      return ret;
+  }
+
+This is very simple! The tricky thing is combining this approach with
+mplink I/O that happens in the event loop. The heartbeat is one example.
+I don't remember the protocol details enough to know how the other
+message exchanges work. Code running in the event loop is not allowed to
+block, so it really needs to use coroutines.
+
 >=20
-> take care,
->   Gerd
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> ---
+>  include/io/mpqemu-link.h | 16 +++++++++
+>  io/mpqemu-link.c         | 78 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 94 insertions(+)
+>=20
+> diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+> index 1542e8ed07..52aa89656c 100644
+> --- a/include/io/mpqemu-link.h
+> +++ b/include/io/mpqemu-link.h
+> @@ -17,6 +17,7 @@
+>  #include "qom/object.h"
+>  #include "qemu/thread.h"
+>  #include "io/channel.h"
+> +#include "io/channel-socket.h"
+> =20
+>  #define REMOTE_MAX_FDS 8
+> =20
+> @@ -30,6 +31,7 @@
+>   */
+>  typedef enum {
+>      INIT =3D 0,
+> +    RET_MSG,
+>      MAX =3D INT_MAX,
+>  } MPQemuCmd;
+> =20
+> @@ -67,6 +69,20 @@ typedef struct {
+>      uint8_t *data2;
+>  } MPQemuMsg;
+> =20
+> +struct MPQemuRequest {
+> +    MPQemuMsg *msg;
+> +    QIOChannelSocket *sioc;
+> +    Coroutine *co;
+> +    bool finished;
+> +    int error;
+> +    long ret;
+> +};
+> +
+> +typedef struct MPQemuRequest MPQemuRequest;
+> +
+> +uint64_t mpqemu_msg_send_reply_co(MPQemuMsg *msg, QIOChannel *ioc,
+
+This function sends a message and waits for the reply. The name confuses
+me, I would guess that this function sends a reply. Perhaps
+mpqemu_msg_send_and_await_reply() is a clearer name.
+
+> +                                  Error **errp);
+
+Functions with "co" in their name run in coroutine context. This
+function does not. Please remove the _co from the name to avoid
+confusion.
+
+> +
+>  void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc);
+>  int mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc);
+> =20
+> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+> index bfc542b5fd..c430b4d6a2 100644
+> --- a/io/mpqemu-link.c
+> +++ b/io/mpqemu-link.c
+> @@ -16,6 +16,8 @@
+>  #include "qapi/error.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/main-loop.h"
+> +#include "io/channel-socket.h"
+> =20
+>  void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc)
+>  {
+> @@ -118,6 +120,82 @@ int mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc)
+>      return 0;
+>  }
+> =20
+> +/* Use in proxy only as it clobbers fd handlers. */
+> +static void coroutine_fn mpqemu_msg_send_co(void *data)
+> +{
+> +    MPQemuRequest *req =3D (MPQemuRequest *)data;
+> +    MPQemuMsg msg_reply =3D {0};
+> +    long ret =3D -EINVAL;
+> +
+> +    if (!req->sioc) {
+> +        error_report("No channel available to send command %d",
+> +                     req->msg->cmd);
+
+Can this ever happen?
+
+> +        atomic_mb_set(&req->finished, true);
+
+Why is atomic_mb_set() used here?
+
+> +        req->error =3D -EINVAL;
+> +        return;
+> +    }
+> +
+> +    req->co =3D qemu_coroutine_self();
+> +    mpqemu_msg_send(req->msg, QIO_CHANNEL(req->sioc));
+> +
+> +    yield_until_fd_readable(req->sioc->fd);
+> +
+> +    ret =3D mpqemu_msg_recv(&msg_reply, QIO_CHANNEL(req->sioc));
+
+mpqemu_msg_recv() already yields when called from a coroutine. Why is
+yield_until_fd_readable() called explicitly here?
+
+After removing the yield_until_fd_readable() it will also be possible to
+use QIOChannel instead of the more specific QIOChannelSocket. That will
+make the code a little simpler because the QIO_CHANNEL() casts can be
+removed.
+
+> +    if (ret < 0) {
+> +        error_report("ERROR: failed to get a reply for command %d, \
+> +                     errno %s, ret is %ld",
+
+C doesn't support backslash string wrapping in a useful way. The
+backslash tells the preprocessor to wrap the line but the string will
+contain the leading whitespace.
+
+This format string is equivalent to:
+
+  "ERROR: failed to get a reply for command %d,                    errno %s=
+, ret is %ld"
+
+A common way of wrapping strings is:
+
+  error_report("ERROR: failed to get a reply for command %d, "
+               "errno %s, ret is %ld",
+
+> +                     req->msg->cmd, strerror(errno), ret);
+> +        req->error =3D -errno;
+
+s/errno/ret/
+
+> +    } else {
+> +        if (!mpqemu_msg_valid(&msg_reply) || msg_reply.cmd !=3D RET_MSG)=
+ {
+> +            error_report("ERROR: Invalid reply received for command %d",
+> +                         req->msg->cmd);
+> +            req->error =3D -EINVAL;
+> +        } else {
+> +            req->ret =3D msg_reply.data1.u64;
+> +        }
+> +    }
+> +    atomic_mb_set(&req->finished, true);
+> +}
+> +
+> +/*
+> + * Create if needed and enter co-routine to send the message to the
+> + * remote channel ioc and wait for the reply.
+> + * Resturns the value from the reply message, sets the error on failure.
+
+s/Resturns/Returns/
+
+> + */
+> +
+> +uint64_t mpqemu_msg_send_reply_co(MPQemuMsg *msg, QIOChannel *ioc,
+> +                                  Error **errp)
+> +{
+> +    MPQemuRequest req =3D {0};
+> +    uint64_t ret =3D UINT64_MAX;
+> +
+> +    req.sioc =3D QIO_CHANNEL_SOCKET(ioc);
+> +    if (!req.sioc) {
+> +        return ret;
+
+The doc comment says "sets the error on failure" but this error return
+does not set errp.
+
+> +    }
+> +
+> +    req.msg =3D msg;
+> +    req.ret =3D 0;
+> +    req.finished =3D false;
+> +
+> +    if (!req.co) {
+
+req.co is always NULL here because it's a local variable initialized to
+0 at the beginning of this function.
+
+> +        req.co =3D qemu_coroutine_create(mpqemu_msg_send_co, &req);
+> +    }
+> +
+> +    qemu_coroutine_enter(req.co);
+> +    while (!req.finished) {
+> +        aio_poll(qemu_get_aio_context(), false);
+
+The second argument must be true so that aio_poll() waits for activity
+instead of returning immediately. If it returns immediately then this
+loop will consume 100% CPU.
+
+> +    }
+> +    if (req.error) {
+> +        error_setg(errp, "Error exchanging message with remote process, =
+"\
+> +                        "socket %d, error %d", req.sioc->fd, req.error);
+> +    }
+> +    ret =3D req.ret;
+> +
+> +    return ret;
+> +}
+> +
+>  bool mpqemu_msg_valid(MPQemuMsg *msg)
+>  {
+>      if (msg->cmd >=3D MAX && msg->cmd < 0) {
+> --=20
+> 2.25.GIT
+>=20
+
+--J2SCkAp4GZ/dPZZf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl77hRIACgkQnKSrs4Gr
+c8hcgQf/V7bb7CXcLGlDoin2LT3Z8bbYLWgxy49XzZHL/02ZDzIaZJ/5Y3oFC8iQ
+DR//Ovv9F28rosYYPMqTjEjiJYSxrYH+VmD6amzWKoZvjioEfV1t75JKhECuZHhq
+NrDzR0JiI+u0pKUEXnll2QQy4xVrV9JDxSo4nyk4f/EBjgIEsadRSyXiQz5lNNkj
+BkyphGr1wirBtqQ2QTiFtDQfJRoagfaS4C31wzPbi2soE2HF7iy/03Ujlxv2Vmyw
+9MgAkzKf4Ax0WuxkWgrxe1gOChtzGNhTM1eCoCxPLvgXzHLs/j2eiWb88UIxD/8o
+eNJVJcdNjXhSSB+VY934/F4Kk9NyoQ==
+=b1B6
+-----END PGP SIGNATURE-----
+
+--J2SCkAp4GZ/dPZZf--
 
 
