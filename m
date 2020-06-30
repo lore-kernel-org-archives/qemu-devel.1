@@ -2,91 +2,86 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6D00C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2093C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B33C620672
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:33:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D93A20672
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM2q96Oq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B33C620672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IL0O3a2X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D93A20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFST-000836-TZ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:33:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43002)
+	id 1jqFSa-0008K9-Pr
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:34:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqFQq-0006LF-26; Tue, 30 Jun 2020 08:32:15 -0400
-Received: from mail-ej1-x62c.google.com ([2a00:1450:4864:20::62c]:42704)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqFQo-0003vp-Gl; Tue, 30 Jun 2020 08:32:11 -0400
-Received: by mail-ej1-x62c.google.com with SMTP id i14so20342462ejr.9;
- Tue, 30 Jun 2020 05:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:to:cc:from:subject:message-id:date:user-agent:mime-version
- :content-language:content-transfer-encoding;
- bh=VrkfnazT2yj9IgpFzubDWyH6oSQm7gfNPjHJe2Wng0U=;
- b=QM2q96OqosO7MvFw3Y+wP8QdtAFpkaWTVp+mzG2o9FlTZMZI2rH5M6TnX7mx14Jb26
- FLDpnHfXi4dpFhhK9v83WRUOspM1tXz3OVfVeyicjl9FfETF+euFsdYiAK4WtdcyN92f
- kvgzbEg9z4+epVSSGrq0keO3r4DXPLenbLkHZpTUjoiEn43Ke1hVyZBLhFxzzODiUpFk
- kvL2E5v7h0Nj7iEKZ7ZzznYni90z6j6d9RW0C0HsenHetIeyHTnxZ9+IV3syApjztR0d
- 18mLKxvBVYHhUKuo3Zvw2WIEhDuXubtJBMSAcckyX/CcpFfvi7yAraw+t/1+09/5rAi6
- z7sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:to:cc:from:subject:message-id:date
- :user-agent:mime-version:content-language:content-transfer-encoding;
- bh=VrkfnazT2yj9IgpFzubDWyH6oSQm7gfNPjHJe2Wng0U=;
- b=pyf9S03iTwN7VHeGrUvLYNM6nYUGedXjpoZa4mnOFQghyErL5E1hpzdpanHjCslcYS
- rG6uK9zfo4nENhzb9dZhgfv0wtjsWGjOZ0qtnUTwjSqUh2zH4bcKmgLlShRNWtj82lzF
- 2Wq+EzeCmdQT6K5c6Kd2KNzZRpeW9N8wuEA5vo0fxc7Sy4Z+InW4tC31j1z+j8JYo+Aa
- 2HtJ20r8PQZe0t723UNiZBRHaWtjNhNMQ5Nzqkq+HxY9dqTzm7k3S8DOdtxs/1+vO56r
- hcVPTPge0xa/D/PdFRe3DG7AVo9K/4cGzKCtik7Pd1gwxyPHnwzumduk4d6hT1Xx1ddW
- /GVA==
-X-Gm-Message-State: AOAM530DsDkTWwnQ6LR0BTf7kDMVyqUvuY92x6NbpYtw+fTZHrw0OOZ7
- T5AA4kjR+xofkioYWrBnWyso4v7VagI=
-X-Google-Smtp-Source: ABdhPJzVgiIqDmiC3ZxAT9YMBWmcZ8xEwX3LcStUO+649ngh44TUr3jvkzuiIuMzO9EJ22qTIj0RlA==
-X-Received: by 2002:a17:906:1455:: with SMTP id
- q21mr1697312ejc.139.1593520328064; 
- Tue, 30 Jun 2020 05:32:08 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id c9sm2689938edv.8.2020.06.30.05.32.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 05:32:07 -0700 (PDT)
-To: Eddie James <eajames@linux.ibm.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?=
- <clg@kaod.org>, Joel Stanley <joel@jms.id.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Subject: hw/arm/aspeed: Why aspeed_machine_init uses empty SD cards?
-Message-ID: <3985e947-d798-b12c-1b55-71b3e4ed9189@amsat.org>
-Date: Tue, 30 Jun 2020 14:32:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jqFQ0-0005EJ-13
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39440)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jqFPx-0003jw-Hn
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593520276;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=P5WJC/lONKTLoi6rxFfZsZwDAUiOGKmFKgrKK48Cwxw=;
+ b=IL0O3a2XWuBvoYRL+dixv208CHFuZXhBZTaYZj6vBQgZ+NdYrVeO4tKxIf/B0eCBEcsd6+
+ Cgjzvx9rXJLtQfgQ955WQmoqJqyg8ezEYNQhK6rCRfhk191V8m5Yh1beB7urJb00i+NTqL
+ +dW2D1M9z6HF6i7g9tn2s/Dh6HS7DmY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-7ZEOMwn8M5KK1xcd4uzTzg-1; Tue, 30 Jun 2020 08:31:07 -0400
+X-MC-Unique: 7ZEOMwn8M5KK1xcd4uzTzg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4647019200E8;
+ Tue, 30 Jun 2020 12:31:05 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.192.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 831395C1C5;
+ Tue, 30 Jun 2020 12:30:58 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v3 8/9] imx7-ccm: add digprog mmio write method
+Date: Tue, 30 Jun 2020 17:57:09 +0530
+Message-Id: <20200630122710.1119158-9-ppandit@redhat.com>
+In-Reply-To: <20200630122710.1119158-1-ppandit@redhat.com>
+References: <20200630122710.1119158-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::62c;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,22 +95,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Cédric, Eddie,
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-I'm trying to understand commits 2bea128c3d0 and a29e3e12707,
-the Aspeed machines always add SD cards on the SD bus, even
-if there are no block drive to attach to. Is that what you
-want?
+Add digprog mmio write method to avoid assert failure during
+initialisation.
 
-Expected behavior from the board is to create the SoC, the
-SoC creates the SDHCI which creates the SD bus. No need to
-add phantom SD cards to the machine if they don't exist.
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/misc/imx7_ccm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thoughts?
+Update v3: Add Reviewed-by: ...
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09452.html
+
+diff --git a/hw/misc/imx7_ccm.c b/hw/misc/imx7_ccm.c
+index 02fc1ae8d0..5ac5ecf74c 100644
+--- a/hw/misc/imx7_ccm.c
++++ b/hw/misc/imx7_ccm.c
+@@ -131,8 +131,15 @@ static const struct MemoryRegionOps imx7_set_clr_tog_ops = {
+     },
+ };
+ 
++static void imx7_digprog_write(void *opaque, hwaddr addr,
++                                        uint64_t data, unsigned size)
++{
++    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
++}
++
+ static const struct MemoryRegionOps imx7_digprog_ops = {
+     .read = imx7_set_clr_tog_read,
++    .write = imx7_digprog_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .impl = {
+         .min_access_size = 4,
+-- 
+2.26.2
+
 
