@@ -2,101 +2,92 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33FAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60364C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72C8D20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:49:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C8D20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A89B206BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAIOek2+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A89B206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqGdl-0001vP-Ma
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:49:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35620)
+	id 1jqGeD-0003G1-Bx
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:50:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
- id 1jqGVu-0004bq-3u
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:41:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11178)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
- id 1jqGVs-0006sU-2z
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:41:29 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05UDWVEX009257; Tue, 30 Jun 2020 09:41:24 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32041dvwnm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 30 Jun 2020 09:41:24 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05UDWac0009436;
- Tue, 30 Jun 2020 09:41:23 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32041dvwn4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 30 Jun 2020 09:41:23 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05UDZvVH030739;
- Tue, 30 Jun 2020 13:41:22 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma01wdc.us.ibm.com with ESMTP id 31wwr8r8d5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 30 Jun 2020 13:41:22 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05UDfL3V58458484
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 30 Jun 2020 13:41:21 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0F22FC6057;
- Tue, 30 Jun 2020 13:41:21 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3F9D8C6055;
- Tue, 30 Jun 2020 13:41:20 +0000 (GMT)
-Received: from Tobins-MBP-2.fios-router.home (unknown [9.85.167.92])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 30 Jun 2020 13:41:20 +0000 (GMT)
-From: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqGTz-0001KO-SS; Tue, 30 Jun 2020 09:39:31 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:41732)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqGTy-0006Kw-7Q; Tue, 30 Jun 2020 09:39:31 -0400
+Received: by mail-ed1-x544.google.com with SMTP id e22so16227400edq.8;
+ Tue, 30 Jun 2020 06:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/74ZOEVtWoI92Rhuv9NWA62JHOdD9/euQUb+Sj4+JZg=;
+ b=cAIOek2+VUlEPq6VZObms5zcks/UNF8orPh7ODrxUf93whGbPppvaEOUNBNgIjVtwb
+ RnJJj+a10P+abz3HB4QjiMILLCTSI24rjITO7ftpDHypTR8DOiiEcibRZZt63Ilqzcba
+ EobA8YDO+yZG1yEm4piNn/Bbt9tvLnQxlkwuBMAE1gcDJB0zwm3+zh2Bf7IKS82auT89
+ 4tNgB4vnS92LOGUAcEsCY+Idnu32vr336tODo/LknvGOGYBvtHLoTqH3HWaOcSL4/W+Y
+ Q+Xrr+Ut4rtN0OEpHOQO01B/+3pGd+Ea9uwi90XJC4B8M1rLH8Y84C5XM6azBvUnbzbV
+ NB5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=/74ZOEVtWoI92Rhuv9NWA62JHOdD9/euQUb+Sj4+JZg=;
+ b=MOhs38O//AeCM+oZzqMGvwtyEhg7+NrVeWoJoi3Do83A6Y4WtOCXmxySHLCcYjb+k3
+ TSGgPF0BM37AUPaVZBsHvRXjRRQwLZolHJCt6fBn2VVdDyLMGHXV2/XN77eHssU8k+X+
+ Tk2+rKmL7/jz85ieYo/SpwYx+V8/d+4L4Aus4yKTNPHieERTO+MjJr250+on3LeudPEx
+ eqfxCBbzPAZyg46GHr0k2e2vcOMuT4vSVyrMaDSW/G6X2PtQg7pw2dJBed5x/D9mNP9m
+ O9P3jkqFaSqPakEPZQLaSMcbsG35Dx9E0b30g6hLZvktDC8PT4+6vPgLELaUP5vG0Zc+
+ oIsg==
+X-Gm-Message-State: AOAM533ngooLykBgIBsC9sCcHx8lRu1YaM97Casva4Iq9W1BamjXwOY1
+ Oprh8y6Tm8u59LvEdX5jJ47si8jzmxk=
+X-Google-Smtp-Source: ABdhPJwmVWhsHgXMGS5UDv329YVKJlrZm5l0XYS5jrAFMnCZIJaBqp9mxejIJt6y33aYA1cAzbYKoQ==
+X-Received: by 2002:aa7:c442:: with SMTP id n2mr13672084edr.309.1593524368446; 
+ Tue, 30 Jun 2020 06:39:28 -0700 (PDT)
+Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id p18sm2099172ejm.55.2020.06.30.06.39.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 06:39:27 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: SEV: QMP support for Inject-Launch-Secret
-Date: Tue, 30 Jun 2020 09:41:01 -0400
-Message-Id: <20200630134102.46777-1-tobin@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
+Subject: [PATCH v7 13/17] hw/sd/sdcard: Constify sd_crc*()'s message argument
+Date: Tue, 30 Jun 2020 15:39:07 +0200
+Message-Id: <20200630133912.9428-14-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200630133912.9428-1-f4bug@amsat.org>
+References: <20200630133912.9428-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-06-30_06:2020-06-30,
- 2020-06-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0
- priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=1 adultscore=0
- clxscore=1011 phishscore=0 lowpriorityscore=0 mlxlogscore=773
- malwarescore=0 impostorscore=0 cotscore=-2147483648 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006300094
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=tobin@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 09:41:26
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,38 +100,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, jejb@linux.ibm.com, tobin@ibm.com,
- dgilbert@redhat.com, Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>,
- pbonzini@redhat.com, brijesh.singh@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an update to part of a patch submitted previously to
-provide support for injecting a secret blob into guest memory
-using AMD SEV.
+CRC functions don't modify the buffer argument,
+make it const.
 
-The user provides a header and a wrapped secret blob via QMP,
-which are provided to the AMD Secure Processor and injected
-into the guest.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Note that this patch requires the user to provide the guest
-physical address where the secret will be injected via QMP.
-
-Tobin Feldman-Fitzthum (1):
-  sev: add sev-inject-launch-secret
-
- include/monitor/monitor.h |  3 ++
- include/sysemu/sev.h      |  2 ++
- monitor/misc.c            |  8 ++---
- qapi/misc-target.json     | 18 +++++++++++
- target/i386/monitor.c     |  9 ++++++
- target/i386/sev-stub.c    |  5 +++
- target/i386/sev.c         | 66 +++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events  |  1 +
- 8 files changed, 108 insertions(+), 4 deletions(-)
-
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 2946fe3040..364a6d1fcd 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -255,11 +255,11 @@ static const int sd_cmd_class[SDMMC_CMD_MAX] = {
+     7,  7, 10,  7,  9,  9,  9,  8,  8, 10,  8,  8,  8,  8,  8,  8,
+ };
+ 
+-static uint8_t sd_crc7(void *message, size_t width)
++static uint8_t sd_crc7(const void *message, size_t width)
+ {
+     int i, bit;
+     uint8_t shift_reg = 0x00;
+-    uint8_t *msg = (uint8_t *) message;
++    const uint8_t *msg = (const uint8_t *)message;
+ 
+     for (i = 0; i < width; i ++, msg ++)
+         for (bit = 7; bit >= 0; bit --) {
+@@ -271,11 +271,11 @@ static uint8_t sd_crc7(void *message, size_t width)
+     return shift_reg;
+ }
+ 
+-static uint16_t sd_crc16(void *message, size_t width)
++static uint16_t sd_crc16(const void *message, size_t width)
+ {
+     int i, bit;
+     uint16_t shift_reg = 0x0000;
+-    uint16_t *msg = (uint16_t *) message;
++    const uint16_t *msg = (const uint16_t *)message;
+     width <<= 1;
+ 
+     for (i = 0; i < width; i ++, msg ++)
 -- 
-2.20.1 (Apple Git-117)
+2.21.3
 
 
