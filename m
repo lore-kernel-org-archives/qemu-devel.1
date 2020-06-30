@@ -2,69 +2,74 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCB7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33891C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61EE120720
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:09:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61EE120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0859E2074F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:12:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0859E2074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqHtN-0004pm-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:09:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34512)
+	id 1jqHvX-0007CE-95
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jqHsd-0004JY-KJ
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:09:03 -0400
-Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:46127)
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jqHuK-0006CX-PI; Tue, 30 Jun 2020 11:10:50 -0400
+Received: from mga09.intel.com ([134.134.136.24]:60577)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jqHsb-0005yw-O3
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:09:03 -0400
-Authentication-Results: esa2.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: OjpqnZo3XH7g7b87jmn7DyAGGy6bnb1vG0VaLDdwnbRe5viygiv6JcLiAhoVymBXSaSdifaKYW
- bu0yCX7KWl3TJWfIEmK9avXh/VBUr6kY2qjK36Fhl+ov/GVYjrQdWlcZjEwZbCuQvvEXoNC1DX
- uFgiDiABsgJwowLWz9ZYhrlqb/o5mUsCSgMw/LRuw7UfHl+SUQoBXSlKUfYBXoyhPnE2ud8a3U
- wNQQ83m4aRjNZbCYpsogUZkLpa/mDZfMfOkrXd+R3XWBTTuyXg27l+UEIkPf8F1lI5KZzaKOJ2
- sPg=
-X-SBRS: 2.7
-X-MesageID: 21294008
-X-Ironport-Server: esa2.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.75,297,1589256000"; d="scan'208";a="21294008"
-Date: Tue, 30 Jun 2020 16:08:49 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Paul Durrant <paul@xen.org>
-Subject: Re: [PATCH 2/2] xen: cleanup unrealized flash devices
-Message-ID: <20200630150849.GA2110@perard.uk.xensource.com>
-References: <20200624121841.17971-1-paul@xen.org>
- <20200624121841.17971-3-paul@xen.org>
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jqHuI-0006Q9-KI; Tue, 30 Jun 2020 11:10:48 -0400
+IronPort-SDR: UdTqiIEhpIffiuNE3wq5ZK7IAvixNmBP6fDH3vPQLgMl/5Cmncdm0NlKs8Tq7FVb9NXdHxMafJ
+ +8GTNgljY9Rw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="147807098"
+X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; d="scan'208";a="147807098"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 30 Jun 2020 08:10:43 -0700
+IronPort-SDR: 94vQ/0NliUIh9wcexFalpa33QqLFd3g0eZRY+9qIYCCfAPprrREWrZzBVpPvIDzqdbqMLW1NTi
+ hkeHYuLxcitg==
+X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; d="scan'208";a="481223086"
+Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
+ ([10.212.222.216])
+ by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 30 Jun 2020 08:10:42 -0700
+Subject: Re: [PATCH v3 3/4] hw/block/nvme: Fix pmrmsc register size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200630110429.19972-1-philmd@redhat.com>
+ <20200630110429.19972-4-philmd@redhat.com>
+From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Message-ID: <45a97bae-887c-2669-439e-08ec3e75113e@linux.intel.com>
+Date: Tue, 30 Jun 2020 08:10:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200624121841.17971-3-paul@xen.org>
-Received-SPF: pass client-ip=216.71.145.153;
- envelope-from=anthony.perard@citrix.com; helo=esa2.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 11:08:59
+In-Reply-To: <20200630110429.19972-4-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=134.134.136.24;
+ envelope-from=andrzej.jakowski@linux.intel.com; helo=mga09.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 11:10:43
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,44 +82,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <pdurrant@amazon.com>,
- Jason Andryuk <jandryuk@gmail.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 01:18:41PM +0100, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
+On 6/30/20 4:04 AM, Philippe Mathieu-Daudé wrote:
+> The Persistent Memory Region Controller Memory Space Control
+> register is 64-bit wide. See 'Figure 68: Register Definition'
+> of the 'NVM Express Base Specification Revision 1.4'.
 > 
-> The generic pc_machine_initfn() calls pc_system_flash_create() which creates
-> 'system.flash0' and 'system.flash1' devices. These devices are then realized
-> by pc_system_flash_map() which is called from pc_system_firmware_init() which
-> itself is called via pc_memory_init(). The latter however is not called when
-> xen_enable() is true and hence the following assertion fails:
+> Fixes: 6cf9413229 ("introduce PMR support from NVMe 1.4 spec")
+> Reported-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+> ---
+>  include/block/nvme.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
-> Assertion `dev->realized' failed
-> 
-> These flash devices are unneeded when using Xen so this patch avoids the
-> assertion by simply removing them using pc_system_flash_cleanup_unused().
-> 
-> Reported-by: Jason Andryuk <jandryuk@gmail.com>
-> Fixes: ebc29e1beab0 ("pc: Support firmware configuration with -blockdev")
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> Tested-by: Jason Andryuk <jandryuk@gmail.com>
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 71c5681912..82c384614a 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -21,7 +21,7 @@ typedef struct QEMU_PACKED NvmeBar {
+>      uint32_t    pmrsts;
+>      uint32_t    pmrebs;
+>      uint32_t    pmrswtp;
+> -    uint32_t    pmrmsc;
+> +    uint64_t    pmrmsc;
+>  } NvmeBar;
+>  
+>  enum NvmeCapShift {
+> -- 2.21.3
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+This is good catch, though I wanted to highlight that this will still 
+need to change as this register is not aligned properly and thus not in
+compliance with spec.
 
-I think I would add:
-
-Fixes: dfe8c79c4468 ("qdev: Assert onboard devices all get realized properly")
-
-as this is the first commit where the unrealized flash devices are an
-issue.
-
--- 
-Anthony PERARD
+Reviewed-by Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
 
