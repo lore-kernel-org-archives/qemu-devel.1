@@ -2,81 +2,94 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF65AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD00C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:47:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD2C320775
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:41:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2C320775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7D5FE2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 17:47:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJGkF4kH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D5FE2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqKGM-0001rD-0G
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:41:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47156)
+	id 1jqKMG-0004Ml-OM
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 13:47:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqKFY-0001Q5-Ks
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:40:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49208)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqKFW-0007xa-IS
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:40:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jqKFU-0007qU-3h
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 17:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0CAEE2E80E7
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 17:40:48 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jqKL4-0003aH-O1
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:46:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31904
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jqKL0-0000WX-PR
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 13:46:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593539189;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aZYmS6mzFJLVmNNsl5Qw9y8d5914CaPDAjtqnhRupj8=;
+ b=UJGkF4kHOI2ghf2VXQbYVPeHXxvrZ1wdBBKbieLvYk5lp1OH7eEIc2ezUvDOEkf7TRwIFD
+ RXrHIOxHEccs6B5DQE0LSSSKxiwyC/F4fqwZk9phoUEKlAK+o3m0w+TqMyXKrFdWhOC7lW
+ U5C4FH6ZxK/+tqaDRjqjpGyM7b3CnVw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-W6JRW0qRMrCuouleDIYF8A-1; Tue, 30 Jun 2020 13:46:25 -0400
+X-MC-Unique: W6JRW0qRMrCuouleDIYF8A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6759E8064B5;
+ Tue, 30 Jun 2020 17:46:24 +0000 (UTC)
+Received: from work-vm (ovpn-112-141.ams2.redhat.com [10.36.112.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31BBE289B5;
+ Tue, 30 Jun 2020 17:46:17 +0000 (UTC)
+Date: Tue, 30 Jun 2020 18:46:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PATCH v2 2/3] trace: Add support for recorder back-end
+Message-ID: <20200630174614.GM2673@work-vm>
+References: <20200626162706.3304357-1-dinechin@redhat.com>
+ <20200626162706.3304357-3-dinechin@redhat.com>
+ <20200630090556.GA2673@work-vm> <lyeepwd6nl.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jun 2020 17:34:39 -0000
-From: Alistair Francis <1885350@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
- assignee=alistair@alistair23.me; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: rpvrverve453-4tr5t34t5
-X-Launchpad-Bug-Reporter: Mina Magdy (rpvrverve453-4tr5t34t5)
-X-Launchpad-Bug-Modifier: Alistair Francis (alistair2323)
-References: <159323684589.25927.6403829131374464357.malonedeb@gac.canonical.com>
-Message-Id: <159353848032.2590.13330840115044675694.launchpad@wampee.canonical.com>
-Subject: [Bug 1885350] Re: RISCV dynamic rounding mode is not behaving
- correctly
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0754564504dc5a04d2118f0442e94ddb77815517
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 13:40:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <lyeepwd6nl.fsf@redhat.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,66 +98,389 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885350 <1885350@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Alistair Francis (alistair2323)
+* Christophe de Dinechin (dinechin@redhat.com) wrote:
+> 
+> On 2020-06-30 at 11:05 CEST, Dr. David Alan Gilbert wrote...
+> > * Christophe de Dinechin (dinechin@redhat.com) wrote:
+> >> The recorder library provides support for low-cost continuous
+> >> recording of events, which can then be replayed. This makes it
+> >> possible to collect data "after the fact",for example to show the
+> >> events that led to a crash.
+> >>
+> >> Recorder support in qemu is implemented using the existing tracing
+> >> interface. In addition, it is possible to individually enable
+> >> recorders that are not traces, although this is probably not
+> >> recommended.
+> >>
+> >> HMP COMMAND:
+> >> The 'recorder' hmp command has been added, which supports two
+> >> sub-commands:
+> >> - recorder dump: Dump the current state of the recorder. You can
+> >                                                           ^^^^^^^^
+> > is that intended?
+> 
+> No. I think the intent was to indicate that you could pass the name of a
+> recorder to dump as an arg. I'll fix.
+> 
+> >
+> >> - recorder trace: Set traces using the recorder_trace_set() syntax.
+> >>   You can use "recorder trace help" to list all available recorders.
+> >>
+> >> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> >> ---
+> >>  configure                             |  5 +++
+> >>  hmp-commands.hx                       | 19 ++++++++--
+> >>  monitor/misc.c                        | 27 ++++++++++++++
+> >>  scripts/tracetool/backend/recorder.py | 51 +++++++++++++++++++++++++++
+> >>  trace/Makefile.objs                   |  2 ++
+> >>  trace/control.c                       |  7 ++++
+> >>  trace/recorder.c                      | 22 ++++++++++++
+> >>  trace/recorder.h                      | 34 ++++++++++++++++++
+> >>  util/module.c                         |  8 +++++
+> >>  9 files changed, 173 insertions(+), 2 deletions(-)
+> >>  create mode 100644 scripts/tracetool/backend/recorder.py
+> >>  create mode 100644 trace/recorder.c
+> >>  create mode 100644 trace/recorder.h
+> >>
+> >> diff --git a/configure b/configure
+> >> index ae8737d5a2..130630b98f 100755
+> >> --- a/configure
+> 
+> >> +++ b/configure
+> >> @@ -7702,6 +7702,11 @@ fi
+> >>  if have_backend "log"; then
+> >>    echo "CONFIG_TRACE_LOG=y" >> $config_host_mak
+> >>  fi
+> >> +if have_backend "recorder"; then
+> >> +  echo "CONFIG_TRACE_RECORDER=y" >> $config_host_mak
+> >> +  # This is a bit brutal, but there is currently a bug in the makefiles
+> >> +  LIBS="$LIBS -lrecorder"
+> >> +fi
+> >>  if have_backend "ust"; then
+> >>    echo "CONFIG_TRACE_UST=y" >> $config_host_mak
+> >>  fi
+> >> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> >> index 60f395c276..565f518d4b 100644
+> >> --- a/hmp-commands.hx
+> >> +++ b/hmp-commands.hx
+> >> @@ -297,6 +297,22 @@ ERST
+> >>          .cmd        = hmp_trace_file,
+> >>      },
+> >>
+> >> +SRST
+> >> +``trace-file on|off|flush``
+> >> +  Open, close, or flush the trace file.  If no argument is given, the
+> >> +  status of the trace file is displayed.
+> >> +ERST
+> >> +#endif
+> >> +
+> >> +#if defined(CONFIG_TRACE_RECORDER)
+> >> +    {
+> >> +        .name       = "recorder",
+> >> +        .args_type  = "op:s?,arg:F?",
+> >
+> > Having 'arg' as a filename is a bit odd; using op/arg is very generic
+> > for adding extra commands; but it suddenly becomes less generic if
+> > arg is always a filename.
+> >
+> >> +        .params     = "trace|dump [arg]",
+> >> +        .help       = "trace selected recorders or print recorder dump",
+> >> +        .cmd        = hmp_recorder,
+> >> +    },
+> >> +
+> >>  SRST
+> >>  ``trace-file on|off|flush``
+> >>    Open, close, or flush the trace file.  If no argument is given, the
+> >
+> > I think this SRST chunk is the one that needs updating for recorder.
+> > (The diff has made a bit of a mess, but I think you've copy pasted the
+> > trace-file chunk, but forgotten to update the SRST section).
+> 
+> Indeed. I had forgotten to get back to the .hx file and add the documentation.
+> 
+> >
+> >> @@ -1120,7 +1136,7 @@ ERST
+> >>
+> >>  SRST
+> >>  ``dump-guest-memory [-p]`` *filename* *begin* *length*
+> >> -  \
+> >> +  \
+> >>  ``dump-guest-memory [-z|-l|-s|-w]`` *filename*
+> >>    Dump guest memory to *protocol*. The file can be processed with crash or
+> >>    gdb. Without ``-z|-l|-s|-w``, the dump format is ELF.
+> >> @@ -1828,4 +1844,3 @@ ERST
+> >>          .sub_table  = hmp_info_cmds,
+> >>          .flags      = "p",
+> >>      },
+> >> -
+> >> diff --git a/monitor/misc.c b/monitor/misc.c
+> >> index 89bb970b00..0094b1860f 100644
+> >> --- a/monitor/misc.c
+> >> +++ b/monitor/misc.c
+> >> @@ -61,6 +61,9 @@
+> >>  #ifdef CONFIG_TRACE_SIMPLE
+> >>  #include "trace/simple.h"
+> >>  #endif
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +#include "trace/recorder.h"
+> >> +#endif
+> >>  #include "exec/memory.h"
+> >>  #include "exec/exec-all.h"
+> >>  #include "qemu/option.h"
+> >> @@ -227,6 +230,30 @@ static void hmp_trace_file(Monitor *mon, const QDict *qdict)
+> >>  }
+> >>  #endif
+> >>
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +static void hmp_recorder(Monitor *mon, const QDict *qdict)
+> >> +{
+> >> +    const char *op = qdict_get_try_str(qdict, "op");
+> >> +    const char *arg = qdict_get_try_str(qdict, "arg");
+> >> +
+> >> +    if (!op) {
+> >> +        monitor_printf(mon, "missing recorder command\"%s\"\n", op);
+> >> +        help_cmd(mon, "recorder");
+> >> +    } else if (!strcmp(op, "trace")) {
+> >> +        recorder_trace_set(arg);
+> >> +    } else if (!strcmp(op, "dump")) {
+> >> +        if (!arg || !*arg) {
+> >> +            recorder_dump();
+> >> +        } else {
+> >> +            recorder_dump_for(arg);
+> >> +        }
+> >> +    } else {
+> >> +        monitor_printf(mon, "unexpected recorder command \"%s\"\n", op);
+> >> +        help_cmd(mon, "recorder");
+> >> +    }
+> >> +}
+> >
+> > Consider whether just doing two separate commands would be easier;
+> > a recorder-trace and recorder-dump for example; that's fine from a HMP
+> > point of view and I think you'll find it's less code.
+> 
+> Hmmm. Looking back at the code, I see that I should also probably name the
+> commands something beginning with trace. Maybe trace-record and trace-dump?
 
--- =
+This depends; Stefan: As tracing owner do you have a preference on the
+names?  This isn't genering tracing, this is your recorder special, so
+I'm not sure.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885350
+Dave
 
-Title:
-  RISCV dynamic rounding mode is not behaving correctly
+> 
+> >
+> > Dave
+> >
+> >> +#endif
+> >> +
+> >>  static void hmp_info_help(Monitor *mon, const QDict *qdict)
+> >>  {
+> >>      help_cmd(mon, "info");
+> >> diff --git a/scripts/tracetool/backend/recorder.py b/scripts/tracetool/backend/recorder.py
+> >> new file mode 100644
+> >> index 0000000000..79cc6f5b03
+> >> --- /dev/null
+> >> +++ b/scripts/tracetool/backend/recorder.py
+> >> @@ -0,0 +1,51 @@
+> >> +# -*- coding: utf-8 -*-
+> >> +
+> >> +"""
+> >> +Trace back-end for recorder library
+> >> +"""
+> >> +
+> >> +__author__     = "Christophe de Dinechin <christophe@dinechin.org>"
+> >> +__copyright__  = "Copyright 2020, Christophe de Dinechin and Red Hat"
+> >> +__license__    = "GPL version 2 or (at your option) any later version"
+> >> +
+> >> +__maintainer__ = "Christophe de Dinechin"
+> >> +__email__      = "christophe@dinechin.org"
+> >> +
+> >> +
+> >> +from tracetool import out
+> >> +
+> >> +PUBLIC = True
+> >> +
+> >> +def generate_h_begin(events, group):
+> >> +    out('#include <recorder/recorder.h>', '')
+> >> +
+> >> +    for event in events:
+> >> +        out('RECORDER_DECLARE(%(name)s);', name=event.name)
+> >> +
+> >> +
+> >> +def generate_h(event, group):
+> >> +    argnames = ", ".join(event.args.names())
+> >> +    if len(event.args) > 0:
+> >> +        argnames = ", " + argnames
+> >> +
+> >> +    out('    record(%(event)s, %(fmt)s %(argnames)s);',
+> >> +        event=event.name,
+> >> +        fmt=event.fmt.rstrip("\n"),
+> >> +        argnames=argnames)
+> >> +
+> >> +
+> >> +def generate_h_backend_dstate(event, group):
+> >> +    out('    RECORDER_TWEAK(%(event_id)s) || \\', event_id=event.name)
+> >> +
+> >> +def generate_c_begin(events, group):
+> >> +    out('#include "qemu/osdep.h"',
+> >> +        '#include "trace/control.h"',
+> >> +        '#include "trace/simple.h"',
+> >> +        '#include <recorder/recorder.h>',
+> >> +        '')
+> >> +
+> >> +    for event in events:
+> >> +        out('RECORDER_DEFINE(%(name)s, 8, "Tracetool recorder for %(api)s(%(args)s)");',
+> >> +            name=event.name,
+> >> +            api=event.api(),
+> >> +            args=event.args)
+> >> diff --git a/trace/Makefile.objs b/trace/Makefile.objs
+> >> index c544509adf..9e347640c2 100644
+> >> --- a/trace/Makefile.objs
+> >> +++ b/trace/Makefile.objs
+> >> @@ -54,6 +54,8 @@ $(obj)/generated-tcg-tracers.h-timestamp: $(SRC_PATH)/trace-events $(BUILD_DIR)/
+> >>
+> >>  util-obj-$(CONFIG_TRACE_SIMPLE) += simple.o
+> >>  util-obj-$(CONFIG_TRACE_FTRACE) += ftrace.o
+> >> +util-obj-$(CONFIG_TRACE_RECORDER) += recorder.o
+> >> +recorder.o-libs = -lrecorder
+> >>  util-obj-y += control.o
+> >>  obj-y += control-target.o
+> >>  util-obj-y += qmp.o
+> >> diff --git a/trace/control.c b/trace/control.c
+> >> index 2ffe000818..15e5293eec 100644
+> >> --- a/trace/control.c
+> >> +++ b/trace/control.c
+> >> @@ -23,6 +23,9 @@
+> >>  #ifdef CONFIG_TRACE_SYSLOG
+> >>  #include <syslog.h>
+> >>  #endif
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +#include "trace/recorder.h"
+> >> +#endif
+> >>  #include "qapi/error.h"
+> >>  #include "qemu/error-report.h"
+> >>  #include "qemu/config-file.h"
+> >> @@ -282,6 +285,10 @@ bool trace_init_backends(void)
+> >>      openlog(NULL, LOG_PID, LOG_DAEMON);
+> >>  #endif
+> >>
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +    recorder_trace_init();
+> >> +#endif
+> >> +
+> >>      return true;
+> >>  }
+> >>
+> >> diff --git a/trace/recorder.c b/trace/recorder.c
+> >> new file mode 100644
+> >> index 0000000000..cbc22ee2d5
+> >> --- /dev/null
+> >> +++ b/trace/recorder.c
+> >> @@ -0,0 +1,22 @@
+> >> +/*
+> >> + * Recorder-based trace backend
+> >> + *
+> >> + * Copyright Red Hat 2020
+> >> + *
+> >> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> >> + * the COPYING file in the top-level directory.
+> >> + *
+> >> + */
+> >> +
+> >> +#include "trace/recorder.h"
+> >> +
+> >> +RECORDER_CONSTRUCTOR
+> >> +void recorder_trace_init(void)
+> >> +{
+> >> +    recorder_trace_set(getenv("RECORDER_TRACES"));
+> >> +
+> >> +    // Allow a dump in case we receive some unhandled signal
+> >> +    // For example, send USR2 to a hung process to get a dump
+> >> +    if (getenv("RECORDER_TRACES"))
+> >> +        recorder_dump_on_common_signals(0,0);
+> >> +}
+> >> diff --git a/trace/recorder.h b/trace/recorder.h
+> >> new file mode 100644
+> >> index 0000000000..00b11a2d2f
+> >> --- /dev/null
+> >> +++ b/trace/recorder.h
+> >> @@ -0,0 +1,34 @@
+> >> +/*
+> >> + * Recorder-based trace backend
+> >> + *
+> >> + * Copyright Red Hat 2020
+> >> + *
+> >> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> >> + * the COPYING file in the top-level directory.
+> >> + *
+> >> + */
+> >> +
+> >> +#ifndef TRACE_RECORDER_H
+> >> +#define TRACE_RECORDER_H
+> >> +
+> >> +#include "qemu/osdep.h"
+> >> +
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +
+> >> +#include <recorder/recorder.h>
+> >> +
+> >> +extern void recorder_trace_init(void);
+> >> +
+> >> +#else
+> >> +
+> >> +// Disable recorder macros
+> >> +#define RECORDER(Name, Size, Description)
+> >> +#define RECORDER_DEFINE(Name, Size, Description)
+> >> +#define RECORDER_DECLARE(Name)
+> >> +#define RECORD(Name, ...)
+> >> +#define record(Name, ...)
+> >> +#define recorder_trace_init()
+> >> +
+> >> +#endif // CONFIG_TRACE_RECORDER
+> >> +
+> >> +#endif // TRACE_RECORDER_H
+> >> diff --git a/util/module.c b/util/module.c
+> >> index e48d9aacc0..2fa93561fe 100644
+> >> --- a/util/module.c
+> >> +++ b/util/module.c
+> >> @@ -22,6 +22,10 @@
+> >>  #ifdef CONFIG_MODULE_UPGRADES
+> >>  #include "qemu-version.h"
+> >>  #endif
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +#include "trace/recorder.h"
+> >> +#endif
+> >> +
+> >>
+> >>  typedef struct ModuleEntry
+> >>  {
+> >> @@ -150,6 +154,10 @@ static int module_load_file(const char *fname)
+> >>          g_module_close(g_module);
+> >>          ret = -EINVAL;
+> >>      } else {
+> >> +#ifdef CONFIG_TRACE_RECORDER
+> >> +        // New recorders may have been pulled in, activate them if necessary
+> >> +        recorder_trace_init();
+> >> +#endif
+> >>          QTAILQ_FOREACH(e, &dso_init_list, node) {
+> >>              e->init();
+> >>              register_module_init(e->init, e->type);
+> >> --
+> >> 2.26.2
+> >>
+> 
+> 
+> --
+> Cheers,
+> Christophe de Dinechin (IRC c3d)
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  I=E2=80=99ve gone through the RISC-V code in latest QEMU release
-  (qemu-5.0.0-rc2) and when checking the Floating point encodings I
-  found the rounding mode is only updated if the opcode field =E2=80=9Crm=
-=E2=80=9D is
-  changed =E2=80=9Cctx->frm =3D=3D rm=E2=80=9D. But according to RISC-V Vol=
-ume I:
-  Unprivileged ISA, there=E2=80=99s a dynamic mode when rm=3D7 where the ro=
-unding
-  mode is set with frm value.
-
-  So for the same rm value (=3D7) and when changing frm value seeking
-  different rounding modes, and according to the below code, the
-  rounding mode won=E2=80=99t be updated. Please correct me if I got this
-  implementation wrong.
-
-  static void gen_set_rm(DisasContext *ctx, int rm)
-  {
-      TCGv_i32 t0;
-      if (ctx->frm =3D=3D rm) {
-          return;
-      }
-      ctx->frm =3D rm;
-      t0 =3D tcg_const_i32(rm);
-      gen_helper_set_rounding_mode(cpu_env, t0);
-      tcg_temp_free_i32(t0);
-  }
-
-  =
-
-  My testcase:
-  I set statically the rm field in the instruction to 7 and before this exe=
-cution I changed the value of frm field in fcsr register. For the 1st time =
-it worked (according to the code above, the rm is updated so the round mode=
- will also be updated). But when changing fcsr register an re-execute the i=
-nstruction, there's no difference and the rounding mode is the same like th=
-e previous frm value.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885350/+subscriptions
 
