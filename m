@@ -2,116 +2,95 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31945C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E932520780
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C4302065F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZqtOTVjy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E932520780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bm3psvMN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4302065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDlM-0006Ot-7x
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41612)
+	id 1jqDnG-0008UN-5T
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:47:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqDk6-0005IH-V9
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:43:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25767
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqDk5-0003CO-0c
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:43:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593513835;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hot+mluM3cHtIHPQHJrUiwN+uYq9MdnBip/MVUQSNFA=;
- b=ZqtOTVjyaofVVODK+o7whnvGzH7cdnhfjLJvclpIdUEDBCji/QSwHZCrMK3Z5qVuF0L9Qo
- OAsIQA8zkN39SE5N8EvF6igspNs4XVyUxuJwWuOERD+eS0z0JUa6SwDTutpFatqc45NjrH
- aoTlrSOkL5vWaDTCnSbhhRiWrb1bDwc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-sG7g712oNnC80xYngCiQaQ-1; Tue, 30 Jun 2020 06:43:53 -0400
-X-MC-Unique: sG7g712oNnC80xYngCiQaQ-1
-Received: by mail-wr1-f72.google.com with SMTP id p9so18571794wrx.10
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 03:43:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqDla-00072z-2t; Tue, 30 Jun 2020 06:45:30 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35437)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqDlY-0003WD-8k; Tue, 30 Jun 2020 06:45:29 -0400
+Received: by mail-ej1-x641.google.com with SMTP id rk21so20036687ejb.2;
+ Tue, 30 Jun 2020 03:45:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xWW3S9JbFqbF/WDaHtuTcZJtixpKk+BO6FbGx3kUnLI=;
+ b=bm3psvMNTmSW0Z7/1cNLpn0EuURvc/8NPcxoCdaUGoXNP10ktMucUNEqt3B3y6kz3C
+ qjBa+dpAaRCIAW4JFA+93MxzpuAdfS07sVUKSCu00oT738sXXiRVFcnal/jt+TT/y6cK
+ J+P7XiW5LdwH91zydtHNTp2Gji065P0UaheiDG9/lSdhsxmaUrPHJ4xtwtdOehjVEgP5
+ cQe0dJ7GscTjtANEneCFD+v3tT4uOarMU8ITomH8BkLTn6Rp14/P6EGNHFe/afRDs2gn
+ 7gMY8VYR29jVHpZoIHV1MAEm0nk/Vs/MOar22lTiZ0VUjq5L5IOL2P7jrW2fuNPzHqs0
+ WXqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hot+mluM3cHtIHPQHJrUiwN+uYq9MdnBip/MVUQSNFA=;
- b=VZ7SwM8Vt5MlHa+kO5KLOEEr44Dz71fDSBoJ1/miL9lFz4OG4AyxZcu5En54reBmLZ
- px3V6bISJnDZ5/r70rPjukYMdonyxeNrf4CNkbS3mudEmeIQ/Q7M6nr/F1fZHc83V2W2
- 3Diav2eF4sZ2K0cE/6Az4H/FLg7SftCoKsITHXOjxzZrVTFsObhppRRqlKLMYVaMRcru
- Wb9201twXXuJmULGgteymH8lttgz4CQ6b7d3Dy7CU5Y4WqMM8alymN6mPmZ94dsTagb8
- wWk3MiTFHtz203+Qcs20eGiWeJ1ZLuUDk0s72H6KlILvuJebNP5Mve5rl7xzz+kAUqQ8
- JGhA==
-X-Gm-Message-State: AOAM530fvsLZC+TF4jGlbFJb5dVkVROQr7Cga78bZWQJ4rWxrN1VrMby
- wdZLiwRfdMMJR48oViNses/CAWMYXYV0XdQzOzC/pj4j2WLMGH2KGxvYlnW79+Fi/JJOwwgGNAP
- PyBWvNqI8aYwgOpQ=
-X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr11677770wme.177.1593513831863; 
- Tue, 30 Jun 2020 03:43:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxB74NJWQi3+3JVB1awb3TlReSwbr1f1KuciaxmqEHp/yuuU13sVwB1ImQy+wchhA8Zw4DABw==
-X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr11677749wme.177.1593513831596; 
- Tue, 30 Jun 2020 03:43:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:acad:d1d4:42b8:23e4?
- ([2001:b07:6468:f312:acad:d1d4:42b8:23e4])
- by smtp.gmail.com with ESMTPSA id p13sm3368611wrn.0.2020.06.30.03.43.50
+ bh=xWW3S9JbFqbF/WDaHtuTcZJtixpKk+BO6FbGx3kUnLI=;
+ b=uapuoc4chheN8dIoEWKXxM32DXaomHrXkex0ToCzcxujPAjKWhs5G+R5al1/YHhLHm
+ o0MADJ6xfhmAw5mh+lSLCxbg7Vj9hW2YeDgj5HqjLlxf8+iIVzfkNGUtTZG522ad236b
+ rDzPKInRMAohO6mAIQPZclDEwwGRhV7PYeaoqTSWphPlccFKLNeOza+5IBcFodLyPL5l
+ LrI/5MbuInRMHAUVIuZj8Dt6oauIX2ukyY2OKnXW3mY9anVPfTzod/CK0BuSuVCsROuk
+ iO81I24PN4osiMT7rkJbkT1napb5jfvLwmneDNPseEYU1+36InEjrK+61fg3jjFDxku/
+ bZwA==
+X-Gm-Message-State: AOAM530hLQLaAfLtXCjvypfIund6WhO3siTYGcuY3+UrolJWxhVcwDK5
+ M6kGUV61gh7xRfksGQ28RVA=
+X-Google-Smtp-Source: ABdhPJxqLQCqK4RSP2fo8IdzSeQNHc7fKOrj/EWa6d2YJm136DHU3+K0KaK16FgOmO0kSCg6MhNRWg==
+X-Received: by 2002:a17:906:538a:: with SMTP id
+ g10mr18685060ejo.354.1593513925420; 
+ Tue, 30 Jun 2020 03:45:25 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id r19sm2388690edp.79.2020.06.30.03.45.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 03:43:50 -0700 (PDT)
-Subject: Re: [PATCH 4/8] i386: hvf: Implement CPU kick
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200624225850.16982-5-r.bolshakov@yadro.com>
- <9d63db4e-25a7-9c77-6f05-e5f808b8b33c@redhat.com>
- <20200625155712.GI25104@SPB-NB-133.local>
- <6508d40b-0142-1b42-2f48-fcd2da66ea4b@redhat.com>
- <20200629113107.GL25104@SPB-NB-133.local>
- <d1d7cf19-d56c-c095-a3b8-45e2be0752ea@redhat.com>
- <20200629132911.GN25104@SPB-NB-133.local>
- <0c8d14fa-e2cf-00e7-135f-d88fda38f31d@redhat.com>
- <20200629140433.GO25104@SPB-NB-133.local>
- <cb4a42b2-5bb7-5f69-64d1-cad6f4bb05df@redhat.com>
- <20200630101228.GA39334@SPB-NB-133.local>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0549a18b-aedf-d88f-1765-65e333ee2e00@redhat.com>
-Date: Tue, 30 Jun 2020 12:43:49 +0200
+ Tue, 30 Jun 2020 03:45:24 -0700 (PDT)
+Subject: Re: [PATCH 5/5] hw/i2c: Document the I2C qdev helpers
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200629173821.22037-1-f4bug@amsat.org>
+ <20200629173821.22037-6-f4bug@amsat.org> <87zh8kg8qu.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4f3eff51-57b0-f1c9-9d1d-f7d6eddcec80@amsat.org>
+Date: Tue, 30 Jun 2020 12:45:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200630101228.GA39334@SPB-NB-133.local>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <87zh8kg8qu.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -125,110 +104,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Claudio Fontana <cfontana@suse.de>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ok, I'll review the patch to see what you've implemented.  Thanks!
+On 6/30/20 12:15 PM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> In commit d88c42ff2c we added new prototype but neglected to
+>> add their documentation. Fix that.
+>>
+>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  include/hw/i2c/i2c.h | 48 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 48 insertions(+)
+>>
+>> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+>> index c533058998..fcc61e509b 100644
+>> --- a/include/hw/i2c/i2c.h
+>> +++ b/include/hw/i2c/i2c.h
+>> @@ -79,8 +79,56 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
+>>  int i2c_send(I2CBus *bus, uint8_t data);
+>>  uint8_t i2c_recv(I2CBus *bus);
+>>  
+>> +/**
+>> + * Create an I2C slave device on the heap.
+>> + * @name: a device type name
+>> + * @addr: I2C address of the slave when put on a bus
+>> + *
+>> + * This only initializes the device state structure and allows
+>> + * properties to be set. Type @name must exist. The device still
+>> + * needs to be realized. See qdev-core.h.
+>> + */
+>>  I2CSlave *i2c_slave_new(const char *name, uint8_t addr);
+>> +
+>> +/**
+>> + * Create an I2C slave device on the heap.
+> 
+> Suggest "Create and realize ..."
+> 
+>> + * @bus: I2C bus to put it on
+>> + * @name: I2C slave device type name
+>> + * @addr: I2C address of the slave when put on a bus
+>> + *
+>> + * Create the device state structure, initialize it, put it on the
+>> + * specified @bus, and drop the reference to it (the device is realized).
+>> + * Any error aborts the process.
+> 
+> Stick to imperative mood: Abort on error.
+> 
+> Do we need the sentence?  Doc comments of object_new(), qdev_new() and
+> i2c_slave_new() don't have it, they document *preconditions* instead,
+> using "must", and rely on the tacit understanding that a function may
+> abort or crash when its documented preconditions aren't met.  Matter of
+> taste, I guess.
+> 
+>> + */
+>>  I2CSlave *i2c_slave_create_simple(I2CBus *bus, const char *name, uint8_t addr);
+>> +
+>> +/**
+>> + * i2c_slave_realize_and_unref: realize and unref an I2C slave device
+> 
+> Either consistently waste space for repeating the function name at the
+> beginning of its doc comment, or consistently don't :)
+> 
+> qdev_realize_and_unref()'s doc comment says "and drop a reference"
+> instead of "unref", because "unref" is not a word.
+> 
+>> + * @dev: I2C slave device to realize
+>> + * @bus: I2C bus to put it on
+>> + * @addr: I2C address of the slave on the bus
+>> + * @errp: error pointer
+> 
+> $ git-grep -h "@errp:" | sort -u
+>  *  @errp: pointer to Error*, to store an error if it happens
+>  * @errp:   error object
+>  * @errp: Error object
+>  * @errp: Error object which may be set by job_complete(); this is not
+>  * @errp: Error object.
+>  * @errp: If an error occurs, a pointer to an area to store the error
+>  * @errp: Output pointer for error information. Can be NULL.
+>  * @errp: Pointer for reporting an #Error.
+>  * @errp: Populated with an error in failure cases
+>  * @errp: a pointer to an Error that is filled if getting/setting fails.
+>  * @errp: a pointer to return the #Error object if an error occurs.
+>  * @errp: an error indicator
+>  * @errp: error
+>  * @errp: error object
+>  * @errp: error object handle
+>  * @errp: handle to an error object
+>  * @errp: if an error occurs, a pointer to an area to store the error
+>  * @errp: indirect pointer to Error to be set
+>  * @errp: location to store error
+>  * @errp: location to store error information
+>  * @errp: location to store error information.
+>  * @errp: location to store error, will be set only for exception
+>  * @errp: pointer to Error*, to store an error if it happens.
+>  * @errp: pointer to NULL initialized error object
+>  * @errp: pointer to a NULL initialized error object
+>  * @errp: pointer to a NULL-initialized error object
+>  * @errp: pointer to an error
+>  * @errp: pointer to error object
+>  * @errp: pointer to initialized error object
+>  * @errp: pointer to uninitialized error object
+> 
+> Aside: gotta love these two.
+> 
+>  * @errp: returns an error if this function fails
+>  * @errp: set *errp if the check failed, with reason
+>  * @errp: set in case of an error
+>  * @errp: set on error
+>  * @errp: unused
+>  * @errp: where to put errors
+> 
+> Plenty of choice, recommend not to invent another one :)
+> 
+>> + *
+>> + * Call 'realize' on @dev, put it on the specified @bus, and drop the
+>> + * reference to it. Errors are reported via @errp and by returning
+>> + * false.
+> 
+> Recommend to use a separate paragraph for the return value.  Since your
+> comment style resembles GTK-Doc style[*], you may just as well use it
+> for the return value, like this:
+> 
+>       Returns: %true on success, %false on failure.
+> 
+> By convention, it goes after the function description.
 
-Paolo
+OK, I'll use whatever you prefer. Maybe the shorter the easier.
 
-On 30/06/20 12:12, Roman Bolshakov wrote:
-> On Mon, Jun 29, 2020 at 04:18:46PM +0200, Paolo Bonzini wrote:
->> On 29/06/20 16:04, Roman Bolshakov wrote:
->>> My approach is based
->>> hv_vcpu_run() and should hopefully work almost anywhere where
->>> Hypervisor.framework is available because Hypervisor framework exposes
->>> timer value
->>> (https://developer.apple.com/documentation/hypervisor/vmcs_guest_vmx_timer_value)
->>> since macOS 10.10.3+.
->>
->> There are a few other constants for which it would be unwise to write
->> from userspace, so that's not a big consolation. :)
->>
-> 
-> Hi Paolo,
-> 
-> So, I've tried Big Sur Beta and it has exactly the same performance
-> issue with hv_vcpu_run_until() while hv_vcpu_run() works as good as it
-> worked on 10.15.5. I've submitted FB7827341 to Apple wrt the issue.
-> 
->>> I can also test how hv_vcpu_run_until() performs with HV_DEADLINE_FOREVER
->>> on the Beta. And if the performance issues with VMX-preemption timer and
->>> hv_vcpu_run_until() are fixed there.
->>
->> Thanks!  The main thing to test on Big Sur would be: 1) whether the
->> preemption timer bit in the pin controls "sticks" to 0 after setting it
-> 
-> It does not. If it's set, it stays there.
-> 
->> 2) whether the bit reads back as zero after
->> hv_vcpu_run_until(HV_DEADLINE_FOREVER).
->>
-> 
-> Likewise, it's not cleared if set.
-> 
-> As far as I understand, hv_vcpu_run_until(HV_DEADLINE_FOREVER) works
-> like hv_vcpu_run() without VMX-preemption timer. Otherwise
-> hv_vcpu_run_until() implicitly sets VMX-preemption timer Pin-based
-> control and sets the timer value.
-> 
-> Thanks,
-> Roman
-> 
-> Here's the patch over v2 that adds support of hv_vcpu_run_until() on Big Sur:
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 317304aa1d..ad202f7358 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -72,8 +72,12 @@
->  #include "sysemu/accel.h"
->  #include "target/i386/cpu.h"
->  
-> +#if defined(__MAC_10_16) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_16
-> +#define HVF_MAX_DEADLINE HV_DEADLINE_FOREVER
-> +#else
->  /* Maximum value of VMX-preemption timer */
->  #define HVF_MAX_DEADLINE UINT32_MAX
-> +#endif
->  
->  HVFState *hvf_state;
->  
-> @@ -693,6 +697,7 @@ int hvf_vcpu_exec(CPUState *cpu)
->      CPUX86State *env = &x86_cpu->env;
->      int ret = 0;
->      uint64_t rip = 0;
-> +    hv_return_t r;
->  
->      if (hvf_process_events(cpu)) {
->          return EXCP_HLT;
-> @@ -718,10 +723,22 @@ int hvf_vcpu_exec(CPUState *cpu)
->          /* Use VMX-preemption timer trick only if available */
->          if (rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS) &
->              VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER) {
-> +#if defined(__MAC_10_16) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_16
-> +            r = hv_vcpu_run_until(cpu->hvf_fd,
-> +                                  atomic_read(&env->hvf_deadline));
-> +        } else {
-> +            /*
-> +             * Equivalent to behaviour of hv_vcpu_run() with VMX-preemption
-> +             * timer disabled, prone to kick loss.
-> +             */
-> +            r = hv_vcpu_run_until(cpu->hvf_fd, HVF_MAX_DEADLINE);
-> +        }
-> +#else
->              wvmcs(cpu->hvf_fd, VMCS_PREEMPTION_TIMER_VALUE,
->                    atomic_read(&env->hvf_deadline));
->          }
-> -        hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
-> +        r = hv_vcpu_run(cpu->hvf_fd);
-> +#endif
->          atomic_set(&env->hvf_deadline, HVF_MAX_DEADLINE);
->          assert_hvf_ok(r);
->  
-> 
+I will see if I can find to spend more time on this during the
+week-end, but I can't promise anything. Anyway since it is
+documentation it can be integrated during soft freeze.
 
+Thanks for your detailed review.
+
+> 
+>> + *
+>> + * This function is useful if you have created @dev via qdev_new(),
+>> + * i2c_slave_new() or i2c_slave_try_new() (which take a reference to
+>> + * the device it returns to you), so that you can set properties on it
+>> + * before realizing it. If you don't need to set properties then
+>> + * i2c_slave_create_simple() is probably better (as it does the create,
+>> + * init and realize in one step).
+>> + *
+>> + * If you are embedding the I2C slave into another QOM device and
+>> + * initialized it via some variant on object_initialize_child() then
+>> + * do not use this function, because that family of functions arrange
+>> + * for the only reference to the child device to be held by the parent
+>> + * via the child<> property, and so the reference-count-drop done here
+>> + * would be incorrect.  (Instead you would want i2c_slave_realize(),
+>> + * which doesn't currently exist but would be trivial to create if we
+>> + * had any code that wanted it.)
+>> + */
+> 
+> The advice on use is more elaborate qdev_realize_and_unref()'s.  That
+> one simply shows intended use.  I doubt we need more.  But as the person
+> who wrote qdev_realize_and_unref(), I'm singularly unqualified judging
+> the need ;)
+> 
+>>  bool i2c_slave_realize_and_unref(I2CSlave *dev, I2CBus *bus, Error **errp);
+>>  
+>>  /* lm832x.c */
+> 
+> 
+> [*] A style I dislike, but it's common in QEMU, so you're certainly
+> entitled to use it.
+> 
+> 
 
