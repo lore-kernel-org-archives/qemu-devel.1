@@ -2,99 +2,121 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD8FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD537C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:29:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A308420663
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:27:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8885020663
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:29:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YL/Rrp70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A308420663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EivupubK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8885020663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqIAe-0004YH-SV
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:27:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37634)
+	id 1jqICS-0006uc-Qp
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:29:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jqI4G-0005m7-1b
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:21:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31877
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI95-0002YA-SC
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:26:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57238
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jqI4E-00087s-C6
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:21:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI91-0000OL-Uv
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:26:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593530458;
+ s=mimecast20190719; t=1593530758;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=yUmhadzYsbJoUsPNvSzXULsKvEgPV32pY2Dh+SsTOBs=;
- b=YL/Rrp70o6VwAgegTSjdxJtFfZQmcTRY5weZznk27S7XM1S22xQYd0Yv2l1mtephZZO/Mr
- 58T/ue6YTyMXgvXpaswccQUgnH/XxW2uAeGTFdHw2Z77PtVqQuErI+PsRvnmVx9kWB2nub
- vu8RIfX7uatNFhfkNL5sCUHgbvtEZMU=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-tfOaxwxuMpWY0jrC2DgSoA-1; Tue, 30 Jun 2020 11:20:56 -0400
-X-MC-Unique: tfOaxwxuMpWY0jrC2DgSoA-1
-Received: by mail-qv1-f69.google.com with SMTP id 59so14130377qvb.4
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:20:56 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TgmQ2qPZaMql3FNmjFEGdsNRy1PraDve/uxYO4ofKOE=;
+ b=EivupubK8RjURwFAMTEwZKMfp/TVPtf0tcxQIyyzbGWUDWesqmw1WNacJvUdDKTLCLc3IU
+ cPjsDQbTdX2i8unJDIRwV5utchCbiJNULb+3pj+4tGuju744N24KPQK5ZdLUcHb2uBCdiX
+ 9GdQcucJaDZ37bBl7iL5+igbsO6huHw=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-UdsbqrjyMxuM9uVV81lEUQ-1; Tue, 30 Jun 2020 11:25:56 -0400
+X-MC-Unique: UdsbqrjyMxuM9uVV81lEUQ-1
+Received: by mail-ed1-f69.google.com with SMTP id g18so17302797edu.22
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:25:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yUmhadzYsbJoUsPNvSzXULsKvEgPV32pY2Dh+SsTOBs=;
- b=ekVlex57BqbF74YXzbTpR5uYPIS5SIOHaGARh7FgFKh+KZTN3WkGloyyA/Mt3E0K1F
- 4HtgDL4bqNMjpPv2iPrgbPFGmIm3LXdZsKvkDqilhhGxtxefFP1FggxlX4qMJsyly6Ma
- 7q1E4+uLPd3EX8Y3edOXRnJXX67THiQ7XBFY/egDKYz1gy0YBUF+Dt2b/6btGqumoHi4
- pmr1tJpn0w2Yhn7lIk4THsTkMpstYca2EKRr8Vp6XrXDeWkFlWUQfGfr6XSMJFh0UGZU
- dOhG6W82mxojzbVxINIhCE/hSw0ggjk/eUK3IIik5u+NtNQTDXjpv3lfCezN3RFdSbv+
- LBqw==
-X-Gm-Message-State: AOAM530WT9OeyYkP2FE0hMO4ueMe95OzZDUpFb05V3l4l2mFWajpBG5L
- 1p8tGTIX1RseRIZjuLTFj3VcUwIfuNBB2qXnt6UQgd7b4IMSUaJAFXzxAQLKGcrt0wLnH1M2eBj
- xwbPGSVCDCm7EohM=
-X-Received: by 2002:ac8:691:: with SMTP id f17mr21071263qth.60.1593530455163; 
- Tue, 30 Jun 2020 08:20:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyaSyRApaOEKtSry3MwsgGncS6tKjbi/UUHjyaY0u983MTzn5zOMB9Ndi7N57O0ZmipW+5A6g==
-X-Received: by 2002:ac8:691:: with SMTP id f17mr21071097qth.60.1593530453188; 
- Tue, 30 Jun 2020 08:20:53 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id t48sm3530585qtb.50.2020.06.30.08.20.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 08:20:52 -0700 (PDT)
-Date: Tue, 30 Jun 2020 11:20:50 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200630152050.GC3138@xz-x1>
-References: <20200626064122.9252-2-eperezma@redhat.com>
- <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
- <20200629133403.GA266532@xz-x1>
- <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
- <1b4eaaaf-c2ab-0da8-afb4-1b7b4221e6cf@redhat.com>
- <20200630052148-mutt-send-email-mst@kernel.org>
- <49f547e1-dd87-7abe-1075-9dcece75b641@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=TgmQ2qPZaMql3FNmjFEGdsNRy1PraDve/uxYO4ofKOE=;
+ b=GUdURtTHuDvwade90zJKU1DesGngFIIdxV2FNkdPUtO2+8nlB2vIK6bQxCevoUlMkJ
+ s1aQDB0aQwX5iiVLXg4EDVL53Suf+TbKZxMhsI36g9qxlvRdiBd1IBu2DIkSYaszeIwO
+ NZfs+2G9ark8UjhjVudyjqdWCeA6xzgn8ZknxjXAW+rP7BRuKwWOps/lHAwUqzFad1Hb
+ OdrXqUYwaCs1mQu+aJnqXoJQwSikIQS3XeicQJj4qQzXGWvuthY2kxzSGGOjNVe+LBvZ
+ LP78qhA/5WLNifcX54NIV3rxo04J5L7geFGVsDrnjluwtzquIgfUg2yQutqzervWU3jh
+ jTzA==
+X-Gm-Message-State: AOAM533C5yorHM6vd2xaOB4yHydYEQYVarw17fDGHgove+fRz7nJG+MZ
+ VYGrwFart3lNcnC+7S0T43hJBtfK2c6LzxPVNlZBcLfkhJVpWPHNp8NKUhIpS2NYAfyt95m8o0X
+ D5ypeq8KNT5ZHuvs=
+X-Received: by 2002:aa7:d049:: with SMTP id n9mr16524097edo.39.1593530755308; 
+ Tue, 30 Jun 2020 08:25:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx5tYsh8vTJLx6oVLu+kxWJAfWgGHr3oq2bkuchH0QACjfzGcYkSC7JX+uAed7ZNz1+qmaYuQ==
+X-Received: by 2002:aa7:d049:: with SMTP id n9mr16524086edo.39.1593530755146; 
+ Tue, 30 Jun 2020 08:25:55 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id s1sm3242130edy.1.2020.06.30.08.25.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 08:25:54 -0700 (PDT)
+Subject: Re: [PATCH 2/2] xen: cleanup unrealized flash devices
+To: Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org,
+ qemu-devel@nongnu.org
+References: <20200624121841.17971-1-paul@xen.org>
+ <20200624121841.17971-3-paul@xen.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <33e594dd-dbfa-7c57-1cf5-0852e8fc8e1d@redhat.com>
+Date: Tue, 30 Jun 2020 17:25:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <49f547e1-dd87-7abe-1075-9dcece75b641@redhat.com>
+In-Reply-To: <20200624121841.17971-3-paul@xen.org>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -117,43 +139,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Jason Andryuk <jandryuk@gmail.com>,
+ Paul Durrant <pdurrant@amazon.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 30, 2020 at 05:23:31PM +0800, Jason Wang wrote:
-> > > Ok, we had a dedicated mr for interrupt:
-> > > 
-> > > memory_region_add_subregion_overlap(MEMORY_REGION(&vtd_dev_as->iommu),
-> > > VTD_INTERRUPT_ADDR_FIRST,
-> > > &vtd_dev_as->iommu_ir, 1);
-> > > 
-> > > So it should be fine. I guess the reason that I'm asking is that I thought
-> > > "IR" means "Interrupt remapping" but in fact it means "Interrupt Region"?
-
-I was meaning "interrupt remapping", and of course it's the interrupt region
-too when IR enabled...
-
-> > > 
-> > > But I'm still not clear about the invalidation part for interrupt region,
-> > > maybe you can elaborate a little more on this.
-> > > 
-> > > Btw, I think guest can trigger the assert in vtd_do_iommu_translate() if we
-> > > teach vhost to DMA to that region:
-> > 
-> > Why would we want to?
+On 6/24/20 2:18 PM, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
 > 
+> The generic pc_machine_initfn() calls pc_system_flash_create() which creates
+> 'system.flash0' and 'system.flash1' devices. These devices are then realized
+> by pc_system_flash_map() which is called from pc_system_firmware_init() which
+> itself is called via pc_memory_init(). The latter however is not called when
+> xen_enable() is true and hence the following assertion fails:
 > 
-> I meant a buggy(malicious) guest driver.
+> qemu-system-i386: hw/core/qdev.c:439: qdev_assert_realized_properly:
+> Assertion `dev->realized' failed
+> 
+> These flash devices are unneeded when using Xen so this patch avoids the
+> assertion by simply removing them using pc_system_flash_cleanup_unused().
+> 
+> Reported-by: Jason Andryuk <jandryuk@gmail.com>
+> Fixes: ebc29e1beab0 ("pc: Support firmware configuration with -blockdev")
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> Tested-by: Jason Andryuk <jandryuk@gmail.com>
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> ---
+>  hw/i386/pc_piix.c    | 9 ++++++---
+>  hw/i386/pc_sysfw.c   | 2 +-
+>  include/hw/i386/pc.h | 1 +
+>  3 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 1497d0e4ae..977d40afb8 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -186,9 +186,12 @@ static void pc_init1(MachineState *machine,
+>      if (!xen_enabled()) {
+>          pc_memory_init(pcms, system_memory,
+>                         rom_memory, &ram_memory);
+> -    } else if (machine->kernel_filename != NULL) {
+> -        /* For xen HVM direct kernel boot, load linux here */
+> -        xen_load_linux(pcms);
+> +    } else {
+> +        pc_system_flash_cleanup_unused(pcms);
 
-Yes seems possible.  Do you want to post a patch?  Let me know if you want me
-to...  Thanks,
+TIL pc_system_flash_cleanup_unused().
 
--- 
-Peter Xu
+What about restricting at the source?
+
+-- >8 --
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1004,24 +1004,26 @@ void pc_memory_init(PCMachineState *pcms,
+                                     &machine->device_memory->mr);
+     }
+
+-    /* Initialize PC system firmware */
+-    pc_system_firmware_init(pcms, rom_memory);
+-
+-    option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+-    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+-                           &error_fatal);
+-    if (pcmc->pci_enabled) {
+-        memory_region_set_readonly(option_rom_mr, true);
+-    }
+-    memory_region_add_subregion_overlap(rom_memory,
+-                                        PC_ROM_MIN_VGA,
+-                                        option_rom_mr,
+-                                        1);
+-
+     fw_cfg = fw_cfg_arch_create(machine,
+                                 x86ms->boot_cpus, x86ms->apic_id_limit);
+
+-    rom_set_fw(fw_cfg);
++    /* Initialize PC system firmware */
++    if (!xen_enabled()) {
++        pc_system_firmware_init(pcms, rom_memory);
++
++        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
++        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
++                               &error_fatal);
++        if (pcmc->pci_enabled) {
++            memory_region_set_readonly(option_rom_mr, true);
++        }
++        memory_region_add_subregion_overlap(rom_memory,
++                                            PC_ROM_MIN_VGA,
++                                            option_rom_mr,
++                                            1);
++
++        rom_set_fw(fw_cfg);
++    }
+
+     if (pcmc->has_reserved_memory && machine->device_memory->base) {
+         uint64_t *val = g_malloc(sizeof(*val));
+---
+
+> +        if (machine->kernel_filename != NULL) {
+> +            /* For xen HVM direct kernel boot, load linux here */
+> +            xen_load_linux(pcms);
+> +        }
+>      }
+>  
+>      gsi_state = pc_gsi_create(&x86ms->gsi, pcmc->pci_enabled);
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index ec2a3b3e7e..0ff47a4b59 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -108,7 +108,7 @@ void pc_system_flash_create(PCMachineState *pcms)
+>      }
+>  }
+>  
+> -static void pc_system_flash_cleanup_unused(PCMachineState *pcms)
+> +void pc_system_flash_cleanup_unused(PCMachineState *pcms)
+>  {
+>      char *prop_name;
+>      int i;
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index e6135c34d6..497f2b7ab7 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -187,6 +187,7 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
+>  
+>  /* pc_sysfw.c */
+>  void pc_system_flash_create(PCMachineState *pcms);
+> +void pc_system_flash_cleanup_unused(PCMachineState *pcms);
+>  void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>  
+>  /* acpi-build.c */
+> 
 
 
