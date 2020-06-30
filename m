@@ -2,70 +2,92 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97973C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEC5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C411206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:29:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C411206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 71B53206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:32:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEp0vy2U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B53206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqESS-00053R-J5
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:29:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53126)
+	id 1jqEVD-0006RA-2q
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:32:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqEQt-00030k-5I
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:28:11 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:41028
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqEQr-0001qn-FQ
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:28:10 -0400
-Received: from host86-182-221-235.range86-182.btcentralplus.com
- ([86.182.221.235] helo=kentang.int.eigen-ltd.com)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqEQr-0008WD-HZ; Tue, 30 Jun 2020 12:28:12 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org,
-	laurent@vivier.eu
-Date: Tue, 30 Jun 2020 12:27:52 +0100
-Message-Id: <20200630112752.31134-3-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200630112752.31134-1-mark.cave-ayland@ilande.co.uk>
-References: <20200630112752.31134-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqETg-0005hO-Mb
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:31:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45486
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqETd-0002Mf-Kn
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:31:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593516660;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SypkcHwTgaHIYnPoZ5HiVYmK3K4+/4Fwx3jxhr7PcvU=;
+ b=eEp0vy2UlNukza2fbKBmlPt8WcucwKuFpYQuNgOgZZhhP/0VgXIGubXdPgp4uYft1XdpMC
+ Vi31BdS61FXMhMXUFUKzc6uVsI/C15d2+yJu3cVgu7XPjoyVUL7S3H6I4pHc5Sw1og9MRI
+ 6BXsc4+LeWQTi26+mrwhqNhV+7I5Uw4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-HAGjvsR0MaqwEvIvhU42ow-1; Tue, 30 Jun 2020 07:30:58 -0400
+X-MC-Unique: HAGjvsR0MaqwEvIvhU42ow-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894178015F6
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 11:30:57 +0000 (UTC)
+Received: from gondolin (ovpn-113-12.ams2.redhat.com [10.36.113.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ACE9A2B583;
+ Tue, 30 Jun 2020 11:30:46 +0000 (UTC)
+Date: Tue, 30 Jun 2020 13:30:43 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
+Message-ID: <20200630133043.2be1d209.cohuck@redhat.com>
+In-Reply-To: <20200630064227-mutt-send-email-mst@kernel.org>
+References: <20200629102758.421552-1-cohuck@redhat.com>
+ <20200629104948-mutt-send-email-mst@kernel.org>
+ <20200629173933.35cea40f.cohuck@redhat.com>
+ <20200629114515-mutt-send-email-mst@kernel.org>
+ <20200630113527.7b27f34f.cohuck@redhat.com>
+ <20200630064227-mutt-send-email-mst@kernel.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.182.221.235
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v3 2/2] target/m68k: consolidate physical translation offset
- into get_physical_address()
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,78 +100,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since all callers to get_physical_address() now apply the same page offset to
-the translation result, move the logic into get_physical_address() itself to
-avoid duplication.
+On Tue, 30 Jun 2020 06:45:42 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/m68k/helper.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+> On Tue, Jun 30, 2020 at 11:35:27AM +0200, Cornelia Huck wrote:
+> > On Mon, 29 Jun 2020 11:45:35 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Mon, Jun 29, 2020 at 05:39:33PM +0200, Cornelia Huck wrote:  
+> > > > On Mon, 29 Jun 2020 10:53:23 -0400
+> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >     
+> > > > > On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:    
+> > > > > > virtio-fs devices are only specified for virtio-1, so it is unclear
+> > > > > > how a legacy or transitional device should behave.
+> > > > > > 
+> > > > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > > > > ---
+> > > > > > 
+> > > > > > Forcing off legacy now (after the virtio-fs device has already been
+> > > > > > available) may have unintended consequences, therefore RFC.
+> > > > > > 
+> > > > > > By default, a virtio-pci device uses 'AUTO' for disable_legacy, which
+> > > > > > will resolve to different values based upon which bus the device has
+> > > > > > been plugged. Therefore, forcing disable_legacy may result in the same
+> > > > > > device or a quite different one.
+> > > > > > 
+> > > > > > Even though pre-virtio-1 behaviour of virtio-fs devices is simply not
+> > > > > > specified, toggling disable_legacy will have implications for the BAR
+> > > > > > layout, IIRC, and therefore a guest might end up getting a different
+> > > > > > device, even if it always used it with virtio-1 anyway.
+> > > > > > 
+> > > > > > Not sure what the best way to solve this problem is. Adding a compat
+> > > > > > property for disable_legacy=AUTO may be the right thing to do, but I'm
+> > > > > > not quite clear if there are any further implications here.     
+> > 
+> > Hnm, I'm a bit confused where to actually set this property...  
+> 
+> 
+> Not a property, just some flag that I'd set in the core,
+> and then teach all transports to take that into account.
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 631eab7774..71c2376910 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -643,7 +643,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                 /* Transparent Translation Register bit */
-                 env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
-             }
--            *physical = address & TARGET_PAGE_MASK;
-+            *physical = address;
-             *page_size = TARGET_PAGE_SIZE;
-             return 0;
-         }
-@@ -771,7 +771,8 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     }
-     *page_size = 1 << page_bits;
-     page_mask = ~(*page_size - 1);
--    *physical = next & page_mask;
-+    address &= TARGET_PAGE_MASK;
-+    *physical = (next & page_mask) + (address & (*page_size - 1));
- 
-     if (access_type & ACCESS_PTEST) {
-         env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-@@ -826,8 +827,6 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         return -1;
-     }
- 
--    addr &= TARGET_PAGE_MASK;
--    phys_addr += addr & (page_size - 1);
-     return phys_addr;
- }
- 
-@@ -891,10 +890,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     ret = get_physical_address(&cpu->env, &physical, &prot,
-                                address, access_type, &page_size);
-     if (likely(ret == 0)) {
--        address &= TARGET_PAGE_MASK;
--        physical += address & (page_size - 1);
--        tlb_set_page(cs, address, physical,
--                     prot, mmu_idx, TARGET_PAGE_SIZE);
-+        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
-         return true;
-     }
- 
-@@ -1383,9 +1380,8 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
-     ret = get_physical_address(env, &physical, &prot, addr,
-                                access_type, &page_size);
-     if (ret == 0) {
--        addr &= TARGET_PAGE_MASK;
--        physical += addr & (page_size - 1);
--        tlb_set_page(env_cpu(env), addr, physical,
-+        tlb_set_page(env_cpu(env), addr & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK,
-                      prot, access_type & ACCESS_SUPER ?
-                      MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
-     }
--- 
-2.20.1
+I was thinking about compat handling for the disable-legacy property
+(struggling a bit with it).
+
+> 
+> > > > > 
+> > > > > Well I notice that this device is not migrateable.
+> > > > > So I think that we can just switch it over and be done with it.    
+> > > > 
+> > > > Oh, that makes things easier. (I'm wondering if libvirt already
+> > > > configures this correctly?)
+> > > >     
+> > > > > 
+> > > > >     
+> > > > > > Whatever we do here, we should make sure that the ccw incarnation of
+> > > > > > this device indeed forces virtio-1.      
+> > > > > 
+> > > > > I agree. I notice that the API virtio_pci_force_virtio_1 turned out
+> > > > > to be too fragile. I propose that instead we have a whitelist of
+> > > > > devices which can be legacy or transitional. Force rest to modern.    
+> > > > 
+> > > > Also, there are further complications because the mechanism is per
+> > > > transport, and therefore easy to miss.
+> > > > 
+> > > > bool virtio_legacy_allowed(VirtIODevice *vdev)
+> > > > {
+> > > >     switch (vdev->device_id) {
+> > > >     case <...>:
+> > > >     <list of legacy-capable devices>
+> > > >         return true;
+> > > >     default:
+> > > >         return false;
+> > > > }
+> > > > 
+> > > > Seems straightforward enough.    
+> > > 
+> > > 
+> > > Agreed. virtio spec has the list.  
+> > 
+> > Ok, I've been staring at this a bit, and it's a bit messy for other
+> > reasons.
+> > 
+> > First, I noticed that virtio-iommu does not force virtio-1, either; I
+> > think it should? Eric?
+> > 
+> > Then, there's the mechanism using different names for transitional and
+> > non-transitional devices. Devices that support both usually define both
+> > names (with disable_legacy and disable_modern set appropriately) and a
+> > base name (where the properties can be set manually for the desired
+> > effect). Most virtio-1 only devices set neither the non-transitional
+> > nor the transitional name and rely on virtio_pci_force_virtio_1() to
+> > disable legacy support. But there are outliers:
+> > 
+> > * this device: it has only a non-transitional name
+> >   ("vhost-user-fs-pci"), which means we automatically get the correct
+> >   configuration; in order to define a transitional/legacy device, you
+> >   would need to use the base name "vhost-user-fs-pci-base" explicitly,
+> >   and it's unlikely that someone has been doing that.
+> > * virtio-iommu (which I *think* is a virtio-1 only device): it defines
+> >   the full set of transitional, non-transitional, and base names.
+> > 
+> > How should we proceed?
+> > * With this patch here, we can fence off the very unlikely possibility
+> >   of somebody configuring a non-modern virtio-fs device for pci. We
+> >   probably should do it, but I don't think we need compat handling.
+> > * For virtio-iommu, we should get an agreement what the desired state
+> >   is. If it really should be modern only, we need compat handling, as
+> >   the device had been added in 5.0. (And we need to figure out how to
+> >   apply that compat handling.)  
+> 
+> 
+> Well I know it's not really used on x86 yet, so no problem there.
+> 
+> Which machines are actually affected?
+
+I'd suspect ARM, but breaking even a subset is not nice.
+
+> 
+> 
+> > * What is the preferred way to express 'this virtio-pci device is
+> >   modern only'? Using virtio_pci_force_virtio_1()? Setting the
+> >   non-transitional name to the obvious name? Both?
+> > * We probably still want to have a 'central authority' for whether a
+> >   device is virtio-1 only or not, so all transports can refer to it.
+> > 
+> > Thoughts?  
+> 
+> 
+> I still think that for the above the best approach is a whitelist
+> of legacy virtio IDs.
+
+I agree, a list of the device types that actually support legacy seems
+like the way to go. Making it accessible at the right point in the
+device instantiation process is the fiddly bit; but maybe I just need a
+break from staring at this.
+
+> 
+> > >   
+> > > > > 
+> > > > >     
+> > > > > > ---
+> > > > > >  hw/virtio/vhost-user-fs-pci.c | 1 +
+> > > > > >  1 file changed, 1 insertion(+)
+> > > > > > 
+> > > > > > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.c
+> > > > > > index e11c889d82b3..244205edf765 100644
+> > > > > > --- a/hw/virtio/vhost-user-fs-pci.c
+> > > > > > +++ b/hw/virtio/vhost-user-fs-pci.c
+> > > > > > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> > > > > >          vpci_dev->nvectors = dev->vdev.conf.num_request_queues + 2;
+> > > > > >      }
+> > > > > >  
+> > > > > > +    virtio_pci_force_virtio_1(vpci_dev);
+> > > > > >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+> > > > > >  }
+> > > > > >  
+> > > > > > -- 
+> > > > > > 2.25.4      
+> > > > >     
+> > >   
+> 
 
 
