@@ -2,77 +2,77 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B38E8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9541C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:30:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78F7D20672
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82F1220672
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:30:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRd5J9Qm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F7D20672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SpyFMVb9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82F1220672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFKz-0002kp-N9
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:26:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40962)
+	id 1jqFPP-00046V-2d
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:30:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqFKN-0002K8-Tn
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:25:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48847)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jqFOM-0003c9-0U
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:29:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57514
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqFKM-0002nD-9P
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:25:31 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jqFOK-0003Lr-CW
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:29:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593519929;
+ s=mimecast20190719; t=1593520175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=qXclUpPwOjyqzF474WE1bL0a8kLPXOeATDdFmPn+S08=;
- b=YRd5J9Qm7Wc5jbuTa4pnpRE9qBFatJH4j7M2cf/xWT9o8MxTyvJL60sVGR5ZdqIg2of6dB
- u8Xdi+p1GY3sVDikRs9jOT/o2myF82hSR7z6sStsviHS5RcxNnT1ycFwVZLWyIo5WVwAf5
- jACStEpLkEAtPkNNU1monOrkPU5vJmg=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=qUnq+5GZ9xwCAFtpDMIsDBMX1qgmSY9o4mcNiNUP51Y=;
+ b=SpyFMVb9LnXstO1Am12RIz0l+mzxJjRKnRyYStP8RIHnl2tilT245HzSE11WW5dp8Pu2ln
+ Bf6lRI1vmAIibUfxXh6xy2rSfgUrHhbmcPG/jsL8xOr6ah810+JGpadltykH4Y2TdzaSbh
+ ALoJDairBW71NdZCSZ1qUrKkUC6QCiY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-V8-sqLxUPbuJOxHuQ4cdDg-1; Tue, 30 Jun 2020 08:25:26 -0400
-X-MC-Unique: V8-sqLxUPbuJOxHuQ4cdDg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-252-FEn-QtqaNkWZkDIxLvhiUw-1; Tue, 30 Jun 2020 08:29:30 -0400
+X-MC-Unique: FEn-QtqaNkWZkDIxLvhiUw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B153F107ACCD
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:25:25 +0000 (UTC)
-Received: from gondolin (ovpn-113-12.ams2.redhat.com [10.36.113.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECC057C1F5;
- Tue, 30 Jun 2020 12:25:18 +0000 (UTC)
-Date: Tue, 30 Jun 2020 14:25:04 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
-Message-ID: <20200630142504.688aa989.cohuck@redhat.com>
-In-Reply-To: <20200630121037.GC91444@stefanha-x1.localdomain>
-References: <20200629102758.421552-1-cohuck@redhat.com>
- <20200630121037.GC91444@stefanha-x1.localdomain>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FD2E80183C;
+ Tue, 30 Jun 2020 12:29:29 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.192.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4194618211;
+ Tue, 30 Jun 2020 12:29:13 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v3 0/9] memory: assert and define MemoryRegionOps callbacks
+Date: Tue, 30 Jun 2020 17:57:01 +0530
+Message-Id: <20200630122710.1119158-1-ppandit@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/OQp9lvHYrmfaAYZWNStEMg6";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -93,93 +93,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/OQp9lvHYrmfaAYZWNStEMg6
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-On Tue, 30 Jun 2020 13:10:37 +0100
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
+Hello,
 
-> On Mon, Jun 29, 2020 at 12:27:58PM +0200, Cornelia Huck wrote:
-> > virtio-fs devices are only specified for virtio-1, so it is unclear
-> > how a legacy or transitional device should behave.
-> >=20
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > --- =20
->=20
-> I thought that the following already forced VIRTIO 1.0 because it
-> doesn't advertize Legacy or Transitional devices:
->=20
->   static const VirtioPCIDeviceTypeInfo vhost_user_fs_pci_info =3D {
->       .base_name             =3D TYPE_VHOST_USER_FS_PCI,
->       .non_transitional_name =3D "vhost-user-fs-pci",
->       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->       .instance_size =3D sizeof(VHostUserFSPCI),
->       .instance_init =3D vhost_user_fs_pci_instance_init,
->       .class_init    =3D vhost_user_fs_pci_class_init,
->   };
+* This series asserts that MemoryRegionOps objects define read/write
+  callback methods. Thus avoids potential NULL pointer dereference.
+  ex. -> https://git.qemu.org/?p=qemu.git;a=commit;h=bb15013ef34617eb1344f5276292cadd326c21b2
 
-This indeed makes vhost-user-fs-pci modern-only, I had not spotted that
-when I wrote the patch. Other modern-only devices do not go down this
-route and use the virtio_pci_force_virtio_1() approach.
+* Also adds various undefined MemoryRegionOps read/write functions
+  to avoid potential assert failure.
 
->=20
-> Do you have a guest that sees this VIRTIO 1.0 device and still fails to
-> negotiate the VERSION_1 feature bit?
->=20
-> > diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pc=
-i.c
-> > index e11c889d82b3..244205edf765 100644
-> > --- a/hw/virtio/vhost-user-fs-pci.c
-> > +++ b/hw/virtio/vhost-user-fs-pci.c
-> > @@ -44,6 +44,7 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy =
-*vpci_dev, Error **errp)
-> >          vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 2;
-> >      }
-> > =20
-> > +    virtio_pci_force_virtio_1(vpci_dev); =20
->=20
-> Can this be moved to virtio_pci_types_register() so that it
-> automatically happens for .non_transitional_name devices?
+Thank you.
+--
+Prasad J Pandit (9):
+  hw/pci-host: add pci-intack write method
+  pci-host: add pcie-msi read method
+  vfio: add quirk device write method
+  prep: add ppc-parity write method
+  nvram: add nrf51_soc flash read method
+  spapr_pci: add spapr msi read method
+  tz-ppc: add dummy read/write methods
+  imx7-ccm: add digprog mmio write method
+  memory: assert MemoryRegionOps callbacks are defined
 
-There are several existing modern-only devices that don't use that kind
-of naming scheme...
+ hw/misc/imx7_ccm.c       |  7 +++++++
+ hw/misc/tz-ppc.c         | 14 ++++++++++++++
+ hw/nvram/nrf51_nvm.c     |  5 +++++
+ hw/pci-host/designware.c |  9 +++++++++
+ hw/pci-host/prep.c       |  8 ++++++++
+ hw/ppc/prep_systemio.c   |  8 ++++++++
+ hw/ppc/spapr_pci.c       | 13 +++++++++++--
+ hw/vfio/pci-quirks.c     |  8 ++++++++
+ memory.c                 | 10 +++++++++-
+ 9 files changed, 79 insertions(+), 3 deletions(-)
 
-What bothers me most is that you need to explicitly request a device to
-be modern-only, while that should be the default for any newly added
-device. Hence the approach with the centralized list of device types
-mentioned in a parallel thread. The main problem with that is that the
-proxy device starts getting realized before the virtio device with its
-id is present... I failed to find a solution so far. But I'd really
-like an approach that can work for all transports.
-
---Sig_/OQp9lvHYrmfaAYZWNStEMg6
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl77LyAACgkQ3s9rk8bw
-L6/OBg/7Bl8Mq3TdM1SyGGm9eKle/3UB3qxhfKPDD+zPPnLzHVhwyJHsH7U28GZd
-QL4kZsenIEuLdb2bz1HWUH3rVirMZAaG3M8ijIThJUuTVk9xviCdqAN62Yl9Bw4e
-y3Vs3mOkI0cnUSqTs5tR1GNLGEGQB1gOjqQtfqzw0SfsEWPKmkE3oXTEWHyU/2sY
-UDb0ZkvnQyGUUGMQsgUA8IQrIHRnMhQkkch29015HMdznSgJVcqAjiTc7JX4iUUO
-tbsXK/XKTnlUjIzJ+lf/kmiFODbe2/yvh06PdAXyBWWLCa7r/+AgQkhbD/LOZ5g/
-Nj2hkRrk0Zt68FEC4m/xK5pjw+/fs7sK0jtTrWzI/kvaBJubJ4SOdFMbPKP6VtBP
-6ZobaXhCr72XKrhZualsK4sXPRs+WhKEFyjOk/fTy30aemHdgm6RVH6cJIVDyOlq
-aktE6MDm4sEQRRY32gyOElZly534M/qaTx5JvUK68Ot+fvUe24SaG3oBOid1hauJ
-CeiKCbVKQBu61LWrY8DdNdWOYvJmDIf/7KU6BXtxAfohHmcMB7KPSyhinQ8fiKZk
-/YfR9UQTIV39OhrmWpQ3ODYmJicq8NPundb2hN8Okf1uwthVX6t0x4d7SQNjlX92
-PQvtxlHBtJK+9URD0CbsAon0QNQ06/bphuhgeT+wdHq6BkTFStI=
-=ZqeD
------END PGP SIGNATURE-----
-
---Sig_/OQp9lvHYrmfaAYZWNStEMg6--
+-- 
+2.26.2
 
 
