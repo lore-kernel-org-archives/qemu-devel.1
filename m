@@ -2,74 +2,86 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33891C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D731C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:13:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0859E2074F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0859E2074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4831420720
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:13:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrgkhIdz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4831420720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqHvX-0007CE-95
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35014)
+	id 1jqHxM-0000fG-IJ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:13:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jqHuK-0006CX-PI; Tue, 30 Jun 2020 11:10:50 -0400
-Received: from mga09.intel.com ([134.134.136.24]:60577)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jqHuI-0006Q9-KI; Tue, 30 Jun 2020 11:10:48 -0400
-IronPort-SDR: UdTqiIEhpIffiuNE3wq5ZK7IAvixNmBP6fDH3vPQLgMl/5Cmncdm0NlKs8Tq7FVb9NXdHxMafJ
- +8GTNgljY9Rw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="147807098"
-X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; d="scan'208";a="147807098"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 30 Jun 2020 08:10:43 -0700
-IronPort-SDR: 94vQ/0NliUIh9wcexFalpa33QqLFd3g0eZRY+9qIYCCfAPprrREWrZzBVpPvIDzqdbqMLW1NTi
- hkeHYuLxcitg==
-X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; d="scan'208";a="481223086"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.212.222.216])
- by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 30 Jun 2020 08:10:42 -0700
-Subject: Re: [PATCH v3 3/4] hw/block/nvme: Fix pmrmsc register size
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200630110429.19972-1-philmd@redhat.com>
- <20200630110429.19972-4-philmd@redhat.com>
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Message-ID: <45a97bae-887c-2669-439e-08ec3e75113e@linux.intel.com>
-Date: Tue, 30 Jun 2020 08:10:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqHvU-0007KQ-TM
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:12:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26400
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqHvS-0006ez-HH
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:12:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593529917;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uP0c6irLZ6kVnyOWAa7zHg/TP/Hw78U+sog6plFEIVI=;
+ b=VrgkhIdzJ9zisVpVK9hX98keT7qiuuvCLCFf/GDR/xNKiAE5lGxZa+FXa/Jsb3RJVd7NI2
+ Bv9iKl7WwApzQJyxExIugJIjGI15a2VCmDJmSOw3lhoOskolUFShfcklorpIF+bdp7ANBs
+ /9gS02KBcLdp1iTQtTE/pGX4caokJ8U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-rG4X1N2nPsGDflZhM7zf1g-1; Tue, 30 Jun 2020 11:11:52 -0400
+X-MC-Unique: rG4X1N2nPsGDflZhM7zf1g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E9E1EC1A0;
+ Tue, 30 Jun 2020 15:11:51 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com
+ (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B0C7A60C81;
+ Tue, 30 Jun 2020 15:11:50 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] KVM: x86: believe what KVM says about WAITPKG
+Date: Tue, 30 Jun 2020 11:11:50 -0400
+Message-Id: <20200630151150.536580-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200630110429.19972-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=134.134.136.24;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 11:10:43
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,46 +94,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 4:04 AM, Philippe Mathieu-Daudé wrote:
-> The Persistent Memory Region Controller Memory Space Control
-> register is 64-bit wide. See 'Figure 68: Register Definition'
-> of the 'NVM Express Base Specification Revision 1.4'.
-> 
-> Fixes: 6cf9413229 ("introduce PMR support from NVMe 1.4 spec")
-> Reported-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-> ---
->  include/block/nvme.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 71c5681912..82c384614a 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -21,7 +21,7 @@ typedef struct QEMU_PACKED NvmeBar {
->      uint32_t    pmrsts;
->      uint32_t    pmrebs;
->      uint32_t    pmrswtp;
-> -    uint32_t    pmrmsc;
-> +    uint64_t    pmrmsc;
->  } NvmeBar;
->  
->  enum NvmeCapShift {
-> -- 2.21.3
+Currently, QEMU is overriding KVM_GET_SUPPORTED_CPUID's answer for
+the WAITPKG bit depending on the "-overcommit cpu-pm" setting.  This is a
+bad idea because it does not even check if the host supports it, but it
+can be done in x86_cpu_realizefn just like we do for the MONITOR bit.
 
-This is good catch, though I wanted to highlight that this will still 
-need to change as this register is not aligned properly and thus not in
-compliance with spec.
+This patch moves it there, of course making it conditional on host
+availability which is not being done for the MONITOR bit.  It also makes
+MONITOR conditional, though not strictly necessary, so that the code
+looks the same for both and generally more natural.
 
-Reviewed-by Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Cc: qemu-stable@nongnu.org
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.c | 5 ++++-
+ target/i386/kvm.c | 6 ------
+ 2 files changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c44cc510e1..0de8dc569a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6535,7 +6535,10 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+         if (enable_cpu_pm) {
+             host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+                        &cpu->mwait.ecx, &cpu->mwait.edx);
+-            env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
++            env->features[FEAT_1_ECX] |=
++                x86_cpu_get_supported_feature_word(FEAT_1_ECX, cpu->migratable) & CPUID_EXT_MONITOR;
++            env->features[FEAT_7_0_ECX] |=
++                x86_cpu_get_supported_feature_word(FEAT_7_0_ECX, cpu->migratable) & CPUID_7_0_ECX_WAITPKG;
+         }
+         if (kvm_enabled() && cpu->ucode_rev == 0) {
+             cpu->ucode_rev = kvm_arch_get_supported_msr_feature(kvm_state,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 2b6b7443d2..c9ef27080d 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -411,12 +411,6 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (host_tsx_blacklisted()) {
+             ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+         }
+-    } else if (function == 7 && index == 0 && reg == R_ECX) {
+-        if (enable_cpu_pm) {
+-            ret |= CPUID_7_0_ECX_WAITPKG;
+-        } else {
+-            ret &= ~CPUID_7_0_ECX_WAITPKG;
+-        }
+     } else if (function == 7 && index == 0 && reg == R_EDX) {
+         /*
+          * Linux v4.17-v4.20 incorrectly return ARCH_CAPABILITIES on SVM hosts.
+-- 
+2.26.2
+
 
