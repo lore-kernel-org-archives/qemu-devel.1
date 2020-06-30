@@ -2,92 +2,94 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A45AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A6CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A202067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3BE32065F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 11:05:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bWRZjEaM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A202067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Je0rn66D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3BE32065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqE3v-0006cV-Bz
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:04:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46548)
+	id 1jqE4x-0008MP-Vi
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 07:05:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqE2z-00062M-9j
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:03:29 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22193
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqE44-00072o-Vm
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:04:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31865
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqE2x-0006Kb-1F
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:03:28 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqE43-0006PJ-An
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 07:04:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593515006;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Zcj9qsdWh1ZJWwvONxX6MREQYwmxR+n7OlNW327iP8I=;
- b=bWRZjEaMXjoxOZGJGUBnMJ6sH9LWwRcq/U83971z/Ou8p1bfc7ZCuAIGRH6LCMFwrvlXaD
- cpAWxTBE+aVLYpACHW8/SOK91PlU5OxYSsObFdAnnngKCmyHqVzDVuNPqF2OyotDYKhjWB
- mdvG+nvbuTTYtdnpGIajFf1sLQhGqPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-ZSo0Xj2tMAKmAeRCu2cKNg-1; Tue, 30 Jun 2020 07:03:19 -0400
-X-MC-Unique: ZSo0Xj2tMAKmAeRCu2cKNg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C23ED10059A1;
- Tue, 30 Jun 2020 11:03:18 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 635AE1002388;
- Tue, 30 Jun 2020 11:03:13 +0000 (UTC)
-Date: Tue, 30 Jun 2020 12:03:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH] net: tap: check if the file descriptor is valid before
- using it
-Message-ID: <20200630110310.GG1370404@redhat.com>
-References: <20200625084835.GB1009994@redhat.com>
- <541b40c5-ee72-d37d-1c30-664775812d1b@redhat.com>
- <929203d2-20d2-7caf-e487-6bfe5b851974@redhat.com>
- <ea94fa3c-edb5-220e-e0e0-4b7fca7b90e8@redhat.com>
- <b912e24c-8dc5-7022-6ed2-cf10d72ef6e7@redhat.com>
- <20200630092318.GE1370404@redhat.com>
- <20200630093148.GF1370404@redhat.com>
- <247f4aa8-1846-c5ec-4fe3-1d344979ad52@redhat.com>
- <d24b43e9-5a8c-1cc0-9d1c-4ee01a8cbbca@redhat.com>
- <7a110325-0123-53da-604d-8a9374903782@redhat.com>
+ s=mimecast20190719; t=1593515074;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=dQtdX/Iepj7l620FVFuLcRqaReUJLFsonligtePyPJQ=;
+ b=Je0rn66D6EhnTOjXiWr9OGALZDK29YY8RC4gBaHpzrM4cXgxFi+gHxDfDiPf2yvmZfktEi
+ jQ4w/+yGj/sQsg8UrEicksvCkt1RfNu1KiYPk0CoTKDE1Gn6GnFgkgu4c1enqaCjaHLulC
+ Id+NCpcvYAMMpf2aCniEWQS0h8WmAVI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-o66w8F3tPDWaWC8r3XZAnA-1; Tue, 30 Jun 2020 07:04:33 -0400
+X-MC-Unique: o66w8F3tPDWaWC8r3XZAnA-1
+Received: by mail-ed1-f69.google.com with SMTP id h5so16655828edl.7
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 04:04:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dQtdX/Iepj7l620FVFuLcRqaReUJLFsonligtePyPJQ=;
+ b=racDkDU+uuhtIbA/04UlKIbq4vkRrK6J44SKSxO20LN0UgZpvARcMHZqb4/9ucz4OF
+ nyDqdUsVms7W5b/2PzSvAlRdFCRwUwPcroiZ2YkZ4s1PmjV/3I7FGBMAzNViMZaCE3E+
+ gNFScaF/g5PI/+iE2eykQlg9yN/aTbaE2NIjlXZhUhR2rvK75ewpSZCzGtqaN3lmOdhk
+ 4trQyeSprPU0Ze0+RMzqqg8NvZMg8yQvWqek4Ahju1PNUx6yTBNkeUISjoGSQCbQyX9i
+ G/g7Yg98eARRsy1/sC9dBsxy00KUsXEp7imwac6+0kwvWtETw5e8xykaNI1VY8CXTMdV
+ 4csg==
+X-Gm-Message-State: AOAM532BVd96tzKmd5scnTffcv5tJF7xyemBPQjN+4EMFLLyoJcHjA4s
+ 5FZI92CnxVZp81XiTCmyqk+S7wDZwZ20oY61Jez7v0FyGiyBFElUWe7ReqwBzE3wGH/On+Gdmu9
+ 3OXxvVvfaxk/YGV0=
+X-Received: by 2002:a17:906:c30b:: with SMTP id
+ s11mr18499358ejz.263.1593515071551; 
+ Tue, 30 Jun 2020 04:04:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxEM5OlDDjfebCOE2ywQ6CZKkIYy+ClRXbFBOzhuC5r4K5WAVH5zCKdic+RIDj8xf9ANiLN5Q==
+X-Received: by 2002:a17:906:c30b:: with SMTP id
+ s11mr18499334ejz.263.1593515071358; 
+ Tue, 30 Jun 2020 04:04:31 -0700 (PDT)
+Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id d24sm2094129edp.83.2020.06.30.04.04.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 04:04:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/4] hw/block/nvme: Fix I/O BAR structure
+Date: Tue, 30 Jun 2020 13:04:25 +0200
+Message-Id: <20200630110429.19972-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <7a110325-0123-53da-604d-8a9374903782@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,7 +97,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,136 +110,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 30, 2020 at 12:35:46PM +0200, Laurent Vivier wrote:
-> On 30/06/2020 12:03, Jason Wang wrote:
-> > 
-> > On 2020/6/30 下午5:45, Laurent Vivier wrote:
-> >> On 30/06/2020 11:31, Daniel P. Berrangé wrote:
-> >>> On Tue, Jun 30, 2020 at 10:23:18AM +0100, Daniel P. Berrangé wrote:
-> >>>> On Tue, Jun 30, 2020 at 05:21:49PM +0800, Jason Wang wrote:
-> >>>>> On 2020/6/30 上午3:30, Laurent Vivier wrote:
-> >>>>>> On 28/06/2020 08:31, Jason Wang wrote:
-> >>>>>>> On 2020/6/25 下午7:56, Laurent Vivier wrote:
-> >>>>>>>> On 25/06/2020 10:48, Daniel P. Berrangé wrote:
-> >>>>>>>>> On Wed, Jun 24, 2020 at 09:00:09PM +0200, Laurent Vivier wrote:
-> >>>>>>>>>> qemu_set_nonblock() checks that the file descriptor can be
-> >>>>>>>>>> used and, if
-> >>>>>>>>>> not, crashes QEMU. An assert() is used for that. The use of
-> >>>>>>>>>> assert() is
-> >>>>>>>>>> used to detect programming error and the coredump will allow
-> >>>>>>>>>> to debug
-> >>>>>>>>>> the problem.
-> >>>>>>>>>>
-> >>>>>>>>>> But in the case of the tap device, this assert() can be
-> >>>>>>>>>> triggered by
-> >>>>>>>>>> a misconfiguration by the user. At startup, it's not a real
-> >>>>>>>>>> problem,
-> >>>>>>>>>> but it
-> >>>>>>>>>> can also happen during the hot-plug of a new device, and here
-> >>>>>>>>>> it's a
-> >>>>>>>>>> problem because we can crash a perfectly healthy system.
-> >>>>>>>>> If the user/mgmt app is not correctly passing FDs, then there's
-> >>>>>>>>> a whole
-> >>>>>>>>> pile of bad stuff that can happen. Checking whether the FD is
-> >>>>>>>>> valid is
-> >>>>>>>>> only going to catch a small subset. eg consider if fd=9 refers
-> >>>>>>>>> to the
-> >>>>>>>>> FD that is associated with the root disk QEMU has open. We'll
-> >>>>>>>>> fail to
-> >>>>>>>>> setup the TAP device and close this FD, breaking the healthy
-> >>>>>>>>> system
-> >>>>>>>>> again.
-> >>>>>>>>>
-> >>>>>>>>> I'm not saying we can't check if the FD is valid, but lets be
-> >>>>>>>>> clear that
-> >>>>>>>>> this is not offering very much protection against a broken mgmt
-> >>>>>>>>> apps
-> >>>>>>>>> passing bad FDs.
-> >>>>>>>>>
-> >>>>>>>> I agree with you, but my only goal here is to avoid the crash in
-> >>>>>>>> this
-> >>>>>>>> particular case.
-> >>>>>>>>
-> >>>>>>>> The punishment should fit the crime.
-> >>>>>>>>
-> >>>>>>>> The user can think the netdev_del doesn't close the fd, and he
-> >>>>>>>> can try
-> >>>>>>>> to reuse it. Sending back an error is better than crashing his
-> >>>>>>>> system.
-> >>>>>>>> After that, if the system crashes, it will be for the good
-> >>>>>>>> reasons, not
-> >>>>>>>> because of an assert.
-> >>>>>>> Yes. And on top of this we may try to validate the TAP via st_dev
-> >>>>>>> through fstat[1].
-> >>>>>> I agree, but the problem I have is to know which major(st_dev) we can
-> >>>>>> allow to use.
-> >>>>>>
-> >>>>>> Do we allow only macvtap major number?
-> >>>>>
-> >>>>> Macvtap and tuntap.
-> >>>>>
-> >>>>>
-> >>>>>> How to know the macvtap major number at user level?
-> >>>>>> [it is allocated dynamically: do we need to parse /proc/devices?]
-> >>>>>
-> >>>>> I think we can get them through fstat for /dev/net/tun and
-> >>>>> /dev/macvtapX.
-> >>>> Don't assume QEMU has any permission to access to these device nodes,
-> >>>> only the pre-opened FDs it is given by libvirt.
-> >>> Actually permissions are the least of the problem - the device nodes
-> >>> won't even exist, because QEMU's almost certainly running in a private
-> >>> mount namespace with a minimal /dev populated
-> >>>
-> >> I'm working on a solution using /proc/devices.
-> > 
-> > 
-> > Similar issue with /dev. There's no guarantee that qemu can access
-> > /proc/devices or it may not exist (CONFIG_PROCFS).
-> 
-> There is a lot of things that will not work without /proc (several tools
-> rely on /proc, like ps, top, lsof, mount, ...). Some information are
-> only available from /proc, and if /proc is there, I think /proc/devices
-> is always readable by everyone. Moreover /proc is already used by qemu
-> in several places.
-> 
-> It can also a best effort check.
-> 
-> The problem with fstat() on /dev files is to guess the /dev/macvtapX as
-> X varies (the same with /dev/tapY)..
-> 
-> > 
-> >> macvtap has its own major number, but tuntap use "misc" (10) major
-> >> number.
-> 
-> Another question: it is possible to use the "fd=" parameter with macvtap
-> as macvtap creates a /dev/tapY device, but how to do that with tuntap
-> that does not create a /dev/tapY device?
+Improvements for the I/O BAR structure:
+- correct pmrmsc register size (Klaus)
+- pack structures
+- align to 4KB
 
+Since v2:
+- Added Klaus' tags with correct address
 
-I think we should step back and ask why we need to check this at all.
+$ git backport-diff -u v2
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-IMHO, if the passed-in FD works with the syscalls that tap-linux.c
-is executing, then that shows the FD is suitable for QEMU. The problem
-is that many of the tap APIs don't use "Error **errp" parameters to
-report errors, so we can't catch the failures. IOW, instead of checking
-the FD major/minor number, we should make the existing code be better
-at reporting errors, so they can be fed back to the QMP console
-gracefully.
+001/4:[----] [--] 'hw/block/nvme: Update specification URL'
+002/4:[----] [--] 'hw/block/nvme: Use QEMU_PACKED on hardware/packet structures'
+003/4:[----] [--] 'hw/block/nvme: Fix pmrmsc register size'
+004/4:[----] [--] 'hw/block/nvme: Align I/O BAR to 4 KiB'
 
+Philippe Mathieu-Daudé (4):
+  hw/block/nvme: Update specification URL
+  hw/block/nvme: Use QEMU_PACKED on hardware/packet structures
+  hw/block/nvme: Fix pmrmsc register size
+  hw/block/nvme: Align I/O BAR to 4 KiB
 
-Regards,
-Daniel
+ include/block/nvme.h | 42 ++++++++++++++++++++++--------------------
+ hw/block/nvme.c      |  7 +++----
+ 2 files changed, 25 insertions(+), 24 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.21.3
 
 
