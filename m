@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D02FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1136C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAF7D207F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:11:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B869D2073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:12:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="le+pnGOK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF7D207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IEKL2LMZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B869D2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDF9-00018i-69
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58810)
+	id 1jqDFX-0001xD-Vg
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7U-0002mf-LK; Tue, 30 Jun 2020 06:04:05 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44364)
+ id 1jqD7I-0002P3-2L; Tue, 30 Jun 2020 06:03:52 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:42538)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7S-0004jD-Cr; Tue, 30 Jun 2020 06:04:04 -0400
-Received: by mail-ej1-x643.google.com with SMTP id ga4so19869853ejb.11;
- Tue, 30 Jun 2020 03:04:01 -0700 (PDT)
+ id 1jqD7G-0004cn-D8; Tue, 30 Jun 2020 06:03:51 -0400
+Received: by mail-ej1-x643.google.com with SMTP id i14so19906888ejr.9;
+ Tue, 30 Jun 2020 03:03:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GCA/b5P4oEFejWJMVskzw5rnEpDdc0VO+NTpGDzUdqY=;
- b=le+pnGOKUuda9x8XTM54HzMlggBHV3uuwCOWiv7DfWp8jAxUF58n1jRgM5x2wffuxa
- MChv+3X66zJnTIvSEU8wbGAJro7dQEREHIlfwm1BUjPn62PGT0n5o66V7t5SRneFj0f8
- Mq4geFZDlt4WOnINIjOaFvZBNhYJ9NBU8n0aGkoYXUjieUf5mWZpE88gh2OzMBfIsJdU
- FlqKadidSPTkHH3qnPYKt8/fPBKj4Vejb2qE+9fI4qRsMXx1m2myIB3A4b/4YAyYfxTY
- Xi4dMWLN0hX0hI9mYZZ6cy3+BJ7Ftv6QIOt2w7iVG1fUX5GBHCn5TPNOSgF5wZO0qPRs
- UEag==
+ bh=i3AX6k9zJcs7ntcPjDjs5EOqKiW+/SX/Gp5bwn7hkCA=;
+ b=IEKL2LMZH0/frLWh99/3r5wwdykr2VKNm1Wa0MgHcETnX10XHnjCRRenK2whSolssw
+ 9/LsfjZ99vJYdJ4j2n/JjD0PXoahwoljYFP0Ot9FnZVpdqIO1WkkJSZ8utwxe5hfdY1b
+ jbPRxAjthFs/itv5YuyOc+by8mtqvOHhQ434+h8YduQ5wFHzFHml45cPH7DAYN4j02FS
+ uNRZSmWqlB25KkLuwnXOSJv3VPnI22WV+Z0g++Ma6wOA6UJCQgNx/F5QajoNu4WmUySU
+ zJh8XAOXdkCLFd22y0YL6Ce/aVbT/Heyi//Ro2BTKq6PiUM2BpoxJ+S6SRNrEKzr5b+Z
+ A07w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GCA/b5P4oEFejWJMVskzw5rnEpDdc0VO+NTpGDzUdqY=;
- b=NgPcrDz+eNgWPuS1XP/Vq/4q847/YiasUjl8X7PGpHYMMsNnbScF/XVl/6I5vYORX6
- u7SXQiQyBkpKbeiNRQ6YiJDkaXn2AX6uJPd/+5upI/TGo9hi6y1BDZ5NcTg1UwALW69+
- YNqdZZOwgADpneVn2hz5AZLZXfzTlcv+IzJKqONsiz4SZbKJMpxBkBbFz8ovfG16ISjZ
- //vHIrZ0tCWAoqKbNJyiZ2129wUECc9QTV0P1YMJ0XnG8ktJQ8LYTTllsWaAq4VN3zaD
- p5IUiHVZYuNlswd/dKzFV+BnaUASul2/KWEqhqalPTxfgGLp+EXG2ErljDrWHQHCvJ2N
- WIAg==
-X-Gm-Message-State: AOAM533mUX8gTlRm5WRCrZ50rl1YDNLqYYLvODWA/7hMovRueTiW5ci2
- hn7GI68rqUF+JmK6Z0pR8kHDRSK+2Co=
-X-Google-Smtp-Source: ABdhPJx/UXPmJKCrRFL+o2iujK1iaTo1kszTE9L6mS7CAVDQ9Uw2wFeqJM598jkHGqKu3b4F5L2/ow==
-X-Received: by 2002:a17:906:1414:: with SMTP id
- p20mr17184146ejc.247.1593511440624; 
- Tue, 30 Jun 2020 03:04:00 -0700 (PDT)
+ bh=i3AX6k9zJcs7ntcPjDjs5EOqKiW+/SX/Gp5bwn7hkCA=;
+ b=ZKl+IE1gVWLShQ2v/fg5WCElI378Ia7DYgtVQ39XqeKt4EamsQvk5VI9EaWGnLyLLt
+ E0bZa9TXKy6lgNnNQkpcCqYFDr9Ht/vI036LcgoQdIaqX6hBbqCj8Dol5ejDBfGJAbjM
+ d4V647FM74yQ/p4PRB62/uNKEDQUbcq17WIQNzzkybPEeAKJ76nH+W2lIuaILN7tPdHX
+ ES0A9lqycBTtSPPBmL6gvW9Z0ctxGjqEZqLWSE5QYjjNsGQPbvNBwZ2ph1dy9kuK8uYk
+ x7xvrZzI6QpWv2vX6hXqLNdGpYKPJWKFEH0zuYBx4sl5DXLs20hl4YegC/lt+O8OVEGq
+ xclQ==
+X-Gm-Message-State: AOAM533gEfHU43qX4Eo0wRLQxG9Na/ukhJR2lewGMBoIM90A2i34Jrce
+ RI0Wp8MZ6hRQO7ZNwikDPPQyvse6Yc4=
+X-Google-Smtp-Source: ABdhPJzHnfqUeAgd+c1AOgg8ja274FnZFBqR0ujPY7o0XxBRBrtq/1+c+OFyVIzaknIIbLth/3w4cw==
+X-Received: by 2002:a17:907:a92:: with SMTP id
+ by18mr18590748ejc.116.1593511428544; 
+ Tue, 30 Jun 2020 03:03:48 -0700 (PDT)
 Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.59
+ by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 03:04:00 -0700 (PDT)
+ Tue, 30 Jun 2020 03:03:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 15/15] hw/sd/sdcard: Simplify realize() a bit
-Date: Tue, 30 Jun 2020 12:03:42 +0200
-Message-Id: <20200630100342.27625-16-f4bug@amsat.org>
+Subject: [PATCH v6 04/15] hw/sd/sdcard: Use the HWBLOCK_SIZE definition
+Date: Tue, 30 Jun 2020 12:03:31 +0200
+Message-Id: <20200630100342.27625-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200630100342.27625-1-f4bug@amsat.org>
 References: <20200630100342.27625-1-f4bug@amsat.org>
@@ -109,36 +109,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need to check if sd->blk is set twice.
+Replace the following different uses of the same value by
+the same HWBLOCK_SIZE definition:
+  - 512 (magic value)
+  - 0x200 (magic value)
+  - 1 << HWBLOCK_SHIFT
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/sd/sd.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 7f973f6763..e1bba887b2 100644
+index 4816b4a462..04451fdad2 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -2140,12 +2140,12 @@ static void sd_realize(DeviceState *dev, Error **errp)
-         return;
+@@ -81,6 +81,7 @@ enum SDCardStates {
+ };
+ 
+ #define HWBLOCK_SHIFT   9                       /* 512 bytes */
++#define HWBLOCK_SIZE    (1 << HWBLOCK_SHIFT)
+ #define SECTOR_SHIFT    5                       /* 16 kilobytes */
+ #define WPGROUP_SHIFT   7                       /* 2 megs */
+ #define CMULT_SHIFT     9                       /* 512 times HWBLOCK_SIZE */
+@@ -129,7 +130,7 @@ struct SDState {
+     uint32_t blk_written;
+     uint64_t data_start;
+     uint32_t data_offset;
+-    uint8_t data[512];
++    uint8_t data[HWBLOCK_SIZE];
+     qemu_irq readonly_cb;
+     qemu_irq inserted_cb;
+     QEMUTimer *ocr_power_timer;
+@@ -410,7 +411,7 @@ static void sd_set_csd(SDState *sd, uint64_t size)
+             ((HWBLOCK_SHIFT << 6) & 0xc0);
+         sd->csd[14] = 0x00;	/* File format group */
+     } else {			/* SDHC */
+-        size /= 512 * KiB;
++        size /= HWBLOCK_SIZE * KiB;
+         size -= 1;
+         sd->csd[0] = 0x40;
+         sd->csd[1] = 0x0e;
+@@ -574,7 +575,7 @@ static void sd_reset(DeviceState *dev)
+     sd->erase_start = 0;
+     sd->erase_end = 0;
+     sd->size = size;
+-    sd->blk_len = 0x200;
++    sd->blk_len = HWBLOCK_SIZE;
+     sd->pwd_len = 0;
+     sd->expecting_acmd = false;
+     sd->dat_lines = 0xf;
+@@ -685,7 +686,7 @@ static const VMStateDescription sd_vmstate = {
+         VMSTATE_UINT32(blk_written, SDState),
+         VMSTATE_UINT64(data_start, SDState),
+         VMSTATE_UINT32(data_offset, SDState),
+-        VMSTATE_UINT8_ARRAY(data, SDState, 512),
++        VMSTATE_UINT8_ARRAY(data, SDState, HWBLOCK_SIZE),
+         VMSTATE_UNUSED_V(1, 512),
+         VMSTATE_BOOL(enable, SDState),
+         VMSTATE_END_OF_LIST()
+@@ -754,8 +755,8 @@ static void sd_erase(SDState *sd)
+ 
+     if (FIELD_EX32(sd->ocr, OCR, CARD_CAPACITY)) {
+         /* High capacity memory card: erase units are 512 byte blocks */
+-        erase_start *= 512;
+-        erase_end *= 512;
++        erase_start *= HWBLOCK_SIZE;
++        erase_end *= HWBLOCK_SIZE;
      }
  
--    if (sd->blk && blk_is_read_only(sd->blk)) {
--        error_setg(errp, "Cannot use read-only drive as SD card");
--        return;
--    }
--
-     if (sd->blk) {
-+        if (blk_is_read_only(sd->blk)) {
-+            error_setg(errp, "Cannot use read-only drive as SD card");
-+            return;
-+        }
-+
-         ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
-                            BLK_PERM_ALL, errp);
-         if (ret < 0) {
+     erase_start = sd_addr_to_wpnum(erase_start);
+@@ -1149,7 +1150,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+     case 16:	/* CMD16:  SET_BLOCKLEN */
+         switch (sd->state) {
+         case sd_transfer_state:
+-            if (req.arg > (1 << HWBLOCK_SHIFT)) {
++            if (req.arg > HWBLOCK_SIZE) {
+                 sd->card_status |= BLOCK_LEN_ERROR;
+             } else {
+                 trace_sdcard_set_blocklen(req.arg);
+@@ -1961,7 +1962,7 @@ uint8_t sd_read_data(SDState *sd)
+     if (sd->card_status & (ADDRESS_ERROR | WP_VIOLATION))
+         return 0x00;
+ 
+-    io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
++    io_len = (sd->ocr & (1 << 30)) ? HWBLOCK_SIZE : sd->blk_len;
+ 
+     trace_sdcard_read_data(sd->proto_name,
+                            sd_acmd_name(sd->current_cmd),
 -- 
 2.21.3
 
