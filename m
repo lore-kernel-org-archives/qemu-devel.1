@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D9DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891E5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326BD206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 539DA206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUqWCk1f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326BD206A1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehMtRkpT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539DA206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqLin-0007px-NJ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:15:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42182)
+	id 1jqLiq-0007wR-F5
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:15:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLhL-000627-7N
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:39 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51970
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLhF-0005yF-7H
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21438
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLhG-0005W9-Bq
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:38 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLhD-0005Vj-Oo
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593544413;
+ s=mimecast20190719; t=1593544411;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sSpxL68KI0zjY+P0ZTv/agflMQHnncdM/JAB05rWw4M=;
- b=MUqWCk1fAyLdZ4ENaxkf+eA6qC71is5wdgHnB8QYlZB5gxj9r0EEglts62rZzXw6EWVvkw
- L37PObXtcrZN/E+rHkNp0V/ZszzX7h6l+anppx9eME3NTY/3HYNLkDWfxHpG1MrWZ9UF1s
- gU4E/bLKPy+1PxSzuDqwAtMAnB6mt50=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-05q7PtuFPqapqQmFngKUMg-1; Tue, 30 Jun 2020 15:13:32 -0400
-X-MC-Unique: 05q7PtuFPqapqQmFngKUMg-1
-Received: by mail-wm1-f69.google.com with SMTP id v24so21394945wmh.3
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:13:31 -0700 (PDT)
+ bh=oDXkElBCSL5Fje+j3PutyCwM6gIK6a01PpGIaTigzW4=;
+ b=ehMtRkpT+yxnnQNe2BF5uLiESR7RM7pYYMwjBLiFNJ49DNuUEqbXoVcypZLR032lz5v2bD
+ 0ztpqMKx80uLxOfjMmJxT+O6h8QM768V4b8LqxI/VlC4tmeHDxxOICKtX/63B4RVzRMdfx
+ YkNnQXS76oBgtpgy547Ytvkx0S5QKfs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-f6_TNI6BPDeCH-0mQYI7wA-1; Tue, 30 Jun 2020 15:13:27 -0400
+X-MC-Unique: f6_TNI6BPDeCH-0mQYI7wA-1
+Received: by mail-wm1-f70.google.com with SMTP id q20so11579753wme.3
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:13:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sSpxL68KI0zjY+P0ZTv/agflMQHnncdM/JAB05rWw4M=;
- b=I4A7GyUboRGiJqRTK3XVrqLDNMaO32KJiByLmcROvHpK/ZtW8Vvyh/YpcNOmGgd8H9
- 86qAG/rBnVrEHnrPiGlv6UGF34tffdBbbhmUrtHd9KUQqSGhL7ed420r5r8AZ4nyNrUu
- bXM/7VtANPcYv/0g3ig25RxpLXNln0QtwUFtpAebEdQ/PpLO8draOqw253jASDIy3n5Y
- e0aZgd/WPb7skQmRHIEgTJtvMngCqu9DaYBacruA0Se7b1clRnacRZQKFf09F7zFwINq
- oWBDA/2S9nDpna7YXuoUDuzDopSKRzYi4L7YYkI6/uKo0uQqwZQwSXTrSGL7216nOrcG
- HoTg==
-X-Gm-Message-State: AOAM532pg1dUxhmIu1+ppBZW3Ett0BWtl4mI9mrQbI9TSN5yBIRWt4JY
- xzxn1UVaIZ3VfbCUe33p1+mqFA43f7vcTAlIqHvN7NBZ3doiejpF68qU2npAa2XtMPXjMNFO+Q5
- DXumdegVqTI1GESU=
-X-Received: by 2002:a1c:2602:: with SMTP id m2mr23955274wmm.50.1593544410828; 
- Tue, 30 Jun 2020 12:13:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLyipKg//WKrV8o5D+oPIV/Utzm3hTol8MMrTlA3AQVAJTLZ+Tx5dgMEDayArhX8VC+GGiLw==
-X-Received: by 2002:a1c:2602:: with SMTP id m2mr23955260wmm.50.1593544410661; 
- Tue, 30 Jun 2020 12:13:30 -0700 (PDT)
+ bh=oDXkElBCSL5Fje+j3PutyCwM6gIK6a01PpGIaTigzW4=;
+ b=SBNfuebIkC1irm3UTEOvWnVvl9RF3yvvaEO7jRBpliQKBJRDMp6fNfOafVbkTcKEeO
+ 3h5czwDCovyK/a3TGR0KNWXSOnk8hNdUoZPq8+mJkRyNDnS+bd/V9gWygMNZIqhPCMIl
+ rnPIXA4Niiwwl++o8ivRXFAw79oGxlSjeB4W0rgbC1f/6eKRY9gCA5RyClRQM3zXlvaL
+ GIGPWVr+2pGwg/iQh6wZvCjQM+zVDMaAdzaT8Wwn0Otywy6YNip64isuP1Sc1M9dSoUc
+ 4TSzx/qaRi7MYNz7h5Y63o/cxao6gX6VnytlmsugMOMzsOag2kvp1LzfxlTSxxWu7kET
+ Pnxg==
+X-Gm-Message-State: AOAM531y2anAWzlhqRvzMmVhSe5v4mMOMr9nPV9AHTmsEO1UHhFP2kWV
+ eDLQjm5RPJCXNGcBkDtvEfxGoOOlfN8pvEzC0MMt7cZpz5+1j+VhnChZbPVSqwkZ3jXY/5KigNY
+ nKSEjc4rO039zPEc=
+X-Received: by 2002:a7b:c055:: with SMTP id u21mr22142438wmc.132.1593544405935; 
+ Tue, 30 Jun 2020 12:13:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwjM85LW5DmxOv6Awt6/4b1jhrOzm3MXlEFAr2qP7AdnzrwJJ62ZtEn+gKE2mBtaPe1hxsz9g==
+X-Received: by 2002:a7b:c055:: with SMTP id u21mr22142408wmc.132.1593544405652; 
+ Tue, 30 Jun 2020 12:13:25 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id c6sm4670385wma.15.2020.06.30.12.13.29
+ by smtp.gmail.com with ESMTPSA id w17sm4989638wra.42.2020.06.30.12.13.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 12:13:30 -0700 (PDT)
+ Tue, 30 Jun 2020 12:13:25 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 02/12] block/nvme: Avoid further processing if trace event
- not enabled
-Date: Tue, 30 Jun 2020 21:13:08 +0200
-Message-Id: <20200630191318.30021-3-philmd@redhat.com>
+Subject: [PATCH v2 01/12] block/nvme: Replace magic value by SCALE_MS
+ definition
+Date: Tue, 30 Jun 2020 21:13:07 +0200
+Message-Id: <20200630191318.30021-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200630191318.30021-1-philmd@redhat.com>
 References: <20200630191318.30021-1-philmd@redhat.com>
@@ -122,28 +122,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avoid further processing if TRACE_NVME_SUBMIT_COMMAND_RAW is
-not enabled. This is an untested intend of performance optimization.
+Use self-explicit SCALE_MS definition instead of magic value.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- block/nvme.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 2f5e3c2adf..8c30a5fee2 100644
+index 374e268915..2f5e3c2adf 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -441,6 +441,9 @@ static void nvme_trace_command(const NvmeCmd *cmd)
- {
-     int i;
- 
-+    if (!trace_event_get_state_backends(TRACE_NVME_SUBMIT_COMMAND_RAW)) {
-+        return;
-+    }
-     for (i = 0; i < 8; ++i) {
-         uint8_t *cmdp = (uint8_t *)cmd + i * 8;
-         trace_nvme_submit_command_raw(cmdp[0], cmdp[1], cmdp[2], cmdp[3],
+@@ -715,7 +715,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     /* Reset device to get a clean state. */
+     s->regs->cc = cpu_to_le32(le32_to_cpu(s->regs->cc) & 0xFE);
+     /* Wait for CSTS.RDY = 0. */
+-    deadline = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + timeout_ms * 1000000ULL;
++    deadline = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + timeout_ms * SCALE_MS;
+     while (le32_to_cpu(s->regs->csts) & 0x1) {
+         if (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) > deadline) {
+             error_setg(errp, "Timeout while waiting for device to reset (%"
 -- 
 2.21.3
 
