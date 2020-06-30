@@ -2,94 +2,93 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1270C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B11C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:19:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A5A82073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:19:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F66F20760
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:19:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="P6ps+ZCx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A5A82073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GG84reCw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F66F20760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDMX-00034T-UQ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:19:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60896)
+	id 1jqDMk-0003Q2-O7
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:19:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDFk-0002de-Sn
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:12:36 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:56202 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDFi-0006ET-Kx
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:12:36 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id F28384C886;
- Tue, 30 Jun 2020 10:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1593511950;
- x=1595326351; bh=nRfdTHkrrXY0LAEfhvcDRbsLe7NaPi6CbgUnnvy64D0=; b=
- P6ps+ZCxghTuI6MHdPlnDa49Hl46Q+qKcKdRhG0k5Xly48CUVd/fzYiDERmOE447
- bZFbfDUQJyP+Z73+y7aqgLdKbFGNRLqho+yXTvFpGjIN226N0bGd2VSjw8BJPkhp
- 3EwM19zNgquMsq14wc0vMQgpWCSmfZ31uK621/dNbHM=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RNIQIYe2jm2C; Tue, 30 Jun 2020 13:12:30 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id C904A412C5;
- Tue, 30 Jun 2020 13:12:29 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 30
- Jun 2020 13:12:29 +0300
-Date: Tue, 30 Jun 2020 13:12:28 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 4/8] i386: hvf: Implement CPU kick
-Message-ID: <20200630101228.GA39334@SPB-NB-133.local>
-References: <20200624225850.16982-5-r.bolshakov@yadro.com>
- <9d63db4e-25a7-9c77-6f05-e5f808b8b33c@redhat.com>
- <20200625155712.GI25104@SPB-NB-133.local>
- <6508d40b-0142-1b42-2f48-fcd2da66ea4b@redhat.com>
- <20200629113107.GL25104@SPB-NB-133.local>
- <d1d7cf19-d56c-c095-a3b8-45e2be0752ea@redhat.com>
- <20200629132911.GN25104@SPB-NB-133.local>
- <0c8d14fa-e2cf-00e7-135f-d88fda38f31d@redhat.com>
- <20200629140433.GO25104@SPB-NB-133.local>
- <cb4a42b2-5bb7-5f69-64d1-cad6f4bb05df@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqD7R-0002kH-CW; Tue, 30 Jun 2020 06:04:02 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:46802)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqD7P-0004hB-Ji; Tue, 30 Jun 2020 06:04:01 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id p20so19862916ejd.13;
+ Tue, 30 Jun 2020 03:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=zGHpga6H2Rh60b+shqZXMAR/68CCrter5/aFoJNoNjw=;
+ b=GG84reCwLGmxirJzTSDZ1TKY//DM9x7P0UHiGXRCZc5yE7j5u0qqXLdru62rlGqm6x
+ HXPWnek0NfZmiXu4OwwOJWit0/NACsqMSBaKiplcy4+pI58GKMid5CZ+VHWMNlwdYClc
+ gkYPgDMCXZWuBy9tHxhVzTs17TjVcDxzE2jMNEMzIOBp0phSX8Ayvq6+ID176zcY+eIF
+ Kc92Gf+eqm8XWF4/xEZZfIUzLx/P+piu0Hv1OVrCrhY3FpREj8/IDXykRbT6qKFX2TzF
+ x37xSKRAEM6EyjKTGcdC+9UVXVuvnQIVHW9mjcPTI5BrQHRAHAih8sjxOVvhL3RbOGNe
+ 2m4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=zGHpga6H2Rh60b+shqZXMAR/68CCrter5/aFoJNoNjw=;
+ b=bAg9eK2diTJSReP0DcAUjkEVUVxES96JzBP+LdK2CFVIMF88M+Zak4l1SRO132P7jj
+ iK/hESwkfCHkLKrEN8yaJyiJhRn9P0nRDUK3Vf9EMHyGf7EpVDfybvW/mUvpQ0roWefo
+ qWEQBgI4ZUh90bK/H7eB4zbtV7au633K41meOM7qnNPmMlru/es5LGcTLY08FqT82Br+
+ tlAEsAnGYHc6Iw8yy5ULLU2z1V6ksExiELQCoxF4yb2bjS4epeg9zbHjlknoGnAx0J9N
+ XMxlpJtsZw8PBxts2d3ySSwd2c9n9iIHYM+NSLiAepCiNQf4cXvidupg/KKztfC6XXvX
+ kxqg==
+X-Gm-Message-State: AOAM533LASxCfDu67X09CgqmraCHq7mWaW8MRJRyRh+xHY6kYdJfVcA3
+ 3N5yy8qYn7icZhr3DKLfN71Mgs17+28=
+X-Google-Smtp-Source: ABdhPJy7f71t6+HMDAMJQupy69MxORznFBGbe62ASB8xFozccU9HcUc5dIrRLS3l+iKH/KjE1J1AtA==
+X-Received: by 2002:a17:907:4240:: with SMTP id
+ oi24mr17051034ejb.23.1593511437547; 
+ Tue, 30 Jun 2020 03:03:57 -0700 (PDT)
+Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 03:03:57 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 12/15] hw/sd/sdcard: Make iolen unsigned
+Date: Tue, 30 Jun 2020 12:03:39 +0200
+Message-Id: <20200630100342.27625-13-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200630100342.27625-1-f4bug@amsat.org>
+References: <20200630100342.27625-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cb4a42b2-5bb7-5f69-64d1-cad6f4bb05df@redhat.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 06:12:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,104 +101,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Claudio Fontana <cfontana@suse.de>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 04:18:46PM +0200, Paolo Bonzini wrote:
-> On 29/06/20 16:04, Roman Bolshakov wrote:
-> > My approach is based
-> > hv_vcpu_run() and should hopefully work almost anywhere where
-> > Hypervisor.framework is available because Hypervisor framework exposes
-> > timer value
-> > (https://developer.apple.com/documentation/hypervisor/vmcs_guest_vmx_timer_value)
-> > since macOS 10.10.3+.
-> 
-> There are a few other constants for which it would be unwise to write
-> from userspace, so that's not a big consolation. :)
-> 
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Hi Paolo,
+I/O request length can not be negative.
 
-So, I've tried Big Sur Beta and it has exactly the same performance
-issue with hv_vcpu_run_until() while hv_vcpu_run() works as good as it
-worked on 10.15.5. I've submitted FB7827341 to Apple wrt the issue.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+v4: Use uint32_t (pm215)
+---
+ hw/sd/sd.c         | 2 +-
+ hw/sd/trace-events | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> > I can also test how hv_vcpu_run_until() performs with HV_DEADLINE_FOREVER
-> > on the Beta. And if the performance issues with VMX-preemption timer and
-> > hv_vcpu_run_until() are fixed there.
-> 
-> Thanks!  The main thing to test on Big Sur would be: 1) whether the
-> preemption timer bit in the pin controls "sticks" to 0 after setting it
-
-It does not. If it's set, it stays there.
-
-> 2) whether the bit reads back as zero after
-> hv_vcpu_run_until(HV_DEADLINE_FOREVER).
-> 
-
-Likewise, it's not cleared if set.
-
-As far as I understand, hv_vcpu_run_until(HV_DEADLINE_FOREVER) works
-like hv_vcpu_run() without VMX-preemption timer. Otherwise
-hv_vcpu_run_until() implicitly sets VMX-preemption timer Pin-based
-control and sets the timer value.
-
-Thanks,
-Roman
-
-Here's the patch over v2 that adds support of hv_vcpu_run_until() on Big Sur:
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 317304aa1d..ad202f7358 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -72,8 +72,12 @@
- #include "sysemu/accel.h"
- #include "target/i386/cpu.h"
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 2238ba066d..504228198e 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -1967,7 +1967,7 @@ uint8_t sd_read_data(SDState *sd)
+ {
+     /* TODO: Append CRCs */
+     uint8_t ret;
+-    int io_len;
++    uint32_t io_len;
  
-+#if defined(__MAC_10_16) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_16
-+#define HVF_MAX_DEADLINE HV_DEADLINE_FOREVER
-+#else
- /* Maximum value of VMX-preemption timer */
- #define HVF_MAX_DEADLINE UINT32_MAX
-+#endif
+     if (!sd->blk || !blk_is_inserted(sd->blk) || !sd->enable)
+         return 0x00;
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 5f09d32eb2..d0cd7c6ec4 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -52,7 +52,7 @@ sdcard_unlock(void) ""
+ sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+ sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+ sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
+-sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, int length) "%s %20s/ CMD%02d len %d"
++sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint32_t length) "%s %20s/ CMD%02d len %" PRIu32
+ sdcard_set_voltage(uint16_t millivolts) "%u mV"
  
- HVFState *hvf_state;
- 
-@@ -693,6 +697,7 @@ int hvf_vcpu_exec(CPUState *cpu)
-     CPUX86State *env = &x86_cpu->env;
-     int ret = 0;
-     uint64_t rip = 0;
-+    hv_return_t r;
- 
-     if (hvf_process_events(cpu)) {
-         return EXCP_HLT;
-@@ -718,10 +723,22 @@ int hvf_vcpu_exec(CPUState *cpu)
-         /* Use VMX-preemption timer trick only if available */
-         if (rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS) &
-             VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER) {
-+#if defined(__MAC_10_16) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_16
-+            r = hv_vcpu_run_until(cpu->hvf_fd,
-+                                  atomic_read(&env->hvf_deadline));
-+        } else {
-+            /*
-+             * Equivalent to behaviour of hv_vcpu_run() with VMX-preemption
-+             * timer disabled, prone to kick loss.
-+             */
-+            r = hv_vcpu_run_until(cpu->hvf_fd, HVF_MAX_DEADLINE);
-+        }
-+#else
-             wvmcs(cpu->hvf_fd, VMCS_PREEMPTION_TIMER_VALUE,
-                   atomic_read(&env->hvf_deadline));
-         }
--        hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
-+        r = hv_vcpu_run(cpu->hvf_fd);
-+#endif
-         atomic_set(&env->hvf_deadline, HVF_MAX_DEADLINE);
-         assert_hvf_ok(r);
- 
+ # milkymist-memcard.c
+-- 
+2.21.3
 
 
