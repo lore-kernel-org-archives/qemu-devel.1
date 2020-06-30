@@ -2,89 +2,97 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CD5C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D450C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:03:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A33CE20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:00:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 687FA20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRk4tnPC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A33CE20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IZiAN2wh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687FA20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqHkf-0006tF-TE
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:00:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58960)
+	id 1jqHmo-0000Rs-N5
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:03:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqHhp-0002mT-QT
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 10:57:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55779
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqHhn-0003FY-OC
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 10:57:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593529070;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ZH19pVjzXWpQUO//wVZCmwjWoMeVo83fpUNJGDa3EKs=;
- b=dRk4tnPCfo2zN2tqBCe9OyTDorPs612AC3AOo1sk3LWDWO0cst5ue0ZKFUFwdbWZOLcydI
- jLFUDp4JtGm4IBQlpHxIQ9mpT+thVnt6azs0nt+89QG3d8reFFp+j5T4JaqIUcSwstXipz
- THa0hRIwL2WJITf01NQwXyFWlYKMRxU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-kJRZ1750NIiTD3YBrzgr_w-1; Tue, 30 Jun 2020 10:57:48 -0400
-X-MC-Unique: kJRZ1750NIiTD3YBrzgr_w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0016F6BF81;
- Tue, 30 Jun 2020 14:57:44 +0000 (UTC)
-Received: from localhost (ovpn-115-106.ams2.redhat.com [10.36.115.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 312EC5C1B0;
- Tue, 30 Jun 2020 14:57:36 +0000 (UTC)
-Date: Tue, 30 Jun 2020 15:57:35 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v7 02/21] multi-process: Add config option for
- multi-process QEMU
-Message-ID: <20200630145735.GA109906@stefanha-x1.localdomain>
-References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
- <626a8bb28b71b4bd2a7e8f9defe4a6dc9aaf1907.1593273671.git.elena.ufimtseva@oracle.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqHl1-0007OO-0t
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:01:11 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:51671)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqHku-0003zG-36
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:01:10 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id l6so6499694pjq.1
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=mlMdpfsudobpLEFcK7g1Am1DrsgPtMirY3X8ftqAplU=;
+ b=IZiAN2whM0yLPwX55puOhJ5T5BfOYWE3XxdlW2ymG+71XiVk+0jRlQuTzjWRbJBDTs
+ k3s/TRmIypyd52n2BJhXooaLeOA2+S2xGhJe2i0EdJcNE4Bl2WMCwR5LQmUj8Urd2uPD
+ BP+ng1dkrTVhqOJPy9ZjfelrnT/hwatnIZowbqaL5lrcelNAHpNUjN9aOQj+AN1gwChP
+ pmmfxoRJBL//MA04lR5bsJghmkmGwyzty6/FAk8iIweFSWI4FBBQmd5cAaqFzw4EwtuO
+ TTGS5FAgt95YzqHNjkQESvWDaFWDar9UGuXelXvFjllcOZk6EpSkjOjmf5ttCVfE2V5g
+ i1rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mlMdpfsudobpLEFcK7g1Am1DrsgPtMirY3X8ftqAplU=;
+ b=kD+LZLvcvVE/eTU6e4ZHcEmrzMSBJ4qyhBryZ2TzCmwbzTORQr3x0oGjyW540ZUWUl
+ JygTmt0qhRCKZcdgu31Jjeh3iR9I26BEQ4dXP0HqmOEHJIpegluVpZ+9/HJV+JARAgsu
+ /wtdvhfU4y7ISnTWj2zX8QPmv0DIqrWb7tBPgwCqNn5F0q8Xc9lXo8Sk4DMvwOcEKT9M
+ LlwkL42K7dY7drNVArY5PCAPfMmSAESJPabgN8fT2V5l1cRKBNAQZm4DiEP4vGt4wuwX
+ Ylz2vhODUuYX3zSMXoGJoFYQ5PDYh7VQF7g1iUSC471ChjQ+buMvENasTHbdBWnUwvMy
+ 50Jw==
+X-Gm-Message-State: AOAM531zm2ozRgfuqpgESfB7ZNLyTgmg5cvJI4RcQFkIl2S0dDe5LxiT
+ DjvWpgkxT9JO6vGq48308/EhqA==
+X-Google-Smtp-Source: ABdhPJxGdbdxEOmMGI2cDd9IMsZb4WuWT5VOIWwtHs6nKXy4BGp2MRyCMBHb/jfJVph6k3aS3ZyS+g==
+X-Received: by 2002:a17:90b:3748:: with SMTP id
+ ne8mr2212372pjb.7.1593529262228; 
+ Tue, 30 Jun 2020 08:01:02 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id m31sm2744103pjb.52.2020.06.30.08.01.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 08:01:01 -0700 (PDT)
+Subject: Re: [PATCH 2/2] target/riscv: Do amo*.w insns operate with 32 bits
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <20200629130731.1080-1-zhiwei_liu@c-sky.com>
+ <20200629130731.1080-3-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dcac30bb-4d01-48fa-ee48-0feed464b180@linaro.org>
+Date: Tue, 30 Jun 2020 08:00:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <626a8bb28b71b4bd2a7e8f9defe4a6dc9aaf1907.1593273671.git.elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200629130731.1080-3-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,52 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
- thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com,
+ wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---W/nzBZO5zC0uMSeA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 6/29/20 6:07 AM, LIU Zhiwei wrote:
+> +static bool
+> +gen_amo_w(DisasContext *ctx, arg_atomic *a,
+> +          void(*func)(TCGv, TCGv, TCGv, TCGArg, MemOp),
+> +          MemOp mop, bool sign)
+>  {
+>      TCGv src1 = tcg_temp_new();
+>      TCGv src2 = tcg_temp_new();
+>  
+>      gen_get_gpr(src1, a->rs1);
+>      gen_get_gpr(src2, a->rs2);
+> +    if (sign) {
+> +        tcg_gen_ext32s_tl(src2, src2);
+> +    } else {
+> +        tcg_gen_ext32u_tl(src2, src2);
+> +    }
+>  
+>      (*func)(src2, src1, src2, ctx->mem_idx, mop);
+> -
+> +    tcg_gen_ext32s_tl(src2, src2);
+>      gen_set_gpr(a->rd, src2);
+> +
+>      tcg_temp_free(src1);
+>      tcg_temp_free(src2);
+>      return true;
 
-On Sat, Jun 27, 2020 at 10:09:24AM -0700, elena.ufimtseva@oracle.com wrote:
-> From: Jagannathan Raman <jag.raman@oracle.com>
->=20
-> Add a configuration option to separate multi-process code
->=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> ---
->  configure | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+With the fix to tcg, there should be no change required here, since you're
+already passing MO_TESL for signed input.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Note that unsigned comparisions work as expected with sign-extended inputs.
+That's what the risc-v isa does, after all.
 
---W/nzBZO5zC0uMSeA
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl77Ut8ACgkQnKSrs4Gr
-c8gUfwf/SOVHCq2GurITY68Aarai9rZomii2uApegTrdSJjTi9RW0KaUgN0xO1T4
-CwflPDFO24Nn014lTpG6jqE7N8xejGm3DPdw8Dq6HlY/59oLE2PASmyG9vatcFK2
-LhjWxEa7JWJD+wa+QWkuARR5uGmy07CoCk1DQi2NDMWmyRy7o6OQ8p+5edMOYrt0
-W2pHsqSzLUoHL1t9BZmD6UekZwJw5xUWIgi6vo2Z4f/UVY1OZMgMOzcJxDr/6/2i
-Xc5qRE6bW7M7Rkif9a4HB4Z7KTktFpUbSuWVyF/lEELrk4iwYxSlZO+abB+NCc8y
-5S4fCncfY/ah/o2mJqnZSleGZ7SgoQ==
-=dABt
------END PGP SIGNATURE-----
-
---W/nzBZO5zC0uMSeA--
-
+r~
 
