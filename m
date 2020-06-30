@@ -2,81 +2,120 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EE3C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D39C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:52:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF9C206BE
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:52:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F36A1206BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:52:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WFCfZJjT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF9C206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOkF1BY0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36A1206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqC09-0002wk-2V
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:52:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36318)
+	id 1jqC0O-0003AF-AM
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:52:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqByf-0000sp-Sy
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:50:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22907
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqBv1-0005BL-K9
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:47:07 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43216
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqBye-0000fK-4G
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:50:53 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqBv0-00007k-4G
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:47:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593507051;
+ s=mimecast20190719; t=1593506825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=8LPIbR6VP+jENeQRLj9u1oukf9ucQIGKk9Hg+tZmCpA=;
- b=WFCfZJjT5IGGC3PEgBF/wtOR7i6DvGL23alG5rxftGv5CpsNw0X76dod18zyJsMt3/wW7w
- S/izMwNJgQQq0tHlSDypPF9RKph+JzLQda39d9/yUhWCVN82cRWOd7n6h/P88Vq2g/fmAq
- gBYGHh8KQpE0Vl3jdmq8RjLlNqqbAIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-ChNVLAE9P6ymyenXKr_xvQ-1; Tue, 30 Jun 2020 04:50:46 -0400
-X-MC-Unique: ChNVLAE9P6ymyenXKr_xvQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D9C8100CCC0;
- Tue, 30 Jun 2020 08:50:44 +0000 (UTC)
-Received: from localhost (ovpn-115-106.ams2.redhat.com [10.36.115.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94A525D9DC;
- Tue, 30 Jun 2020 08:50:43 +0000 (UTC)
-Date: Tue, 30 Jun 2020 09:50:42 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH] util/coroutine: Cleanup start_switch_fiber_ for TSAN.
-Message-ID: <20200630085042.GD81930@stefanha-x1.localdomain>
-References: <20200626170001.27017-1-robert.foley@linaro.org>
- <20200629132640.GN31392@stefanha-x1.localdomain>
- <875zb9svss.fsf@linaro.org>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=W3b/qTeenEtl21pNKmDf1cpErOMxHMaHRIktFWkMxSo=;
+ b=fOkF1BY0Vy+/4YCR7BXlNdY8RS8LXTHWlx//lePNbHwdvMCBOmVqZBZlUwb2FFGDDvBjWw
+ SA6AvkjNPojvaEh/wjF/xxJ7GhJLEOZ7gNG+nvx59fVeTBuouM/PVPVRaaVu3ShOroy9W9
+ Gpg+yqkoL7j/HdqFP9VDHMgZSiXN6LM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-exBOXwJ7OXONXjXxM5JGGw-1; Tue, 30 Jun 2020 04:47:03 -0400
+X-MC-Unique: exBOXwJ7OXONXjXxM5JGGw-1
+Received: by mail-ej1-f72.google.com with SMTP id op28so11386214ejb.15
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 01:47:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=W3b/qTeenEtl21pNKmDf1cpErOMxHMaHRIktFWkMxSo=;
+ b=PhnU7sWVVAOQM8jj6igloks35u9eNwF5f7amLL2KPki8oVKYQ8hAy4k+a876DxDws6
+ 9hrIXwSkx1Yfre2v7kjHz3eB+q8e9mO2zJ4knCYIuuZWmBMPmy8VluH6q0vf1KQqYWC3
+ bYsXf7f+F879smWrec3eBD5h9w/VOjQTlY6ikTjdaKRz/3Tw/lUrPnux7asHJccwfAZo
+ dBI91ELY3T9oSxIlcjzH1Wy1oDqDvk5RLsZHvDKGHFQB5LOL6VCY9uy/kMB5yLBgGElY
+ NJGvGE3z6hdOJSGstsYCRYMckotuhMTZziMk0sLkqWSO/0j/wU5uz+YM7O/1XvplbOgA
+ DKPQ==
+X-Gm-Message-State: AOAM530rnmJ+WhxZzdjxdx1QkWDp9G8FkxlyhviV/g7xcZUJvvsjxx0Z
+ ZzDQ+hSVHf0vtLLlbiAFOmtvd21QWJ8pAvCZQtX90GMUYLaGY08yNI+Zm8fgXUsa5v+v86FOtqE
+ nDLPqBhPrPnK7fQM=
+X-Received: by 2002:a50:f418:: with SMTP id r24mr16670878edm.382.1593506821861; 
+ Tue, 30 Jun 2020 01:47:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzvK3ZzbDLQxQEReBmRbECL5H97QHOxX2C3nCwT4Q4CClNWIO8ETEGbBkEof8qEAE9WhDI/HQ==
+X-Received: by 2002:a50:f418:: with SMTP id r24mr16670861edm.382.1593506821700; 
+ Tue, 30 Jun 2020 01:47:01 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id dt22sm1574019ejc.104.2020.06.30.01.47.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 01:47:01 -0700 (PDT)
+Subject: Re: [PATC 7/9] Skipping drm build, unsupported
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <CA+XhMqzjjrfxXeSENBQuHzTe4TRMWV5GOdqPkD3bo17T3ufR1A@mail.gmail.com>
+ <1058ccbd-b4bb-9413-abc5-ae89076a58e1@redhat.com>
+ <20200630082301.6vybzwmg4pviuwob@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <a482bd09-28c8-7de7-de06-dba60d1c8160@redhat.com>
+Date: Tue, 30 Jun 2020 10:46:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <875zb9svss.fsf@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+In-Reply-To: <20200630082301.6vybzwmg4pviuwob@sirius.home.kraxel.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sgneBHv3152wZ8jf"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,67 +136,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Robert Foley <robert.foley@linaro.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, cota@braap.org,
- peter.puhov@linaro.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ David CARLIER <devnexen@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---sgneBHv3152wZ8jf
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 6/30/20 10:23 AM, Gerd Hoffmann wrote:
+> On Tue, Jun 30, 2020 at 08:44:24AM +0200, Philippe Mathieu-DaudÃ© wrote:
+>> +Gerd
+>>
+>> On 6/29/20 11:48 PM, David CARLIER wrote:
+>>> From 157a0374093371719de42e99364352d64190f52a Mon Sep 17 00:00:00 2001
+>>> From: David Carlier <devnexen@gmail.com>
+>>> Date: Mon, 29 Jun 2020 22:20:06 +0000
+>>> Subject: [PATCH 7/9] Skipping drm build, unsupported.
+> 
+> --verbose please.
 
-On Mon, Jun 29, 2020 at 05:04:19PM +0100, Alex Benn=E9e wrote:
->=20
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
->=20
-> > On Fri, Jun 26, 2020 at 01:00:01PM -0400, Robert Foley wrote:
-> >> This is a cleanup patch to follow-up the patch which introduced TSAN.
-> >> This patch makes separate start_switch_fiber_ functions for TSAN and A=
-SAN.
-> >>=20
-> >> This does two things:
-> >> 1. Unrelated ASAN and TSAN code is separate and each function only
-> >>    has arguments that are actually needed.
-> >> 2. The co->tsan_caller_fiber and co->tsan_co_fiber fields are only
-> >>    access from within #ifdef CONFIG_TSAN.
-> >>=20
-> >> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> >> ---
-> >>  util/coroutine-ucontext.c | 52 +++++++++++++++++++++++++-------------=
--
-> >>  1 file changed, 34 insertions(+), 18 deletions(-)
-> >
-> > Thank you for revisiting this patch after it was applied!
-> >
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Who takes care of coroutine patches or should this go via a different
-> tree?
+David has difficulties understanding how to send patches,
+so you missed the cover/context. This is for the Haiku OS
+which apparently is POSIX.1-2001 compatible.
 
-Commit 0aebab04b9289bd37017593b413ce7a762b54c55 ("configure: add
---enable-tsan flag + fiber annotations for coroutine-ucontext") went
-through your tree. Please take this follow-up patch too.
+I don't know about DRI-1.0, maybe it is POSIX.1-2008?
 
-Stefan
-
---sgneBHv3152wZ8jf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl76/OIACgkQnKSrs4Gr
-c8jsPAgAvQQ1ogMqXLEsnxp0+t5UA4sACrW7utuWMo2Unn7+ehgl0SX4ckbBlv+y
-uMve91NTCxNULipG0D0aRk7DnqcGr/1cHheBIOFVTdEJRxA4T187dNS6kRIoq09l
-V5bMvqPp+awXruLxGD/WdCLJku1s3c0281vPBH2hY0CJr4T61cyjT0FgQFlD6MFH
-4qYhInHuEZ0U5biBnrxiMehvO62AOI8cGoAdcJRRbqA07msz+R4uyRCXv1MOdK0s
-3lN5gcmN7syQUfMjD8fTg6m3FtglZyAUl3XPwPv2YP1GGIs8voZVn+bXdccE5rg9
-jWRwNaB7qttEkVa4IAZiB0uyEyrRVg==
-=EUw1
------END PGP SIGNATURE-----
-
---sgneBHv3152wZ8jf--
+>>> -util-obj-$(CONFIG_POSIX) += drm.o
+>>> +util-obj-$(CONFIG_LINUX) += drm.o
+> 
+> Can't see anything linux-specific there.  Also note that FreeBSD (and
+> possibly other *BSDs too) have drm support.  So CONFIG_POSIX looks
+> correct to me.
+> 
+> take care,
+>   Gerd
+> 
 
 
