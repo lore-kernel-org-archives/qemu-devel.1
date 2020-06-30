@@ -2,80 +2,81 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3107C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF04C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEB13206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:05:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0404C206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:05:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLGVNF5d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB13206A1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxCtuqm+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0404C206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqCCd-0004Hd-VW
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:05:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39832)
+	id 1jqCDC-0005Z6-74
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:05:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBO-0002Sg-An
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49640
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBQ-0002Wg-Lu
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56154
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBK-0002rN-IF
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:01 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCBL-0002tg-PV
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:04:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593507837;
+ s=mimecast20190719; t=1593507839;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DhvCuRBdoQSKvGtesEiQzYopeLp7ZgAezuSkNsBxI+E=;
- b=dLGVNF5dI9yraNPj/Fs/cppMHbaZOlUVFOYgi0hW9g/DrUqabM3uC0edhpzHtwXYgHsYGk
- +EQghSFcFHipVNRpmLThm8gYWcShwWyY5NX8Xjj+8w/M47r4umC+EGHQsISfO+mrydgDMC
- uW7GP+TrVhOCA5dJJJPbG54H1ABz3f0=
+ bh=uMK46KJ2cnpUchCFeSEj8pYKe2vweYwRfkLAmNI0C5s=;
+ b=MxCtuqm+PdCj8TnE3hWIpmpMwrqUH347phJtgu/dIHiKTPdIsQFH+Midonjdqv3NAzEm5x
+ ZNGXBg8Ou6RL9Gr6X9yL4V/91NtdBODDIUaidpnp5q3Ujz0EkzLaeEAnLVgbB/9ebPA5EC
+ AlAo/hteUNa4Jfvsku8t3DJctCcM4dI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-4ldQaU-FOmm767vs8JIuBA-1; Tue, 30 Jun 2020 05:03:56 -0400
-X-MC-Unique: 4ldQaU-FOmm767vs8JIuBA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-435-sySd74y3NS6fJ3caPw6EmQ-1; Tue, 30 Jun 2020 05:03:57 -0400
+X-MC-Unique: sySd74y3NS6fJ3caPw6EmQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20B42BFC6
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 09:03:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DB5F800C64;
+ Tue, 30 Jun 2020 09:03:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C0D856E6F0;
- Tue, 30 Jun 2020 09:03:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FAFB60E1C;
+ Tue, 30 Jun 2020 09:03:56 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AFF791138471; Tue, 30 Jun 2020 11:03:51 +0200 (CEST)
+ id DBBAE1138478; Tue, 30 Jun 2020 11:03:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 05/26] tests: Use error_free_or_abort() where appropriate
-Date: Tue, 30 Jun 2020 11:03:30 +0200
-Message-Id: <20200630090351.1247703-6-armbru@redhat.com>
+Subject: [PATCH v3 12/26] aspeed: Clean up roundabout error propagation
+Date: Tue, 30 Jun 2020 11:03:37 +0200
+Message-Id: <20200630090351.1247703-13-armbru@redhat.com>
 In-Reply-To: <20200630090351.1247703-1-armbru@redhat.com>
 References: <20200630090351.1247703-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 00:34:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,213 +97,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Replace
 
-    g_assert(err != NULL);
-    error_free(err);
-    err = NULL;
+        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &local_err);
+        error_propagate(&err, local_err);
+        if (err) {
+            error_propagate(errp, err);
+            return;
+	}
 
-and variations thereof by
+by
 
-    error_free_or_abort(&err);
+        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
+        if (err) {
+            error_propagate(errp, err);
+            return;
+	}
 
+Cc: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 ---
- tests/check-block-qdict.c   | 24 ++++++------------------
- tests/check-qom-proplist.c  |  7 ++-----
- tests/test-base64.c         |  3 +--
- tests/test-bdrv-graph-mod.c |  4 +---
- tests/test-block-iothread.c |  3 +--
- tests/test-crypto-cipher.c  |  8 ++------
- tests/test-io-task.c        |  4 +---
- 7 files changed, 14 insertions(+), 39 deletions(-)
+ hw/arm/aspeed_ast2600.c | 10 ++++------
+ hw/arm/aspeed_soc.c     | 10 ++++------
+ 2 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
-index 73d3e9f574..5a25825093 100644
---- a/tests/check-block-qdict.c
-+++ b/tests/check-block-qdict.c
-@@ -610,9 +610,7 @@ static void qdict_rename_keys_test(void)
-     copy = qdict_clone_shallow(dict);
-     qdict_rename_keys(copy, renames, &local_err);
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 6da687299f..08b3592e36 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -228,7 +228,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     int i;
+     AspeedSoCState *s = ASPEED_SOC(dev);
+     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+-    Error *err = NULL, *local_err = NULL;
++    Error *err = NULL;
+     qemu_irq irq;
  
--    g_assert(local_err != NULL);
--    error_free(local_err);
--    local_err = NULL;
-+    error_free_or_abort(&local_err);
- 
-     g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-     g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-@@ -649,9 +647,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.0.policy", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -660,9 +656,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.a", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -673,9 +667,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.b", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -684,9 +676,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.3", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -695,9 +685,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.+1", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- }
- 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 8c71734e1a..e1e0a96661 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -491,17 +491,14 @@ static void test_dummy_getenum(void)
-                                    "av",
-                                    "BadAnimal",
-                                    &err);
--    g_assert(err != NULL);
--    error_free(err);
--    err = NULL;
-+    error_free_or_abort(&err);
- 
-     /* A non-enum property name */
-     val = object_property_get_enum(OBJECT(dobj),
-                                    "iv",
-                                    "DummyAnimal",
-                                    &err);
--    g_assert(err != NULL);
--    error_free(err);
-+    error_free_or_abort(&err);
- 
-     object_unparent(OBJECT(dobj));
- }
-diff --git a/tests/test-base64.c b/tests/test-base64.c
-index ec122ceba5..a7f722c459 100644
---- a/tests/test-base64.c
-+++ b/tests/test-base64.c
-@@ -54,10 +54,9 @@ static void test_base64_bad(const char *input,
-                                      &len,
-                                      &err);
- 
--    g_assert(err != NULL);
-+    error_free_or_abort(&err);
-     g_assert(actual == NULL);
-     g_assert_cmpint(len, ==, 0);
--    error_free(err);
- }
- 
- 
-diff --git a/tests/test-bdrv-graph-mod.c b/tests/test-bdrv-graph-mod.c
-index f93f3168b0..8cff13830e 100644
---- a/tests/test-bdrv-graph-mod.c
-+++ b/tests/test-bdrv-graph-mod.c
-@@ -115,9 +115,7 @@ static void test_update_perm_tree(void)
-                       BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY, &error_abort);
- 
-     bdrv_append(filter, bs, &local_err);
--
--    g_assert_nonnull(local_err);
--    error_free(local_err);
-+    error_free_or_abort(&local_err);
- 
-     blk_unref(root);
- }
-diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
-index a953794be2..3f866a35c6 100644
---- a/tests/test-block-iothread.c
-+++ b/tests/test-block-iothread.c
-@@ -650,8 +650,7 @@ static void test_propagate_mirror(void)
-     blk_insert_bs(blk, src, &error_abort);
- 
-     bdrv_try_set_aio_context(target, ctx, &local_err);
--    g_assert(local_err);
--    error_free(local_err);
-+    error_free_or_abort(&local_err);
- 
-     g_assert(blk_get_aio_context(blk) == main_ctx);
-     g_assert(bdrv_get_aio_context(src) == main_ctx);
-diff --git a/tests/test-crypto-cipher.c b/tests/test-crypto-cipher.c
-index 07fa2fa616..bebba1a4f4 100644
---- a/tests/test-crypto-cipher.c
-+++ b/tests/test-crypto-cipher.c
-@@ -761,10 +761,7 @@ static void test_cipher_short_plaintext(void)
-                                  sizeof(plaintext1),
+     /* IO space */
+@@ -394,8 +394,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+         object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
+-        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &local_err);
+-        error_propagate(&err, local_err);
++        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+@@ -446,11 +445,10 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < sc->macs_num; i++) {
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
                                   &err);
-     g_assert(ret == -1);
--    g_assert(err != NULL);
--
--    error_free(err);
--    err = NULL;
-+    error_free_or_abort(&err);
+-        sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &local_err);
+-        error_propagate(&err, local_err);
++        sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+-           return;
++            return;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+                         sc->memmap[ASPEED_ETH1 + i]);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 810cf9b6cc..ec21de50ce 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -218,7 +218,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     int i;
+     AspeedSoCState *s = ASPEED_SOC(dev);
+     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+-    Error *err = NULL, *local_err = NULL;
++    Error *err = NULL;
  
-     /* Should report an error as plaintext is larger than
-      * block size, but not a multiple of block size
-@@ -775,9 +772,8 @@ static void test_cipher_short_plaintext(void)
-                                  sizeof(plaintext2),
+     /* IO space */
+     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
+@@ -340,8 +340,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     /* SPI */
+     for (i = 0; i < sc->spis_num; i++) {
+         object_property_set_int(OBJECT(&s->spi[i]), 1, "num-cs", &err);
+-        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &local_err);
+-        error_propagate(&err, local_err);
++        sysbus_realize(SYS_BUS_DEVICE(&s->spi[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+@@ -392,11 +391,10 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < sc->macs_num; i++) {
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
                                   &err);
-     g_assert(ret == -1);
--    g_assert(err != NULL);
-+    error_free_or_abort(&err);
- 
--    error_free(err);
-     qcrypto_cipher_free(cipher);
- }
- 
-diff --git a/tests/test-io-task.c b/tests/test-io-task.c
-index c8a3813d49..85e7a98da5 100644
---- a/tests/test-io-task.c
-+++ b/tests/test-io-task.c
-@@ -240,9 +240,7 @@ static void test_task_thread_failure(void)
-     object_unref(obj);
- 
-     g_assert(data.source == obj);
--    g_assert(data.err != NULL);
--
--    error_free(data.err);
-+    error_free_or_abort(&data.err);
- 
-     self = g_thread_self();
- 
+-        sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &local_err);
+-        error_propagate(&err, local_err);
++        sysbus_realize(SYS_BUS_DEVICE(&s->ftgmac100[i]), &err);
+         if (err) {
+             error_propagate(errp, err);
+-           return;
++            return;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+                         sc->memmap[ASPEED_ETH1 + i]);
 -- 
 2.26.2
 
