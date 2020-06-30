@@ -2,76 +2,78 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB7CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC20C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:58:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78A1820768
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3294E20768
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:58:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sw1oCa8S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A1820768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EkBDPDfm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3294E20768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqMOo-000178-NV
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53350)
+	id 1jqMOu-000196-EU
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:58:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqMNl-00089E-MA; Tue, 30 Jun 2020 15:57:29 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37191)
+ id 1jqMNm-00089N-9J; Tue, 30 Jun 2020 15:57:30 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39291)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqMNk-00044T-Bz; Tue, 30 Jun 2020 15:57:29 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a6so21339355wrm.4;
- Tue, 30 Jun 2020 12:57:27 -0700 (PDT)
+ id 1jqMNl-00044X-1U; Tue, 30 Jun 2020 15:57:30 -0400
+Received: by mail-wr1-x443.google.com with SMTP id q5so21326445wru.6;
+ Tue, 30 Jun 2020 12:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=znF0WQWyIqwGCAno4Um3q4Y6c7tQfMSvObuszrCzcOU=;
- b=sw1oCa8SAfWJs9iSCnQUnUQZKHwn876FsUAU4nArXdfW0HkiH6dox8D8o3JWX37o+i
- fkVCeT07dEaXy+meKOojYfKuUds5e9ujbwiwbN1kEWQxEJfWCBuYNKVJ+cmGjDI5uZbW
- zkD2LC/+SYukrxbnm2NZN+tkVsZ3lSOB65SnUVHcHMzDiGh46fxWyMXBKTaAIxB3nDUH
- +0HHh6KhJU7CAgz0veDkgYsuhcbmp1crlx4O0c5vu5eUgm35m7xmvN3+JeOyR2icaoOe
- +8F8qwAvRtU4riz7KrEo0d2j+aJuqwXAVjT7AaNm8RWOFs8QzM9w8Du+WsYTrq/4QFb8
- bDtg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=U3siTkfLjVJQEaCMkrInYfzFvhXImBmDXKhPhC0qsnI=;
+ b=EkBDPDfm41QjdCyNFfSY3uO9T/oVk/BxIFYE0qDNx+tazx1A4MerVH4FuVtKqPYRAk
+ HPgkYhV0xwggFAYHGpuW1hRR1ZJ2ENpqci1WoNwpu6seNx6nMaegjFFeQnt+BJhLsLay
+ RBpdDcMJmxijtCkxTbnDDa6ciL2TYlvxcDMxwePlKFNRMqiFzJR/ZY/P9LRA0evleq7B
+ 8gPlOXojQZasRhB2eh0vwmIjhAJiJvXqw9EXX3y4+wqsHqWxuTH6Zdl4GtZoJPQuuHaf
+ LbJuqP/EjPR/uS8YUV9M7h6HVX8dRYVy0wa3Sp/Mhf68Z6e1UNPjWm9NKs0OyZA1vwuZ
+ wj6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=znF0WQWyIqwGCAno4Um3q4Y6c7tQfMSvObuszrCzcOU=;
- b=DzfYXOiMJ3XkeXOBd/h2qE4hla+V7lmF1TPl8k1AfeP+LvnEtI31dCefj855BbQ2ih
- gPzigMXBEgeiobk7itrwt4+uLyFxqAJUJw7wSIwCSO7G+sdoLapvFvoAyBNSBmYPk0GS
- RtMoMKbH8eYeN8w78KoKf3oQ0na/hzc40X9M2ulfssOq6HYa1tXcJfgdoFNe52yueAwO
- Ia0D7D4NDtSqqLyqZLGmCZEQbC8ROEcSQqsvPaLjPQDsqzzNK4WtE8D1hvY1MSoWIBpJ
- TlDEuQohVNbKjsGnktUtlwOlJXkOna83LasI0y4sU/p8nQ9tszRWohUavKNr9LNGlh9q
- TIQA==
-X-Gm-Message-State: AOAM531NlW3XXhT+zBHlZEFCwXtk14lYp2ht+Bazfz9k1PDKte5Finr2
- QT3OHrFtTFIYBG6iQVlfbxvkdBHiMuM=
-X-Google-Smtp-Source: ABdhPJzb3MpPAdJyF/SEYmSS/22YsA7VmQtQy6nPUF0HNtsU+BgZd1+PqK1h9S9haLMKL/v3pKo/kg==
-X-Received: by 2002:adf:edc6:: with SMTP id v6mr23308804wro.413.1593547045495; 
- Tue, 30 Jun 2020 12:57:25 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=U3siTkfLjVJQEaCMkrInYfzFvhXImBmDXKhPhC0qsnI=;
+ b=RyshWyFOkuXxlTbFEjrf5OgHXwaOXi7HMoC6uv6NYzDOT6tj4uIWy+NPkywbZifQXJ
+ DnJtvhCMBCuNauwS69/RluUA2Y+F0xnsddXeldnywbCOMo/1uX2BP44mr0Ly3QQQ8XQc
+ iv4NqK6Yy09X0B5/MR1VOYIy2haQs5vBT9L1xLUD0bLH4ctG0WClh/KaWju8hleJ+lkS
+ 6wjwF/cbOFrBIYVwkywFf65LGGTvTHMgZfHpL5DeB/s2ZVTF9Za2NHZ3/tC68UIEfZ6/
+ Cr9K8PIliDRi/qV1VE+BthW9P+RKi988EhmJHHAEH7OHjc9ZEOmzW/QnglNIxnTMpdPm
+ 1Zjw==
+X-Gm-Message-State: AOAM530fvCVCxaPBKEB4Y0xMT0dMAzSRW/7fcgFESqVG2yEfWzye5yJn
+ 8rkPfqRjUDzFTmkxsRssOtBqKpRcg5o=
+X-Google-Smtp-Source: ABdhPJx2wD5QVQlaXTpGyvQCGyqHMszfdzf6bxNLksOfafCeVC68Eut2P33k2F5fh5WY+mPzFlTdXQ==
+X-Received: by 2002:adf:f5ce:: with SMTP id k14mr22106264wrp.234.1593547046627; 
+ Tue, 30 Jun 2020 12:57:26 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id k11sm5172979wrd.23.2020.06.30.12.57.24
+ by smtp.gmail.com with ESMTPSA id k11sm5172979wrd.23.2020.06.30.12.57.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 12:57:24 -0700 (PDT)
+ Tue, 30 Jun 2020 12:57:26 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org, Yunqiang Su <ysu@wavecomp.com>,
  Aurelien Jarno <aurelien@aurel32.net>
-Subject: [PATCH v3 0/5] hw/mips/malta: Add the 'malta-strict' machine,
- matching Malta hardware
-Date: Tue, 30 Jun 2020 21:57:18 +0200
-Message-Id: <20200630195723.1359-1-f4bug@amsat.org>
+Subject: [PATCH v3 1/5] hw/mips/malta: Trivial code movement
+Date: Tue, 30 Jun 2020 21:57:19 +0200
+Message-Id: <20200630195723.1359-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200630195723.1359-1-f4bug@amsat.org>
+References: <20200630195723.1359-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
@@ -100,7 +102,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Igor Mammedov <imammedo@redhat.com>,
@@ -109,40 +112,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Trivial code movement to make the next patch easier to review.
 
-This series add a new 'malta-strict' machine, that aims to properly
-model the real hardware (which is not what the current 'malta'
-machine models).
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/mips/malta.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Since v2:
-- Initialize missing malta_machine_types::class_size
-- Remove RFC patch that confuses Aleksandar
-- Added examples of 'malta-strict' use
-
-$ git backport-diff -u v2
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/5:[----] [--] 'hw/mips/malta: Trivial code movement'
-002/5:[----] [--] 'hw/mips/malta: Register the machine as a TypeInfo'
-003/5:[0001] [FC] 'hw/mips/malta: Introduce MaltaMachineClass::max_ramsize'
-004/5:[----] [--] 'hw/mips/malta: Introduce the 'malta-strict' machine'
-005/5:[----] [--] 'hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes'
-
-Philippe Mathieu-Daudé (5):
-  hw/mips/malta: Trivial code movement
-  hw/mips/malta: Register the machine as a TypeInfo
-  hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
-  hw/mips/malta: Introduce the 'malta-strict' machine
-  hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
-
- hw/mips/malta.c | 105 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 91 insertions(+), 14 deletions(-)
-
+diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+index d95926a89c..5b371c1e34 100644
+--- a/hw/mips/malta.c
++++ b/hw/mips/malta.c
+@@ -1426,6 +1426,13 @@ static const TypeInfo mips_malta_device = {
+     .instance_size = sizeof(MaltaState),
+ };
+ 
++static void mips_malta_register_types(void)
++{
++    type_register_static(&mips_malta_device);
++}
++
++type_init(mips_malta_register_types)
++
+ static void mips_malta_machine_init(MachineClass *mc)
+ {
+     mc->desc = "MIPS Malta Core LV";
+@@ -1442,10 +1449,3 @@ static void mips_malta_machine_init(MachineClass *mc)
+ }
+ 
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
+-
+-static void mips_malta_register_types(void)
+-{
+-    type_register_static(&mips_malta_device);
+-}
+-
+-type_init(mips_malta_register_types)
 -- 
 2.21.3
 
