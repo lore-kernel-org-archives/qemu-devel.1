@@ -2,88 +2,88 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E3FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF1FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EB5E20702
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61BC42074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 20:56:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFu1qENS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB5E20702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5EoJpC6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BC42074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqNGC-0006Xl-UU
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 16:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39312)
+	id 1jqNIf-0007xz-Ll
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 16:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqNFK-0005od-LX
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 16:52:50 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30554
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqNFI-00042X-1W
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 16:52:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593550366;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=V56K+a8mq8ksqdgM7uZyQi18ArqwScpjTLYuCQ0IBXY=;
- b=cFu1qENS/zXtSOPP3YPxQb9xTD5Gq0VJV1jCkZ+xbPlNEeEGjMxJ6KyldPh7qgUWt4c2Kc
- lIU1YYBu7rQSKzAHATdNRVRL7OoSMtIvQygZp2m1uFXScwefW6EYZ7fTUQWZFAY+9OI5h1
- 783mjf6L9V0U02+Mmboq/59mEI2FgcU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-R3Ro1a5dOOeXtIS0OQ5Ttg-1; Tue, 30 Jun 2020 16:52:43 -0400
-X-MC-Unique: R3Ro1a5dOOeXtIS0OQ5Ttg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 053BD805EEE;
- Tue, 30 Jun 2020 20:52:41 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D9A9B19C79;
- Tue, 30 Jun 2020 20:52:39 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id DF2BC16E16; Tue, 30 Jun 2020 22:52:38 +0200 (CEST)
-Date: Tue, 30 Jun 2020 22:52:38 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH v4] sm501: Fix and optimize overlap check
-Message-ID: <20200630205238.rwzs7rlr4l2qjsmw@sirius.home.kraxel.org>
-References: <f0b64bf047e343f8b2e91baeccb4753bc26b17cc.1592686588.git.balaton@eik.bme.hu>
- <20200624164737.A941374633D@zero.eik.bme.hu>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jqNHr-000778-0t; Tue, 30 Jun 2020 16:55:27 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43482)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jqNHp-0004HP-BR; Tue, 30 Jun 2020 16:55:26 -0400
+Received: by mail-io1-xd43.google.com with SMTP id k23so22507877iom.10;
+ Tue, 30 Jun 2020 13:55:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cS07S9PeaiBeK0IzcW0qbV66hIIZRnIen/5zf8xLf1c=;
+ b=X5EoJpC6n7Z6YvON2sQFoVhsOwbawuSeaPsYxkJC7x4N17/U9xK5Udfy3kNOcTYIhT
+ O+GkysAPVljHAvKXJ2dYXmrQjXO43xv2rgdCBJkKH6sQxcgRkmA/u5nPOvXhpNWT9B99
+ HGkqf3WY/gz51AbJIrU/xP+wb4ckM+HyjKOIXFy4m0k8as5CCO7mIWDv+GH64bF2/R0v
+ v/FrnOyOywvCyrfe92Hi0DRZAyMhy5Xw9ECYsEiIg68q04JIQyu2EOE3WVKHSyowWs4d
+ FTIjBHfoIZ5iPoxETbygTdLObU4TnqOgzK6VDkXcjcLyDhbRWsEpCYcxMrRt23MYc0Kz
+ uEjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cS07S9PeaiBeK0IzcW0qbV66hIIZRnIen/5zf8xLf1c=;
+ b=W1PGFlJ/fLTxl/MT/OrloDXoeIrxkWN3NnE939DPij2Rlb9fVFVXtpDFpvxZ5OoelN
+ i6hE9q2i+Rlpslatz+poAbHuxSfs2otiyty6N2x3pUPm5LcgsPTVCVYe0qPBgVgVuGub
+ ND3OjWGdbre7F6VZ+8g4lQOilDT8iHnyDE+JBr3hlMIXwMzOBPPvo5SmBqIiV+AuG6Jo
+ gmt2jcQP27XrKrjDehNHV2I+CzIzcVFGUzxpkMz9Rxfu4IQUZ2iqOlC4FnH/fNjPsFFZ
+ LlSakGYnnOVeSdUyfUAr0H0NXF4JHOhjQBtJWjV0kqfF2FkeJivdlPf6ZR0orn5zz6E5
+ wdRQ==
+X-Gm-Message-State: AOAM533f8fpYgFfIS305JCMxiD6zUMhpovQoIqlt1rB34tzj5bcKeugX
+ VeKN7fygse3SF3trVoAMGB02fORZmlPInAAOWmA=
+X-Google-Smtp-Source: ABdhPJzc1HK+aiVyA7xPxnOjkc+y1u/ihbeEBTgGWDTI84rWORAuSnFo5uoYbu2GP0rHoINmq9H2KpRzQDktup9jgmY=
+X-Received: by 2002:a6b:8dd1:: with SMTP id
+ p200mr23583366iod.118.1593550523524; 
+ Tue, 30 Jun 2020 13:55:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200624164737.A941374633D@zero.eik.bme.hu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200628142429.17111-1-peter.maydell@linaro.org>
+ <20200628142429.17111-6-peter.maydell@linaro.org>
+In-Reply-To: <20200628142429.17111-6-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 30 Jun 2020 13:45:39 -0700
+Message-ID: <CAKmqyKPiq4QGuhUADFLhMnekEpDA2NPh=MTHPskUjt2u+DTA5g@mail.gmail.com>
+Subject: Re: [PATCH 05/17] hw/arm/spitz: Implement inbound GPIO lines for bit5
+ and power signals
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,30 +96,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 24, 2020 at 06:42:18PM +0200, BALATON Zoltan wrote:
-> When doing reverse blit we need to check if source and dest overlap
-> but it is not trivial due to possible different base and pitch of
-> source and dest. Do rectangle overlap if base and pitch match,
-> otherwise just check if memory area containing the rects overlaps so
-> rects could possibly overlap.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On Sun, Jun 28, 2020 at 7:29 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> Currently the Spitz board uses a nasty hack for the GPIO lines
+> that pass "bit5" and "power" information to the LCD controller:
+> the lcdtg realize function sets a global variable to point to
+> the instance it just realized, and then the functions spitz_bl_power()
+> and spitz_bl_bit5() use that to find the device they are changing
+> the internal state of. There is a comment reading:
+>  FIXME: Implement GPIO properly and remove this hack.
+> which was added in 2009.
+>
+> Implement GPIO properly and remove this hack.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
-> This version fixes overlap check according to Peter's suggestion, only
-> resending this patch as v4, others still valid from v3. Let me know if
-> you want the whole series resent instead.
-
-Queued up now,  Last patch in a series is easy to replace.
-
-thanks,
-  Gerd
-
+>  hw/arm/spitz.c | 28 ++++++++++++----------------
+>  1 file changed, 12 insertions(+), 16 deletions(-)
+>
+> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+> index 69bc2b3fa10..11e413723f4 100644
+> --- a/hw/arm/spitz.c
+> +++ b/hw/arm/spitz.c
+> @@ -586,12 +586,9 @@ static void spitz_bl_update(SpitzLCDTG *s)
+>          zaurus_printf("LCD Backlight now off\n");
+>  }
+>
+> -/* FIXME: Implement GPIO properly and remove this hack.  */
+> -static SpitzLCDTG *spitz_lcdtg;
+> -
+>  static inline void spitz_bl_bit5(void *opaque, int line, int level)
+>  {
+> -    SpitzLCDTG *s = spitz_lcdtg;
+> +    SpitzLCDTG *s = opaque;
+>      int prev = s->bl_intensity;
+>
+>      if (level)
+> @@ -605,7 +602,7 @@ static inline void spitz_bl_bit5(void *opaque, int line, int level)
+>
+>  static inline void spitz_bl_power(void *opaque, int line, int level)
+>  {
+> -    SpitzLCDTG *s = spitz_lcdtg;
+> +    SpitzLCDTG *s = opaque;
+>      s->bl_power = !!level;
+>      spitz_bl_update(s);
+>  }
+> @@ -639,13 +636,16 @@ static uint32_t spitz_lcdtg_transfer(SSISlave *dev, uint32_t value)
+>      return 0;
+>  }
+>
+> -static void spitz_lcdtg_realize(SSISlave *dev, Error **errp)
+> +static void spitz_lcdtg_realize(SSISlave *ssi, Error **errp)
+>  {
+> -    SpitzLCDTG *s = FROM_SSI_SLAVE(SpitzLCDTG, dev);
+> +    SpitzLCDTG *s = FROM_SSI_SLAVE(SpitzLCDTG, ssi);
+> +    DeviceState *dev = DEVICE(s);
+>
+> -    spitz_lcdtg = s;
+>      s->bl_power = 0;
+>      s->bl_intensity = 0x20;
+> +
+> +    qdev_init_gpio_in_named(dev, spitz_bl_bit5, "bl_bit5", 1);
+> +    qdev_init_gpio_in_named(dev, spitz_bl_power, "bl_power", 1);
+>  }
+>
+>  /* SSP devices */
+> @@ -820,15 +820,11 @@ static void spitz_out_switch(void *opaque, int line, int level)
+>      case 3:
+>          zaurus_printf("Orange LED %s.\n", level ? "on" : "off");
+>          break;
+> -    case 4:
+> -        spitz_bl_bit5(opaque, line, level);
+> -        break;
+> -    case 5:
+> -        spitz_bl_power(opaque, line, level);
+> -        break;
+>      case 6:
+>          spitz_adc_temp_on(opaque, line, level);
+>          break;
+> +    default:
+> +        g_assert_not_reached();
+>      }
+>  }
+>
+> @@ -858,9 +854,9 @@ static void spitz_scoop_gpio_setup(SpitzMachineState *sms)
+>
+>      if (sms->scp1) {
+>          qdev_connect_gpio_out(sms->scp1, SPITZ_SCP2_BACKLIGHT_CONT,
+> -                              outsignals[4]);
+> +                              qdev_get_gpio_in_named(sms->lcdtg, "bl_bit5", 0));
+>          qdev_connect_gpio_out(sms->scp1, SPITZ_SCP2_BACKLIGHT_ON,
+> -                              outsignals[5]);
+> +                              qdev_get_gpio_in_named(sms->lcdtg, "bl_power", 0));
+>      }
+>
+>      qdev_connect_gpio_out(sms->scp0, SPITZ_SCP_ADC_TEMP_ON, outsignals[6]);
+> --
+> 2.20.1
+>
+>
 
