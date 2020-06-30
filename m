@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60364C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41232C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A89B206BE
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D92F206BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAIOek2+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A89B206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BO7i1ymp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D92F206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqGeD-0003G1-Bx
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:50:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35090)
+	id 1jqGeL-0003Xe-9Y
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:50:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqGTz-0001KO-SS; Tue, 30 Jun 2020 09:39:31 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:41732)
+ id 1jqGTv-0001Ex-BC; Tue, 30 Jun 2020 09:39:27 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:33969)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqGTy-0006Kw-7Q; Tue, 30 Jun 2020 09:39:31 -0400
-Received: by mail-ed1-x544.google.com with SMTP id e22so16227400edq.8;
- Tue, 30 Jun 2020 06:39:29 -0700 (PDT)
+ id 1jqGTt-0006Jd-Pd; Tue, 30 Jun 2020 09:39:27 -0400
+Received: by mail-ed1-x542.google.com with SMTP id a8so15033747edy.1;
+ Tue, 30 Jun 2020 06:39:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/74ZOEVtWoI92Rhuv9NWA62JHOdD9/euQUb+Sj4+JZg=;
- b=cAIOek2+VUlEPq6VZObms5zcks/UNF8orPh7ODrxUf93whGbPppvaEOUNBNgIjVtwb
- RnJJj+a10P+abz3HB4QjiMILLCTSI24rjITO7ftpDHypTR8DOiiEcibRZZt63Ilqzcba
- EobA8YDO+yZG1yEm4piNn/Bbt9tvLnQxlkwuBMAE1gcDJB0zwm3+zh2Bf7IKS82auT89
- 4tNgB4vnS92LOGUAcEsCY+Idnu32vr336tODo/LknvGOGYBvtHLoTqH3HWaOcSL4/W+Y
- Q+Xrr+Ut4rtN0OEpHOQO01B/+3pGd+Ea9uwi90XJC4B8M1rLH8Y84C5XM6azBvUnbzbV
- NB5w==
+ bh=VFFOiCizJ+mW5k6WnhghvzdFvmIVL76nU3yTXrPInm0=;
+ b=BO7i1ymp9yBffSDllzficR4ZG69UtZZ5R74AqNSXRYh8yUuIGpV8FDDWcdVshR7lJO
+ ud8RU7KqCzVcV5rMG4Nbmwt/FwZVPDlyxK+nBEwUg/8vXpMuwlr8PUzX+1hiboXF2NEJ
+ nZ4Nu1oUzek7wlaIZjxu/o3ZHnNPjJaSzTDCc9apCxXDRgAxYL+MH/Ge43MbdLJFxmYm
+ QRJSYlgHF15tzT/pnn95AScFJ8BDfNsu4GDmiQ565xM0Dbyx4AADHTgKi9jxF1APw+P/
+ UHWyrE0HlrQrtpCZ2/qGum2R1hCn0lB4P7/AaisN7MRRF+CaSJZpfP6J56pSL7n/sKPM
+ OBWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/74ZOEVtWoI92Rhuv9NWA62JHOdD9/euQUb+Sj4+JZg=;
- b=MOhs38O//AeCM+oZzqMGvwtyEhg7+NrVeWoJoi3Do83A6Y4WtOCXmxySHLCcYjb+k3
- TSGgPF0BM37AUPaVZBsHvRXjRRQwLZolHJCt6fBn2VVdDyLMGHXV2/XN77eHssU8k+X+
- Tk2+rKmL7/jz85ieYo/SpwYx+V8/d+4L4Aus4yKTNPHieERTO+MjJr250+on3LeudPEx
- eqfxCBbzPAZyg46GHr0k2e2vcOMuT4vSVyrMaDSW/G6X2PtQg7pw2dJBed5x/D9mNP9m
- O9P3jkqFaSqPakEPZQLaSMcbsG35Dx9E0b30g6hLZvktDC8PT4+6vPgLELaUP5vG0Zc+
- oIsg==
-X-Gm-Message-State: AOAM533ngooLykBgIBsC9sCcHx8lRu1YaM97Casva4Iq9W1BamjXwOY1
- Oprh8y6Tm8u59LvEdX5jJ47si8jzmxk=
-X-Google-Smtp-Source: ABdhPJwmVWhsHgXMGS5UDv329YVKJlrZm5l0XYS5jrAFMnCZIJaBqp9mxejIJt6y33aYA1cAzbYKoQ==
-X-Received: by 2002:aa7:c442:: with SMTP id n2mr13672084edr.309.1593524368446; 
- Tue, 30 Jun 2020 06:39:28 -0700 (PDT)
+ bh=VFFOiCizJ+mW5k6WnhghvzdFvmIVL76nU3yTXrPInm0=;
+ b=J+s8UBqxs4Y34KQPuBB6A29eb72MldJth0cGtP8AEMsDfFYIEkK3WqU05HUDk560OA
+ OJmpDWgDo99sti+fIIflugeiKXfgI02ER1wcMuYt6eupuXCNQFnqwvV2DCLEheZuyFKN
+ syUWqNsBYYE7TDFemsb8hydGhjoJrv2FP8XV2O/UxbzSOCbOfL7CtBQD21J20H0hoGQ2
+ tOWZkhjGjCA4zXnftrd/uzYORIHIkh7/mPLD1KMd1kQLXibgy9XeIib1DJCfNzWlfBhI
+ m40pqtj2N5uR/uvBTNT+gguNM06t/3ZvOb4n+XHZ8RGStLAVKRQS3x8BBSW4cMcpKcpS
+ KDTA==
+X-Gm-Message-State: AOAM531wET6YQmdJcvsu0CC3VWxV2oimor2lWaZK16+PCXgt1XwtRTb7
+ sVKLqMbq6rR1vgzgjH7bq7NAeu7351E=
+X-Google-Smtp-Source: ABdhPJwRdFf/h+UGSi2IZWls9PKOqan0JBjUYiv+eqhH8xA4qmKnc1X36AvIDR+rlcXshLQVKX6Tvw==
+X-Received: by 2002:aa7:d049:: with SMTP id n9mr15933117edo.39.1593524363856; 
+ Tue, 30 Jun 2020 06:39:23 -0700 (PDT)
 Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id p18sm2099172ejm.55.2020.06.30.06.39.27
+ by smtp.gmail.com with ESMTPSA id p18sm2099172ejm.55.2020.06.30.06.39.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 06:39:27 -0700 (PDT)
+ Tue, 30 Jun 2020 06:39:23 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 13/17] hw/sd/sdcard: Constify sd_crc*()'s message argument
-Date: Tue, 30 Jun 2020 15:39:07 +0200
-Message-Id: <20200630133912.9428-14-f4bug@amsat.org>
+Subject: [PATCH v7 09/17] hw/sd/sdcard: Special case the -ENOMEDIUM error
+Date: Tue, 30 Jun 2020 15:39:03 +0200
+Message-Id: <20200630133912.9428-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200630133912.9428-1-f4bug@amsat.org>
 References: <20200630133912.9428-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -101,7 +101,6 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  qemu-block@nongnu.org
@@ -109,47 +108,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CRC functions don't modify the buffer argument,
-make it const.
+As we have no interest in the underlying block geometry,
+directly call blk_getlength(). We have to care about machines
+creating SD card with not drive attached (probably incorrect
+API use). Simply emit a warning when such Frankenstein cards
+of zero size are reset.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/sd/sd.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 2946fe3040..364a6d1fcd 100644
+index e5adcc8055..548745614e 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -255,11 +255,11 @@ static const int sd_cmd_class[SDMMC_CMD_MAX] = {
-     7,  7, 10,  7,  9,  9,  9,  8,  8, 10,  8,  8,  8,  8,  8,  8,
- };
- 
--static uint8_t sd_crc7(void *message, size_t width)
-+static uint8_t sd_crc7(const void *message, size_t width)
+@@ -545,18 +545,30 @@ static inline uint64_t sd_addr_to_wpnum(uint64_t addr)
+ static void sd_reset(DeviceState *dev)
  {
-     int i, bit;
-     uint8_t shift_reg = 0x00;
--    uint8_t *msg = (uint8_t *) message;
-+    const uint8_t *msg = (const uint8_t *)message;
+     SDState *sd = SD_CARD(dev);
+-    uint64_t size;
+-    uint64_t sect;
  
-     for (i = 0; i < width; i ++, msg ++)
-         for (bit = 7; bit >= 0; bit --) {
-@@ -271,11 +271,11 @@ static uint8_t sd_crc7(void *message, size_t width)
-     return shift_reg;
- }
+     trace_sdcard_reset();
+     if (sd->blk) {
+-        blk_get_geometry(sd->blk, &sect);
+-    } else {
+-        sect = 0;
+-    }
+-    size = sect << 9;
++        int64_t size = blk_getlength(sd->blk);
++
++        if (size == -ENOMEDIUM) {
++            /*
++             * FIXME blk should be set once per device in sd_realize(),
++             * and we shouldn't be checking it in sed_reset(). But this
++             * is how the reparent currently works.
++             */
++            char *id = object_get_canonical_path_component(OBJECT(dev));
++
++            warn_report("sd-card '%s' created with no drive.",
++                        id ? id : "unknown");
++            g_free(id);
++            size = 0;
++        }
++        assert(size >= 0);
++        sd->size = size;
++    } else {
++        sd->size = 0;
++    }
  
--static uint16_t sd_crc16(void *message, size_t width)
-+static uint16_t sd_crc16(const void *message, size_t width)
- {
-     int i, bit;
-     uint16_t shift_reg = 0x0000;
--    uint16_t *msg = (uint16_t *) message;
-+    const uint16_t *msg = (const uint16_t *)message;
-     width <<= 1;
- 
-     for (i = 0; i < width; i ++, msg ++)
+-    sd->size = size;
+     sd->state = sd_idle_state;
+     sd->rca = 0x0000;
+     sd_set_ocr(sd);
 -- 
 2.21.3
 
