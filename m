@@ -2,97 +2,98 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE3DC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFE1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:31:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AF19206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:30:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7A01206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SiwVutjX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AF19206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AYxT3Eo+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A01206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqBep-0005Hl-FR
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:30:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59902)
+	id 1jqBfm-0006FW-8c
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:31:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqBeA-0004dN-Cc
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:29:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50020
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqBe7-0005hw-RP
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:29:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593505778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6WT/YFKnl15KcGvwJBWSa5CF8eXHhaqtaU6U18AT3ck=;
- b=SiwVutjXDaunVfic7YWIWwZTEGs4hKkrtJaSRd5iA74W+bWWjxBH7CzhdPjDKWhHC2Ad0F
- CE1c27VyemZhAjt6eZv6w4u1J3cGu6L47QqgENGaIQ5zmGoHQarItAFmdfdfF/FhileUml
- YRSCNwGAclc4AWOzT9gcth/2qmtX+sY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-BuYO0fnOP-yGxApj-SfFJA-1; Tue, 30 Jun 2020 04:29:36 -0400
-X-MC-Unique: BuYO0fnOP-yGxApj-SfFJA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55930805EF8;
- Tue, 30 Jun 2020 08:29:35 +0000 (UTC)
-Received: from [10.72.13.159] (ovpn-13-159.pek2.redhat.com [10.72.13.159])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2D4F86E6F0;
- Tue, 30 Jun 2020 08:29:20 +0000 (UTC)
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-From: Jason Wang <jasowang@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-References: <20200626064122.9252-1-eperezma@redhat.com>
- <20200626064122.9252-2-eperezma@redhat.com> <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
- <20200629133403.GA266532@xz-x1>
- <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
-Message-ID: <1b4eaaaf-c2ab-0da8-afb4-1b7b4221e6cf@redhat.com>
-Date: Tue, 30 Jun 2020 16:29:19 +0800
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqBeG-0004gr-8F; Tue, 30 Jun 2020 04:29:48 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:34581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqBeE-0005iK-HI; Tue, 30 Jun 2020 04:29:47 -0400
+Received: by mail-ej1-x644.google.com with SMTP id y10so19652795eje.1;
+ Tue, 30 Jun 2020 01:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=VLB9KdGPiTGQMkdwrnwOKpJ+SdzWfT9IkNjDXiY1yEE=;
+ b=AYxT3Eo+1UXnUTkgrXYPMdliIMw3nQx7oqI52mMrJUf0DSLCHQzG10ar/r8mG66o4s
+ zFYPprTDK5983h5hnsAORTfWMERC0j6ecyADxqp4YAGNMzMcr3fjLpFNlwC7HdeUMNfP
+ hc2uAXDgbCvvSyhONZL7vbszGtYsJe5wNrcCysuTABcHM8GVC7rzepykZp/wzuSqs7HO
+ wAZ0dIwbEEYWBqyxJIDo1RglWvm84ZkuapwVeIok14fqSTjHapW/90Dezr6jZjY6gQJm
+ rxZh+/cDxzW/DfcBXlkFForuep4cv/WDP5RdP6lDqOWlalK0KsycyZuBPHN0bNiRxL7c
+ SO+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VLB9KdGPiTGQMkdwrnwOKpJ+SdzWfT9IkNjDXiY1yEE=;
+ b=E/jfM//bUn4PWEQfCewPspQHJhp9PHUFlUSlpEUDIu5ZFmyXbmZC0PWcnx8Rmdp4Pr
+ mJ5gtIj1KytPyzzB57kMDBliqjV/UmX0paCJ5nSoI5PA16num5oozNdTDTFwgz2Issxu
+ vznNvfTlb64k0Uusn0HOR74gjSJ+s+7zn7XWZqQP5z/EPLDc2o0Pn9pQFM2BzjpZ36HO
+ VRwcamgYUf93g+4Umg77b5ZBB0a6iL2f9mGnDkAsKv8kyrTg2+Birf48IhwwxR0k4y6P
+ 6hApOhxsm0xXRR9Eg/LY3MQIq1GJYYqaW2ZBSJV+zuWfxfgTBA9WRiSMvkl87Y8d4Ywf
+ 2anQ==
+X-Gm-Message-State: AOAM531w8XzU/rC7MXCT97Rysqo3xHvx/7v/BmQYL5GOPRrdLgsQVTrI
+ ylaeDKTAAg4f2C8Bw7dhz2E=
+X-Google-Smtp-Source: ABdhPJw+pFs6cjYW0XnJplgIquh46j2lw9bHdJdcWE2d8QvUFmpcjWzVYgE1dOdBQK+19pW+JqgY4g==
+X-Received: by 2002:a17:906:c056:: with SMTP id
+ bm22mr7653641ejb.444.1593505784134; 
+ Tue, 30 Jun 2020 01:29:44 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id g21sm2095590edu.2.2020.06.30.01.29.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 01:29:43 -0700 (PDT)
+Subject: Re: [PATCH 2/5] hw/i2c: Rename i2c_try_create_slave() as
+ i2c_slave_new()
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200629173821.22037-1-f4bug@amsat.org>
+ <20200629173821.22037-3-f4bug@amsat.org>
+ <alpine.BSF.2.22.395.2006292333540.63145@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0b7730a8-bd1d-9104-9a48-5daecaa6b940@amsat.org>
+Date: Tue, 30 Jun 2020 10:29:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
+In-Reply-To: <alpine.BSF.2.22.395.2006292333540.63145@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,129 +106,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/29/20 11:37 PM, BALATON Zoltan wrote:
+> On Mon, 29 Jun 2020, Philippe Mathieu-Daudé wrote:
+>> We use "new" names for functions that allocate and initialize
+>> device objects: pci_new(), isa_new(), usb_new().
+>> Let's call this one i2c_slave_new(). Since we have to update
+>> all the callers, also let it return a I2CSlave object.
+> 
+> All the callers now need a cast due to change to I2CSlave * instead of
+> what they expect. Does that really worth it? Also this introduces
+> inconsistency between i2c_create_slave and i2c_new so not sure about
+> that part but I don't really mind either way. Maybe return what most
+> callers expect so the calls are simple and don't need an additional cast
+> in most of the cases?
 
-On 2020/6/30 上午10:41, Jason Wang wrote:
->
-> On 2020/6/29 下午9:34, Peter Xu wrote:
->> On Mon, Jun 29, 2020 at 01:51:47PM +0800, Jason Wang wrote:
->>> On 2020/6/28 下午10:47, Peter Xu wrote:
->>>> On Sun, Jun 28, 2020 at 03:03:41PM +0800, Jason Wang wrote:
->>>>> On 2020/6/27 上午5:29, Peter Xu wrote:
->>>>>> Hi, Eugenio,
->>>>>>
->>>>>> (CCing Eric, Yan and Michael too)
->>>>>>
->>>>>> On Fri, Jun 26, 2020 at 08:41:22AM +0200, Eugenio Pérez wrote:
->>>>>>> diff --git a/memory.c b/memory.c
->>>>>>> index 2f15a4b250..7f789710d2 100644
->>>>>>> --- a/memory.c
->>>>>>> +++ b/memory.c
->>>>>>> @@ -1915,8 +1915,6 @@ void 
->>>>>>> memory_region_notify_one(IOMMUNotifier *notifier,
->>>>>>>             return;
->>>>>>>         }
->>>>>>> -    assert(entry->iova >= notifier->start && entry_end <= 
->>>>>>> notifier->end);
->>>>>> I can understand removing the assertion should solve the issue, 
->>>>>> however imho
->>>>>> the major issue is not about this single assertion but the whole 
->>>>>> addr_mask
->>>>>> issue behind with virtio...
->>>>> I don't get here, it looks to the the range was from guest IOMMU 
->>>>> drivers.
->>>> Yes.  Note that I didn't mean that it's a problem in virtio, it's 
->>>> just the fact
->>>> that virtio is the only one I know that would like to support 
->>>> arbitrary address
->>>> range for the translated region.  I don't know about tcg, but vfio 
->>>> should still
->>>> need some kind of page alignment in both the address and the 
->>>> addr_mask.  We
->>>> have that assumption too across the memory core when we do 
->>>> translations.
->>>
->>> Right but it looks to me the issue is not the alignment.
->>>
->>>
->>>> A further cause of the issue is the MSI region when vIOMMU enabled 
->>>> - currently
->>>> we implemented the interrupt region using another memory region so 
->>>> it split the
->>>> whole DMA region into two parts.  That's really a clean approach to IR
->>>> implementation, however that's also a burden to the invalidation 
->>>> part because
->>>> then we'll need to handle things like this when the listened range 
->>>> is not page
->>>> alighed at all (neither 0-0xfedffff, nor 0xfef0000-MAX).  If 
->>>> without the IR
->>>> region (so the whole iommu address range will be a single FlatRange),
->>>
->>> Is this a bug? I remember that at least for vtd, it won't do any 
->>> DMAR on the
->>> intrrupt address range
->> I don't think it's a bug, at least it's working as how I 
->> understand...  that
->> interrupt range is using an IR region, that's why I said the IR 
->> region splits
->> the DMAR region into two pieces, so we have two FlatRange for the same
->> IOMMUMemoryRegion.
->
->
-> I don't check the qemu code but if "a single FlatRange" means 
-> 0xFEEx_xxxx is subject to DMA remapping, OS need to setup passthrough 
-> mapping for that range in order to get MSI to work. This is not what 
-> vtd spec said:
->
-> """
->
-> 3.14 Handling Requests to Interrupt Address Range
->
-> Requests without PASID to address range 0xFEEx_xxxx are treated as
-> potential interrupt requests and are not subjected to DMA remapping
-> (even if translation structures specify a mapping for this
-> range). Instead, remapping hardware can be enabled to subject such
-> interrupt requests to interrupt remapping.
->
-> """
->
-> My understanding is vtd won't do any DMA translation on 0xFEEx_xxxx 
-> even if IR is not enabled.
+You are right that the code guidance is not clear regarding what
+qdev_foo_new() should return.
 
+Working on another object (LEDs) Richard suggested me to return
+the full type, so I understood it was the recommended default:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg714729.html
 
-Ok, we had a dedicated mr for interrupt:
-
-memory_region_add_subregion_overlap(MEMORY_REGION(&vtd_dev_as->iommu),
-VTD_INTERRUPT_ADDR_FIRST,
-&vtd_dev_as->iommu_ir, 1);
-
-So it should be fine. I guess the reason that I'm asking is that I 
-thought "IR" means "Interrupt remapping" but in fact it means "Interrupt 
-Region"?
-
-But I'm still not clear about the invalidation part for interrupt 
-region, maybe you can elaborate a little more on this.
-
-Btw, I think guest can trigger the assert in vtd_do_iommu_translate() if 
-we teach vhost to DMA to that region:
-
-     /*
-      * We have standalone memory region for interrupt addresses, we
-      * should never receive translation requests in this region.
-      */
-     assert(!vtd_is_interrupt_addr(addr));
-
-Is this better to return false here? (We can work on the fix for vhost 
-but it should be not trivial)
-
-Thanks
-
-
+> 
+> Regards,
+> BALATON Zoltan
+> 
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> include/hw/i2c/i2c.h | 2 +-
+>> hw/arm/aspeed.c      | 4 ++--
+>> hw/i2c/core.c        | 9 ++++-----
+>> 3 files changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+>> index d6e3d85faf..18efc668f1 100644
+>> --- a/include/hw/i2c/i2c.h
+>> +++ b/include/hw/i2c/i2c.h
+>> @@ -79,8 +79,8 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool
+>> send);
+>> int i2c_send(I2CBus *bus, uint8_t data);
+>> uint8_t i2c_recv(I2CBus *bus);
+>>
+>> +I2CSlave *i2c_slave_new(const char *name, uint8_t addr);
+>> DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t
+>> addr);
+>> -DeviceState *i2c_try_create_slave(const char *name, uint8_t addr);
+>> bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp);
+>>
+>> /* lm832x.c */
+>> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+>> index 1285bf82c0..54ca36e0b6 100644
+>> --- a/hw/arm/aspeed.c
+>> +++ b/hw/arm/aspeed.c
+>> @@ -513,7 +513,7 @@ static void
+>> witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>>     /* Bus 3: TODO bmp280@77 */
+>>     /* Bus 3: TODO max31785@52 */
+>>     /* Bus 3: TODO dps310@76 */
+>> -    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
+>> +    dev = DEVICE(i2c_slave_new(TYPE_PCA9552, 0x60));
+>>     qdev_prop_set_string(dev, "description", "pca1");
+>>     i2c_realize_and_unref(dev, aspeed_i2c_get_bus(&soc->i2c, 3),
+>>                           &error_fatal);
+>> @@ -531,7 +531,7 @@ static void
+>> witherspoon_bmc_i2c_init(AspeedMachineState *bmc)
+>>
+>>     smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 11), 0x51,
+>>                           eeprom_buf);
+>> -    dev = i2c_try_create_slave(TYPE_PCA9552, 0x60);
+>> +    dev = DEVICE(i2c_slave_new(TYPE_PCA9552, 0x60));
+>>     qdev_prop_set_string(dev, "description", "pca0");
+>>     i2c_realize_and_unref(dev, aspeed_i2c_get_bus(&soc->i2c, 11),
+>>                           &error_fatal);
+>> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+>> index acf34a12d6..6eacb4a463 100644
+>> --- a/hw/i2c/core.c
+>> +++ b/hw/i2c/core.c
+>> @@ -267,13 +267,13 @@ const VMStateDescription vmstate_i2c_slave = {
+>>     }
+>> };
+>>
+>> -DeviceState *i2c_try_create_slave(const char *name, uint8_t addr)
+>> +I2CSlave *i2c_slave_new(const char *name, uint8_t addr)
+>> {
+>>     DeviceState *dev;
+>>
+>>     dev = qdev_new(name);
+>>     qdev_prop_set_uint8(dev, "address", addr);
+>> -    return dev;
+>> +    return I2C_SLAVE(dev);
+>> }
+>>
+>> bool i2c_realize_and_unref(DeviceState *dev, I2CBus *bus, Error **errp)
+>> @@ -283,10 +283,9 @@ bool i2c_realize_and_unref(DeviceState *dev,
+>> I2CBus *bus, Error **errp)
+>>
+>> DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t
+>> addr)
+>> {
+>> -    DeviceState *dev;
+>> +    DeviceState *dev = DEVICE(i2c_slave_new(name, addr));
+>>
+>> -    dev = i2c_try_create_slave(name, addr);
+>> -    i2c_realize_and_unref(dev, bus, &error_fatal);
+>> +    i2c_realize_and_unref(I2C_SLAVE(dev), bus, &error_fatal);
+>>
+>>     return dev;
+>> }
+>>
 
