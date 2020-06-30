@@ -2,80 +2,103 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24689C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3E8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:36:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D39362073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C47120774
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9hExgUP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D39362073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3/eOJX+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C47120774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFV6-0003t9-2m
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42658)
+	id 1jqFVA-000438-Fn
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:36:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFPn-00054e-5B
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32141
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqFTl-0002Ja-0y
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:35:14 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20307
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFPl-0003im-8U
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:06 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqFTi-0004Gu-3H
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:35:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593520264;
+ s=mimecast20190719; t=1593520506;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UqytC2fk6ON/bzO2ooHYivM9VguXfJO4IjAnv4dzJeY=;
- b=b9hExgUPuAYOoPiM5pQQF7hZA+r1vCtVzLh7xDqUB/vNFWBoFryeEYGOV27Cx9j8Vxv2qN
- Z0MwctN79oeP9Y/+U0mZHANfrunZzsO2v+VaDa2RALWDB2kDju9vNZPkmgIH/jDaACM9c0
- C7La0IZwzXhzJBIFq6CRmlOsgxDmKLg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-wPAzjNDKMDap4zWznLcaTg-1; Tue, 30 Jun 2020 08:30:54 -0400
-X-MC-Unique: wPAzjNDKMDap4zWznLcaTg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC085A0C20;
- Tue, 30 Jun 2020 12:30:52 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E21725C1C5;
- Tue, 30 Jun 2020 12:30:45 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 6/9] spapr_pci: add spapr msi read method
-Date: Tue, 30 Jun 2020 17:57:07 +0530
-Message-Id: <20200630122710.1119158-7-ppandit@redhat.com>
-In-Reply-To: <20200630122710.1119158-1-ppandit@redhat.com>
-References: <20200630122710.1119158-1-ppandit@redhat.com>
+ bh=IrdTemAVXSth7S8Ngc+V6Z7fI368p6qBpEIF+M2GKTk=;
+ b=H3/eOJX+UPmbsI1lg0YBP64+/pA7cg/dh+prVnQVM02MOb/s9zZ/zcPLw2ntvUCmpPqlS9
+ lAFaFNkm0NaJG6UWiwxf1mtPfhWVRnnTjiXzqvs75JLnfz+Z9YiBqp43LYqOUvpwNpDusX
+ MHxa4fpvui5U8RSU94BFMgOw8u6gzYU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-QC-M7qjxM7aiRSStLpb8Ng-1; Tue, 30 Jun 2020 08:35:04 -0400
+X-MC-Unique: QC-M7qjxM7aiRSStLpb8Ng-1
+Received: by mail-wm1-f69.google.com with SMTP id h6so20796144wmb.7
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 05:35:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IrdTemAVXSth7S8Ngc+V6Z7fI368p6qBpEIF+M2GKTk=;
+ b=a5t8zOmxDtDbS9RLbozm9pv7pZLPHLmaR0XxogCoPe0SfbVTiAHeZaMvnQeiuO6CUF
+ +yCQSo/JdVbtYgOrmLecSr5jxmRM2Sb4qBotAw8Zrg8Sn8OWoImdupCGjz73zdWDAtmG
+ 0747uzD/Qx3TBzSFCayl2psz0jtmSETFnv/W9fXcZRoqPDP7jH3aWdJlFGM8hWqPjoUg
+ fi2N9Wf6E+Z44IEylwjNROJmbMnZYiWI1CW2TlmbExlwBDMUDkWebYczXfk+j0YBthMg
+ BiHObYu51nahjnpKCDJBBaRO5PU0bLFOHnWHYnVHnbiQgzCQn8BHgPx5rlwKcKlMDSDk
+ Qjiw==
+X-Gm-Message-State: AOAM531aIGVZjNVkiewVaDQgfrx6thQJanRHxI4qC06zFp4a0u3o52y7
+ HuM+ZU4Y2sK1eRC4s03JogfuVJnF+8+uPiH0WSlG/rrvjZwrJXzimtSQI1/mA/NgDfFOzH2thaP
+ Ph4uFvQlL6cmdht4=
+X-Received: by 2002:a05:6000:cf:: with SMTP id
+ q15mr22253476wrx.203.1593520503098; 
+ Tue, 30 Jun 2020 05:35:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzQQDjPidxLUa6l0oxTXSE129fB16Rkp+nORL67w2ql98gUOBQV3RJu+ZXv0dLsdrRiUkXMw==
+X-Received: by 2002:a05:6000:cf:: with SMTP id
+ q15mr22253466wrx.203.1593520502893; 
+ Tue, 30 Jun 2020 05:35:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b0e5:c632:a580:8b9a?
+ ([2001:b07:6468:f312:b0e5:c632:a580:8b9a])
+ by smtp.gmail.com with ESMTPSA id l8sm3593120wrq.15.2020.06.30.05.35.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 05:35:02 -0700 (PDT)
+Subject: Re: [PATCH v2 1/9] i386: hvf: Set env->eip in macvm_set_rip()
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200630102824.77604-1-r.bolshakov@yadro.com>
+ <20200630102824.77604-2-r.bolshakov@yadro.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6a498ea9-2c9f-58be-5afc-3704db8af9d3@redhat.com>
+Date: Tue, 30 Jun 2020 14:35:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200630102824.77604-2-r.bolshakov@yadro.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,72 +119,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <cfontana@suse.de>,
+ Cameron Esfahani <dirty@apple.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On 30/06/20 12:28, Roman Bolshakov wrote:
+> cpu_synchronize_state() is currently no-op for hvf but BIOS will hang in
+> vAPIC option ROM when cpu_synchronize_state() is wired to
+> hvf_cpu_synchronize_state().
+> 
+> cpu_synchronize_state() state is called from vapic_write() during option
+> ROM initialization. It sets dirty flag on the cpu. macvm_set_rip() is
+> then invoked to advance IP after the I/O write to vAPIC port.
+> 
+> macvm_set_rip() only modifies VMCS, it doesn't change env->eip.
+> Therefore on the next iteration of vCPU loop, vcpu_dirty flag is checked
+> and hvf_put_registers() overwrites correct RIP in VMCS with the value of
+> env->eip that points to the I/O write instruction. Execution of the CPU
+> gets stuck on the instruction.
+> 
+> The issue can be avoided if eip doesn't contain stale value when dirty
+> flag is set on cpu.
+> 
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  target/i386/hvf/vmx.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+> index ce2a1532d5..1e8b29bf7d 100644
+> --- a/target/i386/hvf/vmx.h
+> +++ b/target/i386/hvf/vmx.h
+> @@ -173,6 +173,7 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+>  
+>      /* BUG, should take considering overlap.. */
+>      wreg(cpu->hvf_fd, HV_X86_RIP, rip);
+> +    env->eip = rip;
+>  
+>      /* after moving forward in rip, we need to clean INTERRUPTABILITY */
+>     val = rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+> 
 
-Add spapr msi mmio read method to avoid NULL pointer dereference
-issue.
+Queued except for patch 4.
 
-Reported-by: Lei Sun <slei.casper@gmail.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/ppc/spapr_pci.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-Update v3: Add Acked-by: ...
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08054.html
-
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 329002ac04..7033352834 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -52,6 +52,7 @@
- #include "sysemu/kvm.h"
- #include "sysemu/hostmem.h"
- #include "sysemu/numa.h"
-+#include "qemu/log.h"
- 
- /* Copied from the kernel arch/powerpc/platforms/pseries/msi.c */
- #define RTAS_QUERY_FN           0
-@@ -738,6 +739,12 @@ static PCIINTxRoute spapr_route_intx_pin_to_irq(void *opaque, int pin)
-     return route;
- }
- 
-+static uint64_t spapr_msi_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-+    return 0;
-+}
-+
- /*
-  * MSI/MSIX memory region implementation.
-  * The handler handles both MSI and MSIX.
-@@ -755,8 +762,10 @@ static void spapr_msi_write(void *opaque, hwaddr addr,
- }
- 
- static const MemoryRegionOps spapr_msi_ops = {
--    /* There is no .read as the read result is undefined by PCI spec */
--    .read = NULL,
-+    /* .read result is undefined by PCI spec
-+     * define .read method to avoid assert failure in memory_region_init_io
-+     */
-+    .read = spapr_msi_read,
-     .write = spapr_msi_write,
-     .endianness = DEVICE_LITTLE_ENDIAN
- };
--- 
-2.26.2
+Paolo
 
 
