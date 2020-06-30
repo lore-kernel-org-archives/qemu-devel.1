@@ -2,86 +2,85 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604DCC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A764C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:24:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B3B820663
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:22:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A76D20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:24:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NRZ1wtX5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3B820663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7ubvTA7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A76D20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqI5S-0006gI-GX
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:22:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37576)
+	id 1jqI78-0000Ac-CS
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:24:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI3s-0005au-HR
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:20:43 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31989
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI0P-0002JS-Hb
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:17:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46278
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI3l-00086n-KK
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:20:40 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqI0N-0007UE-CP
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:17:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593530432;
+ s=mimecast20190719; t=1593530222;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3Q68uV4NKCffVlEx9DmYr8Tcy2UpV4TM2zGQR62nl10=;
- b=NRZ1wtX5pu9BB21lmk5cShEnO4TUS3K7uZ5upKWry+ZEkC+O4HFjjKWyVhzHSnYAn67PkC
- j6EuBS/JJr4b1UjmULLP35vDTwJ6PMIayfPC+tjlQC88iKhk9wLzBYI1dtnv6WPkm4j2yi
- 2kPvN0F7YkKMtqrFCykRh+pgaE65G48=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-eRWCQcDQNH6BGk7hSlkWmw-1; Tue, 30 Jun 2020 11:19:56 -0400
-X-MC-Unique: eRWCQcDQNH6BGk7hSlkWmw-1
-Received: by mail-ed1-f72.google.com with SMTP id cn4so13011068edb.9
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:19:56 -0700 (PDT)
+ bh=TPPIxDap/uV1aYpe6/Cf/G0w57aBryIKr0ii6Fptxgc=;
+ b=X7ubvTA7HntqDODlSCshx2VTy6llIv4d55WOi7whAzOE3tKvGLXr+as415YKNPzXfPm1IB
+ 94+8xG3DD7ydXbsja4YwFetjNaJfaOQqSAWiSuImTCsZMO+uKe5/tLxXhjedpjM3ELAImh
+ QlIIrR9o7f6+e9kiZWbaKHlyRvVze1M=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-K3-ucLT9Oomgar-WjEh1bA-1; Tue, 30 Jun 2020 11:16:58 -0400
+X-MC-Unique: K3-ucLT9Oomgar-WjEh1bA-1
+Received: by mail-ej1-f72.google.com with SMTP id e21so13280328ejr.9
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:16:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=3Q68uV4NKCffVlEx9DmYr8Tcy2UpV4TM2zGQR62nl10=;
- b=H+6Nwtb2GHU2yK9kGDOcrpqtzhSCHi9WFqa0Zw0OXrSfcWyFGIcX/ombGWvDN+gRHF
- Dtx8i7I++dNoBh9QFzH0jR++PqlVt5Q69cbztm4GO0bRVonjYnXZ788WIIRs1iXO59mS
- WiAmNu9Hstm8QLv8MfsKMpgTgfBNwx/2kdpg6yAzTbzC+XAv5982StVdwC22KvdPEACE
- G6jBIioBf1fSKZ9+nCzWbhdaK8w2NR/RFDXXzhm1B1/sLSBsmznHuLLHVLvPDicV1I0+
- xpVnlWO2b/Wl35aoGJFPWPNe5ivh2Ev/i5sK0vTtsagdzORnv9i8Kwf9NctH8MYO9HxC
- Ikuw==
-X-Gm-Message-State: AOAM531NzEzGQnHvtJcI6WMMe3twKV8btEkr+pyYuTR1IHhfMjHAPfhV
- e78ky9pq7NrwfnKcB28yV8V1EAudnv0Snwlckzrr95VAViobSBPnUNznrZxdwugF1GFJ41AGpZR
- atvV7v0s//rE1Pdk=
-X-Received: by 2002:a17:906:4086:: with SMTP id
- u6mr20093274ejj.9.1593530395530; 
- Tue, 30 Jun 2020 08:19:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx968WRLbUisR+Ua1av2ZFZrg5txPJ4uxePXOJef4L9Vgi/0Ql6VBEd7JzAxiIPxCPm9IU36A==
-X-Received: by 2002:a17:906:4086:: with SMTP id
- u6mr20093262ejj.9.1593530395330; 
- Tue, 30 Jun 2020 08:19:55 -0700 (PDT)
+ bh=TPPIxDap/uV1aYpe6/Cf/G0w57aBryIKr0ii6Fptxgc=;
+ b=dG0kqXT1oXkI5mKL1gQ0om26H8v2kwQ8umYAIzRIZxd8ngzCs0gCan6I8nbEQ1BCT1
+ l9GkuRY/62EiMT8gozHdYgTLpQIEQEAj7JoRpozjELwhDYbMu5Lf9jUmsh1rTiypwvgX
+ 5jClXWPZgdupIsfm5W5Cw5yMRhsDS1TDB1f1qWvWqFnd45U36DiZJ5tqy8SMeZmaN4cI
+ 5t/vBANJXA9LebJlLedEgqbL8hj6Uq51CkXpsuq0A1wHWdp5sf4sf+3TAUpq/Fboboc+
+ Hh+xl44cV83si5L9Fbf9aeZjd8OV/hnrnA110l6D84lWSYkxLbbjMWJsuuC+IjHZcuwc
+ Ws6w==
+X-Gm-Message-State: AOAM5335j4LeomTk8l5P0z8JZTrAZ1Gl/zcfwvWMOENSmw3nncRk/DVn
+ 0ykXD9u8PZ0Oc339Jila6wWbQNryj2SiBKKW0MuWZjGkHA9WrbxNRXZkPrKijbSZKqYu9HbhE21
+ ll54uhOcxRe9A4Tw=
+X-Received: by 2002:a17:906:494a:: with SMTP id
+ f10mr19646367ejt.428.1593530216873; 
+ Tue, 30 Jun 2020 08:16:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysnQ2xtqnpNLg8ZMrfRFnOJI+ZDZ5uofsDJOYtHElEeFfbRsYr/6yESmqYIk293yeiJzAXyg==
+X-Received: by 2002:a17:906:494a:: with SMTP id
+ f10mr19646339ejt.428.1593530216627; 
+ Tue, 30 Jun 2020 08:16:56 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id k15sm2231802eji.49.2020.06.30.08.19.54
+ by smtp.gmail.com with ESMTPSA id i7sm3013833eds.91.2020.06.30.08.16.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 08:19:54 -0700 (PDT)
-Subject: Re: [PATCH 1/2] xen: fix legacy 'xen-sysdev' and 'xen-backend' bus
- types
-To: Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org,
- qemu-devel@nongnu.org
-References: <20200624121841.17971-1-paul@xen.org>
- <20200624121841.17971-2-paul@xen.org>
+ Tue, 30 Jun 2020 08:16:55 -0700 (PDT)
+Subject: Re: [PATCH v3 3/4] hw/block/nvme: Fix pmrmsc register size
+To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>, qemu-devel@nongnu.org
+References: <20200630110429.19972-1-philmd@redhat.com>
+ <20200630110429.19972-4-philmd@redhat.com>
+ <45a97bae-887c-2669-439e-08ec3e75113e@linux.intel.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -106,12 +105,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ee15f95a-ef85-8246-f10d-2778baa343c7@redhat.com>
-Date: Tue, 30 Jun 2020 17:19:53 +0200
+Message-ID: <e19634b7-b4b6-dbb8-e49f-bf7f96b89e81@redhat.com>
+Date: Tue, 30 Jun 2020 17:16:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200624121841.17971-2-paul@xen.org>
+In-Reply-To: <45a97bae-887c-2669-439e-08ec3e75113e@linux.intel.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -119,9 +118,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -142,67 +141,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Paul Durrant <pdurrant@amazon.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Jason Andryuk <jandryuk@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/24/20 2:18 PM, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
+On 6/30/20 5:10 PM, Andrzej Jakowski wrote:
+> On 6/30/20 4:04 AM, Philippe Mathieu-Daudé wrote:
+>> The Persistent Memory Region Controller Memory Space Control
+>> register is 64-bit wide. See 'Figure 68: Register Definition'
+>> of the 'NVM Express Base Specification Revision 1.4'.
+>>
+>> Fixes: 6cf9413229 ("introduce PMR support from NVMe 1.4 spec")
+>> Reported-by: Klaus Jensen <k.jensen@samsung.com>
+>> Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>> Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+>> ---
+>>  include/block/nvme.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/include/block/nvme.h b/include/block/nvme.h
+>> index 71c5681912..82c384614a 100644
+>> --- a/include/block/nvme.h
+>> +++ b/include/block/nvme.h
+>> @@ -21,7 +21,7 @@ typedef struct QEMU_PACKED NvmeBar {
+>>      uint32_t    pmrsts;
+>>      uint32_t    pmrebs;
+>>      uint32_t    pmrswtp;
+>> -    uint32_t    pmrmsc;
+>> +    uint64_t    pmrmsc;
+>>  } NvmeBar;
+>>  
+>>  enum NvmeCapShift {
+>> -- 2.21.3
 > 
-> 'xen-sysdev' plugs into the 'System' bus type, not 'xen-sysbus. That bus type
-> is what 'xen-backend' plugs into.
-> 'xen-sysdev' is drived form 'sys-bus-device' so the bus type need not be
-> overridden. 'xen-backend' is derived from 'device', which plugs into the
-> generic 'bus' type, so its bus type should be overridden to 'xen-sysbus'.
-> 
-> Without this patch, the following assertion will fail:
-> 
-> qemu-system-i386: hw/core/qdev.c:102: qdev_set_parent_bus: Assertion
-> `dc->bus_type && object_dynamic_cast(OBJECT(bus), dc->bus_type)'
-> failed.
-> 
-> Reported-by: Jason Andryuk <jandryuk@gmail.com>
-> Fixes: 81cb05732efb ("qdev: Assert devices are plugged into a bus that can take them")
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> ---
->  hw/xen/xen-legacy-backend.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
-> index 2335ee2e65..c5c75c0064 100644
-> --- a/hw/xen/xen-legacy-backend.c
-> +++ b/hw/xen/xen-legacy-backend.c
-> @@ -789,11 +789,12 @@ static void xendev_class_init(ObjectClass *klass, void *data)
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->      /* xen-backend devices can be plugged/unplugged dynamically */
->      dc->user_creatable = true;
-> +    dc->bus_type = TYPE_XENSYSBUS;
->  }
->  
->  static const TypeInfo xendev_type_info = {
->      .name          = TYPE_XENBACKEND,
-> -    .parent        = TYPE_XENSYSDEV,
-> +    .parent        = TYPE_DEVICE,
->      .class_init    = xendev_class_init,
->      .instance_size = sizeof(struct XenLegacyDevice),
->  };
-> @@ -824,7 +825,6 @@ static void xen_sysdev_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
->      device_class_set_props(dc, xen_sysdev_properties);
-> -    dc->bus_type = TYPE_XENSYSBUS;
->  }
->  
->  static const TypeInfo xensysdev_info = {
-> 
+> This is good catch, though I wanted to highlight that this will still 
+> need to change as this register is not aligned properly and thus not in
+> compliance with spec.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I was wondering the odd alignment too. So you are saying at some time
+in the future the spec will be updated to correct the alignment?
+
+Should we use this instead?
+
+      uint32_t    pmrmsc;
+ +    uint32_t    pmrmsc_upper32; /* the spec define this, but *
+ +                                 * only low 32-bit are used  */
+
+Or eventually an unnamed struct:
+
+ -    uint32_t    pmrmsc;
+ +    struct {
+ +        uint32_t pmrmsc;
+ +        uint32_t pmrmsc_upper32; /* the spec define this, but *
+ +                                  * only low 32-bit are used  */
+ +    };
+
+> 
+> Reviewed-by Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+> 
 
 
