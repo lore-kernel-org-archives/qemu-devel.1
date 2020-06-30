@@ -2,54 +2,57 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45668C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 06:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19236C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 06:11:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E88620759
+	by mail.kernel.org (Postfix) with ESMTPS id E121D20759
 	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 06:11:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E88620759
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E121D20759
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jq9Uq-0002lM-CD
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 02:11:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59100)
+	id 1jq9Ur-0002mx-4p
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 02:11:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jq9Tp-0001wq-K6
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 02:10:53 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:40432
+ id 1jq9Tq-0001wx-Sh
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 02:10:54 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:40438
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jq9Tn-0001u8-OA
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 02:10:53 -0400
+ id 1jq9To-0001uF-Sv
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 02:10:54 -0400
 Received: from host86-182-221-235.range86-182.btcentralplus.com
  ([86.182.221.235] helo=kentang.int.eigen-ltd.com)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jq9Th-0006sP-44; Tue, 30 Jun 2020 07:10:53 +0100
+ id 1jq9Tp-0006sP-Vc; Tue, 30 Jun 2020 07:10:58 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org,
 	laurent@vivier.eu
-Date: Tue, 30 Jun 2020 07:10:34 +0100
-Message-Id: <20200630061036.7526-1-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 30 Jun 2020 07:10:35 +0100
+Message-Id: <20200630061036.7526-2-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200630061036.7526-1-mark.cave-ayland@ilande.co.uk>
+References: <20200630061036.7526-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.182.221.235
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 0/2] target/m68k: fix physical address translation in
+Subject: [PATCH v2 1/2] target/m68k: fix physical address translation in
  m68k_cpu_get_phys_page_debug()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
@@ -79,27 +82,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first patch in the series fixes the original bug, whilst the second patch
-implements the suggestion by Philippe to consolidate the translation offset
-logic into get_physical_address() itself now that all callers are identical.
+The result of the get_physical_address() function should be combined with the
+offset of the original page access before being returned. Otherwise the
+m68k_cpu_get_phys_page_debug() function can round to the wrong page causing
+incorrect lookups in gdbstub and various "Disassembler disagrees with
+translator over instruction decoding" warnings to appear at translation time.
 
+Fixes: 88b2fef6c3 ("target/m68k: add MC68040 MMU")
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-v2:
-- Add R-B tags from Philippe and Laurent
-- Add patch 2 to consolidate the translation offset logic into get_physical_address()
-
-
-Mark Cave-Ayland (2):
-  target/m68k: fix physical address translation in
-    m68k_cpu_get_phys_page_debug()
-  target/m68k: consolidate physical translation offset into
-    get_physical_address()
-
- target/m68k/helper.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 79b0b10ea9..631eab7774 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -820,10 +820,14 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     if (env->sr & SR_S) {
+         access_type |= ACCESS_SUPER;
+     }
++
+     if (get_physical_address(env, &phys_addr, &prot,
+                              addr, access_type, &page_size) != 0) {
+         return -1;
+     }
++
++    addr &= TARGET_PAGE_MASK;
++    phys_addr += addr & (page_size - 1);
+     return phys_addr;
+ }
+ 
 -- 
 2.20.1
 
