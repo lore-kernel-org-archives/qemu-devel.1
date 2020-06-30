@@ -2,87 +2,86 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EF5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF52C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:17:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6929D20759
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18C8D20759
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 08:17:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pe71eC0F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6929D20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yx6KI/SA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C8D20759
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqBSX-0007Xd-MX
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:17:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55774)
+	id 1jqBSj-0007vi-CY
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 04:17:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqBOY-0001QK-3I
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:13:34 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:44344)
+ id 1jqBPc-0003Ng-RS; Tue, 30 Jun 2020 04:14:40 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:42466)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqBOW-0003Bv-L7
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 04:13:33 -0400
-Received: by mail-ed1-x542.google.com with SMTP id by13so5435989edb.11
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 01:13:32 -0700 (PDT)
+ id 1jqBPa-0003Ki-FT; Tue, 30 Jun 2020 04:14:40 -0400
+Received: by mail-ej1-x644.google.com with SMTP id i14so19582797ejr.9;
+ Tue, 30 Jun 2020 01:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=o9MheSyfE8UMIhLbV+ncpbSwjga0svuWXC9D1+WgrXc=;
- b=pe71eC0F2ALAT20eM/ZcZb6ej2fmvO0uDyHCOcF1yTet9KaZ44wtHBym4lYIBRC99r
- xLuwbH9x4ivc+sk/Z0RvTkE8QoplES18oXy5rKISQjT6sI2sgLoUdBeqaeeXuKXp/1JN
- vREMXkXSc2Oxqeqq09yjvC76xtL+FBAN5UNJtnMgJ3oowHbGGPAOucAEXtj5lMEyifUS
- mLnDDU98Or4k/q+CzjRgQgkEanNFmgBYig76DeQd+JeKJe5QUiS7AOAck1sxhAKmDL8B
- hl9rZTPTS8K8aucFQxfaD873U7rM1wgSPrl+ckhHs7K99y8cBUZQoKpsyN9rokXv4uXM
- ZNoQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TudWM1wkL52+YWCkl1Dxv9SRDhDpUoJlZG8pQ7k5sm8=;
+ b=Yx6KI/SASjGSSGtYxS+OXZxdKukRBnSPeZcWwrJ9ePr2yfiUsje3Fas5mrR7IeOXKo
+ zoFHv5QfLpA3sVyA6dGAJbkvPUes51cmAW97XHzdWU2Hq5gITo5u+WSMkSwXAcVYDF6o
+ U53O4ivtG+2k5an2ec+gU6afRLvIOktv8qlgcN/UrcpKM2lqtfB2xZgA+cRuhB46jxEL
+ BvCf2fLc8JHK2+dpHzf86P+CA3bm+8jtDYz6phBBwfBHUo+t+LN3PdytzosHi5IRD6a0
+ RovQSexSCDlg8iWW2FTA8ps0wZvnmhFSB4uHDvFoRuYiRPqbZnrvloDMef8S3SPIAkfA
+ 1qTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=o9MheSyfE8UMIhLbV+ncpbSwjga0svuWXC9D1+WgrXc=;
- b=qn9vH10YuXne1faodF3ACeZC0Ob5aiW4O3/gieDPSxdYR/GqrzRPOVQOuNjD0v6u1c
- 4Kx3pL7HUd6Rq9kbkV82mbge/lVqahEYD/+EPCFOV8UWT7yZ8P1wfjQixPRCxYiXTOP5
- jpaYes0ti0KeO/7s4K4Nc3+BxLmJ6ZFCrQ7yJH70wfh6Kot6cE5RfcOSe7HWk9PmW5zN
- Nga/rFykgaWI3A0fwk5CMSsHu0Qz489OZvmTLxTdIrPpje7mEW8suqVSGEh38nJpeE/I
- ncNV6aYdrEvZ5uXj3OG0LRgRPdFugLYoj1jcwERm2UehOxhpcFgCZaO9boF+se9+/4el
- angg==
-X-Gm-Message-State: AOAM532D9HQ1qY3ejRSaLW3ZUOFxJFVRNat+Ghks6PQMfdkZ5Ir82vYl
- av/94WjQTTw+DliTzk9whNU=
-X-Google-Smtp-Source: ABdhPJx0HIyo14FvgFOEIRxpqWInW9YAFn7TMtZwSm/jrlRcEgZ13uv4/0lIkHrM2oQ4Jxl3/1uHwA==
-X-Received: by 2002:a05:6402:2212:: with SMTP id
- cq18mr22866189edb.173.1593504811362; 
- Tue, 30 Jun 2020 01:13:31 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TudWM1wkL52+YWCkl1Dxv9SRDhDpUoJlZG8pQ7k5sm8=;
+ b=khzj+vmMheuQD4xcF2qO+a5xZy94T7y4abVAmub4m73HFyiWt01P/zAzf7UUhWXJfo
+ Elg3zrVcVwfeAxmYdZqq0AAz1g33P7qF/obnL/YeKljmzULeSOBGeUvJhN7lIkb1Erep
+ 9ppTols78C8KLSlJ3dNHMeVNrifrVBdld74uORBXycNzSng6fOUS1px1T3WItohPbvqI
+ Uk13ADL/OzL5LmpZ+NCedDTQXK4hp8/MGq0tWcsao3Tbqr3B3x2A4JaO1VZybPcz/Ien
+ js4whGJrfJnlecPzkc7uMm7lk+aRAb7VvZ8eZYB8+XMEFrjkLyVqO3LFc1IxE6zxXfBd
+ PHQw==
+X-Gm-Message-State: AOAM5333gNE3+44+pn3s9z+7XwXQmPeLr1mv/wBAEPAD8roh/A1KY5CA
+ EsHZd5VF9jOgpcNDkI7bdow=
+X-Google-Smtp-Source: ABdhPJzIjtKP+rBOXYTiFYnpmXATCqJNlE5rSyXCQYdFPFb6nB3slVvyFhAk4Ezhi6nVdhVW2DXhow==
+X-Received: by 2002:a17:906:3958:: with SMTP id
+ g24mr16638205eje.26.1593504876419; 
+ Tue, 30 Jun 2020 01:14:36 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id z1sm1425948ejb.41.2020.06.30.01.13.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 01:13:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: Yunqiang Su <ysu@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>,
- qemu-devel@nongnu.org
-Subject: [PATCH 5/7] hw/mips/malta: Introduce the 'malta-phys' machine
-Date: Tue, 30 Jun 2020 10:13:20 +0200
-Message-Id: <20200630081322.19146-6-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200630081322.19146-1-f4bug@amsat.org>
-References: <20200630081322.19146-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id jo25sm1422045ejb.116.2020.06.30.01.14.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 01:14:35 -0700 (PDT)
+Subject: Re: [PATCH] hw/misc/pca9552: Add missing TypeInfo::class_size field
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200629074704.23028-1-f4bug@amsat.org>
+ <CAFEAcA_uAJzddqVfttgZ9PjNfbrjt3q1=HaTwRNPs+=smrDkjg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bc93f3ed-a2bb-1b4a-d249-cf964bd43488@amsat.org>
+Date: Tue, 30 Jun 2020 10:14:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_uAJzddqVfttgZ9PjNfbrjt3q1=HaTwRNPs+=smrDkjg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -104,64 +103,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jean-Christophe DUBOIS <jcd@tribudubois.net>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce the 'malta-phys' machine, aiming to have the same
-limitations as real hardware. Start by restricting the RAM
-to 1GB, which is the maximum amount of memory the GT-64120A
-north bridge can address.
+On 6/29/20 11:07 PM, Peter Maydell wrote:
+> On Mon, 29 Jun 2020 at 08:47, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> When adding the generic PCA955xClass in commit 736132e455, we
+>> forgot to set the class_size field. Fill it now to avoid:
+> 
+> Thanks; I've applied this to master since it fixes a memory
+> corruption that affects all arm targets and I'm not otherwise
+> planning an arm pullreq for a bit.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/mips/malta.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/hw/mips/malta.c b/hw/mips/malta.c
-index 1ca41b44db..013bf9272c 100644
---- a/hw/mips/malta.c
-+++ b/hw/mips/malta.c
-@@ -1479,11 +1479,32 @@ static void malta_machine_virt_class_init(ObjectClass *oc, void *data)
-     mmc->max_ramsize = 2 * GiB;
- }
- 
-+static void malta_machine_phys_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    MaltaMachineClass *mmc = MALTA_MACHINE_CLASS(oc);
-+
-+    mc->desc = "MIPS Malta Core LV (physically limited as real hardware)";
-+    mc->block_default_type = IF_PFLASH;
-+    mc->max_cpus = 1;
-+#ifdef TARGET_MIPS64
-+    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("5Kc");
-+#else
-+    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("4Kc");
-+#endif
-+    mc->default_ram_size = 32 * MiB;
-+    mmc->max_ramsize = 256 * MiB; /* 32 MByte PC100 SDRAM DIMMs x 4 slots */
-+};
-+
- static const TypeInfo malta_machine_types[] = {
-     {
-         .name          = MACHINE_TYPE_NAME("malta-virt"),
-         .parent        = TYPE_MALTA_MACHINE,
-         .class_init    = malta_machine_virt_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("malta-phys"),
-+        .parent        = TYPE_MALTA_MACHINE,
-+        .class_init    = malta_machine_phys_class_init,
-     }, {
-         .name          = TYPE_MALTA_MACHINE,
-         .parent        = TYPE_MACHINE,
--- 
-2.21.3
-
+Thanks Peter!
 
