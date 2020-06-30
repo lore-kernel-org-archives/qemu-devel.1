@@ -2,94 +2,69 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CFAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:53:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E98EC206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:52:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NG1lPzVc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E98EC206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5BEEC20829
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:53:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEEC20829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqGgz-0007eh-2a
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:52:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35124)
+	id 1jqGhQ-0008Vp-Kj
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:53:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqGU2-0001Ly-8d; Tue, 30 Jun 2020 09:39:34 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:40988)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqGU0-0006LX-GN; Tue, 30 Jun 2020 09:39:33 -0400
-Received: by mail-ej1-x644.google.com with SMTP id dp18so20648044ejc.8;
- Tue, 30 Jun 2020 06:39:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Q/J0Q8HRfbG27Ye3g4wwIvBclHiw8k1nTV85awsZwW4=;
- b=NG1lPzVcx1qi5mzWzP26qpnLVHTJsZ1UzMnobEnp9qoo4T5eVTrkBgjgm89CTeZ9WH
- r5WOdEJkNrgVQd0g5p/nr8bVisv5yC9L+tgWVTK/qBvy7OKfVTScwXSHbR37jRJwzxOn
- ojLT68pprbZ+RKBDZbfL84SToYX/deBIkKHOQAsBz/3HqUAvMOA7pj3/6vMhPXWOoVhm
- ++DYpPZ713sGSomFKoSS29BrJbDBao6vTGf1CS3sD1rvhc8Kc6+RxxQ0WSrXisCOkZO6
- RsjdqBQoyfKkJ5YIavpi7aWz/CFGTzDZ/AlKqVXP1fiw18CDBz7CWIFJmOWRa4XYVfv1
- 97Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Q/J0Q8HRfbG27Ye3g4wwIvBclHiw8k1nTV85awsZwW4=;
- b=WnrhrNz7xbbGAmbKAqJAliS26s65/AezlQBGuFDKRe+64Y8bj2Pjks64hPXDyUCYNU
- u7qCCNEHviJ+dJCXRa7f3yXxTk/nkdgaINYC8cgWT2bJvY9p9b7qFM16InQoQa1vc5RZ
- 5i3MoMoifmmZ8LOJskyykPB7vEf3RhqrDRrsvvxBUSfQboGE/3CE7kre60zCs2l2SmUV
- xwJBKJzE15ptq1Ee4MyH/iRj0lBLlIBmBDmzMRe7mGUgLYD2pivEl5ghB40vuMF6Rnd3
- mYQYi7hKbvPuJBxSj+eUXTzfTD5Hw0Pico2UPe59vmhGG+Aiqp+qWXTqop6RK9lSqukb
- YBJA==
-X-Gm-Message-State: AOAM532ZMZJD+XkcB+y44nATzeJkOX44CvJveVND+azil17X5h7NbFMx
- A/oBWFQvDBOvHvHSHa7nxsHzYNTUDps=
-X-Google-Smtp-Source: ABdhPJz4CNgwE4fuM8AZTyW7lrVaRSUsZxJwoZYtmlSsEC2Zi8BmWqpQdYrI2Why77sI9Uu6JUUuDA==
-X-Received: by 2002:a17:906:c102:: with SMTP id
- do2mr17807190ejc.126.1593524370687; 
- Tue, 30 Jun 2020 06:39:30 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id p18sm2099172ejm.55.2020.06.30.06.39.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 06:39:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 15/17] hw/sd/sdcard: Correctly display the command name in
- trace events
-Date: Tue, 30 Jun 2020 15:39:09 +0200
-Message-Id: <20200630133912.9428-16-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200630133912.9428-1-f4bug@amsat.org>
-References: <20200630133912.9428-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqGWg-0005Y9-E7
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:42:18 -0400
+Received: from 10.mo7.mail-out.ovh.net ([178.33.250.56]:50606)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqGWc-0006vk-Sb
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:42:18 -0400
+Received: from player698.ha.ovh.net (unknown [10.110.103.41])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id BB16816C2A1
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 15:42:03 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player698.ha.ovh.net (Postfix) with ESMTPSA id 7D10A13E00767;
+ Tue, 30 Jun 2020 13:41:54 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R0066526ca7b-8267-4449-9bf9-375ecf278710,321FFE8278D843C460097280AF09A0BF63DC926D)
+ smtp.auth=groug@kaod.org
+Date: Tue, 30 Jun 2020 15:41:51 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 1/3] qom: Introduce object_property_try_add_child()
+Message-ID: <20200630154151.229e60eb@bahia.lan>
+In-Reply-To: <20200629193424.30280-2-eric.auger@redhat.com>
+References: <20200629193424.30280-1-eric.auger@redhat.com>
+ <20200629193424.30280-2-eric.auger@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4695847038586362218
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrtddtgdefkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.33.250.56; envelope-from=groug@kaod.org;
+ helo=10.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 09:42:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,88 +77,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Cc: berrange@redhat.com, ehabkost@redhat.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some ACMD were incorrectly displayed. Fix by remembering if we
-are processing a ACMD (with current_cmd_is_acmd) and add the
-sd_current_cmd_name() helper, which display to correct name
-regardless it is a CMD or ACMD.
+On Mon, 29 Jun 2020 21:34:22 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sd.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+> object_property_add() does not allow object_property_try_add()
+> to gracefully fail as &error_abort is passed as an error handle.
+> 
+> However such failure can easily be triggered from the QMP shell when,
+> for instance, one attempts to create an object with an id that already
+> exists. This is achieved from the following call path:
+> 
+> qmp_object_add -> user_creatable_add_dict -> user_creatable_add_type ->
+> object_property_add_child -> object_property_add
+> 
+> For instance, from the qmp-shell, call twice:
+> object-add qom-type=memory-backend-ram id=mem1 props.size=1073741824
+> and QEMU aborts.
+> 
+> This behavior is undesired as a user/management application mistake
+> in reusing a property ID shouldn't result in loss of the VM and live
+> data within.
+> 
+> This patch introduces a new function, object_property_try_add_child()
+> which takes an error handle and turn object_property_try_add() into
+> a non-static one.
+> 
+> Now the call path becomes:
+> 
+> user_creatable_add_type -> object_property_try_add_child ->
+> object_property_try_add
+> 
+> and the error is returned gracefully to the QMP client.
+> 
+> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+> {"return": {}}
+> (QEMU) object-add qom-type=memory-backend-ram id=mem2  props.size=4294967296
+> {"error": {"class": "GenericError", "desc": "attempt to add duplicate property
+> 'mem2' to object (type 'container')"}}
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 3e9faa8add..eb549a52e1 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -125,6 +125,7 @@ struct SDState {
-     uint8_t pwd[16];
-     uint32_t pwd_len;
-     uint8_t function_group[6];
-+    bool current_cmd_is_acmd;
-     uint8_t current_cmd;
-     /* True if we will handle the next command as an ACMD. Note that this does
-      * *not* track the APP_CMD status bit!
-@@ -1718,6 +1719,8 @@ int sd_do_command(SDState *sd, SDRequest *req,
-                       req->cmd);
-         req->cmd &= 0x3f;
-     }
-+    sd->current_cmd = req->cmd;
-+    sd->current_cmd_is_acmd = sd->expecting_acmd;
- 
-     if (sd->card_status & CARD_IS_LOCKED) {
-         if (!cmd_valid_while_locked(sd, req->cmd)) {
-@@ -1745,7 +1748,6 @@ int sd_do_command(SDState *sd, SDRequest *req,
-         /* Valid command, we can update the 'state before command' bits.
-          * (Do this now so they appear in r1 responses.)
-          */
--        sd->current_cmd = req->cmd;
-         sd->card_status &= ~CURRENT_STATE;
-         sd->card_status |= (last_state << 9);
-     }
-@@ -1806,6 +1808,15 @@ send_response:
-     return rsplen;
- }
- 
-+static const char *sd_current_cmd_name(SDState *sd)
-+{
-+    if (sd->current_cmd_is_acmd) {
-+        return sd_acmd_name(sd->current_cmd);
-+    } else {
-+        return sd_cmd_name(sd->current_cmd);
-+    }
-+}
-+
- static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
- {
-     trace_sdcard_read_block(addr, len);
-@@ -1844,7 +1855,7 @@ void sd_write_data(SDState *sd, uint8_t value)
-         return;
- 
-     trace_sdcard_write_data(sd->proto_name,
--                            sd_acmd_name(sd->current_cmd),
-+                            sd_current_cmd_name(sd),
-                             sd->current_cmd, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-@@ -1998,7 +2009,7 @@ uint8_t sd_read_data(SDState *sd)
-     io_len = (sd->ocr & (1 << 30)) ? HWBLOCK_SIZE : sd->blk_len;
- 
-     trace_sdcard_read_data(sd->proto_name,
--                           sd_acmd_name(sd->current_cmd),
-+                           sd_current_cmd_name(sd),
-                            sd->current_cmd, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
--- 
-2.21.3
+FWIW
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+and
+
+Tested-by: Greg Kurz <groug@kaod.org>
+
+> ---
+> 
+> v3 -> v4:
+> - Took into account Markus' style related comments
+> 
+> v2 -> v3:
+> - don't take the object reference on failure in
+>   object_property_try_add_child
+> ---
+>  include/qom/object.h    | 26 ++++++++++++++++++++++++--
+>  qom/object.c            | 21 ++++++++++++++++-----
+>  qom/object_interfaces.c |  7 +++++--
+>  3 files changed, 45 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 94a61ccc3f..1c5cdcd0e3 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -1039,7 +1039,7 @@ Object *object_ref(Object *obj);
+>  void object_unref(Object *obj);
+>  
+>  /**
+> - * object_property_add:
+> + * object_property_try_add:
+>   * @obj: the object to add a property to
+>   * @name: the name of the property.  This can contain any character except for
+>   *  a forward slash.  In general, you should use hyphens '-' instead of
+> @@ -1056,10 +1056,23 @@ void object_unref(Object *obj);
+>   *   meant to allow a property to free its opaque upon object
+>   *   destruction.  This may be NULL.
+>   * @opaque: an opaque pointer to pass to the callbacks for the property
+> + * @errp: pointer to error object
+>   *
+>   * Returns: The #ObjectProperty; this can be used to set the @resolve
+>   * callback for child and link properties.
+>   */
+> +ObjectProperty *object_property_try_add(Object *obj, const char *name,
+> +                                        const char *type,
+> +                                        ObjectPropertyAccessor *get,
+> +                                        ObjectPropertyAccessor *set,
+> +                                        ObjectPropertyRelease *release,
+> +                                        void *opaque, Error **errp);
+> +
+> +/**
+> + * object_property_add:
+> + * Same as object_property_try_add() with @errp hardcoded to
+> + * &error_abort.
+> + */
+>  ObjectProperty *object_property_add(Object *obj, const char *name,
+>                                      const char *type,
+>                                      ObjectPropertyAccessor *get,
+> @@ -1495,10 +1508,11 @@ Object *object_resolve_path_type(const char *path, const char *typename,
+>  Object *object_resolve_path_component(Object *parent, const char *part);
+>  
+>  /**
+> - * object_property_add_child:
+> + * object_property_try_add_child:
+>   * @obj: the object to add a property to
+>   * @name: the name of the property
+>   * @child: the child object
+> + * @errp: pointer to error object
+>   *
+>   * Child properties form the composition tree.  All objects need to be a child
+>   * of another object.  Objects can only be a child of one object.
+> @@ -1512,6 +1526,14 @@ Object *object_resolve_path_component(Object *parent, const char *part);
+>   *
+>   * Returns: The newly added property on success, or %NULL on failure.
+>   */
+> +ObjectProperty *object_property_try_add_child(Object *obj, const char *name,
+> +                                              Object *child, Error **errp);
+> +
+> +/**
+> + * object_property_add_child:
+> + * Same as object_property_try_add_child() with @errp hardcoded to
+> + * &error_abort
+> + */
+>  ObjectProperty *object_property_add_child(Object *obj, const char *name,
+>                                            Object *child);
+>  
+> diff --git a/qom/object.c b/qom/object.c
+> index 6ece96bc2b..dc10bb1889 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1132,7 +1132,7 @@ void object_unref(Object *obj)
+>      }
+>  }
+>  
+> -static ObjectProperty *
+> +ObjectProperty *
+>  object_property_try_add(Object *obj, const char *name, const char *type,
+>                          ObjectPropertyAccessor *get,
+>                          ObjectPropertyAccessor *set,
+> @@ -1651,8 +1651,8 @@ static void object_finalize_child_property(Object *obj, const char *name,
+>  }
+>  
+>  ObjectProperty *
+> -object_property_add_child(Object *obj, const char *name,
+> -                          Object *child)
+> +object_property_try_add_child(Object *obj, const char *name,
+> +                              Object *child, Error **errp)
+>  {
+>      g_autofree char *type = NULL;
+>      ObjectProperty *op;
+> @@ -1661,14 +1661,25 @@ object_property_add_child(Object *obj, const char *name,
+>  
+>      type = g_strdup_printf("child<%s>", object_get_typename(child));
+>  
+> -    op = object_property_add(obj, name, type, object_get_child_property, NULL,
+> -                             object_finalize_child_property, child);
+> +    op = object_property_try_add(obj, name, type, object_get_child_property,
+> +                                 NULL, object_finalize_child_property,
+> +                                 child, errp);
+> +    if (!op) {
+> +        return NULL;
+> +    }
+>      op->resolve = object_resolve_child_property;
+>      object_ref(child);
+>      child->parent = obj;
+>      return op;
+>  }
+>  
+> +ObjectProperty *
+> +object_property_add_child(Object *obj, const char *name,
+> +                          Object *child)
+> +{
+> +    return object_property_try_add_child(obj, name, child, &error_abort);
+> +}
+> +
+>  void object_property_allow_set_link(const Object *obj, const char *name,
+>                                      Object *val, Error **errp)
+>  {
+> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> index 7e26f86fa6..1e05e41d2f 100644
+> --- a/qom/object_interfaces.c
+> +++ b/qom/object_interfaces.c
+> @@ -82,8 +82,11 @@ Object *user_creatable_add_type(const char *type, const char *id,
+>      }
+>  
+>      if (id != NULL) {
+> -        object_property_add_child(object_get_objects_root(),
+> -                                  id, obj);
+> +        object_property_try_add_child(object_get_objects_root(),
+> +                                      id, obj, &local_err);
+> +        if (local_err) {
+> +            goto out;
+> +        }
+>      }
+>  
+>      user_creatable_complete(USER_CREATABLE(obj), &local_err);
 
 
