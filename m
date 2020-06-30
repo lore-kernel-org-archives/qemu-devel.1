@@ -2,88 +2,70 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDBFC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B1EC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28BB120724
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D30432074F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pfty3Mmn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BB120724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KcQgViw6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30432074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqINP-0007Ol-Cv
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:40:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42618)
+	id 1jqIQC-00022s-53
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqILJ-0003yV-N5
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:38:41 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35537)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqILI-0003Fr-2w
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:38:41 -0400
-Received: by mail-wr1-x442.google.com with SMTP id g18so20704549wrm.2
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:38:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1GbJ3qR8DbeArfmr/fgMB2nbWQEYgRsT+hJBwHxLbKY=;
- b=pfty3Mmn0wpkMG1+vuXJazh3KcumB9EsESuEuaTUYL4VIA72QUlAX20MQ9XOKdvZxu
- evodc3bS/zh4OiYw5jog3ziLsqHiKwe6mH77axBKKI6hybLYH9t1K1ZwiXxkIo1Ewxpz
- 0MLAqXzUh9XdpeKIcfoDJHOs5xGh0gFMUhYpc/mfrmfykeIFuEQubcKTYTRsGvWd3mU4
- 4WcgaPRs4i8E7TURMy0gcN74zb9Thk9sqCKMLTcBuHFcLIqMsv49aTLmd1mtBUr+R6bp
- LoAFqnwAKbM/aQnmcY2fFeyhyIegPUagm3/1Xpv4GFc4+0Vp3ivcmCQZTH6nVijJyAPy
- 87Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1GbJ3qR8DbeArfmr/fgMB2nbWQEYgRsT+hJBwHxLbKY=;
- b=grXv2oD0hTzo+4xhq0Vmrj7NsbMdR3URMBN9u6CVGdOvTfEDGfl0RrawX2YB4F35Gy
- KQKLfyZ7SXhRHNTJ21hasnjdp7KvE8j1MnDk7M73JaNb/Up0u07UYKhKG1BXk4Rx21Ok
- 6kGQ3uKYkVB0cpIi4UjhFzGHT2bz6WKTiQHQ23LyKiHTb6MnS3CwI2AMgBngIBDySluO
- G0LgIcQ9zZ4huNjupFChX++hfRk5uJEXMDCPz9Kz2KxFtE3twpDR7Z55sVN7JlMUarLk
- wiZw1sUMJXi4rtXNXpUkUFVDxyhWSxS3wvLbsVW9K+dSttW5wfPQ1vQ9BzWCNFTz/O74
- EyeQ==
-X-Gm-Message-State: AOAM533io9VZRi+Itqt9rBh1AW5PEe2JvAIwDvip7c+RrjGqH9cqL2gQ
- hxkSlrpN8+Iv02wP2uLXtQ9aNpSoG7IjLt87cY4=
-X-Google-Smtp-Source: ABdhPJz0gm2HZ9DsOqVgr1PrEUNoVoUfRyoq5lD0Gs5uOB912TgHE1ZA0bmHRqRdRwpc+wul+ZdMPevCO2iy7Mdo5ek=
-X-Received: by 2002:a5d:6907:: with SMTP id t7mr22303156wru.329.1593531518419; 
- Tue, 30 Jun 2020 08:38:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1jqIPB-00014P-7a; Tue, 30 Jun 2020 11:42:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51044)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1jqIP4-000444-5i; Tue, 30 Jun 2020 11:42:40 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 90BDE20724;
+ Tue, 30 Jun 2020 15:42:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593531751;
+ bh=ai2EI65XSwr6oI2mkqxeKVrzd1NE2AtoAjbDgX3KUNk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=KcQgViw6yjVSJYoTAobLOhZkwzLNRapX5LoB0BeVvdrvdCD/8ODjSzC7AItRTny76
+ qZd4dKU31P7MEidfIOMtCx7lHfcBuxK49yzs2v+OY/BW37pfXqyR6y7N68ITOY8l4r
+ 5yme5O74mcZdnsjDHd91ezgK3flh09jRYJ/mTdRA=
+Date: Tue, 30 Jun 2020 08:42:28 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 00/10] hw/block/nvme: namespace types and zoned namespaces
+Message-ID: <20200630154228.GB1987534@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200630100139.1483002-1-its@irrelevant.dk>
+ <20200630125932.GA553472@localhost.localdomain>
+ <c10b18a8-44f3-7dab-b9bb-7d017f210934@redhat.com>
 MIME-Version: 1.0
-References: <20200630145236.27529-1-f4bug@amsat.org>
-In-Reply-To: <20200630145236.27529-1-f4bug@amsat.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 30 Jun 2020 17:38:25 +0200
-Message-ID: <CAHiYmc4=pmzEyhVTHaqxBnCotE8V+vaptMFincyurvAyDHNn6g@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] hw/mips/malta: Add the 'malta-strict' machine,
- matching Malta hardware
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c10b18a8-44f3-7dab-b9bb-7d017f210934@redhat.com>
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 11:42:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -80
+X-Spam_score: -8.1
+X-Spam_bar: --------
+X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,57 +78,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yunqiang Su <ysu@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Matias Bjorling <Matias.Bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=83=D1=82=D0=BE, 30. =D1=98=D1=83=D0=BD 2020. =D1=83 16:52 Philippe Math=
-ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Hi,
->
-> This series add a new 'malta-strict' machine, that aims to properly
-> model the real hardware (which is not what the current 'malta'
-> machine models).
->
-> As a bonus for Debian builders, a 'malta-unleashed' machine RFC
-> patch is included. This might start another endless discussion
-> upstream, but this is not the point of, so I still include it
-> for people to test. The rest of the series is candidate for merging
-> in mainstream QEMU.
->
-> Philippe Mathieu-Daud=C3=A9 (6):
->   hw/mips/malta: Trivial code movement
->   hw/mips/malta: Register the machine as a TypeInfo
->   hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
->   hw/mips/malta: Introduce the 'malta-strict' machine
->   hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
->   hw/mips/malta: Introduce the 'malta-unleashed' 64-bit machine
->
->  hw/mips/malta.c | 125 ++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 111 insertions(+), 14 deletions(-)
->
-> --
-
-This whole series is based on idea of emulating physically
-non-existing feature, and as such violates the fundamental principles
-of QEMU.
-
-As such, not acceptable for upstreaming.
-
-I don't see the point of sending again the same series, in just
-cosmetically different form, if it was said to you that the concept is
-wrong.
-
-Regards,
-Aleksandar
+On Tue, Jun 30, 2020 at 04:09:46PM +0200, Philippe Mathieu-Daudé wrote:
+> What I see doable for the following days is:
+> - hw/block/nvme: Fix I/O BAR structure [3]
+> - hw/block/nvme: handle transient dma errors
+> - hw/block/nvme: bump to v1.3
 
 
-> 2.21.3
->
+These look like sensible patches to rebase future work on, IMO. The 1.3
+updates had been prepared a while ago, at least.
 
