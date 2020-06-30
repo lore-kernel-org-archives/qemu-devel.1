@@ -2,90 +2,93 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 989DAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74303C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5508420675
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4055D20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 13:48:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TcPjXnni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5508420675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSaNzF7C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4055D20675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqGcB-0007ik-CN
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35076)
+	id 1jqGcR-0008C1-Dz
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 09:48:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jqGTy-0001Ia-Ro
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:39:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60957
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jqGTx-0006Kl-CC
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 09:39:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593524368;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BshmLbkCegvWQdOrab3Q23b6T16SbqzgLcrY5ZDWofo=;
- b=TcPjXnniUnZJ33tHWmA3dPUViBWL7tbXLNiUhp+0FZuKAdWjCIg7V/6epToeNwE4d9sze6
- BwjC04kAJCDIpX51rIP43DaiL9mGfm6jWjQBIOwzyDBggas6W+UJMvfySvfHx5QYpGQBJ6
- zYNs2Ngs3kg9iB294APZ8XDXjgE6uBk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-fxhnA3w1Mg6DgPEn1ZgnZw-1; Tue, 30 Jun 2020 09:39:24 -0400
-X-MC-Unique: fxhnA3w1Mg6DgPEn1ZgnZw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB03C800D5C;
- Tue, 30 Jun 2020 13:39:22 +0000 (UTC)
-Received: from titinator (ovpn-114-115.ams2.redhat.com [10.36.114.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 252647FE9C;
- Tue, 30 Jun 2020 13:39:11 +0000 (UTC)
-References: <20200626164307.3327380-1-dinechin@redhat.com>
- <20200626164307.3327380-2-dinechin@redhat.com>
- <20200630052756-mutt-send-email-mst@kernel.org>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 01/10] modules: Provide macros making it easier to
- identify module exports
-In-reply-to: <20200630052756-mutt-send-email-mst@kernel.org>
-Date: Tue, 30 Jun 2020 15:39:10 +0200
-Message-ID: <lybll0d669.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqGTu-0001CJ-At; Tue, 30 Jun 2020 09:39:26 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:35461)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqGTs-0006JG-MC; Tue, 30 Jun 2020 09:39:25 -0400
+Received: by mail-ed1-x544.google.com with SMTP id e15so16262211edr.2;
+ Tue, 30 Jun 2020 06:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=uCWGmD+bgn4Y2GrUizD+G8/TwFtuJI6lZxJDh/W1Rng=;
+ b=RSaNzF7CbF9k8PI5rtmpHuzt9wDkHj4Zs5XVMwjlDQisRmrjnFvTnObBAxtAlRCPQd
+ Qf+N3xKg/2WfnVNlersmYkOKpioa3zQeEuMvqW2BMcyqbWKz3UIWEjTVScAur53YzBm1
+ XxniCU8Q+wI6wHnf08GIzgtOEaaY5FL4oPE0JVZuFshe5dVbx8drdl605m8KX5sfU7i1
+ YPwsmi9AMCZMcPmL9xMu7JVbm35UhPRotE+NRpNLSy2Z8wlP0GvVVqrQDcMdOU7N1xZz
+ UiZQHvK+2AFF9b9c9HE9+1hhEY+0bRybgszgg+mDSzDpQ6mgoOmWfCAZXeuD8A5eESfv
+ Ce9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=uCWGmD+bgn4Y2GrUizD+G8/TwFtuJI6lZxJDh/W1Rng=;
+ b=iQzU77zmi8g/BdA73ls7JCs90KcMfMfbiynSd+EzkI6kuomONEehRALNKaZY1tnkEK
+ ZPwM9rfp19vr1yYsZtP54yqGgjMG9hJZmTe7lkFCSnr5L3UFIRd9lhFOSZGtMeVQIVRs
+ lb+ZVl5IgBTfnDyJndEE8YslMMrBmO99brbvkwEqz8VBGNhcG5+3esS43kdiuxaiddia
+ usG6gdcNUp1P7VWcCbLSxX4t3q3b54nwK+TWIFHJUiP1GJfoccMnNJ2msetKo1OLvShd
+ YLVpPgJMfm75+6OKu7Z8UR6txC/bXQo4hViKmBom5iIskM3JNuAoWOEx4DtECwPJBUj3
+ FInA==
+X-Gm-Message-State: AOAM532cD3pMfwqaVcdPkwrXmJOZUmUiu7xuuopdbBuLQl6drT+NBlgc
+ +PwfRVIoHQQjT+e4N2Dd1RcUlcqMJeQ=
+X-Google-Smtp-Source: ABdhPJxkHlEvFofkVpNPN8Z0SQg13iRYAQr5YwXd4sZOY5ljj4ROIz2pAVG7H5dfZgIENEQGWl0q6g==
+X-Received: by 2002:aa7:d3cd:: with SMTP id o13mr22568115edr.176.1593524362774; 
+ Tue, 30 Jun 2020 06:39:22 -0700 (PDT)
+Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id p18sm2099172ejm.55.2020.06.30.06.39.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Jun 2020 06:39:22 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 08/17] hw/sd/sdcard: Call sd_addr_to_wpnum where it is used,
+ consider zero size
+Date: Tue, 30 Jun 2020 15:39:02 +0200
+Message-Id: <20200630133912.9428-9-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200630133912.9428-1-f4bug@amsat.org>
+References: <20200630133912.9428-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dinechin@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,93 +101,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?utf-8?Q?Mar?= =?utf-8?Q?c-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Avoid setting 'sect' variable just once (its name is confuse
+anyway). Directly set 'sd->wpgrps_size'. Special case when
+size is zero.
 
-On 2020-06-30 at 11:38 CEST, Michael S. Tsirkin wrote...
-> On Fri, Jun 26, 2020 at 06:42:58PM +0200, Christophe de Dinechin wrote:
->> In order to facilitate the move of large chunks of functionality to
->> load modules, it is simpler to create a wrapper with the same name
->> that simply relays the implementation. For efficiency, this is
->> typically done using inline functions in the header for the
->> corresponding functionality. In that case, we rename the actual
->> implementation by appending _implementation to its name. This makes it
->> easier to select which function you want to put a breakpoint on.
->>
->> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
->> ---
->>  include/qemu/module.h | 24 ++++++++++++++++++++++++
->>  1 file changed, 24 insertions(+)
->>
->> diff --git a/include/qemu/module.h b/include/qemu/module.h
->> index 011ae1ae76..1922a0293c 100644
->> --- a/include/qemu/module.h
->> +++ b/include/qemu/module.h
->> @@ -39,6 +39,30 @@ static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \
->>  }
->>  #endif
->>
->> +#ifdef CONFIG_MODULES
->> +/* Identify which functions are replaced by a callback stub */
->> +#ifdef MODULE_STUBS
->> +#define MODIFACE(Ret,Name,Args)                                         \
->> +    Ret (*Name)Args;                                                    \
->> +    extern Ret Name##_implementation Args
->> +#else /* !MODULE_STUBS */
->> +#define MODIFACE(Ret,Name,Args)                                         \
->> +    extern Ret (*Name)Args;                                             \
->> +    extern Ret Name##_implementation Args
->> +#endif /* MODULE_STUBS */
->> +
->> +#define MODIMPL(Ret,Name,Args)                                          \
->> +    static void __attribute__((constructor)) Name##_register(void)      \
->> +    {                                                                   \
->> +        Name = Name##_implementation;                                   \
->> +    }                                                                   \
->> +    Ret Name##_implementation Args
->> +#else /* !CONFIG_MODULES */
->> +/* When not using a module, such functions are called directly */
->> +#define MODIFACE(Ret,Name,Args)         Ret Name Args
->> +#define MODIMPL(Ret,Name,Args)          Ret Name Args
->> +#endif /* CONFIG_MODULES */
->> +
->>  typedef enum {
->>      MODULE_INIT_MIGRATION,
->>      MODULE_INIT_BLOCK,
->
-> Hmm that's quite a bit of overhead for each call across modules.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sd.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Do you mean runtime overhead, i.e. the difference between
-foo(x) and (*foo)(x)?
-
-
-> Can't code patching be used somehow?
-
-I've considered it, but this seems like a bit of a hammer for half a dozen
-calls that are mostly init, so not performance sensitive.
-
-In the old times, ld.so used to do that for you. All you had to do was to
-mark one symbol as weak. Apparently for security reasons, that feature was
-dropped several years ago. At least, that put call patching where it
-belonged, i.e. in the loader.
-
->
->
->> --
->> 2.26.2
-
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 078b0e81ee..e5adcc8055 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -556,8 +556,6 @@ static void sd_reset(DeviceState *dev)
+     }
+     size = sect << 9;
+ 
+-    sect = sd_addr_to_wpnum(size) + 1;
+-
+     sd->size = size;
+     sd->state = sd_idle_state;
+     sd->rca = 0x0000;
+@@ -570,7 +568,11 @@ static void sd_reset(DeviceState *dev)
+ 
+     g_free(sd->wp_groups);
+     sd->wp_switch = sd->blk ? blk_is_read_only(sd->blk) : false;
+-    sd->wpgrps_size = sect;
++    if (sd->size) {
++        sd->wpgrps_size = sd_addr_to_wpnum(sd, sd->size) + 1;
++    } else {
++        sd->wpgrps_size = 1;
++    }
+     sd->wp_groups = bitmap_new(sd->wpgrps_size);
+     memset(sd->function_group, 0, sizeof(sd->function_group));
+     sd->erase_start = 0;
+-- 
+2.21.3
 
 
