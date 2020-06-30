@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2FFC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6AC5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B727A2078B
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4F22073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:09:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWz6y/qM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B727A2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZc2yj3r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4F22073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDCN-0003bY-WC
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:09:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58550)
+	id 1jqDCY-00047O-Re
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:09:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7F-0002IP-GV; Tue, 30 Jun 2020 06:03:49 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:40861)
+ id 1jqD7K-0002Tn-Aw; Tue, 30 Jun 2020 06:03:54 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:37885)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqD7D-0004bI-6z; Tue, 30 Jun 2020 06:03:49 -0400
-Received: by mail-ed1-x542.google.com with SMTP id b15so15591609edy.7;
- Tue, 30 Jun 2020 03:03:46 -0700 (PDT)
+ id 1jqD7I-0004dI-Lj; Tue, 30 Jun 2020 06:03:53 -0400
+Received: by mail-ej1-x641.google.com with SMTP id lx13so1241187ejb.4;
+ Tue, 30 Jun 2020 03:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZtgcwLm+oPvDM0rBUBUhyO6syjgVWMHkfRFyMuMRFYE=;
- b=CWz6y/qM/FM1kLLwVrv7Rp58ep2HZ3jXLn6EycnQgAWdxTe9E28VKwZPXe9KBlHyPJ
- O+TWOXa2zRruy3KvWsrhCTGb+8m36VPEzc5P86SClF8IOTgIK6tYpQavEL9WbJBe/ubX
- G7P+ItNa6cCKDcCGHpKLMT2LPalLJn0Rl/5f1HPHvZvvzbGRec6FvV4uvLOhKkyEfebE
- gTT2xjlKvXm9YZVovXNCTthmi81mMQ6P3UG8bh6W+Z0bfzZ2TxaiwcvLIELGYkmAIcSy
- HeUOlASYHO1DFrFCGbkLZeaorJo0nuh5c7iJ40wqnIgi4gLE0ey/BFufgx7IbmMZrFBu
- NjSQ==
+ bh=2FehWZv489g7gLp1IpuJgAw0ELgG4HGTfqwfreEPxtg=;
+ b=CZc2yj3rRHmUKsdZ8q5lEUQ9/BSmJRv4oTy85kFlRGlTFpmcKj7Gl9WJGTKGAKAbu0
+ UPrINk+k2ucWASQo6917Lqnwm2e+lsnkJkv32Fed6JfV9eJWdwivnWiihMNTn+znAteQ
+ oITiMFz1ct6B/s4jSRyhtpRte4t5oym1sqAp0YKV0tou4BEZ3Hz0KLpb3QWzk6ExspjT
+ CP3lIUY1p0dPiWgJgTxAt5t8g+e2+hM3lgd88vRV6W0aR/0STnI9VjTmYoFFzt5Uktja
+ KJhnjRNEiYHSjXIdsg8YrjAfKEUmBqgarvqSICAfILK3oug6nROK4lv+xmEA5W7lR/H5
+ 0BPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZtgcwLm+oPvDM0rBUBUhyO6syjgVWMHkfRFyMuMRFYE=;
- b=aQQDa+EBschkUtfYFjADIPLjTFS3cVw0MELTUhyLoC02Ce27GMZ7u1Auw6g8eRD6dG
- uFM56awIeeR+J9gH0IeIfBDj2dLYo8b7W3YO3qOsLvVPW05dWb9LlBzUGSi/74+rQLb+
- sRrRCI+3Vey6RwAEeBeln1qmhNPbJfjlQGpoJD8jmkeAiSQTOxHbRnzlQM8Skt3tYghr
- uCvDFCRI0bFgmxnq7OxW32ppmS1ftT6GJZQOKgg2a1owszt2Cto7IXtEfUIbqLmdpMIC
- DRaBbY5FxSdz6oWqDQu9Ml2+V87zXWw+pMQUWglVaH5PZRAVOOUDdxuQy9QN2D7wXY+F
- WMMQ==
-X-Gm-Message-State: AOAM532NnVIn5AbqJa8xSAaBN83uFfUUY/YALXQt8FZOykZ3lEszoYoS
- pj6MpyKbADpMpp5nYpwq6VTgUT+yCo0=
-X-Google-Smtp-Source: ABdhPJzXULjQs0VOJsgCNZhzvvi3XfavAABn1GcURP614TMxhXNCjSQsnX2VbYg2T9rehXAoIT0l8A==
-X-Received: by 2002:aa7:c496:: with SMTP id m22mr8886070edq.336.1593511425216; 
- Tue, 30 Jun 2020 03:03:45 -0700 (PDT)
+ bh=2FehWZv489g7gLp1IpuJgAw0ELgG4HGTfqwfreEPxtg=;
+ b=BB3LVOfSeCeadDuMTC1egTyMTALlZSl0t8gC6tjxTUNgdolkT3ibq9byRpqQD7CQwn
+ hXKi/mHJZenPb7tnHR1Asvz2/80lInDNMhTYLOptW0gnLYz/zAn+FnCnvlBVpPo45GvF
+ Vxh0d4IPv9JuORRcicHGCazcoTBzoMIInPXELeeXK0zljEGPuKPK1UF9Ie/zH9zjlP4A
+ LIgL2juZ/3EKdaf3JCEAH+TZqoXMq4EtK2e7ut4S8MVNL6RD0KToY6/jej0GOMauc4IL
+ jtvNtYSm9MT4KInyAb0T+PYIiToQpYRLoKZvonZDzA9GqaC8HvXooTpZW5Vp0NKVdD6j
+ +Faw==
+X-Gm-Message-State: AOAM530jSB8PlKdLj2/TPFCea+yBfsLh9VLgneLF/03b3kyLPflX0mzE
+ mrOOlQ4BrrIL8bICRMACoBRCoKdJmpY=
+X-Google-Smtp-Source: ABdhPJzCL+AIs9+afEjc2reah4gGN0cmZG8vo2l/C6RU1HKPjXu6wemJ0JbVRICYCyOpiDqf8Lf6gg==
+X-Received: by 2002:a17:907:1059:: with SMTP id
+ oy25mr18817818ejb.90.1593511430847; 
+ Tue, 30 Jun 2020 03:03:50 -0700 (PDT)
 Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.44
+ by smtp.gmail.com with ESMTPSA id h2sm2304697edk.54.2020.06.30.03.03.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 03:03:44 -0700 (PDT)
+ Tue, 30 Jun 2020 03:03:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 01/15] MAINTAINERS: Cc qemu-block mailing list
-Date: Tue, 30 Jun 2020 12:03:28 +0200
-Message-Id: <20200630100342.27625-2-f4bug@amsat.org>
+Subject: [PATCH v6 06/15] hw/sd/sdcard: Restrict Class 6 commands to SCSD cards
+Date: Tue, 30 Jun 2020 12:03:33 +0200
+Message-Id: <20200630100342.27625-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200630100342.27625-1-f4bug@amsat.org>
 References: <20200630100342.27625-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,34 +103,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Only SCSD cards support Class 6 (Block Oriented Write Protection)
+commands.
 
-We forgot to include the qemu-block mailing list while adding
-this section in commit 076a0fc32a7. Fix this.
+  "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+  4.3.14 Command Functional Difference in Card Capacity Types
+
+  * Write Protected Group
+
+  SDHC and SDXC do not support write-protected groups. Issuing
+  CMD28, CMD29 and CMD30 generates the ILLEGAL_COMMAND error.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ hw/sd/sd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dec252f38b..9ad876c4a7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1628,6 +1628,7 @@ F: hw/ssi/xilinx_*
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 7e0d684aca..871c30a67f 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -922,6 +922,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         sd->multi_blk_cnt = 0;
+     }
  
- SD (Secure Card)
- M: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+L: qemu-block@nongnu.org
- S: Odd Fixes
- F: include/hw/sd/sd*
- F: hw/sd/core.c
++    if (sd_cmd_class[req.cmd] == 6 && FIELD_EX32(sd->ocr, OCR, CARD_CAPACITY)) {
++        /* Only Standard Capacity cards support class 6 commands */
++        return sd_illegal;
++    }
++
+     switch (req.cmd) {
+     /* Basic commands (Class 0 and Class 1) */
+     case 0:	/* CMD0:   GO_IDLE_STATE */
 -- 
 2.21.3
 
