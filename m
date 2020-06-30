@@ -2,70 +2,92 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC771C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19028C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:30:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B01CC204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:28:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B01CC204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id D34FE204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 09:29:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3TWu424"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34FE204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqCZK-0001ts-WB
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:28:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46420)
+	id 1jqCaV-0003Ua-5z
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 05:29:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jqCYV-0000xD-PI; Tue, 30 Jun 2020 05:27:56 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:19319)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jqCYS-0006ie-4o; Tue, 30 Jun 2020 05:27:55 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id DFBA2748DCC;
- Tue, 30 Jun 2020 11:27:48 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 9B775748DCB; Tue, 30 Jun 2020 11:27:48 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 99869748DCA;
- Tue, 30 Jun 2020 11:27:48 +0200 (CEST)
-Date: Tue, 30 Jun 2020 11:27:48 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 2/4] smbus: Fix spd_data_generate() error API violation
-In-Reply-To: <20bcd5be-7664-4555-38bc-c8c68b603127@amsat.org>
-Message-ID: <alpine.BSF.2.22.395.2006301118100.65701@zero.eik.bme.hu>
-References: <20200422134815.1584-1-armbru@redhat.com>
- <20200422134815.1584-3-armbru@redhat.com>
- <alpine.BSF.2.22.395.2004221622140.19234@zero.eik.bme.hu>
- <0af0e0f0-8127-da83-d9d2-89a3fe28f778@redhat.com>
- <alpine.BSF.2.22.395.2004222053070.22480@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2006261315070.94870@zero.eik.bme.hu>
- <87k0ztrn9m.fsf@dusky.pond.sub.org>
- <731e8765-4886-3bfe-b877-06078d0e977d@amsat.org>
- <alpine.BSF.2.22.395.2006292127520.63145@zero.eik.bme.hu>
- <20bcd5be-7664-4555-38bc-c8c68b603127@amsat.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCYl-0001Ad-Uy
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:28:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54431
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqCYk-0006tN-Fa
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 05:28:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593509289;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mcvnlQe1R9yvYzfHbvW4W8qErrPOOrx4jLzOlsECtWM=;
+ b=H3TWu424zZBZ8A/kh4BZ80MzAEOAuSzK/SJWVDIc5Tp4XviPQ9mCr5bI/G0fokwf22ckEp
+ hKsyxzPofj/UL6STTb4btXKBY4F6ry6Tz4PYtPB0Y2usAtw2E/DKpqIaiXudIuGybeb5kl
+ MSplfTIQESJSNIqv8WsPRa3j4/R7774=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-1eluJmn7OMKWEm3zo487yw-1; Tue, 30 Jun 2020 05:28:04 -0400
+X-MC-Unique: 1eluJmn7OMKWEm3zo487yw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DB77879511;
+ Tue, 30 Jun 2020 09:28:03 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B73775C1C5;
+ Tue, 30 Jun 2020 09:28:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 402D411384A6; Tue, 30 Jun 2020 11:28:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 1/5] hw/i2c/aspeed_i2c: Simplify aspeed_i2c_get_bus()
+References: <20200629173821.22037-1-f4bug@amsat.org>
+ <20200629173821.22037-2-f4bug@amsat.org>
+Date: Tue, 30 Jun 2020 11:28:00 +0200
+In-Reply-To: <20200629173821.22037-2-f4bug@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 29 Jun 2020 19:38:17
+ +0200")
+Message-ID: <87r1twhpi7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1423549813-1593509268=:65701"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 05:27:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,133 +100,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
---3866299591-1423549813-1593509268=:65701
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
+> Simplify aspeed_i2c_get_bus() by using a AspeedI2CState argument.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On Tue, 30 Jun 2020, Philippe Mathieu-Daudé wrote:
-> On 6/29/20 11:31 PM, BALATON Zoltan wrote:
->>>>> Besides the above here's another use case of the fix ups that I wanted
->>>>> to keep:
->>>>>
->>>>> https://patchew.org/QEMU/cover.1592315226.git.balaton@eik.bme.hu/b5f4598529a77f15f554c593e9be2d0ff9e5fab3.1592315226.git.balaton@eik.bme.hu/
->>>>>
->>>>>
->>>>> This board normally uses OpenBIOS which gets RAM size from fw_cfg and
->>>>> so works with whatever amount of RAM (also Linux booted with -kernel
->>>>> probably does not care) so any -memory value is valid. However some
->>>>> may want to also use original firmware ROM for compatibility which
->>>>> detects RAM reading SPD eeproms (the i2c emulation needed for that is
->>>>> not working yet but once that's fixed this will be the case). I want
->>>>> to add smbus_eeproms for this but do not want to just abort for cases
->>>>> where -memory given by user cannot be covered with SPD data. Instead a
->>>>> warning and covering as much RAM as possible should be enough (the ROM
->>>>> will detect less RAM than given with -m
->>>>> but that's OK and better than just bailing out without a message
->>>>> tripping an assert). But I don't want to replicate in board code the
->>>>> calculation and checks the spd_data_generate() function does anyway
->>>>> (that would just puzzle reviewers for every use of this functions).
->>>>>
->>>>> Previously this was possible with my original spd_data_generate()
->>>>> implementation. What's your suggestion to bring that functionality
->>>>> back without breaking Error API? Maybe adding new parameters to tell
->>>>> the spd_data_generate() which fixups are allowed?
-[...]
->> What I'd like is reverting f26740c61a57f and fix that some other way so
->> I don't have to duplicate size check in board code as can be seen in the
->> patchew link above but could just call spd_data_generate() to do its
->> job. This was discussed at the time that patch was in review you can
->> read it here:
->>
->> http://patchwork.ozlabs.org/project/qemu-devel/patch/20200420132826.8879-3-armbru@redhat.com/
->>
->>
->> My points were not really considered then, now that I have another use
->> case maybe it could be revisited and fixed. What I want is to be able to
->> call spd_data_generate() from board code with whatever sizÃ?Â© (the
->> board does not need to know about SPD limits and so cannot pre-check the
->> size) and the function should return the largest possible size SPD and
->> some indication if the size was not used completely. If Error cannot be
->> used for this, return the message or error some other way but let the
->> board code decide if it wants to abort or it can use the smaller SPD. Do
->> not assert in the helper function. Maybe the DIMM type fix up can be
->> dropped and only keep the size fix up so then we don't need to use error
->> twice, the board could call the function again if a different type is
->> also acceptable, since only sam460ex would need this I can do that there
->> for type fixup and call spd_data_generate() again with DDR2 if first one
->> with DDR could not fit all ram. But at least the asserts should be
->> dropped for this and the size check brought back. Then adding SPD to
->> mac_oldworld could also be done by calling spd_data_generate() instead
->> of duplicating the checks this function does anyway. This board has
->> three slots so if user says -m 1400 it would call spd_data_generate()
->> with 1400 first, get back 512 SPD that it adds to first slot then calls
->> spd_data_generate() again with 888, gets 512 again that it adds to 2nd
->> slot and calls spd_data_generate() for last slot with 376 which would
->> give 256 and 120 remaining that it may warn the user about but still
->> continue because the SPD data is only used by a ROM from real hardware
->> (that may be used for compatibility with some software) but the default
->> OpenBIOS disregards SPD data and would still use 1400 so it's not an
->> error to abort on. Simply if using a firmare ROM then only 1280 MB of
->> the 1400 will be available due to its limitations but that's not a
->> reason to force users to change their command line. Printing a warning
->> is enough to hint they may use different value but aborting without an
->> error message on an assert which is the current situation is not really
->> a user friendly way.
->
-> I just noticed we have a MachineClass::fixup_ram_size() handler. There
-> is only one implementation (on s390x) which does a bit the opposite:
-> If the user asks for -m 1400, it will pad to a valid physical size,
-> so in your example to 1472 MiB. Then the guest can use only 1400 if it
-> is happy with it. 72 MiB are wasted, but this is still better than the
-> 576 MiB wasted if we were using 2 GiB instead ;)
->
-> See commit 5c30ef937f5:
->
-> static ram_addr_t s390_fixup_ram_size(ram_addr_t sz)
-> {
->    /* same logic as in sclp.c */
->    int increment_size = 20;
->    ram_addr_t newsz;
->
->    while ((sz >> increment_size) > MAX_STORAGE_INCREMENTS) {
->        increment_size++;
->    }
->    newsz = sz >> increment_size << increment_size;
->
->    if (sz != newsz) {
->        qemu_printf("Ram size %" PRIu64 "MB was fixed up to %" PRIu64
->                    "MB to match machine restrictions. "
->                    "Consider updating "
->                    "the guest definition.\n", (uint64_t) (sz / MiB),
->                    (uint64_t) (newsz / MiB));
->    }
->    return newsz;
-> }
+The real motivation seems to be simplifying the callers: every single
+one of them casts the argument from AspeedI2CState * to DeviceState *.
+Pointing that out in the commit message wouldn't hurt.
 
-May have a look but first sight it might work for sam460ex but not for the 
-mac_oldworld problem as described above without duplicating size checks in 
-board code that I'd like to avoid and have it only in spd_data_generate 
-for clarity and avoiding mistakes in duplicated copies. What the above 
-could be good for is to avoid unused RAM area but that's not related to 
-spd_data_generate and if it returns error some way or asserts.
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-I think the problem with fix up was that memdev will allocate mem region 
-and it does not have a callback for the board to apply fixup or any other 
-way to specify constraints so by the time board code runs the memory 
-region is already allocated with the user specified size so all the board 
-code can do is use that or abort (or not use and waste some amount). Maybe 
-s390x wasn't converted to this or using it differently?
-
-Regards,
-BALATON Zoltan
---3866299591-1423549813-1593509268=:65701--
 
