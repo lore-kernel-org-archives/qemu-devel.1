@@ -8,70 +8,71 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AC8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C81C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C8AA2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A32452053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:06:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OtZcODxS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8AA2074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5LbJGU/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A32452053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqNPp-0004ET-FR
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:03:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41482)
+	id 1jqNSS-0005fB-Tl
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:06:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqNOF-000344-IL; Tue, 30 Jun 2020 17:02:03 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:35960)
+ id 1jqNRl-0004zo-Bd; Tue, 30 Jun 2020 17:05:41 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:36865)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqNOD-0005iS-RT; Tue, 30 Jun 2020 17:02:03 -0400
-Received: by mail-io1-xd41.google.com with SMTP id y2so22597030ioy.3;
- Tue, 30 Jun 2020 14:02:01 -0700 (PDT)
+ id 1jqNRj-00064q-La; Tue, 30 Jun 2020 17:05:41 -0400
+Received: by mail-io1-xd44.google.com with SMTP id v6so8909318iob.4;
+ Tue, 30 Jun 2020 14:05:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=InGJbraVxG/kUlDkU/RtrndrD8/88qDbhcRi4HR1b4Y=;
- b=OtZcODxSD2LGi7MdJbSabkrG1Pk2x0zavcbuo8UvxYkP1AES3dXE5nK/OXkAmUavL9
- w27atzw5ItnBRPZWRtGVxGasonMdlTRG6VTx9o/x/Riv7QEPU9AIwyST8hA69gLmLfjp
- /mFAnxhNuDf4kzK340xS7Fq9StQQYsvS20TWFiXIpJL1DgYK6Iwaa92UL+kvg1KvkLDh
- MGY8pIl10+AaK0vL+57z7XiBb+wcqSxRBn/GdIWiCgBh0IxK7oLgfI1DXoRq8ANqqkOg
- 4XC/VMhftd7c2dII2nM9Srtc/ojVvSMeJ+hgIdCQzxokXQ68ae/ho8XHFkpObTnESEmA
- aL4w==
+ :cc; bh=AkVgbj2SVV7S0xqA22+uHgxrGpa6j1wryT4d5Xv/0w0=;
+ b=O5LbJGU/0Rujb38vqhTNoXlukQgTsfjnH2M7cJR+kmEKgecsjQMnyYcKTDbh/ahrrx
+ ND0pjXrkYvQZCzZv0Az9On1z7PNrLrVJJ8+RvuiTttL38/Ji8js/tbX3tVPvvAneaSbp
+ wP9dI3UQJVggs7JOozIEyh/aZ5MiEkicYjBSCR0ei/B6fRrS6/HHWLDyr12YYo5hEjZ8
+ XvsQ/2G2zSf6+CMPkoXttylngojyEe3mFlN0jOElKnewy+x3ZHoTXO8d8de5n+mYG/ba
+ FypSvY01mHR3CcCpgVF8Xuf0FWCjKEa2kS8lKPdkVVKxyt2I+DWmJOdD9yB/eqSylTMS
+ y83Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=InGJbraVxG/kUlDkU/RtrndrD8/88qDbhcRi4HR1b4Y=;
- b=R4/MS8j/Kp0BRKlkpRwpY06ngkyCrDpVlIQmx11NxerFegqLfDAHjcw+BMplSz4dVZ
- 6tFGQo6pgUMUtw7RwLf9TJIj2GpVPImp0nbLbb4wnPF/Ge0e/5iTh0C4DZY7u445vLPj
- DEb40et0zG1Yczqev7I4vpG65eqpgg+gIsbplwxXgf5TTT1qh89OwOSzFxBzByBcgaBu
- pDVTiec91U1pCQRfRiYynkHIeF7QFF1LMuvVTcUDN++Mdm3DygH0XOwPF8DFeE3Xx+kg
- PMN+VEBec5Skt31GTmegyy7Gthwj9zsPiUIe39HHR0IlUM1bsqkdm3v2q1EzAx9HXdVl
- Onqg==
-X-Gm-Message-State: AOAM532H/SG/Km87UFsyVWEp5LFsXeoHob8yjPjQPRYESrHsK3Kmowuv
- MHb6jN6JT88R4hnrH82j0Z3pqHud1uvFaA9SJlg=
-X-Google-Smtp-Source: ABdhPJwmupILyY273LUU0B4L2qVT6nnqZhXBL1Hw/poEPlwzeBDW0PqqENkkvFdXkCeL9QLbLykq23QsNELg4WnOH7w=
-X-Received: by 2002:a02:1a06:: with SMTP id 6mr25838650jai.8.1593550919596;
- Tue, 30 Jun 2020 14:01:59 -0700 (PDT)
+ bh=AkVgbj2SVV7S0xqA22+uHgxrGpa6j1wryT4d5Xv/0w0=;
+ b=shWcB5Oi/bUwdgrmMCdQy/tkzQi71vhbH/PX9xv26qG4tiNGkWUae9yhw7xXgn1UUV
+ e/42v1XuRSzWW8mhQKIBUiOh2lPHYTVETJTNBtEXRKcA5CYRH6KqnWek+8MYGpALER0H
+ 2mOcHj1Jy6mgB7ovzUUcTmDJ/3Uiyw6rVLe9X21/p6uzVDo4omucpSdqyHgJ8eIo7wbh
+ AUaTSzgLvt4wBXv/RpSAtpEdqMoW+oxj6niC+j9BobvBq28qA01nhSW8r5RR0rFMe9Ag
+ /FJedV5U5xvCrXKIOzOjSV3qQ6UqYnkbolnkPIB5415FTpbpRM78vz41536qFygvSCjw
+ ZggA==
+X-Gm-Message-State: AOAM532qiXuNPvyy6Eg8MMCSSKFIfwX+U+1qG38vpgAyFsLO64xzfcPu
+ LdW5L04S0ew4bquveg7DWMUURM3yJYV6Acya6Dc=
+X-Google-Smtp-Source: ABdhPJwPanBGaAFFxJcwBc8kG/3SHx22A9FkpaewxQVSHIMPV5AjhBpXO+LJ3/Oc1joIBUJtOFT/ZJG93xik11fHiNA=
+X-Received: by 2002:a05:6638:dd3:: with SMTP id
+ m19mr25753448jaj.106.1593551138063; 
+ Tue, 30 Jun 2020 14:05:38 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200628142429.17111-1-peter.maydell@linaro.org>
- <20200628142429.17111-8-peter.maydell@linaro.org>
-In-Reply-To: <20200628142429.17111-8-peter.maydell@linaro.org>
+ <20200628142429.17111-9-peter.maydell@linaro.org>
+In-Reply-To: <20200628142429.17111-9-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jun 2020 13:52:14 -0700
-Message-ID: <CAKmqyKObpLa774FLLvHoO8=kE+054oU_fX3C87Cwj+-mfzSA5g@mail.gmail.com>
-Subject: Re: [PATCH 07/17] hw/misc/max111x: Don't use vmstate_register()
+Date: Tue, 30 Jun 2020 13:55:54 -0700
+Message-ID: <CAKmqyKNfBsG3k=ryC954D5Q6g3Ese86rODr23iRmc70MCBAJiQ@mail.gmail.com>
+Subject: Re: [PATCH 08/17] ssi: Add ssi_realize_and_unref()
 To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -102,14 +103,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 7:25 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+On Sun, Jun 28, 2020 at 7:27 AM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> The max111x is a proper qdev device; we can use dc->vmsd rather than
-> directly calling vmstate_register().
+> Add an ssi_realize_and_unref(), for the benefit of callers
+> who want to be able to create an SSI device, set QOM properties
+> on it, and then do the realize-and-unref afterwards.
 >
-> It's possible that this is a migration compat break, but the only
-> boards that use this device are the spitz-family ('akita', 'borzoi',
-> 'spitz', 'terrier').
+> The API works on the same principle as the recently added
+> qdev_realize_and_undef(), sysbus_realize_and_undef(), etc.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
@@ -118,30 +119,69 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/misc/max111x.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  include/hw/ssi/ssi.h | 26 ++++++++++++++++++++++++++
+>  hw/ssi/ssi.c         |  7 ++++++-
+>  2 files changed, 32 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/misc/max111x.c b/hw/misc/max111x.c
-> index d0e5534e4f5..abddfa3c660 100644
-> --- a/hw/misc/max111x.c
-> +++ b/hw/misc/max111x.c
-> @@ -140,8 +140,6 @@ static int max111x_init(SSISlave *d, int inputs)
->
->      s->inputs = inputs;
->
-> -    vmstate_register(VMSTATE_IF(dev), VMSTATE_INSTANCE_ID_ANY,
-> -                     &vmstate_max111x, s);
->      return 0;
+> diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
+> index 93f2b8b0beb..4be5325e654 100644
+> --- a/include/hw/ssi/ssi.h
+> +++ b/include/hw/ssi/ssi.h
+> @@ -79,6 +79,32 @@ extern const VMStateDescription vmstate_ssi_slave;
 >  }
 >
-> @@ -206,6 +204,7 @@ static void max111x_class_init(ObjectClass *klass, void *data)
+>  DeviceState *ssi_create_slave(SSIBus *bus, const char *name);
+> +/**
+> + * ssi_realize_and_unref: realize and unref an SSI slave device
+> + * @dev: SSI slave device to realize
+> + * @bus: SSI bus to put it on
+> + * @errp: error pointer
+> + *
+> + * Call 'realize' on @dev, put it on the specified @bus, and drop the
+> + * reference to it. Errors are reported via @errp and by returning
+> + * false.
+> + *
+> + * This function is useful if you have created @dev via qdev_new()
+> + * (which takes a reference to the device it returns to you), so that
+> + * you can set properties on it before realizing it. If you don't need
+> + * to set properties then ssi_create_slave() is probably better (as it
+> + * does the create, init and realize in one step).
+> + *
+> + * If you are embedding the SSI slave into another QOM device and
+> + * initialized it via some variant on object_initialize_child() then
+> + * do not use this function, because that family of functions arrange
+> + * for the only reference to the child device to be held by the parent
+> + * via the child<> property, and so the reference-count-drop done here
+> + * would be incorrect.  (Instead you would want ssi_realize(), which
+> + * doesn't currently exist but would be trivial to create if we had
+> + * any code that wanted it.)
+> + */
+> +bool ssi_realize_and_unref(DeviceState *dev, SSIBus *bus, Error **errp);
 >
->      k->transfer = max111x_transfer;
->      dc->reset = max111x_reset;
-> +    dc->vmsd = &vmstate_max111x;
+>  /* Master interface.  */
+>  SSIBus *ssi_create_bus(DeviceState *parent, const char *name);
+> diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+> index 67b48c31cd6..a35d7ebb266 100644
+> --- a/hw/ssi/ssi.c
+> +++ b/hw/ssi/ssi.c
+> @@ -90,11 +90,16 @@ static const TypeInfo ssi_slave_info = {
+>      .abstract = true,
+>  };
+>
+> +bool ssi_realize_and_unref(DeviceState *dev, SSIBus *bus, Error **errp)
+> +{
+> +    return qdev_realize_and_unref(dev, &bus->parent_obj, errp);
+> +}
+> +
+>  DeviceState *ssi_create_slave(SSIBus *bus, const char *name)
+>  {
+>      DeviceState *dev = qdev_new(name);
+>
+> -    qdev_realize_and_unref(dev, &bus->parent_obj, &error_fatal);
+> +    ssi_realize_and_unref(dev, bus, &error_fatal);
+>      return dev;
 >  }
 >
->  static const TypeInfo max111x_info = {
 > --
 > 2.20.1
 >
