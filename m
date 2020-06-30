@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B13EC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5860C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:32:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE59920672
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DE53207F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czRrxgAV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE59920672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LoOPKzoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE53207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFQP-0005GV-3o
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:31:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42372)
+	id 1jqFQk-0005mB-Sx
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:32:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFOt-00044x-OQ
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33430
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jqFPT-0004WB-KB
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29172
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFOr-0003SD-Tf
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:11 -0400
+ id 1jqFPR-0003b7-Mk
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593520209;
+ s=mimecast20190719; t=1593520243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nf2jiKcgao0KRB8jp6YKGOLtoeAw61e09YX+V3F/S9o=;
- b=czRrxgAVWI2EqE28Wd2CEPRQYpmVxxAJ11Wr/8uNuZSaLv8u0AOl1yE6O23Wt6l/1pI+/P
- VSES7lYI1uPEUg+r/jUgBgT74cKbyBROzhXtiuKvmuEalpkIVaDL+J/ZXW+7W2ZzRl7ZPt
- Lt9hZWM8WWWWrmIf7SIx9EjHF17yEAc=
+ bh=nR2mlk71ijNyuzlqjwtm3TtC/BDoRCd3qq5v1Q1dItE=;
+ b=LoOPKzoB4EH7J6h5YIXNiJmmEXGENUoZ+DhuGsYvZrYRBILyi2Rt66Kgb+Hmc6KRd2BW1b
+ arU5vbFeLbTF8BkYXrFudy1qDzVUfSdUewB7ZidR2//81EBTmC62rXUShuMcyQ+kBnttwD
+ hB6FZktzZC1yf+kjpI4dzc/8/LHR6tE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-TGVF1GlwNBaNpnmwuv3oog-1; Tue, 30 Jun 2020 08:30:05 -0400
-X-MC-Unique: TGVF1GlwNBaNpnmwuv3oog-1
+ us-mta-354-zynKvBOAM8Wo9xnDO-NmNQ-1; Tue, 30 Jun 2020 08:30:29 -0400
+X-MC-Unique: zynKvBOAM8Wo9xnDO-NmNQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8E5F104ECFE;
- Tue, 30 Jun 2020 12:29:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 117832E94;
+ Tue, 30 Jun 2020 12:30:28 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 32D335C66E;
- Tue, 30 Jun 2020 12:29:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 940A25C66E;
+ Tue, 30 Jun 2020 12:30:19 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 2/9] pci-host: add pcie-msi read method
-Date: Tue, 30 Jun 2020 17:57:03 +0530
-Message-Id: <20200630122710.1119158-3-ppandit@redhat.com>
+Subject: [PATCH v3 4/9] prep: add ppc-parity write method
+Date: Tue, 30 Jun 2020 17:57:05 +0530
+Message-Id: <20200630122710.1119158-5-ppandit@redhat.com>
 In-Reply-To: <20200630122710.1119158-1-ppandit@redhat.com>
 References: <20200630122710.1119158-1-ppandit@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -109,53 +109,47 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Add pcie-msi mmio read method to avoid NULL pointer dereference
+Add ppc-parity mmio write method to avoid NULL pointer dereference
 issue.
 
 Reported-by: Lei Sun <slei.casper@gmail.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/pci-host/designware.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/ppc/prep_systemio.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Update v3: Add Reviewed-by: ...
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09400.html
+Update v3: Add Acked-by: ...
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08053.html
 
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index 8492c18991..82262bdfdf 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -21,6 +21,7 @@
+diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
+index bbc51b6e9a..097f68f4a5 100644
+--- a/hw/ppc/prep_systemio.c
++++ b/hw/ppc/prep_systemio.c
+@@ -23,6 +23,7 @@
+  */
+ 
  #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
 +#include "qemu/log.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/pci/pci_host.h"
-@@ -63,6 +64,13 @@ designware_pcie_root_to_host(DesignwarePCIERoot *root)
-     return DESIGNWARE_PCIE_HOST(bus->parent);
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -235,8 +236,15 @@ static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
+     return val;
  }
  
-+static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr addr,
-+                                              unsigned size)
++static void ppc_parity_error_writel(void *opaque, hwaddr addr,
++                                    uint64_t data, unsigned size)
 +{
-+    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-+    return 0;
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid write access\n", __func__);
 +}
 +
- static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
-                                            uint64_t val, unsigned len)
- {
-@@ -77,6 +85,7 @@ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
- }
- 
- static const MemoryRegionOps designware_pci_host_msi_ops = {
-+    .read = designware_pcie_root_msi_read,
-     .write = designware_pcie_root_msi_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
+ static const MemoryRegionOps ppc_parity_error_ops = {
+     .read = ppc_parity_error_readl,
++    .write = ppc_parity_error_writel,
      .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
 -- 
 2.26.2
 
