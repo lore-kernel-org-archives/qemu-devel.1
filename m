@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA193C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5732EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7895720672
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22E5220672
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 12:34:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+X3VWnr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7895720672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WgDpkxyW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E5220672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqFSt-0000eW-LC
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42596)
+	id 1jqFTU-0001h2-Aw
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 08:34:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFPj-0004yz-Mi
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53277
+ id 1jqFPK-0004RZ-6t
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43985
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jqFPh-0003iP-Rw
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:31:03 -0400
+ id 1jqFPG-0003af-0I
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 08:30:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593520261;
+ s=mimecast20190719; t=1593520232;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=huuVV6CmrhIMjX39cZvGBeBINYF6X+gwzf67AJA/UlA=;
- b=O+X3VWnrakfCmL2RtsorOx9rnN4Ve/wq9dO892cBrSQ1Ghi+WuJBPxXJXC8syhDoAx7Sek
- hq8p30l5zVMTlwZABKzOeNyD5TiNNg93s9h1zI67SnkldX68Lt6g6iDbYaqkeWrEznNviB
- kMJLoCQ6dkvlYW0VAwrmalk9QRPwVGc=
+ bh=g4NkpeznYcI4d0ovDvVCdOnMDUdG0xhZ5rvfXRRKl4I=;
+ b=WgDpkxyWNT+zMvcXRi51BqKMlAqzp9ivNaQdiYg2PDvDC5rtVBQJG6DP1+EfmdGtciooTC
+ jLw47qyuxqR7bmpsawWFlBZNlLNq+AymYjj02VPCKijMvBI7qySB+FhP7uPlpyB0LmN9zz
+ wm/YsEaY648g3flETXWH2J8gCwEsEcs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-_cPx-ChiOlaBQVUbHgek-w-1; Tue, 30 Jun 2020 08:30:46 -0400
-X-MC-Unique: _cPx-ChiOlaBQVUbHgek-w-1
+ us-mta-257-3GazydatNPOP6g-SXHwttw-1; Tue, 30 Jun 2020 08:30:22 -0400
+X-MC-Unique: 3GazydatNPOP6g-SXHwttw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 323E51060B97;
- Tue, 30 Jun 2020 12:30:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29D39DB39;
+ Tue, 30 Jun 2020 12:30:19 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E345C5C241;
- Tue, 30 Jun 2020 12:30:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C17835C241;
+ Tue, 30 Jun 2020 12:30:00 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 5/9] nvram: add nrf51_soc flash read method
-Date: Tue, 30 Jun 2020 17:57:06 +0530
-Message-Id: <20200630122710.1119158-6-ppandit@redhat.com>
+Subject: [PATCH v3 3/9] vfio: add quirk device write method
+Date: Tue, 30 Jun 2020 17:57:04 +0530
+Message-Id: <20200630122710.1119158-4-ppandit@redhat.com>
 In-Reply-To: <20200630122710.1119158-1-ppandit@redhat.com>
 References: <20200630122710.1119158-1-ppandit@redhat.com>
 MIME-Version: 1.0
@@ -109,41 +109,47 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Add nrf51_soc mmio read method to avoid NULL pointer dereference
-issue.
+Add vfio quirk device mmio write method to avoid NULL pointer
+dereference issue.
 
 Reported-by: Lei Sun <slei.casper@gmail.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/nvram/nrf51_nvm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/vfio/pci-quirks.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Update v3: use g_assert_not_reached()
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09560.html
+Update v3: Add Reviewed-by: ...
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09406.html
 
-diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
-index f2283c1a8d..82e89d965b 100644
---- a/hw/nvram/nrf51_nvm.c
-+++ b/hw/nvram/nrf51_nvm.c
-@@ -273,6 +273,10 @@ static const MemoryRegionOps io_ops = {
-         .endianness = DEVICE_LITTLE_ENDIAN,
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index d304c81148..cc6d5dbc23 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -14,6 +14,7 @@
+ #include "config-devices.h"
+ #include "exec/memop.h"
+ #include "qemu/units.h"
++#include "qemu/log.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/module.h"
+@@ -264,8 +265,15 @@ static uint64_t vfio_ati_3c3_quirk_read(void *opaque,
+     return data;
+ }
+ 
++static void vfio_ati_3c3_quirk_write(void *opaque, hwaddr addr,
++                                        uint64_t data, unsigned size)
++{
++    qemu_log_mask(LOG_GUEST_ERROR, "%s not implemented\n", __func__);
++}
++
+ static const MemoryRegionOps vfio_ati_3c3_quirk = {
+     .read = vfio_ati_3c3_quirk_read,
++    .write = vfio_ati_3c3_quirk_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
  };
  
-+static uint64_t flash_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    g_assert_not_reached();
-+}
- 
- static void flash_write(void *opaque, hwaddr offset, uint64_t value,
-         unsigned int size)
-@@ -300,6 +304,7 @@ static void flash_write(void *opaque, hwaddr offset, uint64_t value,
- 
- 
- static const MemoryRegionOps flash_ops = {
-+    .read = flash_read,
-     .write = flash_write,
-     .valid.min_access_size = 4,
-     .valid.max_access_size = 4,
 -- 
 2.26.2
 
