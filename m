@@ -2,91 +2,81 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C81C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA087C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:11:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A32452053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:06:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5LbJGU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A32452053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 73A5B20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 21:11:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A5B20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqNSS-0005fB-Tl
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:06:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42178)
+	id 1jqNXQ-0000s0-CN
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 17:11:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqNRl-0004zo-Bd; Tue, 30 Jun 2020 17:05:41 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:36865)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqNWn-0000FR-5a
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 17:10:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqNRj-00064q-La; Tue, 30 Jun 2020 17:05:41 -0400
-Received: by mail-io1-xd44.google.com with SMTP id v6so8909318iob.4;
- Tue, 30 Jun 2020 14:05:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AkVgbj2SVV7S0xqA22+uHgxrGpa6j1wryT4d5Xv/0w0=;
- b=O5LbJGU/0Rujb38vqhTNoXlukQgTsfjnH2M7cJR+kmEKgecsjQMnyYcKTDbh/ahrrx
- ND0pjXrkYvQZCzZv0Az9On1z7PNrLrVJJ8+RvuiTttL38/Ji8js/tbX3tVPvvAneaSbp
- wP9dI3UQJVggs7JOozIEyh/aZ5MiEkicYjBSCR0ei/B6fRrS6/HHWLDyr12YYo5hEjZ8
- XvsQ/2G2zSf6+CMPkoXttylngojyEe3mFlN0jOElKnewy+x3ZHoTXO8d8de5n+mYG/ba
- FypSvY01mHR3CcCpgVF8Xuf0FWCjKEa2kS8lKPdkVVKxyt2I+DWmJOdD9yB/eqSylTMS
- y83Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AkVgbj2SVV7S0xqA22+uHgxrGpa6j1wryT4d5Xv/0w0=;
- b=shWcB5Oi/bUwdgrmMCdQy/tkzQi71vhbH/PX9xv26qG4tiNGkWUae9yhw7xXgn1UUV
- e/42v1XuRSzWW8mhQKIBUiOh2lPHYTVETJTNBtEXRKcA5CYRH6KqnWek+8MYGpALER0H
- 2mOcHj1Jy6mgB7ovzUUcTmDJ/3Uiyw6rVLe9X21/p6uzVDo4omucpSdqyHgJ8eIo7wbh
- AUaTSzgLvt4wBXv/RpSAtpEdqMoW+oxj6niC+j9BobvBq28qA01nhSW8r5RR0rFMe9Ag
- /FJedV5U5xvCrXKIOzOjSV3qQ6UqYnkbolnkPIB5415FTpbpRM78vz41536qFygvSCjw
- ZggA==
-X-Gm-Message-State: AOAM532qiXuNPvyy6Eg8MMCSSKFIfwX+U+1qG38vpgAyFsLO64xzfcPu
- LdW5L04S0ew4bquveg7DWMUURM3yJYV6Acya6Dc=
-X-Google-Smtp-Source: ABdhPJwPanBGaAFFxJcwBc8kG/3SHx22A9FkpaewxQVSHIMPV5AjhBpXO+LJ3/Oc1joIBUJtOFT/ZJG93xik11fHiNA=
-X-Received: by 2002:a05:6638:dd3:: with SMTP id
- m19mr25753448jaj.106.1593551138063; 
- Tue, 30 Jun 2020 14:05:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqNWl-0007Qt-6J
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 17:10:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jqNWi-0001mr-NK
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 21:10:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7D9A02E810B
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 21:10:48 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200628142429.17111-1-peter.maydell@linaro.org>
- <20200628142429.17111-9-peter.maydell@linaro.org>
-In-Reply-To: <20200628142429.17111-9-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jun 2020 13:55:54 -0700
-Message-ID: <CAKmqyKNfBsG3k=ryC954D5Q6g3Ese86rODr23iRmc70MCBAJiQ@mail.gmail.com>
-Subject: Re: [PATCH 08/17] ssi: Add ssi_realize_and_unref()
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jun 2020 20:59:25 -0000
+From: Mina Magdy <1885350@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
+ assignee=alistair@alistair23.me; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alistair2323 rpvrverve453-4tr5t34t5
+X-Launchpad-Bug-Reporter: Mina Magdy (rpvrverve453-4tr5t34t5)
+X-Launchpad-Bug-Modifier: Mina Magdy (rpvrverve453-4tr5t34t5)
+References: <159323684589.25927.6403829131374464357.malonedeb@gac.canonical.com>
+Message-Id: <159355076509.18036.506736375392887824.malone@soybean.canonical.com>
+Subject: [Bug 1885350] Re: RISCV dynamic rounding mode is not behaving
+ correctly
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bc793f2becefe965e6ee1a3a288a655855914389
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 16:50:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,95 +85,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>
+Reply-To: Bug 1885350 <1885350@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 7:27 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> Add an ssi_realize_and_unref(), for the benefit of callers
-> who want to be able to create an SSI device, set QOM properties
-> on it, and then do the realize-and-unref afterwards.
->
-> The API works on the same principle as the recently added
-> qdev_realize_and_undef(), sysbus_realize_and_undef(), etc.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Thank you Alistair Francis.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+-- =
 
-Alistair
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885350
 
-> ---
->  include/hw/ssi/ssi.h | 26 ++++++++++++++++++++++++++
->  hw/ssi/ssi.c         |  7 ++++++-
->  2 files changed, 32 insertions(+), 1 deletion(-)
->
-> diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
-> index 93f2b8b0beb..4be5325e654 100644
-> --- a/include/hw/ssi/ssi.h
-> +++ b/include/hw/ssi/ssi.h
-> @@ -79,6 +79,32 @@ extern const VMStateDescription vmstate_ssi_slave;
->  }
->
->  DeviceState *ssi_create_slave(SSIBus *bus, const char *name);
-> +/**
-> + * ssi_realize_and_unref: realize and unref an SSI slave device
-> + * @dev: SSI slave device to realize
-> + * @bus: SSI bus to put it on
-> + * @errp: error pointer
-> + *
-> + * Call 'realize' on @dev, put it on the specified @bus, and drop the
-> + * reference to it. Errors are reported via @errp and by returning
-> + * false.
-> + *
-> + * This function is useful if you have created @dev via qdev_new()
-> + * (which takes a reference to the device it returns to you), so that
-> + * you can set properties on it before realizing it. If you don't need
-> + * to set properties then ssi_create_slave() is probably better (as it
-> + * does the create, init and realize in one step).
-> + *
-> + * If you are embedding the SSI slave into another QOM device and
-> + * initialized it via some variant on object_initialize_child() then
-> + * do not use this function, because that family of functions arrange
-> + * for the only reference to the child device to be held by the parent
-> + * via the child<> property, and so the reference-count-drop done here
-> + * would be incorrect.  (Instead you would want ssi_realize(), which
-> + * doesn't currently exist but would be trivial to create if we had
-> + * any code that wanted it.)
-> + */
-> +bool ssi_realize_and_unref(DeviceState *dev, SSIBus *bus, Error **errp);
->
->  /* Master interface.  */
->  SSIBus *ssi_create_bus(DeviceState *parent, const char *name);
-> diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
-> index 67b48c31cd6..a35d7ebb266 100644
-> --- a/hw/ssi/ssi.c
-> +++ b/hw/ssi/ssi.c
-> @@ -90,11 +90,16 @@ static const TypeInfo ssi_slave_info = {
->      .abstract = true,
->  };
->
-> +bool ssi_realize_and_unref(DeviceState *dev, SSIBus *bus, Error **errp)
-> +{
-> +    return qdev_realize_and_unref(dev, &bus->parent_obj, errp);
-> +}
-> +
->  DeviceState *ssi_create_slave(SSIBus *bus, const char *name)
->  {
->      DeviceState *dev = qdev_new(name);
->
-> -    qdev_realize_and_unref(dev, &bus->parent_obj, &error_fatal);
-> +    ssi_realize_and_unref(dev, bus, &error_fatal);
->      return dev;
->  }
->
-> --
-> 2.20.1
->
->
+Title:
+  RISCV dynamic rounding mode is not behaving correctly
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I=E2=80=99ve gone through the RISC-V code in latest QEMU release
+  (qemu-5.0.0-rc2) and when checking the Floating point encodings I
+  found the rounding mode is only updated if the opcode field =E2=80=9Crm=
+=E2=80=9D is
+  changed =E2=80=9Cctx->frm =3D=3D rm=E2=80=9D. But according to RISC-V Vol=
+ume I:
+  Unprivileged ISA, there=E2=80=99s a dynamic mode when rm=3D7 where the ro=
+unding
+  mode is set with frm value.
+
+  So for the same rm value (=3D7) and when changing frm value seeking
+  different rounding modes, and according to the below code, the
+  rounding mode won=E2=80=99t be updated. Please correct me if I got this
+  implementation wrong.
+
+  static void gen_set_rm(DisasContext *ctx, int rm)
+  {
+      TCGv_i32 t0;
+      if (ctx->frm =3D=3D rm) {
+          return;
+      }
+      ctx->frm =3D rm;
+      t0 =3D tcg_const_i32(rm);
+      gen_helper_set_rounding_mode(cpu_env, t0);
+      tcg_temp_free_i32(t0);
+  }
+
+  =
+
+  My testcase:
+  I set statically the rm field in the instruction to 7 and before this exe=
+cution I changed the value of frm field in fcsr register. For the 1st time =
+it worked (according to the code above, the rm is updated so the round mode=
+ will also be updated). But when changing fcsr register an re-execute the i=
+nstruction, there's no difference and the rounding mode is the same like th=
+e previous frm value.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885350/+subscriptions
 
