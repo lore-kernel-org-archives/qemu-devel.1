@@ -2,84 +2,85 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7131C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660C020720
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:05:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71D5120720
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:06:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+fCxXN6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660C020720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dE5LyIDK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D5120720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqHpN-0002gL-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:05:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60212)
+	id 1jqHpz-0003Ft-Of
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:06:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqHlm-00086H-3D
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:01:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51194
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqHo9-00029n-EE
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:04:25 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40492
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqHlk-0004FC-Bn
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:01:57 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqHo6-00053t-5L
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:04:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593529312;
+ s=mimecast20190719; t=1593529460;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ZUXakE3b/7vUMkh9NzniLV8kHc1obJfWQ6LnVqPlCR8=;
- b=a+fCxXN6VeyVUtUtVPULhJQa7wElRw+ntj2fwSzhlAPtoBmaZZkLP77RA+VP6rF4MqOl8A
- FqCFYSujowO0dqicTOMZkkb+jjbVjC7Lw0yyxx0OYAp4BLXBy5bfcfC6UclK8fO23E1fxM
- XYUfyEtIevV6TbEavwTGLfB6p1jaMkc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-by9DIO5YPlelzvlP2NlLZg-1; Tue, 30 Jun 2020 11:01:43 -0400
-X-MC-Unique: by9DIO5YPlelzvlP2NlLZg-1
-Received: by mail-ej1-f71.google.com with SMTP id y10so7361455ejd.1
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:01:43 -0700 (PDT)
+ bh=Pqf+op65SMxFvFo8CmtxT5e/mhUtCGk2tLIOAKSGI4E=;
+ b=dE5LyIDKC9dyQzvkyQtFzfZxDAINawifYWeB95aSpRMlphMbv8LYkT+tNZvo9qrcKSHspH
+ vVEsaeOX7bTKOm7Yb5o723cVefLWx11ZuDVrLWw/LpuWjp4Z/G4nYVHqLBwphUkVtLyzIp
+ Cd1A+no8I6Kbk6pCWabAV9xlXLcYf28=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-8B8AdsnNNXqzjxHLO9a0rQ-1; Tue, 30 Jun 2020 11:04:19 -0400
+X-MC-Unique: 8B8AdsnNNXqzjxHLO9a0rQ-1
+Received: by mail-ed1-f69.google.com with SMTP id y66so10179742ede.19
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:04:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=ZUXakE3b/7vUMkh9NzniLV8kHc1obJfWQ6LnVqPlCR8=;
- b=db6iawVnT4LzlWnujhJJz1c109R4Hgemq+cJ+V8iJ6dX+UdWJJG8C019G3CJeCRVa+
- jJ/C6EFysK+xAXIpsoWxcgj8FzxJ5kUxjvZUh8KnNPchW9rdZ3YsXGWMJ7RY9UO/NmX+
- 4FucKb2X6uaHCsgsqdpA1uS5cWUfbHlTMt3xATY77qZfFrV3JIuehREQJO21CoJzSdgY
- Xk+InM0IRnpf/jXNLf7tNX8Js1DG1DaXsM5WcWy1SXKCWQlAjq5DMwMV6iNAeUHpRAxu
- 5R9RFmm7Z1KEFJ1FzzA8m0olwQS/h4Qboweexh+czDNc+YLHtvm3jsct3cpnhS704F51
- +PAQ==
-X-Gm-Message-State: AOAM532OjH059fCe9kOEjPhMRgcmgfUaRQQeSPNJCsdh4o5hsjjSTtGw
- zTSUmGV5CrwRDjFv8LLPG37cE+oMT4CbRooeblgPMcXcPH11Zz3YxObEmBmLwtDZQNGsD35wrde
- 4XM77FyLPty82x+U=
-X-Received: by 2002:a17:906:4341:: with SMTP id
- z1mr13357269ejm.392.1593529302042; 
- Tue, 30 Jun 2020 08:01:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzXStioSS0LSzxVIkY9HCejgg7L2AzC49Ex2Bevo5BfPzAuwxZ3OaGIFRX320MxPTvtC4kDsw==
-X-Received: by 2002:a17:906:4341:: with SMTP id
- z1mr13357241ejm.392.1593529301758; 
- Tue, 30 Jun 2020 08:01:41 -0700 (PDT)
+ bh=Pqf+op65SMxFvFo8CmtxT5e/mhUtCGk2tLIOAKSGI4E=;
+ b=YwNMQvIF8Vzk6KNvG97irPl4BjpXuYJhBVvebgM8fLDivtjIoDGXlIlfFmDZW6PvIA
+ Qo7hGPGnkDYtsNKY46VfQIUe4CMbdnYNcEMA95uEvhLAeZHK8JKwqbkUt17BX/LTJGFE
+ Lm1+bPI/juzPm5qAzDpL/mlzQs2UiZYYDmr4HWn+T5j8NkmNyLNxeRA7nEPvQOKQVJNn
+ WqoN1QEUnL5BKz/LdKCRJGm5AYftbXtwkjj5ud5sAFubEUTt4dna6P8ZJDXIbYuvtp1j
+ AVj3pU0f3gbmrUE0Z+o4MkvBLyUEG6u3yXPEfgjHIkxHcExS0PpCUW6RE2V+l0Kzw7WZ
+ aE5g==
+X-Gm-Message-State: AOAM530NH6z07oUyFLUNxzqpxueU8jwcOWHIJUT3HsUFG4XuH31vPLbR
+ crdWirHt0FQtWQV33BQPww/NJQmjMFLgUfP+fCEhLAIKcKc3YwmdFcbYjc3qnAhVRiczFURw+2m
+ 4i4Fy6piS6KP7BSc=
+X-Received: by 2002:a17:906:314c:: with SMTP id
+ e12mr15246134eje.500.1593529456710; 
+ Tue, 30 Jun 2020 08:04:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/OC02Qty3G7w8EuTkyaFWaNo6mKQyIecaDO5IalMdbTsnbHRnyfy4Ip2MOAQqQQ0RfGxyfg==
+X-Received: by 2002:a17:906:314c:: with SMTP id
+ e12mr15246112eje.500.1593529456489; 
+ Tue, 30 Jun 2020 08:04:16 -0700 (PDT)
 Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id b4sm2974860edx.96.2020.06.30.08.01.40
+ by smtp.gmail.com with ESMTPSA id x19sm3037604eds.43.2020.06.30.08.04.15
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 30 Jun 2020 08:01:41 -0700 (PDT)
-Subject: Re: [PATCH v2] coverity: provide Coverity-friendly MIN_CONST and
- MAX_CONST
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200629162804.1096180-1-eblake@redhat.com>
+ Tue, 30 Jun 2020 08:04:15 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] net: tap: check if the file descriptor is valid
+ before using it
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200630145737.232095-1-lvivier@redhat.com>
+ <20200630145737.232095-2-lvivier@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,12 +105,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1cc63c60-72c3-9b0b-757e-0065f9be5588@redhat.com>
-Date: Tue, 30 Jun 2020 17:01:39 +0200
+Message-ID: <51383642-0b7e-ea24-2296-67a650b4102a@redhat.com>
+Date: Tue, 30 Jun 2020 17:04:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200629162804.1096180-1-eblake@redhat.com>
+In-Reply-To: <20200630145737.232095-2-lvivier@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -140,91 +141,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 6:28 PM, Eric Blake wrote:
-> Coverity has problems seeing through __builtin_choose_expr, which
-> result in it abandoning analysis of later functions that utilize a
-> definition that used MIN_CONST or MAX_CONST, such as in qemu-file.c:
+On 6/30/20 4:57 PM, Laurent Vivier wrote:
+> qemu_set_nonblock() checks that the file descriptor can be used and, if
+> not, crashes QEMU. An assert() is used for that. The use of assert() is
+> used to detect programming error and the coredump will allow to debug
+> the problem.
 > 
->  50    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+> But in the case of the tap device, this assert() can be triggered by
+> a misconfiguration by the user. At startup, it's not a real problem, but it
+> can also happen during the hot-plug of a new device, and here it's a
+> problem because we can crash a perfectly healthy system.
 > 
-> CID 1429992 (#1 of 1): Unrecoverable parse warning (PARSE_ERROR)1.
-> expr_not_constant: expression must have a constant value
+> For instance:
+>  # ip link add link virbr0 name macvtap0 type macvtap mode bridge
+>  # ip link set macvtap0 up
+>  # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
+>  # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
+>  (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
+>  (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
+>  (qemu) device_del net0
+>  (qemu) netdev_del hostnet0
+>  (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
+>  qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
+>  Aborted (core dumped)
 > 
-> As has been done in the past (see 07d66672), it's okay to dumb things
-> down when compiling for static analyzers.  (Of course, now the
-> syntax-checker has a false positive on our reference to
-> __COVERITY__...)
+> To avoid that, check the file descriptor is valid before passing it to
+> qemu_set_non_block() for "fd=" and "fds=" parameters.
 > 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: CID 1429992, CID 1429995, CID 1429997, CID 1429999
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
+>  include/qemu/sockets.h |  1 +
+>  net/tap.c              | 13 +++++++++++++
+>  util/oslib-posix.c     |  5 +++++
+>  util/oslib-win32.c     |  6 ++++++
+>  4 files changed, 25 insertions(+)
 > 
-> Improvements over Paolo's v1:
-> - proper use of ()
-> - add comment explaining the COVERITY section
-> - add indentation for easier read of #if/#else flow
-> 
->  include/qemu/osdep.h | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 0d26a1b9bd07..0fc206ae6154 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -250,7 +250,8 @@ extern int daemon(int, int);
->   * Note that neither form is usable as an #if condition; if you truly
->   * need to write conditional code that depends on a minimum or maximum
->   * determined by the pre-processor instead of the compiler, you'll
-> - * have to open-code it.
-> + * have to open-code it.  Sadly, Coverity is severely confused by the
-> + * constant variants, so we have to dumb things down there.
->   */
->  #undef MIN
->  #define MIN(a, b)                                       \
-> @@ -258,22 +259,28 @@ extern int daemon(int, int);
->          typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
->          _a < _b ? _a : _b;                              \
->      })
-> -#define MIN_CONST(a, b)                                         \
-> -    __builtin_choose_expr(                                      \
-> -        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> -        (a) < (b) ? (a) : (b),                                  \
-> -        ((void)0))
->  #undef MAX
->  #define MAX(a, b)                                       \
->      ({                                                  \
->          typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
->          _a > _b ? _a : _b;                              \
->      })
-> -#define MAX_CONST(a, b)                                         \
+> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+> index 57cd049d6edd..5b0c2d77ddad 100644
+> --- a/include/qemu/sockets.h
+> +++ b/include/qemu/sockets.h
+> @@ -17,6 +17,7 @@ int qemu_socket(int domain, int type, int protocol);
+>  int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+>  int socket_set_cork(int fd, int v);
+>  int socket_set_nodelay(int fd);
+> +bool qemu_fd_is_valid(int fd);
+>  void qemu_set_block(int fd);
+>  void qemu_set_nonblock(int fd);
+>  int socket_set_fast_reuse(int fd);
+> diff --git a/net/tap.c b/net/tap.c
+> index 6207f61f84ab..f65966aaccd8 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -795,6 +795,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>              return -1;
+>          }
+>  
+> +        /* Check if fd is valid */
+> +        if (!qemu_fd_is_valid(fd)) {
+> +            error_setg(errp, "Invalid file descriptor %d", fd);
+> +            return -1;
+> +        }
 > +
-> +#ifdef __COVERITY__
-> +# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))
-> +# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))
-> +#else
-> +# define MIN_CONST(a, b)                                        \
-> +    __builtin_choose_expr(                                      \
-> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> +        (a) < (b) ? (a) : (b),                                  \
-> +        ((void)0))
-> +# define MAX_CONST(a, b)                                        \
->      __builtin_choose_expr(                                      \
->          __builtin_constant_p(a) && __builtin_constant_p(b),     \
->          (a) > (b) ? (a) : (b),                                  \
->          ((void)0))
-> +#endif
-> 
->  /*
->   * Minimum function that returns zero only if both values are zero.
+>          qemu_set_nonblock(fd);
+>  
+>          vnet_hdr = tap_probe_vnet_hdr(fd);
+> @@ -843,6 +849,13 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>                  goto free_fail;
+>              }
+>  
+> +            /* Check if fd is valid */
+> +            if (!qemu_fd_is_valid(fd)) {
+> +                error_setg(errp, "Invalid file descriptor %d", fd);
+> +                ret = -1;
+> +                goto free_fail;
+> +            }
+> +
+>              qemu_set_nonblock(fd);
+>  
+>              if (i == 0) {
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 916f1be2243a..8d5705f598d3 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -244,6 +244,11 @@ void qemu_anon_ram_free(void *ptr, size_t size)
+>      qemu_ram_munmap(-1, ptr, size);
+>  }
+>  
+> +bool qemu_fd_is_valid(int fd)
+> +{
+> +    return fcntl(fd, F_GETFL) != -1;
+> +}
+> +
+>  void qemu_set_block(int fd)
+>  {
+>      int f;
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index e9b14ab17847..a6be9445cfdb 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -132,6 +132,12 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
+>  }
+>  #endif /* CONFIG_LOCALTIME_R */
+>  
+> +bool qemu_fd_is_valid(int fd)
+> +{
+> +    /* FIXME: how to check if fd is valid? */
+> +    return true;
+> +}
+> +
+>  void qemu_set_block(int fd)
+>  {
+>      unsigned long opt = 0;
 > 
 
 
