@@ -2,94 +2,70 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED14C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D17C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:41:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A320204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:30:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ij2Zhtun"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A320204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 450EB206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:41:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450EB206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqJ9H-0003m5-9i
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 12:30:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
+	id 1jqJJe-0001JL-Je
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 12:41:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jqJ8J-0002ZC-Fc
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:29:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57882
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jqJ8H-00051e-TI
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:29:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593534557;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Iki+3wFuolN8flHlcoZTKxF/AtY4NLWFToDzLtfW0sU=;
- b=ij2ZhtunDTI8UmJPgrsG4ytCSl5p3bb5L6Dy4RSV0/hqUyK61ChuBKCMzSzfaRMEJTWTvr
- u+2uEASJiePn+/Nw5lLRc3/atlAI8mHTFuJ1bxSsqzPxqQIcI7D3kLhPaaDgbM0NTzFA/7
- FOnHgHXRVgFLc8wjJd6QmFllSLtjxSY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-DJ-BRuTZM1O7V9aFBB8cEA-1; Tue, 30 Jun 2020 12:29:15 -0400
-X-MC-Unique: DJ-BRuTZM1O7V9aFBB8cEA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5ED8F1005513;
- Tue, 30 Jun 2020 16:29:13 +0000 (UTC)
-Received: from [10.36.112.70] (ovpn-112-70.ams2.redhat.com [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DD4C5D9DC;
- Tue, 30 Jun 2020 16:29:04 +0000 (UTC)
-Subject: Re: [PATCH RESEND 6/9] hw/arm/smmu-common: Manage IOTLB block entries
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200611161500.23580-1-eric.auger@redhat.com>
- <20200611161500.23580-7-eric.auger@redhat.com>
- <CAFEAcA9FZV=jSk_9aJ_tHy=KLy+YrTFNoiqvCv7BMs0dWrHWFA@mail.gmail.com>
- <db6d92ba-2716-40df-54d3-84fb51ab3ad3@redhat.com>
- <CAFEAcA8ez0ycijFSZrVA3haaoKGho2Q2gQR=cDiiAm7S=-t6OQ@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0936903d-109f-c9cf-b40e-767fe7a21dae@redhat.com>
-Date: Tue, 30 Jun 2020 18:29:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqJIl-0000ZE-R7
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:40:07 -0400
+Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:39090)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqJIj-0006gk-GK
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:40:07 -0400
+Received: from player728.ha.ovh.net (unknown [10.110.115.113])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 54C6816EF97
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 18:40:02 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player728.ha.ovh.net (Postfix) with ESMTPSA id 9CC7413D3178C;
+ Tue, 30 Jun 2020 16:40:00 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005fe997039-0a2a-4543-8ac8-686910461166,321FFE8278D843C460097280AF09A0BF63DC926D)
+ smtp.auth=groug@kaod.org
+Date: Tue, 30 Jun 2020 18:39:57 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
+Message-ID: <20200630183957.38b63719@bahia.lan>
+In-Reply-To: <33906767.5Uf7ihArhA@silver>
+References: <cover.1587309014.git.qemu_oss@crudebyte.com>
+ <3959658.0YslYoXCm0@silver> <20200629183902.75d6fb0b@bahia.lan>
+ <33906767.5Uf7ihArhA@silver>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ez0ycijFSZrVA3haaoKGho2Q2gQR=cDiiAm7S=-t6OQ@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 02:00:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Ovh-Tracer-Id: 7701436838296656192
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrtddtgdejfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=188.165.35.227; envelope-from=groug@kaod.org;
+ helo=17.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 12:40:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,60 +78,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will@kernel.org>,
- zhangfei.gao@foxmail.com, QEMU Developers <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Robin Murphy <robin.murphy@arm.com>, Rob Herring <robh@kernel.org>,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On Tue, 30 Jun 2020 17:16:40 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-On 6/30/20 5:50 PM, Peter Maydell wrote:
-> On Fri, 26 Jun 2020 at 14:53, Auger Eric <eric.auger@redhat.com> wrote:
->> On 6/25/20 5:30 PM, Peter Maydell wrote:
->>> Rather than looping around doing multiple hash table lookups like
->>> this, why not just avoid including the tg and level in the
->>> key equality test?
->>>
->>> If I understand the range-based-invalidation feature correctly,
->>> the only time we care about the TG/LVL is if we're processing
->>> an invalidate-range command that specifies them. But in that
->>> case there should never be multiple entries in the bs->iotlb
->>> with the same iova, so we can just check whether the entry
->>> matches the requested TG/LVL once we've pulled it out of the
->>> hash table. (Or we could architecturally validly just blow
->>> it away regardless of requested TG/LVL -- they are only hints,
->>> not required-to-match.)
->>
->> This change could have been done independently on the RIL feature. As we
->> now put block entries in the IOTLB , when we look for an iova
->> translation, the IOVA can be mapped using different block sizes or using
->> page entries. So we start looking at blocks of the bigger size (entry
->> level) downto the page, for instance 4TB/512MB/64KB. We cannot know
->> which block and size the address belongs to.
+> On Montag, 29. Juni 2020 18:39:02 CEST Greg Kurz wrote:
+> > On Wed, 03 Jun 2020 19:16:08 +0200
+> > 
+> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > On Sonntag, 19. April 2020 17:06:17 CEST Christian Schoenebeck wrote:
+> > > > Make top half really top half and bottom half really bottom half:
+> > > > 
+> > > > Each T_readdir request handling is hopping between threads (main
+> > > > I/O thread and background I/O driver threads) several times for
+> > > > every individual directory entry, which sums up to huge latencies
+> > > > for handling just a single T_readdir request.
+> > > > 
+> > > > Instead of doing that, collect now all required directory entries
+> > > > (including all potentially required stat buffers for each entry) in
+> > > > one rush on a background I/O thread from fs driver by calling the
+> > > > previously added function v9fs_co_readdir_many() instead of
+> > > > v9fs_co_readdir(), then assemble the entire resulting network
+> > > > response message for the readdir request on main I/O thread. The
+> > > > fs driver is still aborting the directory entry retrieval loop
+> > > > (on the background I/O thread inside of v9fs_co_readdir_many())
+> > > > as soon as it would exceed the client's requested maximum R_readdir
+> > > > response size. So this will not introduce a performance penalty on
+> > > > another end.
+> > > > 
+> > > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > > ---
+> > > > 
+> > > >  hw/9pfs/9p.c | 122 +++++++++++++++++++++++----------------------------
+> > > >  1 file changed, 55 insertions(+), 67 deletions(-)
+> > > 
+> > > Ping. Anybody?
+> > > 
+> > > I would like to roll out this patch set soon and this is the only patch in
+> > > this series missing a review yet.
+> > 
+> > Hi Christian,
 > 
-> Yes, but we wouldn't need to care which TG and LVL the
-> address belongs to if we didn't put them into
-> the key, would we? I'm probably missing something here, but
-> just because the hardware might want to use the hints in
-> the invalidation-command about TG and LVL doesn't inherently
-> mean QEMU is most efficient if it cares about the hints.
-
-OK I think I understand your point now. It is not necessary to put
-TG/LVL in the key as log as they are in the entry. I will look at this
-implementation ...
-
-Thanks
-
-Eric
+> Hi Greg,
 > 
-> thanks
-> -- PMM
+> > Sorry for getting back to this only now :-\
+> > 
+> > So I still have some concerns about the locking of the directory stream
+> > pointer a fid. It was initially introduced to avoid concurrent accesses
+> > by multiple threads to the corresponding internal glibc object, as
+> > recommended in the readdir(3) manual page. Now, this patch considerably
+> > extends the critical section to also contain calls to telldir() and all
+> > the _many_ readdir()... so I'm not sure exactly what's the purpose of
+> > that mutex right now. Please provide more details.
+> 
+> The intention of this lock is to prevent concurrent r/w (i.e. telldir()/
+> readdir()) of the dir stream position by two or more active readdir requests 
+> handled in parallel, provided that they would use the same FID. Due to the 
+> latter requirement for this to become relevant, we already agreed that this is 
+> not something that would usually happen with a Linux 9p client, but there is 
+> nothing from protocol point of view that would prohibit this to be done by a 
+> client, so the resulting undefined behaviour should be prevented, which this 
+> lock does.
 > 
 
+Makes sense. The dir stream position is no different from glibc's internal
+dirent in that respect: it shouldn't be used by concurrent threads.
+
+> What's your precise concern?
+> 
+
+My overall concern is still the same. The patches are big and I've
+been away for too long, so I need some more discussion to reassemble
+my thoughts and the puzzle :)
+
+But now that I'm starting to understand why it's a good thing to
+extend the critical section, I realize it should be extended
+even more: we also have calls to seekdir() and rewindir() in
+v9fs_readdir() and friends that could _theoretically_ cause the
+very same kind of undefined behavior you're mentioning.
+
+I think the change is important enough that it deserves its
+own patch. I expect that moving the locking to the top-level
+handler might also simplify the existing code, and thus your
+series as well.
+
+Please let me come up with a patch first.
+
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
+
+Cheers,
+
+--
+Greg
 
