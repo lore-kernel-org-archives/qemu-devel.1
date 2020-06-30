@@ -2,70 +2,95 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D17C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D09C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 450EB206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:41:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450EB206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BB536206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 16:43:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVaXpy0y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB536206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqJJe-0001JL-Je
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 12:41:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59352)
+	id 1jqJLm-0002jL-2O
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 12:43:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqJIl-0000ZE-R7
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:40:07 -0400
-Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:39090)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqJIj-0006gk-GK
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 12:40:07 -0400
-Received: from player728.ha.ovh.net (unknown [10.110.115.113])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 54C6816EF97
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 18:40:02 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player728.ha.ovh.net (Postfix) with ESMTPSA id 9CC7413D3178C;
- Tue, 30 Jun 2020 16:40:00 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G005fe997039-0a2a-4543-8ac8-686910461166,321FFE8278D843C460097280AF09A0BF63DC926D)
- smtp.auth=groug@kaod.org
-Date: Tue, 30 Jun 2020 18:39:57 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Message-ID: <20200630183957.38b63719@bahia.lan>
-In-Reply-To: <33906767.5Uf7ihArhA@silver>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <3959658.0YslYoXCm0@silver> <20200629183902.75d6fb0b@bahia.lan>
- <33906767.5Uf7ihArhA@silver>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqJKt-0002AJ-Ab; Tue, 30 Jun 2020 12:42:19 -0400
+Received: from mail-ed1-x535.google.com ([2a00:1450:4864:20::535]:32942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqJKr-0007Fz-5Z; Tue, 30 Jun 2020 12:42:18 -0400
+Received: by mail-ed1-x535.google.com with SMTP id h28so16876790edz.0;
+ Tue, 30 Jun 2020 09:42:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=buVjnKtsgM/hiikKP5YdIW+PSfTeTQ7j1E2XzUxbNdc=;
+ b=GVaXpy0yWaoT/s8aKNh51iLkXSb0H+ujLZdeVJyNAb+3J8B++jtfj62Bzb60Eo/sAD
+ 4IzKWmZPJwWOr316T5PIKPDtJGjHklbFcTBC95uf3uoyZj6BSvD/9AM6uPGaT4bJVKhU
+ o28QOVPBRJ7OiW/mSfcbCep6Ma0atZX7zHy1Kt5Cb5oD1LV2NUqWxeD0qZTHsUlguEC1
+ xONUndMoSExhOtR25i2jqSEVC9EjLHJEgR1/5Nu3vRgWZ7Tfa3HXQ3EvvNZrXuEMrhLm
+ ERTYFoVMWQcKcnv4dxh0HSF0XS8WkENtxPVhdLWj1tlN8UQWP6a/fyBj822kkH0YGWI5
+ BXmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=buVjnKtsgM/hiikKP5YdIW+PSfTeTQ7j1E2XzUxbNdc=;
+ b=qvF9hgAN12l2fiptgDAX6dpa8gSTiYX7mINDtrxqvLNynIc6XLhTzwASwAR2WmYSFb
+ myLbNJbPoGMtCzVQ7Mh7FHZ7hxrqsGHSf8dEgtLN0I0tWHtpPZz2b3B2ePqWDZZ/+TK0
+ rel/g9AwQ4oinFRHRPLzfBS/5xNNGmEDbTsI2G1kWyb2PVI+0X683UGjoiKEnswRFmK0
+ vNtEzrsvKuSY/fLOqI8cMSHRwCS5KYvDf6TKr5dyexcQ8hENNV2v3Fk16os/HL/vgYPk
+ zPmsLB6hxMV3kAZkgJp+fwudO4H8fg0dOfUDy1Fi7Isohfz4Mctvs8uj9kjkmGBwzamO
+ pAEg==
+X-Gm-Message-State: AOAM531hnIYtBhIugf+EyUbbRWT6ijiyujsYoTFSE52k5Tn1dzVcpkmE
+ bDXEqgAHsuY3UlSKPWoaA/1uFi3VTi0=
+X-Google-Smtp-Source: ABdhPJzkEdufy+P5WWM9HnNyru1orq6sKqjlfvNVQ/3N68Bje4ArFiXHg4FLhJIjN4DOYDJdOfd0LA==
+X-Received: by 2002:a50:f109:: with SMTP id w9mr23061308edl.277.1593535335139; 
+ Tue, 30 Jun 2020 09:42:15 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id be2sm3311728edb.92.2020.06.30.09.42.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 09:42:14 -0700 (PDT)
+Subject: Re: hw/misc/aspeed_scu: 5d971f9e breaks Supermicro AST2400
+To: Erik Smit <erik.lucas.smit@gmail.com>
+References: <CA+MHfoubt1g2FzcjTw3a0vNr7X2T8Jb+nYoc4_x=Z2TP51afKg@mail.gmail.com>
+ <a7acba46-5a9a-5dd2-71c6-7e4586485823@amsat.org>
+ <CA+MHfot6FdS2yT0mEsCW36bCfwy-WY-1KPQ-KDfYBKzTy=Gd7w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f67f8c26-3ae9-72c9-9404-7c28e09deb18@amsat.org>
+Date: Tue, 30 Jun 2020 18:42:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 7701436838296656192
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrtddtgdejfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=188.165.35.227; envelope-from=groug@kaod.org;
- helo=17.mo7.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 12:40:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CA+MHfot6FdS2yT0mEsCW36bCfwy-WY-1KPQ-KDfYBKzTy=Gd7w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::535;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x535.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,103 +103,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel <qemu-devel@nongnu.org>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 17:16:40 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-
-> On Montag, 29. Juni 2020 18:39:02 CEST Greg Kurz wrote:
-> > On Wed, 03 Jun 2020 19:16:08 +0200
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > On Sonntag, 19. April 2020 17:06:17 CEST Christian Schoenebeck wrote:
-> > > > Make top half really top half and bottom half really bottom half:
-> > > > 
-> > > > Each T_readdir request handling is hopping between threads (main
-> > > > I/O thread and background I/O driver threads) several times for
-> > > > every individual directory entry, which sums up to huge latencies
-> > > > for handling just a single T_readdir request.
-> > > > 
-> > > > Instead of doing that, collect now all required directory entries
-> > > > (including all potentially required stat buffers for each entry) in
-> > > > one rush on a background I/O thread from fs driver by calling the
-> > > > previously added function v9fs_co_readdir_many() instead of
-> > > > v9fs_co_readdir(), then assemble the entire resulting network
-> > > > response message for the readdir request on main I/O thread. The
-> > > > fs driver is still aborting the directory entry retrieval loop
-> > > > (on the background I/O thread inside of v9fs_co_readdir_many())
-> > > > as soon as it would exceed the client's requested maximum R_readdir
-> > > > response size. So this will not introduce a performance penalty on
-> > > > another end.
-> > > > 
-> > > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > > ---
-> > > > 
-> > > >  hw/9pfs/9p.c | 122 +++++++++++++++++++++++----------------------------
-> > > >  1 file changed, 55 insertions(+), 67 deletions(-)
-> > > 
-> > > Ping. Anybody?
-> > > 
-> > > I would like to roll out this patch set soon and this is the only patch in
-> > > this series missing a review yet.
-> > 
-> > Hi Christian,
+On 6/30/20 5:32 PM, Erik Smit wrote:
+> Hi Philippe,
 > 
-> Hi Greg,
+> On Tue, 30 Jun 2020 at 17:29, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Hi Erik,
+>>
+>> On 6/30/20 5:11 PM, Erik Smit wrote:
+>>> Hello,
+>>>
+>>> 5d971f9e memory: Revert "memory: accept mismatching sizes in
+>>> memory_region_access_valid" breaks Supermicro AST2400 u-boot.
+>>> Supermicro AST2500 u-boot is fine.
+>>>
+>>> The u-boot tries to make a 2-byte read from address 0x84, but
+>>> aspeed_ast2400_scu_ops has min_access = 4. When I change min_access to
+>>> 2 or revert above commit, u-boot boots again.
+>>>
+>>> Is changing min_access to 2 the right way to fix this?
+>>
+>> If you have access to the datasheet and can verify, then yes.
+>> Else I suppose Cédric, Andrew or Joel can check for you.
 > 
-> > Sorry for getting back to this only now :-\
-> > 
-> > So I still have some concerns about the locking of the directory stream
-> > pointer a fid. It was initially introduced to avoid concurrent accesses
-> > by multiple threads to the corresponding internal glibc object, as
-> > recommended in the readdir(3) manual page. Now, this patch considerably
-> > extends the critical section to also contain calls to telldir() and all
-> > the _many_ readdir()... so I'm not sure exactly what's the purpose of
-> > that mutex right now. Please provide more details.
+> I do not have a datasheet. Aspeed seems quite picky about sharing this
+> and I'm just a random researcher.
+
+Neither I have them. The I suggest to open a bug on
+https://bugs.launchpad.net/qemu/+filebug and we'll ask the Aspeed folks
+to write a patch.
+
 > 
-> The intention of this lock is to prevent concurrent r/w (i.e. telldir()/
-> readdir()) of the dir stream position by two or more active readdir requests 
-> handled in parallel, provided that they would use the same FID. Due to the 
-> latter requirement for this to become relevant, we already agreed that this is 
-> not something that would usually happen with a Linux 9p client, but there is 
-> nothing from protocol point of view that would prohibit this to be done by a 
-> client, so the resulting undefined behaviour should be prevented, which this 
-> lock does.
-> 
-
-Makes sense. The dir stream position is no different from glibc's internal
-dirent in that respect: it shouldn't be used by concurrent threads.
-
-> What's your precise concern?
-> 
-
-My overall concern is still the same. The patches are big and I've
-been away for too long, so I need some more discussion to reassemble
-my thoughts and the puzzle :)
-
-But now that I'm starting to understand why it's a good thing to
-extend the critical section, I realize it should be extended
-even more: we also have calls to seekdir() and rewindir() in
-v9fs_readdir() and friends that could _theoretically_ cause the
-very same kind of undefined behavior you're mentioning.
-
-I think the change is important enough that it deserves its
-own patch. I expect that moving the locking to the top-level
-handler might also simplify the existing code, and thus your
-series as well.
-
-Please let me come up with a patch first.
-
 > Best regards,
-> Christian Schoenebeck
 > 
+> Erik Smit
 > 
-
-Cheers,
-
---
-Greg
 
