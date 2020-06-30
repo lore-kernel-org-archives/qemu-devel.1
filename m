@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 340E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:36:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F16B720675
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:36:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C968620675
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:36:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="eXSr+pPU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16B720675
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="s817XI9/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C968620675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDch-0003ld-7y
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:36:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37440)
+	id 1jqDcl-0003tW-29
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:36:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDVJ-0001mK-70
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:41 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:58184 helo=mta-01.yadro.com)
+ id 1jqDVK-0001oQ-NJ
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:42 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:58188 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDVF-0000Ym-8L
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:40 -0400
+ id 1jqDVF-0000Yu-Q6
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:42 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id A5F3F4C88A;
- Tue, 30 Jun 2020 10:28:35 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id 38B9E412C8;
+ Tue, 30 Jun 2020 10:28:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
  content-type:content-type:content-transfer-encoding:mime-version
  :references:in-reply-to:x-mailer:message-id:date:date:subject
  :subject:from:from:received:received:received; s=mta-01; t=
- 1593512914; x=1595327315; bh=j+dLQ3Qm8YxeeVjQS2TlnM27l6e4GSF+c6Q
- WwzeGH5g=; b=eXSr+pPUcKls3uO36WMA8Q0DqODJRnYM+g9FwI/iKcJwxTm32tk
- yj8OA0RrbSbXCG6X7obq3QPRFKeKKNUCqHOqU6JMNXFuwjr5zyckaUph2qh5e14k
- olB8pDWTELZovTHyrkI8K4J880PDUiDuj2Y0dU4XE7IirMfDsUIeHevs=
+ 1593512914; x=1595327315; bh=yrctfyslInb9wd24ZeqDcRrPa5bol+8mHtC
+ UZl/8RGI=; b=s817XI9/jnoL1pqFs4IWeRwi5fNTCnkbiwGASOAgNxbKv/w422S
+ DkMsInfqitvigaATJ6x/4krztvo+Us3N4Fd+/0ca8yil025NE+AmD518/jxFyvI2
+ bodoqWQRM5kRGE0NAMzpxxYE2oExFiN59Mkr7mK3+BBu4CWLwYetHEBI=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yCiWkFjDagT0; Tue, 30 Jun 2020 13:28:34 +0300 (MSK)
+ with ESMTP id LF5aX9eymL4N; Tue, 30 Jun 2020 13:28:34 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 42C414C8A0;
+ by mta-01.yadro.com (Postfix) with ESMTPS id CEEA04C89B;
  Tue, 30 Jun 2020 13:28:34 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
@@ -61,9 +61,9 @@ Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  Jun 2020 13:28:34 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 8/9] i386: hvf: Clean up synchronize functions
-Date: Tue, 30 Jun 2020 13:28:23 +0300
-Message-ID: <20200630102824.77604-9-r.bolshakov@yadro.com>
+Subject: [PATCH v2 9/9] MAINTAINERS: Add Cameron as HVF co-maintainer
+Date: Tue, 30 Jun 2020 13:28:24 +0300
+Message-ID: <20200630102824.77604-10-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200630102824.77604-1-r.bolshakov@yadro.com>
 References: <20200630102824.77604-1-r.bolshakov@yadro.com>
@@ -95,90 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, Claudio Fontana <cfontana@suse.de>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>, Claudio Fontana <cfontana@suse.de>,
+ Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make them more concise and consitent with the rest of the code in the
-file and drop non-relevant TODO.
+Similar patch was sent a while ago but got lost.
+While at it, add a status wiki page.
 
 Cc: Cameron Esfahani <dirty@apple.com>
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- target/i386/hvf/hvf.c | 36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index f1114c2a09..967bb9a193 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -285,47 +285,43 @@ void hvf_handle_io(CPUArchState *env, uint16_t port, void *buffer,
-     }
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dec252f38b..b6d4f62ba2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -417,7 +417,9 @@ F: target/i386/kvm.c
+ F: scripts/kvm/vmxcap
  
--/* TODO: synchronize vcpu state */
- static void do_hvf_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
- {
--    CPUState *cpu_state = cpu;
--    if (cpu_state->vcpu_dirty == 0) {
--        hvf_get_registers(cpu_state);
-+    if (!cpu->vcpu_dirty) {
-+        hvf_get_registers(cpu);
-+        cpu->vcpu_dirty = true;
-     }
--
--    cpu_state->vcpu_dirty = 1;
- }
- 
--void hvf_cpu_synchronize_state(CPUState *cpu_state)
-+void hvf_cpu_synchronize_state(CPUState *cpu)
- {
--    if (cpu_state->vcpu_dirty == 0) {
--        run_on_cpu(cpu_state, do_hvf_cpu_synchronize_state, RUN_ON_CPU_NULL);
-+    if (!cpu->vcpu_dirty) {
-+        run_on_cpu(cpu, do_hvf_cpu_synchronize_state, RUN_ON_CPU_NULL);
-     }
- }
- 
--static void do_hvf_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
-+static void do_hvf_cpu_synchronize_post_reset(CPUState *cpu,
-+                                              run_on_cpu_data arg)
- {
--    CPUState *cpu_state = cpu;
--    hvf_put_registers(cpu_state);
--    cpu_state->vcpu_dirty = false;
-+    hvf_put_registers(cpu);
-+    cpu->vcpu_dirty = false;
- }
- 
--void hvf_cpu_synchronize_post_reset(CPUState *cpu_state)
-+void hvf_cpu_synchronize_post_reset(CPUState *cpu)
- {
--    run_on_cpu(cpu_state, do_hvf_cpu_synchronize_post_reset, RUN_ON_CPU_NULL);
-+    run_on_cpu(cpu, do_hvf_cpu_synchronize_post_reset, RUN_ON_CPU_NULL);
- }
- 
- static void do_hvf_cpu_synchronize_post_init(CPUState *cpu,
-                                              run_on_cpu_data arg)
- {
--    CPUState *cpu_state = cpu;
--    hvf_put_registers(cpu_state);
--    cpu_state->vcpu_dirty = false;
-+    hvf_put_registers(cpu);
-+    cpu->vcpu_dirty = false;
- }
- 
--void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
-+void hvf_cpu_synchronize_post_init(CPUState *cpu)
- {
--    run_on_cpu(cpu_state, do_hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
-+    run_on_cpu(cpu, do_hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
- }
- 
- static void do_hvf_cpu_synchronize_pre_loadvm(CPUState *cpu,
+ X86 HVF CPUs
++M: Cameron Esfahani <dirty@apple.com>
+ M: Roman Bolshakov <r.bolshakov@yadro.com>
++W: https://wiki.qemu.org/Features/HVF
+ S: Maintained
+ F: accel/stubs/hvf-stub.c
+ F: target/i386/hvf/
 -- 
 2.26.1
 
