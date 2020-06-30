@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2A0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2920DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8F0720771
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E144E20771
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 10:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="XLM/yU7V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F0720771
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="PbWu9TfP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E144E20771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqDYE-0006GF-5R
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:31:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37430)
+	id 1jqDYi-0006v0-5S
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 06:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDVI-0001lB-Fn
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:40 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:58172 helo=mta-01.yadro.com)
+ id 1jqDVD-0001iK-DD
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:35 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:58088 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jqDVE-0000Ya-Hj
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:39 -0400
+ id 1jqDVA-0000VX-To
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 06:28:35 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 86F3B4C8A6;
- Tue, 30 Jun 2020 10:28:34 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id 55F9F4C890;
+ Tue, 30 Jun 2020 10:28:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
  content-type:content-type:content-transfer-encoding:mime-version
  :references:in-reply-to:x-mailer:message-id:date:date:subject
  :subject:from:from:received:received:received; s=mta-01; t=
- 1593512913; x=1595327314; bh=4IQZgJczcCUTieQ8Wf6mR93bDaNV5bniGKg
- TQ4nDSYU=; b=XLM/yU7V/BPZYoGgmGwdvQGvsVWmQmM2Wm8OMH+yIbg8YIJp9vJ
- GE6RF55H9bwMJ2Wwu/2HW1X2sOgRRCnPvrOIMbqTUGmTGZgMVJpb0BcLIIJCU3X2
- IkiyOG4NJEEG/7FdYQU/KxvF2GRaC5u6yXjHuQWBr3DCp4L3Gp+FHSz4=
+ 1593512910; x=1595327311; bh=oeWDG+WWzJ1ddsNbdkQSnBzk7CCguEOTiGP
+ 81HTc41Y=; b=PbWu9TfPRGVaZ9WEOYdxxhRWv5gWSpfR5Qs3K69BzKPXYzWTkup
+ KfttQxZwTpexxMpyotMDu3p/1YXes7Q+R+oG0tcy1LjSeK5zwGFXZR1JKnUr9WMS
+ vHz5YtOQmxUNbuW+utTisPZn/lWSZvU+iw0DnrKvwk0GUjgJWRoeBaKc=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0Etf8cxaDX3S; Tue, 30 Jun 2020 13:28:33 +0300 (MSK)
+ with ESMTP id 4tenPRJO27_C; Tue, 30 Jun 2020 13:28:30 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 191554C89B;
- Tue, 30 Jun 2020 13:28:33 +0300 (MSK)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 0BF7C412C8;
+ Tue, 30 Jun 2020 13:28:30 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 30
- Jun 2020 13:28:32 +0300
+ Jun 2020 13:28:29 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 6/9] i386: hvf: Move Guest LMA reset to macvm_set_cr0()
-Date: Tue, 30 Jun 2020 13:28:21 +0300
-Message-ID: <20200630102824.77604-7-r.bolshakov@yadro.com>
+Subject: [PATCH v2 1/9] i386: hvf: Set env->eip in macvm_set_rip()
+Date: Tue, 30 Jun 2020 13:28:16 +0300
+Message-ID: <20200630102824.77604-2-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200630102824.77604-1-r.bolshakov@yadro.com>
 References: <20200630102824.77604-1-r.bolshakov@yadro.com>
@@ -102,56 +102,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only useful purpose of hvf_reset_vcpu() is to clear "IA-32e mode
-guest" (LMA) VM-Entry control. But it can be moved to macvm_set_cr0()
-which is indirectly used by post-init and post-reset to flush emulator
-state. That enables clean removal of hvf_reset_vcpu().
+cpu_synchronize_state() is currently no-op for hvf but BIOS will hang in
+vAPIC option ROM when cpu_synchronize_state() is wired to
+hvf_cpu_synchronize_state().
 
-LMA is set only if IA32_EFER.LME = 1, according to Intel SDM "9.8.5
-Initializing IA-32e Mode" and "9.8.5.4 Switching Out of IA-32e Mode
-Operation", otherwise the entry control can be safely cleared.
+cpu_synchronize_state() state is called from vapic_write() during option
+ROM initialization. It sets dirty flag on the cpu. macvm_set_rip() is
+then invoked to advance IP after the I/O write to vAPIC port.
+
+macvm_set_rip() only modifies VMCS, it doesn't change env->eip.
+Therefore on the next iteration of vCPU loop, vcpu_dirty flag is checked
+and hvf_put_registers() overwrites correct RIP in VMCS with the value of
+env->eip that points to the I/O write instruction. Execution of the CPU
+gets stuck on the instruction.
+
+The issue can be avoided if eip doesn't contain stale value when dirty
+flag is set on cpu.
 
 Cc: Cameron Esfahani <dirty@apple.com>
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- target/i386/hvf/hvf.c | 1 -
- target/i386/hvf/vmx.h | 4 ++++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ target/i386/hvf/vmx.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 317304aa1d..1d3a27167d 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -462,7 +462,6 @@ void hvf_reset_vcpu(CPUState *cpu) {
-     /* TODO: this shouldn't be needed; there is already a call to
-      * cpu_synchronize_all_post_reset in vl.c
-      */
--    wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS, 0);
-     wvmcs(cpu->hvf_fd, VMCS_GUEST_IA32_EFER, 0);
- 
-     /* Initialize PDPTE */
 diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index 437238f11d..75ba1e2a5f 100644
+index ce2a1532d5..1e8b29bf7d 100644
 --- a/target/i386/hvf/vmx.h
 +++ b/target/i386/hvf/vmx.h
-@@ -123,6 +123,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-     uint64_t old_cr0 = rvmcs(vcpu, VMCS_GUEST_CR0);
-     uint64_t changed_cr0 = old_cr0 ^ cr0;
-     uint64_t mask = CR0_PG | CR0_CD | CR0_NW | CR0_NE | CR0_ET;
-+    uint64_t entry_ctls;
+@@ -173,6 +173,7 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
  
-     if ((cr0 & CR0_PG) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE) &&
-         !(efer & MSR_EFER_LME)) {
-@@ -146,6 +147,9 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-                 exit_long_mode(vcpu, cr0, efer);
-             }
-         }
-+    } else {
-+        entry_ctls = rvmcs(vcpu, VMCS_ENTRY_CTLS);
-+        wvmcs(vcpu, VMCS_ENTRY_CTLS, entry_ctls & ~VM_ENTRY_GUEST_LMA);
-     }
+     /* BUG, should take considering overlap.. */
+     wreg(cpu->hvf_fd, HV_X86_RIP, rip);
++    env->eip = rip;
  
-     /* Filter new CR0 after we are finished examining it above. */
+     /* after moving forward in rip, we need to clean INTERRUPTABILITY */
+    val = rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
 -- 
 2.26.1
 
