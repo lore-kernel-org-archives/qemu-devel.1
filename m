@@ -2,105 +2,94 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DCBC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF85C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:20:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10DBA206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1352A206C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:20:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+xkyFnh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10DBA206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EkTVbUw2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1352A206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqLnU-0007Rp-QU
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:20:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42270)
+	id 1jqLnr-0007wE-59
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:20:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLha-0006Uw-B6
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40639
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLhX-0005XV-Vd
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:13:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593544429;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JwOS0dTFEWL6oyJkADDTKayrcrCvjz0aXfTaNffA7dY=;
- b=A+xkyFnhnBN7pSVTVJtB2f/FWv115ToqGxC7GhRFC1dWTVR0Klnkeg4OtQcbNM0SOVZqKS
- 8/2sOOVpq7KFqRtKZ4oRnAHTgY5satxKUHCvJ6Rzh+zAFcK3Qp8zryIUYliTiQw7TIjSB0
- ScUbrNjJflTzR3X5I1/avSIZpH3R8VE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-oxSFFa8sPv6rTRujviHvQg-1; Tue, 30 Jun 2020 15:13:48 -0400
-X-MC-Unique: oxSFFa8sPv6rTRujviHvQg-1
-Received: by mail-wm1-f72.google.com with SMTP id a21so21154028wmd.0
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:13:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqLjE-00014i-1N
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:15:36 -0400
+Received: from mail-lj1-x22f.google.com ([2a00:1450:4864:20::22f]:43087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqLjC-0005tL-6g
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:15:35 -0400
+Received: by mail-lj1-x22f.google.com with SMTP id f5so8029999ljj.10
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:15:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=frrsInF8bWDxkckWByVwp5XV8jqUNQmqXa6WiUylT0w=;
+ b=EkTVbUw2XoBGisT5gscaOY/3d3stWkUiE6kAxXJ8ZJOCtcHtv/vZZIvNV1jzvPphyP
+ I5iQJVXfSI8k4oi/oKM0A8uOjQalQ/ExtfnT4VHIcxE2Xq70C4zgzqHNT8V9hi/HL8PQ
+ /eG2KtW4i6EQz8+vovgVDvyokEqss1LBQb2QFYKngTMjcltgt9Z0aras3YYNfqQh5zFb
+ +CLVI5/wqJFSyDzOiG0VDs5A6nUwy8mG33YHNzkutKP+zRGMiF6TlEM9EOOiiUpEoRSz
+ uQD2nh2F1WvyDNohgqINPY9B0sEVthA2ZwZcGwhmCbpzMddFrhqabVOfrrAu90cYSvT0
+ 3FcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=JwOS0dTFEWL6oyJkADDTKayrcrCvjz0aXfTaNffA7dY=;
- b=X72gJTF8ujGeZ8PjuuumZhupi32kd7/LV9MAIwBaoRg+C0lVfn99+9wwQqyz1mKJ8l
- W3bp8u1OYycCWoSmmg/ID82mqLcCG+o1qLK84k3VlNkkKuSF6IBBq2GZ6JvOW5OBYYxP
- BSVB7NxPlRFLvU1Ih0vAiuAK+8s8Pn4tM46zZRAkMju5MmnsTORdhMdDqIpjitnVqkNQ
- kSKWlRoRxK6tYvfl837NGIOpQCFkfjl/vReKGG1+IjLplbeanGNrLt/+daGCWdjXMrcG
- tGrNEyB+Lr/xWotP/gkU9cOxUQp5Jg4ZbHLZEczJLHJWRjrLckoJjuEQgN7LeLh9nqxa
- KVTQ==
-X-Gm-Message-State: AOAM531MvsMlcugflJT8byAhZ4rCoo+71PQUnXh3w4mwiCB5yB2yqNIr
- 51efT+LdU6l81UgcLW32s6o6Ylj8A2pz26gg/pDZnrexuAttbOkRalUDsWtl64kJtOmKaccMNZE
- MF/+SrwlN2ugb/9A=
-X-Received: by 2002:adf:e948:: with SMTP id m8mr23627167wrn.398.1593544426608; 
- Tue, 30 Jun 2020 12:13:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx6sSf6GxnS8+vTJS8mFterJVik6kcKKrFZr5Z33nidnpIjIjpS8zSEYkw8IA7Rk6e1NcoHOQ==
-X-Received: by 2002:adf:e948:: with SMTP id m8mr23627062wrn.398.1593544424684; 
- Tue, 30 Jun 2020 12:13:44 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id w17sm4990456wra.42.2020.06.30.12.13.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 12:13:44 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 05/12] block/nvme: Rename local variable
-Date: Tue, 30 Jun 2020 21:13:11 +0200
-Message-Id: <20200630191318.30021-6-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200630191318.30021-1-philmd@redhat.com>
-References: <20200630191318.30021-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=frrsInF8bWDxkckWByVwp5XV8jqUNQmqXa6WiUylT0w=;
+ b=OOpQoaClDCG7DXdIFJYEIMUI3YEgyx5IzFihr0iiqyFjXAezc4eXmxax5tcRZokZQK
+ n0PA/ywgOfPyDXxdU6Eg9RZ1RYBX4iLxvfVLQjkFFDjgoNMAagj1UhZF1IAb2tJoGJ2y
+ dhuLttqsgSgZstO3QzlF/c6NvQrMYiRf5lgar+aTsoR3BnB7Gm8bDCkhaYsshir4QBvJ
+ 9vT43dMMeimzyS6TKdgq5CDdnehgJFo+4JN+TXmLBVwzJeQXmdyJFmnyo9jPdU66eFzv
+ hz63OuPglcQSlSiNUESTypOuimgzBrFNyuQjRryjIYCZL/CM+BgSEJe1j3p3UczHo1A7
+ z8rQ==
+X-Gm-Message-State: AOAM533OZeLqyQXKhjBRgbgK3E9A6hYefuST8RviZSE0QHFScb1sIi18
+ YIsdYcHs3d9/rmOKUlLty32gwUgWRsCpQf45a3w=
+X-Google-Smtp-Source: ABdhPJzBN14fAJfA1m8DliyvLg+FcSe3+PmvA+MSNvWsMTQl78pgEc5Ut9UFak15wfC8ZHXVNDTyZGGnYKLUTn5lNKU=
+X-Received: by 2002:a05:651c:1044:: with SMTP id
+ x4mr10674758ljm.409.1593544529722; 
+ Tue, 30 Jun 2020 12:15:29 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 01:11:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+ <5ff8e75e-787e-a34d-2b3c-da63e2e46e1f@redhat.com>
+ <CALTWKrUOjwi9xG7vXCQ9sXStFaPh782ytwwPbztAp_PNuHFHYA@mail.gmail.com>
+ <CAHiYmc7tYYWb6AMQeFtCOQFXWbzB4+jGx1Zia+uvDd8ej+rieg@mail.gmail.com>
+ <54168dd1-2907-37ef-20d4-9feddf7c7561@redhat.com>
+In-Reply-To: <54168dd1-2907-37ef-20d4-9feddf7c7561@redhat.com>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Tue, 30 Jun 2020 21:14:50 +0200
+Message-ID: <CALTWKrXDqu-eo5OtyN1EpHirktJgUBWQeoid6HADksKR5Ft=tg@mail.gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::22f;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x22f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,79 +102,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to modify the code in the next commit. Renaming
-the 'resp' variable to 'id' first makes the next commit easier
-to review. No logical changes.
+On Tue, Jun 30, 2020 at 2:46 PM Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=
+ wrote:
+>
+> > However, we know that the results for hosts of different architectures
+> > will be different - we expect that.
+> >
+> > 32-bit Intel host will also most likely produce significantly
+> > different results than 64-bit Intel hosts. By the way, 64-bit targets
+> > in QEMU linux-user mode are not supported on 32-bit hosts (although
+> > nothing stops the user to start corresponding instances of QEMU on a
+> > 32-bit host, but the results are unpredictable.
+> >
+> > Let's focus now on Intel 64-bit hosts only. Richard, can you perhaps
+> > enlighten us on whether QEMU (from the point of view of TCG target)
+> > behaves differently on different Intel 64-bit hosts, and to what
+> > degree?
+> >
+> > I currently work remotely, but once I am be physically at my office I
+> > will have a variety of hosts at the company, and would be happy to do
+> > the comparison between them, wrt what you presented in Report 2.
+> >
+> > In conclusion, I think a basic description of your test bed is missing
+> > in your reports. And, for final reports (which we call "nightly
+> > reports") a detailed system description, as Mr Lukas outlined, is,
+> > also in my opinion, necessary.
+> >
+> > Thanks, Mr. Lukas, for bringing this to our attention!
+> >
+>
+> You're welcome. I'm more on the python side, but as far as I know differe=
+nt cpu models (provided their features are enabled) and especially architec=
+tures result in way different code-paths. Imagine an old processor without =
+vector instructions compare to newer ones that can process multiple instruc=
+tions at once.
+>
+> As for the reports, I don't think that at this point it would be necessar=
+y to focus on anything besides a single cpu model (x86_64 Intel) as there a=
+re already many variables. Later someone can follow-up with a cross-arch co=
+mparison, if necessary.
+>
+> Regards,
+> Luk=C3=A1=C5=A1
+>
+> > Yours,
+> > Aleksandar
+> >
+> >
+> >
+> >
+> >> Best regards,
+> >> Ahmed Karaman
+> >
+>
+>
+Thanks Mr. Luk=C3=A1=C5=A1 and Aleksandar,
+OK, now I see how important it is to have this information somewhere
+on the reports page.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+In response to Mr. Yongang, I said I will create an mini-report as a
+guide for setting up the testbed.
+I will add a section to this report with the detailed hardware
+information of the used system.
+Thanks for bringing this into attention.
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 28762d7ee8..b9760ff04f 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -510,8 +510,8 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     BDRVNVMeState *s = bs->opaque;
-     NvmeIdCtrl *idctrl;
-     NvmeIdNs *idns;
-+    uint8_t *id;
-     NvmeLBAF *lbaf;
--    uint8_t *resp;
-     uint16_t oncs;
-     int r;
-     uint64_t iova;
-@@ -520,14 +520,14 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-         .cdw10 = cpu_to_le32(0x1),
-     };
- 
--    resp = qemu_try_blockalign0(bs, sizeof(NvmeIdCtrl));
--    if (!resp) {
-+    id = qemu_try_blockalign0(bs, sizeof(NvmeIdCtrl));
-+    if (!id) {
-         error_setg(errp, "Cannot allocate buffer for identify response");
-         goto out;
-     }
--    idctrl = (NvmeIdCtrl *)resp;
--    idns = (NvmeIdNs *)resp;
--    r = qemu_vfio_dma_map(s->vfio, resp, sizeof(NvmeIdCtrl), true, &iova);
-+    idctrl = (NvmeIdCtrl *)id;
-+    idns = (NvmeIdNs *)id;
-+    r = qemu_vfio_dma_map(s->vfio, id, sizeof(NvmeIdCtrl), true, &iova);
-     if (r) {
-         error_setg(errp, "Cannot map buffer for DMA");
-         goto out;
-@@ -554,8 +554,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROS);
-     s->supports_discard = !!(oncs & NVME_ONCS_DSM);
- 
--    memset(resp, 0, 4096);
--
-+    memset(id, 0, 4096);
-     cmd.cdw10 = 0;
-     cmd.nsid = cpu_to_le32(namespace);
-     if (nvme_cmd_sync(bs, s->queues[QUEUE_INDEX_ADMIN], &cmd)) {
-@@ -587,8 +586,8 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
- 
-     s->blkshift = lbaf->ds;
- out:
--    qemu_vfio_dma_unmap(s->vfio, resp);
--    qemu_vfree(resp);
-+    qemu_vfio_dma_unmap(s->vfio, id);
-+    qemu_vfree(id);
- }
- 
- static bool nvme_poll_queues(BDRVNVMeState *s)
--- 
-2.21.3
-
+Best regards,
+Ahmed Karaman
 
