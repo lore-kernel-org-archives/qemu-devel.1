@@ -2,106 +2,94 @@ Return-Path: <SRS0=gXk/=AL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42AFC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C23AC206C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:23:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSKcGYF4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C23AC206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFDF1206C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 19:24:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFDF1206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqLrG-0004Uo-3n
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:23:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42554)
+	id 1jqLsC-0005Q0-10
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 15:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLiB-0007ML-HY
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:14:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33631
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqLi8-0005c5-Q9
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 15:14:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593544468;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xAix5j6fBTu5J6nPbJGKsMJBRsOhK42Lg6OcyQOGwZc=;
- b=JSKcGYF4t1pYN06U+nDCPUQoOiFyEqrRpeFyyN+cpk9RS36HLukja4fIji5YJMN7SEfWZH
- 0EDeWd1k7AVJjfTMlvmLQHLxpNlhlpnHNrZW0NcdcV5mP4zcmtiX+HzUT+6WzGLYdq0ibZ
- y1gNn0vQnap2FEFPYLTN1xsnOzvoF9s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-VR0k5xBkOC2m9RzD0pTMfw-1; Tue, 30 Jun 2020 15:13:57 -0400
-X-MC-Unique: VR0k5xBkOC2m9RzD0pTMfw-1
-Received: by mail-wm1-f72.google.com with SMTP id t145so21419068wmt.2
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 12:13:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xAix5j6fBTu5J6nPbJGKsMJBRsOhK42Lg6OcyQOGwZc=;
- b=PmEPfiid5b27a0OMLFaOm4pOzkxQvsHbYA8x7jYXH+kN8PQ+RtqrYPRrIxN5iA3Pfm
- QWi4vsaViYUYYlSl4MFzbQuFqLXLXiHidZCCrJ0cUyaLRe+R6Q0dVkOXPwQyOWZPWR11
- q1AyYaM5AJ4aDHcqCpPxAfazxkPjLxceTBULANtn/nuBHQZ7dQJwZqSnTUT+O8XmkTtI
- JobmeB25874KMmtW8+bfjbdFbLycK4yd9LnOfR5n7kka6jZsRZos/OyGYWMPov4DucsK
- JIuBZdMzMEIlXLXvB6e020M6VklSBMDDD8Q1ELhB8MeHvm8trmvMaJmzteehTdW7Dl4f
- 0Gdw==
-X-Gm-Message-State: AOAM533XoWJWHRomMy8Il9oHv2FI+mY8iYg+HwQgu1JQh2mcfuf3LfWD
- wr2zmTgtGfukHDxdIMjOF1dl3kJWsXWbA/McFIeailajgkfOeVoN0passAzUp48vCCKhFuYJrgU
- oxzzDZcq2+wF9b3s=
-X-Received: by 2002:a5d:4fce:: with SMTP id h14mr22884002wrw.199.1593544436505; 
- Tue, 30 Jun 2020 12:13:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhruJ8mI3C5RCoqABBkYuxHHuvtJP8Eowyx5JB9C2yerOF6aJ6+ucGR2EFxhiO+TJ+LpjcIg==
-X-Received: by 2002:a5d:4fce:: with SMTP id h14mr22883902wrw.199.1593544434428; 
- Tue, 30 Jun 2020 12:13:54 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r8sm4472994wrp.40.2020.06.30.12.13.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Jun 2020 12:13:53 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 07/12] block/nvme: Replace qemu_try_blockalign0 by
- qemu_try_blockalign/memset
-Date: Tue, 30 Jun 2020 21:13:13 +0200
-Message-Id: <20200630191318.30021-8-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200630191318.30021-1-philmd@redhat.com>
-References: <20200630191318.30021-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jqLjW-0001su-1Q; Tue, 30 Jun 2020 15:15:54 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:41796
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jqLjU-0005wv-CF; Tue, 30 Jun 2020 15:15:53 -0400
+Received: from host86-182-221-235.range86-182.btcentralplus.com
+ ([86.182.221.235] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jqLjU-0002YG-9P; Tue, 30 Jun 2020 20:15:56 +0100
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <cover.1593456926.git.balaton@eik.bme.hu>
+ <aa3087554703e0849c3d6582cdefb265cc444403.1593456926.git.balaton@eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <70cae4de-0c08-7d5c-339c-75648a8b7b93@ilande.co.uk>
+Date: Tue, 30 Jun 2020 20:15:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <aa3087554703e0849c3d6582cdefb265cc444403.1593456926.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.182.221.235
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v7 5/8] mac_oldworld: Change PCI address of macio to match
+ real hardware
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,92 +102,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the next commit we'll get rid of qemu_try_blockalign().
-To ease review, first replace qemu_try_blockalign0() by explicit
-calls to qemu_try_blockalign() and memset().
+On 29/06/2020 19:55, BALATON Zoltan wrote:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+> The board firmware expect these to be at fixed addresses and programs
+> them without probing, this patch puts the macio device at the expected
+> PCI address.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/ppc/mac_oldworld.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 4200008851..6276973c95 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -286,7 +286,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>      ide_drive_get(hd, ARRAY_SIZE(hd));
+>  
+>      /* MacIO */
+> -    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
+> +    macio = pci_new(PCI_DEVFN(16, 0), TYPE_OLDWORLD_MACIO);
+>      dev = DEVICE(macio);
+>      qdev_prop_set_uint64(dev, "frequency", tbfreq);
+>      object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 7ebd5be1f3..5b0bb9a8d7 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -174,12 +174,12 @@ static void nvme_init_queue(BlockDriverState *bs, NVMeQueue *q,
- 
-     bytes = ROUND_UP(nentries * entry_bytes, s->page_size);
-     q->head = q->tail = 0;
--    q->queue = qemu_try_blockalign0(bs, bytes);
--
-+    q->queue = qemu_try_blockalign(bs, bytes);
-     if (!q->queue) {
-         error_setg(errp, "Cannot allocate queue");
-         return;
-     }
-+    memset(q->queue, 0, bytes);
-     r = qemu_vfio_dma_map(s->vfio, q->queue, bytes, false, &q->iova);
-     if (r) {
-         error_setg(errp, "Cannot map queue");
-@@ -223,11 +223,12 @@ static NVMeQueuePair *nvme_create_queue_pair(BlockDriverState *bs,
-     if (!q) {
-         return NULL;
-     }
--    q->prp_list_pages = qemu_try_blockalign0(bs,
-+    q->prp_list_pages = qemu_try_blockalign(bs,
-                                           s->page_size * NVME_QUEUE_SIZE);
-     if (!q->prp_list_pages) {
-         goto fail;
-     }
-+    memset(q->prp_list_pages, 0, s->page_size * NVME_QUEUE_SIZE);
-     qemu_mutex_init(&q->lock);
-     q->s = s;
-     q->index = idx;
-@@ -521,7 +522,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-         .cdw10 = cpu_to_le32(0x1),
-     };
- 
--    id = qemu_try_blockalign0(bs, sizeof(*id));
-+    id = qemu_try_blockalign(bs, sizeof(*id));
-     if (!id) {
-         error_setg(errp, "Cannot allocate buffer for identify response");
-         goto out;
-@@ -531,8 +532,9 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-         error_setg(errp, "Cannot map buffer for DMA");
-         goto out;
-     }
--    cmd.prp1 = cpu_to_le64(iova);
- 
-+    memset(id, 0, sizeof(*id));
-+    cmd.prp1 = cpu_to_le64(iova);
-     if (nvme_cmd_sync(bs, s->queues[QUEUE_INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to identify controller");
-         goto out;
-@@ -1282,11 +1284,11 @@ static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
- 
-     assert(s->nr_queues > 1);
- 
--    buf = qemu_try_blockalign0(bs, s->page_size);
-+    buf = qemu_try_blockalign(bs, s->page_size);
-     if (!buf) {
-         return -ENOMEM;
-     }
--
-+    memset(buf, 0, s->page_size);
-     buf->nlb = cpu_to_le32(bytes >> s->blkshift);
-     buf->slba = cpu_to_le64(offset >> s->blkshift);
-     buf->cattr = 0;
--- 
-2.21.3
+This looks much better!
 
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
 
