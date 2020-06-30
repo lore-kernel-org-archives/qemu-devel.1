@@ -6,84 +6,85 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D79C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0370BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4422E20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C675720663
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jun 2020 15:54:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vhLHPffV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4422E20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KBdQ8FIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C675720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqIaq-0006CY-Fv
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47742)
+	id 1jqIau-0006HJ-2k
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 11:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jqIZa-0003WW-D2
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:53:26 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44296)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jqIZY-0006Zl-RH
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:53:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k6so13991350oij.11
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 08:53:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=bksqS5OXW4yPLtnDgxApaC1LnjKvojyARYOjWT9jY54=;
- b=vhLHPffVxPaiD8FYEzs/6assXv4aydjZlfAGsmN2QrDAO8qpdzN6mQdmr0E5Zb1h6s
- xEaKLNXOA1E2g7/JxtVnF3Qt5ynNsb8b/9wTXQv9iYlPC/Lh1P3YqnEEv8JOWWPHL34d
- qxEha3SvO/i+fn+aSbJZGWXqVqGr/R84Jzk9WiLiKJoSZyMIo2/ZksTGe74OJXphFIRb
- N7Pn5fxSnlQEP1uQ4PFsRuMVbb8JBophMJ+aFF1RE2qyc/88cTMNPr0lKWW2hCqmiWc+
- w+GjW1+Q7Wek06rmveLcDuMa02FUiVsnl7ifXmGSXvQnt1Y9JOvu5YV9NEnfBewwPQSZ
- cHxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=bksqS5OXW4yPLtnDgxApaC1LnjKvojyARYOjWT9jY54=;
- b=rGPebhxAfmq22zps1MdShl0OrAY8ix6gULNp9AIlRU9nH799sz0iZWAhVyJMPu/kZ6
- 5+da7znVfHsGNzeXYPvSaMyRMKBknttSChZvoDIrGdzBkcAjy0g21nzywsZAKn0NkNj+
- sBGY/oTl18qnblxDZS3aYyTjx5hwB2/JKY9SmjX1IpX34gxOjPLjHpAd85bZDfuYZW6m
- rK80MZu9Sv2qyowmfNngup2G/hQ+YhDN1VBtVxeHdfHxFuBPZOQmYITn7c5Uer9lQ9NM
- 44Or4VrhjOtIcNGkj+YbjDA/qvA7g0YK+y0KVN+5L7/RH3QHWETyUeDOno4HS1lti2uQ
- 4EuQ==
-X-Gm-Message-State: AOAM532PThOZn8z8xFFLG1+tSOL62WvY0RWVGxAcBRf1GGISoYL+QUIL
- 90gP1Kd47FoI/jEfaX2tmgpNUEH/UEca311x6LbC1w==
-X-Google-Smtp-Source: ABdhPJwOisfkpCweJlEMmpgTkBVV4rGLNi06rBzppVFE4pYhne6j4wMAU2XN8nzWbeieHqPveUWLdQj3HtBPEqdKv90=
-X-Received: by 2002:a54:4694:: with SMTP id k20mr16009221oic.146.1593532403224; 
- Tue, 30 Jun 2020 08:53:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqIZc-0003Yn-KS
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:53:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31124
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqIZa-0006a4-RQ
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 11:53:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593532406;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=BoZjZl1efbg68on61JAxXlx7C+HWblxiHixB9xMGOss=;
+ b=KBdQ8FIJRd9HNMQayW+jOGjidX96sEoL00ur6Th/D9FMD6ShzvxG0C+lrPtqERitLYECek
+ KvoysfIJ76by7FgecCP2LkWcho/N85CFJal6L6TADcT6oIjQr4Tuc2NKCxLlsMSNR1qGH2
+ 5F303ajSEfN+iIaLqFUnYkVjpXiURkk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-R8NMHr8WNLmfhlo96PrO1Q-1; Tue, 30 Jun 2020 11:53:21 -0400
+X-MC-Unique: R8NMHr8WNLmfhlo96PrO1Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E4A9EC1B7;
+ Tue, 30 Jun 2020 15:53:19 +0000 (UTC)
+Received: from localhost (ovpn-115-106.ams2.redhat.com [10.36.115.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 53F915C1B0;
+ Tue, 30 Jun 2020 15:53:10 +0000 (UTC)
+Date: Tue, 30 Jun 2020 16:53:08 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v7 06/21] multi-process: define MPQemuMsg format and
+ transmission functions
+Message-ID: <20200630155308.GF109906@stefanha-x1.localdomain>
+References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+ <f3e8c0b53e9ee337f2551f7326562cba1fffb908.1593273671.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-References: <CA+XhMqzjjrfxXeSENBQuHzTe4TRMWV5GOdqPkD3bo17T3ufR1A@mail.gmail.com>
- <1058ccbd-b4bb-9413-abc5-ae89076a58e1@redhat.com>
- <20200630082301.6vybzwmg4pviuwob@sirius.home.kraxel.org>
-In-Reply-To: <20200630082301.6vybzwmg4pviuwob@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jun 2020 16:53:12 +0100
-Message-ID: <CAFEAcA8jkzf8+d5AyAVH2HJ544TyHsM4xP5tpWsKiJbJtWMjKw@mail.gmail.com>
-Subject: Re: [PATC 7/9] Skipping drm build, unsupported
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <f3e8c0b53e9ee337f2551f7326562cba1fffb908.1593273671.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="WlEyl6ow+jlIgNUh"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 03:55:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,40 +97,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, David CARLIER <devnexen@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 09:24, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Tue, Jun 30, 2020 at 08:44:24AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > +Gerd
-> >
-> > On 6/29/20 11:48 PM, David CARLIER wrote:
-> > > From 157a0374093371719de42e99364352d64190f52a Mon Sep 17 00:00:00 200=
-1
-> > > From: David Carlier <devnexen@gmail.com>
-> > > Date: Mon, 29 Jun 2020 22:20:06 +0000
-> > > Subject: [PATCH 7/9] Skipping drm build, unsupported.
->
-> --verbose please.
->
-> > > -util-obj-$(CONFIG_POSIX) +=3D drm.o
-> > > +util-obj-$(CONFIG_LINUX) +=3D drm.o
->
-> Can't see anything linux-specific there.  Also note that FreeBSD (and
-> possibly other *BSDs too) have drm support.  So CONFIG_POSIX looks
-> correct to me.
+--WlEyl6ow+jlIgNUh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-This change was my suggestion; I assumed that "open /dev/dri/whatever"
-was Linux-specific. The specific thing that doesn't work on
-Haiku, or on Solaris for that matter, is that the code uses
-DT_CHR, which isn't in POSIX but is a Linux-and-BSDism.
+On Sat, Jun 27, 2020 at 10:09:28AM -0700, elena.ufimtseva@oracle.com wrote:
+> +void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc)
+> +{
+> +    Error *local_err = NULL;
+> +    struct iovec send[2];
+> +    int *fds = NULL;
+> +    size_t nfds = 0;
+> +
+> +    send[0].iov_base = msg;
+> +    send[0].iov_len = MPQEMU_MSG_HDR_SIZE;
+> +
+> +    send[1].iov_base = msg->bytestream ? msg->data2 : (void *)&msg->data1;
+> +    send[1].iov_len = msg->size;
+> +
+> +    if (msg->num_fds) {
+> +        nfds = msg->num_fds;
+> +        fds = msg->fds;
+> +    }
+> +
+> +    (void)qio_channel_writev_full_all(ioc, send, G_N_ELEMENTS(send), fds, nfds,
+> +                                      &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +    }
 
-thanks
--- PMM
+Error propagation is missing. Is this by design, i.e. errors only need
+to be handled in the read path, or is the patch incomplete?
+
+> +}
+> +
+> +static int mpqemu_readv(QIOChannel *ioc, struct iovec *iov, int **fds,
+> +                        size_t *nfds, Error **errp)
+> +{
+> +    size_t size, len;
+> +
+> +    size = iov->iov_len;
+> +
+> +    while (size > 0) {
+> +        len = qio_channel_readv_full(ioc, iov, 1, fds, nfds, errp);
+
+iovec buffers are overwritten when this loop iterates because iov is
+not updated after reading some data.
+
+fds is leaked when this loop iterates multiple times and there are fds
+each time. fds/nfds should probably be set to 0 after the first
+iteration.
+
+> +
+> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> +            if (qemu_in_coroutine()) {
+> +                qio_channel_yield(ioc, G_IO_IN);
+> +            } else {
+> +                qio_channel_wait(ioc, G_IO_IN);
+> +            }
+> +            continue;
+> +        }
+> +
+> +        if (len <= 0) {
+> +            return -EIO;
+> +        }
+> +
+> +        size -= len;
+> +    }
+> +
+> +    return iov->iov_len;
+> +}
+> +
+> +int mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc)
+> +{
+> +    Error *local_err = NULL;
+> +    int *fds = NULL;
+> +    struct iovec hdr, data;
+> +    size_t nfds = 0;
+> +
+> +    hdr.iov_base = g_malloc0(MPQEMU_MSG_HDR_SIZE);
+> +    hdr.iov_len = MPQEMU_MSG_HDR_SIZE;
+> +
+> +    if (mpqemu_readv(ioc, &hdr, &fds, &nfds, &local_err) < 0) {
+> +        return -EIO;
+
+hdr.iov_base is leaked.
+
+Why is hdr.iov_base allocated on the heap? Can you read directly into
+msg instead of using an extra variable?
+
+> +    }
+> +
+> +    memcpy(msg, hdr.iov_base, hdr.iov_len);
+> +
+> +    free(hdr.iov_base);
+> +    if (msg->size > MPQEMU_MSG_DATA_MAX) {
+> +        error_report("The message size is more than MPQEMU_MSG_DATA_MAX %d",
+> +                     MPQEMU_MSG_DATA_MAX);
+> +        return -EINVAL;
+> +    }
+> +
+> +    data.iov_base = g_malloc0(msg->size);
+> +    data.iov_len = msg->size;
+> +
+> +    if (mpqemu_readv(ioc, &data, NULL, NULL, &local_err) < 0) {
+> +        return -EIO;
+
+data.iov_base is leaked.
+
+> +    }
+> +
+> +    if (msg->bytestream) {
+> +        msg->data2 = calloc(1, msg->size);
+
+QEMU uses glib memory allocation functions when possible. Please use
+g_malloc0().
+
+The calloc() and memcpy() can be avoided like this:
+
+  msg->data2 = data.iov_base;
+  data.iov_base = NULL; /* the pointer has been moved, don't free it */
+
+> +        memcpy(msg->data2, data.iov_base, msg->size);
+> +    } else {
+> +        memcpy((void *)&msg->data1, data.iov_base, msg->size);
+
+Buffer overflow when msg->size > sizeof(msg->data1). There should be a
+check:
+
+  if (msg->bytestream) {
+      ...
+  } else {
+      if (msg->size > sizeof(msg->data1)) {
+          ...handle invalid size...
+	  return -EIO;
+      }
+      memcpy(&msg->data1, data.iov_base, msg->size);
+  }
+
+> +    }
+> +
+> +    free(data.iov_base);
+
+Should be g_free() since the allocation was made with g_malloc0().
+
+> +
+> +    if (nfds) {
+> +        msg->num_fds = nfds;
+> +        memcpy(msg->fds, fds, nfds * sizeof(int));
+> +    }
+
+It's safer to move the msg->num_fds = nfds outside the if statement so
+that it always happens. That way num_fds is set to 0 and we don't depend
+on the caller initializing it to 0.
+
+--WlEyl6ow+jlIgNUh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl77X+QACgkQnKSrs4Gr
+c8iuyQgAxc2b30cPLf/CLDHwZ68E4dW0gtGQeHplJkguNVJlBithL+Ib5SkC23aR
+S+CkqW636ieSnUdZQ8lNUJ3oODWyJD+P0Rsd0phof1bxRModZie5nWjd4CF2r2Uc
+gWBTTY5a5h8MHQm9uncoqQaP1fhMEqOQG8LVb30sjYT84nQW6kQoSYcxpCQ65XxB
+RTJ4VM7kEkB0fjha21+tJKOPwiZXBH6VoatNdsXRkEgiC5fv1+30vNHf+C59nj0Z
+Kc0Zdf8pvkdLUFS/3AWuCqWEfymv62fFqQDTUmR9/HXlVzNAxituzf1lXh0OVX60
+vffNHWhzZLCrlmWIUOKa/IejGLcwTg==
+=ushO
+-----END PGP SIGNATURE-----
+
+--WlEyl6ow+jlIgNUh--
+
 
