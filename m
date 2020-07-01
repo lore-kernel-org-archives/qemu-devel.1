@@ -2,110 +2,95 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276EAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73782C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD53206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41228206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmLCbLbG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD53206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WlXD7kXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41228206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqdj9-0004O8-5b
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:28:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39026)
+	id 1jqdjV-0004yv-Fq
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:29:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqdgW-0001rK-Rj
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:26:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21055
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqdgU-0002An-UB
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:26:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593613558;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=t5HcXnEsZH1QefsX1QuZ3AuaKWbFdGteqhsXfdg5MN0=;
- b=LmLCbLbG/003PlQWLIgOMNdqIEKmPwrdEuC5v/xejfhDKvb+XjerK2AkMmNaLDd4I0aLQf
- kpAKl2rQBqAF/dsPYwafS92RQlnXwv4dBklpBrmFHB8eJ8LiYiifJw/ehb0b2+bKQePsWt
- xDnUdioQ3v6sE8QA5d94HB2UErw8yXI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-XQmBWqUgMW6QuXzxzgTFWw-1; Wed, 01 Jul 2020 10:25:52 -0400
-X-MC-Unique: XQmBWqUgMW6QuXzxzgTFWw-1
-Received: by mail-wm1-f70.google.com with SMTP id g187so23676997wme.0
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:25:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqdUS-0006ZI-Gz
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:32 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51098)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqdUQ-0000A3-Iz
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:32 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id l17so22608870wmj.0
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:13:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PJhXUCcF3c2PKDCFsCiaqFOmEKen6xlVm+g2tj8AYP8=;
+ b=WlXD7kXTRinT7Nh0YWHeQjdrlpdwKW9wzLMBsuVgwCFPxDtx1THdoOTNvTmAoW+c6m
+ uYX2DworzFB9U7oVOrQ5bZu/kk0jTpqeRG7JBe7DE/knr06Xsrkv2A0L9ScJBO5MlI15
+ lGSIC6xnmIbMnPU9xnPt75lKLKFq+ZGYKLd70I7hwLVAyrh+ayuuJApL9t1NHDahY86u
+ WS8pRCPL2nweFC9Dudd7htNV63Rqg6Wzi6rBU/KLBJHWDRB4BVH98zbWvpxe2sRUNFq7
+ iRPw9m9424drJk2mcxRc/Q05+vbJY5uVby4UWKglAzKnmElti4YcRCcLWi5bHCPXqRRj
+ 2mnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=t5HcXnEsZH1QefsX1QuZ3AuaKWbFdGteqhsXfdg5MN0=;
- b=eKcB03Om97QxkTJLMc6hS8yGILvQc+L+tMzQq0zhjoxQm7ub/UqosMDxqp1hJJ5DZ9
- 24h3acQSdZYkoBTlPCWh3jStn87KB2DM6N0lIguLvJFwd6Bqg3vz7+TfhhsNtzTk23/C
- lIUku4SCqI29eJXvUktxXT6oyZOLRGMQ/KwFiN+CibeiPjCDkvVL1f6JRBmz92kBS75j
- od7ilzk+AIewF/1Yzt3f8ksn39yZz2Ckio4u5WQRDGFGTCx5Q3agUvpE7CoOZ1Go3Eww
- 5guzkiXbKS+Q5/LQSS6tUOkDV/fqH5oXDLdP/gJC2gq2cpo8ePp29moY2aXfl6q8VYki
- mYtA==
-X-Gm-Message-State: AOAM530Fw9xlRkSGEJfGR7jliTTIsXWsLrbwFJb59pE++YEclDr8JVZq
- xRthi3wunGXbOoIa+WjXw+TE4wVQbE3cfgqmcUlrz2bLzLLsYmqlO6Ckse5490ThO2s8dcNg79u
- gU74EurcVjQKrJeM=
-X-Received: by 2002:adf:8444:: with SMTP id 62mr25784752wrf.278.1593613551557; 
- Wed, 01 Jul 2020 07:25:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXz3UDVoujeKZYrNR5UUnOEBFQTmCz3ZJ4dxZna76kJys9sIEdy/NzLM41sMqbe4itldoEnA==
-X-Received: by 2002:adf:8444:: with SMTP id 62mr25784728wrf.278.1593613551256; 
- Wed, 01 Jul 2020 07:25:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1?
- ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
- by smtp.gmail.com with ESMTPSA id t2sm7307442wma.43.2020.07.01.07.25.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 07:25:50 -0700 (PDT)
-Subject: Re: [PATCH] scripts/get_maintainer: Use .ignoredmailmap to ignore
- invalid emails
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200629172716.20781-1-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8616bdd8-34a9-f737-aa9d-f11d735cc0fe@redhat.com>
-Date: Wed, 1 Jul 2020 16:25:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PJhXUCcF3c2PKDCFsCiaqFOmEKen6xlVm+g2tj8AYP8=;
+ b=Rczy8EKcJWQ3jfdihvPk5Gtwg3/A4CuOu6w7A0dgjH15LnTBOkhiciU2gxmffjh2dQ
+ uodOmVSuRQ+x1whc0FroZykB2RsByh/FsOMERJISiOfqds5mG/Jf/Tjjo2xt8j9OL2Ka
+ mjZ5zwsHdZUCKpgjXakkAN4eLwJbbOdK8R0jxMoncrlTYX5KiVsL5XROz5A1bEDtJL6w
+ hvv+SSb/iQ83hUsqPj53JdOUVjb7rw3MBwdu7b58CbkDADREoqNo+Bs7TkIT2BN/Ustt
+ 06lLygxMNWLMwqxULHUfvaubE0DJMtDhY9+o4KYK5hjTe2x3WSOAC4IdxZdOGoyjfDXQ
+ RrEA==
+X-Gm-Message-State: AOAM533xafsfMpSs5cu5MysSi8rrItPf/QgDGExFRh+BsAO13vAFs1ag
+ dVVLaKJwpjeQ79zRD1w9R+ynag==
+X-Google-Smtp-Source: ABdhPJyFeqTgxTB7qpx/e9QfQREZkFwCuxVWJNm1e0sXeL3mMBqdGOtfwzVYJABhr67ua3awDjP+9A==
+X-Received: by 2002:a1c:4408:: with SMTP id r8mr26979777wma.100.1593612808833; 
+ Wed, 01 Jul 2020 07:13:28 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w2sm7835430wrs.77.2020.07.01.07.13.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jul 2020 07:13:27 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 27B561FF8F;
+ Wed,  1 Jul 2020 14:56:56 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 32/40] tests/docker: add a linux-user testing focused image
+Date: Wed,  1 Jul 2020 14:56:44 +0100
+Message-Id: <20200701135652.1366-33-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200701135652.1366-1-alex.bennee@linaro.org>
+References: <20200701135652.1366-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200629172716.20781-1-f4bug@amsat.org>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,110 +103,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, berrange@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/06/20 19:27, Philippe Mathieu-Daudé wrote:
-> Sometime emails get rejected and 'bounce'. It might take time
-> between we report that, a patch is posted, reviewed, merged...
-> 
-> To reduce time spent looking at bouncing emails in one mailbox,
-> add the feature to simply ignore broken email addresses. The
-> format is similar to the '.mailmap' file. Add an email address
-> in your local '.ignoredmailmap. and get_maintainer.pl won't
-> list it anymore.
-> 
-> This is particularly useful when git-send-email is used with
-> the --cc-cmd argument, like suggested in QEMU wiki:
-> https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+We happily use all the cross images for both cross-building QEMU as
+well as building the linux-user tests. However calling docker from
+within docker seems not to work. As we can build in Debian anyway why
+not include an image that has all the compilers available for
+non-docker invocation.
 
-Do you have such a list already?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ .gitlab-ci.d/containers.yml                   |  7 +++
+ tests/docker/Makefile.include                 |  1 +
+ .../dockerfiles/debian-all-test-cross.docker  | 53 +++++++++++++++++++
+ 3 files changed, 61 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-all-test-cross.docker
 
-Paolo
-
-> ---
->  scripts/get_maintainer.pl | 50 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
-> 
-> diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-> index 271f5ff42a..7f7a4ff3ef 100755
-> --- a/scripts/get_maintainer.pl
-> +++ b/scripts/get_maintainer.pl
-> @@ -38,6 +38,7 @@
->  my $interactive = 0;
->  my $email_remove_duplicates = 1;
->  my $email_use_mailmap = 1;
-> +my $email_use_ignoredmailmap = 1;
->  my $output_multiline = 1;
->  my $output_separator = ", ";
->  my $output_roles = 0;
-> @@ -365,6 +366,51 @@ sub read_mailmap {
->      close($mailmap_file);
->  }
->  
-> +my $ignoredmailmap;
-> +
-> +read_ignoredmailmap();
-> +
-> +sub read_ignoredmailmap {
-> +    $ignoredmailmap = {
-> +	names => {},
-> +	addresses => {}
-> +    };
-> +
-> +    return if (!$email_use_ignoredmailmap || !(-f "${lk_path}.ignoredmailmap"));
-> +
-> +    open(my $ignoredmailmap_file, '<', "${lk_path}.ignoredmailmap")
-> +	or warn "$P: Can't open .ignoredmailmap: $!\n";
-> +
-> +    while (<$ignoredmailmap_file>) {
-> +	s/#.*$//; #strip comments
-> +	s/^\s+|\s+$//g; #trim
-> +
-> +	next if (/^\s*$/); #skip empty lines
-> +	#entries have one of the following formats:
-> +	# name1 <mail1>
-> +	# <mail1>
-> +
-> +	if (/^([^<]+)<([^>]+)>$/) {
-> +	    my $real_name = $1;
-> +	    my $address = $2;
-> +
-> +	    $real_name =~ s/\s+$//;
-> +	    ($real_name, $address) = parse_email("$real_name <$address>");
-> +	    $ignoredmailmap->{$address} = 1;
-> +	} elsif (/^(.+)<([^>]+)>\s*<([^>]+)>$/) {
-> +	    my $real_name = $1;
-> +	    my $real_address = $2;
-> +	    my $wrong_address = $3;
-> +
-> +	    $real_name =~ s/\s+$//;
-> +	    ($real_name, $real_address) =
-> +		parse_email("$real_name <$real_address>");
-> +	    $ignoredmailmap->{$real_address} = 1;
-> +	}
-> +    }
-> +    close($ignoredmailmap_file);
-> +}
-> +
->  ## use the filenames on the command line or find the filenames in the patchfiles
->  
->  my @files = ();
-> @@ -1074,6 +1120,10 @@ sub push_email_address {
->      if ($address eq "") {
->  	return 0;
->      }
-> +    if (exists $ignoredmailmap->{$address}) {
-> +        #warn("Ignoring address: '" . $address . "'\n");
-> +        return 0;
-> +    }
->  
->      if (!$email_remove_duplicates) {
->  	push(@email_to, [format_email($name, $address, $email_usename), $role]);
-> 
+diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
+index f353359fd8b..a7621c4204c 100644
+--- a/.gitlab-ci.d/containers.yml
++++ b/.gitlab-ci.d/containers.yml
+@@ -64,6 +64,13 @@ amd64-debian-cross-container:
+   variables:
+     NAME: debian-amd64-cross
+ 
++amd64-debian-user-cross-container:
++  <<: *container_job_definition
++  stage: containers-layer2
++  needs: ['amd64-debian10-container']
++  variables:
++    NAME: debian-all-test-cross
++
+ amd64-debian-container:
+   <<: *container_job_definition
+   stage: containers-layer2
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 977d8ff6e40..8406d039858 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -134,6 +134,7 @@ docker-image-travis: NOUSER=1
+ 
+ # Specialist build images, sometimes very limited tools
+ docker-image-debian-tricore-cross: docker-image-debian9
++docker-image-debian-all-test-cross: docker-image-debian10
+ docker-image-debian-arm64-test-cross: docker-image-debian11
+ 
+ # These images may be good enough for building tests but not for test builds
+diff --git a/tests/docker/dockerfiles/debian-all-test-cross.docker b/tests/docker/dockerfiles/debian-all-test-cross.docker
+new file mode 100644
+index 00000000000..dedcea58b46
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-all-test-cross.docker
+@@ -0,0 +1,53 @@
++#
++# Docker all cross-compiler target (tests only)
++#
++# While the normal cross builds take care to setup proper multiarch
++# build environments which can cross build QEMU this just installs the
++# basic compilers for as many targets as possible. We shall use this
++# to build and run linux-user tests on GitLab
++#
++FROM qemu/debian10
++
++# What we need to build QEMU itself
++RUN apt update && \
++    DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt build-dep -yy qemu
++
++# Add the foreign architecture we want and install dependencies
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++        apt install -y --no-install-recommends \
++        gcc-aarch64-linux-gnu \
++        libc6-dev-arm64-cross \
++        gcc-alpha-linux-gnu \
++        libc6.1-dev-alpha-cross \
++        gcc-arm-linux-gnueabihf \
++        libc6-dev-armhf-cross \
++        gcc-hppa-linux-gnu \
++        libc6-dev-hppa-cross \
++        gcc-m68k-linux-gnu \
++        libc6-dev-m68k-cross \
++        gcc-mips-linux-gnu \
++        libc6-dev-mips-cross \
++        gcc-mips64-linux-gnuabi64 \
++        libc6-dev-mips64-cross \
++        gcc-mips64el-linux-gnuabi64 \
++        libc6-dev-mips64el-cross \
++        gcc-mipsel-linux-gnu \
++        libc6-dev-mipsel-cross \
++        gcc-powerpc-linux-gnu \
++        libc6-dev-powerpc-cross \
++        gcc-powerpc64-linux-gnu \
++        libc6-dev-ppc64-cross \
++        gcc-powerpc64le-linux-gnu \
++        libc6-dev-ppc64el-cross \
++        gcc-riscv64-linux-gnu \
++        libc6-dev-riscv64-cross \
++        gcc-s390x-linux-gnu \
++        libc6-dev-s390x-cross \
++        gcc-sh4-linux-gnu \
++        libc6-dev-sh4-cross \
++        gcc-sparc64-linux-gnu \
++        libc6-dev-sparc64-cross
++
++ENV QEMU_CONFIGURE_OPTS --disable-system --disable-docs --disable-tools
++ENV DEF_TARGET_LIST aarch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,i386-linux-user,m68k-linux-user,mips-linux-user,mips64-linux-user,mips64el-linux-user,mipsel-linux-user,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,riscv64-linux-user,s390x-linux-user,sh4-linux-user,sparc64-linux-user
+-- 
+2.20.1
 
 
