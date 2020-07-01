@@ -2,84 +2,98 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82846C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4FDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:21:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D0620760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0B2220760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:21:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSdu4yY8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D0620760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HGwIBDVm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0B2220760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeX4-00022G-Jl
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:20:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50050)
+	id 1jqeYL-000378-Py
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:21:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeI1-0003Oz-W8
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49256
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeHw-0001Cz-6c
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615879;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=8c5rpM/uUzeAs95QmaeYXk7xK2+A8aAk2ZuVb9/UVi8=;
- b=PSdu4yY8WGJxYbdhAar85yGHjfuEq3NiPexARF45F97zBhV1KbG+cK+BXka0206gRxvGli
- aMJFs6ckuKFfUjPk8Ezc2olnTFv8zaCznLHNTj8lTJ0cNNT2JcKl7wcp0TX4fid6mxmuwy
- WyL/bTfX74BCysSnpTuHUzQV9nCIxR0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-6oR8ddD8Ms26A-hh5GNbKQ-1; Wed, 01 Jul 2020 11:04:37 -0400
-X-MC-Unique: 6oR8ddD8Ms26A-hh5GNbKQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17A73802ED5;
- Wed,  1 Jul 2020 15:04:35 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD13390352;
- Wed,  1 Jul 2020 15:04:30 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 93A6931E85; Wed,  1 Jul 2020 17:04:25 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 08/13] sm501: Convert debug printfs to traces
-Date: Wed,  1 Jul 2020 17:04:20 +0200
-Message-Id: <20200701150425.13739-9-kraxel@redhat.com>
-In-Reply-To: <20200701150425.13739-1-kraxel@redhat.com>
-References: <20200701150425.13739-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqeKm-0007Xw-7C
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:07:36 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:33936)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqeKk-0001fB-9f
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:07:35 -0400
+Received: by mail-ej1-x644.google.com with SMTP id y10so25138381eje.1
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 08:07:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=J4qbmX+uAPtSc0cDMg/pYTi/lLEXOpoblmBXxcQzGEc=;
+ b=HGwIBDVmxvo0+u/zOCR+uYymsbSFZPZm0SYJ8E/BGHmsI/ir1YxZfCbHS1GFllUYIg
+ 1lohZFdvn+HY1W7rm/Ab7MZdqbhJ1kc64AGf2HqLYsFHmM9zzcvPvOYoonmgmEM3CVGx
+ ctbuGsSs4SlP5FsJpCr42Uif3xVLIXl+Lx071osQpP6oBmbAV4QH4tLXAbMwH4D2eGM+
+ X0uN9fRLl/nPijsVO3GabFA/ydDqTMhOKXvMMNwcs9G8Yh2riC8qziWtwp2tu/rlUWdz
+ P8kkt0kRETWOA5A7832oWJoorSYOfvg/Ad4V8J08W44+S9r3maBeneqB4yJUX4BdQySJ
+ utww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J4qbmX+uAPtSc0cDMg/pYTi/lLEXOpoblmBXxcQzGEc=;
+ b=UGZ5GskD4EGveepHpfHIjyb26WjNkx4SIBthaVOkEem0eEpJrR+KxH6s31wyttmvDA
+ Zr2EJ9C6UIIrbBwe2X9lC02Hp8ag7GuYcIVa6nHY1Md3SGAJtRqposGjipcBh475HRQo
+ nZ6Ih5wgPM8NLdCNTblNJAjSMZzRIgkJlT6/EfKhS8bTrZvmeSqY+zyE2bI3jpOmALGF
+ +j7BrKKik8b/x7mKLxQAisGgo6bKhwc2CznU7mRk85wBFCVGBUnXCZLJiipJull+eLcT
+ erOwuCghrae5WKKzImei6+GGDugZIxa1opaV95MttdeyfgG+92gMS7ZNJY6CDonVnOnU
+ AkFg==
+X-Gm-Message-State: AOAM533NdaCFxGqONdXIiEDpff7C/BffHEosqd+ezTB1xb5Ql3QziBWE
+ pr8NeMvoXes0Td4Nl8/ea+4=
+X-Google-Smtp-Source: ABdhPJxDgCA08m5yP0JBtqujWmDcUQkIGh1w7CGC8fUU1OryzKsxKNtsGlIlCgse1ZdmXg7z91JlSg==
+X-Received: by 2002:a17:906:7212:: with SMTP id
+ m18mr23242462ejk.29.1593616052748; 
+ Wed, 01 Jul 2020 08:07:32 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id be2sm6385945edb.92.2020.07.01.08.07.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 08:07:32 -0700 (PDT)
+Subject: Re: [PATCH] scripts/get_maintainer: Use .ignoredmailmap to ignore
+ invalid emails
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200629172716.20781-1-f4bug@amsat.org>
+ <8616bdd8-34a9-f737-aa9d-f11d735cc0fe@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <caee1217-867e-f2b3-68c6-3b3e87e926a9@amsat.org>
+Date: Wed, 1 Jul 2020 17:07:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <8616bdd8-34a9-f737-aa9d-f11d735cc0fe@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,226 +107,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+On 7/1/20 4:25 PM, Paolo Bonzini wrote:
+> On 29/06/20 19:27, Philippe Mathieu-Daudé wrote:
+>> Sometime emails get rejected and 'bounce'. It might take time
+>> between we report that, a patch is posted, reviewed, merged...
+>>
+>> To reduce time spent looking at bouncing emails in one mailbox,
+>> add the feature to simply ignore broken email addresses. The
+>> format is similar to the '.mailmap' file. Add an email address
+>> in your local '.ignoredmailmap. and get_maintainer.pl won't
+>> list it anymore.
+>>
+>> This is particularly useful when git-send-email is used with
+>> the --cc-cmd argument, like suggested in QEMU wiki:
+>> https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> Do you have such a list already?
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: caf97bf0c84a440896ddf020e84c312fa5c15076.1592686588.git.balaton@eik.bme.hu
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/sm501.c      | 50 +++++++++++------------------------------
- hw/display/trace-events | 12 ++++++++++
- 2 files changed, 25 insertions(+), 37 deletions(-)
+$ cat .ignoredmailmap
+#
+# From man git-shortlog the forms are:
+#
+#  Proper Name <commit@email.xx>
+#  <proper@email.xx>
+#
+Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+Caio Carrara <ccarrara@redhat.com>
+Yongbok Kim <yongbok.kim@mips.com>
+James Hogan <james.hogan@mips.com>
+Paul Burton <pburton@wavecomp.com>
+Alexander Graf <agraf@suse.de>
+Roy Franz <roy.franz@linaro.org>
+Dmitry Solodkiy <d.solodkiy@samsung.com>
+Evgeny Voevodin <e.voevodin@samsung.com>
+Serge Hallyn <serge.hallyn@ubuntu.com>
+Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 7e4c042d5229..2db347dcbc1c 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -39,15 +39,7 @@
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
- #include "qemu/bswap.h"
--
--/*#define DEBUG_SM501*/
--/*#define DEBUG_BITBLT*/
--
--#ifdef DEBUG_SM501
--#define SM501_DPRINTF(fmt, ...) printf(fmt, ## __VA_ARGS__)
--#else
--#define SM501_DPRINTF(fmt, ...) do {} while (0)
--#endif
-+#include "trace.h"
- 
- #define MMIO_BASE_OFFSET 0x3e00000
- #define MMIO_SIZE 0x200000
-@@ -871,7 +863,6 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
- {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 system config regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
-     case SM501_SYSTEM_CONTROL:
-@@ -923,7 +914,7 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented system config"
-                       "register read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_system_config_read(addr, ret);
-     return ret;
- }
- 
-@@ -931,9 +922,8 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
-                                       uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 system config regs : write addr=%x, val=%x\n",
--                  (uint32_t)addr, (uint32_t)value);
- 
-+    trace_sm501_system_config_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_SYSTEM_CONTROL:
-         s->system_control &= 0x10DB0000;
-@@ -1019,9 +1009,7 @@ static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
-         qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
-                       " addr=0x%" HWADDR_PRIx "\n", addr);
-     }
--
--    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
--                  addr, ret);
-+    trace_sm501_i2c_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1029,9 +1017,8 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-                             unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
--                  " val=%" PRIx64 "\n", addr, value);
- 
-+    trace_sm501_i2c_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_I2C_BYTE_COUNT:
-         s->i2c_byte_count = value & 0xf;
-@@ -1045,25 +1032,19 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-                 s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-                 if (!res) {
-                     int i;
--                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
--                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
-                     for (i = 0; i <= s->i2c_byte_count; i++) {
-                         res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-                                             !(s->i2c_addr & 1));
-                         if (res) {
--                            SM501_DPRINTF("sm501 i2c : transfer failed"
--                                          " i=%d, res=%d\n", i, res);
-                             s->i2c_status |= SM501_I2C_STATUS_ERROR;
-                             return;
-                         }
-                     }
-                     if (i) {
--                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
-                         s->i2c_status = SM501_I2C_STATUS_COMPLETE;
-                     }
-                 }
-             } else {
--                SM501_DPRINTF("sm501 i2c : end transfer\n");
-                 i2c_end_transfer(s->i2c_bus);
-                 s->i2c_status &= ~SM501_I2C_STATUS_ERROR;
-             }
-@@ -1103,7 +1084,8 @@ static const MemoryRegionOps sm501_i2c_ops = {
- static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 palette read addr=%x\n", (int)addr);
-+
-+    trace_sm501_palette_read((uint32_t)addr);
- 
-     /* TODO : consider BYTE/WORD access */
-     /* TODO : consider endian */
-@@ -1116,8 +1098,8 @@ static void sm501_palette_write(void *opaque, hwaddr addr,
-                                 uint32_t value)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 palette write addr=%x, val=%x\n",
--                  (int)addr, value);
-+
-+    trace_sm501_palette_write((uint32_t)addr, value);
- 
-     /* TODO : consider BYTE/WORD access */
-     /* TODO : consider endian */
-@@ -1132,7 +1114,6 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
- {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 disp ctrl regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
- 
-@@ -1237,7 +1218,7 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented disp ctrl register "
-                       "read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_disp_ctrl_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1245,9 +1226,8 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-                                   uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 disp ctrl regs : write addr=%x, val=%x\n",
--                  (unsigned)addr, (unsigned)value);
- 
-+    trace_sm501_disp_ctrl_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_DC_PANEL_CONTROL:
-         s->dc_panel_control = value & 0x0FFF73FF;
-@@ -1392,7 +1372,6 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
- {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
-     case SM501_2D_SOURCE:
-@@ -1462,7 +1441,7 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented disp ctrl register "
-                       "read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_2d_engine_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1470,9 +1449,8 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
-                                   uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 2d engine regs : write addr=%x, val=%x\n",
--                  (unsigned)addr, (unsigned)value);
- 
-+    trace_sm501_2d_engine_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_2D_SOURCE:
-         s->twoD_source = value;
-@@ -1830,8 +1808,6 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-                        uint32_t local_mem_bytes)
- {
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
--    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
--                  s->local_mem_size_index);
- 
-     /* local memory */
-     memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 72d4c9812c69..970d6bac5dcf 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -161,3 +161,15 @@ cg3_write(uint32_t addr, uint32_t val, unsigned size) "write addr:0x%06"PRIx32"
- # dpcd.c
- dpcd_read(uint32_t addr, uint8_t val) "read addr:0x%"PRIx32" val:0x%02x"
- dpcd_write(uint32_t addr, uint8_t val) "write addr:0x%"PRIx32" val:0x%02x"
-+
-+# sm501.c
-+sm501_system_config_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_system_config_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_i2c_read(uint32_t addr, uint8_t val) "addr=0x%x, val=0x%x"
-+sm501_i2c_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_palette_read(uint32_t addr) "addr=0x%x"
-+sm501_palette_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_disp_ctrl_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_disp_ctrl_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_2d_engine_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_2d_engine_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
--- 
-2.18.4
-
+> 
+> Paolo
+> 
+>> ---
+>>  scripts/get_maintainer.pl | 50 +++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 50 insertions(+)
+>>
+>> diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+>> index 271f5ff42a..7f7a4ff3ef 100755
+>> --- a/scripts/get_maintainer.pl
+>> +++ b/scripts/get_maintainer.pl
+>> @@ -38,6 +38,7 @@
+>>  my $interactive = 0;
+>>  my $email_remove_duplicates = 1;
+>>  my $email_use_mailmap = 1;
+>> +my $email_use_ignoredmailmap = 1;
+>>  my $output_multiline = 1;
+>>  my $output_separator = ", ";
+>>  my $output_roles = 0;
+>> @@ -365,6 +366,51 @@ sub read_mailmap {
+>>      close($mailmap_file);
+>>  }
+>>  
+>> +my $ignoredmailmap;
+>> +
+>> +read_ignoredmailmap();
+>> +
+>> +sub read_ignoredmailmap {
+>> +    $ignoredmailmap = {
+>> +	names => {},
+>> +	addresses => {}
+>> +    };
+>> +
+>> +    return if (!$email_use_ignoredmailmap || !(-f "${lk_path}.ignoredmailmap"));
+>> +
+>> +    open(my $ignoredmailmap_file, '<', "${lk_path}.ignoredmailmap")
+>> +	or warn "$P: Can't open .ignoredmailmap: $!\n";
+>> +
+>> +    while (<$ignoredmailmap_file>) {
+>> +	s/#.*$//; #strip comments
+>> +	s/^\s+|\s+$//g; #trim
+>> +
+>> +	next if (/^\s*$/); #skip empty lines
+>> +	#entries have one of the following formats:
+>> +	# name1 <mail1>
+>> +	# <mail1>
+>> +
+>> +	if (/^([^<]+)<([^>]+)>$/) {
+>> +	    my $real_name = $1;
+>> +	    my $address = $2;
+>> +
+>> +	    $real_name =~ s/\s+$//;
+>> +	    ($real_name, $address) = parse_email("$real_name <$address>");
+>> +	    $ignoredmailmap->{$address} = 1;
+>> +	} elsif (/^(.+)<([^>]+)>\s*<([^>]+)>$/) {
+>> +	    my $real_name = $1;
+>> +	    my $real_address = $2;
+>> +	    my $wrong_address = $3;
+>> +
+>> +	    $real_name =~ s/\s+$//;
+>> +	    ($real_name, $real_address) =
+>> +		parse_email("$real_name <$real_address>");
+>> +	    $ignoredmailmap->{$real_address} = 1;
+>> +	}
+>> +    }
+>> +    close($ignoredmailmap_file);
+>> +}
+>> +
+>>  ## use the filenames on the command line or find the filenames in the patchfiles
+>>  
+>>  my @files = ();
+>> @@ -1074,6 +1120,10 @@ sub push_email_address {
+>>      if ($address eq "") {
+>>  	return 0;
+>>      }
+>> +    if (exists $ignoredmailmap->{$address}) {
+>> +        #warn("Ignoring address: '" . $address . "'\n");
+>> +        return 0;
+>> +    }
+>>  
+>>      if (!$email_remove_duplicates) {
+>>  	push(@email_to, [format_email($name, $address, $email_usename), $role]);
+>>
+> 
+> 
 
