@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1AEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B62CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:50:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACB1F20781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E4D120781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:50:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+vg65ag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB1F20781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxbYef/k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4D120781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqQut-0000Lp-VN
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 20:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38618)
+	id 1jqQwu-0001PN-P1
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 20:50:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqQu5-00088A-W6; Tue, 30 Jun 2020 20:47:10 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35118)
+ id 1jqQvf-0000qP-BP; Tue, 30 Jun 2020 20:48:47 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:40064)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqQu3-0008Ki-VR; Tue, 30 Jun 2020 20:47:09 -0400
-Received: by mail-io1-xd44.google.com with SMTP id v8so23046570iox.2;
- Tue, 30 Jun 2020 17:47:07 -0700 (PDT)
+ id 1jqQvd-0000Ae-E2; Tue, 30 Jun 2020 20:48:47 -0400
+Received: by mail-il1-x144.google.com with SMTP id e18so8850232ilr.7;
+ Tue, 30 Jun 2020 17:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=w79Sev6iTPoIOV0GqrC3mMTBsITLTWDWM1QrF03kCnU=;
- b=V+vg65agCcRBWOEnLhaWpod5rTq5zfGGQK2FKF/YKTAThl2UVFnmT819lGBcGvJQzv
- EuwlKrCZJsDqeR2L6MBrg+oSVN+A/+D0qtaIcYsUDrn+aGltpUA+nYj2QSRxVWMrkbXv
- 8PuC6bVbo/Gunu0Gi50fWmWVl/LnBMnsVOjVBh+lnWy7CTNk4RaWQZu2m9cqX3J7cUl7
- RV63uF3erSIC8wk2O/53h63G9Gprau5E3kW6HGMv8wQ8/k9OxkU0Mqdx5d7PlDx2jyfH
- ikP6WFODeu52ewSmfl1nkn7UfN4jyY1gYTslVZHgBTLmRWykMMZ3Jwda2f3sY+1835/K
- DliQ==
+ :cc; bh=7CtOIRE6zq79/FIIwJKTayfmxdvbxzV7oSi57qtRis8=;
+ b=VxbYef/kJ2tJ5t14pImF0Geizlro4tBgORk0W5Nh0Xz0WglCvaYEnDAO92h+7GsFho
+ TuI6zXcE7gtBL6Xe4QPoNqyDJx3m+7nS0mYlmkCm0dqGje6pqnLxdwbEYG3zdV0id3/i
+ Gr06dqQ5Roau0ct++kSDZL8l7JchFDeZ+FXYW+aN9Z0EHMkoueVvoLDOr8hXJBVwwXHK
+ 2Zfkeg+cLzKXsWgWGThWMykIZ1kGmSqJNNxYPcfIKvSZm1AkdazrUeTsF9eIBl9o060/
+ GpX2wDGRQrYRW07zTdru8ZNUjlgHHAPOknBOv0cpG2WDPfYuL7LnI/zBi9dDqvzqvI9W
+ pZEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=w79Sev6iTPoIOV0GqrC3mMTBsITLTWDWM1QrF03kCnU=;
- b=r3CGfJkPqdoYxYq3Efw4tS3iovdGt6WwyIxrvDO58ZtmFQjcB/t6ScxuxVD3iFm37i
- KEvXFMN38UVYLjyigEI89KCN5IbnnQSXlXrZKctwXmu254I5l/S1kGn8Z46tFA/etESF
- 7frP3FYiuGWfxnRb7x1wEsO11aO3FonLaWC0VVHUqVuW2RAI80PDNbqUfAqT9JrB3kLR
- sl9cjLMrSE3B8jTIIhY7Fzm57ojTQmnCHGpJ+u9PpZ2I2RysDdP2nAb46FBgkXOG8Q4b
- 2Oo+SsGLeh8QHqu3vF35Py9be23NHDiGMckdoKxekMFdiOaEYWVLR43cfXcDceIgAD9M
- 3s5Q==
-X-Gm-Message-State: AOAM532qdwjyLWb0R9MfsSSXL8YVIijTUvw0Gj/+3+zgYkparTMQ+19H
- Tsxbwg7y4ZJMKuoIb6mBD1JEA2Ef0vkgwZiLNYQ=
-X-Google-Smtp-Source: ABdhPJwXEOLug44p16yyNisJE3jOTnaosXcrdJ/JOk/VzG5wZgtM7J/GHsSpuw+Qmg3/chxYZlVGGr+QdlpwUNs4MFM=
-X-Received: by 2002:a02:5b83:: with SMTP id g125mr25886800jab.91.1593564426509; 
- Tue, 30 Jun 2020 17:47:06 -0700 (PDT)
+ bh=7CtOIRE6zq79/FIIwJKTayfmxdvbxzV7oSi57qtRis8=;
+ b=UNQ+5kzxJ4my/qiqlUwgmxQFuSVUu82HpXQw8T7AWYGKv+bIq/PjemUBuguWc1vbEt
+ z13y4y59mePi6WFjR6ARTKyCj+uE8nWqsU2C9GO791uxsJufT0455pZZJ4dzPgkk2UYJ
+ MmDqwxFt+XJzxmWVjdzAV8du5nklSplWxa4RILGxrLm7useK6LSqVc9u52oK2hiVeejk
+ hdj0Hf6q2I11GpO/mAVRMrp+hD6HiPAyx5bxwVp5IkJQdz0s9p7Qub50Sr8Pb0mc6PEU
+ 6aQAciSkIk5MxjE6S8c0SCTz2ByTU59cwqZvTsi43mAPjsMQwiz7dFzckZGOCeTqjBP0
+ uTPw==
+X-Gm-Message-State: AOAM532qD1+9o2s8510kU/fwRi2mFQMt8TVPeKbaKyjwuSwtcjRTfJ/m
+ EMfdKVa3j/zu5go0a0HFGRg/LEbPaasPNSvXnAkPVvVg
+X-Google-Smtp-Source: ABdhPJxEcYGuJOIjh/Nf+RqkGP2NH4olxSLc4AduH1gBN9WFwqlyUhwwy9KzzfP1gp9BpvkCy8YrAf1vbiaPm7b/+70=
+X-Received: by 2002:a92:5f12:: with SMTP id t18mr5480177ilb.267.1593564523750; 
+ Tue, 30 Jun 2020 17:48:43 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200628142429.17111-1-peter.maydell@linaro.org>
- <20200628142429.17111-11-peter.maydell@linaro.org>
-In-Reply-To: <20200628142429.17111-11-peter.maydell@linaro.org>
+ <20200628142429.17111-14-peter.maydell@linaro.org>
+In-Reply-To: <20200628142429.17111-14-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jun 2020 17:37:22 -0700
-Message-ID: <CAKmqyKO5DiM=cNU8Y5kYuCVG4MhDwHS_2c=wuSTCnNExGCQfxA@mail.gmail.com>
-Subject: Re: [PATCH 10/17] hw/misc/max111x: Use GPIO lines rather than
- max111x_set_input()
+Date: Tue, 30 Jun 2020 17:38:59 -0700
+Message-ID: <CAKmqyKMuG31E4ij_w=3U55N_0EsH=deDBEsqtaLxKFx=BNEe-g@mail.gmail.com>
+Subject: Re: [PATCH 13/17] hw/gpio/zaurus.c: Use LOG_GUEST_ERROR for bad guest
+ register accesses
 To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -103,18 +103,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 7:28 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+On Sun, Jun 28, 2020 at 7:35 AM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> The max111x ADC device model allows other code to set the level on
-> the 8 ADC inputs using the max111x_set_input() function.  Replace
-> this with generic qdev GPIO inputs, which also allow inputs to be set
-> to arbitrary values.
+> Instead of logging guest accesses to invalid register offsets in this
+> device using zaurus_printf() (which just prints to stderr), use the
+> usual qemu_log_mask(LOG_GUEST_ERROR,...).
 >
-> Using GPIO lines will make it easier for board code to wire things
-> up, so that if device A wants to set the ADC input it doesn't need to
-> have a direct pointer to the max111x but can just set that value on
-> its output GPIO, which is then wired up by the board to the
-> appropriate max111x input.
+> Since this was the only use of the zaurus_printf() macro outside
+> spitz.c, we can move the definition of that macro from sharpsl.h
+> to spitz.c.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
@@ -123,86 +120,76 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  include/hw/ssi/ssi.h |  3 ---
->  hw/arm/spitz.c       |  9 +++++----
->  hw/misc/max111x.c    | 16 +++++++++-------
->  3 files changed, 14 insertions(+), 14 deletions(-)
+>  include/hw/arm/sharpsl.h |  3 ---
+>  hw/arm/spitz.c           |  3 +++
+>  hw/gpio/zaurus.c         | 12 +++++++-----
+>  3 files changed, 10 insertions(+), 8 deletions(-)
 >
-> diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
-> index 4be5325e654..5fd411f2e4e 100644
-> --- a/include/hw/ssi/ssi.h
-> +++ b/include/hw/ssi/ssi.h
-> @@ -111,7 +111,4 @@ SSIBus *ssi_create_bus(DeviceState *parent, const char *name);
+> diff --git a/include/hw/arm/sharpsl.h b/include/hw/arm/sharpsl.h
+> index 89e168fbff3..e986b28c527 100644
+> --- a/include/hw/arm/sharpsl.h
+> +++ b/include/hw/arm/sharpsl.h
+> @@ -9,9 +9,6 @@
 >
->  uint32_t ssi_transfer(SSIBus *bus, uint32_t val);
+>  #include "exec/hwaddr.h"
 >
-> -/* max111x.c */
-> -void max111x_set_input(DeviceState *dev, int line, uint8_t value);
+> -#define zaurus_printf(format, ...)     \
+> -    fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
 > -
->  #endif
+>  /* zaurus.c */
+>
+>  #define SL_PXA_PARAM_BASE      0xa0000a00
 > diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-> index 93a25edcb5b..fa592aad6d6 100644
+> index bab9968ccee..6eb46869157 100644
 > --- a/hw/arm/spitz.c
 > +++ b/hw/arm/spitz.c
-> @@ -696,13 +696,14 @@ static void corgi_ssp_gpio_cs(void *opaque, int line, int level)
+> @@ -62,6 +62,9 @@ typedef struct {
+>  #define SPITZ_MACHINE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(SpitzMachineClass, klass, TYPE_SPITZ_MACHINE)
 >
->  static void spitz_adc_temp_on(void *opaque, int line, int level)
->  {
-> +    int batt_temp;
+> +#define zaurus_printf(format, ...)                              \
+> +    fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
 > +
->      if (!max1111)
->          return;
+>  #undef REG_FMT
+>  #define REG_FMT                         "0x%02lx"
 >
-> -    if (level)
-> -        max111x_set_input(max1111, MAX1111_BATT_TEMP, SPITZ_BATTERY_TEMP);
-> -    else
-> -        max111x_set_input(max1111, MAX1111_BATT_TEMP, 0);
-> +    batt_temp = level ? SPITZ_BATTERY_TEMP : 0;
-> +
-> +    qemu_set_irq(qdev_get_gpio_in(max1111, MAX1111_BATT_TEMP), batt_temp);
->  }
->
->  static void corgi_ssp_realize(SSISlave *d, Error **errp)
-> diff --git a/hw/misc/max111x.c b/hw/misc/max111x.c
-> index abddfa3c660..3a5cb838445 100644
-> --- a/hw/misc/max111x.c
-> +++ b/hw/misc/max111x.c
-> @@ -131,12 +131,21 @@ static const VMStateDescription vmstate_max111x = {
->      }
->  };
->
-> +static void max111x_input_set(void *opaque, int line, int value)
-> +{
-> +    MAX111xState *s = MAX_111X(opaque);
-> +
-> +    assert(line >= 0 && line < s->inputs);
-> +    s->input[line] = value;
-> +}
-> +
->  static int max111x_init(SSISlave *d, int inputs)
->  {
->      DeviceState *dev = DEVICE(d);
->      MAX111xState *s = MAX_111X(dev);
->
->      qdev_init_gpio_out(dev, &s->interrupt, 1);
-> +    qdev_init_gpio_in(dev, max111x_input_set, inputs);
->
->      s->inputs = inputs;
->
-> @@ -153,13 +162,6 @@ static void max1111_realize(SSISlave *dev, Error **errp)
->      max111x_init(dev, 4);
->  }
->
-> -void max111x_set_input(DeviceState *dev, int line, uint8_t value)
-> -{
-> -    MAX111xState *s = MAX_111X(dev);
-> -    assert(line >= 0 && line < s->inputs);
-> -    s->input[line] = value;
-> -}
+> diff --git a/hw/gpio/zaurus.c b/hw/gpio/zaurus.c
+> index 9a12c683420..258e9264930 100644
+> --- a/hw/gpio/zaurus.c
+> +++ b/hw/gpio/zaurus.c
+> @@ -22,9 +22,7 @@
+>  #include "hw/sysbus.h"
+>  #include "migration/vmstate.h"
+>  #include "qemu/module.h"
 > -
->  static void max111x_reset(DeviceState *dev)
->  {
->      MAX111xState *s = MAX_111X(dev);
+> -#undef REG_FMT
+> -#define REG_FMT                        "0x%02lx"
+> +#include "qemu/log.h"
+>
+>  /* SCOOP devices */
+>
+> @@ -104,7 +102,9 @@ static uint64_t scoop_read(void *opaque, hwaddr addr,
+>      case SCOOP_GPRR:
+>          return s->gpio_level;
+>      default:
+> -        zaurus_printf("Bad register offset " REG_FMT "\n", (unsigned long)addr);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "scoop_read: bad register offset 0x%02" HWADDR_PRIx "\n",
+> +                      addr);
+>      }
+>
+>      return 0;
+> @@ -150,7 +150,9 @@ static void scoop_write(void *opaque, hwaddr addr,
+>          scoop_gpio_handler_update(s);
+>          break;
+>      default:
+> -        zaurus_printf("Bad register offset " REG_FMT "\n", (unsigned long)addr);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "scoop_write: bad register offset 0x%02" HWADDR_PRIx "\n",
+> +                      addr);
+>      }
+>  }
+>
 > --
 > 2.20.1
 >
