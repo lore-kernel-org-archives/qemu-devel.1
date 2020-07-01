@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF5FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D67C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 491E020702
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13A49206CB
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:56:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pLzwI8k8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491E020702
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rHf9Nz/Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A49206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqaPd-0006Gp-Ds
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:56:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44760)
+	id 1jqaQ0-0006uT-Ap
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaND-0002Dl-GA; Wed, 01 Jul 2020 06:53:51 -0400
+ id 1jqaNA-00025i-Sn; Wed, 01 Jul 2020 06:53:48 -0400
 Received: from mail-eopbgr10133.outbound.protection.outlook.com
  ([40.107.1.133]:2638 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaNB-0002JK-Gi; Wed, 01 Jul 2020 06:53:51 -0400
+ id 1jqaN9-0002JK-2u; Wed, 01 Jul 2020 06:53:48 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KA2OcxUNuP75Ph1f8nBss5xTTadNzfiAqk40qEVapYVAQMNYOjMROiPZpepErICMc3YvLe98m/M+0GLL5b+TidpKYyz3wMhdowNUFb0NUUKhsuqVejXsvhMHYY7yehTRUdT3/pwH5S76ttERcTEU3XCBrPyItEz+WVQ2kiyFeijNBmPUdME8aWFrV7jxAI59KbqjU94jhDRMKq3h355b46Zg0ZsFzO/a6CYR/lccvx0pQcVCmYjdHMKSxP66jd7Td1X2tty6RiqYriaSh+1ht5ihFZBiLpt/rltSEtJn2j5OUN9/7IYGvtQRKsub/KPEPiVuG2T3LI/N/Sl49JNLNw==
+ b=E4eaGCT5DmjN0yezzXruzmFlEr8Hk/H9ojE43T/BQ+jLMJ6STFdtQto6a2gRdzgOygg0WRfFzJS+lbtjFaPDQ63baZ95DGqQXtOY/gpbpvBA3gSu/UCwS1p4d3gC2jeJIheVzlaiVYylNNqr560WJv8eO/AnolgqKE61dBZ8l8zhIJT7WAMMnZtaK4Sadq+qGsf/QJU8+NoQMLv2Dn6cWNplgVEpUufE9Mcjl/wnrS9vH8Z7HU09bvMv0ccZ7ZpvDCJiTAdVC2JinaT3UZD+a9b+OVMXRVvMEez5hXw6SImnyDLlCOZjFg7iWu4KIVfBpkrG1yYjG0Sm+w9Ked7wQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=INV8Y637qC2GJVOVxdRU5pSc9L2uP2EMdzF41dyXMa8=;
- b=STWtP+YxzWEb5c21t2+pGJMirzXyXmOxIw7720zfJ7wF7IXix3lMbXfk4jcq2pzIdLRZaL0inTM6T1D7JWI08QBRHLsRS/iTFGL6acNpBWct74EPwoPJ/lh8xf1ylt6HY1/p9oa2bBVarikp/7zPCQJngJGdmOolHKfKWJ0zVjylJ33F13r7UgEo6KtQkokxnl/h4LDb5IPtiHkBaR4IZIWtk2Sr/x6wcNu7BcB4dGb45ZXR4uhhTMtOM9aQTG4yCQM8f3xp3hqfTWAxp8QmjR1ulieI/Ly7xMIUl+y7BI8rPX8je+TsWjTFGKW3pcVLqSlQrMH0913ZxpnjAqaqug==
+ bh=iTil3AQGxHhzTY22bEOMgdhz3baVKtAIRIum9+ZopiI=;
+ b=EKpOUk3VCSVwz/ywIHSomedtyKn1FVe4qqO6WfRh+PxU7jzg6XlOtkehjKfSyWhARgckwr8BwEx3GUIO0ztUaGuPwh6iWYqzuGXhI8pGwBz+jkiTcogcNy9fXXfmtiSRrxjxSErU625x+Yt4YhwHRyuzQejYAzvlcVk4utgyBgYI1E4PRHicULFWiEkHitUN7TDPaOk22T7Zbw3MNRwh/ncmJSpPcZjpoLabUIn2QlfVpb5sQJ7GoOpRSUg1rtXlcgKH30xu3Ic9wamsVx8cqsfB5ltg+hy1WcjGEKW3GJ12se93N67cJVWz575575tQE6ZuCNn1xmcmwrifsr1B+Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=INV8Y637qC2GJVOVxdRU5pSc9L2uP2EMdzF41dyXMa8=;
- b=pLzwI8k8v9CYD6Kl9hIXBWEzlhi2QM20BPvuGf9cOHBfIs7A+grk3QhKOFc5c5kpeJNeqdIPk+Nj6DQQMzXwziW0A/1/NQe0OYvVcaA5A5iOo9MJcqVsF4Fig//IBCNKpQj0inD+rfKJwYgLmdGU6M4MlBZWQdUMiXZ6env9Fb0=
+ bh=iTil3AQGxHhzTY22bEOMgdhz3baVKtAIRIum9+ZopiI=;
+ b=rHf9Nz/YyVQDzll3K7iKp4qkmfgR/lwJYX3UX8k89xU0d/ddaM0x0aRDBVFBvrtUlAn8xlaQqLsq3vL9oGd9YkeMndEE5o466eji3kpQBrz7P9HmtlBcD/dfELKMf3D7Phl6jFXF/JYXgIGOGnYGhRnk0IkRJcej+cLaXOGVxdM=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB4850.eurprd08.prod.outlook.com (2603:10a6:20b:d2::12)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.26; Wed, 1 Jul
- 2020 10:53:42 +0000
+ 2020 10:53:40 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Wed, 1 Jul 2020
- 10:53:42 +0000
+ 10:53:40 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 5/5] iotests: test shutdown when bitmap is exported through
- NBD
-Date: Wed,  1 Jul 2020 13:53:31 +0300
-Message-Id: <20200701105331.121670-6-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 3/5] nbd: make nbd_export_close_all() synchronous
+Date: Wed,  1 Jul 2020 13:53:29 +0300
+Message-Id: <20200701105331.121670-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20200701105331.121670-1-vsementsov@virtuozzo.com>
 References: <20200701105331.121670-1-vsementsov@virtuozzo.com>
@@ -77,34 +76,34 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.28) by
  AM0P190CA0004.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.20 via Frontend Transport; Wed, 1 Jul 2020 10:53:41 +0000
+ 15.20.3153.20 via Frontend Transport; Wed, 1 Jul 2020 10:53:39 +0000
 X-Mailer: git-send-email 2.18.0
 X-Originating-IP: [185.215.60.28]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bcf01570-f800-408f-cc7f-08d81dad04d7
+X-MS-Office365-Filtering-Correlation-Id: 5895c814-13c0-4f8e-ce14-08d81dad03de
 X-MS-TrafficTypeDiagnostic: AM6PR08MB4850:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB48501FE4E084E9B648523819C16C0@AM6PR08MB4850.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4850839EC8483113CB07F51DC16C0@AM6PR08MB4850.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
 X-Forefront-PRVS: 04519BA941
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: J71mtDPx81/WNwZjQOqEZrd2xXXKSEa+evYwDLUneIiDUvGhHk3I8xKBAayekDwCztcBh3Y5wZCepWnkoT4SZuFbmDlle7w4k4dC0D4VmsPzWtlIIk3vg0Ju78rE52IaacQiiSbikCFEwBaBb11v1sslD+Odlo75K11OIFbL1+3GeWlcrpYPBy5/GgMw2rdiUUYGMFEPTXvMPnji26XLEvwfeYLV7tWwa3DorAd+1j4ne7oGJEJ2b7FhRZRGrEjZ04UI/PT7B9uoNnWRTTL955M03woL9joXuFxjwLmXoq+bSxRAfMVSslkKnx3cgD+LnzK+ntUGWTGurTsLkKs0sLM8BIVUkyIFs7cE7AGTnqjSyJwfNejm78lkUXhnyeQM+grqt6KyUm6JBY9KerkYUOZ16khjPTAbf1G2i2jSqBKoYMVPCVkNt0aFIun6yfvqW2dXR56gY+7yZUAlCxl4vHBZS5jrRouJqDpyKmJa9V0=
+X-Microsoft-Antispam-Message-Info: eHUY3jhihVBZEK7EFZvL55Lx+7mmzCTiZOXjn2jXoBfj2jL3gy+m08Y/Uu1xSE7SMt5Su4LBio+dxdbseYggDADdALkUoiGJhybqJ13skFfX2SJ9AcS34ayU2J2nmVNpiO5gc7VcnVy1mmQNCf2MEIZEYJ3Hh/YSt8fgLPZr5yQSR0qvH/iA+gyTVd3ytpjOsba9XhK/SxpiVLiPt4wEI7nXf+rKTbX7/AaekF+4iUpCFwM19k9kZRvc9GpzRWq8GcLL3liYsA52wUwmpLS2fMmSBOuBf8gV2ASHR7bL9252q+fypagsvfV4vB1nzhe7d3ljHMa1BBEjXY9Hm/9MOg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(366004)(39840400004)(376002)(346002)(396003)(2906002)(83380400001)(956004)(316002)(2616005)(6512007)(6916009)(107886003)(6666004)(66946007)(66556008)(4326008)(5660300002)(66476007)(86362001)(1076003)(478600001)(186003)(6506007)(36756003)(52116002)(8936002)(26005)(16526019)(6486002)(8676002)(2004002)(21314003);
+ SFS:(4636009)(136003)(366004)(39840400004)(376002)(346002)(396003)(2906002)(83380400001)(956004)(316002)(2616005)(6512007)(6916009)(107886003)(6666004)(66946007)(66556008)(4326008)(5660300002)(66476007)(86362001)(1076003)(478600001)(186003)(6506007)(36756003)(52116002)(8936002)(26005)(16526019)(6486002)(8676002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: iTaEELjJHYESdJnqjZWjHRCh15pCjy/4s6n4xrc1I51zxX3SnW5fcKDwAr0xNjWDo4iH2CUPF7dxGVDjlxJXHdLpG9FJa8LWFokpPvjxZi2Swg9S3F5m+JZyKTwQ6VixS4I/Xj/ORB/QLCyE7EkB/ALYRIVARpRcthUQOwT395Z9WZX/WXLVMdTwjYMmM53a8B5g/q9yK9fevcFmrVcSfgK+sq17GptqdAr/8YRNnbLpKLBvN4FYtaeXvpscF+aJUrDatCdHSUbeQYaeEJpDG9ElIqnnpGuL/aiWgHV55egf638cEtSb5D4h7shVoWd0hHBdEfAVGN5JPsTWDLXG5wHB28Hu1gTxGK93IbuXjJodIrBiQR+LgkmWPS2UW+IiXmZWuX9Ibtw5RrUlwu9S8T7XHy7jheisN+kg/P38Nv9QE1zGldUr9tlPZOTkkwjT1dBnFqqhHigMmPZSrXqqGAze8hH3fbF+PA3ng/zu0z4=
+X-MS-Exchange-AntiSpam-MessageData: 1+sCkSpx0DpXWajS685Tx+V5T3jqMimluTH+tOqEYEuG5GUjmifJljl7UMZRSSmZCmLNFAr0VrtIyuByX446KCnkZPQgeJ8KQCrF29znTrkteARHf2WjhVqGAlIhM6MInnUn8Edj44q+oK1rx9Y6t0Pycro3N0VQxaGGQM3OhOvfVo5u2+FEahoKszHI12dST/2QH4ZwmBdqdQtPq0bUey75oh8M+WgddnBKrBrf5CBkixBkRLiFg3YYv4x6YZWw/yBuK6P1n3R0zT52zZYTwJj60Sn1cCkvG3xhrVstSyGOtDcelLgks8thN3zpLSad3OchvSoCXvZR0HPpnL1eeexEVxP7i/1FmnUb8xGTaV6MFBau2BgJyn/lL/V9m1Sw/iutebnduOQl8IUSK3Kt5a5USoryqOmMaZ6cSvXb9bZ4QfRR7OUSRIOvg5vcwUFEDT8UBUaxp2KtB0NA4V5WokBKCzdC9KwHy/514EU1aX8=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcf01570-f800-408f-cc7f-08d81dad04d7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5895c814-13c0-4f8e-ce14-08d81dad03de
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 10:53:42.2586 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 10:53:40.6377 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fz/anZ1oi/N9bLVzanavgwF5dlwFEUVpctMonnfTqysRzzl4B42MIMX9NFbagOBVg+yafmFS6t3TSmdhVUWMVgDJqRLRMW48QriwUOYqO4w=
+X-MS-Exchange-CrossTenant-UserPrincipalName: JNUhP1KOOpwk/0H0g556y5qyqwmU5UTlBkk22e3N5bFjoJnP5N23fWlffRiounOxk5tI67XgzvEIAeti7HUg4mqLuSOLzF1pdTylntf8TpU=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4850
 Received-SPF: pass client-ip=40.107.1.133;
  envelope-from=vsementsov@virtuozzo.com;
@@ -137,114 +136,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test shutdown when bitmap is exported through NBD and active client
-exists. The previous patch fixes a crash, provoked by this scenario.
+Consider nbd_export_close_all(). The call-stack looks like this:
+ nbd_export_close_all() -> nbd_export_close -> call client_close() for
+each client.
+
+client_close() doesn't guarantee that client is closed: nbd_trip()
+keeps reference to it. So, nbd_export_close_all() just reduce
+reference counter on export and removes it from the list, but doesn't
+guarantee that nbd_trip() finished neither export actually removed.
+
+Let's wait for all exports actually removed.
+
+Without this fix, the following crash is possible:
+
+- export bitmap through internal Qemu NBD server
+- connect a client
+- shutdown Qemu
+
+On shutdown nbd_export_close_all is called, but it actually don't wait
+for nbd_trip() to finish and to release its references. So, export is
+not release, and exported bitmap remains busy, and on try to remove the
+bitmap (which is part of bdrv_close()) the assertion fails:
+
+bdrv_release_dirty_bitmap_locked: Assertion `!bdrv_dirty_bitmap_busy(bitmap)' failed
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/299     | 65 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/299.out | 10 ++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 76 insertions(+)
- create mode 100644 tests/qemu-iotests/299
- create mode 100644 tests/qemu-iotests/299.out
 
-diff --git a/tests/qemu-iotests/299 b/tests/qemu-iotests/299
-new file mode 100644
-index 0000000000..e129c7f7cb
---- /dev/null
-+++ b/tests/qemu-iotests/299
-@@ -0,0 +1,65 @@
-+#!/usr/bin/env python3
-+#
-+# Test shutdown when bitmap is exported through NBD server
-+#
-+# Copyright (c) 2020 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+v2: rewritten, try to wait exports directly.
+
+Note: I'm not sure in my understanding of AIO_WAIT_WHILE and related things
+and really hope for review.
+
+
+ nbd/server.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 20754e9ebc..9d64b00f4b 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -102,6 +102,8 @@ struct NBDExport {
+ };
+ 
+ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
++static QTAILQ_HEAD(, NBDExport) closed_exports =
++        QTAILQ_HEAD_INITIALIZER(closed_exports);
+ 
+ /* NBDExportMetaContexts represents a list of contexts to be exported,
+  * as selected by NBD_OPT_SET_META_CONTEXT. Also used for
+@@ -1655,6 +1657,7 @@ void nbd_export_close(NBDExport *exp)
+         g_free(exp->name);
+         exp->name = NULL;
+         QTAILQ_REMOVE(&exports, exp, next);
++        QTAILQ_INSERT_TAIL(&closed_exports, exp, next);
+     }
+     g_free(exp->description);
+     exp->description = NULL;
+@@ -1717,7 +1720,9 @@ void nbd_export_put(NBDExport *exp)
+             g_free(exp->export_bitmap_context);
+         }
+ 
++        QTAILQ_REMOVE(&closed_exports, exp, next);
+         g_free(exp);
++        aio_wait_kick();
+     }
+ }
+ 
+@@ -1737,6 +1742,9 @@ void nbd_export_close_all(void)
+         nbd_export_close(exp);
+         aio_context_release(aio_context);
+     }
 +
-+import iotests
-+
-+# The test is unrelated to formats, restrict it to qcow2 to avoid extra runs
-+iotests.script_initialize(
-+    supported_fmts=['qcow2'],
-+)
-+
-+nbd_sock = iotests.file_path('nbd.sock', base_dir=iotests.sock_dir)
-+nbd_uri = 'nbd+unix:///disk?socket=' + nbd_sock
-+size = 1024 * 1024
-+
-+vm = iotests.VM()
-+vm.launch()
-+
-+vm.qmp_log('blockdev-add', **{
-+    'node-name': 'disk',
-+    'driver': 'null-co',
-+    'size': 1024 * 1024,
-+})
-+
-+vm.qmp_log('block-dirty-bitmap-add', **{
-+    'node': 'disk',
-+    'name': 'bitmap0'
-+})
-+
-+vm.qmp_log('nbd-server-start', **{
-+    'addr': {
-+        'type': 'unix',
-+        'data': {'path': nbd_sock}
-+    }
-+}, filters=[iotests.filter_qmp_testfiles])
-+
-+vm.qmp_log('nbd-server-add', **{
-+    'device': 'disk',
-+    'writable': True,
-+    'bitmap': 'bitmap0'
-+})
-+
-+p = iotests.QemuIoInteractive('-f', 'raw', nbd_uri)
-+# wait for connection and check it:
-+iotests.log(p.cmd('read 0 512').rstrip(), filters=[iotests.filter_qemu_io])
-+
-+vm.shutdown()
-+
-+p.close()
-diff --git a/tests/qemu-iotests/299.out b/tests/qemu-iotests/299.out
-new file mode 100644
-index 0000000000..bba4252923
---- /dev/null
-+++ b/tests/qemu-iotests/299.out
-@@ -0,0 +1,10 @@
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "disk", "size": 1048576}}
-+{"return": {}}
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "disk"}}
-+{"return": {}}
-+{"execute": "nbd-server-start", "arguments": {"addr": {"data": {"path": "SOCK_DIR/PID-nbd.sock"}, "type": "unix"}}}
-+{"return": {}}
-+{"execute": "nbd-server-add", "arguments": {"bitmap": "bitmap0", "device": "disk", "writable": true}}
-+{"return": {}}
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index d886fa0cb3..250192352c 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -302,3 +302,4 @@
- 291 rw quick
- 292 rw auto quick
- 297 meta
-+299 auto quick
++    AIO_WAIT_WHILE(NULL, !(QTAILQ_EMPTY(&exports) &&
++                           QTAILQ_EMPTY(&closed_exports)));
+ }
+ 
+ static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
 -- 
 2.18.0
 
