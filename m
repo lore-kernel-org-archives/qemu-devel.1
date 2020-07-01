@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C1BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D895C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:46:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E80220781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E80220781
+	by mail.kernel.org (Postfix) with ESMTPS id 78A7D20781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:46:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A7D20781
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqgor-0004rq-FV
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:46:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35638)
+	id 1jqgot-0004vU-N9
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:46:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqgnu-0003rK-UU
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:45:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37618)
+ id 1jqgnw-0003rW-AY
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:45:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqgns-0005mQ-NG
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:45:50 -0400
+ id 1jqgns-0005m1-Gt
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:45:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jqgnp-0001tC-Jr
+ id 1jqgnp-0001si-82
  for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 17:45:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0E1882E8129
- for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 17:45:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5C6972E8114
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 17:45:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Jul 2020 17:37:43 -0000
+Date: Wed, 01 Jul 2020 17:34:11 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878645@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,8 +57,7 @@ References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonic
  <20200701135652.1366-2-alex.bennee@linaro.org>
  <85314d31-813a-8c20-7522-5186d5f31884@redhat.com> <87pn9fqjcd.fsf@linaro.org>
  <838d4d01-cd9e-d74a-5cd2-b23644172c9f@redhat.com> <87k0znqi03.fsf@linaro.org>
- <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
-Message-ID: <bc418946-9d67-6efa-d6c7-dd2d8c5d757c@redhat.com>
+Message-ID: <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
 Subject: [Bug 1878645] Re: [PATCH v4 01/40] hw/isa: check for current_cpu
  before generating IRQ
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -67,7 +66,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a120af195b7e853c78be9e9fcbae3a433a3dc45a
+X-Launchpad-Hash: 77ee9a5f70c103331f99531c9573ff98a41ef3c2
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 10:05:42
@@ -93,89 +92,79 @@ Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200701173743.JJmINFCnkhX5lNBeWopM53zVoot9MGmqPH7vzzA7rZc@z>
+Message-ID: <20200701173411.DEdZSbs5fnacLI1x3lmZGhUXNMpaxQVkOUjZPUmwuYY@z>
 
-On 7/1/20 7:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> +Paolo
-> =
++Paolo
 
-> On 7/1/20 7:09 PM, Alex Benn=C3=A9e wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>> On 7/1/20 6:40 PM, Alex Benn=C3=A9e wrote:
->>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>>>
->>>>> On 7/1/20 3:56 PM, Alex Benn=C3=A9e wrote:
->>>>>> It's possible to trigger this function from qtest/monitor at which
->>>>>> point current_cpu won't point at the right place. Check it and
->>>>>> fall back to first_cpu if it's NULL.
->>>>>>
->>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>>>> Cc: Bug 1878645 <1878645@bugs.launchpad.net>
->>>>>> ---
->>>>>>  hw/isa/lpc_ich9.c | 2 +-
->>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
->>>>>> index cd6e169d47a..791c878eb0b 100644
->>>>>> --- a/hw/isa/lpc_ich9.c
->>>>>> +++ b/hw/isa/lpc_ich9.c
->>>>>> @@ -439,7 +439,7 @@ static void ich9_apm_ctrl_changed(uint32_t val, =
-void *arg)
->>>>>>                  cpu_interrupt(cs, CPU_INTERRUPT_SMI);
->>>>>>              }
->>>>>>          } else {
->>>>>> -            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
->>>>>> +            cpu_interrupt(current_cpu ? current_cpu : first_cpu, CP=
-U_INTERRUPT_SMI);
+On 7/1/20 7:09 PM, Alex Benn=C3=A9e wrote:
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>> On 7/1/20 6:40 PM, Alex Benn=C3=A9e wrote:
+>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>>
+>>>> On 7/1/20 3:56 PM, Alex Benn=C3=A9e wrote:
+>>>>> It's possible to trigger this function from qtest/monitor at which
+>>>>> point current_cpu won't point at the right place. Check it and
+>>>>> fall back to first_cpu if it's NULL.
 >>>>>
->>>>> I'm not sure this change anything, as first_cpu is NULL when using
->>>>> qtest accelerator or none-machine, see 508b4ecc39 ("gdbstub.c: fix
->>>>> GDB connection segfault caused by empty machines").
+>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>> Cc: Bug 1878645 <1878645@bugs.launchpad.net>
+>>>>> ---
+>>>>>  hw/isa/lpc_ich9.c | 2 +-
+>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>>>>> index cd6e169d47a..791c878eb0b 100644
+>>>>> --- a/hw/isa/lpc_ich9.c
+>>>>> +++ b/hw/isa/lpc_ich9.c
+>>>>> @@ -439,7 +439,7 @@ static void ich9_apm_ctrl_changed(uint32_t val, v=
+oid *arg)
+>>>>>                  cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+>>>>>              }
+>>>>>          } else {
+>>>>> -            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
+>>>>> +            cpu_interrupt(current_cpu ? current_cpu : first_cpu, CPU=
+_INTERRUPT_SMI);
 >>>>
->>>> Good point - anyway feel free to ignore - it shouldn't have been in th=
-is
->>>> series. It was just some random experimentation I was doing when looki=
-ng
->>>> at that bug.
+>>>> I'm not sure this change anything, as first_cpu is NULL when using
+>>>> qtest accelerator or none-machine, see 508b4ecc39 ("gdbstub.c: fix
+>>>> GDB connection segfault caused by empty machines").
 >>>
->>> See commit c781a2cc42 ("hw/i386/vmport: Allow QTest use without
->>> crashing") for a similar approach, but here I was thinking about
->>> a more generic fix, not very intrusive:
->>>
->>> -- >8 --
->>> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
->>> index bce266b957..809afeb3e4 100644
->>> --- a/hw/isa/apm.c
->>> +++ b/hw/isa/apm.c
->>> @@ -40,7 +40,7 @@ static void apm_ioport_writeb(void *opaque, hwaddr
->>> addr, uint64_t val,
->>>      if (addr =3D=3D 0) {
->>>          apm->apmc =3D val;
->>>
->>> -        if (apm->callback) {
->>> +        if (apm->callback && !qtest_enabled()) {
->>>              (apm->callback)(val, apm->arg);
->>>          }
+>>> Good point - anyway feel free to ignore - it shouldn't have been in this
+>>> series. It was just some random experimentation I was doing when looking
+>>> at that bug.
 >>
->> But the other failure mode reported on the bug thread was via the
->> monitor - so I'm not sure just checking for qtest catches that.
+>> See commit c781a2cc42 ("hw/i386/vmport: Allow QTest use without
+>> crashing") for a similar approach, but here I was thinking about
+>> a more generic fix, not very intrusive:
+>>
+>> -- >8 --
+>> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
+>> index bce266b957..809afeb3e4 100644
+>> --- a/hw/isa/apm.c
+>> +++ b/hw/isa/apm.c
+>> @@ -40,7 +40,7 @@ static void apm_ioport_writeb(void *opaque, hwaddr
+>> addr, uint64_t val,
+>>      if (addr =3D=3D 0) {
+>>          apm->apmc =3D val;
+>>
+>> -        if (apm->callback) {
+>> +        if (apm->callback && !qtest_enabled()) {
+>>              (apm->callback)(val, apm->arg);
+>>          }
 > =
 
-> Ah indeed.
-> =
+> But the other failure mode reported on the bug thread was via the
+> monitor - so I'm not sure just checking for qtest catches that.
 
-> in exec.c:
-> =
+Ah indeed.
 
-> /* current CPU in the current thread. It is only valid inside
->    cpu_exec() */
-> __thread CPUState *current_cpu;
-> =
+in exec.c:
 
-> Maybe we shouldn't use current_cpu out of exec.c...
+/* current CPU in the current thread. It is only valid inside
+   cpu_exec() */
+__thread CPUState *current_cpu;
 
-I meant, out of cpu_exec(), a cpu thread. Here we access it
-from an I/O thread.
+Maybe we shouldn't use current_cpu out of exec.c...
 
 -- =
 
