@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A121DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87541C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:55:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E3D420775
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21ACF206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:55:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sey34xSB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3D420775
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AdYyR47F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21ACF206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqaOC-0003lC-NF
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:54:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44694)
+	id 1jqaOd-0004dA-BO
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:55:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaN8-0001zR-Bv; Wed, 01 Jul 2020 06:53:46 -0400
-Received: from mail-eopbgr10133.outbound.protection.outlook.com
- ([40.107.1.133]:2638 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ id 1jqaN8-00020c-Ud; Wed, 01 Jul 2020 06:53:46 -0400
+Received: from mail-eopbgr10106.outbound.protection.outlook.com
+ ([40.107.1.106]:9187 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaN6-0002JK-QO; Wed, 01 Jul 2020 06:53:46 -0400
+ id 1jqaN7-0002Jl-B9; Wed, 01 Jul 2020 06:53:46 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n3/Wr5W/xiTs8MxJDLNAseCoSrREsMfpbGd+WApCm+uP6IZAXC+RTBscTW+5zB2eCtrlqPu/AdvJrp2p/cMD2L5+d7Rf99E6R8g/Lx45qRRqFvKYqjQcm1uWRkj6/1gfHHz2w8BwALUnmMCbdip7W0++RId80/1eFviDzA8LPHjUipkLsAHWB0/iyLsgXRXr+537vZAt1AY67j2wp3DX2XVcqOFbmokOks68kaIaVLhwrGUbuCjgCoQufS9dqjdB8wKj8+m1YNVkGYu5Dd1GEgRO0rELdyaC1AiVTIQTcwd9FaAC2H6lk1nj8/KFSaerqxnCKbpbhNco/iZ/tO52kQ==
+ b=a8Bql5/4iQ6r+LWOA4iO0w+ro6MjVAt/kEUhoK/KmL9oONbZ12z3TiBsy2/VoQQr9lQGguDOo2EtUXqWjxZqTXcdXxDUO8OWzLgFhkldkrNjhdq7omQGNk7tTZLGumO2/TsTffl3WrZZNeMrD/3YMfW2CPgBArVIKWJ1FW90EqzQGC30RGAExtEG4Oe4bdwBtXiHZpM9RR2pLRAklqEvCwh57hWcHS5C5B5sIZ/EzFjLjUghKUOSh10RhwmCzn2scDpMICedMEI1dIdSBkMqNiJ6xpquADL3z7tBQGNWMPn1ZCoO6NB/On74uvWphV6rD4uhybkRNkXdXJSuTwij3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CYZsvrdBC7fM5IWsY1MIRuH8ZTl28pVdRfLQ3vO6S+4=;
- b=eoKs8fU+POQDzOzP2GvgBRGI3+G59Xw0mW/0ya1eaAZ4K7nlEaHikQ5foqHK8pN22pijU//SyPmdbiA8uiAk4K84y1eJRldSjr6TfFBJy8+AmRiM2EC1EbfrMxrQHL1tfaPFpJuAMHEb3k/RV/fOs0iyvUAWvsxD/rjXLSX3fKXtZy1r4jIl0oL2DmrFVzi9BX6pQu/YQ8wCDi4o5MtfqP5kIuQrdVBkCS/APtHn5fcNkqEkotngFnfLyeQJQYC/ZK3kUFYw69gCxdoFROXGQP81hy3dcTiLlib9YjcmFM5a7xMzgADRpPV9xHuLWo7oNLDltnSDndhPHWU7m2PwYQ==
+ bh=n6G1dRBHL0pLEdzQ/5RUVCtUO777notCFjPwcfqsYyo=;
+ b=IxTG3qTkeNbC4rT9Fw9hbxEUIX4sV4xUz2ZddPHfDvHMG/KtgabxRvFo6L0usIWrbXwVqezxK6FwKgKKmbvpozkKjPPP1dU1diShLM1bB6y2oTZw5H3BexvvXlC6zRUiFfJwpU+dli6k2ASpmlnupYjxJ0A0dxOobULkgkBKv3ZPwfuETldDwqgEwWdTNtPvI3AfFmG05mxPLuaXSFoQb/fw7aC12IrdGGz0KgCOmBtc7QGhm/MBOeG85+1ypSNAfMQB20sSXwT2vucTJxCYDEpQ2ZURIMTVZIclLqRzktIr4+uLK8yzRs0pxJN6F/FyIurKAUvlJ4uwFd+wyMm8pg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CYZsvrdBC7fM5IWsY1MIRuH8ZTl28pVdRfLQ3vO6S+4=;
- b=sey34xSB0NQovfX3cJhZ11S+bWv+kauoCNEZOBMJPQfgQAuHuiYFbgWklI6FiZEPgqwhsgw6uqP043LbmRHunGJnWRojqC4ZOuByLU+kahzEiPWEMiIZQjxA0jvhTcFOrcgqzPZvEu1seWrVsc5QqWqZui184CLJ11igXgETCaA=
+ bh=n6G1dRBHL0pLEdzQ/5RUVCtUO777notCFjPwcfqsYyo=;
+ b=AdYyR47F2jdozjTXjiumxiYE1kQfzO7xEsI5+OPWxgfrtTPa/+wZFOG3ZiVWUGzFzK2/pYtBL2goEPfGZekdsfksj7Sd+DBckhq+5SBffG9APzgkTmmGGeyAuTw+DKhoXO3sHy5qwBYvI3sBu/nmW+yxBo7WKld2Jx6rx9rozdY=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
@@ -61,9 +61,9 @@ Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  10:53:39 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/5] iotests.py: QemuIoInteractive: print output on failure
-Date: Wed,  1 Jul 2020 13:53:28 +0300
-Message-Id: <20200701105331.121670-3-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 1/5] iotests: QemuIoInteractive: use qemu_io_args_no_fmt
+Date: Wed,  1 Jul 2020 13:53:27 +0300
+Message-Id: <20200701105331.121670-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20200701105331.121670-1-vsementsov@virtuozzo.com>
 References: <20200701105331.121670-1-vsementsov@virtuozzo.com>
@@ -76,39 +76,39 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.28) by
  AM0P190CA0004.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.20 via Frontend Transport; Wed, 1 Jul 2020 10:53:39 +0000
+ 15.20.3153.20 via Frontend Transport; Wed, 1 Jul 2020 10:53:38 +0000
 X-Mailer: git-send-email 2.18.0
 X-Originating-IP: [185.215.60.28]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4be2d367-387c-4877-0dc2-08d81dad0358
+X-MS-Office365-Filtering-Correlation-Id: 0d4e6549-91fb-48f3-a20f-08d81dad02db
 X-MS-TrafficTypeDiagnostic: AM6PR08MB4850:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB48500A6F0680FD9E59F93EF6C16C0@AM6PR08MB4850.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1247;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4850291C4EFE8CF598D20966C16C0@AM6PR08MB4850.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:530;
 X-Forefront-PRVS: 04519BA941
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YfzA3gxuqG7NEwtTDCAdU4gS0u0XIRpMp3neaeEsOE+QQXuoiC6j98Yeso+QW1lcJMArpuQ8juppl/3rmOSgo2wJ6rzCn3cVRO7fknNQQ06L1O2mpzjJLpEWgy5dzr/Ii6Exp5y8ip4/V/47JY6WjtVzLMsBvP+o0G9hIF5ITpcJzuqY3HpM+3mkMWWaxk5gY6r2v+bxfGswUTTfwLe6eOD1FepJNHxt2IGk6qTZ4B4WmsvH8X8MDKG5UTZIC1rw1fSf2B7IUzy4hRw+/8ZcyyJ6asRsLc5VETs5yTEokz/jGhStOnM7Q2lJdnwZfzZythrrupHLa2ivPN5C5AGNqQ==
+X-Microsoft-Antispam-Message-Info: KPz+yvYR7HBBt+GpgHxau4RovWGBoKuU0c35+gGzls4KIkME2pjPZWBB34djGHyghwvBExzOLVeccTLYCN7IIYEMK2biQg1tqnWLenntEbvD/gK4etXkyU9DJbcGmSHy3AuQmEVbeIgXJoUFPTyEz0kOlMFr6fHHQQUxQ5zuKcsldISPd1a7OT5CDZLNRUALxi1GAcFZtUF3KUMzPm5hjy7CH+B8AjYcyIDOuRzK6aG37PWotEGFkByINaYeWBKZL8QiP5zYP2MDzQrSNCjbVPl2H9pfxsRFSE6r7GtvI024k6t7Ck9Y5o069+AoIl7Vy3XLk1hk+JhAdHuLiYLv8w==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
  SFS:(6029001)(4636009)(136003)(366004)(39840400004)(376002)(346002)(396003)(2906002)(83380400001)(956004)(316002)(2616005)(6512007)(6916009)(107886003)(6666004)(66946007)(66556008)(4326008)(5660300002)(66476007)(86362001)(4744005)(1076003)(478600001)(186003)(6506007)(36756003)(52116002)(8936002)(26005)(16526019)(6486002)(8676002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: TCQW1onjwgt9fuLXWm08n9WpFUs+HchjcZ1yiP8VyttGhg6B7v2UXZI0mtvI4gIAQGFBsu8MgNWpvJ8CBsf0nnd0OabYnHKIyIFD/cACo4eKmult4DQ/vGoJ4PJXM8Yymtj6bg3zNwnfOqTI7dQz/r+Gbj3/nAlDKr8ZItk3JxLJB788mwQUZPCbWxBr9gkR7EOdXJR3kIFi8s/adwb+74ALFGzkup/mL6O+oQD19o0XWfmRU3sQDYM55VE2bTuE7AOpy8qaNh7SoZ78jMn/kzPtBG8GjXQ6h5Za9lihvLZ6k73ofjjgjy1FOoKdfPVN10bxLHdGYqLYxJ7iActmgAxkZtumEl48Bztpzc0MLfOtejAyZP4tqrX9j+YKmZHYRv4h1Kz5J730pg/4i/mj5j4RjoNC9xpoWDxM4dqlYyHaJJYOP474RFbmk/XLbE0JtmVUQnBqxQCXVwncMRpADx7jDIFGk3TU2c7qbHTIrnA=
+X-MS-Exchange-AntiSpam-MessageData: hprFzC+PiB3y93Kbx66HoTjI34VF8rSDWXV91NJZu5Ijl2Wq81e0R2o6P8u7bAxVUOJ5tgF7CCF7fA7CeKE+c+1OPwLskSvzU/H/sFEjFmlevOzt5GXELl1rSKZy2fkO0lEa/UxFgGCjv4/QMFmUXO8uncOH13y+HC3IDCRgn4zRUvPK3OJFi6oR09Lzgh7Uh8mx8hotqpjok+7Tped0GD9TwuuAGsxLttQltfm01s2kduAP8RWz99k6saq16aANcrzb/XzBt/2piqp9bOrglLAJ+LFqKP3plqBLz+6WtrXWW4wQc1T/TvqMhESpsJ4yF6Rm8CZhbxR3rjeD/GnxpOjCpTFuiDSlYOrLYTgjvg05LJG8zIQSt1FqggG1YPcsMOcM+ddTCL0aXXorNtvgfRdfGPDYMv2/b1CCMxyXqJ/cf9+y/qchE8xNaZS3btfx40i2x1vZIGbouk26V9EYXol4Wy/3q+AZMzKxdTSLMyI=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4be2d367-387c-4877-0dc2-08d81dad0358
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d4e6549-91fb-48f3-a20f-08d81dad02db
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 10:53:39.7895 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 10:53:38.9292 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N23+KkAoFVxGv+HXbaInK9uxtBXZBNgQoWwE0sMfh5MeT/AOqYSVQJqYyodzQI9fSHVqJG2hTMn3X8W0XNeuweK+NfOPLCMtdf6M+OksgVA=
+X-MS-Exchange-CrossTenant-UserPrincipalName: NWfjh0QoAlFcruazSNwntKxM7IJJFbZ4fAGRIB9C6YCp/3h/YaJPD3YaBszkZygo8nSz+2lUkTORsmwH+KDWnLwnzI/CcjNpRLvxeXH+95o=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4850
-Received-SPF: pass client-ip=40.107.1.133;
+Received-SPF: pass client-ip=40.107.1.106;
  envelope-from=vsementsov@virtuozzo.com;
  helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 06:53:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 06:53:43
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -136,34 +136,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make it simpler to debug when qemu-io fails due to wrong arguments or
-environment.
+The only user (iotest 205) of QemuIoInteractive provides -f argument,
+so it's a bit inefficient to use qemu_io_args, which contains -f too.
+And we are going to add one more test, which wants to specify -f by
+hand. Let's use qemu_io_args_no_fmt.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index efe9958f5e..ac9d199a1e 100644
+index 5ea4c4df8b..efe9958f5e 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -216,7 +216,13 @@ class QemuIoInteractive:
+@@ -211,7 +211,7 @@ def get_virtio_scsi_device():
+ 
+ class QemuIoInteractive:
+     def __init__(self, *args):
+-        self.args = qemu_io_args + list(args)
++        self.args = qemu_io_args_no_fmt + list(args)
+         self._p = subprocess.Popen(self.args, stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT,
-                                    universal_newlines=True)
--        assert self._p.stdout.read(9) == 'qemu-io> '
-+        out = self._p.stdout.read(9)
-+        if out != 'qemu-io> ':
-+            # Most probably qemu-io just failed to start.
-+            # Let's collect the whole output and exit.
-+            out += self._p.stdout.read()
-+            self._p.wait(timeout=1)
-+            raise ValueError(out)
- 
-     def close(self):
-         self._p.communicate('q\n')
 -- 
 2.18.0
 
