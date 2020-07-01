@@ -2,99 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D51DFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97022C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:56:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A40972078A
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:55:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDR1HwTT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40972078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6BF0E20748
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:56:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF0E20748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqg1G-0000yF-Uh
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:55:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51366)
+	id 1jqg1w-0002IS-Nl
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:56:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqg0L-0008TT-Th
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:54:37 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:40555)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqg0K-0005es-2L
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:54:37 -0400
-Received: by mail-ed1-x542.google.com with SMTP id b15so20655969edy.7
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=i48S9WMtcgdjRahYRCye5AvSj/FAyDBQc7Tp8q6azVc=;
- b=fDR1HwTTrXK67in0YmW0UPebgGOPQ3jRCAiyyiak0nceEtpnls7zWLIKjw/Vv6ccca
- Y38NYMG5eHbWbmiwEsYYY4tWLQLObkT1td31SyLXUib3JBqTcSdLp4YreS0lEdyarkS+
- J94xPoqAdPJ99kxL+lKB8RVnwZln63oysDo+CTFS6MIN3j+eg5OTvbI669A0ntXLLRfl
- L/5WxFtEeKz1DKw5Bd9WkfsOGoU3l2sxUYF3N+Lf12pFT+UQVIg2igIMePsX74JMCpX9
- KWE4FKQvRQcn2tnFlXcEtYzcoVJYZ0WmBMg9/SK6EOSb4nqEDDr/gEKE6AEafI1f+Jsk
- LHjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=i48S9WMtcgdjRahYRCye5AvSj/FAyDBQc7Tp8q6azVc=;
- b=La9KQjeRX/9sCxsHEkzZiWrbfkenzJv2sFNaowgtRZMoi8ytLoOKq7l48Qy9oPxgrA
- 4X1M+//HH8vUG+LiAFe3fc15/soZbSAZHoycv6qv6jzbwEIe8+Vo9IXGRtCHYnvAiy92
- SecyA2eydtMpKDiPQIQWc0ct0ggGvWSssq+tfIXtpMP2aN2kJm1vw7RWUvoA/GDOl3nw
- rkHg73BuMGV/BmL2tIv/8PptzuJfd8kS1prrTNFs4ntjpN6EHMJV+CCeRuMw3QYGT+xS
- /Ak2nysOPIHaY0LdGg9d/q3ZOWyMWKf8SLTFC6X5ULs3R5fAX3vrfAciqxDfZChxoOLu
- a4kg==
-X-Gm-Message-State: AOAM533QQKk0ClMM9NAjDn8ElL9NYZMvVSVOqREvIoW6CR0Ww5kl1Acs
- zktQFkqeHWD1GQz2z/nBXxk=
-X-Google-Smtp-Source: ABdhPJzfeRaJ4XHzkz0FMt83wGcy3hq7kOt918h/C8E1Vuxf/O8NoVPgXr6OcgA2L9qWR6mxxyvVwg==
-X-Received: by 2002:a05:6402:f:: with SMTP id d15mr7991969edu.25.1593622474659; 
- Wed, 01 Jul 2020 09:54:34 -0700 (PDT)
-Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id da20sm6467365edb.27.2020.07.01.09.54.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 09:54:33 -0700 (PDT)
-Subject: Re: [PATCH] scripts/get_maintainer: Use .ignoredmailmap to ignore
- invalid emails
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200629172716.20781-1-f4bug@amsat.org>
- <8616bdd8-34a9-f737-aa9d-f11d735cc0fe@redhat.com>
- <caee1217-867e-f2b3-68c6-3b3e87e926a9@amsat.org>
- <70e3b721-4515-352a-1f9a-0638ee19b784@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <94527813-1a04-16d7-4449-f583b356a76e@amsat.org>
-Date: Wed, 1 Jul 2020 18:54:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqg0Z-0000OJ-CQ; Wed, 01 Jul 2020 12:54:51 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqg0W-0005fv-H9; Wed, 01 Jul 2020 12:54:51 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08067109|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_regular_dialog|0.146209-0.000366199-0.853425;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03275; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hvx9HeA_1593622482; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hvx9HeA_1593622482)
+ by smtp.aliyun-inc.com(10.147.41.158);
+ Thu, 02 Jul 2020 00:54:42 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 44/61] target/riscv: narrowing floating-point/integer
+ type-convert instructions
+Date: Wed,  1 Jul 2020 23:25:32 +0800
+Message-Id: <20200701152549.1218-45-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <70e3b721-4515-352a-1f9a-0638ee19b784@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,50 +71,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>,
- Alexander Graf <graf@amazon.com>, Paul Burton <paulburton@kernel.org>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Pavel/Paul/Alexander
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 11 ++++++
+ target/riscv/insn32.decode              |  5 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 48 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 39 ++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
-On 7/1/20 5:12 PM, Paolo Bonzini wrote:
-> On 01/07/20 17:07, Philippe Mathieu-Daudé wrote:
->> $ cat .ignoredmailmap
->> #
->> # From man git-shortlog the forms are:
->> #
->> #  Proper Name <commit@email.xx>
->> #  <proper@email.xx>
->> #
->> Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
->> Caio Carrara <ccarrara@redhat.com>
->> Yongbok Kim <yongbok.kim@mips.com>
->> James Hogan <james.hogan@mips.com>
->> Paul Burton <pburton@wavecomp.com>
->> Alexander Graf <agraf@suse.de>
->> Roy Franz <roy.franz@linaro.org>
->> Dmitry Solodkiy <d.solodkiy@samsung.com>
->> Evgeny Voevodin <e.voevodin@samsung.com>
->> Serge Hallyn <serge.hallyn@ubuntu.com>
->> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>
-> 
-> For at least Paul Burton, Pavel Dovgalyuk and Alex Graf we should just
-> use .mailmap, anyway I think the concept of the patch is okay.
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index c5f1f298f2..5870c4041e 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1028,3 +1028,14 @@ DEF_HELPER_5(vfwcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index eda09f0c15..55fbe166d8 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -526,6 +526,11 @@ vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
+ vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
+ vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
+ vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
++vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
++vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
++vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
++vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
++vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 0fc8947389..6c46d893b0 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2276,3 +2276,51 @@ GEN_OPFV_WIDEN_TRANS(vfwcvt_x_f_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_xu_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_x_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_f_v)
++
++/* Narrowing Floating-Point/Integer Type-Convert Instructions */
++
++/*
++ * If the current SEW does not correspond to a supported IEEE floating-point
++ * type, an illegal instruction exception is raised
++ */
++static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, true) &&
++            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
++                                     2 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++#define GEN_OPFV_NARROW_TRANS(NAME)                                \
++static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
++{                                                                  \
++    if (opfv_narrow_check(s, a)) {                                 \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_3_ptr * const fns[2] = {            \
++            gen_helper_##NAME##_h,                                 \
++            gen_helper_##NAME##_w,                                 \
++        };                                                         \
++        TCGLabel *over = gen_new_label();                          \
++        gen_set_rm(s, 7);                                          \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
++                           s->vlen / 8, data, fns[s->sew - 1]);    \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++
++GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 742080dc7d..05dcf7cd09 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4293,3 +4293,42 @@ RVVCALL(OPFVV1, vfwcvt_f_f_v_h, WOP_UU_H, H4, H2, vfwcvtffv16)
+ RVVCALL(OPFVV1, vfwcvt_f_f_v_w, WOP_UU_W, H8, H4, float32_to_float64)
+ GEN_VEXT_V_ENV(vfwcvt_f_f_v_h, 2, 4, clearl)
+ GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
++
++/* Narrowing Floating-Point/Integer Type-Convert Instructions */
++/* (TD, T2, TX2) */
++#define NOP_UU_H uint16_t, uint32_t, uint32_t
++#define NOP_UU_W uint32_t, uint64_t, uint64_t
++/* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
++RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
++RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
++GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4, clearl)
++
++/* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
++RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
++RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
++GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4, clearl)
++
++/* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
++RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4, clearl)
++
++/* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
++RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4, clearl)
++
++/* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
++static uint16_t vfncvtffv16(uint32_t a, float_status *s)
++{
++    return float32_to_float16(a, true, s);
++}
++
++RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
++RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
+-- 
+2.23.0
 
-Pavel has been using a GMail account, but seems to be back to
-ispras.ru, so it might have be a temporary failure (over few
-days although).
-
-I can send a pair of patches for Paul and Alexander if they
-are OK. The others seem MIA.
-
-> 
-> Paolo
-> 
-> 
 
