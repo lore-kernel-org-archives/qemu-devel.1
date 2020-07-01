@@ -2,93 +2,89 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F21C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E63C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92E3120760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:41:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D88DA20663
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:46:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/hqvt6M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E3120760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWd+H3GG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88DA20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqczo-000146-Ru
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 09:41:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55146)
+	id 1jqd4C-0002Up-34
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 09:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqczE-0000dP-4Q
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:41:16 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45026
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqczC-0003ZN-AN
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:41:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593610872;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VWIEMuaa/6uCppivhJ0ihLS3Q0Xor5YKfbH7JAJdquo=;
- b=S/hqvt6MQw8wWUCBMx2BSEDJt2dMTqpncCPoyd+Pvvt2pl5Q6WZvhILAdIF+Z3AmaKkPN1
- oQIUByxkPIyh95LYDN6/F+CYGA1M2oNehDy4XpDF6wlgRo44NtGMaPAO1htF9g5kwCOMeQ
- a29LzMnhPQe+flCvKXAzd2GTrZInJB8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-49jJOE5lN-uu-nlXF-LVZg-1; Wed, 01 Jul 2020 09:40:55 -0400
-X-MC-Unique: 49jJOE5lN-uu-nlXF-LVZg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D301107ACF7;
- Wed,  1 Jul 2020 13:40:54 +0000 (UTC)
-Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D96F7C1F8;
- Wed,  1 Jul 2020 13:40:53 +0000 (UTC)
-Subject: Re: [PATCH 1/1] scripts/performance: Add dissect.py script
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>, qemu-devel@nongnu.org,
- aleksandar.qemu.devel@gmail.com, alex.bennee@linaro.org, ldoktor@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com, luoyonggang@gmail.com
-References: <20200701130433.1506-1-ahmedkhaledkaraman@gmail.com>
- <20200701130433.1506-2-ahmedkhaledkaraman@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <06a0026e-f7cc-9a15-bc0e-d6c6c4846caf@redhat.com>
-Date: Wed, 1 Jul 2020 08:40:52 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqd3T-0001zJ-ED
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:45:39 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqd3R-0003y2-TC
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:45:39 -0400
+Received: by mail-lf1-x143.google.com with SMTP id y18so13615667lfh.11
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 06:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=if9uY0p3qfRQUqC4wu+FkB1BnF9XMBm0XdamLIpBPnE=;
+ b=PWd+H3GGAaRYP0On5kaMEwToQMvy7qdSTFIzGEzTUFa2lfiPxeyPAgbRZ6Ejh1UGT4
+ a4v+1rkd3xP7tXSeOpn8bYlPzihngA/qYWXWgduxxN4gJyAVBVI0PNbKvB+ufvCs2OtS
+ OvnFmyPwZseSILGRKIOArRwcIY/lMpm8MZqSnFWvSwpe9L9XwRtBMMQJYwFdAa1QX720
+ ORPF6lTg762kY3paZ6NGq+u49yZKs0yb6dB5b2zXnrX2hlrbvzB9NcCRUvvBUhkS+Qn9
+ HssHrqcVmDRQ8ntGYshMF9AZbbmVpUH3P+mq5wFO7VVKVlQeimlWGRskplEU7nU4sZxT
+ GK4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=if9uY0p3qfRQUqC4wu+FkB1BnF9XMBm0XdamLIpBPnE=;
+ b=nOVq6bkNGWSvE29VR0V16ItlHxgWWwZlNrSxXndWU2p+jvFL1hXJPaVI/MNvSol53q
+ CDs2DugGANedQnOch5XJ1eRGTpa6WWzs7FX4GiDTmokR+7WfC57t2P5n4f1Xm0huZOXb
+ qMREbxIu3ejNPMt352MnUHqqVf9LYTxLvgj6IjYJ8P3aoau3dU/yd+Us8NFwQyGlwg5Q
+ OHTDJ4yUta2JHh4Qvs0dLz/HkV6pT45tZGg1l5LrYiyGq+yReqfLgFq5T47lMwzBITcy
+ 4UwsZsgduQLOOLvAU9TvfAk4Hs3WRz4KRWmiBfJ6kuLvw+djVw8EOSfSuM57S1dlFn6K
+ rdCA==
+X-Gm-Message-State: AOAM531qh4G43+eIutUMjXJlJyT/zmsv8RReR/U7hGNytF6bE1Hy09mB
+ UBX/5SjcY59Phy3xXVAUCOhZVbdJvdLCzP2yW14=
+X-Google-Smtp-Source: ABdhPJxnhtW//cSbjRglPzHwYgzLTo16ef3YBB95j12wsAayWHgwWdLGQqnRd/6Ysk6LoCD8REX4dkPM9TDT34t0dZU=
+X-Received: by 2002:a19:f20a:: with SMTP id q10mr15415733lfh.89.1593611133414; 
+ Wed, 01 Jul 2020 06:45:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200701130433.1506-2-ahmedkhaledkaraman@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CALTWKrVAW33jJs1Q+51wN07DDUbAqwo=o+WDCpoT=NFB6dNZ6A@mail.gmail.com>
+ <878sg5svu5.fsf@linaro.org>
+In-Reply-To: <878sg5svu5.fsf@linaro.org>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Wed, 1 Jul 2020 15:44:57 +0200
+Message-ID: <CALTWKrVx+e0oRVrvd27WeXAbAAZHVispG27cRPKwVo3HfNYbkQ@mail.gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#2] Dissecting
+ QEMU Into Three Main Parts
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lf1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,100 +97,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 8:04 AM, Ahmed Karaman wrote:
-> Python script that dissects QEMU execution into three main phases:
-> code generation, JIT execution and helpers execution.
-> 
-> Syntax:
-> dissect.py [-h] -- <qemu executable> [<qemu executable options>] \
->                   <target executable> [<target executable options>]
-> 
-> [-h] - Print the script arguments help message.
-> 
-> Example of usage:
-> dissect.py -- qemu-arm coulomb_double-arm
+On Mon, Jun 29, 2020 at 6:03 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+> Assuming your test case is constant execution (i.e. runs the same each
+> time) you could run in through a plugins build to extract the number of
+> guest instructions, e.g.:
+>
+>   ./aarch64-linux-user/qemu-aarch64 -plugin tests/plugin/libinsn.so -d pl=
+ugin ./tests/tcg/aarch64-linux-user/sha1
+>   SHA1=3D15dd99a1991e0b3826fede3deffc1feba42278e6
+>   insns: 158603512
+>
+> --
+> Alex Benn=C3=A9e
 
-Given the example usage...
+Hi Mr. Alex,
+I've created a plugins build as you've said using "--enable-plugins" option=
+.
+I've searched for "libinsn.so" plugin that you've mentioned in your
+command but it isn't in that path.
 
-> 
-> Example output:
-> Total Instructions:        4,702,865,362
-> 
-> Code Generation:             115,819,309	 2.463%
-> JIT Execution:             1,081,980,528	23.007%
-> Helpers:                   3,505,065,525	74.530%
-> 
-> Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> ---
->   scripts/performance/dissect.py | 165 +++++++++++++++++++++++++++++++++
->   1 file changed, 165 insertions(+)
->   create mode 100644 scripts/performance/dissect.py
-> 
-> diff --git a/scripts/performance/dissect.py b/scripts/performance/dissect.py
-> new file mode 100644
+Are there any other options that I should configure my build with?
+Thanks in advance.
 
-...this should have the executable bit set.
-
-
-> +def get_JIT_line(callgrind_data):
-> +    """
-> +    Search for the first instance of the JIT call in
-> +    the callgrind_annoutate output when ran using --tree=caller
-
-annotate
-
-> +    This is equivalent to the self number of instructions of JIT.
-> +
-> +    Parameters:
-> +    callgrind_data (list): callgrind_annotate output
-> +
-> +    Returns:
-> +    (int): Line number
-> +   """
-> +    line = -1
-> +    for i in range(len(callgrind_data)):
-> +        if callgrind_data[i].strip('\n') and \
-> +                callgrind_data[i].split()[-1] == "[???]":
-> +            line = i
-> +            break
-> +    if line == -1:
-> +        sys.exit("Couldn't locate the JIT call ... Exiting!")
-
-We tend to avoid ! at the end of error messages (it can come across as 
-shouting at the user).
-
-> +    return line
-> +
-> +
-> +def main():
-> +    # Parse the command line arguments
-> +    parser = argparse.ArgumentParser(
-> +        usage='dissect.py [-h] -- '
-> +        '<qemu executable> [<qemu executable options>] '
-> +        '<target executable> [<target executable options>]')
-> +
-> +    parser.add_argument('command', type=str, nargs='+', help=argparse.SUPPRESS)
-> +
-> +    args = parser.parse_args()
-> +
-> +    # Extract the needed variables from the args
-> +    command = args.command
-> +
-> +    # Insure that valgrind is installed
-> +    check_valgrind = subprocess.run(
-> +        ["which", "valgrind"], stdout=subprocess.DEVNULL)
-> +    if check_valgrind.returncode:
-> +        sys.exit("Please install valgrind before running the script!")
-
-and again
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Regards,
+Ahmed Karaman
 
