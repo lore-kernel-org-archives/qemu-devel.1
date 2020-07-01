@@ -2,93 +2,81 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C993C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 539F5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1ADF206BE
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eaesLXJu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1ADF206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FA3D206BE
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:42:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA3D206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqZFM-0004tz-5o
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56356)
+	id 1jqZGB-0005lN-D9
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqZEo-0004Ut-Gs
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:41:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38935
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqZEm-0007pc-42
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:41:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593596462;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4ZRktC2pp2ziUJZ1/ll+bHHqGCnBnsNQoQITIOdWtmU=;
- b=eaesLXJuimI6J2cdJxZx3AMp4LhYxaNmbU+h4VGwQINCVWUaIXC90rMXZbgGrSFZaFs7Y6
- z4cvPHdbnJwzBIruI/60IM8fd+ShAP8oqvV7GoFdYZu89mGYaLiL/c+tlJBMx+tSwAOTlz
- IYDpcksTLDSfzFKuTL7vdX6vYj3mkvU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-7wlO5HFsMAyaJmMimLd5sw-1; Wed, 01 Jul 2020 05:41:01 -0400
-X-MC-Unique: 7wlO5HFsMAyaJmMimLd5sw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28A681902EA7;
- Wed,  1 Jul 2020 09:40:59 +0000 (UTC)
-Received: from localhost (ovpn-113-121.ams2.redhat.com [10.36.113.121])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C529C741A2;
- Wed,  1 Jul 2020 09:40:52 +0000 (UTC)
-Date: Wed, 1 Jul 2020 10:40:51 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH v7 13/21] multi-process: Forward PCI config space acceses
- to the remote process
-Message-ID: <20200701094051.GF126613@stefanha-x1.localdomain>
-References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
- <736d124ffb6c58e8061baba2503981f5e8b3f70b.1593273671.git.elena.ufimtseva@oracle.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqZEt-0004Zn-WD
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:41:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45302)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqZEr-0007qn-T7
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:41:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jqZEo-0007v5-4W
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:41:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 16E302E8123
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 09:41:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <736d124ffb6c58e8061baba2503981f5e8b3f70b.1593273671.git.elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="juZjCTNxrMaZdGZC"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Jul 2020 09:31:43 -0000
+From: santhosh kumar <1885889@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: santhoshht th-huth
+X-Launchpad-Bug-Reporter: santhosh kumar (santhoshht)
+X-Launchpad-Bug-Modifier: santhosh kumar (santhoshht)
+References: <159359515867.16429.1432427219999923792.malonedeb@soybean.canonical.com>
+Message-Id: <159359590320.3046.1389058344844099056.malone@wampee.canonical.com>
+Subject: [Bug 1885889] Re: ERROR: core-image-minimal-1.0-r0 do_rootfs: The
+ postinstall intercept hook 'update_font_cache' failed, 
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 64bfcda43e1a305138f7da49ccf781095894578f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 03:10:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,96 +85,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
- thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Reply-To: Bug 1885889 <1885889@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---juZjCTNxrMaZdGZC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am running this under below ubuntu environment.
+santhosh@santhosh-VirtualBox:~/Denverton/Source/BSP/poky$ uname -a
+Linux santhosh-VirtualBox 4.15.0-108-generic #109-Ubuntu SMP Fri Jun 19 11:=
+33:10 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+santhosh@santhosh-VirtualBox:~/Denverton/Source/BSP/poky$
 
-On Sat, Jun 27, 2020 at 10:09:35AM -0700, elena.ufimtseva@oracle.com wrote:
-> @@ -42,6 +48,12 @@ gboolean mpqemu_process_msg(QIOChannel *ioc, GIOCondit=
-ion cond,
->      case CONNECT_DEV:
->          process_connect_dev_msg(&msg, ioc, &local_err);
->          break;
-> +    case PCI_CONFIG_WRITE:
-> +        process_config_write(ioc, pci_dev, &msg);
-> +        break;
-> +    case PCI_CONFIG_READ:
-> +        process_config_read(ioc, pci_dev, &msg);
-> +        break;
+-- =
 
-pci_dev is NULL when mpqemu_process_msg() is called on the main socket.
-This is an example of how the N:1 model complicates things.  Now
-process_config_read/write() need to check that pci_dev is non-NULL to
-avoid crashing.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885889
 
->      default:
->          error_setg(&local_err, "Unknown command (%d) received from proxy=
- \
->                     in remote process pid=3D%d", msg.cmd, getpid());
-> @@ -89,3 +101,45 @@ exit:
-> =20
->      mpqemu_msg_send(&ret, com);
->  }
-> +
-> +static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
-> +                                 MPQemuMsg *msg)
-> +{
-> +    struct conf_data_msg *conf =3D (struct conf_data_msg *)msg->data2;
-> +    MPQemuMsg ret =3D { 0 };
-> +
-> +    if (conf->addr >=3D PCI_CFG_SPACE_EXP_SIZE) {
+Title:
+  ERROR: core-image-minimal-1.0-r0 do_rootfs: The postinstall intercept
+  hook 'update_font_cache' failed,
 
-This check treats all devices as PCIe devices. Traditional PCI devices
-have a smaller config space and pci_default_write_config() has an
-assertion that fails on out-of-bounds writes:
+Status in QEMU:
+  Invalid
 
-  assert(addr + l <=3D pci_config_size(d));
+Bug description:
+  Hello,
 
-Are you sure all devices are PCIe? If yes, please enforce that in the
-code. If no, then please fix the size check.
+  I am trying to build bitbake core-image-minimal getting following
+  error.
 
-> +struct conf_data_msg {
-> +    uint32_t addr;
-> +    uint32_t val;
-> +    int l;
-> +};
+  santhosh@santhosh-VirtualBox:~/Denverton/Source/BSP/poky/build$ bitbake c=
+ore-image-minimal
+  Loading cache: 100% |####################################################=
+###########################################| Time: 0:00:00
+  Loaded 1370 entries from dependency cache.
+  NOTE: Resolving any missing task queue dependencies
 
-QEMU coding style uses typedefs:
+  Build Configuration:
+  BB_VERSION           =3D "1.44.0"
+  BUILD_SYS            =3D "x86_64-linux"
+  NATIVELSBSTRING      =3D "universal"
+  TARGET_SYS           =3D "x86_64-poky-linux"
+  MACHINE              =3D "ddsmdnv"
+  DISTRO               =3D "poky"
+  DISTRO_VERSION       =3D "3.0.2"
+  TUNE_FEATURES        =3D "m64 corei7"
+  TARGET_FPU           =3D ""
+  meta                 =
 
-  typedef struct {
-      uint32_t addr;
-      uint32_t val;
-      int l;
-  } ConfDataMsg;
+  meta-poky            =
 
---juZjCTNxrMaZdGZC
-Content-Type: application/pgp-signature; name="signature.asc"
+  meta-ddsmdnv         =3D "DDSM_Denverton_PHASE_1_FDJ_Release:471fec241d3a=
+1a4b70ad58135fe229eab2b6a196"
 
------BEGIN PGP SIGNATURE-----
+  Initialising tasks: 100% |###############################################=
+###########################################| Time: 0:00:05
+  Sstate summary: Wanted 413 Found 0 Missed 413 Current 937 (0% match, 69% =
+complete)
+  NOTE: Executing Tasks
+  NOTE: Setscene tasks completed
+  ERROR: core-image-minimal-1.0-r0 do_rootfs: The postinstall intercept hoo=
+k 'update_font_cache' failed, details in /home/santhosh/Denverton/Source/BS=
+P/poky/build/tmp/work/ddsmdnv-poky-linux/core-image-minimal/1.0-r0/temp/log=
+.do_rootfs
+  ERROR: Logfile of failure stored in: /home/santhosh/Denverton/Source/BSP/=
+poky/build/tmp/work/ddsmdnv-poky-linux/core-image-minimal/1.0-r0/temp/log.d=
+o_rootfs.9682
+  ERROR: Task (/home/santhosh/Denverton/Source/BSP/poky/meta-ddsmdnv/recipe=
+s-core/images/core-image-minimal.bb:do_rootfs) failed with exit code '1'
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl78WiMACgkQnKSrs4Gr
-c8jYWgf+NeT1ihCS2FskPLXKSGmQah9K8ViTawP8036kDOEatxVp4d8U25JsQpqT
-PiP3LoSmlSX9QZkyrQh1i4LXcBblofeSlRWa/o2cN8WNZnWgc6f54EGyQI24SchU
-SEM/hvn62OxO2bswhyqSIlmU7PbDO0gN5mPg6bo2KFppCpGxspoOaP2IADJiyzAc
-28IyJ22snSM9HLzkMxx2MWfCGPGewT1CLfBcqaXRkplCTNRLhk+/Gg4SzhLzAXPj
-AK9dGo+IL1KP/ryKGmYGJBh+t/Pw++k/t0umjnSFYmsmtVMG/eKRmT8XOII3la5E
-h94D96cqyNqhZX0slbuh8p2YhFxayQ==
-=HBJB
------END PGP SIGNATURE-----
+  =
 
---juZjCTNxrMaZdGZC--
+  Could you please help me on how to fix this issue.
 
+  Thank you.
+
+  Santhosh
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885889/+subscriptions
 
