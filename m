@@ -2,68 +2,124 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F704C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73570C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:11:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 076AA2067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:07:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 076AA2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 389E92067D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:11:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="T8yb8LOZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 389E92067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqaae-00062D-B8
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 07:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47788)
+	id 1jqaeW-0007yN-HB
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 07:11:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jqaZ6-0003xO-Qf
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:06:08 -0400
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:29827)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jqadq-0007Lb-0P; Wed, 01 Jul 2020 07:11:02 -0400
+Received: from mail-eopbgr30101.outbound.protection.outlook.com
+ ([40.107.3.101]:53890 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1jqaZ4-0004hH-4l
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:06:08 -0400
-Authentication-Results: esa3.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: O9QW0YFfOy/Q8znWGSQyuQdD4h7Q1vNcBI3M2+mjz9GEaC7kFJVVDmpxhYneOT9S47gxJiQleo
- PrCokCKxRoaWButroNqmg9QXKqtyRm2isR7CGli4k57BFDK6r2OYK/eCN3U0B3Xmd2p9RGuBzz
- P3NuV9pqLTiKNzacmENIeijRLdch6KFftsg/vd8hwvH8qRf+QfUk6TKDh9EAef0BKEUinOAVCO
- lgcn2sa6Uq7togA1Y5GT//NNLssbHDu30Rd4Bq4xdQX6RzDHsv9UMs7goO6RZ2OrnB3yE9ovUI
- t0A=
-X-SBRS: 2.7
-X-MesageID: 21375916
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.75,300,1589256000"; d="scan'208";a="21375916"
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] acpi: Fix access to PM1 control and status registers
-Date: Wed, 1 Jul 2020 12:05:49 +0100
-Message-ID: <20200701110549.148522-1-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jqadl-0005IU-MY; Wed, 01 Jul 2020 07:11:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D2ne7nqoTMTn+IexQyr0fMxmRnLgme1Q2tcl6ZZOCJz692GzP0gi+bAFyfXR0KghkDwysIqhui6qIm5wGXiFbosg9AW7BPEPLnZmrMNuAnH+iMKEcS5MkBUdKOv8PL73a8w7Smnft05S83UUmAzHm4UIdMOPXhB65MYzG4F+z+1StPG2LdNxlNXiMuqaFwuG9kKfT8ZJP3HXHioElQEUj4UfNWp0bLWIh5/OH56KRhKvE1s8dLcn0s6EwiRe/aCHfROS3hDUf9Af5wrCRqkH1SOshBKfXPNCdYR9MFRJ/4NvFDyTSlFADmIVYtsbOOdppwJUL5Xjg9Ap1uhCwoGrHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A+V8RzAcsR1noaK4d3PizPfTE6qOMfufO6SJ6K8f2Pk=;
+ b=c+6EKUHgOs0DQ9kb1ctlLohymH8ulXEs+lAFkodYEPCUJO9vrsI3Z9RZPjWff3TSI1CUwtPvXVgDH5TXh1Xp63lN/RB+/AKt6gdCVpwQEayKYA4PEw1dHMgTY1L222zzjA6L1xGwt6BfJrXd50C4kacBztVE02E9T76hJTGBDrAl52NPi4k5KJhTEBpWbH58Pf1kCfOR/tiI/C0kvPjVFC1Cr7MzCDMAZqlU71kvTTYPW2hazUPLrR55L/yP7oSw8kBuKCF2b+ry2Gl4zdoktcvSqn5g4EJHcrVi/vZlloiIcHyjb1qmGjYGYf00wjsp/cPsv2+bx20fEQBmx2WP6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A+V8RzAcsR1noaK4d3PizPfTE6qOMfufO6SJ6K8f2Pk=;
+ b=T8yb8LOZdIlTxxCK8IPs48GWMcqBJGXsPoe73Zh5+nz614FJhXjwGWHYNZH/MHHy9VG22Y0X55vQFH6bJLqkdrq8CjQ8e8SYtAv0/gYoDUf2yhKLbdZX+uOxDTAfmXKc7iJLMNU9r6Ku+Vvo7oan3p+oYWhIo4ozPJ91N+Fq5RM=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4852.eurprd08.prod.outlook.com (2603:10a6:20b:cc::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.26; Wed, 1 Jul
+ 2020 11:10:53 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Wed, 1 Jul 2020
+ 11:10:53 +0000
+Subject: Re: [PATCH 1/4] migration: Prevent memleak by ...params_test_apply
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200630084552.46362-1-mreitz@redhat.com>
+ <20200630084552.46362-2-mreitz@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c2a03349-4213-a784-7aac-f5e84201d553@virtuozzo.com>
+Date: Wed, 1 Jul 2020 14:10:51 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+In-Reply-To: <20200630084552.46362-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR07CA0013.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::26) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.71.145.155;
- envelope-from=anthony.perard@citrix.com; helo=esa3.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 07:06:03
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.28) by
+ AM0PR07CA0013.eurprd07.prod.outlook.com (2603:10a6:208:ac::26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3174.8 via Frontend Transport; Wed, 1 Jul 2020 11:10:52 +0000
+X-Originating-IP: [185.215.60.28]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 10951fc7-d197-4360-ce57-08d81daf6b39
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4852:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4852B4A86499F352AFC039FCC16C0@AM6PR08MB4852.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1091;
+X-Forefront-PRVS: 04519BA941
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lrlxvVyblhJa65dSYudZPH84pyl8OpsAVgqgfeEU7i0KiSjmlu9nAXMJc5NOnBAvkCdC8z3iaF/R/kHIR5q7Jh4miF2Y9IlgVoLDRwlc5O7KCK8hr6h43psAuLaop4itqAV+lRsSXVpFbN+GKLX+GyIGtwtV28l3VtcD6MWBpRoCO75cCDOYbWBcgMyMzVBP9V22GC3yJAB4ZGTcVtkOz5SxhEH4A43k7fa3qyrbuHcW3DoqLzO0MTORSLQZDpfw77bEjQMN3GDl/EEyHzbgHqeoXJ8TNNlwh69GRZJagzZE4w3hmhSvqUcFuHO2IJLgxiZfzGGDzpJI9mzNqkOzyMTpiJJHTsAmA5z+fIopnRYygULRucPm5fOqnrIfSRZx
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(396003)(376002)(136003)(366004)(39840400004)(6486002)(16576012)(956004)(2616005)(66556008)(86362001)(66476007)(5660300002)(31696002)(316002)(66946007)(4744005)(31686004)(52116002)(54906003)(8676002)(2906002)(36756003)(16526019)(186003)(4326008)(8936002)(26005)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: BKymsgo+dn1C6pXuXH6a0CpSJZWToa4oIO+Wi+cLeZLGkpKCXfJO8LBuf091T7cLurGiK0GWtyHrY5fNr2zeXGFyEW1TIWAAqUa835Ea142Oxki5mySJG+d6jhccnx0xsHgv5RMYCmiOKUps1MedZLOJ+/hVoxK4CJ2pYYlXVQQyECqowmrARSp9gxYprEJ8Pp2E/92JCxJSEPqe4sZKKtdVGjbIPXEBt8HTASbDCvBBg7L4vuZ2JKJw1M2KPDnGEcO7Woq8RimrrkC/h1YGxQTkUyhU4BL1xxKFt+QHee09MbAF6gacaXi30tNxiihek8tqElX9p/Ie8gRD71EXY0hKfoNlWD71cCVSJ8XsYiKgEUCTB91rhZcpkF7HYj7k/P70MMWuIzIXkK6WE7ZQoGv7ZDZrVKWUKe1GqIdg643dNZx6K7WKcA+QaqvR/3NAOLzL0gqrd1kyHM7fuwbXi2lJuBzeYXwiSh9qdOP8zoM=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10951fc7-d197-4360-ce57-08d81daf6b39
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 11:10:53.1145 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: awBFP9fN8pJLsHrsay9x8DibDsuJxG6N8DQM/2jSANp+dmKaRH02zGh0LjTEopwhaOAUfrB3lerxotg8YwVGxKCdzn4MZ0y9G/zG5HNjZ5I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4852
+Received-SPF: pass client-ip=40.107.3.101;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 07:10:54
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,141 +132,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony PERARD <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ACPI spec state that "Accesses to PM1 control registers are
-accessed through byte and word accesses." (In section 4.7.3.2.1 PM1
-Control Registers of my old spec copy rev 4.0a).
+30.06.2020 11:45, Max Reitz wrote:
+> The created structure is not really a proper QAPI object, so we cannot
+> and will not free its members.  Strings therein should therefore not be
+> duplicated, or we will leak them.
+> 
+> Signed-off-by: Max Reitz<mreitz@redhat.com>
 
-With commit 5d971f9e6725 ("memory: Revert "memory: accept mismatching
-sizes in memory_region_access_valid""), it wasn't possible anymore to
-access the pm1_cnt register by reading a single byte, and that is use
-by at least a Xen firmware called "hvmloader".
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Also, take care of the PM1 Status Registers which also have "Accesses
-to the PM1 status registers are done through byte or word accesses"
-(In section 4.7.3.1.1 PM1 Status Registers).
-
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- hw/acpi/core.c | 46 +++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 9 deletions(-)
-
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49abdd..31974e2f91bf 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -394,9 +394,17 @@ uint16_t acpi_pm1_evt_get_sts(ACPIREGS *ar)
-     return ar->pm1.evt.sts;
- }
- 
--static void acpi_pm1_evt_write_sts(ACPIREGS *ar, uint16_t val)
-+static void acpi_pm1_evt_write_sts(ACPIREGS *ar, hwaddr addr, uint16_t val,
-+                                   unsigned width)
- {
-     uint16_t pm1_sts = acpi_pm1_evt_get_sts(ar);
-+    if (width == 1) {
-+        if (addr == 0) {
-+            val |= pm1_sts & 0xff00;
-+        } else if (addr == 1) {
-+            val = (val << BITS_PER_BYTE) | (pm1_sts & 0xff);
-+        }
-+    }
-     if (pm1_sts & val & ACPI_BITMASK_TIMER_STATUS) {
-         /* if TMRSTS is reset, then compute the new overflow time */
-         acpi_pm_tmr_calc_overflow_time(ar);
-@@ -404,8 +412,16 @@ static void acpi_pm1_evt_write_sts(ACPIREGS *ar, uint16_t val)
-     ar->pm1.evt.sts &= ~val;
- }
- 
--static void acpi_pm1_evt_write_en(ACPIREGS *ar, uint16_t val)
-+static void acpi_pm1_evt_write_en(ACPIREGS *ar, hwaddr addr, uint16_t val,
-+                                  unsigned width)
- {
-+    if (width == 1) {
-+        if (addr == 0) {
-+            val |= ar->pm1.evt.en & 0xff00;
-+        } else if (addr == 1) {
-+            val = (val << BITS_PER_BYTE) | (ar->pm1.evt.en & 0xff);
-+        }
-+    }
-     ar->pm1.evt.en = val;
-     qemu_system_wakeup_enable(QEMU_WAKEUP_REASON_RTC,
-                               val & ACPI_BITMASK_RT_CLOCK_ENABLE);
-@@ -434,9 +450,11 @@ static uint64_t acpi_pm_evt_read(void *opaque, hwaddr addr, unsigned width)
-     ACPIREGS *ar = opaque;
-     switch (addr) {
-     case 0:
--        return acpi_pm1_evt_get_sts(ar);
-+    case 1:
-+        return acpi_pm1_evt_get_sts(ar) >> (addr * BITS_PER_BYTE);
-     case 2:
--        return ar->pm1.evt.en;
-+    case 3:
-+        return ar->pm1.evt.en >> ((addr - 2) * BITS_PER_BYTE);
-     default:
-         return 0;
-     }
-@@ -448,11 +466,13 @@ static void acpi_pm_evt_write(void *opaque, hwaddr addr, uint64_t val,
-     ACPIREGS *ar = opaque;
-     switch (addr) {
-     case 0:
--        acpi_pm1_evt_write_sts(ar, val);
-+    case 1:
-+        acpi_pm1_evt_write_sts(ar, addr, val, width);
-         ar->pm1.evt.update_sci(ar);
-         break;
-     case 2:
--        acpi_pm1_evt_write_en(ar, val);
-+    case 3:
-+        acpi_pm1_evt_write_en(ar, addr - 2, val, width);
-         ar->pm1.evt.update_sci(ar);
-         break;
-     }
-@@ -461,7 +481,7 @@ static void acpi_pm_evt_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_evt_ops = {
-     .read = acpi_pm_evt_read,
-     .write = acpi_pm_evt_write,
--    .valid.min_access_size = 2,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 2,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
-@@ -590,19 +610,27 @@ void acpi_pm1_cnt_update(ACPIREGS *ar,
- static uint64_t acpi_pm_cnt_read(void *opaque, hwaddr addr, unsigned width)
- {
-     ACPIREGS *ar = opaque;
--    return ar->pm1.cnt.cnt;
-+    return ar->pm1.cnt.cnt >> (addr * BITS_PER_BYTE);
- }
- 
- static void acpi_pm_cnt_write(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
- {
-+    ACPIREGS *ar = opaque;
-+    if (width == 1) {
-+        if (addr == 0) {
-+            val |= ar->pm1.cnt.cnt & 0xff00;
-+        } else if (addr == 1) {
-+            val = (val << BITS_PER_BYTE) | (ar->pm1.cnt.cnt & 0xff);
-+        }
-+    }
-     acpi_pm1_cnt_write(opaque, val);
- }
- 
- static const MemoryRegionOps acpi_pm_cnt_ops = {
-     .read = acpi_pm_cnt_read,
-     .write = acpi_pm_cnt_write,
--    .valid.min_access_size = 2,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 2,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
 -- 
-Anthony PERARD
-
+Best regards,
+Vladimir
 
