@@ -2,131 +2,88 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:59:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A97DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF66720780
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:59:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6766D20772
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:07:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YTtWAuzR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF66720780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pZx5Nf9a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6766D20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqcKr-0006bT-0V
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:59:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43368)
+	id 1jqcS3-0001QM-I7
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 09:06:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqcK6-0005qC-Nd
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:58:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28097
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqcK4-0004sg-Q1
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:58:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593608324;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Q4kH6UYzzbB28jFGr6RdcF3XJO/pbyI6No/EeYQ0lPI=;
- b=YTtWAuzRONqnnV8vXRpZVOprpredrcFvAbT0BxCUz3Moeh+rxj4J/Fj4/Q/KCkntx6wzIn
- iiWeJSNl9lyXD4oCV8Vs8iQIcCtqTcz+F4Hu7qiNBZx1eKnu1N4rCKAkwMomyTgDo5u+9a
- IL0KZWo8lwsNso5zwTK1kCytQFXhrKI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-el4F0bA6PzWH6RUHGLuyCg-1; Wed, 01 Jul 2020 08:58:39 -0400
-X-MC-Unique: el4F0bA6PzWH6RUHGLuyCg-1
-Received: by mail-ej1-f70.google.com with SMTP id q9so4624100ejr.21
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:58:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqcRD-0000No-17
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:06:07 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41598)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jqcRB-0006Ir-4X
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:06:06 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z15so12466444wrl.8
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 06:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=fOYRSgb6QiPfrgdzhZYNnAer88CUkfYQW+y0xXCMyXE=;
+ b=pZx5Nf9aDpvwGwh/xzTApWyyY//4EdiRj561fiNEGAOGQGvrb13G3xArG5n4dIiC1B
+ cevlShQjSL3MPSLUX14EQQI6qnVtZsIvnwC9BgHzCMhDFpE0vS7QMSAr3VokUbpuVk3b
+ dC67A/hOabuJ/7CDYJd+jMb8IDLfOZCr/JcsxbuwP5xI+IuiqvGsiA2oRZcktjpUdd+4
+ /r+uMv+jDL664E2ahDoh23Y+5NWIJT00FlsldJksEl1IVHXkjyS4M3/tIlgNdNwTJ4VH
+ QI7XljX8Dsem5jGtFWg20ntn3oavbKLeX3a27TfnV6itm0abjDWAuc3YFgcBpald1RJ2
+ +mjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Q4kH6UYzzbB28jFGr6RdcF3XJO/pbyI6No/EeYQ0lPI=;
- b=j2DJmkeX1JDHYbq5+ANu+IQePwgd01+kqT2l+YGA12kh6Hn9WeBVIHoJCFxaFt/DHz
- hNENADVkeW64SyaRqqNS1CSyDj2rzxBKq2l/bRLaJyvX1GrnE2Yn/jw2yLdvgXBYnXjc
- /UVmsDY++Uln+T7LHqCdxCRJgdjq6A3GNdSx8rzcM26JEx7eRz6bUaG2ULjhaVR/k8YV
- jeCz6Q0H9thFqqmt8hdBMbPrhR8LFshPKnsThJTMqaPTXSWg8NYESmzdLW5MZ/JfAfMm
- PEWkn9jxHi8l+btmZXs7+09IsFwSJftkzQPAMF13c95Zc5eSTXM2OsToZW/W9oA66B5T
- 2qvw==
-X-Gm-Message-State: AOAM532e7/HpQBc9TcvD9INRRbWHpoz3w9XmtEH92hVggz7745SJeYsj
- Vm8ytU93i1weHTIGW1H6zlVQQRUXGqKbmn/bxIO4XnG/BwZYX0pa9Ocj32QxIiQFUSj93WOvU5e
- 2bpDykHB8rzn9Hbw=
-X-Received: by 2002:a50:931e:: with SMTP id m30mr30058849eda.341.1593608317935; 
- Wed, 01 Jul 2020 05:58:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWQW9axunJwqMnuYDxr2AESpoA1db67qmSJCe1gb43BMi6VJ4kz06N5Xsris0Im11dNtBBNw==
-X-Received: by 2002:a50:931e:: with SMTP id m30mr30058830eda.341.1593608317717; 
- Wed, 01 Jul 2020 05:58:37 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u13sm4658716ejx.3.2020.07.01.05.58.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 05:58:36 -0700 (PDT)
-Subject: Re: [PATCH 0/2] hw/block/nvme: handle transient dma errors
-To: Klaus Jensen <its@irrelevant.dk>, qemu-devel@nongnu.org,
- kwolf@redhat.com, mreitz@redhat.com
-References: <20200629202053.1223342-1-its@irrelevant.dk>
- <159346486377.15477.6186679362319226240@d1fd068a5071>
- <20200629213408.qlehce2mtgqodqd6@apples.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <30b8117f-25bd-e50b-98cb-db2e0a2690d0@redhat.com>
-Date: Wed, 1 Jul 2020 14:58:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200629213408.qlehce2mtgqodqd6@apples.localdomain>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=fOYRSgb6QiPfrgdzhZYNnAer88CUkfYQW+y0xXCMyXE=;
+ b=pqWcYna1VRBFfJ7vjgnjIJ04vLcME7zVKBWODsvKRrj1wwN3Zp6kQHs/RCr6/AFLsC
+ 8F198E/HfR2YrN5oB+HOjhnHV4xDDS7GGKQauXpdeAvTtRy8gjBvcJQtvyio41fqRdli
+ oeDAGYRKy/UzBTFSZnj+N0JTX5KYAauQ1m3sUJKxLUB7AfuXz3PgxFx1pDtPvWMsGFaH
+ 7DKUT0MT0r4TYaH3VU7OS1X/TrsvKNUVwGQMVMHBUxH2daNnEwyPdGt7+hJ4Qer3ZuV/
+ bqmHyuok7WJdV/GG3HyRF0/qj6L0UaSzw4roSPrY+YWmYAvtXY2T5dIjWQTqkZnWVES0
+ IlEA==
+X-Gm-Message-State: AOAM531/gbpZfDPAEJL5FzyhWDHjs0RkF7vX+44+IUXgOmq+wxaGEdEr
+ mZwlJqMCrINKRKyUW8LtB/4jjwn5
+X-Google-Smtp-Source: ABdhPJxRdP/HRKa3W6gt8QK1l/tHrLYLQf30BYSiRkmcgw2r28SfP4fNlvIEGl9mql0s1/Y5MlPG/w==
+X-Received: by 2002:a5d:6907:: with SMTP id t7mr26653006wru.329.1593608762874; 
+ Wed, 01 Jul 2020 06:06:02 -0700 (PDT)
+Received: from AK-L.domain.name ([197.58.21.177])
+ by smtp.gmail.com with ESMTPSA id u65sm7053999wmg.5.2020.07.01.06.06.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jul 2020 06:06:02 -0700 (PDT)
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com,
+ alex.bennee@linaro.org, ldoktor@redhat.com, eblake@redhat.com,
+ rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com,
+ luoyonggang@gmail.com
+Subject: [PATCH 0/1] Add Script for Dissecting QEMU Execution
+Date: Wed,  1 Jul 2020 15:04:32 +0200
+Message-Id: <20200701130433.1506-1-ahmedkhaledkaraman@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,33 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, k.jensen@samsung.com, qemu-block@nongnu.org
+Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/29/20 11:34 PM, Klaus Jensen wrote:
-> On Jun 29 14:07, no-reply@patchew.org wrote:
->> Patchew URL: https://patchew.org/QEMU/20200629202053.1223342-1-its@irrelevant.dk/
+Hi,
 
->> --- /tmp/qemu-test/src/tests/qemu-iotests/040.out       2020-06-29 20:12:10.000000000 +0000
->> +++ /tmp/qemu-test/build/tests/qemu-iotests/040.out.bad 2020-06-29 20:58:48.288790818 +0000
->> @@ -1,3 +1,5 @@
->> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
->> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
+This series adds the dissect.py script which breaks down the execution
+of QEMU into three main phases:
+code generation, JIT execution, and helpers execution.
 
-Kevin, Max, can iotests/040 be affected by this change?
+It prints the number of instructions executed by QEMU in each of these
+three phases, plus the total number of executed instructions.
 
-> 
-> 
-> Hmm, I can't seem to reproduce this locally and the test succeeded on
-> the next series[1] that is based on this.
-> 
-> Is this a flaky test? Or a bad test runner? I'm of course worried when
-> a qcow2 test fails and I touch something else than the nvme device ;)
-> 
-> 
->   [1]: https://patchew.org/QEMU/20200629203155.1236860-1-its@irrelevant.dk/
-> 
+To learn more about how the script works and for further usage
+instructions, please check the "Dissecting QEMU Into Three Main Parts"
+report posted as part of the "TCG Continuous Benchmarking" GSoC project.
+
+Report link:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg09441.html
+
+Best regards,
+Ahmed Karaman
+
+Ahmed Karaman (1):
+  scripts/performance: Add dissect.py script
+
+ scripts/performance/dissect.py | 165 +++++++++++++++++++++++++++++++++
+ 1 file changed, 165 insertions(+)
+ create mode 100644 scripts/performance/dissect.py
+
+-- 
+2.17.1
 
 
