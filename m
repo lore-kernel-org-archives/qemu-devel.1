@@ -2,99 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA152C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E81BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74B9D2085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:44:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cy5ds3Hh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B9D2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8FB720747
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:46:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FB720747
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfqI-0006Y5-NZ
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:44:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49212)
+	id 1jqfsD-0007j4-7d
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqfpf-0005vx-RM
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:43:35 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39516)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqfpe-0003xc-06
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:43:35 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q5so24761116wru.6
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=iJJFrsRgLgPVzDDdzBSoQ9owWAboOX6vG+wFvtEzsis=;
- b=cy5ds3Hh6GC19MduR8JqWv5rze5lvPYFnLx1D1tJudT7UZpDbSfka2nKIQ1pYZALD0
- ptnMv9tNOT7C9fe5JsOLN+sfzHpdM6/gY88C4sgIjBz2iWCD2LgKAmP765fqJBTbgbr0
- tRugznknvvU+JhNCSkLOBwsliQLwjE+uMaRD7lcauRNXrtt2j3HkYOn4z4x8JV8fTj6j
- q8yUCnJtJ/Saj4WOhmOxvYCTnURlP6QEZM0N0r7GeowDgKFYnsY/2IY0gsBh6V6E/cLr
- +PsPw9wWq2g3f27kDut3fX2NQPzW7N8GOsjNj+CmWFDEHUQEE1iASv5TsmA3EkqYX0Yi
- MB7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=iJJFrsRgLgPVzDDdzBSoQ9owWAboOX6vG+wFvtEzsis=;
- b=ZzApvFQFLlmxWhC9Zl1o3lDL61qu7QQ0pq3wKYXKPUIKP/4GoRlwHglza7ObVHdKh1
- K42YSrrcscbCT7X/GMFQKyiQVtG5ax9M9f/qiUxr711n2nRpl84b5klsEHOCHRlVprEa
- LaGzWu25dHhnB+eIHx0xzjYRuSGttrIvGFTaoLGJgzQ1aKw5LboJF2D1ZY0sFgzHrRUL
- YKL3jD1YxavA84FPzHZCicmaYDmEMK9n9rKLoQ1D16N6By5miPSnjk4Cz8dzr9OYjZot
- hh6D1iqBKrffmAmwVS2Xnum/3WWRCRmawn0O2Ei3lKEdaU1Dqm/xiJi/lwI3pg16zLW+
- dPnw==
-X-Gm-Message-State: AOAM533WWaLCoA/sMgNYJ9hJtgE30rR3H4Xr+XJNNZ8JpPecpHkmo9iI
- 91NGp9abwoNH5OB1vIOtKNypAA==
-X-Google-Smtp-Source: ABdhPJzz8gc9nFyF16lw4ZSRUEp61iR1aVpQ8es6mUG5f1X/WuASrMuIdARewXEKA8iBTQvGqWYj0w==
-X-Received: by 2002:a05:6000:12c5:: with SMTP id
- l5mr29754692wrx.219.1593621812374; 
- Wed, 01 Jul 2020 09:43:32 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m16sm2830193wro.0.2020.07.01.09.43.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 09:43:31 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B6B9D1FF7E;
- Wed,  1 Jul 2020 17:43:29 +0100 (BST)
-References: <20200701135652.1366-1-alex.bennee@linaro.org>
- <20200701135652.1366-29-alex.bennee@linaro.org>
- <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v4 28/40] tests/acceptance: skip multicore mips_malta
- tests on GitLab
-In-reply-to: <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org>
-Date: Wed, 01 Jul 2020 17:43:29 +0100
-Message-ID: <87mu4jqj7y.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfqv-000710-Dn; Wed, 01 Jul 2020 12:44:53 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37766)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfqs-00046v-6S; Wed, 01 Jul 2020 12:44:53 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0396159-8.99278e-05-0.960294;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hvwh.5g_1593621878; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hvwh.5g_1593621878)
+ by smtp.aliyun-inc.com(10.147.41.137);
+ Thu, 02 Jul 2020 00:44:39 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 39/61] target/riscv: vector floating-point compare
+ instructions
+Date: Wed,  1 Jul 2020 23:25:27 +0800
+Message-Id: <20200701152549.1218-40-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,74 +71,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- berrange@redhat.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
- Cleber Rosa <crosa@redhat.com>, aurelien@aurel32.net
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  37 +++++
+ target/riscv/insn32.decode              |  12 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  35 +++++
+ target/riscv/vector_helper.c            | 174 ++++++++++++++++++++++++
+ 4 files changed, 258 insertions(+)
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index eea4c59820..0e8d241831 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -959,3 +959,40 @@ DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++
++DEF_HELPER_6(vmfeq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 0e173e9b71..59fb1a2425 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -502,6 +502,18 @@ vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
++vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
++vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
++vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
++vmfne_vf        011100 . ..... ..... 101 ..... 1010111 @r_vm
++vmflt_vv        011011 . ..... ..... 001 ..... 1010111 @r_vm
++vmflt_vf        011011 . ..... ..... 101 ..... 1010111 @r_vm
++vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
++vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
++vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
++vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
++vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
++vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 460d9bce8c..791d377e3c 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2146,3 +2146,38 @@ GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
+ GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
++
++/* Vector Floating-Point Compare Instructions */
++static bool opfvv_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            (s->sew != 0) &&
++            ((vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
++              vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul)) ||
++             (s->lmul == 0)));
++}
++
++GEN_OPFVV_TRANS(vmfeq_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfne_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmflt_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfle_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmford_vv, opfvv_cmp_check)
++
++static bool opfvf_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (s->sew != 0) &&
++            (vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul) ||
++             (s->lmul == 0)));
++}
++
++GEN_OPFVF_TRANS(vmfeq_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfne_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmflt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 7f1b7a8614..0c12752f49 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -3929,3 +3929,177 @@ RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
+ GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
++
++/* Vector Floating-Point Compare Instructions */
++#define GEN_VEXT_CMP_VV_ENV(NAME, ETYPE, H, DO_OP)            \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
++                  CPURISCVState *env, uint32_t desc)          \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vm = vext_vm(desc);                              \
++    uint32_t vl = env->vl;                                    \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {            \
++            continue;                                         \
++        }                                                     \
++        vext_set_elem_mask(vd, mlen, i,                       \
++                           DO_OP(s2, s1, &env->fp_status));   \
++    }                                                         \
++    for (; i < vlmax; i++) {                                  \
++        vext_set_elem_mask(vd, mlen, i, 0);                   \
++    }                                                         \
++}
++
++static bool float16_eq_quiet(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare_quiet(a, b, s);
++    return compare == float_relation_equal;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_d, uint64_t, H8, float64_eq_quiet)
++
++#define GEN_VEXT_CMP_VF(NAME, ETYPE, H, DO_OP)                      \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
++                  CPURISCVState *env, uint32_t desc)                \
++{                                                                   \
++    uint32_t mlen = vext_mlen(desc);                                \
++    uint32_t vm = vext_vm(desc);                                    \
++    uint32_t vl = env->vl;                                          \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);              \
++    uint32_t i;                                                     \
++                                                                    \
++    for (i = 0; i < vl; i++) {                                      \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                          \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                  \
++            continue;                                               \
++        }                                                           \
++        vext_set_elem_mask(vd, mlen, i,                             \
++                           DO_OP(s2, (ETYPE)s1, &env->fp_status));  \
++    }                                                               \
++    for (; i < vlmax; i++) {                                        \
++        vext_set_elem_mask(vd, mlen, i, 0);                         \
++    }                                                               \
++}
++
++GEN_VEXT_CMP_VF(vmfeq_vf_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_d, uint64_t, H8, float64_eq_quiet)
++
++static bool vmfne16(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
++}
++
++static bool vmfne32(uint32_t a, uint32_t b, float_status *s)
++{
++    FloatRelation compare = float32_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
++}
++
++static bool vmfne64(uint64_t a, uint64_t b, float_status *s)
++{
++    FloatRelation compare = float64_compare_quiet(a, b, s);
++    return compare != float_relation_equal;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_d, uint64_t, H8, vmfne64)
++GEN_VEXT_CMP_VF(vmfne_vf_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VF(vmfne_vf_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VF(vmfne_vf_d, uint64_t, H8, vmfne64)
++
++static bool float16_lt(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare(a, b, s);
++    return compare == float_relation_less;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_d, uint64_t, H8, float64_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_d, uint64_t, H8, float64_lt)
++
++static bool float16_le(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare(a, b, s);
++    return compare == float_relation_less ||
++           compare == float_relation_equal;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_d, uint64_t, H8, float64_le)
++GEN_VEXT_CMP_VF(vmfle_vf_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VF(vmfle_vf_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VF(vmfle_vf_d, uint64_t, H8, float64_le)
++
++static bool vmfgt16(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare(a, b, s);
++    return compare == float_relation_greater;
++}
++
++static bool vmfgt32(uint32_t a, uint32_t b, float_status *s)
++{
++    FloatRelation compare = float32_compare(a, b, s);
++    return compare == float_relation_greater;
++}
++
++static bool vmfgt64(uint64_t a, uint64_t b, float_status *s)
++{
++    FloatRelation compare = float64_compare(a, b, s);
++    return compare == float_relation_greater;
++}
++
++GEN_VEXT_CMP_VF(vmfgt_vf_h, uint16_t, H2, vmfgt16)
++GEN_VEXT_CMP_VF(vmfgt_vf_w, uint32_t, H4, vmfgt32)
++GEN_VEXT_CMP_VF(vmfgt_vf_d, uint64_t, H8, vmfgt64)
++
++static bool vmfge16(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++static bool vmfge32(uint32_t a, uint32_t b, float_status *s)
++{
++    FloatRelation compare = float32_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++static bool vmfge64(uint64_t a, uint64_t b, float_status *s)
++{
++    FloatRelation compare = float64_compare(a, b, s);
++    return compare == float_relation_greater ||
++           compare == float_relation_equal;
++}
++
++GEN_VEXT_CMP_VF(vmfge_vf_h, uint16_t, H2, vmfge16)
++GEN_VEXT_CMP_VF(vmfge_vf_w, uint32_t, H4, vmfge32)
++GEN_VEXT_CMP_VF(vmfge_vf_d, uint64_t, H8, vmfge64)
++
++static bool float16_unordered_quiet(uint16_t a, uint16_t b, float_status *s)
++{
++    FloatRelation compare = float16_compare_quiet(a, b, s);
++    return compare == float_relation_unordered;
++}
++
++GEN_VEXT_CMP_VV_ENV(vmford_vv_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
+-- 
+2.23.0
 
-> On 7/1/20 3:56 PM, Alex Benn=C3=A9e wrote:
->> For some reason these tests fail all the time on GitLab. I can
->> re-create the hang around 3% of the time locally but it doesn't seem
->> to be MTTCG related. For now skipIf on GITLAB_CI.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> ---
->>  tests/acceptance/machine_mips_malta.py | 3 +++
->>  1 file changed, 3 insertions(+)
->>=20
->> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/m=
-achine_mips_malta.py
->> index 92b4f28a112..7c9a4ee4d2d 100644
->> --- a/tests/acceptance/machine_mips_malta.py
->> +++ b/tests/acceptance/machine_mips_malta.py
->> @@ -15,6 +15,7 @@ from avocado import skipUnless
->>  from avocado_qemu import Test
->>  from avocado_qemu import wait_for_console_pattern
->>  from avocado.utils import archive
->> +from avocado import skipIf
->>=20=20
->>=20=20
->>  NUMPY_AVAILABLE =3D True
->> @@ -99,6 +100,7 @@ class MaltaMachineFramebuffer(Test):
->>          """
->>          self.do_test_i6400_framebuffer_logo(1)
->>=20=20
->
-> So the test works using a single core...
-> Good we have a test to figure the bug!
-
-It's about a 1-3% failure rate on my big test box but hits every time on
-CI. However I did disable MTTCG and still saw failures so I think it's a
-more subtle breakage than just a straight race.
-
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
->>      def test_mips_malta_i6400_framebuffer_logo_7cores(self):
->>          """
->>          :avocado: tags=3Darch:mips64el
->> @@ -108,6 +110,7 @@ class MaltaMachineFramebuffer(Test):
->>          """
->>          self.do_test_i6400_framebuffer_logo(7)
->>=20=20
->> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
->>      def test_mips_malta_i6400_framebuffer_logo_8cores(self):
->>          """
->>          :avocado: tags=3Darch:mips64el
->>=20
-
-
---=20
-Alex Benn=C3=A9e
 
