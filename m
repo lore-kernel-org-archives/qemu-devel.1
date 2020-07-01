@@ -2,63 +2,88 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F61C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7063C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6058720771
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6058720771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 8C46E2074D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEs0i9i0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C46E2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqRKY-0008GF-Mh
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 21:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43778)
+	id 1jqRU6-0002nO-SK
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 21:24:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jqRJi-0007ii-Rz; Tue, 30 Jun 2020 21:13:38 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30814)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jqRJf-0003pT-Ve; Tue, 30 Jun 2020 21:13:38 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id DAB2A746331;
- Wed,  1 Jul 2020 03:13:31 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 4BB7774594E; Wed,  1 Jul 2020 03:13:31 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 4A260745712;
- Wed,  1 Jul 2020 03:13:31 +0200 (CEST)
-Date: Wed, 1 Jul 2020 03:13:31 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PATCH v3 0/5] hw/mips/malta: Add the 'malta-strict' machine,
- matching Malta hardware
-In-Reply-To: <CAHiYmc6d3Q2A237qVqp6s0MagXqgy11aX9r_LuJsGkoJxRhfQw@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2007010248270.96257@zero.eik.bme.hu>
-References: <20200630195723.1359-1-f4bug@amsat.org>
- <CAHiYmc6d3Q2A237qVqp6s0MagXqgy11aX9r_LuJsGkoJxRhfQw@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jqRTY-0002Mi-Nm
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 21:23:48 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38993)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jqRTW-0005Pj-OW
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 21:23:48 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 18so20150996otv.6
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 18:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Zm4yZ05PqBp5LXCkpP7pNaqq1xFxWCiEPlJKoMlI91k=;
+ b=KEs0i9i07U2mf9T8b3DiFTeNwxOrnbxPw/IsM3+hfvkgDSSuVMdEGw08FzfsWzIwjX
+ /F/ZSGEKSte1ijWRJvORD9ndlWqxEUmb64tDwPoIsHIpIg/7mBrjOxO0IT3IH/P+Q7cS
+ XkyMeBwsJRABqI9rpptckcMkdz///7Cm2Et5ixNZumMm6aBYqzJynHikK0mgb6b+wv9K
+ ZYX4Hz0c0L9cgMy5cYe1t0mB8HnpkbLff8rZryVEpbbrdfBfwuq4noMCB9Rpy4Eduumn
+ SePCSr5D0dYTC8w6/+b63sMPrJteLMO9FiwcPTcy07rZfmBx8PFE5T4HKHu05DGAbjWP
+ waeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Zm4yZ05PqBp5LXCkpP7pNaqq1xFxWCiEPlJKoMlI91k=;
+ b=blJssZE5WPmNfQIFJU+jqHUnlw6xziaoXfM5dHcev8+smBwUvsen4VMTaFs8YUkmGi
+ glBAA1kdTWl6M/E1BKlO0MZwkXDmwMkaAbDQtrRfxo0L2l79YO1zkj0V0iZrqoxoDd97
+ rE18uiH1eDQSOF5iBBuy9ifNptuROJA/4fV9s+dGJ5YAGQhiof4CHjL1eKtAq6ZMcdzv
+ F4Kif1+NnDIb0YVJMD7u7dY9rJuztFL1BmeIucgjKOTow5TdU2xcQ5CYb9UB2mcpQ6MZ
+ FhMHMiu7AMeJdHWXZORGcidXjXY43WZYkxE2SeuXa5C1j8Kr274LYvgXNpgNsu4nD3hp
+ 7h4g==
+X-Gm-Message-State: AOAM531pI/C3L/pTt9xYO9bJdAIdyWuWvRMdOi4W24y7kbpwWTZ4i83f
+ EnVANwEC6UBb3exyAH42Z4ypzA5tC69Ug/VPioI=
+X-Google-Smtp-Source: ABdhPJzWClwvA/l5qW5aFL/duE4TGAkxxyx/oAyAEkfbq/Aheom68ju+oafPGsurfVnIWs4NCbg0alyKkITgCI9wF40=
+X-Received: by 2002:a05:6830:15c3:: with SMTP id
+ j3mr19181648otr.353.1593566625170; 
+ Tue, 30 Jun 2020 18:23:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-490760158-1593566011=:96257"
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+References: <20200630122710.1119158-1-ppandit@redhat.com>
+ <20200630122710.1119158-8-ppandit@redhat.com>
+In-Reply-To: <20200630122710.1119158-8-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 1 Jul 2020 09:23:09 +0800
+Message-ID: <CAKXe6SKZVQ4HiN2d=X6inbDVDkvTiXQ9iG5f773_Qaoj8hA_FQ@mail.gmail.com>
+Subject: Re: [PATCH v3 7/9] tz-ppc: add dummy read/write methods
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,107 +96,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- Yunqiang Su <ysu@wavecomp.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---3866299591-490760158-1593566011=:96257
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
-
-On Tue, 30 Jun 2020, Aleksandar Markovic wrote:
-> As, in a very clear way, evidenced from the previous versions of this
-> series, this series real goal was not not to create some new
-> "malta-strict" machine, but to prepare path to creation of some
-> imagined "malta-unleashed" machine which will, to the contrary of
-> proclaimed goal, create a machine that could never exist in reality.
-> That is why I can't accept this series.
-
-I don't really want to be included in this discussion so please exclude me 
-from any replies, I can read replies on the list but don't want my mailbox 
-flooded with this thread. I could (and probably should) stay out of it but 
-maybe can offer some outsider view and share a suggestion.
-
-I haven't followed all this thread but if your problem with it is that 
-something called malta should emulate that machine and not something 
-non-existent "malta-unleashed" then how about introducing a new machine 
-called virt which is a purely virtual machine? Arm has such a machine and 
-is recommended to be used for those who just want a generic Linux machine 
-without emulating any particular hardware. See here in docs:
-
-https://wiki.qemu.org/Documentation/Platforms/ARM#Guidelines_for_choosing_a_QEMU_machine
-
-I think Philippe was probably trying to do something like that with this 
-series which is clearly not forbidden by any QEMU policy as evidenced by 
-arm virt so maybe it's only a disagreement about how this should be named.
-
-Keep malta to be modeling the Malta machine and add a new one called virt 
-which can be a copy of the current malta initially just to start from 
-somewhere (as arm was using versatilepb as mentioned above) but then the 
-directions these machines will be developed further could be different: 
-Malta would be developed to faithfully model the Malta machine, running 
-its firmware, etc. while virt could allow having more RAM or virtio 
-devices not available on real hardware. Why is that not acceptable?
-
-Regards,
-BALATON Zoltan
-
-> Regards,
-> Aleksandar
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B46=E6=9C=8830=E6=97=A5=E5=
+=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=888:31=E5=86=99=E9=81=93=EF=BC=9A
 >
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 >
-> уто, 30. јун 2020. у 21:58 Philippe Mathieu-Daudé <f4bug@amsat.org> је
-> написао/ла:
->>
->> Hi,
->>
->> This series add a new 'malta-strict' machine, that aims to properly
->> model the real hardware (which is not what the current 'malta'
->> machine models).
->>
->> Since v2:
->> - Initialize missing malta_machine_types::class_size
->> - Remove RFC patch that confuses Aleksandar
->> - Added examples of 'malta-strict' use
->>
->> $ git backport-diff -u v2
->> Key:
->> [----] : patches are identical
->> [####] : number of functional differences between upstream/downstream patch
->> [down] : patch is downstream-only
->> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
->>
->> 001/5:[----] [--] 'hw/mips/malta: Trivial code movement'
->> 002/5:[----] [--] 'hw/mips/malta: Register the machine as a TypeInfo'
->> 003/5:[0001] [FC] 'hw/mips/malta: Introduce MaltaMachineClass::max_ramsize'
->> 004/5:[----] [--] 'hw/mips/malta: Introduce the 'malta-strict' machine'
->> 005/5:[----] [--] 'hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes'
->>
->> Philippe Mathieu-Daudé (5):
->>   hw/mips/malta: Trivial code movement
->>   hw/mips/malta: Register the machine as a TypeInfo
->>   hw/mips/malta: Introduce MaltaMachineClass::max_ramsize
->>   hw/mips/malta: Introduce the 'malta-strict' machine
->>   hw/mips/malta: Verify malta-strict machine uses correct DIMM sizes
->>
->>  hw/mips/malta.c | 105 +++++++++++++++++++++++++++++++++++++++++-------
->>  1 file changed, 91 insertions(+), 14 deletions(-)
->>
->> --
->> 2.21.3
->>
->>
+> Add tz-ppc-dummy mmio read/write methods to avoid assert failure
+> during initialisation.
 >
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+
+> ---
+>  hw/misc/tz-ppc.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
---3866299591-490760158-1593566011=:96257--
+> Update v3: use g_assert_not_reached()
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09451.html
+>
+> diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+> index 6431257b52..36495c68e7 100644
+> --- a/hw/misc/tz-ppc.c
+> +++ b/hw/misc/tz-ppc.c
+> @@ -196,7 +196,21 @@ static bool tz_ppc_dummy_accepts(void *opaque, hwadd=
+r addr,
+>      g_assert_not_reached();
+>  }
+>
+> +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigned si=
+ze)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
+> +                                        uint64_t data, unsigned size)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+>  static const MemoryRegionOps tz_ppc_dummy_ops =3D {
+> +    /* define r/w methods to avoid assert failure in memory_region_init_=
+io */
+> +    .read =3D tz_ppc_dummy_read,
+> +    .write =3D tz_ppc_dummy_write,
+>      .valid.accepts =3D tz_ppc_dummy_accepts,
+>  };
+>
+> --
+> 2.26.2
+>
 
