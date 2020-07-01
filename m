@@ -2,57 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB337C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEFBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:34:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF9320781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:33:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF9320781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 6458020781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:34:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6458020781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfgG-0005Bc-NX
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:33:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
+	id 1jqfh0-0006Ly-NN
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:34:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqff7-00040r-ST; Wed, 01 Jul 2020 12:32:42 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:50046)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqffE-00042q-Sy; Wed, 01 Jul 2020 12:32:48 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:51251)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqff5-0002Dy-1x; Wed, 01 Jul 2020 12:32:41 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 34B6EBF64B;
- Wed,  1 Jul 2020 16:32:36 +0000 (UTC)
-Date: Wed, 1 Jul 2020 18:32:32 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v2 15/18] hw/block/nvme: Support Zone Descriptor Extensions
-Message-ID: <20200701163232.wt42opdib4pk3hlf@apples.localdomain>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-16-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqff6-0002Du-7Q; Wed, 01 Jul 2020 12:32:48 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1739185|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.027892-8.54176e-05-0.972023;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvwnBLE_1593621154; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvwnBLE_1593621154)
+ by smtp.aliyun-inc.com(10.147.41.178);
+ Thu, 02 Jul 2020 00:32:34 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 33/61] target/riscv: vector widening floating-point
+ multiply
+Date: Wed,  1 Jul 2020 23:25:21 +0800
+Message-Id: <20200701152549.1218-34-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200617213415.22417-16-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 12:11:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -65,243 +71,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 18 06:34, Dmitry Fomichev wrote:
-> Zone Descriptor Extension is a label that can be assigned to a zone.
-> It can be set to an Empty zone and it stays assigned until the zone
-> is reset.
-> 
-> This commit adds a new optional property, "zone_descr_ext_size", to
-> the driver. Its value must be a multiple of 64 bytes. If this value
-> is non-zero, it becomes possible to assign extensions of that size
-> to any Empty zones. The default value for this property is 0,
-> therefore setting extensions is disabled by default.
-> 
-> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
+ target/riscv/vector_helper.c            | 22 ++++++++++++++++++++++
+ 4 files changed, 33 insertions(+)
 
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 94305bd870..9d7dcfeef9 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -852,3 +852,8 @@ DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++
++DEF_HELPER_6(vfwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 5db02f0c0a..dd9bca7eeb 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -463,6 +463,8 @@ vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
+ vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
+ vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
+ vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
++vfwmul_vv       111000 . ..... ..... 001 ..... 1010111 @r_vm
++vfwmul_vf       111000 . ..... ..... 101 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index be9a9a8295..3ce7815f5d 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2057,3 +2057,7 @@ GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
+ GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
+ GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
+ GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
++
++/* Vector Widening Floating-Point Multiply */
++GEN_OPFVV_WIDEN_TRANS(vfwmul_vv, opfvv_widen_check)
++GEN_OPFVF_WIDEN_TRANS(vfwmul_vf)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index e0da273849..dbdfeacf25 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -3410,3 +3410,25 @@ RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
+ GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
++
++/* Vector Widening Floating-Point Multiply */
++static uint32_t vfwmul16(uint16_t a, uint16_t b, float_status *s)
++{
++    return float32_mul(float16_to_float32(a, true, s),
++            float16_to_float32(b, true, s), s);
++}
++
++static uint64_t vfwmul32(uint32_t a, uint32_t b, float_status *s)
++{
++    return float64_mul(float32_to_float64(a, s),
++            float32_to_float64(b, s), s);
++
++}
++RVVCALL(OPFVV2, vfwmul_vv_h, WOP_UUU_H, H4, H2, H2, vfwmul16)
++RVVCALL(OPFVV2, vfwmul_vv_w, WOP_UUU_W, H8, H4, H4, vfwmul32)
++GEN_VEXT_VV_ENV(vfwmul_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwmul_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF2, vfwmul_vf_h, WOP_UUU_H, H4, H2, vfwmul16)
++RVVCALL(OPFVF2, vfwmul_vf_w, WOP_UUU_W, H8, H4, vfwmul32)
++GEN_VEXT_VF(vfwmul_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwmul_vf_w, 4, 8, clearq)
+-- 
+2.23.0
 
-> ---
->  hw/block/nvme.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++---
->  hw/block/nvme.h |  8 ++++++
->  2 files changed, 80 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index b9135a6b1f..eb41081627 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1360,6 +1360,26 @@ static bool nvme_cond_offline_all(uint8_t state)
->      return state == NVME_ZONE_STATE_READ_ONLY;
->  }
->  
-> +static uint16_t nvme_set_zd_ext(NvmeCtrl *n, NvmeNamespace *ns,
-> +    NvmeZone *zone, uint8_t state)
-> +{
-> +    uint16_t status;
-> +
-> +    if (state == NVME_ZONE_STATE_EMPTY) {
-> +        nvme_auto_transition_zone(n, ns, false, true);
-> +        status = nvme_aor_check(n, ns, 1, 0);
-> +        if (status != NVME_SUCCESS) {
-> +            return status;
-> +        }
-> +        nvme_aor_inc_active(n, ns);
-> +        zone->d.za |= NVME_ZA_ZD_EXT_VALID;
-> +        nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_CLOSED);
-> +        return NVME_SUCCESS;
-> +    }
-> +
-> +    return NVME_ZONE_INVAL_TRANSITION;
-> +}
-> +
->  static uint16_t name_do_zone_op(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeZone *zone, uint8_t state, bool all,
->      uint16_t (*op_hndlr)(NvmeCtrl *, NvmeNamespace *, NvmeZone *,
-> @@ -1388,13 +1408,16 @@ static uint16_t name_do_zone_op(NvmeCtrl *n, NvmeNamespace *ns,
->  static uint16_t nvme_zone_mgmt_send(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeCmd *cmd, NvmeRequest *req)
->  {
-> +    NvmeRwCmd *rw;
->      uint32_t dw13 = le32_to_cpu(cmd->cdw13);
-> +    uint64_t prp1, prp2;
->      uint64_t slba = 0;
->      uint64_t zone_idx = 0;
->      uint16_t status;
->      uint8_t action, state;
->      bool all;
->      NvmeZone *zone;
-> +    uint8_t *zd_ext;
->  
->      action = dw13 & 0xff;
->      all = dw13 & 0x100;
-> @@ -1449,7 +1472,25 @@ static uint16_t nvme_zone_mgmt_send(NvmeCtrl *n, NvmeNamespace *ns,
->  
->      case NVME_ZONE_ACTION_SET_ZD_EXT:
->          trace_pci_nvme_set_descriptor_extension(slba, zone_idx);
-> -        return NVME_INVALID_FIELD | NVME_DNR;
-> +        if (all || !n->params.zd_extension_size) {
-> +            return NVME_INVALID_FIELD | NVME_DNR;
-> +        }
-> +        zd_ext = nvme_get_zd_extension(n, ns, zone_idx);
-> +        rw = (NvmeRwCmd *)cmd;
-> +        prp1 = le64_to_cpu(rw->prp1);
-> +        prp2 = le64_to_cpu(rw->prp2);
-> +        status = nvme_dma_write_prp(n, zd_ext, n->params.zd_extension_size,
-> +                                    prp1, prp2);
-> +        if (status) {
-> +            trace_pci_nvme_err_zd_extension_map_error(zone_idx);
-> +            return status;
-> +        }
-> +
-> +        status = nvme_set_zd_ext(n, ns, zone, state);
-> +        if (status == NVME_SUCCESS) {
-> +            trace_pci_nvme_zd_extension_set(zone_idx);
-> +            return status;
-> +        }
->          break;
->  
->      default:
-> @@ -1528,7 +1569,7 @@ static uint16_t nvme_zone_mgmt_recv(NvmeCtrl *n, NvmeNamespace *ns,
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
->  
-> -    if (zra == NVME_ZONE_REPORT_EXTENDED) {
-> +    if (zra == NVME_ZONE_REPORT_EXTENDED && !n->params.zd_extension_size) {
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
->  
-> @@ -1540,6 +1581,9 @@ static uint16_t nvme_zone_mgmt_recv(NvmeCtrl *n, NvmeNamespace *ns,
->      partial = (dw13 >> 16) & 0x01;
->  
->      zone_entry_sz = sizeof(NvmeZoneDescr);
-> +    if (zra == NVME_ZONE_REPORT_EXTENDED) {
-> +        zone_entry_sz += n->params.zd_extension_size;
-> +    }
->  
->      max_zones = (len - sizeof(NvmeZoneReportHeader)) / zone_entry_sz;
->      buf = g_malloc0(len);
-> @@ -1571,6 +1615,14 @@ static uint16_t nvme_zone_mgmt_recv(NvmeCtrl *n, NvmeNamespace *ns,
->              z->wp = cpu_to_le64(~0ULL);
->          }
->  
-> +        if (zra == NVME_ZONE_REPORT_EXTENDED) {
-> +            if (zs->d.za & NVME_ZA_ZD_EXT_VALID) {
-> +                memcpy(buf_p, nvme_get_zd_extension(n, ns, zone_index),
-> +                       n->params.zd_extension_size);
-> +            }
-> +            buf_p += n->params.zd_extension_size;
-> +        }
-> +
->          zone_index++;
->      }
->  
-> @@ -2337,7 +2389,7 @@ static uint16_t nvme_handle_changed_zone_log(NvmeCtrl *n, NvmeCmd *cmd,
->              continue;
->          }
->          num_aen_zones++;
-> -        if (zone->d.za) {
-> +        if (zone->d.za & ~NVME_ZA_ZD_EXT_VALID) {
->              trace_pci_nvme_reporting_changed_zone(zone->d.zslba, zone->d.za);
->              *zid_ptr++ = cpu_to_le64(zone->d.zslba);
->              nids++;
-> @@ -2936,6 +2988,7 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
->      ns->imp_open_zones = g_malloc0(sizeof(NvmeZoneList));
->      ns->closed_zones = g_malloc0(sizeof(NvmeZoneList));
->      ns->full_zones = g_malloc0(sizeof(NvmeZoneList));
-> +    ns->zd_extensions = g_malloc0(n->params.zd_extension_size * n->num_zones);
->      zone = ns->zone_array;
->  
->      nvme_init_zone_list(ns->exp_open_zones);
-> @@ -3010,6 +3063,17 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
->      if (n->params.max_active_zones > nz) {
->          n->params.max_active_zones = nz;
->      }
-> +    if (n->params.zd_extension_size) {
-> +        if (n->params.zd_extension_size & 0x3f) {
-> +            error_setg(errp,
-> +                "zone descriptor extension size must be a multiple of 64B");
-> +            return;
-> +        }
-> +        if ((n->params.zd_extension_size >> 6) > 0xff) {
-> +            error_setg(errp, "zone descriptor extension size is too large");
-> +            return;
-> +        }
-> +    }
->  
->      if (n->params.zone_async_events) {
->          n->ae_cfg |= NVME_AEN_CFG_ZONE_DESCR_CHNGD_NOTICES;
-> @@ -3040,7 +3104,8 @@ static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
->      ns->id_ns_zoned->ozcs = n->params.cross_zone_read ? 0x01 : 0x00;
->  
->      ns->id_ns_zoned->lbafe[lba_index].zsze = cpu_to_le64(n->params.zone_size);
-> -    ns->id_ns_zoned->lbafe[lba_index].zdes = 0;
-> +    ns->id_ns_zoned->lbafe[lba_index].zdes =
-> +        n->params.zd_extension_size >> 6; /* Units of 64B */
->  
->      if (n->params.fill_pattern == 0) {
->          ns->id_ns.dlfeat = 0x01;
-> @@ -3063,6 +3128,7 @@ static void nvme_zoned_clear(NvmeCtrl *n)
->          g_free(ns->imp_open_zones);
->          g_free(ns->closed_zones);
->          g_free(ns->full_zones);
-> +        g_free(ns->zd_extensions);
->      }
->  }
->  
-> @@ -3396,6 +3462,8 @@ static Property nvme_props[] = {
->      DEFINE_PROP_UINT64("zone_size", NvmeCtrl, params.zone_size, 512),
->      DEFINE_PROP_UINT64("zone_capacity", NvmeCtrl, params.zone_capacity, 512),
->      DEFINE_PROP_UINT32("zone_append_max_size", NvmeCtrl, params.zamds_bs, 0),
-> +    DEFINE_PROP_UINT32("zone_descr_ext_size", NvmeCtrl,
-> +                       params.zd_extension_size, 0),
->      DEFINE_PROP_INT32("max_active", NvmeCtrl, params.max_active_zones, 0),
->      DEFINE_PROP_INT32("max_open", NvmeCtrl, params.max_open_zones, 0),
->      DEFINE_PROP_UINT64("reset_rcmnd_delay", NvmeCtrl, params.rzr_delay_usec, 0),
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index e63f7736d7..4251295917 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -24,6 +24,7 @@ typedef struct NvmeParams {
->      uint64_t    zone_capacity;
->      int32_t     max_active_zones;
->      int32_t     max_open_zones;
-> +    uint32_t    zd_extension_size;
->      uint64_t    rzr_delay_usec;
->      uint64_t    rrl_usec;
->      uint64_t    fzr_delay_usec;
-> @@ -123,6 +124,7 @@ typedef struct NvmeNamespace {
->      NvmeZoneList    *imp_open_zones;
->      NvmeZoneList    *closed_zones;
->      NvmeZoneList    *full_zones;
-> +    uint8_t         *zd_extensions;
->      int32_t         nr_open_zones;
->      int32_t         nr_active_zones;
->      bool            aen_pending;
-> @@ -221,6 +223,12 @@ static inline bool nvme_wp_is_valid(NvmeZone *zone)
->             st != NVME_ZONE_STATE_OFFLINE;
->  }
->  
-> +static inline uint8_t *nvme_get_zd_extension(NvmeCtrl *n,
-> +    NvmeNamespace *ns, uint32_t zone_idx)
-> +{
-> +    return &ns->zd_extensions[zone_idx * n->params.zd_extension_size];
-> +}
-> +
->  /*
->   * Initialize a zone list head.
->   */
-> -- 
-> 2.21.0
-> 
-> 
 
