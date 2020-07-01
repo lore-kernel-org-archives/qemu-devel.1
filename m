@@ -2,95 +2,92 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73782C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DDFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41228206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5BB7206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:29:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WlXD7kXT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41228206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fwnsk58a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BB7206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqdjV-0004yv-Fq
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:29:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35314)
+	id 1jqdjy-00060u-Uw
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:29:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdUS-0006ZI-Gz
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:32 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51098)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdUQ-0000A3-Iz
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:32 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id l17so22608870wmj.0
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:13:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PJhXUCcF3c2PKDCFsCiaqFOmEKen6xlVm+g2tj8AYP8=;
- b=WlXD7kXTRinT7Nh0YWHeQjdrlpdwKW9wzLMBsuVgwCFPxDtx1THdoOTNvTmAoW+c6m
- uYX2DworzFB9U7oVOrQ5bZu/kk0jTpqeRG7JBe7DE/knr06Xsrkv2A0L9ScJBO5MlI15
- lGSIC6xnmIbMnPU9xnPt75lKLKFq+ZGYKLd70I7hwLVAyrh+ayuuJApL9t1NHDahY86u
- WS8pRCPL2nweFC9Dudd7htNV63Rqg6Wzi6rBU/KLBJHWDRB4BVH98zbWvpxe2sRUNFq7
- iRPw9m9424drJk2mcxRc/Q05+vbJY5uVby4UWKglAzKnmElti4YcRCcLWi5bHCPXqRRj
- 2mnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PJhXUCcF3c2PKDCFsCiaqFOmEKen6xlVm+g2tj8AYP8=;
- b=Rczy8EKcJWQ3jfdihvPk5Gtwg3/A4CuOu6w7A0dgjH15LnTBOkhiciU2gxmffjh2dQ
- uodOmVSuRQ+x1whc0FroZykB2RsByh/FsOMERJISiOfqds5mG/Jf/Tjjo2xt8j9OL2Ka
- mjZ5zwsHdZUCKpgjXakkAN4eLwJbbOdK8R0jxMoncrlTYX5KiVsL5XROz5A1bEDtJL6w
- hvv+SSb/iQ83hUsqPj53JdOUVjb7rw3MBwdu7b58CbkDADREoqNo+Bs7TkIT2BN/Ustt
- 06lLygxMNWLMwqxULHUfvaubE0DJMtDhY9+o4KYK5hjTe2x3WSOAC4IdxZdOGoyjfDXQ
- RrEA==
-X-Gm-Message-State: AOAM533xafsfMpSs5cu5MysSi8rrItPf/QgDGExFRh+BsAO13vAFs1ag
- dVVLaKJwpjeQ79zRD1w9R+ynag==
-X-Google-Smtp-Source: ABdhPJyFeqTgxTB7qpx/e9QfQREZkFwCuxVWJNm1e0sXeL3mMBqdGOtfwzVYJABhr67ua3awDjP+9A==
-X-Received: by 2002:a1c:4408:: with SMTP id r8mr26979777wma.100.1593612808833; 
- Wed, 01 Jul 2020 07:13:28 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w2sm7835430wrs.77.2020.07.01.07.13.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 07:13:27 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 27B561FF8F;
- Wed,  1 Jul 2020 14:56:56 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 32/40] tests/docker: add a linux-user testing focused image
-Date: Wed,  1 Jul 2020 14:56:44 +0100
-Message-Id: <20200701135652.1366-33-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200701135652.1366-1-alex.bennee@linaro.org>
-References: <20200701135652.1366-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqdjD-0004kT-AN
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:28:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45859
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqdjB-0002mq-Ml
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:28:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593613725;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zPU7EqFwV9rCrW2HV352NLHunw95kH1TtnN75ZIAk84=;
+ b=Fwnsk58a/YBVrMVh9Ic5RCzsz8C8cu6LbTh+47mqeRgrEqw8GMOyRWsDtHSGJEWE35AZom
+ S4HgX5TjFti3lg8YHJWKRd/KghcsEAHTzoEsH6dqzAHpxYXuHtzyrIuiapIS8NnIof/YUh
+ wosmzqzL7u/aos/IrBbmPl/EkNxQVCw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-tlNCgW0uORCzz2sNF6GX-Q-1; Wed, 01 Jul 2020 10:28:41 -0400
+X-MC-Unique: tlNCgW0uORCzz2sNF6GX-Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FDAD10059A9;
+ Wed,  1 Jul 2020 14:28:38 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51F1271662;
+ Wed,  1 Jul 2020 14:28:28 +0000 (UTC)
+Subject: Re: [PATCH v3 13/13] vhost-vdpa: introduce vhost-vdpa net client
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ cohuck@redhat.com, jasowang@redhat.com
+References: <20200701092449.17451-1-lulu@redhat.com>
+ <20200701092449.17451-14-lulu@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <dc1c8668-54b7-4b9f-cf0f-a0479339fa7d@redhat.com>
+Date: Wed, 1 Jul 2020 09:28:27 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200701092449.17451-14-lulu@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,120 +100,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- aurelien@aurel32.net
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, hanand@xilinx.com, hch@infradead.org, eperezma@redhat.com,
+ jgg@mellanox.com, shahafs@mellanox.com, kevin.tian@intel.com,
+ parav@mellanox.com, vmireyno@marvell.com, cunming.liang@intel.com,
+ gdawar@xilinx.com, jiri@mellanox.com, xiao.w.wang@intel.com,
+ stefanha@redhat.com, zhihong.wang@intel.com, Tiwei Bie <tiwei.bie@intel.com>,
+ aadam@redhat.com, rdunlap@infradead.org, maxime.coquelin@redhat.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We happily use all the cross images for both cross-building QEMU as
-well as building the linux-user tests. However calling docker from
-within docker seems not to work. As we can build in Debian anyway why
-not include an image that has all the compilers available for
-non-docker invocation.
+On 7/1/20 4:24 AM, Cindy Lu wrote:
+> This patch set introduces a new net client type: vhost-vdpa.
+> vhost-vdpa net client will set up a vDPA device which is specified
+> by a "vhostdev" parameter.
+> 
+> Signed-off-by: Lingshan Zhu <lingshan.zhu@intel.com>
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- .gitlab-ci.d/containers.yml                   |  7 +++
- tests/docker/Makefile.include                 |  1 +
- .../dockerfiles/debian-all-test-cross.docker  | 53 +++++++++++++++++++
- 3 files changed, 61 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-all-test-cross.docker
+> +++ b/qapi/net.json
 
-diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
-index f353359fd8b..a7621c4204c 100644
---- a/.gitlab-ci.d/containers.yml
-+++ b/.gitlab-ci.d/containers.yml
-@@ -64,6 +64,13 @@ amd64-debian-cross-container:
-   variables:
-     NAME: debian-amd64-cross
- 
-+amd64-debian-user-cross-container:
-+  <<: *container_job_definition
-+  stage: containers-layer2
-+  needs: ['amd64-debian10-container']
-+  variables:
-+    NAME: debian-all-test-cross
-+
- amd64-debian-container:
-   <<: *container_job_definition
-   stage: containers-layer2
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 977d8ff6e40..8406d039858 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -134,6 +134,7 @@ docker-image-travis: NOUSER=1
- 
- # Specialist build images, sometimes very limited tools
- docker-image-debian-tricore-cross: docker-image-debian9
-+docker-image-debian-all-test-cross: docker-image-debian10
- docker-image-debian-arm64-test-cross: docker-image-debian11
- 
- # These images may be good enough for building tests but not for test builds
-diff --git a/tests/docker/dockerfiles/debian-all-test-cross.docker b/tests/docker/dockerfiles/debian-all-test-cross.docker
-new file mode 100644
-index 00000000000..dedcea58b46
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-all-test-cross.docker
-@@ -0,0 +1,53 @@
-+#
-+# Docker all cross-compiler target (tests only)
-+#
-+# While the normal cross builds take care to setup proper multiarch
-+# build environments which can cross build QEMU this just installs the
-+# basic compilers for as many targets as possible. We shall use this
-+# to build and run linux-user tests on GitLab
-+#
-+FROM qemu/debian10
-+
-+# What we need to build QEMU itself
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt build-dep -yy qemu
-+
-+# Add the foreign architecture we want and install dependencies
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+        apt install -y --no-install-recommends \
-+        gcc-aarch64-linux-gnu \
-+        libc6-dev-arm64-cross \
-+        gcc-alpha-linux-gnu \
-+        libc6.1-dev-alpha-cross \
-+        gcc-arm-linux-gnueabihf \
-+        libc6-dev-armhf-cross \
-+        gcc-hppa-linux-gnu \
-+        libc6-dev-hppa-cross \
-+        gcc-m68k-linux-gnu \
-+        libc6-dev-m68k-cross \
-+        gcc-mips-linux-gnu \
-+        libc6-dev-mips-cross \
-+        gcc-mips64-linux-gnuabi64 \
-+        libc6-dev-mips64-cross \
-+        gcc-mips64el-linux-gnuabi64 \
-+        libc6-dev-mips64el-cross \
-+        gcc-mipsel-linux-gnu \
-+        libc6-dev-mipsel-cross \
-+        gcc-powerpc-linux-gnu \
-+        libc6-dev-powerpc-cross \
-+        gcc-powerpc64-linux-gnu \
-+        libc6-dev-ppc64-cross \
-+        gcc-powerpc64le-linux-gnu \
-+        libc6-dev-ppc64el-cross \
-+        gcc-riscv64-linux-gnu \
-+        libc6-dev-riscv64-cross \
-+        gcc-s390x-linux-gnu \
-+        libc6-dev-s390x-cross \
-+        gcc-sh4-linux-gnu \
-+        libc6-dev-sh4-cross \
-+        gcc-sparc64-linux-gnu \
-+        libc6-dev-sparc64-cross
-+
-+ENV QEMU_CONFIGURE_OPTS --disable-system --disable-docs --disable-tools
-+ENV DEF_TARGET_LIST aarch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,i386-linux-user,m68k-linux-user,mips-linux-user,mips64-linux-user,mips64el-linux-user,mipsel-linux-user,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,riscv64-linux-user,s390x-linux-user,sh4-linux-user,sparc64-linux-user
+>   ##
+>   # @NetClientDriver:
+>   #
+>   # Available netdev drivers.
+>   #
+> -# Since: 2.7
+> +# Since: 5.1
+
+This should be:
+
+# Since 2.7
+# @vhost-vdpa since 5.1
+
+since the enum itself is still available in older releases, it is only 
+the new member that was introduced in this series.
+
+>   ##
+>   { 'enum': 'NetClientDriver',
+>     'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+> +            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
+>   
+
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
