@@ -2,74 +2,92 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA97C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B034C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:27:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B89207BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:27:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B89207BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 10279206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:27:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALFwvkbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10279206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqdhn-0002cW-Ai
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:27:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38700)
+	id 1jqdiO-00037q-BJ
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jqdfv-0000Lx-NC
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:25:23 -0400
-Resent-Date: Wed, 01 Jul 2020 10:25:23 -0400
-Resent-Message-Id: <E1jqdfv-0000Lx-NC@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21377)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqdT7-0003jr-Km
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:12:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24780
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jqdfq-0001vV-Rq
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:25:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593613497; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=LIkcve+xUVCn37GggvN9jSDd+KUSHdYIrqi6vmIS6NhA8Hdbe0kO3rkYSyFQ4DvEUIWfjlWyODm1cOK72j9taZdz414oNsFCphc+e58IMPRIgh1Oxwno27s+/ak/NdWX9FLtxuZT8lg4kKp8Rh8vMLU259wh5QtAymu7TC9u30s=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593613497;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=MeQna3sOE1bogK1HrISvyaAEkB/Nc3QquUT6aUSm1oA=; 
- b=bWMAHkdXA6BsJs04prFSWhBrAy9HzgOey1I1U8NsH7NOH1XT0FMt4PCXkcgEQb8u1XEEaySxH8u+WnzU7HS7NkSZIJxJGpPFJw9tOKpWNpuzeYuC8nSLhyoOmVkY9Bfdqx5kUm7pj964ka1quKqwweJ6WnbE08wSO55gk/yTvGE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593613492399878.0960906124783;
- Wed, 1 Jul 2020 07:24:52 -0700 (PDT)
-Message-ID: <159361349123.26405.13886207944377670259@d1fd068a5071>
-Subject: Re: [PATCH v2] tests: disassemble-aml.sh: generate AML in readable
- format
-In-Reply-To: <20200701121349.50523-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jqdT6-0008U8-0T
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:12:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593612727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=92FH5m9pGzl/UyiByXozmNsK+hpLUZSp72dWeVI02Og=;
+ b=ALFwvkbMfyOtch5RuM7C6sIMXEVVS7q4QsxyYzi0i3EZEM6GmYgdC8+LpWbiRakLYDZ+Sg
+ 74xkkh8A5+I0LirKxe1cEdVJhH7Fscil7fApBPhBOW4wo+e2mwOwaUqcIglbr6lMMrjJN/
+ hagplZ+36AdkO3CSskNpP4bxjqbH8sw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-7d9YSBR8PI--ZeM3TQ-yGQ-1; Wed, 01 Jul 2020 10:12:05 -0400
+X-MC-Unique: 7d9YSBR8PI--ZeM3TQ-yGQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C2D8879510
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 14:12:04 +0000 (UTC)
+Received: from [10.3.114.107] (ovpn-114-107.phx2.redhat.com [10.3.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 28A6490351;
+ Wed,  1 Jul 2020 14:12:04 +0000 (UTC)
+Subject: Re: [PATCH 2/2] target-i386: sev: fail query-sev-capabilities if QEMU
+ cannot use SEV
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200630154521.552874-1-pbonzini@redhat.com>
+ <20200630154521.552874-3-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d68fb8a7-8423-02c6-c1a5-8438161c654e@redhat.com>
+Date: Wed, 1 Jul 2020 09:12:03 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mst@redhat.com
-Date: Wed, 1 Jul 2020 07:24:52 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 10:25:14
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200630154521.552874-3-pbonzini@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,44 +100,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMTEyMTM0OS41MDUy
-My0xLW1zdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjJdIHRlc3RzOiBkaXNhc3NlbWJsZS1hbWwuc2g6IGdl
-bmVyYXRlIEFNTCBpbiByZWFkYWJsZSBmb3JtYXQKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIw
-MjAwNzAxMTIxMzQ5LjUwNTIzLTEtbXN0QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwNzAxMTIxMzQ5LjUwNTIzLTEt
-bXN0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDcwMTEyMTM0OS41MDUyMy0xLW1zdEByZWRo
-YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWI1NDIzMiB0ZXN0czogZGlz
-YXNzZW1ibGUtYW1sLnNoOiBnZW5lcmF0ZSBBTUwgaW4gcmVhZGFibGUgZm9ybWF0Cgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNzU1
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRlc3RzL2RhdGEv
-YWNwaS9kaXNhc3NlbWxlLWFtbC5zaDoxMDoKKyAgICAgICAgZWNobyAiVXNhZ2U6IC4vdGVzdHMv
-ZGF0YS9hY3BpL2Rpc2Fzc2VtbGUtYW1sLnNoIFstbyA8b3V0cHV0LWRpcmVjdG9yeT5dIgoKRVJS
-T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4MTogRklMRTogdGVzdHMvZGF0YS9hY3BpL3Jl
-YnVpbGQtZXhwZWN0ZWQtYW1sLnNoOjM5OgorZWNobyAiWW91IGNhbiB1c2UgJHtTUkNfUEFUSH0v
-dGVzdHMvZGF0YS9hY3BpL2Rpc2Fzc2VtbGUtYW1sLnNoIHRvIGRpc2Fzc2VtYmxlIHRoZW0gdG8g
-QVNMLiIKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgNTkgbGluZXMgY2hlY2tlZAoKQ29t
-bWl0IGFiNTQyMzI5M2RhMiAodGVzdHM6IGRpc2Fzc2VtYmxlLWFtbC5zaDogZ2VuZXJhdGUgQU1M
-IGluIHJlYWRhYmxlIGZvcm1hdCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDExMjEzNDku
-NTA1MjMtMS1tc3RAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On 6/30/20 10:45 AM, Paolo Bonzini wrote:
+> In some cases, such as if the kvm-amd "sev" module parameter is set
+> to 0, SEV will be unavailable but query-sev-capabilities will still
+> return all the information.  This tricks libvirt into erroneously
+> reporting that SEV is available.  Check the actual usability of the
+> feature and return the appropriate error if QEMU cannot use KVM
+> or KVM cannot use SEV.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   target/i386/sev.c | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+> 
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 70f9ee026f..22194b3e32 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -450,6 +450,15 @@ sev_get_capabilities(Error **errp)
+>       uint32_t ebx;
+>       int fd;
+>   
+> +    if (!kvm_enabled()) {
+> +        error_setg(errp, "KVM not enabled\n");
+> +        return NULL;
+> +    }
+> +    if (kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, NULL) < 0) {
+> +        error_setg(errp, "SEV is not enabled\n");
+
+Patchew was correct: drop the two \n.  With that fix,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
