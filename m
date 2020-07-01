@@ -2,86 +2,86 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A682FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 892E6C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 794E1207BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AD072068F
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ad46nvnV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 794E1207BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QV9lfwcP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD072068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqdOM-0002W6-LH
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:07:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60734)
+	id 1jqdOd-00038g-KI
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdKl-0004ay-TA
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:03:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40174)
+ id 1jqdEf-0002Wu-RR
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42401)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdKk-0006og-4F
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:03:31 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h5so23977259wrc.7
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:03:29 -0700 (PDT)
+ id 1jqdEb-0005sN-VL
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:13 -0400
+Received: by mail-wr1-x443.google.com with SMTP id o11so23963673wrv.9
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 06:57:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=utjQK07eZNS2y1B+oG+Ze8AGzZ6ibCv0Se22YqtS0r0=;
- b=Ad46nvnVhRJa7GOwUF6AnPDsT5GSEkYL0Xv32G6ZbRoqanH2T5w+tMFHjZm24ISEl2
- zkD3Nwp5TcS/+d5bK3IPlpGcjW++hW1STGIGqDM1WavtxNrcbCIC/fFi3CcT+S64Ir9x
- RDk2gL+he4GlclDc9PqsdxJxZYGF7Ztwd598Z5g8Lfs+bwe9hAp+BgvmMavy9iwjq2/Y
- QYDdsWpNwZvjyuZlKKymW70JIFidsUBXN8y0zBAMzLjkEF1GLGt263qGGqaTfUIgnONu
- 5mpaM8h5v7yDcC2n3ylirnCjCqMTWW3FjZVvECxHGZ77DSjVrp8u0AthxU0CPasp0cOj
- ArDQ==
+ bh=ZQXPMBJFSRwRAMpnVcrqX7aTAD1ChFBfvwEUcI3QHF8=;
+ b=QV9lfwcPg8Ttws8CsGNaD1CPyYpwfk+XUjlDyReZPoF9eZo0F4/F/8DvpURdMKCLci
+ 1rDiqEbCpKFgMKAjfmPCCw/r5SHqeiGbFYWBI03AA3zI4qup9+aabS6qoovj0UChcP0U
+ HCOuWUErC8QxVOWUYXbSXDVKAK1MKg0rQ5SiQ11FB42E3lBfHPP5qJsJwL33K434TFc4
+ u6ZB6K3WeTmDK+98niCm3P1Usd4Xr6czgUgW5NHrGBs3OPWRXTNQaKcnW44h4J9bMsI6
+ Lsdbu4+D/qq+jCPGE4PmdCBP35r0oNjHrn69XjLG/BYYyBwQScl8c+rxrbOIIj0AucOk
+ BolQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=utjQK07eZNS2y1B+oG+Ze8AGzZ6ibCv0Se22YqtS0r0=;
- b=tZa55pEocEWkrb45gemwN/rymCqU4EAfrKAwugQyou6WgmOhX5E7P3bjZr4d0LQD2s
- aHrnm8RlUs4psmKbret1PkcBUQpT26pc0PHwan78GmHolqCECDOYnUV/OFhyojhOfaKG
- 2/hHuXjv0uladNatnlRTrRunuZBekJpo5TKuWZs1PnZAU2u6+YwLchwu/o79xzDLI6h1
- wpTF4dl8Ox8dWletPMFsTTo339DYUngwL2GGvjOw/9GriY/D/IrxvwYyZ8/CYAbx3TzL
- lEAXPIv7ZkwiXUuBJiEhzsJp9NwwsYNxAgWK+ghwoQ+TVKwGQNAC9E9uz1Jo/TXlf2nj
- LX2w==
-X-Gm-Message-State: AOAM531MjHhoXLv/rZe9wsCRKdJuhU1D4Yr8ncEjxm5PfjGWdIL07VbG
- OnPsb5lgGgHoDsrVZFWMm3sr2A==
-X-Google-Smtp-Source: ABdhPJyyRBn/+bXYOWoZ8tSNW0GzHH3CYxlSRMXQ1krjJ4BoAwweRoCdAbqse0t2Eplgw385WDC9CA==
-X-Received: by 2002:adf:f34e:: with SMTP id e14mr26740295wrp.299.1593612208754; 
- Wed, 01 Jul 2020 07:03:28 -0700 (PDT)
+ bh=ZQXPMBJFSRwRAMpnVcrqX7aTAD1ChFBfvwEUcI3QHF8=;
+ b=exK2T2MdWS6aFBy21shNs5k4lOpcVBAsMoKKdhNxF9a3cj3/5f7B9aOzanPwG/HtWs
+ QIZ92bNIJ3HVyohVrHSbQRWbPiasTJwgV9S4+5l3MmjFlhESWOygmGR42QSdU8k7mOkr
+ aHQFFkfpivQaV7tfQQrcm8UV5pitoRSFTZxGD+53bgjnk+gy+bUkvd9DmzRnVg48oa7M
+ iee8oELghmd4lHgpdnFfoU5roRd5847v5DmorVg8l5K7Jz8lC8umT059ifXVHSxPmkir
+ IhhUdSVV45M2Rpnvt8SyHE4TBN02kMPSpBfP8uMdI5IAqjeFMLJZccGdm/z0OFD37XYP
+ WuIg==
+X-Gm-Message-State: AOAM530Au7MmRUBIxpcYWsaACh9HeORlW74xHo7+0uGrBvVDacqoUYkS
+ jFGyrIkGEI/e5IvX5LVwUB9Gvw==
+X-Google-Smtp-Source: ABdhPJyg0RYEDdR5r1t7uGXKZgPWS8Fj8q6k8tIl0NVFnN2qNCeDD+ZlE0LvWpsSeH95TNMX0mLrkQ==
+X-Received: by 2002:adf:f311:: with SMTP id i17mr28013335wro.237.1593611828585; 
+ Wed, 01 Jul 2020 06:57:08 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u20sm7006588wmc.44.2020.07.01.07.03.26
+ by smtp.gmail.com with ESMTPSA id n5sm7285076wmi.34.2020.07.01.06.57.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 07:03:26 -0700 (PDT)
+ Wed, 01 Jul 2020 06:57:02 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 54CCD1FF9E;
- Wed,  1 Jul 2020 14:56:54 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 5CFEB1FFAE;
+ Wed,  1 Jul 2020 14:56:55 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v4 15/40] tests/vm: allow us to take advantage of MTTCG
-Date: Wed,  1 Jul 2020 14:56:27 +0100
-Message-Id: <20200701135652.1366-16-alex.bennee@linaro.org>
+Subject: [PATCH  v4 24/40] tests/docker: add --registry support to tooling
+Date: Wed,  1 Jul 2020 14:56:36 +0100
+Message-Id: <20200701135652.1366-25-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200701135652.1366-1-alex.bennee@linaro.org>
 References: <20200701135652.1366-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,7 +103,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
+Cc: fam@euphon.net, berrange@redhat.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
@@ -112,44 +112,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We currently limit TCG guests to -smp 1 but now we have added some
-aarch64 guests we can do better when running on x86_64 hardware.
-Raise the limit for TCG guests when it is safe to do so.
+This allows us to point the tools towards a registry from which they
+can grab pre-built layers instead of doing everything from scratch
+each time. To enable this we need to be using the DOCKER_BUILDKIT
+engine.
+
+[AJB: note registry.gitlab.com/stsquad/qemu is for my testing, the
+final version will see DOCKER_REGISTRY default to registry.gitlab.com/qemu-project/qemu]
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 ---
+v2
+  - add a pull stage to pull images from the registry
+  - enable BUILDKIT and BUILDKIT_INLINE_CACHE
+  - don't invoke BUILDKIT on Travis
 v4
-  - only attempt compute a bigger default_jobs is
-    multiprocessing.cpu_count > 1
+  - Don't pass --registry in the NOCACHE case
+  - precalc checksum before doing any replace steps
 ---
- tests/vm/basevm.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ tests/docker/Makefile.include |  6 ++++-
+ tests/docker/docker.py        | 44 ++++++++++++++++++++++++++++++-----
+ 2 files changed, 43 insertions(+), 7 deletions(-)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 890bbc5549a..21f46d1957d 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -551,8 +551,15 @@ def parse_config(config, args):
- def parse_args(vmcls):
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index e23b4af20ea..977d8ff6e40 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -13,6 +13,7 @@ DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.doc
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
+ DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
++DOCKER_REGISTRY := $(if $(REGISTRY),$(REGISTRY),registry.gitlab.com/stsquad/qemu)
  
-     def get_default_jobs():
--        if kvm_available(vmcls.arch):
--            return multiprocessing.cpu_count() // 2
-+        if multiprocessing.cpu_count() > 1:
-+            if kvm_available(vmcls.arch):
-+                return multiprocessing.cpu_count() // 2
-+            elif os.uname().machine == "x86_64" and \
-+                 vmcls.arch in ["aarch64", "x86_64", "i386"]:
-+                # MTTCG is available on these arches and we can allow
-+                # more cores. but only up to a reasonable limit. User
-+                # can always override these limits with --jobs.
-+                return min(multiprocessing.cpu_count() // 2, 8)
-         else:
-             return 1
+ DOCKER_TESTS := $(notdir $(shell \
+ 	find $(SRC_PATH)/tests/docker/ -name 'test-*' -type f))
+@@ -56,7 +57,9 @@ else
+ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 	$(call quiet-command,\
+ 		$(DOCKER_SCRIPT) build -t qemu/$* -f $< \
+-		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
++		$(if $V,,--quiet) \
++		$(if $(NOCACHE),--no-cache, \
++			$(if $(DOCKER_REGISTRY),--registry $(DOCKER_REGISTRY))) \
+ 		$(if $(NOUSER),,--add-current-user) \
+ 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+@@ -213,6 +216,7 @@ endif
+ 	@echo '                         Include extra files in image.'
+ 	@echo '    ENGINE=auto/docker/podman'
+ 	@echo '                         Specify which container engine to run.'
++	@echo '    REGISTRY=url         Cache builds from registry (default:$(DOCKER_REGISTRY))'
  
+ # This rule if for directly running against an arbitrary docker target.
+ # It is called by the expanded docker targets (e.g. make
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index cc6f76caa60..9684f07bdeb 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -221,6 +221,13 @@ class Docker(object):
+     """ Running Docker commands """
+     def __init__(self):
+         self._command = _guess_engine_command()
++
++        if "docker" in self._command and "TRAVIS" not in os.environ:
++            os.environ["DOCKER_BUILDKIT"] = "1"
++            self._buildkit = True
++        else:
++            self._buildkit = False
++
+         self._instance = None
+         atexit.register(self._kill_instances)
+         signal.signal(signal.SIGTERM, self._kill_instances)
+@@ -289,10 +296,24 @@ class Docker(object):
+         return labels.get("com.qemu.dockerfile-checksum", "")
+ 
+     def build_image(self, tag, docker_dir, dockerfile,
+-                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
++                    quiet=True, user=False, argv=None, registry=None,
++                    extra_files_cksum=[]):
+         if argv is None:
+             argv = []
+ 
++        # pre-calculate the docker checksum before any
++        # substitutions we make for caching
++        checksum = _text_checksum(_dockerfile_preprocess(dockerfile))
++
++        if registry is not None:
++            dockerfile = dockerfile.replace("FROM qemu/",
++                                            "FROM %s/qemu/" %
++                                            (registry))
++            # see if we can fetch a cache copy, may fail...
++            pull_args = ["pull", "%s/%s" % (registry, tag)]
++            self._do(pull_args, quiet=quiet)
++
++
+         tmp_df = tempfile.NamedTemporaryFile(mode="w+t",
+                                              encoding='utf-8',
+                                              dir=docker_dir, suffix=".docker")
+@@ -306,15 +327,23 @@ class Docker(object):
+                          (uname, uid, uname))
+ 
+         tmp_df.write("\n")
+-        tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+-                     _text_checksum(_dockerfile_preprocess(dockerfile)))
++        tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" % (checksum))
+         for f, c in extra_files_cksum:
+             tmp_df.write("LABEL com.qemu.%s-checksum=%s" % (f, c))
+ 
+         tmp_df.flush()
+ 
+-        self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv +
+-                       [docker_dir],
++        build_args = ["build", "-t", tag, "-f", tmp_df.name]
++        if self._buildkit:
++            build_args += ["--build-arg", "BUILDKIT_INLINE_CACHE=1"]
++
++        if registry is not None:
++            cache = "%s/%s" % (registry, tag)
++            build_args += ["--cache-from", cache]
++        build_args += argv
++        build_args += [docker_dir]
++
++        self._do_check(build_args,
+                        quiet=quiet)
+ 
+     def update_image(self, tag, tarball, quiet=True):
+@@ -403,6 +432,8 @@ class BuildCommand(SubCommand):
+         parser.add_argument("--add-current-user", "-u", dest="user",
+                             action="store_true",
+                             help="Add the current user to image's passwd")
++        parser.add_argument("--registry", "-r",
++                            help="cache from docker registry")
+         parser.add_argument("-t", dest="tag",
+                             help="Image Tag")
+         parser.add_argument("-f", dest="dockerfile",
+@@ -458,7 +489,8 @@ class BuildCommand(SubCommand):
+                      for k, v in os.environ.items()
+                      if k.lower() in FILTERED_ENV_NAMES]
+             dkr.build_image(tag, docker_dir, dockerfile,
+-                            quiet=args.quiet, user=args.user, argv=argv,
++                            quiet=args.quiet, user=args.user,
++                            argv=argv, registry=args.registry,
+                             extra_files_cksum=cksum)
+ 
+             rmtree(docker_dir)
 -- 
 2.20.1
 
