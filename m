@@ -2,87 +2,87 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 385BEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24426C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:21:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05BE42085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:19:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyVoNVEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05BE42085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EEFC220781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEFC220781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqhKg-00032s-87
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43192)
+	id 1jqhMT-0004qH-89
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqhJF-000249-AI
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:18:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27600
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqhJC-0002sR-O4
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:18:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593627489;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=NsTlQXv/1lVA4yowhV6xXFM+EjkuGwf9ZLFWHvHOph0=;
- b=RyVoNVEIZjaIlhri/uNT2UlSDKowFh4i48j+adHISxQL/PYifBEh2Al43k4A62JQu61soA
- dApHmPdNb3pxjWZylzq26bCENzrHeEu8HhWcf1cHGutS3wEUpMPt/+Y5/wem8cIZGnZZ5/
- Ljae5TxiPc1rQ2gsqt/DzDOGF1NyEDA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-4xZ0gxsMPgaROOg0nJw01Q-1; Wed, 01 Jul 2020 14:18:06 -0400
-X-MC-Unique: 4xZ0gxsMPgaROOg0nJw01Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2491A0BDD
- for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 18:18:05 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA21771662;
- Wed,  1 Jul 2020 18:18:02 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A678D16E16; Wed,  1 Jul 2020 20:18:01 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqhLg-0004Em-Sb
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:20:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40616)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jqhLe-0003RQ-88
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:20:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jqhLb-0004dO-GV
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 18:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 79DF42E810D
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 18:20:39 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Jul 2020 18:13:09 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878645@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] ui: fix vc_chr_write call in text_console_do_init
-Date: Wed,  1 Jul 2020 20:18:01 +0200
-Message-Id: <20200701181801.27935-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr ajbennee philmd
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
+ <20200701135652.1366-2-alex.bennee@linaro.org>
+ <85314d31-813a-8c20-7522-5186d5f31884@redhat.com> <87pn9fqjcd.fsf@linaro.org>
+ <838d4d01-cd9e-d74a-5cd2-b23644172c9f@redhat.com> <87k0znqi03.fsf@linaro.org>
+ <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
+ <bc418946-9d67-6efa-d6c7-dd2d8c5d757c@redhat.com>
+ <2e9d5ba9-fef2-6cec-3f96-d1b433d0d818@redhat.com>
+Message-ID: <bbd66a22-dd70-c8c0-0f03-3cd27430bc29@redhat.com>
+Subject: [Bug 1878645] Re: [PATCH v4 01/40] hw/isa: check for current_cpu
+ before generating IRQ
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0ec513e66af39414b68f0a4dc97dd48d2275deb2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 10:05:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,43 +91,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200701181309.QjusxzhdwaBQ6_q_ziij6jzfptkR7adFedSrOZ-x82w@z>
 
-In case the string doesn't fit into the buffer snprintf returns the size
-it would need, so len can be larger than the buffer.  Fix this by simply
-using g_strdup_printf() instead of a static buffer.
+On 7/1/20 7:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> +MST/Igor for ICH9
+> =
 
-Reported-by: Wenxiang Qian <leonwxqian@gmail.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/console.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> On 7/1/20 7:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 7/1/20 7:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> +Paolo
+>>>
+>>> On 7/1/20 7:09 PM, Alex Benn=C3=A9e wrote:
+>>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>>>> On 7/1/20 6:40 PM, Alex Benn=C3=A9e wrote:
+>>>>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>>>>>
+>>>>>>> On 7/1/20 3:56 PM, Alex Benn=C3=A9e wrote:
+>>>>>>>> It's possible to trigger this function from qtest/monitor at which
+>>>>>>>> point current_cpu won't point at the right place. Check it and
+>>>>>>>> fall back to first_cpu if it's NULL.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>>>>> Cc: Bug 1878645 <1878645@bugs.launchpad.net>
+>>>>>>>> ---
+>>>>>>>>  hw/isa/lpc_ich9.c | 2 +-
+>>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>>>
+>>>>>>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>>>>>>>> index cd6e169d47a..791c878eb0b 100644
+>>>>>>>> --- a/hw/isa/lpc_ich9.c
+>>>>>>>> +++ b/hw/isa/lpc_ich9.c
+>>>>>>>> @@ -439,7 +439,7 @@ static void ich9_apm_ctrl_changed(uint32_t val=
+, void *arg)
+>>>>>>>>                  cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+>>>>>>>>              }
+>>>>>>>>          } else {
+>>>>>>>> -            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
+>>>>>>>> +            cpu_interrupt(current_cpu ? current_cpu : first_cpu, =
+CPU_INTERRUPT_SMI);
+>>>>>>>
+>>>>>>> I'm not sure this change anything, as first_cpu is NULL when using
+>>>>>>> qtest accelerator or none-machine, see 508b4ecc39 ("gdbstub.c: fix
+>>>>>>> GDB connection segfault caused by empty machines").
+>>>>>>
+>>>>>> Good point - anyway feel free to ignore - it shouldn't have been in =
+this
+>>>>>> series. It was just some random experimentation I was doing when loo=
+king
+>>>>>> at that bug.
+>>>>>
+>>>>> See commit c781a2cc42 ("hw/i386/vmport: Allow QTest use without
+>>>>> crashing") for a similar approach, but here I was thinking about
+>>>>> a more generic fix, not very intrusive:
+>>>>>
+>>>>> -- >8 --
+>>>>> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
+>>>>> index bce266b957..809afeb3e4 100644
+>>>>> --- a/hw/isa/apm.c
+>>>>> +++ b/hw/isa/apm.c
+>>>>> @@ -40,7 +40,7 @@ static void apm_ioport_writeb(void *opaque, hwaddr
+>>>>> addr, uint64_t val,
+>>>>>      if (addr =3D=3D 0) {
+>>>>>          apm->apmc =3D val;
+>>>>>
+>>>>> -        if (apm->callback) {
+>>>>> +        if (apm->callback && !qtest_enabled()) {
+>>>>>              (apm->callback)(val, apm->arg);
+>>>>>          }
+>>>>
+>>>> But the other failure mode reported on the bug thread was via the
+>>>> monitor - so I'm not sure just checking for qtest catches that.
+>>>
+>>> Ah indeed.
+>>>
+>>> in exec.c:
+>>>
+>>> /* current CPU in the current thread. It is only valid inside
+>>>    cpu_exec() */
+>>> __thread CPUState *current_cpu;
+>>>
+>>> Maybe we shouldn't use current_cpu out of exec.c...
+>>
+>> I meant, out of cpu_exec(), a cpu thread. Here we access it
+>> from an I/O thread.
 
-diff --git a/ui/console.c b/ui/console.c
-index 865fa3263597..5ba0f21831cb 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2184,12 +2184,12 @@ static void text_console_do_init(Chardev *chr, DisplayState *ds)
-     text_console_resize(s);
- 
-     if (chr->label) {
--        char msg[128];
--        int len;
-+        char *msg;
- 
-         s->t_attrib.bgcol = QEMU_COLOR_BLUE;
--        len = snprintf(msg, sizeof(msg), "%s console\r\n", chr->label);
--        vc_chr_write(chr, (uint8_t *)msg, len);
-+        msg = g_strdup_printf("%s console\r\n", chr->label);
-+        vc_chr_write(chr, (uint8_t *)msg, strlen(msg));
-+        g_free(msg);
-         s->t_attrib = s->t_attrib_default;
-     }
- 
--- 
-2.18.4
+Ah! we are in the monitor thread... It makes sense there is not
+current_cpu assigned :)
 
+> =
+
+> ARM and S390X use:
+> =
+
+> hw/arm/boot.c:460:    ARMCPU *armcpu =3D ARM_CPU(qemu_get_cpu(0));
+> hw/arm/virt.c:331:    armcpu =3D ARM_CPU(qemu_get_cpu(0));
+> hw/arm/virt.c:549:    armcpu =3D ARM_CPU(qemu_get_cpu(0));
+> hw/cpu/a15mpcore.c:69:        cpuobj =3D OBJECT(qemu_get_cpu(0));
+> hw/cpu/a9mpcore.c:76:    cpuobj =3D OBJECT(qemu_get_cpu(0));
+> target/s390x/cpu_models.c:155:        cpu =3D S390_CPU(qemu_get_cpu(0));
+> target/s390x/cpu_models.c:169:        cpu =3D S390_CPU(qemu_get_cpu(0));
+> target/s390x/cpu_models.c:184:        cpu =3D S390_CPU(qemu_get_cpu(0));
+> target/s390x/cpu_models.c:204:        cpu =3D S390_CPU(qemu_get_cpu(0));
+> target/s390x/cpu_models.c:218:        cpu =3D S390_CPU(qemu_get_cpu(0));
+> =
+
+> It seems odd that the ICH9 delivers the SMI on a random core.
+> Usually the IRQ lines are wired to a particular unit.
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1878645
+
+Title:
+  null-ptr dereference in ich9_apm_ctrl_changed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  While fuzzing, I found an input which triggers a NULL pointer dereference=
+ in
+  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
+is bug
+  is specific to QTest?
+
+  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
+00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
+  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
+  =3D=3D23862=3D=3DHint: address points to the zero page.
+      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
+mu/accel/tcg/tcg-all.c:57:21
+      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
+ude/hw/core/cpu.h:872:5
+      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
+emu/hw/isa/lpc_ich9.c:442:13
+      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
+hw/isa/apm.c:50:13
+      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
+pment/qemu/memory.c:483:5
+      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
+nt/qemu/memory.c:544:18
+      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
+pment/qemu/memory.c:1476:16
+      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
+/qemu/exec.c:3137:23
+      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
+c.c:3177:14
+      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
+u/exec.c:3268:18
+      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
+:60:5
+      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
+qemu/qtest.c:392:13
+      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
+mu/qtest.c:710:9
+      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
+c:722:5
+      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
+/qemu/chardev/char.c:183:9
+      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
+/chardev/char.c:195:9
+      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
+ev/char-fd.c:68:9
+      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
+elopment/qemu/io/channel-watch.c:84:12
+      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e897)
+      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
+ftmmu/vl.c:1664:9
+      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
+.c:49:5
+      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
+6-softmmu/qemu-system-i386+0xc9c819)
+
+  =
+
+  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
+qtest commands:
+
+  cat << EOF | ./qemu-system-i386 \
+  -qtest stdio -nographic -monitor none -serial none \
+  -M pc-q35-5.0
+  outl 0xcf8 0x8400f841
+  outl 0xcfc 0xaa215d6d
+  outl 0x6d30 0x2ef8ffbe
+  outb 0xb2 0x20
+  EOF
+
+  Please let me know if I can provide any further info.
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
