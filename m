@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC7BC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AABC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D12C206BE
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B83E220663
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:03:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FUi1Ug+K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D12C206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hs6B33Zu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B83E220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqdKB-0002pk-Dz
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:02:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58894)
+	id 1jqdKt-0004L8-Ub
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:03:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdEY-0002NV-UA
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:06 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35406)
+ id 1jqdEa-0002RS-Ii
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:08 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35786)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdEU-0005qj-2Z
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:06 -0400
-Received: by mail-wr1-x442.google.com with SMTP id z2so1691002wrp.2
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 06:57:01 -0700 (PDT)
+ id 1jqdEX-0005rS-JA
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 09:57:08 -0400
+Received: by mail-wr1-x431.google.com with SMTP id z2so1691298wrp.2
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 06:57:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=kdMIZtPe+aZda1/mXQW7aQb8KseTM0tT+oUaOxEz8I4=;
- b=FUi1Ug+K06dvncuG77Qt7vxbcICGi5I+96sl4/hStG1FXbAG7SZQuuw5bMGbjeErhi
- lT04KV0E+95hhsgHwEAqw1O+zhxG5SLaaPL/Q5bMIrJB2Msft6fTpe1+CrVtboUhjynS
- gJrs+JSANAKdk+QzHbMpsiwMb3XGUqWTyVzE1Vvi/DZVP+UVLxjTqTykyFL7/iu3uLEk
- esn52Tmo5/hyBzmRjAqV7/cqRWWgeKS2BUA8n2rTSSFn+oyrJtHb9PuZ3ywwiD6vJCbb
- 1bGrUT/w8CoZ6h1O9oYyzItl6kRdBqx497WJKIXRpUDDFopLzyfphH4idRqP4FdqBort
- a9bA==
+ bh=lPp8XkbnsM3c17W7WUUEalp68Xx8V1JQ2Yf70AfovqA=;
+ b=hs6B33ZuIJP/corK1jB5ucTI9w3eJccTMvFHqd+Wbq40qTGa7ed8yo+pkq7kV2KPuZ
+ dAEGGemtJ43yhk9IDG9vqLODV5/afVYJUlmy/RS+US028CU9Rt8pN8jr4g0XW314ejqh
+ 56T1dy030+ENVNHcUYCT/xEsPH5KubVKH5bubg3J7PY/eDaow2Aku/BNEvAbdno1bJzM
+ FL2D8Lgj9HAPnJezUG6EVXUl7f3hpgEwIsUhroz1WCfpUsOiizn2VG3bl9PiHxCsGovT
+ h0aKfZ6IJWABO3FVCTlTMH0Qw+PdA+t9/XXFJILbCw+opBhEDHInW3Z01+yXJpsiNGJx
+ 3Bhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kdMIZtPe+aZda1/mXQW7aQb8KseTM0tT+oUaOxEz8I4=;
- b=Ym+hKxRV2P9AcUkFwjzy9My1lIBeHLo4f1w6qwt4A6lN68Kp7Vuai15RHf0RsmsmxH
- Z3AcbcFjdKyRpTgt4HGTIhx/zSdyr7xJDsspyYKaJGVQ7MYuL3+526yWCWFy+v+ws88w
- bdAte4G7eafvbnBS7bRQwTe6q/OrnshPeS9sJ404lpwts+iBx7CFm+j4emDr6KA1edVf
- 0OjY7n+MqPBvuQCMTfSBGr9g1mWpMdygzXaVh8+B9wAONOoFydMi7zwp8QJYucp9lFOa
- wU25PgyXCb0rZpCVyeS13W59la77c5K5iMXY37xBSfXiIDS5FMPkwdyJ5ldsTDsKaNyd
- mfzg==
-X-Gm-Message-State: AOAM532pUyZ+b3qZbssain1aWyahrpIkr6cSGjsjMcEIPPUWo2YstljW
- KpYkzthn2949uQwmTENMLLh6rA==
-X-Google-Smtp-Source: ABdhPJxtH5F2ccF9Sf0g/KGEp/TTW7HRV9prurF3v2hg8yhY0PkHJLfoGuBHMZROTuZL7M3/bDpV/Q==
-X-Received: by 2002:a05:6000:1008:: with SMTP id
- a8mr27719999wrx.416.1593611820666; 
- Wed, 01 Jul 2020 06:57:00 -0700 (PDT)
+ bh=lPp8XkbnsM3c17W7WUUEalp68Xx8V1JQ2Yf70AfovqA=;
+ b=RmdGBPU9D7BfZs/R2LGAOMQrxFELXIeKwGKxdhmMx21Et8ylDwctqxZUuRW6CY0Klg
+ fDNmugj5OcIkDpqJIhFToyUqClvge1oBSd6W4ju7O6I9WNvMN+A+bgT+JjiuTans0MDF
+ 2J9VUT+sWoPkUqjtft25l8KcFLSxefABOAQAUA6PDkKXmtsAeI+YVQEZkq9ZVlVoo033
+ aVyc9MXpp+mPVvKMjWDnvkWg8xHGQv3xVxE6kPc/1FB0DexZlnaPNXzWzbYGDc0MBVFU
+ gElW9W1JKlajZbhVqSxiEmNOQMWlD7ZuX1Sxau95L39YAVLlFVlYZsTU51FROBUAh2K4
+ ls4A==
+X-Gm-Message-State: AOAM530igDKYAKfAgmVxC3bNYzDw9psSas3h7Up7ex+aAhLoBXlHs+Ou
+ pO8F1v3IGKLO3NuoKd+1kliBxw==
+X-Google-Smtp-Source: ABdhPJwNzyRXyKa71o1J9mM+/4urUsWcyziLA29ZMC+U5MmN74a3eckER20fy7k9LpPGYIPgYT6stQ==
+X-Received: by 2002:a5d:484b:: with SMTP id n11mr25751128wrs.320.1593611823980; 
+ Wed, 01 Jul 2020 06:57:03 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g13sm7916366wro.84.2020.07.01.06.56.57
+ by smtp.gmail.com with ESMTPSA id 207sm8165108wme.13.2020.07.01.06.56.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 01 Jul 2020 06:57:00 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D0AB81FF99;
+ by zen.linaroharston (Postfix) with ESMTP id B60331FF98;
  Wed,  1 Jul 2020 14:56:53 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v4 10/40] tests/vm: Added a new script for centos.aarch64.
-Date: Wed,  1 Jul 2020 14:56:22 +0100
-Message-Id: <20200701135652.1366-11-alex.bennee@linaro.org>
+Subject: [PATCH  v4 09/40] tests/vm: Added a new script for ubuntu.aarch64.
+Date: Wed,  1 Jul 2020 14:56:21 +0100
+Message-Id: <20200701135652.1366-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200701135652.1366-1-alex.bennee@linaro.org>
 References: <20200701135652.1366-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -115,152 +114,333 @@ Sender: "Qemu-devel"
 
 From: Robert Foley <robert.foley@linaro.org>
 
-centos.aarch64 creates a CentOS 8 image.
-Also added a new kickstart script used to build the centos.aarch64 image.
+ubuntu.aarch64 provides a script to create an Ubuntu 18.04 VM.
+Another new file is also added aarch64vm.py, which is a module with
+common methods used by aarch64 VMs, such as how to create the
+flash images.
 
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200601211421.1277-7-robert.foley@linaro.org>
+Message-Id: <20200601211421.1277-6-robert.foley@linaro.org>
 ---
- tests/vm/Makefile.include    |   3 +-
- tests/vm/centos-8-aarch64.ks |  51 ++++++++
- tests/vm/centos.aarch64      | 227 +++++++++++++++++++++++++++++++++++
- 3 files changed, 280 insertions(+), 1 deletion(-)
- create mode 100644 tests/vm/centos-8-aarch64.ks
- create mode 100755 tests/vm/centos.aarch64
+ configure                 |  20 +++++++
+ tests/vm/Makefile.include |  11 ++++
+ tests/vm/aarch64vm.py     | 106 ++++++++++++++++++++++++++++++++++++++
+ tests/vm/basevm.py        |  12 +++++
+ tests/vm/ubuntu.aarch64   |  68 ++++++++++++++++++++++++
+ 5 files changed, 217 insertions(+)
+ create mode 100644 tests/vm/aarch64vm.py
+ create mode 100755 tests/vm/ubuntu.aarch64
 
+diff --git a/configure b/configure
+index 96256be057a..1fb4d5b61e4 100755
+--- a/configure
++++ b/configure
+@@ -418,6 +418,7 @@ prefix="/usr/local"
+ mandir="\${prefix}/share/man"
+ datadir="\${prefix}/share"
+ firmwarepath="\${prefix}/share/qemu-firmware"
++efi_aarch64=""
+ qemu_docdir="\${prefix}/share/doc/qemu"
+ bindir="\${prefix}/bin"
+ libdir="\${prefix}/lib"
+@@ -1109,6 +1110,8 @@ for opt do
+   ;;
+   --firmwarepath=*) firmwarepath="$optarg"
+   ;;
++  --efi-aarch64=*) efi_aarch64="$optarg"
++  ;;
+   --host=*|--build=*|\
+   --disable-dependency-tracking|\
+   --sbindir=*|--sharedstatedir=*|\
+@@ -1787,6 +1790,7 @@ Advanced options (experts only):
+   --sysconfdir=PATH        install config in PATH$confsuffix
+   --localstatedir=PATH     install local state in PATH (set at runtime on win32)
+   --firmwarepath=PATH      search PATH for firmware files
++  --efi-aarch64=PATH       PATH of efi file to use for aarch64 VMs.
+   --with-confsuffix=SUFFIX suffix for QEMU data inside datadir/libdir/sysconfdir [$confsuffix]
+   --with-pkgversion=VERS   use specified string as sub-version of the package
+   --enable-debug           enable common debug build options
+@@ -3606,6 +3610,20 @@ EOF
+   fi
+ fi
+ 
++############################################
++# efi-aarch64 probe
++# Check for efi files needed by aarch64 VMs.
++# By default we will use the efi included with QEMU.
++# Allow user to override the path for efi also.
++if ! test -f "$efi_aarch64"; then
++  if test -f $source_path/pc-bios/edk2-aarch64-code.fd.bz2; then
++    # valid after build
++    efi_aarch64=$PWD/pc-bios/edk2-aarch64-code.fd
++  else
++    efi_aarch64=""
++  fi
++fi
++
+ ##########################################
+ # libcap-ng library probe
+ if test "$cap_ng" != "no" ; then
+@@ -6850,6 +6868,7 @@ if test "$docs" != "no"; then
+     echo "sphinx-build      $sphinx_build"
+ fi
+ echo "genisoimage       $genisoimage"
++echo "efi_aarch64       $efi_aarch64"
+ echo "python_yaml       $python_yaml"
+ echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
+ if test "$slirp" != "no" ; then
+@@ -7936,6 +7955,7 @@ echo "PYTHON=$python" >> $config_host_mak
+ echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
+ echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
+ echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
++echo "EFI_AARCH64=$efi_aarch64" >> $config_host_mak
+ echo "PYTHON_YAML=$python_yaml" >> $config_host_mak
+ echo "CC=$cc" >> $config_host_mak
+ if $iasl -h > /dev/null 2>&1; then
 diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 4fa292765d5..39f918a430a 100644
+index f6c3892bb28..4fa292765d5 100644
 --- a/tests/vm/Makefile.include
 +++ b/tests/vm/Makefile.include
-@@ -6,7 +6,7 @@ IMAGES := freebsd netbsd openbsd centos fedora
+@@ -5,6 +5,9 @@
+ IMAGES := freebsd netbsd openbsd centos fedora
  ifneq ($(GENISOIMAGE),)
  IMAGES += ubuntu.i386 centos
- ifneq ($(EFI_AARCH64),)
--IMAGES += ubuntu.aarch64
-+IMAGES += ubuntu.aarch64 centos.aarch64
- endif
++ifneq ($(EFI_AARCH64),)
++IMAGES += ubuntu.aarch64
++endif
  endif
  
-@@ -28,6 +28,7 @@ ifneq ($(GENISOIMAGE),)
+ IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
+@@ -23,6 +26,11 @@ vm-help vm-test:
+ ifneq ($(GENISOIMAGE),)
+ 	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, with Docker"
  	@echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 VM"
- ifneq ($(EFI_AARCH64),)
- 	@echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu aarch64 VM"
-+	@echo "  vm-build-centos.aarch64         - Build QEMU in CentOS aarch64 VM"
++ifneq ($(EFI_AARCH64),)
++	@echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu aarch64 VM"
++else
++	@echo "  (to build centos/ubuntu aarch64 images use configure --efi-aarch64)"
++endif
  else
- 	@echo "  (to build centos/ubuntu aarch64 images use configure --efi-aarch64)"
+ 	@echo "  (install genisoimage to build centos/ubuntu images)"
  endif
-diff --git a/tests/vm/centos-8-aarch64.ks b/tests/vm/centos-8-aarch64.ks
+@@ -65,6 +73,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+ 		$(if $(V)$(DEBUG), --debug) \
+ 		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
+ 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
++		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
+ 		--image "$@" \
+ 		--force \
+ 		--build-image $@, \
+@@ -80,6 +89,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
+ 		$(if $(J),--jobs $(J)) \
+ 		$(if $(V),--verbose) \
+ 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
++		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
+ 		--image "$<" \
+ 		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
+ 		--snapshot \
+@@ -102,6 +112,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
+ 		$(if $(J),--jobs $(J)) \
+ 		$(if $(V)$(DEBUG), --debug) \
+ 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
++		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
+ 		--image "$<" \
+ 		--interactive \
+ 		false, \
+diff --git a/tests/vm/aarch64vm.py b/tests/vm/aarch64vm.py
 new file mode 100644
-index 00000000000..fd6ebe4d49e
+index 00000000000..bb04cb19c91
 --- /dev/null
-+++ b/tests/vm/centos-8-aarch64.ks
-@@ -0,0 +1,51 @@
-+# CentOS aarch64 image kickstart file.
-+# This file is used by the CentOS installer to
-+# script the generation of the image.
-+#
-+# Copyright 2020 Linaro
-+#
-+ignoredisk --only-use=vda
-+# System bootloader configuration
-+bootloader --append=" crashkernel=auto" --location=mbr --boot-drive=vda
-+autopart --type=plain
-+# Partition clearing information
-+clearpart --linux --initlabel --drives=vda
-+# Use text mode install
-+text
-+repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream
-+# Use CDROM installation media
-+cdrom
-+# Keyboard layouts
-+keyboard --vckeymap=us --xlayouts=''
-+# System language
-+lang en_US.UTF-8
-+
-+# Network information
-+network  --bootproto=dhcp --device=enp0s1 --onboot=off --ipv6=auto --no-activate
-+network  --hostname=localhost.localdomain
-+# Run the Setup Agent on first boot
-+firstboot --enable
-+# Do not configure the X Window System
-+skipx
-+# System services
-+services --enabled="chronyd"
-+# System timezone
-+timezone America/New_York --isUtc
-+
-+# Shutdown after installation is complete.
-+shutdown
-+
-+%packages
-+@^server-product-environment
-+kexec-tools
-+
-+%end
-+
-+%addon com_redhat_kdump --enable --reserve-mb='auto'
-+
-+%end
-+%anaconda
-+pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
-+pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
-+pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
-+%end
-diff --git a/tests/vm/centos.aarch64 b/tests/vm/centos.aarch64
-new file mode 100755
-index 00000000000..d5232ecdb8c
---- /dev/null
-+++ b/tests/vm/centos.aarch64
-@@ -0,0 +1,227 @@
++++ b/tests/vm/aarch64vm.py
+@@ -0,0 +1,106 @@
 +#!/usr/bin/env python3
 +#
-+# Centos aarch64 image
++# VM testing aarch64 library
 +#
 +# Copyright 2020 Linaro
 +#
 +# Authors:
 +#  Robert Foley <robert.foley@linaro.org>
-+#  Originally based on ubuntu.aarch64
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++#
++import os
++import sys
++import subprocess
++import basevm
++from qemu.accel import kvm_available
++
++# This is the config needed for current version of QEMU.
++# This works for both kvm and tcg.
++CURRENT_CONFIG = {
++    'cpu'          : "max",
++    'machine'      : "virt,gic-version=max",
++}
++
++# The minimum minor version of QEMU we will support with aarch64 VMs is 3.
++# QEMU versions less than 3 have various issues running these VMs.
++QEMU_AARCH64_MIN_VERSION = 3
++
++# The DEFAULT_CONFIG will default to a version of
++# parameters that works for backwards compatibility.
++DEFAULT_CONFIG = {'kvm' : {'cpu'          : "host",
++                           'machine'      : "virt,gic-version=host"},
++                  'tcg' : {'cpu'          : "cortex-a57",
++                           'machine'      : "virt"},
++}
++
++def get_config_defaults(vmcls, default_config):
++    """Fetch the configuration defaults for this VM,
++       taking into consideration the defaults for
++       aarch64 first, followed by the defaults for this VM."""
++    config = default_config
++    config.update(aarch_get_config_defaults(vmcls))
++    return config
++
++def aarch_get_config_defaults(vmcls):
++    """Set the defaults for current version of QEMU."""
++    config = CURRENT_CONFIG
++    args, argv = basevm.parse_args(vmcls)
++    qemu_path = basevm.get_qemu_path(vmcls.arch, args.build_path)
++    qemu_version = basevm.get_qemu_version(qemu_path)
++    if qemu_version < QEMU_AARCH64_MIN_VERSION:
++        error = "\nThis major version of QEMU {} is to old for aarch64 VMs.\n"\
++                "The major version must be at least {}.\n"\
++                "To continue with the current build of QEMU, "\
++                "please restart with QEMU_LOCAL=1 .\n"
++        print(error.format(qemu_version, QEMU_AARCH64_MIN_VERSION))
++        exit(1)
++    if qemu_version == QEMU_AARCH64_MIN_VERSION:
++        # We have an older version of QEMU,
++        # set the config values for backwards compatibility.
++        if kvm_available('aarch64'):
++            config.update(DEFAULT_CONFIG['kvm'])
++        else:
++            config.update(DEFAULT_CONFIG['tcg'])
++    return config
++
++def create_flash_images(flash_dir="./", efi_img=""):
++    """Creates the appropriate pflash files
++       for an aarch64 VM."""
++    flash0_path = get_flash_path(flash_dir, "flash0")
++    flash1_path = get_flash_path(flash_dir, "flash1")
++    fd_null = open(os.devnull, 'w')
++    subprocess.check_call(["dd", "if=/dev/zero", "of={}".format(flash0_path),
++                           "bs=1M", "count=64"],
++                           stdout=fd_null, stderr=subprocess.STDOUT)
++    # A reliable way to get the QEMU EFI image is via an installed package or
++    # via the bios included with qemu.
++    if not os.path.exists(efi_img):
++        sys.stderr.write("*** efi argument is invalid ({})\n".format(efi_img))
++        sys.stderr.write("*** please check --efi-aarch64 argument or "\
++                         "install qemu-efi-aarch64 package\n")
++        exit(3)
++    subprocess.check_call(["dd", "if={}".format(efi_img),
++                           "of={}".format(flash0_path),
++                           "conv=notrunc"],
++                           stdout=fd_null, stderr=subprocess.STDOUT)
++    subprocess.check_call(["dd", "if=/dev/zero",
++                           "of={}".format(flash1_path),
++                           "bs=1M", "count=64"],
++                           stdout=fd_null, stderr=subprocess.STDOUT)
++    fd_null.close()
++
++def get_pflash_args(flash_dir="./"):
++    """Returns a string that can be used to
++       boot qemu using the appropriate pflash files
++       for aarch64."""
++    flash0_path = get_flash_path(flash_dir, "flash0")
++    flash1_path = get_flash_path(flash_dir, "flash1")
++    pflash_args_str = "-drive file={},format=raw,if=pflash "\
++                      "-drive file={},format=raw,if=pflash"
++    pflash_args = pflash_args_str.format(flash0_path, flash1_path)
++    return pflash_args.split(" ")
++
++def get_flash_path(flash_dir, name):
++    return os.path.join(flash_dir, "{}.img".format(name))
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index fa56fbbb4b6..5fd66f6b26a 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -92,6 +92,7 @@ class BaseVM(object):
+         self._guest = None
+         self._genisoimage = args.genisoimage
+         self._build_path = args.build_path
++        self._efi_aarch64 = args.efi_aarch64
+         # Allow input config to override defaults.
+         self._config = DEFAULT_CONFIG.copy()
+         if config != None:
+@@ -496,6 +497,14 @@ def get_qemu_path(arch, build_path=None):
+         qemu_path = "qemu-system-" + arch
+     return qemu_path
+ 
++def get_qemu_version(qemu_path):
++    """Get the version number from the current QEMU,
++       and return the major number."""
++    output = subprocess.check_output([qemu_path, '--version'])
++    version_line = output.decode("utf-8")
++    version_num = re.split(' |\(', version_line)[3].split('.')[0]
++    return int(version_num)
++
+ def parse_config(config, args):
+     """ Parse yaml config and populate our config structure.
+         The yaml config allows the user to override the
+@@ -573,6 +582,9 @@ def parse_args(vmcls):
+     parser.add_option("--config", "-c", default=None,
+                       help="Provide config yaml for configuration. "\
+                            "See config_example.yaml for example.")
++    parser.add_option("--efi-aarch64",
++                      default="/usr/share/qemu-efi-aarch64/QEMU_EFI.fd",
++                      help="Path to efi image for aarch64 VMs.")
+     parser.disable_interspersed_args()
+     return parser.parse_args()
+ 
+diff --git a/tests/vm/ubuntu.aarch64 b/tests/vm/ubuntu.aarch64
+new file mode 100755
+index 00000000000..21d454c27f1
+--- /dev/null
++++ b/tests/vm/ubuntu.aarch64
+@@ -0,0 +1,68 @@
++#!/usr/bin/env python3
++#
++# Ubuntu aarch64 image
++#
++# Copyright 2020 Linaro
++#
++# Authors:
++#  Robert Foley <robert.foley@linaro.org>
++#  Originally based on ubuntu.i386 Fam Zheng <famz@redhat.com>
 +#
 +# This code is licensed under the GPL version 2 or later.  See
 +# the COPYING file in the top-level directory.
 +#
 +
-+import os
 +import sys
-+import subprocess
 +import basevm
-+import time
-+import traceback
 +import aarch64vm
++import ubuntuvm
 +
 +DEFAULT_CONFIG = {
-+    'cpu'          : "max",
-+    'machine'      : "virt,gic-version=max",
-+    'install_cmds' : "yum install -y make git python3 gcc gcc-c++ flex bison, "\
-+        "yum install -y glib2-devel pixman-devel zlib-devel, "\
-+        "yum install -y perl-Test-Harness, "\
-+        "alternatives --set python /usr/bin/python3, "\
-+        "sudo dnf config-manager "\
-+        "--add-repo=https://download.docker.com/linux/centos/docker-ce.repo,"\
-+        "sudo dnf install --nobest -y docker-ce.aarch64,"\
-+        "systemctl enable docker",
++    'cpu'          : "cortex-a57",
++    'machine'      : "virt,gic-version=3",
++    'install_cmds' : "apt-get update,"\
++                     "apt-get build-dep -y --arch-only qemu,"\
++                     "apt-get install -y libfdt-dev pkg-config language-pack-en",
 +    # We increase beyond the default time since during boot
-+    # it can take some time (many seconds) to log into the VM.
++    # it can take some time (many seconds) to log into the VM
++    # especially using softmmu.
 +    'ssh_timeout'  : 60,
 +}
 +
-+class CentosAarch64VM(basevm.BaseVM):
-+    name = "centos.aarch64"
++class UbuntuAarch64VM(ubuntuvm.UbuntuVM):
++    name = "ubuntu.aarch64"
 +    arch = "aarch64"
-+    login_prompt = "localhost login:"
-+    prompt = '[root@localhost ~]#'
-+    image_name = "CentOS-8-aarch64-1905-dvd1.iso"
-+    image_link = "http://mirrors.usc.edu/pub/linux/distributions/centos/8.0.1905/isos/aarch64/"
-+    image_link += image_name
++    image_name = "ubuntu-18.04-server-cloudimg-arm64.img"
++    image_link = "https://cloud-images.ubuntu.com/releases/18.04/release/" + image_name
++    image_sha256="0fdcba761965735a8a903d8b88df8e47f156f48715c00508e4315c506d7d3cb1"
 +    BUILD_SCRIPT = """
 +        set -e;
 +        cd $(mktemp -d);
@@ -269,120 +449,6 @@ index 00000000000..d5232ecdb8c
 +        ./configure {configure_opts};
 +        make --output-sync {target} -j{jobs} {verbose};
 +    """
-+    def set_key_perm(self):
-+        """Set permissions properly on certain files to allow
-+           ssh access."""
-+        self.console_wait_send(self.prompt,
-+                               "/usr/sbin/restorecon -R -v /root/.ssh\n")
-+        self.console_wait_send(self.prompt,
-+                "/usr/sbin/restorecon -R -v "\
-+                "/home/{}/.ssh\n".format(self._config["guest_user"]))
-+
-+    def create_kickstart(self):
-+        """Generate the kickstart file used to generate the centos image."""
-+        # Start with the template for the kickstart.
-+        ks_file = "../tests/vm/centos-8-aarch64.ks"
-+        subprocess.check_call("cp {} ./ks.cfg".format(ks_file), shell=True)
-+        # Append the ssh keys to the kickstart file
-+        # as the post processing phase of installation.
-+        with open("ks.cfg", "a") as f:
-+            # Add in the root pw and guest user.
-+            rootpw = "rootpw --plaintext {}\n"
-+            f.write(rootpw.format(self._config["root_pass"]))
-+            add_user = "user --groups=wheel --name={} "\
-+                       "--password={} --plaintext\n"
-+            f.write(add_user.format(self._config["guest_user"],
-+                                    self._config["guest_pass"]))
-+            # Add the ssh keys.
-+            f.write("%post --log=/root/ks-post.log\n")
-+            f.write("mkdir -p /root/.ssh\n")
-+            addkey = 'echo "{}" >> /root/.ssh/authorized_keys\n'
-+            addkey_cmd = addkey.format(self._config["ssh_pub_key"])
-+            f.write(addkey_cmd)
-+            f.write('mkdir -p /home/{}/.ssh\n'.format(self._config["guest_user"]))
-+            addkey = 'echo "{}" >> /home/{}/.ssh/authorized_keys\n'
-+            addkey_cmd = addkey.format(self._config["ssh_pub_key"],
-+                                       self._config["guest_user"])
-+            f.write(addkey_cmd)
-+            f.write("%end\n")
-+        # Take our kickstart file and create an .iso from it.
-+        # The .iso will be provided to qemu as we boot
-+        # from the install dvd.
-+        # Anaconda will recognize the label "OEMDRV" and will
-+        # start the automated installation.
-+        gen_iso_img = 'genisoimage -output ks.iso -volid "OEMDRV" ks.cfg'
-+        subprocess.check_call(gen_iso_img, shell=True)
-+
-+    def wait_for_shutdown(self):
-+        """We wait for qemu to shutdown the VM and exit.
-+           While this happens we display the console view
-+           for easier debugging."""
-+        # The image creation is essentially done,
-+        # so whether or not the wait is successful we want to
-+        # wait for qemu to exit (the self.wait()) before we return.
-+        try:
-+            self.console_wait("reboot: Power down")
-+        except Exception as e:
-+            sys.stderr.write("Exception hit\n")
-+            if isinstance(e, SystemExit) and e.code == 0:
-+                return 0
-+            traceback.print_exc()
-+        finally:
-+            self.wait()
-+
-+    def build_base_image(self, dest_img):
-+        """Run through the centos installer to create
-+           a base image with name dest_img."""
-+        # We create the temp image, and only rename
-+        # to destination when we are done.
-+        img = dest_img + ".tmp"
-+        # Create an empty image.
-+        # We will provide this as the install destination.
-+        qemu_img_create = "qemu-img create {} 50G".format(img)
-+        subprocess.check_call(qemu_img_create, shell=True)
-+
-+        # Create our kickstart file to be fed to the installer.
-+        self.create_kickstart()
-+        # Boot the install dvd with the params as our ks.iso
-+        os_img = self._download_with_cache(self.image_link)
-+        dvd_iso = "centos-8-dvd.iso"
-+        subprocess.check_call(["cp", "-f", os_img, dvd_iso])
-+        extra_args = "-cdrom ks.iso"
-+        extra_args += " -drive file={},if=none,id=drive1,cache=writeback"
-+        extra_args += " -device virtio-blk,drive=drive1,bootindex=1"
-+        extra_args = extra_args.format(dvd_iso).split(" ")
-+        self.boot(img, extra_args=extra_args)
-+        self.console_wait_send("change the selection", "\n")
-+        # We seem to need to hit esc (chr(27)) twice to abort the
-+        # media check, which takes a long time.
-+        # Waiting a bit seems to be more reliable before hitting esc.
-+        self.console_wait("Checking")
-+        time.sleep(5)
-+        self.console_wait_send("Checking", chr(27))
-+        time.sleep(5)
-+        self.console_wait_send("Checking", chr(27))
-+        print("Found Checking")
-+        # Give sufficient time for the installer to create the image.
-+        self.console_init(timeout=7200)
-+        self.wait_for_shutdown()
-+        os.rename(img, dest_img)
-+        print("Done with base image build: {}".format(dest_img))
-+
-+    def check_create_base_img(self, img_base, img_dest):
-+        """Create a base image using the installer.
-+           We will use the base image if it exists.
-+           This helps cut down on install time in case we
-+           need to restart image creation,
-+           since the base image creation can take a long time."""
-+        if not os.path.exists(img_base):
-+            print("Generate new base image: {}".format(img_base))
-+            self.build_base_image(img_base);
-+        else:
-+            print("Use existing base image: {}".format(img_base))
-+        # Save a copy of the base image and copy it to dest.
-+        # which we will use going forward.
-+        subprocess.check_call(["cp", img_base, img_dest])
-+
 +    def boot(self, img, extra_args=None):
 +        aarch64vm.create_flash_images(self._tmpdir, self._efi_aarch64)
 +        default_args = aarch64vm.get_pflash_args(self._tmpdir)
@@ -398,50 +464,14 @@ index 00000000000..d5232ecdb8c
 +           '-smp' not in self._args:
 +            # Only add if not already there to give caller option to change it.
 +            extra_args.extend(["-smp", "8"])
++
 +        # We have overridden boot() since aarch64 has additional parameters.
 +        # Call down to the base class method.
-+        super(CentosAarch64VM, self).boot(img, extra_args=extra_args)
-+
-+    def build_image(self, img):
-+        img_tmp = img + ".tmp"
-+        self.check_create_base_img(img + ".base", img_tmp)
-+
-+        # Boot the new image for the first time to finish installation.
-+        self.boot(img_tmp)
-+        self.console_init()
-+        self.console_wait_send(self.login_prompt, "root\n")
-+        self.console_wait_send("Password:",
-+                               "{}\n".format(self._config["root_pass"]))
-+
-+        self.set_key_perm()
-+        self.console_wait_send(self.prompt, "rpm -q centos-release\n")
-+        enable_adapter = "sed -i 's/ONBOOT=no/ONBOOT=yes/g'" \
-+                         " /etc/sysconfig/network-scripts/ifcfg-enp0s1\n"
-+        self.console_wait_send(self.prompt, enable_adapter)
-+        self.console_wait_send(self.prompt, "ifup enp0s1\n")
-+        self.console_wait_send(self.prompt,
-+                               'echo "qemu  ALL=(ALL) NOPASSWD:ALL" | '\
-+                               'sudo tee /etc/sudoers.d/qemu\n')
-+        self.console_wait(self.prompt)
-+
-+        # Rest of the commands we issue through ssh.
-+        self.wait_ssh(wait_root=True)
-+
-+        # If the user chooses *not* to do the second phase,
-+        # then we will jump right to the graceful shutdown
-+        if self._config['install_cmds'] != "":
-+            install_cmds = self._config['install_cmds'].split(',')
-+            for cmd in install_cmds:
-+                self.ssh_root(cmd)
-+        self.ssh_root("poweroff")
-+        self.wait_for_shutdown()
-+        os.rename(img_tmp, img)
-+        print("image creation complete: {}".format(img))
-+        return 0
++        super(UbuntuAarch64VM, self).boot(img, extra_args=extra_args)
 +
 +if __name__ == "__main__":
-+    defaults = aarch64vm.get_config_defaults(CentosAarch64VM, DEFAULT_CONFIG)
-+    sys.exit(basevm.main(CentosAarch64VM, defaults))
++    defaults = aarch64vm.get_config_defaults(UbuntuAarch64VM, DEFAULT_CONFIG)
++    sys.exit(basevm.main(UbuntuAarch64VM, defaults))
 -- 
 2.20.1
 
