@@ -7,74 +7,82 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6452C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB718C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:16:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8866420775
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:13:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC62020722
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:16:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvUZ6kMU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8866420775
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i5KIB+nl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC62020722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqYo9-0002ee-RI
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:13:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50376)
+	id 1jqYqf-0004MP-Ve
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:16:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jqYnb-0002Eb-Jt
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:12:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40375
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqYq2-0003nP-4O
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:15:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60765
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jqYnZ-0002nG-Bv
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:12:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqYpz-0003HC-9R
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:15:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593594775;
+ s=mimecast20190719; t=1593594926;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uka67gUwyjNcHmPWfZ+KCCW2bvWOV0dJkLXgCT/mpVk=;
- b=XvUZ6kMUBXwqs6Lm4UTue5z9D/eCbDEyXhdnh14q7In5IzTmNmUK9Tt7XTPV25GKGMb1QN
- UdkGb6EODTXbr0scn99w3qq2N11Y4JpiDNNwvCG25r/5WKe5pL6ylc8L2qv9qllxM4VKCp
- c/qlLXylMHfJhUq9fthkAWAZyjO4kGw=
+ bh=HkbTT6qEXVGILg4kPTN55wx5Q/DZbxooFdoJRUpxVso=;
+ b=i5KIB+nlVnP8JRX7oiFPt9CH91Mo3JSIm0g/BL+/fzExzCOWRks0M4HiSVi5R9G5YwtTwQ
+ L80vJ4xsUoifvl1IKDx+JhhSLH2wzAXQ5hTjGcRFO9k82Ifg5pEyPa+48UXDnR1OyVPj0K
+ 0FoJHNZVI/kHnpQ1CsXHAeqEQtyGZ5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-7GnqxwfxOa2fFpkmOpymLA-1; Wed, 01 Jul 2020 05:12:52 -0400
-X-MC-Unique: 7GnqxwfxOa2fFpkmOpymLA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-246-H23XgjpTMtKI0vLrWbcJ8Q-1; Wed, 01 Jul 2020 05:15:24 -0400
+X-MC-Unique: H23XgjpTMtKI0vLrWbcJ8Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C7F2804001;
- Wed,  1 Jul 2020 09:12:51 +0000 (UTC)
-Received: from titinator (ovpn-114-227.ams2.redhat.com [10.36.114.227])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 642B019C4F;
- Wed,  1 Jul 2020 09:12:50 +0000 (UTC)
-References: <20200616161814.891053-1-dinechin@redhat.com>
- <20200623144415.GP36568@stefanha-x1.localdomain>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [PATCH] Makefile: Compute libraries for libqemuutil.a and
- libvhost-user.a
-In-reply-to: <20200623144415.GP36568@stefanha-x1.localdomain>
-Date: Wed, 01 Jul 2020 11:12:48 +0200
-Message-ID: <ly1rlvd2en.fsf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B59380400E;
+ Wed,  1 Jul 2020 09:15:23 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 36F40741A2;
+ Wed,  1 Jul 2020 09:15:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B7BF411384A6; Wed,  1 Jul 2020 11:15:21 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 34/46] qom: Don't handle impossible
+ object_property_get_link() failure
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-35-armbru@redhat.com>
+ <4c1644b4-4d30-9831-9484-dc32081f41db@redhat.com>
+ <87d05nxjv3.fsf@dusky.pond.sub.org>
+ <fcbda85c-32ef-5fa4-bf87-1b5060f33421@redhat.com>
+Date: Wed, 01 Jul 2020 11:15:21 +0200
+In-Reply-To: <fcbda85c-32ef-5fa4-bf87-1b5060f33421@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 29 Jun 2020 16:38:16
+ +0200")
+Message-ID: <871rlvbnpy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,108 +105,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On 2020-06-23 at 16:44 CEST, Stefan Hajnoczi wrote...
-> On Tue, Jun 16, 2020 at 06:18:14PM +0200, Christophe de Dinechin wrote:
->> In util/Makefile.objs, there is a setting for dbus.o-libs.
->> Trying to copy-paste that to add a library for module.o that was was
->> not otherwise linked yields link errors on a number of binaries,
->> e.g. qemu-ga, with unsatisfied symbols in libqemuutil.a(module.o).
->> The reason is that library dependencies are not propagated to the .a
->> files automatically.
->>
->> Adding a call to extract-libs to get the libraries for the two .a
->> files that are used elsewhere.
->>
->> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
->> ---
->>  Makefile | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/Makefile b/Makefile
->> index 2e93068894..5fb0c78a0b 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -598,6 +598,8 @@ Makefile: $(version-obj-y)
->>  ######################################################################
->>  # Build libraries
->>
->> +libqemuutil.a-libs += $(call extract-libs, $(util-obj-y) $(trace-obj-y) $(stub-obj-y))
->> +libvhost-user.a-libs += $(call extract-libs, $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y))
->>  libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
->>  libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
+> On 6/25/20 5:09 PM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>=20
+>>> On 6/24/20 6:43 PM, Markus Armbruster wrote:
+>>>> Don't handle object_property_get_link() failure that can't happen
+>>>> unless the programmer screwed up, pass &error_abort.
+>>>>
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>>>>  hw/arm/bcm2835_peripherals.c |  7 +------
+>>>>  hw/arm/bcm2836.c             |  7 +------
+>>>>  hw/display/bcm2835_fb.c      |  8 +-------
+>>>>  hw/dma/bcm2835_dma.c         |  9 +--------
+>>>>  hw/gpio/bcm2835_gpio.c       | 15 ++-------------
+>>>>  hw/intc/nios2_iic.c          |  8 +-------
+>>>>  hw/misc/bcm2835_mbox.c       |  9 +--------
+>>>>  hw/misc/bcm2835_property.c   | 17 ++---------------
+>>>>  hw/usb/hcd-dwc2.c            |  9 +--------
+>>>>  9 files changed, 11 insertions(+), 78 deletions(-)
+>>>>
+>>>> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals=
+.c
+>>>> index 8313410ffe..3c40bda91e 100644
+>>>> --- a/hw/arm/bcm2835_peripherals.c
+>>>> +++ b/hw/arm/bcm2835_peripherals.c
+>>>> @@ -134,12 +134,7 @@ static void bcm2835_peripherals_realize(DeviceSta=
+te *dev, Error **errp)
+>>>>      uint64_t ram_size, vcram_size;
+>>>>      int n;
+>>>> =20
+>>>> -    obj =3D object_property_get_link(OBJECT(dev), "ram", &err);
+>>>> -    if (obj =3D=3D NULL) {
+>>>> -        error_setg(errp, "%s: required ram link not found: %s",
+>>>> -                   __func__, error_get_pretty(err));
+>>>> -        return;
+>>>> -    }
+>>>> +    obj =3D object_property_get_link(OBJECT(dev), "ram", &error_abort=
+);
+>>> [...]
+>>>
+>>> Should we now add an assert(errp) in object_property_get_link()?
+>>> Basically this would force forks to adapt their code when
+>>> rebasing.
+>>=20
+>> Functions should not place additional restrictions @errp arguments
+>> without a compelling reason.
 >
-> I wonder if there is GNU Make syntax to avoid duplicating the
-> dependencies of libqemuutil.a and libvhost-user.a?
+> My compelling reason is you spent quite some time cleaning, then we'll
+> merge old patches based on examples previous your cleanup, and either
+> you'll have to clean again, or the codebase will get inconsistent again.
 
-The dependencies are not identical. Would you want two lines, one with the
-shared dependencies, i.e. something like:
+We might also merge patches that ignore errors for perfectly sane
+reasons.  We'll then debug the crash, and take out the assertion again.
 
-  libqemuutils.a libhost-user.a: $(util-obj-y) $(stub-obj-y)
-  libqemuutils.a: $(trace-obj-y)
-  libvhost-user.a: $(libvhost-user-obj-y)
+>> What if you want genuinely don't need the
+>> error details when object_property_get_link() fails?  Passing null is
+>> better than passing &err only to error_free(err).
+>
+> So what about:
+>
+> -- >8 --
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1372,9 +1372,11 @@ void object_property_set_link(Object *obj, Object
+> *value,
+>  Object *object_property_get_link(Object *obj, const char *name,
+>                                   Error **errp)
+>  {
+> -    char *str =3D object_property_get_str(obj, name, errp);
+> +    char *str;
+>      Object *target =3D NULL;
+>
+> +    assert(errp =3D=3D NULL || errp =3D=3D &error_abort || errp =3D=3D &=
+error_fatal);
+> +    str =3D object_property_get_str(obj, name, errp);
+>      if (str && *str) {
+>          target =3D object_resolve_path(str, NULL);
+>          if (!target) {
+> ---
 
-Or do you mean something else?
+Consider an @obj that comes in two flavours, one with and one without
+the link.  Code handles both, but we still want the Error object for
+tracing purposes:
+
+    linked_obj =3D object_property_get_link(obj, "some-link-prop", &err);
+    if (!linked_obj) {
+        char *obj_name =3D object_get_canonical_path_component(obj);
+        trace_frob_get_som_link_prop_failed(obj_name, error_get_pretty(err)=
+);
+        g_free(obj_name);
+        error_free(err);
+    }
+
+Such use of Error objects just for tracing exists in the tree already.
 
 >
-> Another thing I wonder about: the purpose of the .a files is to compile
-> all object files and only link those .o files needed by the program
-> (i.e. a subset of the .a file).
-
-I believe that what you are saying is that by passing the required libraries
-automatically, the binaries that use libqemuutil.a will inherit undesired
-ldd dependencies. Indeed, a quick experiment shows that if you pass a -l
-option, the library dependency is recorded even if no symbol in that library
-is used. I saw no obvious linker option to address that.
-
-Maybe add a comment, then, because otherwise it is surprising to have an
-unsat despite something like:
-
-  foo.o-libs = -lbar
-
-As I pointed out in my commit comment, there is at least one case where this
-is used, dbus.o-libs, suggesting that this is expected to work. This seems
-to be the only case that goes in util-obj-y today. Apparently, this works
-because the link of qemu-system-x86_64 already gets $(GIO_LIBS) from
-some .o file that is not going through libqemuutil.a
-
->
-> Now that libqemuutil.a-libs is defined, do programs using libqemuutil.a
-> link libs required by .o files that aren't being used?
-
-Yes. The alternative being that you get unsatisfied symbols if you do use
-the .o file.
-
->
-> For example, say we had util/mp3encoder.o which depends on an MP3
-> encoder library. A utility like qemu-img does not depend on mp3encoder.o
-> from libqemuutil.a. Therefore -lmp3enc or whatever shouldn't be on
-> qemu-img's linker command-line.
-
-If that's the intent, then util/mp3encoder.o should ideally not be lumped
-into the library. Otherwise, you will get unsatisfied symbols when you use
-it through the library, but not when you use it directly.
-
-One can certainly argue that it's better to have an explicit "unsatisfied
-symbol" error than a silent addition of an unwanted library dependency. If
-that's the consensus, then, just add a comment explaining how this works.
-
-Given that discussion, I'm now inclined to believe that the correct solution
-is:
-
-a) add a comment in the makefile explaining that .o-libs flags are not
-   passed through .a files with a pointer to this discussion.
-
-b) remove the existing dbus.o-libs line which has no effect, to avoid
-   monkey-do copy-paste inheritance
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+>>=20
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>=20
+>> Thanks!
+>>=20
 
 
