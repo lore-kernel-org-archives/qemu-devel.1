@@ -2,57 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C69AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C99C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7CC2207BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7CC2207BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 5A0E920760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0E920760
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfPK-00055x-2h
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:16:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39786)
+	id 1jqfPU-0005Ue-Hx
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:16:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqfKH-0005uv-Cq; Wed, 01 Jul 2020 12:11:09 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:49998)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfJk-00053R-Ma; Wed, 01 Jul 2020 12:10:36 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37491)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqfKE-00067D-Vn; Wed, 01 Jul 2020 12:11:08 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 1DF93BF64B;
- Wed,  1 Jul 2020 16:11:04 +0000 (UTC)
-Date: Wed, 1 Jul 2020 18:11:01 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] MAINTAINERS: Cover "block/nvme.h" file
-Message-ID: <20200701161101.pv7e7ivy37snagvs@apples.localdomain>
-References: <20200701140634.25994-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfJh-0005z4-J4; Wed, 01 Jul 2020 12:10:36 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0846246|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.727025-0.000620295-0.272354;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hvw-8Ga_1593619825; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hvw-8Ga_1593619825)
+ by smtp.aliyun-inc.com(10.147.44.129);
+ Thu, 02 Jul 2020 00:10:26 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 22/61] target/riscv: vector widening integer multiply-add
+ instructions
+Date: Wed,  1 Jul 2020 23:25:10 +0800
+Message-Id: <20200701152549.1218-23-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200701140634.25994-1-philmd@redhat.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 12:11:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -65,62 +71,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Niklas Cassel <Niklas.Cassel@wdc.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Keith Busch <kbusch@kernel.org>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jul  1 16:06, Philippe Mathieu-Daudé wrote:
-> The "block/nvme.h" header is shared by both the NVMe block
-> driver and the NVMe emulated device. Add the 'F:' entry on
-> both sections, so all maintainers/reviewers are notified
-> when it is changed.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 22 ++++++++++++
+ target/riscv/insn32.decode              |  7 ++++
+ target/riscv/insn_trans/trans_rvv.inc.c |  9 +++++
+ target/riscv/vector_helper.c            | 45 +++++++++++++++++++++++++
+ 4 files changed, 83 insertions(+)
 
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index a65a38596b..1249ee274d 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -653,3 +653,25 @@ DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vwmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index f01cf14777..843c15f8fa 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -395,6 +395,13 @@ vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
+ vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
+ vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
+ vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
++vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
++vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
++vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
++vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 0f549f7a19..24e43c615c 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1609,3 +1609,12 @@ GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
+ GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
+ GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
++
++/* Vector Widening Integer Multiply-Add Instructions */
++GEN_OPIVV_WIDEN_TRANS(vwmaccu_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmacc_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmaccsu_vv, opivv_widen_check)
++GEN_OPIVX_WIDEN_TRANS(vwmaccu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmacc_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmaccsu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmaccus_vx)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 9c31e4d75a..9dd2d5748e 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1979,3 +1979,48 @@ GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
++
++/* Vector Widening Integer Multiply-Add Instructions */
++RVVCALL(OPIVV3, vwmaccu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmaccu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmaccu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_b, WOP_SSS_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_h, WOP_SSS_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmacc_vv_w, WOP_SSS_W, H8, H4, H4, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vwmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, DO_MACC)
++GEN_VEXT_VV(vwmaccu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmaccu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmaccu_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmacc_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmacc_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmacc_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmaccsu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmaccsu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmaccsu_vv_w, 4, 8, clearq)
++
++RVVCALL(OPIVX3, vwmaccu_vx_b, WOP_UUU_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccu_vx_h, WOP_UUU_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccu_vx_w, WOP_UUU_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_b, WOP_SSS_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_h, WOP_SSS_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmacc_vx_w, WOP_SSS_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_b, WOP_SSU_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_h, WOP_SSU_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccsu_vx_w, WOP_SSU_W, H8, H4, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_b, WOP_SUS_B, H2, H1, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_h, WOP_SUS_H, H4, H2, DO_MACC)
++RVVCALL(OPIVX3, vwmaccus_vx_w, WOP_SUS_W, H8, H4, DO_MACC)
++GEN_VEXT_VX(vwmaccu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmacc_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmacc_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmacc_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmaccsu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccsu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccsu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmaccus_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmaccus_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmaccus_vx_w, 4, 8, clearq)
+-- 
+2.23.0
 
-> ---
-> Cc: Fam Zheng <fam@euphon.net>
-> Cc: Keith Busch <kbusch@kernel.org>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
-> Cc: Klaus Jensen <its@irrelevant.dk>
-> Cc: Klaus Jensen <k.jensen@samsung.com>
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Cc: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-> Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index dec252f38b..9995cdc805 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1795,6 +1795,7 @@ M: Keith Busch <kbusch@kernel.org>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: hw/block/nvme*
-> +F: include/block/nvme.h
->  F: tests/qtest/nvme-test.c
->  
->  megasas
-> @@ -2804,6 +2805,7 @@ M: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: block/nvme*
-> +F: include/block/nvme.h
->  
->  Bootdevice
->  M: Gonglei <arei.gonglei@huawei.com>
-> -- 
-> 2.21.3
-> 
-> 
 
