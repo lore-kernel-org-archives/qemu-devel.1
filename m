@@ -2,87 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BBEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E021C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77360207FB
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:09:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+/RLLEh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77360207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64FD4207FB
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:10:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FD4207FB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfIo-0002VC-O8
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38128)
+	id 1jqfK4-00053e-KZ
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqfEd-00038U-Nk
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:05:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55498
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqfEb-00056P-Th
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:05:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593619517;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EBRZ4ykElK7nIEuV/uDE8NVjBVx9zR5aZxGytpuZlNo=;
- b=T+/RLLEhUCdyygnpdZmylU882C8O4naAb2kYYi0N6rYkK2Fzz5INofiORStXqN47Tvbmlj
- dgSxDbP6Zpoxtr+IxEU7FJ+celUk0LTN9A6B+C8GQUpI4u22zNmYvFuLYpQRtWaCsqK+Ua
- h4f75pRHiwYawCp9hhZ8U2suSkGeSBU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-4FF2aosnPKKgN38fG926qA-1; Wed, 01 Jul 2020 12:05:15 -0400
-X-MC-Unique: 4FF2aosnPKKgN38fG926qA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D32F12E523;
- Wed,  1 Jul 2020 16:05:14 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.110.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF4492B4CE;
- Wed,  1 Jul 2020 16:05:12 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] util: validate whether O_DIRECT is supported after failure
-Date: Wed,  1 Jul 2020 17:05:07 +0100
-Message-Id: <20200701160509.1523847-2-berrange@redhat.com>
-In-Reply-To: <20200701160509.1523847-1-berrange@redhat.com>
-References: <20200701160509.1523847-1-berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfHq-0000uW-Fk; Wed, 01 Jul 2020 12:08:38 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39646)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfHn-0005fp-C7; Wed, 01 Jul 2020 12:08:38 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1234255|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.466062-0.0104836-0.523454;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hvvr52c_1593619704; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hvvr52c_1593619704)
+ by smtp.aliyun-inc.com(10.147.42.198);
+ Thu, 02 Jul 2020 00:08:25 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 21/61] target/riscv: vector single-width integer
+ multiply-add instructions
+Date: Wed,  1 Jul 2020 23:25:09 +0800
+Message-Id: <20200701152549.1218-22-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,47 +71,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, P J P <ppandit@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we suggest that a filesystem may not support O_DIRECT after
-seeing an EINVAL. Other things can cause EINVAL though, so it is better
-to do an explicit check, and then report a definitive error message.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- util/osdep.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ target/riscv/helper.h                   | 33 ++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 +++
+ target/riscv/vector_helper.c            | 88 +++++++++++++++++++++++++
+ 4 files changed, 139 insertions(+)
 
-diff --git a/util/osdep.c b/util/osdep.c
-index 4829c07ff6..4bdbe81cec 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -342,8 +342,17 @@ int qemu_open(const char *name, int flags, ...)
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 60c436616a..a65a38596b 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -620,3 +620,36 @@ DEF_HELPER_6(vwmulu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwmulsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwmulsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwmulsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmacc_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmacc_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsac_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 877d999129..f01cf14777 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -387,6 +387,14 @@ vwmulsu_vv      111010 . ..... ..... 010 ..... 1010111 @r_vm
+ vwmulsu_vx      111010 . ..... ..... 110 ..... 1010111 @r_vm
+ vwmul_vv        111011 . ..... ..... 010 ..... 1010111 @r_vm
+ vwmul_vx        111011 . ..... ..... 110 ..... 1010111 @r_vm
++vmacc_vv        101101 . ..... ..... 010 ..... 1010111 @r_vm
++vmacc_vx        101101 . ..... ..... 110 ..... 1010111 @r_vm
++vnmsac_vv       101111 . ..... ..... 010 ..... 1010111 @r_vm
++vnmsac_vx       101111 . ..... ..... 110 ..... 1010111 @r_vm
++vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
++vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
++vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
++vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
  
- #ifdef O_DIRECT
-     if (ret == -1 && errno == EINVAL && (flags & O_DIRECT)) {
--        error_report("file system may not support O_DIRECT");
--        errno = EINVAL; /* in case it was clobbered */
-+        int newflags = flags & ~O_DIRECT;
-+# ifdef O_CLOEXEC
-+        ret = open(name, newflags | O_CLOEXEC, mode);
-+# else
-+        ret = open(name, newflags, mode);
-+# endif
-+        if (ret != -1) {
-+            close(ret);
-+            error_report("file system does not support O_DIRECT");
-+            errno = EINVAL;
-+        }
-     }
- #endif /* O_DIRECT */
- 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 9cd31ba1d8..0f549f7a19 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1599,3 +1599,13 @@ GEN_OPIVV_WIDEN_TRANS(vwmulsu_vv, opivv_widen_check)
+ GEN_OPIVX_WIDEN_TRANS(vwmul_vx)
+ GEN_OPIVX_WIDEN_TRANS(vwmulu_vx)
+ GEN_OPIVX_WIDEN_TRANS(vwmulsu_vx)
++
++/* Vector Single-Width Integer Multiply-Add Instructions */
++GEN_OPIVV_TRANS(vmacc_vv, opivv_check)
++GEN_OPIVV_TRANS(vnmsac_vv, opivv_check)
++GEN_OPIVV_TRANS(vmadd_vv, opivv_check)
++GEN_OPIVV_TRANS(vnmsub_vv, opivv_check)
++GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
++GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
++GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
++GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index f27543914f..9c31e4d75a 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1891,3 +1891,91 @@ GEN_VEXT_VX(vwmulu_vx_w, 4, 8, clearq)
+ GEN_VEXT_VX(vwmulsu_vx_b, 1, 2, clearh)
+ GEN_VEXT_VX(vwmulsu_vx_h, 2, 4, clearl)
+ GEN_VEXT_VX(vwmulsu_vx_w, 4, 8, clearq)
++
++/* Vector Single-Width Integer Multiply-Add Instructions */
++#define OPIVV3(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)   \
++static void do_##NAME(void *vd, void *vs1, void *vs2, int i)       \
++{                                                                  \
++    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
++    TD d = *((TD *)vd + HD(i));                                    \
++    *((TD *)vd + HD(i)) = OP(s2, s1, d);                           \
++}
++
++#define DO_MACC(N, M, D) (M * N + D)
++#define DO_NMSAC(N, M, D) (-(M * N) + D)
++#define DO_MADD(N, M, D) (M * D + N)
++#define DO_NMSUB(N, M, D) (-(M * D) + N)
++RVVCALL(OPIVV3, vmacc_vv_b, OP_SSS_B, H1, H1, H1, DO_MACC)
++RVVCALL(OPIVV3, vmacc_vv_h, OP_SSS_H, H2, H2, H2, DO_MACC)
++RVVCALL(OPIVV3, vmacc_vv_w, OP_SSS_W, H4, H4, H4, DO_MACC)
++RVVCALL(OPIVV3, vmacc_vv_d, OP_SSS_D, H8, H8, H8, DO_MACC)
++RVVCALL(OPIVV3, vnmsac_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSAC)
++RVVCALL(OPIVV3, vnmsac_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSAC)
++RVVCALL(OPIVV3, vnmsac_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSAC)
++RVVCALL(OPIVV3, vnmsac_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSAC)
++RVVCALL(OPIVV3, vmadd_vv_b, OP_SSS_B, H1, H1, H1, DO_MADD)
++RVVCALL(OPIVV3, vmadd_vv_h, OP_SSS_H, H2, H2, H2, DO_MADD)
++RVVCALL(OPIVV3, vmadd_vv_w, OP_SSS_W, H4, H4, H4, DO_MADD)
++RVVCALL(OPIVV3, vmadd_vv_d, OP_SSS_D, H8, H8, H8, DO_MADD)
++RVVCALL(OPIVV3, vnmsub_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSUB)
++RVVCALL(OPIVV3, vnmsub_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSUB)
++RVVCALL(OPIVV3, vnmsub_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSUB)
++RVVCALL(OPIVV3, vnmsub_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSUB)
++GEN_VEXT_VV(vmacc_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmacc_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmacc_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmacc_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vnmsac_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vnmsac_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vnmsac_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vnmsac_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmadd_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmadd_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmadd_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmadd_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vnmsub_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vnmsub_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vnmsub_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vnmsub_vv_d, 8, 8, clearq)
++
++#define OPIVX3(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)             \
++static void do_##NAME(void *vd, target_long s1, void *vs2, int i)   \
++{                                                                   \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
++    TD d = *((TD *)vd + HD(i));                                     \
++    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1, d);                   \
++}
++
++RVVCALL(OPIVX3, vmacc_vx_b, OP_SSS_B, H1, H1, DO_MACC)
++RVVCALL(OPIVX3, vmacc_vx_h, OP_SSS_H, H2, H2, DO_MACC)
++RVVCALL(OPIVX3, vmacc_vx_w, OP_SSS_W, H4, H4, DO_MACC)
++RVVCALL(OPIVX3, vmacc_vx_d, OP_SSS_D, H8, H8, DO_MACC)
++RVVCALL(OPIVX3, vnmsac_vx_b, OP_SSS_B, H1, H1, DO_NMSAC)
++RVVCALL(OPIVX3, vnmsac_vx_h, OP_SSS_H, H2, H2, DO_NMSAC)
++RVVCALL(OPIVX3, vnmsac_vx_w, OP_SSS_W, H4, H4, DO_NMSAC)
++RVVCALL(OPIVX3, vnmsac_vx_d, OP_SSS_D, H8, H8, DO_NMSAC)
++RVVCALL(OPIVX3, vmadd_vx_b, OP_SSS_B, H1, H1, DO_MADD)
++RVVCALL(OPIVX3, vmadd_vx_h, OP_SSS_H, H2, H2, DO_MADD)
++RVVCALL(OPIVX3, vmadd_vx_w, OP_SSS_W, H4, H4, DO_MADD)
++RVVCALL(OPIVX3, vmadd_vx_d, OP_SSS_D, H8, H8, DO_MADD)
++RVVCALL(OPIVX3, vnmsub_vx_b, OP_SSS_B, H1, H1, DO_NMSUB)
++RVVCALL(OPIVX3, vnmsub_vx_h, OP_SSS_H, H2, H2, DO_NMSUB)
++RVVCALL(OPIVX3, vnmsub_vx_w, OP_SSS_W, H4, H4, DO_NMSUB)
++RVVCALL(OPIVX3, vnmsub_vx_d, OP_SSS_D, H8, H8, DO_NMSUB)
++GEN_VEXT_VX(vmacc_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmacc_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmacc_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmacc_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vnmsac_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vnmsac_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vnmsac_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vnmsac_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmadd_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmadd_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmadd_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmadd_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
 -- 
-2.26.2
+2.23.0
 
 
