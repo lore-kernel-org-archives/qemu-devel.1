@@ -2,85 +2,70 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5F0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C64FAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F841206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTDEn4ni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F841206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F7A920663
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F7A920663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeQl-0000EG-GD
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49952)
+	id 1jqeSB-0003Tu-P4
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:15:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeHx-0003JT-7v
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23706
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeHu-0001C1-94
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615877;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=11vTNjprUDxxF42ZXFtBkVL+ye/l4xtYd5YtU/dXpDI=;
- b=XTDEn4nivQe5/JV5q/6cbfowRX7zxu9T+y4+pnRK9FAaigfdXbizWATKhSHu0kvEUtbUk5
- CZIC/Gz3DuvjPiLNNFPXdjUF2qVVL6ziuI/mKuGLeiCiazINa/MkZqFzepb3oY9X0vOro1
- 7aUaTOosbRjP1vH3r1XAsWBAKT7xwxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-C8k0ieCYOUG2oLstJRqdow-1; Wed, 01 Jul 2020 11:04:35 -0400
-X-MC-Unique: C8k0ieCYOUG2oLstJRqdow-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DD49800D5C;
- Wed,  1 Jul 2020 15:04:34 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D25E7BEAC;
- Wed,  1 Jul 2020 15:04:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id BC24431E93; Wed,  1 Jul 2020 17:04:25 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/13] ati-vga: Add dummy MEM_SDRAM_MODE_REG
-Date: Wed,  1 Jul 2020 17:04:24 +0200
-Message-Id: <20200701150425.13739-13-kraxel@redhat.com>
-In-Reply-To: <20200701150425.13739-1-kraxel@redhat.com>
-References: <20200701150425.13739-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqePw-0008LN-RQ
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:12:57 -0400
+Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:36020)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jqePt-0002V2-8X
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:12:56 -0400
+Received: from player735.ha.ovh.net (unknown [10.108.54.97])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 7E97A170EFF
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 17:12:43 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player735.ha.ovh.net (Postfix) with ESMTPSA id C1A9213B6C05E;
+ Wed,  1 Jul 2020 15:12:41 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-101G004db2b9b28-9dc7-4b8c-a928-d03fdaffba43,EF6FC975B06A46128E02C0B478BB3EF643A8B18B)
+ smtp.auth=groug@kaod.org
+Date: Wed, 1 Jul 2020 17:12:40 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
+Message-ID: <20200701171240.5374ebc1@bahia.lan>
+In-Reply-To: <3956126.q4pgddXim5@silver>
+References: <cover.1587309014.git.qemu_oss@crudebyte.com>
+ <4716485.3Xd2u1jlTO@silver> <20200701120924.617532a3@bahia.lan>
+ <3956126.q4pgddXim5@silver>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 12099764826496014656
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrtddvgdekjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.33.250.45; envelope-from=groug@kaod.org;
+ helo=2.mo179.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:12:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,67 +78,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+On Wed, 01 Jul 2020 13:47:12 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Radeon chips have an SDRAM mode reg that is accessed by some drivers.
-We don't emulate the memory controller but provide some default value
-to prevent drivers getting unexpected 0.
+> On Mittwoch, 1. Juli 2020 12:09:24 CEST Greg Kurz wrote:
+> > No I'm talking about code that isn't changed by this series:
+> > 
+> >     if (initial_offset == 0) {
+> >         v9fs_co_rewinddir(pdu, fidp);
+> >     } else {
+> >         v9fs_co_seekdir(pdu, fidp, initial_offset);
+> >     }
+> >     count = v9fs_do_readdir(pdu, fidp, max_count);
+> > 
+> > Leaving these outside the critical section seems to negate
+> > your arguments... please clarify.
+> 
+> Yeah, I admit I have neglected this issue, as concurrent readdir requests with 
+> same FID always was some kind of theoretical issue. But yes, you are right, 
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-id: cc1324b9ef06beb8ae233ddc77dedd8bab9b8624.1592737958.git.balaton@eik.bme.hu
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/ati_regs.h | 1 +
- hw/display/ati.c      | 5 +++++
- hw/display/ati_dbg.c  | 1 +
- 3 files changed, 7 insertions(+)
+It's perfectly fine to miss things, that's what reviews are made for :)
 
-diff --git a/hw/display/ati_regs.h b/hw/display/ati_regs.h
-index ebd37ee30d3f..d6282b2ef210 100644
---- a/hw/display/ati_regs.h
-+++ b/hw/display/ati_regs.h
-@@ -60,6 +60,7 @@
- #define MC_FB_LOCATION                          0x0148
- #define MC_AGP_LOCATION                         0x014C
- #define MC_STATUS                               0x0150
-+#define MEM_SDRAM_MODE_REG                      0x0158
- #define MEM_POWER_MISC                          0x015c
- #define AGP_BASE                                0x0170
- #define AGP_CNTL                                0x0174
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 95fc443cac83..4c3ad8f47b0d 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -361,6 +361,11 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
-     case MC_STATUS:
-         val = 5;
-         break;
-+    case MEM_SDRAM_MODE_REG:
-+        if (s->dev_id != PCI_DEVICE_ID_ATI_RAGE128_PF) {
-+            val = BIT(28) | BIT(20);
-+        }
-+        break;
-     case RBBM_STATUS:
-     case GUI_STAT:
-         val = 64; /* free CMDFIFO entries */
-diff --git a/hw/display/ati_dbg.c b/hw/display/ati_dbg.c
-index 0ebbd36f1477..bd0ecd48c7a7 100644
---- a/hw/display/ati_dbg.c
-+++ b/hw/display/ati_dbg.c
-@@ -42,6 +42,7 @@ static struct ati_regdesc ati_reg_names[] = {
-     {"MC_FB_LOCATION", 0x0148},
-     {"MC_AGP_LOCATION", 0x014C},
-     {"MC_STATUS", 0x0150},
-+    {"MEM_SDRAM_MODE_REG", 0x0158},
-     {"MEM_POWER_MISC", 0x015c},
-     {"AGP_BASE", 0x0170},
-     {"AGP_CNTL", 0x0174},
--- 
-2.18.4
+> that should be addressed by 
+> 
+> 1. entirely removing the rewinddir/seekdir code here
+> 
+> 2. passing initial_offset to v9fs_do_readdir(), which in turn would
+>    pass it to readdir_many()
+> 
+> 3. readdir_many() would handle rewinddir/seekdir exclusively in its crticial
+>    section.
+> 
 
+Sounds good. v7 ?
+
+> > There are indeed several issues with the current readdir:
+> > 
+> > 1) potential inconsistency on concurrent Treaddir requests
+> > 
+> > 2) excessive dispatching to worker threads
+> > 
+> > So we agreed that 1) should never happen with a regular linux
+> > client (we could even dump the lock actually) but we want to
+> > make it clear in the code anyway that actions on the directory
+> > stream are serialized.
+> 
+> My point is you are trying to fix a merely thereotical issue on code that's 
+> conceptually, inherently wrong and dead end code at first place. Top half code 
+
+I'm not trying to fix anything. We already have locking in place to
+deal with this theoretical issue and it interferes with your changes.
+I don't care that much if a silly guest shoots itself in the foot
+actually, so it'll be fine with me if you just dump the lock, as
+long as it doesn't cause QEMU to hang or crash.
+
+> should always be designed to be as thin as possible. The old readdir code 
+> though is the complete opposite.
+> 
+
+It isn't readdir only, most requests span over multiple v9fs_co_*() calls...
+
+> > 2) basically means moving some logic from the frontend to the
+> > backend, ie. called from v9fs_co_run_in_worker(). This implies
+> > that a very long request (ie. one that would span on many calls
+> > to readdir()) cannot be interrupted by the client anymore, as
+> > opposed to what we have now BTW.
+> 
+
+... most likely to allow clients to interrupt a long request with a
+Tflush. Have you considered this aspect in your changes ?
+
+> 3) Complexity of old readdir code is so much bigger compared to the new one
+>    such that probability of additional issues is also significantly higher.
+> 
+> > I tend to think that addressing both issues in one "rush" is
+> > as much "error prone".
+> 
+> No it's not. The optimized readdir implementation is quantifyable, 
+> significantly less complex than the old implementation (i.e. significantly 
+> smaller amount of branches and error pathes, determenistic clear separation of 
+> thread's task assignments which includes much smaller amount of thread hops). 
+> Less complexity and increased determinism consequently means reduced chance of 
+> misbehaviours. So that's not a subjective, but rather a quantifyable, proven 
+> statement.
+> 
+> You can't switch from the old (wrong) concept to the new concept without some 
+> minimum amount of changes, which yes are not small, but I don't see any way to 
+> make the change set smaller without yet introducing new negative side effects.
+> 
+> I am now using words that I heard from your side before: please be realistic. 
+> Currently man power on 9p code is extremely limited to put it mildly. Yes, we 
+> could spend time on fixing this (theoretical) issue on the old readdir could. 
+> But what would it buy? Due to the limited man power we can only move forward 
+> with compromises; in this case you are fighting for code that's DOA. The only 
+> thing that you achieve by still sticking to the old readdir code is you are 
+> preventing that we move forward at all. Remember: I originally sent this patch 
+> almost 7 months ago.
+> 
+> > > Also: it does not make sense to move locking on this series from fs driver
+> > > back to main I/O thread. Atomicity must retain on driver side, not on top
+> > > half.
+> > 
+> > Then the whole seekdir/rewinddir/telldir/readdir sequence should
+> > be called with a single v9fs_co_run_in_worker() invocation, in
+> > which case the locking could just be something like:
+> > 
+> > int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
+> >                                       struct V9fsDirEnt **entries,
+> >                                       int32_t maxsize, bool dostat)
+> > {
+> >     int err = 0;
+> > 
+> >     if (v9fs_request_cancelled(pdu)) {
+> >         return -EINTR;
+> >     }
+> > 
+> >     v9fs_readdir_lock(&fidp->fs.dir);
+> > 
+> >     v9fs_co_run_in_worker({
+> >         err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
+> >     });
+> > 
+> >     v9fs_readdir_unlock(&fidp->fs.dir);
+> >     return err;
+> > }
+> 
+> That's exactly what should be prevented. The lock must be on driver thread 
+> side, not on main thread side. The goal is to reduce the time slice of 
+> individual locks. If the lock is on main thread, the time slice of a lock 
+> (even on huge directories with thousands of entries) is multiple factors 
+> larger than if the lock is on driver thread side. So that's not just few 
+> percent or so, it is huge.
+> 
+
+Sorry I don't get it...  In a contention-less situation, which is the
+case we really care for, qemu_co_mutex_lock() has no overhead.
+
+> > This would technically leave the locking in the main I/O thread,
+> > but it isn't conceptually different from locking at the beginning
+> > of do_readdir_lock() and unlocking before returning. My concern
+> > is that I don't know how coroutine mutexes behave with multiple
+> > worker threads...
+> 
+> Well, your Mutex -> CoMutex change was intended to fix a deadlock with the old 
+> readdir implementation. That deadlock could not happen with the new readdir 
+> implementation, which suggests that it probably makes sense to revert this 
+> change (i.e. CoMutex -> Mutex) for this new implementation.
+> 
+
+No we can't because it is also used with 9p2000.u, that you said you
+don't want to fix.
+
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
+
+Cheers,
+
+--
+Greg
 
