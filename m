@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0541AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 142E9C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:03:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C95CA20702
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:03:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDC0720702
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:03:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqVhBuzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95CA20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etYEWdE2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDC0720702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeH6-0001GP-3v
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:03:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48512)
+	id 1jqeH7-0001Gu-1f
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:03:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeDs-0006Iu-KU
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:00:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40383
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeER-0006tC-0n
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:01:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31570
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeDq-0008IY-LI
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:00:28 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeEO-00005R-Va
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:01:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615626;
+ s=mimecast20190719; t=1593615659;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=22XKqxK4bBsySjb0wiXNdLD5Ko/G8DHR6521/0jkKJs=;
- b=OqVhBuzYqIJkDPxP3QQrlen5JFP2A3YmXawlpzKIuMRsz4GjuGizPOsJPFQs3brEzNgnJK
- B3lzPlhbnpV7qp1ZYaSvCMr+ig88pkBt0szsmSqzG4nPkKz4Th2GCBcl+054DH1N0Uj+AS
- DugnPkBq0mLpgaVgNo2tc23eeR4zLyQ=
+ bh=mFdUgkeC8YnD8kkrGxCMNpjjQq34bFTRWXlPBd6ksmI=;
+ b=etYEWdE2sXPuK26xGKW2+mI04P95Zpj7vul03O+zTReOyi4j7A1Wrlgdxut8Clqw1A7wwG
+ eTwmxfrZVvYvfXysNVF2n+hLv3BbtaxAtegnPAFosJCqIRvMbaoU95mFw267VJeY11SCSP
+ nbkj14dlfKs7YwYAYdOXLDPQ1zVirCw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-jRBl1JRXNbKJjmfJRC4Q0w-1; Wed, 01 Jul 2020 11:00:24 -0400
-X-MC-Unique: jRBl1JRXNbKJjmfJRC4Q0w-1
+ us-mta-361-5-fup-igPpSA2XTFtG6TKg-1; Wed, 01 Jul 2020 11:00:56 -0400
+X-MC-Unique: 5-fup-igPpSA2XTFtG6TKg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D519E107ACCA;
- Wed,  1 Jul 2020 15:00:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B2E880183C;
+ Wed,  1 Jul 2020 15:00:53 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 945B75BAC3;
- Wed,  1 Jul 2020 14:59:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 327D073FE1;
+ Wed,  1 Jul 2020 15:00:23 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v4 10/14] vhost: introduce new VhostOps vhost_force_iommu
-Date: Wed,  1 Jul 2020 22:55:34 +0800
-Message-Id: <20200701145538.22333-11-lulu@redhat.com>
+Subject: [PATCH v4 11/14] vhost: implement vhost_force_iommu method
+Date: Wed,  1 Jul 2020 22:55:35 +0800
+Message-Id: <20200701145538.22333-12-lulu@redhat.com>
 In-Reply-To: <20200701145538.22333-1-lulu@redhat.com>
 References: <20200701145538.22333-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -106,35 +106,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces new VhostOps vhost_force_iommu callback
-to force enable features bit VIRTIO_F_IOMMU_PLATFORM.
+use the vhost_force_iommu callback to force enable feature bit VIRTIO_F_IOMMU_PLATFORM
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- include/hw/virtio/vhost-backend.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/virtio/vhost.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index bfc24207e2..e7cb8d028c 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -121,6 +121,8 @@ typedef int (*vhost_vq_get_addr_op)(struct vhost_dev *dev,
- 
- typedef int (*vhost_get_device_id_op)(struct vhost_dev *dev, uint32_t *dev_id);
- 
-+typedef bool (*vhost_force_iommu_op)(struct vhost_dev *dev);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -164,6 +166,7 @@ typedef struct VhostOps {
-     vhost_dev_start_op vhost_dev_start;
-     vhost_vq_get_addr_op  vhost_vq_get_addr;
-     vhost_get_device_id_op vhost_get_device_id;
-+    vhost_force_iommu_op vhost_force_iommu;
- } VhostOps;
- 
- extern const VhostOps user_ops;
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 1e083a8976..1a1384e7a6 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -810,6 +810,11 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
+     if (!vhost_dev_has_iommu(dev)) {
+         features &= ~(0x1ULL << VIRTIO_F_IOMMU_PLATFORM);
+     }
++    if (dev->vhost_ops->vhost_force_iommu) {
++        if (dev->vhost_ops->vhost_force_iommu(dev) == true) {
++            features |= 0x1ULL << VIRTIO_F_IOMMU_PLATFORM;
++       }
++    }
+     r = dev->vhost_ops->vhost_set_features(dev, features);
+     if (r < 0) {
+         VHOST_OPS_DEBUG("vhost_set_features failed");
 -- 
 2.21.1
 
