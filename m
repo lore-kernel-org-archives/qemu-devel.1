@@ -2,62 +2,89 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B09F8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DDCC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F95020781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:22:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F95020781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0ED0020781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:23:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLvyYVG+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ED0020781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfUm-00045o-Nj
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:22:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
+	id 1jqfW2-0005lj-AE
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfRa-0000Zp-OV; Wed, 01 Jul 2020 12:18:43 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40838)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfRV-0007Yq-HL; Wed, 01 Jul 2020 12:18:42 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0754577|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.13812-0.000813233-0.861067;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.Hvvwvw9_1593620309; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.Hvvwvw9_1593620309)
- by smtp.aliyun-inc.com(10.147.42.16); Thu, 02 Jul 2020 00:18:29 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 26/61] target/riscv: vector single-width fractional
- multiply with rounding and saturation
-Date: Wed,  1 Jul 2020 23:25:14 +0800
-Message-Id: <20200701152549.1218-27-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqfSQ-0001Nq-55
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:19:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52804
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jqfSN-0007gK-On
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:19:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593620370;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=78sKt5+S5GgHVonpijEJj8MdZHCnioHrknuFUGnGDWw=;
+ b=PLvyYVG+V1VQlVDREs71oxXVvz37W+QkMmGh1Q74L/q4kUUt2Ll8CCr+O9jSK0AsF42SLW
+ jl5CkFW7kSyFZ+YV/vi1cJjD3SC0CV0Z4JnSjKN3k5nL0DttgQtSTLAGzzRdFkC7yp5ltz
+ argW6ZHt40lhpGgGjA9KluQxGvVr2rA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-sZQtBYjjOuWKCjzCaqSzCQ-1; Wed, 01 Jul 2020 12:19:28 -0400
+X-MC-Unique: sZQtBYjjOuWKCjzCaqSzCQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9679164ACA
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 16:19:27 +0000 (UTC)
+Received: from gondolin (ovpn-113-61.ams2.redhat.com [10.36.113.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AABF679225;
+ Wed,  1 Jul 2020 16:19:20 +0000 (UTC)
+Date: Wed, 1 Jul 2020 18:19:17 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
+Message-ID: <20200701181917.62538421.cohuck@redhat.com>
+In-Reply-To: <20200630090327-mutt-send-email-mst@kernel.org>
+References: <20200629102758.421552-1-cohuck@redhat.com>
+ <20200630121037.GC91444@stefanha-x1.localdomain>
+ <20200630142504.688aa989.cohuck@redhat.com>
+ <20200630090327-mutt-send-email-mst@kernel.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,181 +97,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |   9 ++
- target/riscv/insn32.decode              |   2 +
- target/riscv/insn_trans/trans_rvv.inc.c |   4 +
- target/riscv/vector_helper.c            | 107 ++++++++++++++++++++++++
- 4 files changed, 122 insertions(+)
+On Tue, 30 Jun 2020 09:04:38 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index db9e2024ae..b2fc71c2ea 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -742,3 +742,12 @@ DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vsmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 57228242aa..1dfc5f7ca0 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -424,6 +424,8 @@ vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
- vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
- vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
- vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
-+vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
-+vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 354a802518..8e85a2aed3 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1754,3 +1754,7 @@ GEN_OPIVV_TRANS(vasub_vv, opivv_check)
- GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
- GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
- GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
-+
-+/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
-+GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
-+GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 0b2119b6cc..d062d904ca 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -2597,3 +2597,110 @@ GEN_VEXT_VX_RM(vasub_vx_b, 1, 1, clearb)
- GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
-+
-+/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
-+static inline int8_t vsmul8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-+{
-+    uint8_t round;
-+    int16_t res;
-+
-+    res = (int16_t)a * (int16_t)b;
-+    round = get_round(vxrm, res, 7);
-+    res   = (res >> 7) + round;
-+
-+    if (res > INT8_MAX) {
-+        env->vxsat = 0x1;
-+        return INT8_MAX;
-+    } else if (res < INT8_MIN) {
-+        env->vxsat = 0x1;
-+        return INT8_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static int16_t vsmul16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-+{
-+    uint8_t round;
-+    int32_t res;
-+
-+    res = (int32_t)a * (int32_t)b;
-+    round = get_round(vxrm, res, 15);
-+    res   = (res >> 15) + round;
-+
-+    if (res > INT16_MAX) {
-+        env->vxsat = 0x1;
-+        return INT16_MAX;
-+    } else if (res < INT16_MIN) {
-+        env->vxsat = 0x1;
-+        return INT16_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static int32_t vsmul32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-+{
-+    uint8_t round;
-+    int64_t res;
-+
-+    res = (int64_t)a * (int64_t)b;
-+    round = get_round(vxrm, res, 31);
-+    res   = (res >> 31) + round;
-+
-+    if (res > INT32_MAX) {
-+        env->vxsat = 0x1;
-+        return INT32_MAX;
-+    } else if (res < INT32_MIN) {
-+        env->vxsat = 0x1;
-+        return INT32_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static int64_t vsmul64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-+{
-+    uint8_t round;
-+    uint64_t hi_64, lo_64;
-+    int64_t res;
-+
-+    if (a == INT64_MIN && b == INT64_MIN) {
-+        env->vxsat = 1;
-+        return INT64_MAX;
-+    }
-+
-+    muls64(&lo_64, &hi_64, a, b);
-+    round = get_round(vxrm, lo_64, 63);
-+    /*
-+     * Cannot overflow, as there are always
-+     * 2 sign bits after multiply.
-+     */
-+    res = (hi_64 << 1) | (lo_64 >> 63);
-+    if (round) {
-+        if (res == INT64_MAX) {
-+            env->vxsat = 1;
-+        } else {
-+            res += 1;
-+        }
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vsmul_vv_b, OP_SSS_B, H1, H1, H1, vsmul8)
-+RVVCALL(OPIVV2_RM, vsmul_vv_h, OP_SSS_H, H2, H2, H2, vsmul16)
-+RVVCALL(OPIVV2_RM, vsmul_vv_w, OP_SSS_W, H4, H4, H4, vsmul32)
-+RVVCALL(OPIVV2_RM, vsmul_vv_d, OP_SSS_D, H8, H8, H8, vsmul64)
-+GEN_VEXT_VV_RM(vsmul_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vsmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vsmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vsmul_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vsmul_vx_b, OP_SSS_B, H1, H1, vsmul8)
-+RVVCALL(OPIVX2_RM, vsmul_vx_h, OP_SSS_H, H2, H2, vsmul16)
-+RVVCALL(OPIVX2_RM, vsmul_vx_w, OP_SSS_W, H4, H4, vsmul32)
-+RVVCALL(OPIVX2_RM, vsmul_vx_d, OP_SSS_D, H8, H8, vsmul64)
-+GEN_VEXT_VX_RM(vsmul_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vsmul_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vsmul_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vsmul_vx_d, 8, 8, clearq)
--- 
-2.23.0
+> On Tue, Jun 30, 2020 at 02:25:04PM +0200, Cornelia Huck wrote:
+
+> > What bothers me most is that you need to explicitly request a device to
+> > be modern-only, while that should be the default for any newly added
+> > device. Hence the approach with the centralized list of device types
+> > mentioned in a parallel thread. The main problem with that is that the
+> > proxy device starts getting realized before the virtio device with its
+> > id is present... I failed to find a solution so far. But I'd really
+> > like an approach that can work for all transports.  
+> 
+> So how about simply validating that the device is modern only,
+> unless it's one of the whitelist?
+
+Who would do the validation, the virtio core? How can it distinguish
+between transitional and non-transitional? But maybe I'm just not
+getting your idea.
+
+Also, ccw does not currently have a way to explicitly configure a
+device non-transitional; the revisions can be used to fence off newer
+features, going down to legacy-only, but fencing off older features is
+not possible (that is only done by the device, if it has no legacy
+support).
 
 
