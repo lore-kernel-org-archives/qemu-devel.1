@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C973DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7E4C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97C2A2073E
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EF6C2073E
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 01:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7kFGLGR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C2A2073E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZAao25qz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF6C2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqR9i-0004RG-RD
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 21:03:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41450)
+	id 1jqR9y-0004uZ-GQ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 21:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqR8c-0003YS-LY; Tue, 30 Jun 2020 21:02:10 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:36272)
+ id 1jqR94-0003rU-Ns; Tue, 30 Jun 2020 21:02:38 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:46159)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jqR8b-00028G-0D; Tue, 30 Jun 2020 21:02:10 -0400
-Received: by mail-io1-xd42.google.com with SMTP id y2so23174099ioy.3;
- Tue, 30 Jun 2020 18:02:08 -0700 (PDT)
+ id 1jqR93-0002AX-2G; Tue, 30 Jun 2020 21:02:38 -0400
+Received: by mail-il1-x143.google.com with SMTP id a6so2830991ilq.13;
+ Tue, 30 Jun 2020 18:02:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Q+ANy+tmYn8jGdx2J/ZJza45S2FkoMYyR2K9DYPm68s=;
- b=I7kFGLGRN5mXupkJOQSw0Dn8DW+LrztFQYk6ZqOeh/GFg++gwQkJXnP4ZbCzzoX0eT
- IYmWMeft8sJWHcMYHelb5SmBeMKR8DjlVIcyC/0uTI9e+Qx0VCsObNUIYxvs6xqwfctR
- CR8fxFORHu7bw/LkxyMddSUbJyzx77FbaOXHvxKfvPMpQU9VlD3YF2JK9Ta4oT3A5uU8
- 98S723BpzEoDnWivFeDXaRFKLPp1FSvpnk50jmmJ9s3KHqwojz44+6wfEYwpX5OJrAa8
- cfGnAiDsOvhWDIceuEJ393cCBpNezD9uaswaycmymVC6Ov0xLjitUFdQA2em2tmBQ5+P
- 3YcQ==
+ :cc; bh=Vq3Ye6+ixYUl8G3eozsMz28+mjGSZgqXYVHucg7p8xc=;
+ b=ZAao25qzlJWaXpBfhZPDSMQ3inFcB0D/0Aqma5geioJfMVZ3T/NUMdl/QRYo//3E9N
+ JE/NGFiYyhgdfegDxwJ2KYsYgBdsSzKiBG+YYxyp7yiV3uEnnN53CQiU2Ru6vUh0zQBm
+ AYztqqpTcvWTXtSZAyyPkGOcK1L1IS9wwMdLvHD3LTGkCS3QP1I1T5EfnRbfU6KxYO5m
+ 4wCCcmgqy4+zaQC3n9Ce1ko0iovzGQdUaP8bu8hA+23UgB5Uhz4ENW0sDa2wuxVoTD+G
+ 6cfGmm+rkoM35GsUVBJHbrSi8Ctj4OsJIXlD/uB6bFVDpAgogPRLNhP00fwHN76l1Hkn
+ eldg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Q+ANy+tmYn8jGdx2J/ZJza45S2FkoMYyR2K9DYPm68s=;
- b=KVIrA7EQzK/+jgqBSvZHN6kFWL04OhPecgyK8bWSZkj8xXCjWLOWndGQfbKwTGDzMv
- aesmSFFgHMtp9eUDS634y2t6lxcfwb4fFcHgaTjX2/PrDBk+RDp+oUjREHo6bWrJo3N8
- i3OKOW9I1uWrVe9hStC0aunHVz7OWaAvOAXOwfHwsOCocNVMOmrDLFZD0EyHLwb7jDVD
- PIq/4pjp6xiJNPyHpGQ/KSF0/xnjTbpcpjAazP24xkxoZTbAjzpeByrsAOT36EkyyB/W
- IvztBkNt0FiW0P3iddX/qyEsRkR8Xk/6d7hCesirZPnzGMyTiapQRtBKvk6SvEzI8ap0
- kZSg==
-X-Gm-Message-State: AOAM530LFHJHr/gfwrAqExLGOH4vIXVmL2MSj8N5Jh2LJw4As+kC2We8
- uHgmhMIWtQNpWOB+aoELCVLWhGVcZIqYvrZz13Q=
-X-Google-Smtp-Source: ABdhPJwoaXkRS5GeV6Q/0SNGNicWnHNMNnbSCdHzxPJvDhWDd8iBtf32OrOdHKWLdkYsdQZwFCLZNkkQhzdlt4FMSYM=
-X-Received: by 2002:a5d:97d9:: with SMTP id k25mr8934457ios.42.1593565327691; 
- Tue, 30 Jun 2020 18:02:07 -0700 (PDT)
+ bh=Vq3Ye6+ixYUl8G3eozsMz28+mjGSZgqXYVHucg7p8xc=;
+ b=M4iZGFUpcv4hKRQu/7pDfQoy8hfT92JretOgImuwEWTsLE4KQ7ftsuv64dJ0VRa7I3
+ KuaXdrn+oviXkaUHxeAxMPTw8eQ5t6wrHmbUPX7skNZVtzW5sl5srrEzgc8hqyoTNHom
+ hTfCXrPezP7qr5aXdWyoX4/c5y/VcKhrpd7NHxtHe0Vqiya1xGsn5pKFLoNihD2wbEx0
+ xaPboe/muAdcBF/5tb8r/MiAIMZZeqDyCcp4RiKBgW6t6J1CRL6D5ZCO0skE2+pI2w/N
+ L+9Kf0cZjgJhsgZKsrPFThi1j+M2DtKbKJLvkt3n6SHW74JN9jobDiB3Z1AofgFadXl1
+ JU4w==
+X-Gm-Message-State: AOAM531levdP6Z7rUA6uEF6nk+hCig2+/J5PZ6LsgtSjdrKtrmToi8y4
+ 3SPGQWCRWx2zcHBR4NlauRxhgWJrTcAQIX/NwK4=
+X-Google-Smtp-Source: ABdhPJx+FB3ZoDbusEeYP6mNR/M8SuSq6vUUSWfrGkBIKNJkNRDH4Q3VT4++ZFzqIoWDzOjnEiy8WnyQhShXPDNZ7ow=
+X-Received: by 2002:a92:bb84:: with SMTP id x4mr5593365ilk.177.1593565355778; 
+ Tue, 30 Jun 2020 18:02:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200628142429.17111-1-peter.maydell@linaro.org>
- <20200628142429.17111-15-peter.maydell@linaro.org>
-In-Reply-To: <20200628142429.17111-15-peter.maydell@linaro.org>
+ <20200628142429.17111-16-peter.maydell@linaro.org>
+In-Reply-To: <20200628142429.17111-16-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jun 2020 17:52:23 -0700
-Message-ID: <CAKmqyKNgg20MHE_qo+49b67gR-3NncWHntH+kWXHqsqEKK81dw@mail.gmail.com>
-Subject: Re: [PATCH 14/17] hw/arm/spitz: Use LOG_GUEST_ERROR for bad guest
- register accesses
+Date: Tue, 30 Jun 2020 17:52:51 -0700
+Message-ID: <CAKmqyKPESaqQGAHJ4bPMapgm_nKQUujrcR7nXCYpaG8sERTxkA@mail.gmail.com>
+Subject: Re: [PATCH 15/17] hw/arm/pxa2xx_pic: Use LOG_GUEST_ERROR for bad
+ guest register accesses
 To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -103,11 +103,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 28, 2020 at 7:33 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+On Sun, Jun 28, 2020 at 7:29 AM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Instead of logging guest accesses to invalid register offsets in the
-> Spitz flash device with zaurus_printf() (which just prints to stderr),
-> use the usual qemu_log_mask(LOG_GUEST_ERROR,...).
+> Instead of using printf() for logging guest accesses to invalid
+> register offsets in the pxa2xx PIC device, use the usual
+> qemu_log_mask(LOG_GUEST_ERROR,...).
+>
+> This was the only user of the REG_FMT macro in pxa.h, so we can
+> remove that.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
@@ -116,53 +119,56 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/spitz.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+>  include/hw/arm/pxa.h | 1 -
+>  hw/arm/pxa2xx_pic.c  | 9 +++++++--
+>  2 files changed, 7 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-> index 6eb46869157..49eae3fce4e 100644
-> --- a/hw/arm/spitz.c
-> +++ b/hw/arm/spitz.c
-> @@ -23,6 +23,7 @@
->  #include "hw/ssi/ssi.h"
->  #include "hw/block/flash.h"
->  #include "qemu/timer.h"
+> diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
+> index f6dfb5c0cf0..8843e5f9107 100644
+> --- a/include/hw/arm/pxa.h
+> +++ b/include/hw/arm/pxa.h
+> @@ -184,7 +184,6 @@ struct PXA2xxI2SState {
+>  };
+>
+>  # define PA_FMT                        "0x%08lx"
+> -# define REG_FMT               "0x" TARGET_FMT_plx
+>
+>  PXA2xxState *pxa270_init(MemoryRegion *address_space, unsigned int sdram_size,
+>                           const char *revision);
+> diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
+> index 105c5e63f2f..ceee6aa48db 100644
+> --- a/hw/arm/pxa2xx_pic.c
+> +++ b/hw/arm/pxa2xx_pic.c
+> @@ -11,6 +11,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
 > +#include "qemu/log.h"
->  #include "hw/arm/sharpsl.h"
->  #include "ui/console.h"
->  #include "hw/audio/wm8750.h"
-> @@ -65,9 +66,6 @@ typedef struct {
->  #define zaurus_printf(format, ...)                              \
->      fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
->
-> -#undef REG_FMT
-> -#define REG_FMT                         "0x%02lx"
-> -
->  /* Spitz Flash */
->  #define FLASH_BASE              0x0c000000
->  #define FLASH_ECCLPLB           0x00    /* Line parity 7 - 0 bit */
-> @@ -137,7 +135,9 @@ static uint64_t sl_read(void *opaque, hwaddr addr, unsigned size)
->          return ecc_digest(&s->ecc, nand_getio(s->nand));
->
+>  #include "cpu.h"
+>  #include "hw/arm/pxa.h"
+>  #include "hw/sysbus.h"
+> @@ -166,7 +167,9 @@ static uint64_t pxa2xx_pic_mem_read(void *opaque, hwaddr offset,
+>      case ICHP: /* Highest Priority register */
+>          return pxa2xx_pic_highest(s);
 >      default:
-> -        zaurus_printf("Bad register offset " REG_FMT "\n", (unsigned long)addr);
+> -        printf("%s: Bad register offset " REG_FMT "\n", __func__, offset);
 > +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "sl_read: bad register offset 0x%02" HWADDR_PRIx "\n",
-> +                      addr);
+> +                      "pxa2xx_pic_mem_read: bad register offset 0x%" HWADDR_PRIx
+> +                      "\n", offset);
+>          return 0;
 >      }
->      return 0;
 >  }
-> @@ -168,7 +168,9 @@ static void sl_write(void *opaque, hwaddr addr,
+> @@ -199,7 +202,9 @@ static void pxa2xx_pic_mem_write(void *opaque, hwaddr offset,
+>          s->priority[32 + ((offset - IPR32) >> 2)] = value & 0x8000003f;
 >          break;
->
 >      default:
-> -        zaurus_printf("Bad register offset " REG_FMT "\n", (unsigned long)addr);
+> -        printf("%s: Bad register offset " REG_FMT "\n", __func__, offset);
 > +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "sl_write: bad register offset 0x%02" HWADDR_PRIx "\n",
-> +                      addr);
+> +                      "pxa2xx_pic_mem_write: bad register offset 0x%"
+> +                      HWADDR_PRIx "\n", offset);
+>          return;
 >      }
->  }
->
+>      pxa2xx_pic_update(opaque);
 > --
 > 2.20.1
 >
