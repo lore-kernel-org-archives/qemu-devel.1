@@ -2,81 +2,79 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3034C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6452C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8004E206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8866420775
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:13:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3kEPrj/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8004E206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvUZ6kMU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8866420775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqYec-0005lZ-Po
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:03:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46128)
+	id 1jqYo9-0002ee-RI
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:13:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqYcc-0002dZ-HW
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:01:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44234
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jqYnb-0002Eb-Jt
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:12:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40375
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqYca-0000gz-Ab
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:01:37 -0400
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jqYnZ-0002nG-Bv
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:12:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593594094;
+ s=mimecast20190719; t=1593594775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=7YTS6MnDyMv4lTExixCVsbTrsyAeyYSij5ieO6lNT5Q=;
- b=b3kEPrj/U1AioDykr5txGXqlLUIBiFClHx5QIAolDeLgLXMbwLyS1+xNj1Ao59Zm5h+Z3y
- xKbkcVbj9sQSgVAN/I44fKgOy4p1CXvYtoaiVC0WHmlk+AfIkBmqL4+xGgftXyEHVroyqR
- 9yhzqlbfNAsD5uZcB1/L85Q4QOglLxQ=
+ bh=uka67gUwyjNcHmPWfZ+KCCW2bvWOV0dJkLXgCT/mpVk=;
+ b=XvUZ6kMUBXwqs6Lm4UTue5z9D/eCbDEyXhdnh14q7In5IzTmNmUK9Tt7XTPV25GKGMb1QN
+ UdkGb6EODTXbr0scn99w3qq2N11Y4JpiDNNwvCG25r/5WKe5pL6ylc8L2qv9qllxM4VKCp
+ c/qlLXylMHfJhUq9fthkAWAZyjO4kGw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-ktanh5USOWu_uCJepEUqNw-1; Wed, 01 Jul 2020 05:01:32 -0400
-X-MC-Unique: ktanh5USOWu_uCJepEUqNw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-466-7GnqxwfxOa2fFpkmOpymLA-1; Wed, 01 Jul 2020 05:12:52 -0400
+X-MC-Unique: 7GnqxwfxOa2fFpkmOpymLA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5C3818A822D;
- Wed,  1 Jul 2020 09:01:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BD6A7554B;
- Wed,  1 Jul 2020 09:01:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CA44411384A6; Wed,  1 Jul 2020 11:01:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 15/46] qemu-option: Tidy up opt_set() not to free
- arguments on failure
-References: <20200624164344.3778251-1-armbru@redhat.com>
- <20200624164344.3778251-16-armbru@redhat.com>
- <f9545aa8-93d1-1b0c-9303-f8f8df6c2468@virtuozzo.com>
-Date: Wed, 01 Jul 2020 11:01:29 +0200
-In-Reply-To: <f9545aa8-93d1-1b0c-9303-f8f8df6c2468@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Mon, 29 Jun 2020 13:37:03 +0300")
-Message-ID: <87ftabbod2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C7F2804001;
+ Wed,  1 Jul 2020 09:12:51 +0000 (UTC)
+Received: from titinator (ovpn-114-227.ams2.redhat.com [10.36.114.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 642B019C4F;
+ Wed,  1 Jul 2020 09:12:50 +0000 (UTC)
+References: <20200616161814.891053-1-dinechin@redhat.com>
+ <20200623144415.GP36568@stefanha-x1.localdomain>
+User-agent: mu4e 1.5.2; emacs 26.3
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH] Makefile: Compute libraries for libqemuutil.a and
+ libvhost-user.a
+In-reply-to: <20200623144415.GP36568@stefanha-x1.localdomain>
+Date: Wed, 01 Jul 2020 11:12:48 +0200
+Message-ID: <ly1rlvd2en.fsf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,69 +97,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-> 24.06.2020 19:43, Markus Armbruster wrote:
->> opt_set() frees its argument @value on failure.  Slightly unclean;
->> functions ideally do nothing on failure.
+On 2020-06-23 at 16:44 CEST, Stefan Hajnoczi wrote...
+> On Tue, Jun 16, 2020 at 06:18:14PM +0200, Christophe de Dinechin wrote:
+>> In util/Makefile.objs, there is a setting for dbus.o-libs.
+>> Trying to copy-paste that to add a library for module.o that was was
+>> not otherwise linked yields link errors on a number of binaries,
+>> e.g. qemu-ga, with unsatisfied symbols in libqemuutil.a(module.o).
+>> The reason is that library dependencies are not propagated to the .a
+>> files automatically.
 >>
->> To tidy this up, move opt_create() from opt_set() into its callers,
->> along with the cleanup.
+>> Adding a call to extract-libs to get the libraries for the two .a
+>> files that are used elsewhere.
+>>
+>> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+>> ---
+>>  Makefile | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 2e93068894..5fb0c78a0b 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -598,6 +598,8 @@ Makefile: $(version-obj-y)
+>>  ######################################################################
+>>  # Build libraries
+>>
+>> +libqemuutil.a-libs += $(call extract-libs, $(util-obj-y) $(trace-obj-y) $(stub-obj-y))
+>> +libvhost-user.a-libs += $(call extract-libs, $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y))
+>>  libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
+>>  libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
 >
-> Hmm, let me think a bit..
+> I wonder if there is GNU Make syntax to avoid duplicating the
+> dependencies of libqemuutil.a and libvhost-user.a?
+
+The dependencies are not identical. Would you want two lines, one with the
+shared dependencies, i.e. something like:
+
+  libqemuutils.a libhost-user.a: $(util-obj-y) $(stub-obj-y)
+  libqemuutils.a: $(trace-obj-y)
+  libvhost-user.a: $(libvhost-user-obj-y)
+
+Or do you mean something else?
+
 >
-> So, prior to this patch:
+> Another thing I wonder about: the purpose of the .a files is to compile
+> all object files and only link those .o files needed by the program
+> (i.e. a subset of the .a file).
+
+I believe that what you are saying is that by passing the required libraries
+automatically, the binaries that use libqemuutil.a will inherit undesired
+ldd dependencies. Indeed, a quick experiment shows that if you pass a -l
+option, the library dependency is recorded even if no symbol in that library
+is used. I saw no obvious linker option to address that.
+
+Maybe add a comment, then, because otherwise it is surprising to have an
+unsat despite something like:
+
+  foo.o-libs = -lbar
+
+As I pointed out in my commit comment, there is at least one case where this
+is used, dbus.o-libs, suggesting that this is expected to work. This seems
+to be the only case that goes in util-obj-y today. Apparently, this works
+because the link of qemu-system-x86_64 already gets $(GIO_LIBS) from
+some .o file that is not going through libqemuutil.a
+
 >
-> opt_set gets name/value pair and sets the option in opts object, it
-> seems absolutely obvious and standard behavior for Map-like object.
+> Now that libqemuutil.a-libs is defined, do programs using libqemuutil.a
+> link libs required by .o files that aren't being used?
+
+Yes. The alternative being that you get unsatisfied symbols if you do use
+the .o file.
+
 >
-> The fact that for setting an option we create a QemuOpt object, and
-> somehow register it inside opts object is an implementation detail.
+> For example, say we had util/mp3encoder.o which depends on an MP3
+> encoder library. A utility like qemu-img does not depend on mp3encoder.o
+> from libqemuutil.a. Therefore -lmp3enc or whatever shouldn't be on
+> qemu-img's linker command-line.
 
-You explain behavior on success.  The issue is behavior on failure.
+If that's the intent, then util/mp3encoder.o should ideally not be lumped
+into the library. Otherwise, you will get unsatisfied symbols when you use
+it through the library, but not when you use it directly.
 
-> after the patch:
->
-> opt_set gets opt object, which is already registered in opts. So,
-> it seems like option is "partly" set already, and opt_set only
-> finalize the processing.
+One can certainly argue that it's better to have an explicit "unsatisfied
+symbol" error than a silent addition of an unwanted library dependency. If
+that's the consensus, then, just add a comment explaining how this works.
 
-Yes, opt_set() becomes a bit of a misnomer: it doesn't add a QemuOpt to
-@opts, it validates a QemuOpt against its key's description, if @opts
-has descriptions.
+Given that discussion, I'm now inclined to believe that the correct solution
+is:
 
-Hmm, opt_set() is now almost identical to qemu_opts_validate()'s loop
-body.  Perhaps I can de-duplicate.
+a) add a comment in the makefile explaining that .o-libs flags are not
+   passed through .a files with a pointer to this discussion.
 
-> And, as opt_set() only finalize the "set" operation, on opt_set
-> failure we need additional roll-back of "set" operation first step.
->
-> Additional fact, indirectly showing that something is unclear here
-> is that we pass "opts" to opt_set twice: as "opts" parameter and
-> inside opt: (opt->opts must be the same, assertion won't hurt if
-> you decide to keep the patch).
+b) remove the existing dbus.o-libs line which has no effect, to avoid
+   monkey-do copy-paste inheritance
 
-Valid point.
-
-> =====
->
-> Semantics before the patch seems clearer to me.
->
-> To improve the situation around "value", we can just g_strdup it
-> in opt_create as well as "name" argument (and use const char*
-> type for "value" argument as well)
-
-We don't strdup() there because opts_do_parse() extracts the value with
-get_opt_name(), which strdup()s it.  strdup()ing it some more isn't
-wrong, I just dislike it.
-
-Let me try the de-duplication, and then we'll see whether you still
-dislike the patch.
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
 
 
