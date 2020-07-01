@@ -2,58 +2,89 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72068C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 06:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 579D3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 06:45:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 355D920747
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 06:42:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 355D920747
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 2347120747
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 06:45:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DC+jo7C7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2347120747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqWS3-0000GV-DG
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 02:42:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42782)
+	id 1jqWV7-0001dU-81
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 02:45:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqWRI-0008Bx-Vh; Wed, 01 Jul 2020 02:41:48 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:49246)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqWRG-0003v5-Ag; Wed, 01 Jul 2020 02:41:48 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 3983DBF64B;
- Wed,  1 Jul 2020 06:41:42 +0000 (UTC)
-Date: Wed, 1 Jul 2020 08:41:38 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v2 11/18] hw/block/nvme: Introduce max active and open
- zone limits
-Message-ID: <20200701064138.iok2vsbxrr7bihgu@apples.localdomain>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-12-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqWUX-0001CQ-R1
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 02:45:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25185
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqWUV-0004Kw-Do
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 02:45:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593585906;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=UwEwF8FOhDSYnx4tI16qzKRrR8llFoAvfFCTo2+Vgs0=;
+ b=DC+jo7C7wun+RNbTTjpsAIfRMfXbb8Fet6EA4IEUKxe5ZE7vVDC4gT7D+d9WYBKSIzpRaE
+ ktWK7IV/ZbGX4GVos9ss+LlmfuRbK/trxs7dihpz0eZ0RsfSlbZ/hrDpnIPzALVNvC9Mzf
+ DQrpfg9laDRstZENgOLnWUj27ls++LA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484--ETGEKRpNt6rZqzogRGeIA-1; Wed, 01 Jul 2020 02:45:02 -0400
+X-MC-Unique: -ETGEKRpNt6rZqzogRGeIA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EA8D80183C;
+ Wed,  1 Jul 2020 06:45:00 +0000 (UTC)
+Received: from localhost (ovpn-113-121.ams2.redhat.com [10.36.113.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 29516100164D;
+ Wed,  1 Jul 2020 06:44:53 +0000 (UTC)
+Date: Wed, 1 Jul 2020 07:44:52 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v7 08/21] multi-process: Initialize communication channel
+ at the remote end
+Message-ID: <20200701064452.GA126613@stefanha-x1.localdomain>
+References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+ <f908ad44bec708a20f9367e2f79f529f3a672f0f.1593273671.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f908ad44bec708a20f9367e2f79f529f3a672f0f.1593273671.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
 Content-Disposition: inline
-In-Reply-To: <20200617213415.22417-12-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 02:12:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,360 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 18 06:34, Dmitry Fomichev wrote:
-> Added two module properties, "max_active" and "max_open" to control
-> the maximum number of zones that can be active or open. Once these
-> variables are set to non-default values, the driver checks these
-> limits during I/O and returns Too Many Active or Too Many Open
-> command status if they are exceeded.
-> 
-> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  hw/block/nvme.c | 183 +++++++++++++++++++++++++++++++++++++++++++++++-
->  hw/block/nvme.h |   4 ++
->  2 files changed, 185 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 2e03b0b6ed..05a7cbcfcc 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -120,6 +120,87 @@ static void nvme_remove_zone(NvmeCtrl *n, NvmeNamespace *ns, NvmeZoneList *zl,
->      zone->prev = zone->next = 0;
->  }
->  
-> +/*
-> + * Take the first zone out from a list, return NULL if the list is empty.
-> + */
-> +static NvmeZone *nvme_remove_zone_head(NvmeCtrl *n, NvmeNamespace *ns,
-> +    NvmeZoneList *zl)
-> +{
-> +    NvmeZone *zone = nvme_peek_zone_head(ns, zl);
-> +
-> +    if (zone) {
-> +        --zl->size;
-> +        if (zl->size == 0) {
-> +            zl->head = NVME_ZONE_LIST_NIL;
-> +            zl->tail = NVME_ZONE_LIST_NIL;
-> +        } else {
-> +            zl->head = zone->next;
-> +            ns->zone_array[zl->head].prev = NVME_ZONE_LIST_NIL;
-> +        }
-> +        zone->prev = zone->next = 0;
-> +    }
-> +
-> +    return zone;
-> +}
-> +
-> +/*
-> + * Check if we can open a zone without exceeding open/active limits.
-> + * AOR stands for "Active and Open Resources" (see TP 4053 section 2.5).
-> + */
-> +static int nvme_aor_check(NvmeCtrl *n, NvmeNamespace *ns,
-> +     uint32_t act, uint32_t opn)
-> +{
-> +    if (n->params.max_active_zones != 0 &&
-> +        ns->nr_active_zones + act > n->params.max_active_zones) {
-> +        trace_pci_nvme_err_insuff_active_res(n->params.max_active_zones);
-> +        return NVME_ZONE_TOO_MANY_ACTIVE | NVME_DNR;
-> +    }
-> +    if (n->params.max_open_zones != 0 &&
-> +        ns->nr_open_zones + opn > n->params.max_open_zones) {
-> +        trace_pci_nvme_err_insuff_open_res(n->params.max_open_zones);
-> +        return NVME_ZONE_TOO_MANY_OPEN | NVME_DNR;
-> +    }
-> +
-> +    return NVME_SUCCESS;
-> +}
-> +
-> +static inline void nvme_aor_inc_open(NvmeCtrl *n, NvmeNamespace *ns)
-> +{
-> +    assert(ns->nr_open_zones >= 0);
-> +    if (n->params.max_open_zones) {
-> +        ns->nr_open_zones++;
-> +        assert(ns->nr_open_zones <= n->params.max_open_zones);
-> +    }
-> +}
-> +
-> +static inline void nvme_aor_dec_open(NvmeCtrl *n, NvmeNamespace *ns)
-> +{
-> +    if (n->params.max_open_zones) {
-> +        assert(ns->nr_open_zones > 0);
-> +        ns->nr_open_zones--;
-> +    }
-> +    assert(ns->nr_open_zones >= 0);
-> +}
-> +
-> +static inline void nvme_aor_inc_active(NvmeCtrl *n, NvmeNamespace *ns)
-> +{
-> +    assert(ns->nr_active_zones >= 0);
-> +    if (n->params.max_active_zones) {
-> +        ns->nr_active_zones++;
-> +        assert(ns->nr_active_zones <= n->params.max_active_zones);
-> +    }
-> +}
-> +
-> +static inline void nvme_aor_dec_active(NvmeCtrl *n, NvmeNamespace *ns)
-> +{
-> +    if (n->params.max_active_zones) {
-> +        assert(ns->nr_active_zones > 0);
-> +        ns->nr_active_zones--;
-> +        assert(ns->nr_active_zones >= ns->nr_open_zones);
-> +    }
-> +    assert(ns->nr_active_zones >= 0);
-> +}
-> +
->  static void nvme_assign_zone_state(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeZone *zone, uint8_t state)
->  {
-> @@ -454,6 +535,24 @@ static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
->      timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
->  }
->  
-> +static void nvme_auto_transition_zone(NvmeCtrl *n, NvmeNamespace *ns,
-> +    bool implicit, bool adding_active)
-> +{
-> +    NvmeZone *zone;
-> +
-> +    if (implicit && n->params.max_open_zones &&
-> +        ns->nr_open_zones == n->params.max_open_zones) {
-> +        zone = nvme_remove_zone_head(n, ns, ns->imp_open_zones);
-> +        if (zone) {
-> +            /*
-> +             * Automatically close this implicitly open zone.
-> +             */
-> +            nvme_aor_dec_open(n, ns);
-> +            nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_CLOSED);
-> +        }
-> +    }
-> +}
-> +
->  static uint16_t nvme_check_zone_write(NvmeZone *zone, uint64_t slba,
->      uint32_t nlb)
->  {
-> @@ -531,6 +630,23 @@ static uint16_t nvme_check_zone_read(NvmeCtrl *n, NvmeZone *zone, uint64_t slba,
->      return status;
->  }
->  
-> +static uint16_t nvme_auto_open_zone(NvmeCtrl *n, NvmeNamespace *ns,
-> +    NvmeZone *zone)
-> +{
-> +    uint16_t status = NVME_SUCCESS;
-> +    uint8_t zs = nvme_get_zone_state(zone);
-> +
-> +    if (zs == NVME_ZONE_STATE_EMPTY) {
-> +        nvme_auto_transition_zone(n, ns, true, true);
-> +        status = nvme_aor_check(n, ns, 1, 1);
-> +    } else if (zs == NVME_ZONE_STATE_CLOSED) {
-> +        nvme_auto_transition_zone(n, ns, true, false);
-> +        status = nvme_aor_check(n, ns, 0, 1);
-> +    }
-> +
-> +    return status;
-> +}
-> +
->  static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeZone *zone, uint32_t nlb)
->  {
-> @@ -543,7 +659,11 @@ static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
->          switch (zs) {
->          case NVME_ZONE_STATE_IMPLICITLY_OPEN:
->          case NVME_ZONE_STATE_EXPLICITLY_OPEN:
-> +            nvme_aor_dec_open(n, ns);
-> +            /* fall through */
->          case NVME_ZONE_STATE_CLOSED:
-> +            nvme_aor_dec_active(n, ns);
-> +            /* fall through */
->          case NVME_ZONE_STATE_EMPTY:
->              break;
->          default:
-> @@ -553,7 +673,10 @@ static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
->      } else {
->          switch (zs) {
->          case NVME_ZONE_STATE_EMPTY:
-> +            nvme_aor_inc_active(n, ns);
-> +            /* fall through */
->          case NVME_ZONE_STATE_CLOSED:
-> +            nvme_aor_inc_open(n, ns);
->              nvme_assign_zone_state(n, ns, zone,
->                                     NVME_ZONE_STATE_IMPLICITLY_OPEN);
->          }
-> @@ -636,6 +759,11 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->                                                 zone->d.wp);
->              return NVME_ZONE_INVALID_WRITE | NVME_DNR;
->          }
-> +
-> +        status = nvme_auto_open_zone(n, ns, zone);
-> +        if (status != NVME_SUCCESS) {
-> +            return status;
-> +        }
->      }
->  
->      block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-> @@ -709,6 +837,11 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->                                                     zone->d.wp);
->                  return NVME_ZONE_INVALID_WRITE | NVME_DNR;
->              }
-> +
-> +            status = nvme_auto_open_zone(n, ns, zone);
-> +            if (status != NVME_SUCCESS) {
-> +                return status;
-> +            }
->          } else {
->              status = nvme_check_zone_read(n, zone, slba, nlb,
->                                            n->params.cross_zone_read);
-> @@ -804,9 +937,27 @@ static uint16_t nvme_get_mgmt_zone_slba_idx(NvmeCtrl *n, NvmeNamespace *ns,
->  static uint16_t nvme_open_zone(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeZone *zone, uint8_t state)
->  {
-> +    uint16_t status;
-> +
->      switch (state) {
->      case NVME_ZONE_STATE_EMPTY:
-> +        nvme_auto_transition_zone(n, ns, false, true);
-> +        status = nvme_aor_check(n, ns, 1, 0);
-> +        if (status != NVME_SUCCESS) {
-> +            return status;
-> +        }
-> +        nvme_aor_inc_active(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_CLOSED:
-> +        status = nvme_aor_check(n, ns, 0, 1);
-> +        if (status != NVME_SUCCESS) {
-> +            if (state == NVME_ZONE_STATE_EMPTY) {
-> +                nvme_aor_dec_active(n, ns);
-> +            }
-> +            return status;
-> +        }
-> +        nvme_aor_inc_open(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_IMPLICITLY_OPEN:
->          nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_EXPLICITLY_OPEN);
->          /* fall through */
-> @@ -828,6 +979,7 @@ static uint16_t nvme_close_zone(NvmeCtrl *n,  NvmeNamespace *ns,
->      switch (state) {
->      case NVME_ZONE_STATE_EXPLICITLY_OPEN:
->      case NVME_ZONE_STATE_IMPLICITLY_OPEN:
-> +        nvme_aor_dec_open(n, ns);
->          nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_CLOSED);
->          /* fall through */
->      case NVME_ZONE_STATE_CLOSED:
-> @@ -849,7 +1001,11 @@ static uint16_t nvme_finish_zone(NvmeCtrl *n, NvmeNamespace *ns,
->      switch (state) {
->      case NVME_ZONE_STATE_EXPLICITLY_OPEN:
->      case NVME_ZONE_STATE_IMPLICITLY_OPEN:
-> +        nvme_aor_dec_open(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_CLOSED:
-> +        nvme_aor_dec_active(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_EMPTY:
->          zone->d.wp = nvme_zone_wr_boundary(zone);
->          nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_FULL);
-> @@ -874,7 +1030,11 @@ static uint16_t nvme_reset_zone(NvmeCtrl *n, NvmeNamespace *ns,
->      switch (state) {
->      case NVME_ZONE_STATE_EXPLICITLY_OPEN:
->      case NVME_ZONE_STATE_IMPLICITLY_OPEN:
-> +        nvme_aor_dec_open(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_CLOSED:
-> +        nvme_aor_dec_active(n, ns);
-> +        /* fall through */
->      case NVME_ZONE_STATE_FULL:
->          zone->d.wp = zone->d.zslba;
->          nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_EMPTY);
-> @@ -2412,6 +2572,15 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
->      uint64_t zone_size = 0, capacity;
->      uint32_t nz;
->  
-> +    if (n->params.max_open_zones < 0) {
-> +        error_setg(errp, "invalid max_open_zones value");
-> +        return;
-> +    }
-> +    if (n->params.max_active_zones < 0) {
-> +        error_setg(errp, "invalid max_active_zones value");
-> +        return;
-> +    }
-> +
->      if (n->params.zone_size) {
->          zone_size = n->params.zone_size;
->      } else {
-> @@ -2435,6 +2604,14 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
->      n->num_zones = nz;
->      n->zone_array_size = sizeof(NvmeZone) * nz;
->  
-> +    /* Make sure that the values of all Zoned Command Set properties are sane */
-> +    if (n->params.max_open_zones > nz) {
-> +        n->params.max_open_zones = nz;
-> +    }
-> +    if (n->params.max_active_zones > nz) {
-> +        n->params.max_active_zones = nz;
-> +    }
+--jI8keyz6grp/JLjh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As Alistair already pointed out, a warning would be nice.
-
-> +
->      return;
+On Sat, Jun 27, 2020 at 10:09:30AM -0700, elena.ufimtseva@oracle.com wrote:
+> @@ -42,6 +43,20 @@ static void remote_machine_init(MachineState *machine)
+>      qdev_realize(DEVICE(rem_host), sysbus_get_default(), &error_fatal);
 >  }
->  
-> @@ -2452,8 +2629,8 @@ static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
->      ns->id_ns_zoned = g_malloc0(sizeof(*ns->id_ns_zoned));
->  
->      /* MAR/MOR are zeroes-based, 0xffffffff means no limit */
-> -    ns->id_ns_zoned->mar = 0xffffffff;
-> -    ns->id_ns_zoned->mor = 0xffffffff;
-> +    ns->id_ns_zoned->mar = cpu_to_le32(n->params.max_active_zones - 1);
-> +    ns->id_ns_zoned->mor = cpu_to_le32(n->params.max_open_zones - 1);
->      ns->id_ns_zoned->zoc = 0;
->      ns->id_ns_zoned->ozcs = n->params.cross_zone_read ? 0x01 : 0x00;
->  
-> @@ -2813,6 +2990,8 @@ static Property nvme_props[] = {
->      DEFINE_PROP_UINT64("zone_size", NvmeCtrl, params.zone_size, 512),
->      DEFINE_PROP_UINT64("zone_capacity", NvmeCtrl, params.zone_capacity, 512),
->      DEFINE_PROP_UINT32("zone_append_max_size", NvmeCtrl, params.zamds_bs, 0),
-> +    DEFINE_PROP_INT32("max_active", NvmeCtrl, params.max_active_zones, 0),
-> +    DEFINE_PROP_INT32("max_open", NvmeCtrl, params.max_open_zones, 0),
+> =20
+> +static void remote_set_socket(Object *obj, const char *str, Error **errp=
+)
+> +{
+> +    RemMachineState *s =3D REMOTE_MACHINE(obj);
+> +    Error *local_err =3D NULL;
+> +    int fd =3D atoi(str);
+> +
+> +    s->ioc =3D qio_channel_new_fd(fd, &local_err);
 
-max_active and max_open should be unsigned. 0xfffffffe is a valid value
-for MAR/MOR.
+Missing error handling and local_err is leaked. errp should be set.
 
->      DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
->      DEFINE_PROP_UINT8("fill_pattern", NvmeCtrl, params.fill_pattern, 0),
->      DEFINE_PROP_END_OF_LIST(),
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 2c932b5e29..f5a4679702 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -19,6 +19,8 @@ typedef struct NvmeParams {
->      uint32_t    zamds_bs;
->      uint64_t    zone_size;
->      uint64_t    zone_capacity;
-> +    int32_t     max_active_zones;
-> +    int32_t     max_open_zones;
->  } NvmeParams;
->  
->  typedef struct NvmeAsyncEvent {
-> @@ -103,6 +105,8 @@ typedef struct NvmeNamespace {
->      NvmeZoneList    *imp_open_zones;
->      NvmeZoneList    *closed_zones;
->      NvmeZoneList    *full_zones;
-> +    int32_t         nr_open_zones;
-> +    int32_t         nr_active_zones;
->  } NvmeNamespace;
->  
->  static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
-> -- 
-> 2.21.0
-> 
-> 
+> +}
+> +
+> +static void remote_instance_init(Object *obj)
+> +{
+> +    object_property_add_str(obj, "socket", NULL, remote_set_socket);
+> +}
+
+The name "socket" does not communicate the structure of the value. Is it
+a <host>:<port> pair, a UNIX domain socket path, a file descriptor, etc?
+It's common to name file descriptor arguments with an "fd" suffix (e.g.
+vhostfd) and that would work here too.
+
+Please also include a help string with
+
+  object_property_set_description(obj, property_name, help_text);
+
+The help string when QEMU is invoked like this:
+
+  $ qemu-system-x86_64 -M remote,\?
+
+--jI8keyz6grp/JLjh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl78MOQACgkQnKSrs4Gr
+c8jfIAf6A844b35Yde+R/FpM3kTRoySt5+rcF+2nYuEcUvaFSCPVRyXMlGu772D7
+CvLuMbkKMKJ9MxZTo1KiQwdrIowsL2j/LBEppNfz2iUEo9ayVZpSq7AgJMJbqo6L
+6FOJqMGMupm9jQq+R706IMhNxEtJ+HHylxaxIoZThcTlIv6qseDHQ0yUl7KE4cw2
+m8G2w7MM0YB7jXaDt+0gEWXIQ9dweC/G3KkrTkHO7XHv3fgoeQI/CuaQ8Msi9qHS
+0qFgwMYBVfeViVCBxkoM/GA3kQ5muG0Ad7P4CbiZ6FDoU4q7wOqFxIuZrFs98Ull
+BtsxrJg0BBIqgP3Wdx+2fHdS5GpzKA==
+=ZSmb
+-----END PGP SIGNATURE-----
+
+--jI8keyz6grp/JLjh--
+
 
