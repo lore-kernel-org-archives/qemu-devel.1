@@ -2,72 +2,63 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52898C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0185C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:01:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2806820781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:01:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2806820781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C740320781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:01:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C740320781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqg6l-0000eC-Dz
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:01:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52516)
+	id 1jqg7R-000253-0S
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jqg4g-0006BH-96; Wed, 01 Jul 2020 12:59:06 -0400
-Resent-Date: Wed, 01 Jul 2020 12:59:06 -0400
-Resent-Message-Id: <E1jqg4g-0006BH-96@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21775)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jqg4d-0006PW-LE; Wed, 01 Jul 2020 12:59:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593622737; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=jX2PM4stYKQoTd6nQ4ayt4ddVF1W7RtVSOqk5JWDFl8A0f6L14DmfSlKNCd/pQTSiMpGsh6bFVOKZSfaGH4ltHSGduJTNeRQ5Yk5UzJRN9xo8rk7sxOH4yCk0pKHNNGp0/0uCL1kqAVmWU0H96zQzUQF1PZVWD1qqdnvpszAfJA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593622737;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6OB8hnU0SOHsQMIeJr+yaGjAlUFfSKBL86MgTTEy6ik=; 
- b=UPLB9PZXgM38jNEykyadjp3jfipuLS23Z7ipB+4Hh6/9Vkh8fJCib3ZNmPPBR5ESESMgBNUbhehhTEojuJ17bOIHVTtcswfD9pRFZiDmi4tetufjxGy8eSC58r94z6Zj1uf/NtW0NHrA9wabG9kfPLvw+Tqhx40VgCXjNarSQg4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159362273512595.85980689869552;
- Wed, 1 Jul 2020 09:58:55 -0700 (PDT)
-Message-ID: <159362273389.26405.7163118057791066597@d1fd068a5071>
-Subject: Re: [PATCH 0/3] block: improve error reporting for unsupported
- O_DIRECT
-In-Reply-To: <20200701160509.1523847-1-berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqg6X-0000c5-Rm; Wed, 01 Jul 2020 13:01:01 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:51456)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqg6V-0006gi-HG; Wed, 01 Jul 2020 13:01:01 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=0.07457812|-1; BR=01201311R941ee; CH=green;
+ DM=|OVERLOAD|false|; DS=SPAM|spam_blackmail|0.892561-9.6942e-05-0.107342;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03299; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvxA9R9_1593622844; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvxA9R9_1593622844)
+ by smtp.aliyun-inc.com(10.147.41.120);
+ Thu, 02 Jul 2020 01:00:45 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 47/61] target/riscv: vector single-width floating-point
+ reduction instructions
+Date: Wed,  1 Jul 2020 23:25:35 +0800
+Message-Id: <20200701152549.1218-48-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: berrange@redhat.com
-Date: Wed, 1 Jul 2020 09:58:55 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 12:59:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,55 +71,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, ppandit@redhat.com
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMTE2MDUwOS4xNTIz
-ODQ3LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
-IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgorKysgL3RtcC9xZW11LXRl
-c3QvYnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyNi5vdXQuYmFkIDIwMjAtMDctMDEgMTY6NTg6
-MTEuMzIxMDI5NzE3ICswMDAwCkBAIC02LDcgKzYsNyBAQAogcWVtdS1pbzogY2FuJ3Qgb3Blbjog
-QSByZWd1bGFyIGZpbGUgd2FzIGV4cGVjdGVkIGJ5IHRoZSAnZmlsZScgZHJpdmVyLCBidXQgc29t
-ZXRoaW5nIGVsc2Ugd2FzIGdpdmVuCiBxZW11LWlvOiB3YXJuaW5nOiBPcGVuaW5nIGEgY2hhcmFj
-dGVyIGRldmljZSBhcyBhIGZpbGUgdXNpbmcgdGhlICdmaWxlJyBkcml2ZXIgaXMgZGVwcmVjYXRl
-ZAogPT0gVGVzdGluZyBSVyA9PQotcWVtdS1pbzogY2FuJ3Qgb3BlbjogQ291bGQgbm90IG9wZW4g
-J1RFU1RfRElSL3QuSU1HRk1UJzogSXMgYSBkaXJlY3RvcnkKK3FlbXUtaW86IGNhbid0IG9wZW46
-IFVuYWJsZSB0byBvcGVuICdURVNUX0RJUi90LklNR0ZNVCcgZmxhZ3MgMHgyOiBJcyBhIGRpcmVj
-dG9yeQogcWVtdS1pbzogd2FybmluZzogT3BlbmluZyBhIGNoYXJhY3RlciBkZXZpY2UgYXMgYSBm
-aWxlIHVzaW5nIHRoZSAnZmlsZScgZHJpdmVyIGlzIGRlcHJlY2F0ZWQKIAogPT09IFRlc3Rpbmcg
-d2l0aCBkcml2ZXI6aG9zdF9kZXZpY2UgPT09CkBAIC0xNCwxMyArMTQsMTMgQEAKLS0tCk5vdCBy
-dW46IDI1OQpGYWlsdXJlczogMDYxIDA2OSAxMTEgMjI2IDI0NApGYWlsZWQgNSBvZiAxMTkgaW90
-ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNl
-YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
-ZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAg
-ICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxl
-ZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAn
-LS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTY3MjI4YTcwZTc4NDRkNzBiMDdhODY0
-ZmVmNWM0NTY5JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNv
-bmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJ
-R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
-ZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12
-JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2Nh
-Y2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXkycXV6cWZiL3NyYy9k
-b2NrZXItc3JjLjIwMjAtMDctMDEtMTIuNDEuMTIuMjM1Mzg6L3Zhci90bXAvcWVtdTp6LHJvJywg
-J3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVy
-bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
-dS5pbnN0YW5jZS51dWlkPTY3MjI4YTcwZTc4NDRkNzBiMDdhODY0ZmVmNWM0NTY5Cm1ha2VbMV06
-ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXkycXV6cWZiL3NyYycKbWFrZTogKioqIFtkb2NrZXIt
-cnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxN200MS44OTJzCnVzZXIg
-ICAgMG01Ljc5MHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMjAwNzAxMTYwNTA5LjE1MjM4NDctMS1iZXJyYW5nZUByZWRoYXQuY29tL3Rl
-c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 10 +++++++
+ target/riscv/insn32.decode              |  4 +++
+ target/riscv/insn_trans/trans_rvv.inc.c |  5 ++++
+ target/riscv/vector_helper.c            | 39 +++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
+
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 1c1277c0d1..8e8b8d0407 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1079,3 +1079,13 @@ DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b78fd8bc04..986308e99a 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -541,6 +541,10 @@ vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
+ vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
+ vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
+ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
++# Vector ordered and unordered reduction sum
++vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 91fc1fd059..3dd4171898 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2346,3 +2346,8 @@ GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
+ /* Vector Widening Integer Reduction Instructions */
+ GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
+ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
++
++/* Vector Single-Width Floating-Point Reduction Instructions */
++GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 72b812c743..73214534cb 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4417,3 +4417,42 @@ GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
+ GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
+ GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
+ GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
++
++/* Vector Single-Width Floating-Point Reduction Instructions */
++#define GEN_VEXT_FRED(NAME, TD, TS2, HD, HS2, OP, CLEAR_FN)\
++void HELPER(NAME)(void *vd, void *v0, void *vs1,           \
++                  void *vs2, CPURISCVState *env,           \
++                  uint32_t desc)                           \
++{                                                          \
++    uint32_t mlen = vext_mlen(desc);                       \
++    uint32_t vm = vext_vm(desc);                           \
++    uint32_t vl = env->vl;                                 \
++    uint32_t i;                                            \
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;         \
++    TD s1 =  *((TD *)vs1 + HD(0));                         \
++                                                           \
++    for (i = 0; i < vl; i++) {                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                   \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {         \
++            continue;                                      \
++        }                                                  \
++        s1 = OP(s1, (TD)s2, &env->fp_status);              \
++    }                                                      \
++    *((TD *)vd + HD(0)) = s1;                              \
++    CLEAR_FN(vd, 1, sizeof(TD), tot);                      \
++}
++
++/* Unordered sum */
++GEN_VEXT_FRED(vfredsum_vs_h, uint16_t, uint16_t, H2, H2, float16_add, clearh)
++GEN_VEXT_FRED(vfredsum_vs_w, uint32_t, uint32_t, H4, H4, float32_add, clearl)
++GEN_VEXT_FRED(vfredsum_vs_d, uint64_t, uint64_t, H8, H8, float64_add, clearq)
++
++/* Maximum value */
++GEN_VEXT_FRED(vfredmax_vs_h, uint16_t, uint16_t, H2, H2, float16_maxnum, clearh)
++GEN_VEXT_FRED(vfredmax_vs_w, uint32_t, uint32_t, H4, H4, float32_maxnum, clearl)
++GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
++
++/* Minimum value */
++GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
++GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
++GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
+-- 
+2.23.0
+
 
