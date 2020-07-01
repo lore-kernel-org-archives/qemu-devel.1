@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAB8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 105E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:15:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62BB620772
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:14:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62BB620772
+	by mail.kernel.org (Postfix) with ESMTPS id D9E9B206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 13:15:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E9B206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqcZN-0006Nw-La
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 09:14:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47652)
+	id 1jqcaI-0007K4-5I
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 09:15:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jqcYm-0005vH-UL; Wed, 01 Jul 2020 09:13:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60006)
+ id 1jqcZP-0006Xu-2j; Wed, 01 Jul 2020 09:14:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24828)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jqcYk-0007Vg-T1; Wed, 01 Jul 2020 09:13:56 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ id 1jqcZN-0007YV-7f; Wed, 01 Jul 2020 09:14:34 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 061D2BGN167946; Wed, 1 Jul 2020 09:13:52 -0400
+ 061D3aCw147660; Wed, 1 Jul 2020 09:14:31 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 320s1rkxd3-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320s234usc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 09:13:52 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 061D2WOI169752;
- Wed, 1 Jul 2020 09:13:52 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.72])
- by mx0a-001b2d01.pphosted.com with ESMTP id 320s1rkxbv-1
+ Wed, 01 Jul 2020 09:14:31 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 061D3Wd7147426;
+ Wed, 1 Jul 2020 09:14:31 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320s234ur9-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 09:13:52 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
- by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061D6noR004172;
- Wed, 1 Jul 2020 13:13:49 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma06fra.de.ibm.com with ESMTP id 31wwcgta7n-1
+ Wed, 01 Jul 2020 09:14:31 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061D6Txq012788;
+ Wed, 1 Jul 2020 13:14:29 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com
+ (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+ by ppma04ams.nl.ibm.com with ESMTP id 31wwr8cxn8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 13:13:49 +0000
+ Wed, 01 Jul 2020 13:14:29 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 061DCQ7X47448512
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 061DEQVV52232358
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 1 Jul 2020 13:12:26 GMT
+ Wed, 1 Jul 2020 13:14:26 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8E6804C04E;
- Wed,  1 Jul 2020 13:13:46 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 5C8984C04A;
+ Wed,  1 Jul 2020 13:14:26 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0ECA74C040;
- Wed,  1 Jul 2020 13:13:46 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D50B04C04E;
+ Wed,  1 Jul 2020 13:14:25 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  1 Jul 2020 13:13:45 +0000 (GMT)
-Subject: Re: [PATCH 1/2] virtio-ccw: fix virtio_set_ind_atomic
+ Wed,  1 Jul 2020 13:14:25 +0000 (GMT)
+Subject: Re: [PATCH 2/2] s390x/pci: fix set_ind_atomic
 To: Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
  Cornelia Huck <cohuck@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, qemu-s390x@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200616045035.51641-1-pasic@linux.ibm.com>
- <20200616045035.51641-2-pasic@linux.ibm.com>
+ <20200616045035.51641-3-pasic@linux.ibm.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -118,12 +118,12 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <bf0a3674-ef0a-c443-ddc2-04d0d5654f1a@de.ibm.com>
-Date: Wed, 1 Jul 2020 15:13:45 +0200
+Message-ID: <4eddbf4b-1a02-ea81-93cb-c20dc769126f@de.ibm.com>
+Date: Wed, 1 Jul 2020 15:14:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200616045035.51641-2-pasic@linux.ibm.com>
+In-Reply-To: <20200616045035.51641-3-pasic@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -132,16 +132,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-01_08:2020-07-01,
  2020-07-01 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 suspectscore=0
- phishscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- adultscore=0 priorityscore=1501 cotscore=-2147483648 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007010092
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 09:13:53
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+ lowpriorityscore=0
+ clxscore=1015 impostorscore=0 phishscore=0 suspectscore=0 mlxlogscore=999
+ cotscore=-2147483648 mlxscore=0 spamscore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2007010096
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 08:00:01
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -183,21 +182,22 @@ On 16.06.20 06:50, Halil Pasic wrote:
 > is not performed.
 > 
 > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reported-by: Andre Wild <Andre.Wild1@ibm.com>
-> Fixes: 7e7494627f ("s390x/virtio-ccw: Adapter interrupt support.")
+> Fixes: 8cba80c3a0 ("s390: Add PCI bus support")
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
 Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
 > ---
->  hw/s390x/virtio-ccw.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+>  hw/s390x/s390-pci-bus.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 > 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index c1f4bb1d33..3c988a000b 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -786,9 +786,10 @@ static inline VirtioCcwDevice *to_virtio_ccw_dev_fast(DeviceState *d)
->  static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                                       uint8_t to_be_set)
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index c4a4259f0c..80eb957a91 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -637,22 +637,24 @@ static AddressSpace *s390_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>  
+>  static uint8_t set_ind_atomic(uint64_t ind_loc, uint8_t to_be_set)
 >  {
 > -    uint8_t ind_old, ind_new;
 > +    uint8_t expected, actual;
@@ -208,8 +208,7 @@ Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >  
 >      ind_addr = cpu_physical_memory_map(ind_loc, &len, true);
 >      if (!ind_addr) {
-> @@ -796,14 +797,15 @@ static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                       __func__, sch->cssid, sch->ssid, sch->schid);
+>          s390_pci_generate_error_event(ERR_EVENT_AIRERR, 0, 0, 0, 0);
 >          return -1;
 >      }
 > +    actual = *ind_addr;
@@ -217,18 +216,16 @@ Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > -        ind_old = *ind_addr;
 > -        ind_new = ind_old | to_be_set;
 > -    } while (atomic_cmpxchg(ind_addr, ind_old, ind_new) != ind_old);
-> -    trace_virtio_ccw_set_ind(ind_loc, ind_old, ind_new);
 > -    cpu_physical_memory_unmap(ind_addr, len, 1, len);
 > +        expected = actual;
 > +        actual = atomic_cmpxchg(ind_addr, expected, expected | to_be_set);
 > +    } while (actual != expected);
-> +    trace_virtio_ccw_set_ind(ind_loc, actual, actual | to_be_set);
 > +    cpu_physical_memory_unmap((void *)ind_addr, len, 1, len);
 >  
 > -    return ind_old;
 > +    return actual;
 >  }
 >  
->  static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+>  static void s390_msi_ctrl_write(void *opaque, hwaddr addr, uint64_t data,
 > 
 
