@@ -2,93 +2,62 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FC0C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09F8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5919720781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:21:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3KphS0d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5919720781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F95020781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:22:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F95020781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfU2-000360-HO
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:21:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41040)
+	id 1jqfUm-00045o-Nj
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:22:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqfOT-00043I-Ew
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:15:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60837
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqfOO-0006rE-5R
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:15:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593620123;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sYgbFBsOYt/YNe+vsPDEOrv/IwhWQRnpjZUO17nVabA=;
- b=J3KphS0dhPbat2Yvdr7z1l3o2ZdL7ENKIYhP8tuUkjQFDcd2yPB+loTgv7r5gSgVJNc0d+
- xnec3DKAnFRe8EU9tPQKDQUYgLVkRvYRR7IWipRZJhUtrVCpoZOrNG+dzY61UTsYsL+BFH
- WCJQy830XewHtwg4bIZvY7qspgUzssk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-Ca59u2IIM5iuSzyE9vW2wg-1; Wed, 01 Jul 2020 12:15:21 -0400
-X-MC-Unique: Ca59u2IIM5iuSzyE9vW2wg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D79A186A222;
- Wed,  1 Jul 2020 16:15:20 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6575260CD1;
- Wed,  1 Jul 2020 16:15:04 +0000 (UTC)
-Date: Wed, 1 Jul 2020 17:15:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 3/3] trace: Example of "centralized" recorder tracing
-Message-ID: <20200701161501.GJ1427561@redhat.com>
-References: <20200626162706.3304357-1-dinechin@redhat.com>
- <20200626162706.3304357-4-dinechin@redhat.com>
- <20200630124136.GM1370404@redhat.com>
- <20200701160906.GT126613@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfRa-0000Zp-OV; Wed, 01 Jul 2020 12:18:43 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40838)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfRV-0007Yq-HL; Wed, 01 Jul 2020 12:18:42 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0754577|-1; CH=green; DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.13812-0.000813233-0.861067;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hvvwvw9_1593620309; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Hvvwvw9_1593620309)
+ by smtp.aliyun-inc.com(10.147.42.16); Thu, 02 Jul 2020 00:18:29 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 26/61] target/riscv: vector single-width fractional
+ multiply with rounding and saturation
+Date: Wed,  1 Jul 2020 23:25:14 +0800
+Message-Id: <20200701152549.1218-27-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200701160906.GT126613@stefanha-x1.localdomain>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,42 +70,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- Christophe de Dinechin <dinechin@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 01, 2020 at 05:09:06PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Jun 30, 2020 at 01:41:36PM +0100, Daniel P. Berrangé wrote:
-> > On Fri, Jun 26, 2020 at 06:27:06PM +0200, Christophe de Dinechin wrote:
-> > IMHO the whole point of having the pluggable trace backend impls, is
-> > precisely that we don't have to add multiple different calls in the
-> > code. A single trace_qemu_mutex_unlock() is supposed to work with
-> > any backend.
-> 
-> I think an exception is okay when the other trace backends do not offer
-> equivalent functionality.
-> 
-> Who knows if anyone other than Christophe will use this functionality,
-> but it doesn't cost much to allow it.
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |   9 ++
+ target/riscv/insn32.decode              |   2 +
+ target/riscv/insn_trans/trans_rvv.inc.c |   4 +
+ target/riscv/vector_helper.c            | 107 ++++++++++++++++++++++++
+ 4 files changed, 122 insertions(+)
 
-This patch is just an example though, suggesting this kind of usage is
-expected to done in other current trace probe locations. The trace wrapper
-has most of the information required already including a format string,
-so I'd think it could be wired up to the generator so we don't add extra
-record() statements through the codebase. At most it should require an
-extra annotation in the trace-events file to take the extra parameter
-for grouping, and other trace backends can ignore that.
-
-Regards,
-Daniel
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index db9e2024ae..b2fc71c2ea 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -742,3 +742,12 @@ DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vsmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 57228242aa..1dfc5f7ca0 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -424,6 +424,8 @@ vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
+ vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
+ vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
+ vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
++vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
++vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 354a802518..8e85a2aed3 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1754,3 +1754,7 @@ GEN_OPIVV_TRANS(vasub_vv, opivv_check)
+ GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
+ GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
++
++/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
++GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
++GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 0b2119b6cc..d062d904ca 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2597,3 +2597,110 @@ GEN_VEXT_VX_RM(vasub_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
++static inline int8_t vsmul8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
++{
++    uint8_t round;
++    int16_t res;
++
++    res = (int16_t)a * (int16_t)b;
++    round = get_round(vxrm, res, 7);
++    res   = (res >> 7) + round;
++
++    if (res > INT8_MAX) {
++        env->vxsat = 0x1;
++        return INT8_MAX;
++    } else if (res < INT8_MIN) {
++        env->vxsat = 0x1;
++        return INT8_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int16_t vsmul16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
++{
++    uint8_t round;
++    int32_t res;
++
++    res = (int32_t)a * (int32_t)b;
++    round = get_round(vxrm, res, 15);
++    res   = (res >> 15) + round;
++
++    if (res > INT16_MAX) {
++        env->vxsat = 0x1;
++        return INT16_MAX;
++    } else if (res < INT16_MIN) {
++        env->vxsat = 0x1;
++        return INT16_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int32_t vsmul32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    uint8_t round;
++    int64_t res;
++
++    res = (int64_t)a * (int64_t)b;
++    round = get_round(vxrm, res, 31);
++    res   = (res >> 31) + round;
++
++    if (res > INT32_MAX) {
++        env->vxsat = 0x1;
++        return INT32_MAX;
++    } else if (res < INT32_MIN) {
++        env->vxsat = 0x1;
++        return INT32_MIN;
++    } else {
++        return res;
++    }
++}
++
++static int64_t vsmul64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    uint8_t round;
++    uint64_t hi_64, lo_64;
++    int64_t res;
++
++    if (a == INT64_MIN && b == INT64_MIN) {
++        env->vxsat = 1;
++        return INT64_MAX;
++    }
++
++    muls64(&lo_64, &hi_64, a, b);
++    round = get_round(vxrm, lo_64, 63);
++    /*
++     * Cannot overflow, as there are always
++     * 2 sign bits after multiply.
++     */
++    res = (hi_64 << 1) | (lo_64 >> 63);
++    if (round) {
++        if (res == INT64_MAX) {
++            env->vxsat = 1;
++        } else {
++            res += 1;
++        }
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vsmul_vv_b, OP_SSS_B, H1, H1, H1, vsmul8)
++RVVCALL(OPIVV2_RM, vsmul_vv_h, OP_SSS_H, H2, H2, H2, vsmul16)
++RVVCALL(OPIVV2_RM, vsmul_vv_w, OP_SSS_W, H4, H4, H4, vsmul32)
++RVVCALL(OPIVV2_RM, vsmul_vv_d, OP_SSS_D, H8, H8, H8, vsmul64)
++GEN_VEXT_VV_RM(vsmul_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vsmul_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vsmul_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vsmul_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vsmul_vx_b, OP_SSS_B, H1, H1, vsmul8)
++RVVCALL(OPIVX2_RM, vsmul_vx_h, OP_SSS_H, H2, H2, vsmul16)
++RVVCALL(OPIVX2_RM, vsmul_vx_w, OP_SSS_W, H4, H4, vsmul32)
++RVVCALL(OPIVX2_RM, vsmul_vx_d, OP_SSS_D, H8, H8, vsmul64)
++GEN_VEXT_VX_RM(vsmul_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vsmul_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vsmul_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vsmul_vx_d, 8, 8, clearq)
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.23.0
 
 
