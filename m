@@ -2,63 +2,90 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7572C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B048C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCB0D2067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:49:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB0D2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0106F20874
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:51:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeuOYliZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0106F20874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfvh-0003DZ-1a
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:49:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50232)
+	id 1jqfwv-0004MR-8U
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfuo-0002jV-IW; Wed, 01 Jul 2020 12:48:54 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49629)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfum-0004uS-ID; Wed, 01 Jul 2020 12:48:54 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08085367|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.00652819-9.09021e-05-0.993381;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03278; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvwlE5b_1593622120; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvwlE5b_1593622120)
- by smtp.aliyun-inc.com(10.147.43.230);
- Thu, 02 Jul 2020 00:48:40 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 41/61] target/riscv: vector floating-point merge
- instructions
-Date: Wed,  1 Jul 2020 23:25:29 +0800
-Message-Id: <20200701152549.1218-42-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jqfvd-0003KV-UE
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:49:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54990
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jqfvc-0004xb-Cv
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:49:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593622183;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=UocrftU7n/ydvGPG95SgKJRD1AGWQ7R4RCj5+NpB0pE=;
+ b=eeuOYliZfOidt+cYcWeV1dnePCn831JZFpQxb782KahOhhqQFOzzwi1scilUrKHTPcm143
+ Aj15/PmRLZA58dnpiDxtS3q8O1tv8/OtSd+grfD0d+C/K9gsqpLpBr5FlxERuasVLQ4D3Z
+ F7LIZf0Pcg+Esq8wVNFyIkg2EN1GZAo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-TwY4-78pPj-qPUeIwKj2MQ-1; Wed, 01 Jul 2020 12:49:41 -0400
+X-MC-Unique: TwY4-78pPj-qPUeIwKj2MQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC7D118FF661
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 16:49:40 +0000 (UTC)
+Received: from work-vm (ovpn-114-200.ams2.redhat.com [10.36.114.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D12C71662;
+ Wed,  1 Jul 2020 16:49:40 +0000 (UTC)
+Date: Wed, 1 Jul 2020 17:49:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: add support for AMD nested live migration
+Message-ID: <20200701164937.GH3608@work-vm>
+References: <20200624160608.383931-1-pbonzini@redhat.com>
+ <20200701162841.GG3608@work-vm>
+ <CABgObfZjrBe+87Lhyw_Zyyuyun3VBpHa1RuzovmvthrU-Ea-pQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CABgObfZjrBe+87Lhyw_Zyyuyun3VBpHa1RuzovmvthrU-Ea-pQ@mail.gmail.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,127 +98,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  4 +++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 38 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 24 ++++++++++++++++
- 4 files changed, 68 insertions(+)
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> Il mer 1 lug 2020, 18:28 Dr. David Alan Gilbert <dgilbert@redhat.com> ha
+> scritto:
+> 
+> >
+> > > +    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM &&
+> > > +            nested_state->size > offsetof(struct kvm_nested_state,
+> > data));
+> >
+> > How does this nested_state->size work? It looks like even if it's 1 byte
+> > into 'data' we transmit a whole KVM_STATE_NESTED_SVM_VMCB_SIZE.
+> >
+> 
+> The format is documented as having either 0 or KVM_STATE_NESTED_SVM_VMCB_SIZE
+> bytes (for vmx instead it can be 0, 4K or 8K).
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index fb744c5ec9..2c3f0a4e0c 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1000,3 +1000,7 @@ DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_5(vfclass_v_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfclass_v_w, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 6912eda259..38e7445a16 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -515,6 +515,8 @@ vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
- vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
- vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
- vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
-+vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
-+vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 361bdce654..b6872376ce 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2184,3 +2184,41 @@ GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
- 
- /* Vector Floating-Point Classify Instruction */
- GEN_OPFV_TRANS(vfclass_v, opfv_check)
-+
-+/* Vector Floating-Point Merge Instruction */
-+GEN_OPFVF_TRANS(vfmerge_vfm,  opfvf_check)
-+
-+static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
-+{
-+    if (vext_check_isa_ill(s) &&
-+        vext_check_reg(s, a->rd, false) &&
-+        (s->sew != 0)) {
-+
-+        if (s->vl_eq_vlmax) {
-+            tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
-+                                 MAXSZ(s), MAXSZ(s), cpu_fpr[a->rs1]);
-+        } else {
-+            TCGv_ptr dest;
-+            TCGv_i32 desc;
-+            uint32_t data = FIELD_DP32(0, VDATA, LMUL, s->lmul);
-+            static gen_helper_vmv_vx * const fns[3] = {
-+                gen_helper_vmv_v_x_h,
-+                gen_helper_vmv_v_x_w,
-+                gen_helper_vmv_v_x_d,
-+            };
-+            TCGLabel *over = gen_new_label();
-+            tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+            dest = tcg_temp_new_ptr();
-+            desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-+            tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
-+            fns[s->sew - 1](dest, cpu_fpr[a->rs1], cpu_env, desc);
-+
-+            tcg_temp_free_ptr(dest);
-+            tcg_temp_free_i32(desc);
-+            gen_set_label(over);
-+        }
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 63f08e4554..1d5667f471 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4194,3 +4194,27 @@ RVVCALL(OPIVV1, vfclass_v_d, OP_UU_D, H8, H8, fclass_d)
- GEN_VEXT_V(vfclass_v_h, 2, 2, clearh)
- GEN_VEXT_V(vfclass_v_w, 4, 4, clearl)
- GEN_VEXT_V(vfclass_v_d, 8, 8, clearq)
-+
-+/* Vector Floating-Point Merge Instruction */
-+#define GEN_VFMERGE_VF(NAME, ETYPE, H, CLEAR_FN)              \
-+void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2, \
-+                  CPURISCVState *env, uint32_t desc)          \
-+{                                                             \
-+    uint32_t mlen = vext_mlen(desc);                          \
-+    uint32_t vm = vext_vm(desc);                              \
-+    uint32_t vl = env->vl;                                    \
-+    uint32_t esz = sizeof(ETYPE);                             \
-+    uint32_t vlmax = vext_maxsz(desc) / esz;                  \
-+    uint32_t i;                                               \
-+                                                              \
-+    for (i = 0; i < vl; i++) {                                \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-+        *((ETYPE *)vd + H(i))                                 \
-+          = (!vm && !vext_elem_mask(v0, mlen, i) ? s2 : s1);  \
-+    }                                                         \
-+    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                  \
-+}
-+
-+GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
-+GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
-+GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
--- 
-2.23.0
+OK.
+
+Dave
+
+> Paolo
+> 
+> 
+> > Dave
+> >
+> > > +}
+> > > +
+> > > +static const VMStateDescription vmstate_svm_nested_state = {
+> > > +    .name = "cpu/kvm_nested_state/svm",
+> > > +    .version_id = 1,
+> > > +    .minimum_version_id = 1,
+> > > +    .needed = svm_nested_state_needed,
+> > > +    .fields = (VMStateField[]) {
+> > > +        VMSTATE_U64(hdr.svm.vmcb_pa, struct kvm_nested_state),
+> > > +        VMSTATE_UINT8_ARRAY(data.svm[0].vmcb12,
+> > > +                            struct kvm_nested_state,
+> > > +                            KVM_STATE_NESTED_SVM_VMCB_SIZE),
+> > > +        VMSTATE_END_OF_LIST()
+> > > +    }
+> > > +};
+> > > +
+> > >  static bool nested_state_needed(void *opaque)
+> > >  {
+> > >      X86CPU *cpu = opaque;
+> > >      CPUX86State *env = &cpu->env;
+> > >
+> > >      return (env->nested_state &&
+> > > -            vmx_nested_state_needed(env->nested_state));
+> > > +            (vmx_nested_state_needed(env->nested_state) ||
+> > > +             svm_nested_state_needed(env->nested_state)));
+> > >  }
+> > >
+> > >  static int nested_state_post_load(void *opaque, int version_id)
+> > > @@ -1139,6 +1166,7 @@ static const VMStateDescription
+> > vmstate_kvm_nested_state = {
+> > >      },
+> > >      .subsections = (const VMStateDescription*[]) {
+> > >          &vmstate_vmx_nested_state,
+> > > +        &vmstate_svm_nested_state,
+> > >          NULL
+> > >      }
+> > >  };
+> > > --
+> > > 2.26.2
+> > >
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
