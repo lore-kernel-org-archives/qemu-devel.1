@@ -1,100 +1,64 @@
 Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC593C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF84C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77E852085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:41:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5zavMR2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77E852085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 246232085B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:41:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 246232085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfnQ-0003Af-Q0
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:41:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48576)
+	id 1jqfnf-0003XS-Ds
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:41:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqfmi-0002Ww-Lc
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:40:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33283
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqfmD-0003LP-HJ
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:40:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593621599;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1iX5MYB000v7uy97zKOGY26aZHx+xJ5dItP/i4ClzRY=;
- b=a5zavMR2FLuSS4kknhVMrhio2OlLvypycXgq9B4BclPLsiS/tSnilNpk4n9ige7Me1Q3wI
- h271smMhbQ0ZPpGUsSlnf+ctJyBdIBV+MGaRPdUxP4XLT4aYCDAndcS1up9Ou+NbvuX0Z2
- Y+26fPNe/EBLeKJIZeV1ijN12XXS2gs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-o9o2fiS7N4W_xByzZzzpOA-1; Wed, 01 Jul 2020 12:39:54 -0400
-X-MC-Unique: o9o2fiS7N4W_xByzZzzpOA-1
-Received: by mail-ed1-f71.google.com with SMTP id y4so10178315edv.17
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:39:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1iX5MYB000v7uy97zKOGY26aZHx+xJ5dItP/i4ClzRY=;
- b=gNLeN+bPeD6YdBc/hwkAyI1iCoMyEpoRbQGbzyEx7pDFj9Lg8OdhYefL15er2cRIRz
- 1WpVBsNCAmPIzShlGL+qVCIm0TgynzyxV9YT82sKkdNrhg9vgXejsrtDVggWnO7Ay1AH
- WbX2UstHHHbl1LxbAMb255dRAIPCSh1nZH3M5YDpq+yltXyNMVdjtCOGHCT9cLqgJRsk
- TgHrrc0CaAJKcFdGhY+S0wNCHVm7phJ1hZbn391UJZbHmzIccW2yw7j3C/WWHC3V3Uu5
- kEM7a3A3e5SioBm2ecwvMU8N7wVaPYcLG2MuPTJFHKLNTcnb8lBDafR85rI4Nd4ZrjIY
- YdoA==
-X-Gm-Message-State: AOAM5319oZb4q3jab/6rpm6lUZTfHcS/2ELxr3x4ZGbWKO8pOzq/UYUF
- /omEdQG4zLHWbYKOE+5DQgKSEpJ3hhli5kjXjdYRMj+BGAMCULsa71YtUf2a0Y7/2oEehX1pmY6
- b2BiYHf2LhZbNZbBAXH+wlZDC9vHjfHQ=
-X-Received: by 2002:aa7:d04e:: with SMTP id n14mr5363704edo.161.1593621593128; 
- Wed, 01 Jul 2020 09:39:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx8lkm1+qg9FjjFIuxP2ZnQvOf+qUuUpTeUU42XlXKcxjGqC2Jxl0qx3UQC+iIJaRHXF5xQn9HUyEvY8WUYjAk=
-X-Received: by 2002:aa7:d04e:: with SMTP id n14mr5363682edo.161.1593621592913; 
- Wed, 01 Jul 2020 09:39:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfmw-0002hx-M4; Wed, 01 Jul 2020 12:40:46 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:53248)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfmu-0003b1-Dk; Wed, 01 Jul 2020 12:40:46 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.132259|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0106247-0.000108178-0.989267;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvwwMTs_1593621637; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvwwMTs_1593621637)
+ by smtp.aliyun-inc.com(10.147.41.231);
+ Thu, 02 Jul 2020 00:40:37 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 37/61] target/riscv: vector floating-point min/max
+ instructions
+Date: Wed,  1 Jul 2020 23:25:25 +0800
+Message-Id: <20200701152549.1218-38-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-References: <20200624160608.383931-1-pbonzini@redhat.com>
- <20200701162841.GG3608@work-vm>
-In-Reply-To: <20200701162841.GG3608@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 1 Jul 2020 18:39:40 +0200
-Message-ID: <CABgObfZjrBe+87Lhyw_Zyyuyun3VBpHa1RuzovmvthrU-Ea-pQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: add support for AMD nested live migration
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000f3cc3605a963f0f9"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,163 +71,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f3cc3605a963f0f9
-Content-Type: text/plain; charset="UTF-8"
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 13 ++++++++++++
+ target/riscv/insn32.decode              |  4 ++++
+ target/riscv/insn_trans/trans_rvv.inc.c |  6 ++++++
+ target/riscv/vector_helper.c            | 27 +++++++++++++++++++++++++
+ 4 files changed, 50 insertions(+)
 
-Il mer 1 lug 2020, 18:28 Dr. David Alan Gilbert <dgilbert@redhat.com> ha
-scritto:
-
->
-> > +    return (nested_state->format == KVM_STATE_NESTED_FORMAT_SVM &&
-> > +            nested_state->size > offsetof(struct kvm_nested_state,
-> data));
->
-> How does this nested_state->size work? It looks like even if it's 1 byte
-> into 'data' we transmit a whole KVM_STATE_NESTED_SVM_VMCB_SIZE.
->
-
-The format is documented as having either 0 or KVM_STATE_NESTED_SVM_VMCB_SIZE
-bytes (for vmx instead it can be 0, 4K or 8K).
-
-Paolo
-
-
-> Dave
->
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_svm_nested_state = {
-> > +    .name = "cpu/kvm_nested_state/svm",
-> > +    .version_id = 1,
-> > +    .minimum_version_id = 1,
-> > +    .needed = svm_nested_state_needed,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_U64(hdr.svm.vmcb_pa, struct kvm_nested_state),
-> > +        VMSTATE_UINT8_ARRAY(data.svm[0].vmcb12,
-> > +                            struct kvm_nested_state,
-> > +                            KVM_STATE_NESTED_SVM_VMCB_SIZE),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> >  static bool nested_state_needed(void *opaque)
-> >  {
-> >      X86CPU *cpu = opaque;
-> >      CPUX86State *env = &cpu->env;
-> >
-> >      return (env->nested_state &&
-> > -            vmx_nested_state_needed(env->nested_state));
-> > +            (vmx_nested_state_needed(env->nested_state) ||
-> > +             svm_nested_state_needed(env->nested_state)));
-> >  }
-> >
-> >  static int nested_state_post_load(void *opaque, int version_id)
-> > @@ -1139,6 +1166,7 @@ static const VMStateDescription
-> vmstate_kvm_nested_state = {
-> >      },
-> >      .subsections = (const VMStateDescription*[]) {
-> >          &vmstate_vmx_nested_state,
-> > +        &vmstate_svm_nested_state,
-> >          NULL
-> >      }
-> >  };
-> > --
-> > 2.26.2
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
-
---000000000000f3cc3605a963f0f9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Il mer 1 lug 2020, 18:28 Dr. David Alan Gilbert &lt;<a href=3D=
-"mailto:dgilbert@redhat.com">dgilbert@redhat.com</a>&gt; ha scritto:<br></d=
-iv><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
-:1px #ccc solid;padding-left:1ex"><br>
-&gt; +=C2=A0 =C2=A0 return (nested_state-&gt;format =3D=3D KVM_STATE_NESTED=
-_FORMAT_SVM &amp;&amp;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 nested_state-&gt;size &gt; =
-offsetof(struct kvm_nested_state, data));<br>
-<br>
-How does this nested_state-&gt;size work? It looks like even if it&#39;s 1 =
-byte<br>
-into &#39;data&#39; we transmit a whole KVM_STATE_NESTED_SVM_VMCB_SIZE.<br>=
-</blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">The =
-format is documented as having either 0 or=C2=A0<span style=3D"font-family:=
-sans-serif">KVM_STATE_NESTED_SVM_VMCB_SIZE bytes (for vmx instead it can be=
- 0, 4K or 8K).</span></div><div dir=3D"auto"><span style=3D"font-family:san=
-s-serif"><br></span></div><div dir=3D"auto"><span style=3D"font-family:sans=
--serif">Paolo</span></div><div dir=3D"auto"><span style=3D"font-family:sans=
--serif"><br></span></div><div dir=3D"auto"><div class=3D"gmail_quote"><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">
-<br>
-Dave<br>
-<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static const VMStateDescription vmstate_svm_nested_state =3D {<br>
-&gt; +=C2=A0 =C2=A0 .name =3D &quot;cpu/kvm_nested_state/svm&quot;,<br>
-&gt; +=C2=A0 =C2=A0 .version_id =3D 1,<br>
-&gt; +=C2=A0 =C2=A0 .minimum_version_id =3D 1,<br>
-&gt; +=C2=A0 =C2=A0 .needed =3D svm_nested_state_needed,<br>
-&gt; +=C2=A0 =C2=A0 .fields =3D (VMStateField[]) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_U64(hdr.svm.vmcb_pa, struct kvm_n=
-ested_state),<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT8_ARRAY(data.svm[0].vmcb12,<b=
-r>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct kvm_nested_state,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 KVM_STATE_NESTED_SVM_VMCB_SIZE),<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_END_OF_LIST()<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +};<br>
-&gt; +<br>
-&gt;=C2=A0 static bool nested_state_needed(void *opaque)<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 X86CPU *cpu =3D opaque;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 CPUX86State *env =3D &amp;cpu-&gt;env;<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 return (env-&gt;nested_state &amp;&amp;<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmx_nested_state_needed(env=
--&gt;nested_state));<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (vmx_nested_state_needed(en=
-v-&gt;nested_state) ||<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0svm_nested_state_need=
-ed(env-&gt;nested_state)));<br>
-&gt;=C2=A0 }<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 static int nested_state_post_load(void *opaque, int version_id)<=
-br>
-&gt; @@ -1139,6 +1166,7 @@ static const VMStateDescription vmstate_kvm_nest=
-ed_state =3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 .subsections =3D (const VMStateDescription*[]) {<b=
-r>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;vmstate_vmx_nested_state,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;vmstate_svm_nested_state,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 NULL<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 };<br>
-&gt; -- <br>
-&gt; 2.26.2<br>
-&gt; <br>
---<br>
-Dr. David Alan Gilbert / <a href=3D"mailto:dgilbert@redhat.com" target=3D"_=
-blank" rel=3D"noreferrer">dgilbert@redhat.com</a> / Manchester, UK<br>
-<br>
-</blockquote></div></div></div>
-
---000000000000f3cc3605a963f0f9--
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 8d44154ad2..a080f8358a 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -927,3 +927,16 @@ DEF_HELPER_6(vfwnmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_5(vfsqrt_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfsqrt_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfsqrt_v_d, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfmin_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmin_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmin_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmax_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmax_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmax_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 0d58c4c5e8..854ff9a38f 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -492,6 +492,10 @@ vfwmsac_vf      111110 . ..... ..... 101 ..... 1010111 @r_vm
+ vfwnmsac_vv     111111 . ..... ..... 001 ..... 1010111 @r_vm
+ vfwnmsac_vf     111111 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsqrt_v        100011 . ..... 00000 001 ..... 1010111 @r2_vm
++vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
++vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
++vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
++vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index e875c0e48a..b40e8eec53 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2132,3 +2132,9 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ }
+ 
+ GEN_OPFV_TRANS(vfsqrt_v, opfv_check)
++
++/* Vector Floating-Point MIN/MAX Instructions */
++GEN_OPFVV_TRANS(vfmin_vv, opfvv_check)
++GEN_OPFVV_TRANS(vfmax_vv, opfvv_check)
++GEN_OPFVF_TRANS(vfmin_vf, opfvf_check)
++GEN_OPFVF_TRANS(vfmax_vf, opfvf_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 40ea67d116..6779e4b976 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -3817,3 +3817,30 @@ RVVCALL(OPFVV1, vfsqrt_v_d, OP_UU_D, H8, H8, float64_sqrt)
+ GEN_VEXT_V_ENV(vfsqrt_v_h, 2, 2, clearh)
+ GEN_VEXT_V_ENV(vfsqrt_v_w, 4, 4, clearl)
+ GEN_VEXT_V_ENV(vfsqrt_v_d, 8, 8, clearq)
++
++/* Vector Floating-Point MIN/MAX Instructions */
++RVVCALL(OPFVV2, vfmin_vv_h, OP_UUU_H, H2, H2, H2, float16_minnum)
++RVVCALL(OPFVV2, vfmin_vv_w, OP_UUU_W, H4, H4, H4, float32_minnum)
++RVVCALL(OPFVV2, vfmin_vv_d, OP_UUU_D, H8, H8, H8, float64_minnum)
++GEN_VEXT_VV_ENV(vfmin_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_ENV(vfmin_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_ENV(vfmin_vv_d, 8, 8, clearq)
++RVVCALL(OPFVF2, vfmin_vf_h, OP_UUU_H, H2, H2, float16_minnum)
++RVVCALL(OPFVF2, vfmin_vf_w, OP_UUU_W, H4, H4, float32_minnum)
++RVVCALL(OPFVF2, vfmin_vf_d, OP_UUU_D, H8, H8, float64_minnum)
++GEN_VEXT_VF(vfmin_vf_h, 2, 2, clearh)
++GEN_VEXT_VF(vfmin_vf_w, 4, 4, clearl)
++GEN_VEXT_VF(vfmin_vf_d, 8, 8, clearq)
++
++RVVCALL(OPFVV2, vfmax_vv_h, OP_UUU_H, H2, H2, H2, float16_maxnum)
++RVVCALL(OPFVV2, vfmax_vv_w, OP_UUU_W, H4, H4, H4, float32_maxnum)
++RVVCALL(OPFVV2, vfmax_vv_d, OP_UUU_D, H8, H8, H8, float64_maxnum)
++GEN_VEXT_VV_ENV(vfmax_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_ENV(vfmax_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_ENV(vfmax_vv_d, 8, 8, clearq)
++RVVCALL(OPFVF2, vfmax_vf_h, OP_UUU_H, H2, H2, float16_maxnum)
++RVVCALL(OPFVF2, vfmax_vf_w, OP_UUU_W, H4, H4, float32_maxnum)
++RVVCALL(OPFVF2, vfmax_vf_d, OP_UUU_D, H8, H8, float64_maxnum)
++GEN_VEXT_VF(vfmax_vf_h, 2, 2, clearh)
++GEN_VEXT_VF(vfmax_vf_w, 4, 4, clearl)
++GEN_VEXT_VF(vfmax_vf_d, 8, 8, clearq)
+-- 
+2.23.0
 
 
