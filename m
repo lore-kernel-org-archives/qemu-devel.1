@@ -4,69 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D74C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76556C433E0
 	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 450E5207E8
+	by mail.kernel.org (Postfix) with ESMTPS id 4D68A2082F
 	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:48:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450E5207E8
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D68A2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqmSw-0006Gy-GJ
+	id 1jqmSw-0006IU-HL
 	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 19:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48452)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jqmOX-0008OV-Of; Wed, 01 Jul 2020 19:44:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18198
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jqmOj-0000HI-F2; Wed, 01 Jul 2020 19:44:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2306)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jqmOV-0002BL-Si; Wed, 01 Jul 2020 19:44:01 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 061NWQS1141886; Wed, 1 Jul 2020 19:43:52 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 320t3ftkrt-1
+ id 1jqmOd-0002IJ-Gi; Wed, 01 Jul 2020 19:44:11 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 061NZKxS061490; Wed, 1 Jul 2020 19:43:55 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320yr4y0rj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 19:43:52 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061NdIh3025982;
- Wed, 1 Jul 2020 23:43:51 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01dal.us.ibm.com with ESMTP id 320wfkbdq1-1
+ Wed, 01 Jul 2020 19:43:55 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061Nf10b018410;
+ Wed, 1 Jul 2020 23:43:54 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma02wdc.us.ibm.com with ESMTP id 31wwr93yut-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 23:43:51 +0000
+ Wed, 01 Jul 2020 23:43:54 +0000
 Received: from b03ledav001.gho.boulder.ibm.com
  (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 061NhoBT22937976
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 061NhpH629884752
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 1 Jul 2020 23:43:50 GMT
+ Wed, 1 Jul 2020 23:43:52 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2D9DD6E04C;
- Wed,  1 Jul 2020 23:43:50 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 51B616E04E;
+ Wed,  1 Jul 2020 23:43:53 +0000 (GMT)
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 56B336E04E;
- Wed,  1 Jul 2020 23:43:49 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 7A5626E04C;
+ Wed,  1 Jul 2020 23:43:52 +0000 (GMT)
 Received: from pompom.ibm.com (unknown [9.160.126.23])
  by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed,  1 Jul 2020 23:43:49 +0000 (GMT)
+ Wed,  1 Jul 2020 23:43:52 +0000 (GMT)
 From: Lijun Pan <ljp@linux.ibm.com>
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v4 04/11] target/ppc: convert vmuluwm to tcg_gen_gvec_mul
-Date: Wed,  1 Jul 2020 18:43:39 -0500
-Message-Id: <20200701234344.91843-5-ljp@linux.ibm.com>
+Subject: [PATCH v4 07/11] target/ppc: add vmulld to INDEX_op_mul_vec case
+Date: Wed,  1 Jul 2020 18:43:42 -0500
+Message-Id: <20200701234344.91843-8-ljp@linux.ibm.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20200701234344.91843-1-ljp@linux.ibm.com>
 References: <20200701234344.91843-1-ljp@linux.ibm.com>
@@ -77,16 +76,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-01_15:2020-07-01,
  2020-07-01 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 impostorscore=0 mlxlogscore=984 bulkscore=0
- cotscore=-2147483648 adultscore=0 phishscore=0 clxscore=1015 mlxscore=0
- priorityscore=1501 spamscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007010161
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=ljp@linux.ibm.com;
+ mlxscore=0 malwarescore=0
+ cotscore=-2147483648 clxscore=1015 spamscore=0 suspectscore=0 adultscore=1
+ phishscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2007010162
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 19:43:54
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -111,68 +109,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the original implementation of vmuluwm to the more generic
-tcg_gen_gvec_mul.
+Group vmuluwm and vmulld. Make vmulld-specific
+changes since it belongs to new ISA 3.1.
 
 Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
 ---
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-v3: newly introduced
+v4: add missing changes, and split to 5/11, 6/11, 7/11
+v3: use tcg_gen_gvec_mul()
+v2: fix coding style
+    use Power ISA 3.1 flag
 
- target/ppc/helper.h                 |  1 -
- target/ppc/int_helper.c             | 13 -------------
- target/ppc/translate/vmx-impl.inc.c |  2 +-
- 3 files changed, 1 insertion(+), 15 deletions(-)
+ tcg/ppc/tcg-target.h     |  2 ++
+ tcg/ppc/tcg-target.inc.c | 12 ++++++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 2dfa1c6942..69416b6d7c 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -184,7 +184,6 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
- DEF_HELPER_3(vmuloub, void, avr, avr, avr)
- DEF_HELPER_3(vmulouh, void, avr, avr, avr)
- DEF_HELPER_3(vmulouw, void, avr, avr, avr)
--DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
- DEF_HELPER_3(vslo, void, avr, avr, avr)
- DEF_HELPER_3(vsro, void, avr, avr, avr)
- DEF_HELPER_3(vsrv, void, avr, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index be53cd6f68..bd3e6d7cc7 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -523,19 +523,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
-     r->VsrD(0) = 0;
- }
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 4fa21f0e71..ff1249ef8e 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -63,6 +63,7 @@ typedef enum {
+     tcg_isa_2_06,
+     tcg_isa_2_07,
+     tcg_isa_3_00,
++    tcg_isa_3_10,
+ } TCGPowerISA;
  
--#define VARITH_DO(name, op, element)                                    \
--    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
--    {                                                                   \
--        int i;                                                          \
--                                                                        \
--        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
--            r->element[i] = a->element[i] op b->element[i];             \
--        }                                                               \
--    }
--VARITH_DO(muluwm, *, u32)
--#undef VARITH_DO
--#undef VARITH
--
- #define VARITHFP(suffix, func)                                          \
-     void helper_v##suffix(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, \
-                           ppc_avr_t *b)                                 \
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 403ed3a01c..6e79ffa650 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -801,7 +801,7 @@ static void trans_vclzd(DisasContext *ctx)
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
--GEN_VXFORM(vmuluwm, 4, 2);
-+GEN_VXFORM_V(vmuluwm, MO_32, tcg_gen_gvec_mul, 4, 2);
- GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
-                 vmuluwm, PPC_NONE, PPC2_ALTIVEC_207)
- GEN_VXFORM(vmulosb, 4, 4);
+ extern TCGPowerISA have_isa;
+@@ -72,6 +73,7 @@ extern bool have_vsx;
+ #define have_isa_2_06  (have_isa >= tcg_isa_2_06)
+ #define have_isa_2_07  (have_isa >= tcg_isa_2_07)
+ #define have_isa_3_00  (have_isa >= tcg_isa_3_00)
++#define have_isa_3_10  (have_isa >= tcg_isa_3_10)
+ 
+ /* optional instructions automatically implemented */
+ #define TCG_TARGET_HAS_ext8u_i32        0 /* andi */
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index ee1f9227c1..caa8985b46 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -564,6 +564,7 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define VMULOUH    VX4(72)
+ #define VMULOUW    VX4(136)       /* v2.07 */
+ #define VMULUWM    VX4(137)       /* v2.07 */
++#define VMULLD     VX4(457)       /* v3.10 */
+ #define VMSUMUHM   VX4(38)
+ 
+ #define VMRGHB     VX4(12)
+@@ -3015,6 +3016,8 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+             return -1;
+         case MO_32:
+             return have_isa_2_07 ? 1 : -1;
++        case MO_64:
++            return have_isa_3_10;
+         }
+         return 0;
+     case INDEX_op_bitsel_vec:
+@@ -3149,6 +3152,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     static const uint32_t
+         add_op[4] = { VADDUBM, VADDUHM, VADDUWM, VADDUDM },
+         sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, VSUBUDM },
++        mul_op[4] = { 0, 0, VMULUWM, VMULLD },
+         neg_op[4] = { 0, 0, VNEGW, VNEGD },
+         eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, VCMPEQUD },
+         ne_op[4]  = { VCMPNEB, VCMPNEH, VCMPNEW, 0 },
+@@ -3199,8 +3203,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         a1 = 0;
+         break;
+     case INDEX_op_mul_vec:
+-        tcg_debug_assert(vece == MO_32 && have_isa_2_07);
+-        insn = VMULUWM;
++        insn = mul_op[vece];
+         break;
+     case INDEX_op_ssadd_vec:
+         insn = ssadd_op[vece];
+@@ -3709,6 +3712,11 @@ static void tcg_target_init(TCGContext *s)
+         have_isa = tcg_isa_3_00;
+     }
+ #endif
++#ifdef PPC_FEATURE2_ARCH_3_10
++    if (hwcap2 & PPC_FEATURE2_ARCH_3_10) {
++        have_isa = tcg_isa_3_10;
++    }
++#endif
+ 
+ #ifdef PPC_FEATURE2_HAS_ISEL
+     /* Prefer explicit instruction from the kernel. */
 -- 
 2.23.0
 
