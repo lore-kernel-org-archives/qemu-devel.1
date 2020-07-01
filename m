@@ -2,97 +2,62 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DECC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DD4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F149D20781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O3sAgADu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F149D20781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0471220781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0471220781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfZe-0004Bg-7T
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44716)
+	id 1jqfZw-00056Y-80
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:27:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jqfYh-0002Dv-BU
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:26:03 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:38287)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jqfYf-0000zc-83
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:26:02 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id k5so1680186pjg.3
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=UGNrzErWTkxLmxh9La29txsfoELABioK+bURfbuipYc=;
- b=O3sAgADuI/RxrjEPNfGgyBTUdGGiZrxKmETcCu9GWWHtcDLDaKbbM3KQ/QOWZe1sWd
- bsYq+J2alsxPsH1ZgR401lhK6UMh4+RkQTcLyqVE8NZnJkM+rx1VnvwrnAMbOhn5sTOJ
- tiSEA3M/9PceWiN1JTh+fLtpW7R0eyyDsDusASBzxCs2kfEdiglyVyqOt1u8RSYhskB5
- ejWnMpn8rYPHlVFGOrX26lH8ppT870SFMhW+6kPYUufkJF+oGturUoBaIE5Ftfz4A/Cq
- Wb5aI39y51fzWymNftPbtGe1TvJdl2T09O0+/zEwnoN5kKhiRFGqhO61iT2kZf6n9ACj
- AIbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UGNrzErWTkxLmxh9La29txsfoELABioK+bURfbuipYc=;
- b=LZzdnLrPXmbN4Hpk6sx8iZvl7BCsCpr+tN4b8FdM2RzqiECy5YAHa8i7phdRYJbWQ1
- zmxCxgbXxifQpDzsalohRsvb+5tWsbqYnX+zmq29BMmmfCDZ5CFdcKTxeMg0nr55mdcA
- HVnqqy0IZnjWbLrvcg156aIRBsi5VlgxSWzFweR+PdyKLnLGaACg72NYA3mbRVzLex2D
- EixjsyEZn4rrCQzcPcHeL7aampEekbH7O52FSREHXkafvPzRFTy3BAECYULePta9lK//
- P2/pEed8K7sC/7KnJX+QCqy1Lj2y9kz4H1qaTFmcT0PpaOCpbTI3pBmlQ1punAkeksvi
- AHJg==
-X-Gm-Message-State: AOAM532AAJuPOSwzQlIlo7IFSfYXJtDP+NqRFpe7yufe6N1v3N5hZWOR
- OxLoVnBr0xhrU8+tkgPaQ/cWKA==
-X-Google-Smtp-Source: ABdhPJx+z+EJIFVR/baB9YaOob+BFc5dm+P1Csy9xgERRxWIW7FcTAJ5jDbkY65DThADASlZR3Vb0g==
-X-Received: by 2002:a17:902:8488:: with SMTP id
- c8mr22658413plo.49.1593620759155; 
- Wed, 01 Jul 2020 09:25:59 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s6sm5984163pfd.20.2020.07.01.09.25.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 09:25:58 -0700 (PDT)
-Subject: Re: [PATCH 1/1] tcg/tcg-op: nonatomic_op should work with smaller
- memop
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <20200701152156.1147-1-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e828263f-e592-d787-b4cd-44c41a41e7f3@linaro.org>
-Date: Wed, 1 Jul 2020 09:25:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfXQ-0008Rd-Vz; Wed, 01 Jul 2020 12:24:45 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45323)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfXO-0000bt-2x; Wed, 01 Jul 2020 12:24:44 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436283|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.144939-0.000344041-0.854717;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03268; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvwI0Rt_1593620671; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvwI0Rt_1593620671)
+ by smtp.aliyun-inc.com(10.147.42.22); Thu, 02 Jul 2020 00:24:31 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 29/61] target/riscv: vector narrowing fixed-point clip
+ instructions
+Date: Wed,  1 Jul 2020 23:25:17 +0800
+Message-Id: <20200701152549.1218-30-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200701152156.1147-1-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,25 +70,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com,
- wxy194768@alibaba-inc.com
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 8:21 AM, LIU Zhiwei wrote:
-> -    tcg_gen_qemu_ld_i32(t1, addr, idx, memop & ~MO_SIGN);
-> +    tcg_gen_qemu_ld_i32(t1, addr, idx, memop);
-> +    tcg_gen_ext_i32(val, val, memop);
->      gen(t2, t1, val);
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   |  13 +++
+ target/riscv/insn32.decode              |   6 +
+ target/riscv/insn_trans/trans_rvv.inc.c |   8 ++
+ target/riscv/vector_helper.c            | 141 ++++++++++++++++++++++++
+ 4 files changed, 168 insertions(+)
 
-I was just about to post a simiar patch.
-The difference with mine is that I do not modify val:
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 78438f1ad6..5fa4330200 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -790,3 +790,16 @@ DEF_HELPER_6(vssra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vssra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vnclip_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclip_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclip_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnclipu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnclip_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnclip_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnclip_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 7d5dfeb5c7..78e6da6205 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -439,6 +439,12 @@ vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
+ vssra_vv        101011 . ..... ..... 000 ..... 1010111 @r_vm
+ vssra_vx        101011 . ..... ..... 100 ..... 1010111 @r_vm
+ vssra_vi        101011 . ..... ..... 011 ..... 1010111 @r_vm
++vnclipu_vv      101110 . ..... ..... 000 ..... 1010111 @r_vm
++vnclipu_vx      101110 . ..... ..... 100 ..... 1010111 @r_vm
++vnclipu_vi      101110 . ..... ..... 011 ..... 1010111 @r_vm
++vnclip_vv       101111 . ..... ..... 000 ..... 1010111 @r_vm
++vnclip_vx       101111 . ..... ..... 100 ..... 1010111 @r_vm
++vnclip_vi       101111 . ..... ..... 011 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 31be40f4ba..b9d29f4051 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1775,3 +1775,11 @@ GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
+ GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
+ GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
++
++/* Vector Narrowing Fixed-Point Clip Instructions */
++GEN_OPIVV_NARROW_TRANS(vnclipu_vv)
++GEN_OPIVV_NARROW_TRANS(vnclip_vv)
++GEN_OPIVX_NARROW_TRANS(vnclipu_vx)
++GEN_OPIVX_NARROW_TRANS(vnclip_vx)
++GEN_OPIVI_NARROW_TRANS(vnclipu_vi, 1, vnclipu_vx)
++GEN_OPIVI_NARROW_TRANS(vnclip_vi, 1, vnclip_vx)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index acd44599ba..d7c51daca7 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -875,6 +875,12 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define WOP_SSU_B int16_t, int8_t, uint8_t, int16_t, uint16_t
+ #define WOP_SSU_H int32_t, int16_t, uint16_t, int32_t, uint32_t
+ #define WOP_SSU_W int64_t, int32_t, uint32_t, int64_t, uint64_t
++#define NOP_SSS_B int8_t, int8_t, int16_t, int8_t, int16_t
++#define NOP_SSS_H int16_t, int16_t, int32_t, int16_t, int32_t
++#define NOP_SSS_W int32_t, int32_t, int64_t, int32_t, int64_t
++#define NOP_UUU_B uint8_t, uint8_t, uint16_t, uint8_t, uint16_t
++#define NOP_UUU_H uint16_t, uint16_t, uint32_t, uint16_t, uint32_t
++#define NOP_UUU_W uint32_t, uint32_t, uint64_t, uint32_t, uint64_t
+ 
+ /* operation of two vector elements */
+ typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+@@ -3009,6 +3015,7 @@ vssra64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
+     res   = (a >> shift)  + round;
+     return res;
+ }
++
+ RVVCALL(OPIVV2_RM, vssra_vv_b, OP_SSS_B, H1, H1, H1, vssra8)
+ RVVCALL(OPIVV2_RM, vssra_vv_h, OP_SSS_H, H2, H2, H2, vssra16)
+ RVVCALL(OPIVV2_RM, vssra_vv_w, OP_SSS_W, H4, H4, H4, vssra32)
+@@ -3026,3 +3033,137 @@ GEN_VEXT_VX_RM(vssra_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX_RM(vssra_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vssra_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vssra_vx_d, 8, 8, clearq)
++
++/* Vector Narrowing Fixed-Point Clip Instructions */
++static inline int8_t
++vnclip8(CPURISCVState *env, int vxrm, int16_t a, int8_t b)
++{
++    uint8_t round, shift = b & 0xf;
++    int16_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > INT8_MAX) {
++        env->vxsat = 0x1;
++        return INT8_MAX;
++    } else if (res < INT8_MIN) {
++        env->vxsat = 0x1;
++        return INT8_MIN;
++    } else {
++        return res;
++    }
++}
++
++static inline int16_t
++vnclip16(CPURISCVState *env, int vxrm, int32_t a, int16_t b)
++{
++    uint8_t round, shift = b & 0x1f;
++    int32_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > INT16_MAX) {
++        env->vxsat = 0x1;
++        return INT16_MAX;
++    } else if (res < INT16_MIN) {
++        env->vxsat = 0x1;
++        return INT16_MIN;
++    } else {
++        return res;
++    }
++}
++
++static inline int32_t
++vnclip32(CPURISCVState *env, int vxrm, int64_t a, int32_t b)
++{
++    uint8_t round, shift = b & 0x3f;
++    int64_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > INT32_MAX) {
++        env->vxsat = 0x1;
++        return INT32_MAX;
++    } else if (res < INT32_MIN) {
++        env->vxsat = 0x1;
++        return INT32_MIN;
++    } else {
++        return res;
++    }
++}
++
++RVVCALL(OPIVV2_RM, vnclip_vv_b, NOP_SSS_B, H1, H2, H1, vnclip8)
++RVVCALL(OPIVV2_RM, vnclip_vv_h, NOP_SSS_H, H2, H4, H2, vnclip16)
++RVVCALL(OPIVV2_RM, vnclip_vv_w, NOP_SSS_W, H4, H8, H4, vnclip32)
++GEN_VEXT_VV_RM(vnclip_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vnclip_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vnclip_vv_w, 4, 4, clearl)
++
++RVVCALL(OPIVX2_RM, vnclip_vx_b, NOP_SSS_B, H1, H2, vnclip8)
++RVVCALL(OPIVX2_RM, vnclip_vx_h, NOP_SSS_H, H2, H4, vnclip16)
++RVVCALL(OPIVX2_RM, vnclip_vx_w, NOP_SSS_W, H4, H8, vnclip32)
++GEN_VEXT_VX_RM(vnclip_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vnclip_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vnclip_vx_w, 4, 4, clearl)
++
++static inline uint8_t
++vnclipu8(CPURISCVState *env, int vxrm, uint16_t a, uint8_t b)
++{
++    uint8_t round, shift = b & 0xf;
++    uint16_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > UINT8_MAX) {
++        env->vxsat = 0x1;
++        return UINT8_MAX;
++    } else {
++        return res;
++    }
++}
++
++static inline uint16_t
++vnclipu16(CPURISCVState *env, int vxrm, uint32_t a, uint16_t b)
++{
++    uint8_t round, shift = b & 0x1f;
++    uint32_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > UINT16_MAX) {
++        env->vxsat = 0x1;
++        return UINT16_MAX;
++    } else {
++        return res;
++    }
++}
++
++static inline uint32_t
++vnclipu32(CPURISCVState *env, int vxrm, uint64_t a, uint32_t b)
++{
++    uint8_t round, shift = b & 0x3f;
++    int64_t res;
++
++    round = get_round(vxrm, a, shift);
++    res   = (a >> shift)  + round;
++    if (res > UINT32_MAX) {
++        env->vxsat = 0x1;
++        return UINT32_MAX;
++    } else {
++        return res;
++    }
++}
++
++RVVCALL(OPIVV2_RM, vnclipu_vv_b, NOP_UUU_B, H1, H2, H1, vnclipu8)
++RVVCALL(OPIVV2_RM, vnclipu_vv_h, NOP_UUU_H, H2, H4, H2, vnclipu16)
++RVVCALL(OPIVV2_RM, vnclipu_vv_w, NOP_UUU_W, H4, H8, H4, vnclipu32)
++GEN_VEXT_VV_RM(vnclipu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vnclipu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vnclipu_vv_w, 4, 4, clearl)
++
++RVVCALL(OPIVX2_RM, vnclipu_vx_b, NOP_UUU_B, H1, H2, vnclipu8)
++RVVCALL(OPIVX2_RM, vnclipu_vx_h, NOP_UUU_H, H2, H4, vnclipu16)
++RVVCALL(OPIVX2_RM, vnclipu_vx_w, NOP_UUU_W, H4, H8, vnclipu32)
++GEN_VEXT_VX_RM(vnclipu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vnclipu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vnclipu_vx_w, 4, 4, clearl)
+-- 
+2.23.0
 
--    gen(t2, t1, val);
-+    tcg_gen_ext_i32(t2, val, memop);
-+    gen(t2, t1, t2);
-
-
-r~
 
