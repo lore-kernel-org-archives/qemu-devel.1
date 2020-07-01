@@ -2,88 +2,105 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEF5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43979C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5383D20853
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14B9F2085B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:51:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QDYqAUeO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5383D20853
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bI57N5oW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14B9F2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqhgg-0004yn-Kz
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47876)
+	id 1jqhpP-0000Yu-CF
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=4447ca4a2=atish.patra@wdc.com>)
- id 1jqheQ-00012V-0d; Wed, 01 Jul 2020 14:40:06 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:13124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=4447ca4a2=atish.patra@wdc.com>)
- id 1jqheN-0006Qb-Jz; Wed, 01 Jul 2020 14:40:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593628803; x=1625164803;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=BvWBvty4qCBpcREE0bbUuxJD53acSp3ctXnMrDTq4Ts=;
- b=QDYqAUeOriU/PrRRmPynrn7LVIQzFLGoRUkHRoTr5Bnx/Bph+eoirzzZ
- H4SBh7bLHdhns3q05xR+fY1ihaJJLgigAHPA1pFfY3EXDAP4A9mnmsD2E
- 44VNmF33oAUf4TseBnSxH+njdxu5gHtdUof/LIlCxmuXfSKAQFifjxLM+
- 0SbJgjuM3V/m0zRxKEnumDCB2onmWy0BbC5qEHCPfn1oTrVEtMUI64kXW
- 8qSSnreZ6L7uHSUxYKIBbMQ4sy068MBPZymNExnYh6tMJcActHL9SWNYt
- v6bwIxN17jZez5yJd+mZRQKXiPDESPRZcCoAWYfCwARWWuvxnuNJLERVz Q==;
-IronPort-SDR: 7LRbu3RSuCvqLUDXgD21L0pcKbcyc7OuVz3LRzQSkQyTQi5xBDuI6/aEhXEvLt5PqxEuMD5HpJ
- xJVn67p7yi2tUkJefnhpWeUETrxgA8Kb5WVNlPbika4YF9/SXsBBY6h/2G7LaV1hto3a3lL+sE
- Fzat6KQ65TOivVwnH/OSx5Qn9lo3sLVOxW+qB0iEhzPYx4Bfj8WXI0NdYJMM42rF8C5kD+ad4q
- 0KigFSlaryXbSWJoHd4/HcqB0JWpeNb5EmX+8Myb3v/OXdyUakiJz7sVdQLUmnutkAZ+H4TFQk
- K8s=
-X-IronPort-AV: E=Sophos;i="5.75,301,1589212800"; d="scan'208";a="250642375"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2020 02:39:54 +0800
-IronPort-SDR: jjnOKh6XZPCWmFSsLrR7mvk1z2n4jxE9bZVRaRqPwqvI5JE25L8eejYOfpMHQ6feZEDC9NwQEP
- k5RARxkUYQhNyLq9zZytHAdT0qWhyfS50=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 01 Jul 2020 11:28:11 -0700
-IronPort-SDR: 6qIJKJET4wN0F6FtFwDmXUdyiF+tPpCx2X2IwfhNe8xVfBECMiYoyME6JfQW6oXc0tkP6K6FRp
- i/MmAp24fnNw==
-WDCIronportException: Internal
-Received: from cnf006900.ad.shared (HELO yoda.hgst.com) ([10.86.58.95])
- by uls-op-cesaip02.wdc.com with ESMTP; 01 Jul 2020 11:39:54 -0700
-From: Atish Patra <atish.patra@wdc.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/4] riscv: Add opensbi firmware dynamic support
-Date: Wed,  1 Jul 2020 11:39:48 -0700
-Message-Id: <20200701183949.398134-4-atish.patra@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200701183949.398134-1-atish.patra@wdc.com>
-References: <20200701183949.398134-1-atish.patra@wdc.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqhok-00008V-3i
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:50:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21415
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqhoh-0008Hz-6W
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:50:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593629441;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=R8rVCPJTaO5qYr1ca3cWG6gNe34yXi4fc524fMoJbe0=;
+ b=bI57N5oW2N7hJ4jPWXDH/FIPTqHJf5cLStRHXiV0cX96s7ECQcTgoQGoDstV1PXmuxzObo
+ w9w3rmnj1cbXY72Tk1xYHqEgRNUzyM13bTOmYPJHelQk+m0neTebOranUfB7tKekn+ZkRg
+ jMuPsaKyefB0gxVCwZmK+OxzWt1Tj1o=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-89-lQhq-dGPOaqwG1l8K3gY1Q-1; Wed, 01 Jul 2020 14:50:39 -0400
+X-MC-Unique: lQhq-dGPOaqwG1l8K3gY1Q-1
+Received: by mail-ed1-f72.google.com with SMTP id x20so22558686edr.20
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 11:50:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=R8rVCPJTaO5qYr1ca3cWG6gNe34yXi4fc524fMoJbe0=;
+ b=cj0QalQZMctJ81oLt0Qf6/yO/TC3rqjnpqFYer/IKJamq1AEfO/JYzuSHFrC4G/lpT
+ /EYv0XTuh6iaT1PZCdOwpLkt20EvRG/i9+Bnus0EBG1b/8Lj2rArT+7fs2+2zO/9MAEP
+ a9yHvFlHg9nQ5neMrY/wxuE+UXn000PF286bE9bIE0QbYjPu6/eF0Tud/VnKWNFAJ2rl
+ oSR9RK5QWNKVqeYlWSHMpiPlqpmiKJcE5aMMMSIMcN1m97fTN6oa8twPd9owejYTCjj/
+ 4HJ4qQ1fkYsQeIYBnib47W9VzFjOwv69GOnxqiOXA9EhmHCQAJAlGybmCsgQAnxSpkzd
+ IqRA==
+X-Gm-Message-State: AOAM533aHvhbILY7Gt6m43yBWgJ6V7mrHQsW+hKlrFOn1znLZEFGEWSY
+ C4N7i/3A7N1miLH+Av2wF3TagGzvJ08foaY2FyGMqdVwCSPmYYYqtSTz/+mUFX3+dNIPCXdoX1b
+ e8OYBb0/IeptLA6gSns61GwNDiBeURss=
+X-Received: by 2002:a05:6402:21c2:: with SMTP id
+ bi2mr30391870edb.296.1593629438727; 
+ Wed, 01 Jul 2020 11:50:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwCW9gu1Y/PBj8P5VukR3GuNvEnICd4eDdZMcMWcD+6ofrMdlzm69LX019ftGnsC6eC7IhvpgNUo3X8tGF/Q6g=
+X-Received: by 2002:a05:6402:21c2:: with SMTP id
+ bi2mr30391852edb.296.1593629438550; 
+ Wed, 01 Jul 2020 11:50:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=4447ca4a2=atish.patra@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 14:39:54
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200630102824.77604-1-r.bolshakov@yadro.com>
+ <20200630102824.77604-5-r.bolshakov@yadro.com>
+ <d75c6bd1-b588-796b-e238-21ff41fce60d@redhat.com>
+ <20200630155059.GA78555@SPB-NB-133.local>
+ <2ba7aa12-9eba-1cef-93e0-5561f50629b9@redhat.com>
+ <20200701183645.GC78555@SPB-NB-133.local>
+In-Reply-To: <20200701183645.GC78555@SPB-NB-133.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 1 Jul 2020 20:50:26 +0200
+Message-ID: <CABgObfaFJkcEazMKjGi_eVdNia0vYqQ8ookcaPKrrJkBET=9tw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/9] i386: hvf: Implement CPU kick
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="00000000000096c1c405a965c4fe"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,374 +113,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Cameron Esfahani <dirty@apple.com>, Claudio Fontana <cfontana@suse.de>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-OpenSBI is the default firmware in Qemu and has various firmware loading
-options. Currently, qemu loader uses fw_jump which has a compile time
-pre-defined address where fdt & kernel image must reside. This puts a
-constraint on image size of the Linux kernel depending on the fdt location
-and available memory. However, fw_dynamic allows the loader to specify
-the next stage location (i.e. Linux kernel/U-Boot) in memory and other
-configurable boot options available in OpenSBI.
+--00000000000096c1c405a965c4fe
+Content-Type: text/plain; charset="UTF-8"
 
-Add support for OpenSBI dynamic firmware loading support. This doesn't
-break existing setup and fw_jump will continue to work as it is. Any
-other firmware will continue to work without any issues as long as it
-doesn't expect anything specific from loader in "a2" register.
+Thanks, sounds good! Of course the best solution would be in HVF itself,
+similar to KVM and WHPX, but at least it's possible to work around it.
 
-Signed-off-by: Atish Patra <atish.patra@wdc.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/boot.c                 | 42 +++++++++++++++++++++---
- hw/riscv/sifive_u.c             | 20 +++++++++---
- hw/riscv/spike.c                | 13 ++++++--
- hw/riscv/virt.c                 | 12 +++++--
- include/hw/riscv/boot.h         |  5 ++-
- include/hw/riscv/boot_opensbi.h | 58 +++++++++++++++++++++++++++++++++
- 6 files changed, 134 insertions(+), 16 deletions(-)
- create mode 100644 include/hw/riscv/boot_opensbi.h
+Paolo
 
-diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-index c62f545f15e7..feff6e3f4ed5 100644
---- a/hw/riscv/boot.c
-+++ b/hw/riscv/boot.c
-@@ -25,6 +25,7 @@
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "hw/riscv/boot.h"
-+#include "hw/riscv/boot_opensbi.h"
- #include "elf.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/qtest.h"
-@@ -33,8 +34,10 @@
- 
- #if defined(TARGET_RISCV32)
- # define KERNEL_BOOT_ADDRESS 0x80400000
-+#define fw_dynamic_info_data(__val)     cpu_to_le32(__val)
- #else
- # define KERNEL_BOOT_ADDRESS 0x80200000
-+#define fw_dynamic_info_data(__val)     cpu_to_le64(__val)
- #endif
- 
- void riscv_find_and_load_firmware(MachineState *machine,
-@@ -189,15 +192,45 @@ uint32_t riscv_load_fdt(hwaddr dram_base, uint64_t mem_size, void *fdt)
-     return fdt_addr;
- }
- 
-+void riscv_rom_copy_firmware_info(hwaddr rom_base, hwaddr rom_size,
-+                              uint32_t reset_vec_size, uint64_t kernel_entry)
-+{
-+    struct fw_dynamic_info dinfo;
-+    size_t dinfo_len;
-+
-+    dinfo.magic = fw_dynamic_info_data(FW_DYNAMIC_INFO_MAGIC_VALUE);
-+    dinfo.version = fw_dynamic_info_data(FW_DYNAMIC_INFO_VERSION);
-+    dinfo.next_mode = fw_dynamic_info_data(FW_DYNAMIC_INFO_NEXT_MODE_S);
-+    dinfo.next_addr = fw_dynamic_info_data(kernel_entry);
-+    dinfo.options = 0;
-+    dinfo.boot_hart = 0;
-+    dinfo_len = sizeof(dinfo);
-+
-+    /**
-+     * copy the dynamic firmware info. This information is specific to
-+     * OpenSBI but doesn't break any other firmware as long as they don't
-+     * expect any certain value in "a2" register.
-+     */
-+    if (dinfo_len > (rom_size - reset_vec_size)) {
-+        error_report("not enough space to store dynamic firmware info");
-+        exit(1);
-+    }
-+
-+    rom_add_blob_fixed_as("mrom.finfo", &dinfo, dinfo_len,
-+                           rom_base + reset_vec_size,
-+                           &address_space_memory);
-+}
-+
- void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
--                               hwaddr rom_size,
-+                               hwaddr rom_size, uint64_t kernel_entry,
-                                uint32_t fdt_load_addr, void *fdt)
- {
-     int i;
- 
-     /* reset vector */
-     uint32_t reset_vec[10] = {
--        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
-+        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
-+        0x02828613,                  /*     addi   a2, t0, %pcrel_lo(1b) */
-         0xf1402573,                  /*     csrr   a0, mhartid  */
- #if defined(TARGET_RISCV32)
-         0x0202a583,                  /*     lw     a1, 32(t0) */
-@@ -207,12 +240,11 @@ void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
-         0x0182b283,                  /*     ld     t0, 24(t0) */
- #endif
-         0x00028067,                  /*     jr     t0 */
--        0x00000000,
-         start_addr,                  /* start: .dword */
-         0x00000000,
-         fdt_load_addr,               /* fdt_laddr: .dword */
-         0x00000000,
--                                     /* dtb: */
-+                                     /* fw_dyn: */
-     };
- 
-     /* copy in the reset vector in little_endian byte order */
-@@ -221,6 +253,8 @@ void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
-     }
-     rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-                           rom_base, &address_space_memory);
-+    riscv_rom_copy_firmware_info(rom_base, rom_size, sizeof(reset_vec),
-+                                 kernel_entry);
- 
-     return;
- }
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index aed814da9b94..901efab9d5bd 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -380,6 +380,7 @@ static void sifive_u_machine_init(MachineState *machine)
-     target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
-     int i;
-     uint32_t fdt_load_addr;
-+    uint64_t kernel_entry;
- 
-     /* Initialize SoC */
-     object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
-@@ -436,8 +437,7 @@ static void sifive_u_machine_init(MachineState *machine)
-     riscv_find_and_load_firmware(machine, BIOS_FILENAME, start_addr, NULL);
- 
-     if (machine->kernel_filename) {
--        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
--                                                  NULL);
-+        kernel_entry = riscv_load_kernel(machine->kernel_filename, NULL);
- 
-         if (machine->initrd_filename) {
-             hwaddr start;
-@@ -449,6 +449,12 @@ static void sifive_u_machine_init(MachineState *machine)
-             qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
-+    } else {
-+       /*
-+        * If dynamic firmware is used, it doesn't know where is the next mode
-+        * if kernel argument is not set.
-+        */
-+        kernel_entry = 0;
-     }
- 
-     /* Compute the fdt load address in dram */
-@@ -458,7 +464,8 @@ static void sifive_u_machine_init(MachineState *machine)
-     /* reset vector */
-     uint32_t reset_vec[11] = {
-         s->msel,                       /* MSEL pin state */
--        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
-+        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
-+        0x02828613,                    /*     addi   a2, t0, %pcrel_lo(1b) */
-         0xf1402573,                    /*     csrr   a0, mhartid  */
- #if defined(TARGET_RISCV32)
-         0x0202a583,                    /*     lw     a1, 32(t0) */
-@@ -468,12 +475,11 @@ static void sifive_u_machine_init(MachineState *machine)
-         0x0182b283,                    /*     ld     t0, 24(t0) */
- #endif
-         0x00028067,                    /*     jr     t0 */
--        0x00000000,
-         start_addr,                    /* start: .dword */
-         0x00000000,
-         fdt_load_addr,                 /* fdt_laddr: .dword */
-         0x00000000,
--                                       /* dtb: */
-+                                       /* fw_dyn: */
-     };
- 
-     /* copy in the reset vector in little_endian byte order */
-@@ -482,6 +488,10 @@ static void sifive_u_machine_init(MachineState *machine)
-     }
-     rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-                           memmap[SIFIVE_U_MROM].base, &address_space_memory);
-+
-+    riscv_rom_copy_firmware_info(memmap[SIFIVE_U_MROM].base,
-+                                 memmap[SIFIVE_U_MROM].size,
-+                                 sizeof(reset_vec), kernel_entry);
- }
- 
- static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 5b04562dd106..b295a4319775 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -164,6 +164,7 @@ static void spike_board_init(MachineState *machine)
-     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-     unsigned int smp_cpus = machine->smp.cpus;
-     uint32_t fdt_load_addr;
-+    uint64_t kernel_entry;
- 
-     /* Initialize SOC */
-     object_initialize_child(OBJECT(machine), "soc", &s->soc,
-@@ -194,8 +195,8 @@ static void spike_board_init(MachineState *machine)
-                                  htif_symbol_callback);
- 
-     if (machine->kernel_filename) {
--        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
--                                                  htif_symbol_callback);
-+        kernel_entry = riscv_load_kernel(machine->kernel_filename,
-+                                         htif_symbol_callback);
- 
-         if (machine->initrd_filename) {
-             hwaddr start;
-@@ -207,6 +208,12 @@ static void spike_board_init(MachineState *machine)
-             qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
-+    } else {
-+       /*
-+        * If dynamic firmware is used, it doesn't know where is the next mode
-+        * if kernel argument is not set.
-+        */
-+        kernel_entry = 0;
-     }
- 
-     /* Compute the fdt load address in dram */
-@@ -214,7 +221,7 @@ static void spike_board_init(MachineState *machine)
-                                    machine->ram_size, s->fdt);
-     /* load the reset vector */
-     riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
--                              memmap[SPIKE_MROM].size,
-+                              memmap[SPIKE_MROM].size, kernel_entry,
-                               fdt_load_addr, s->fdt);
- 
-     /* initialize HTIF using symbols found in load_kernel */
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 3b3cc44912f4..85e17feaf84b 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -479,6 +479,7 @@ static void virt_machine_init(MachineState *machine)
-     size_t plic_hart_config_len;
-     target_ulong start_addr = memmap[VIRT_DRAM].base;
-     uint32_t fdt_load_addr;
-+    uint64_t kernel_entry;
-     int i;
-     unsigned int smp_cpus = machine->smp.cpus;
- 
-@@ -510,8 +511,7 @@ static void virt_machine_init(MachineState *machine)
-                                  memmap[VIRT_DRAM].base, NULL);
- 
-     if (machine->kernel_filename) {
--        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
--                                                  NULL);
-+        kernel_entry = riscv_load_kernel(machine->kernel_filename, NULL);
- 
-         if (machine->initrd_filename) {
-             hwaddr start;
-@@ -523,6 +523,12 @@ static void virt_machine_init(MachineState *machine)
-             qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
-+    } else {
-+       /*
-+        * If dynamic firmware is used, it doesn't know where is the next mode
-+        * if kernel argument is not set.
-+        */
-+        kernel_entry = 0;
-     }
- 
-     if (drive_get(IF_PFLASH, 0, 0)) {
-@@ -538,7 +544,7 @@ static void virt_machine_init(MachineState *machine)
-                                    machine->ram_size, s->fdt);
-     /* load the reset vector */
-     riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
--                              virt_memmap[VIRT_MROM].size,
-+                              virt_memmap[VIRT_MROM].size, kernel_entry,
-                               fdt_load_addr, s->fdt);
- 
-     /* create PLIC hart topology configuration string */
-diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-index 35b6ddf710d7..451338780a45 100644
---- a/include/hw/riscv/boot.h
-+++ b/include/hw/riscv/boot.h
-@@ -37,7 +37,10 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
-                          uint64_t kernel_entry, hwaddr *start);
- uint32_t riscv_load_fdt(hwaddr dram_start, uint64_t dram_size, void *fdt);
- void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
--                               hwaddr rom_size,
-+                               hwaddr rom_size, uint64_t kernel_entry,
-                                uint32_t fdt_load_addr, void *fdt);
-+void riscv_rom_copy_firmware_info(hwaddr rom_base, hwaddr rom_size,
-+                                  uint32_t reset_vec_size,
-+                                  uint64_t kernel_entry);
- 
- #endif /* RISCV_BOOT_H */
-diff --git a/include/hw/riscv/boot_opensbi.h b/include/hw/riscv/boot_opensbi.h
-new file mode 100644
-index 000000000000..0d5ddd6c3daf
---- /dev/null
-+++ b/include/hw/riscv/boot_opensbi.h
-@@ -0,0 +1,58 @@
-+/* SPDX-License-Identifier: BSD-2-Clause */
-+/*
-+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
-+ *
-+ * Based on include/sbi/{fw_dynamic.h,sbi_scratch.h} from the OpenSBI project.
-+ */
-+#ifndef OPENSBI_H
-+#define OPENSBI_H
-+
-+/** Expected value of info magic ('OSBI' ascii string in hex) */
-+#define FW_DYNAMIC_INFO_MAGIC_VALUE     0x4942534f
-+
-+/** Maximum supported info version */
-+#define FW_DYNAMIC_INFO_VERSION         0x2
-+
-+/** Possible next mode values */
-+#define FW_DYNAMIC_INFO_NEXT_MODE_U     0x0
-+#define FW_DYNAMIC_INFO_NEXT_MODE_S     0x1
-+#define FW_DYNAMIC_INFO_NEXT_MODE_M     0x3
-+
-+enum sbi_scratch_options {
-+    /** Disable prints during boot */
-+    SBI_SCRATCH_NO_BOOT_PRINTS = (1 << 0),
-+    /** Enable runtime debug prints */
-+    SBI_SCRATCH_DEBUG_PRINTS = (1 << 1),
-+};
-+
-+/** Representation dynamic info passed by previous booting stage */
-+struct fw_dynamic_info {
-+    /** Info magic */
-+    target_long magic;
-+    /** Info version */
-+    target_long version;
-+    /** Next booting stage address */
-+    target_long next_addr;
-+    /** Next booting stage mode */
-+    target_long next_mode;
-+    /** Options for OpenSBI library */
-+    target_long options;
-+    /**
-+     * Preferred boot HART id
-+     *
-+     * It is possible that the previous booting stage uses same link
-+     * address as the FW_DYNAMIC firmware. In this case, the relocation
-+     * lottery mechanism can potentially overwrite the previous booting
-+     * stage while other HARTs are still running in the previous booting
-+     * stage leading to boot-time crash. To avoid this boot-time crash,
-+     * the previous booting stage can specify last HART that will jump
-+     * to the FW_DYNAMIC firmware as the preferred boot HART.
-+     *
-+     * To avoid specifying a preferred boot HART, the previous booting
-+     * stage can set it to -1UL which will force the FW_DYNAMIC firmware
-+     * to use the relocation lottery mechanism.
-+     */
-+    target_long boot_hart;
-+};
-+
-+#endif
--- 
-2.26.2
+Il mer 1 lug 2020, 20:37 Roman Bolshakov <r.bolshakov@yadro.com> ha scritto:
+
+> On Tue, Jun 30, 2020 at 06:04:23PM +0200, Paolo Bonzini wrote:
+> > On 30/06/20 17:50, Roman Bolshakov wrote:
+> > > On Tue, Jun 30, 2020 at 02:33:42PM +0200, Paolo Bonzini wrote:
+> > >> Can a signal interrupt hv_vcpu_run?  If so you actually don't need
+> > >> hv_vcpu_interrupt at all.
+> > >
+> > > Existing signal masking and SIG_IPI didn't work IIRC when I tried to
+> add
+> > > a primitive version of gdbstub support.
+> >
+> > You can try pthread_kill followed by hv_vcpu_interrupt if it doesn't.
+> > The signal would be delivered after return to userspace.
+> >
+>
+> I looked at the signal setup for HVF again. I was wrong with regards to
+> SIG_IPI. It isn't delivered to vCPU because the signal is masked, this
+> fixes it:
+>
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index d81f569aed..7bf05bca21 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -479,6 +479,7 @@ int hvf_init_vcpu(CPUState *cpu)
+>
+>      pthread_sigmask(SIG_BLOCK, NULL, &set);
+>      sigdelset(&set, SIG_IPI);
+> +    pthread_sigmask(SIG_SETMASK, &set, NULL);
+>
+>      init_emu();
+>      init_decoder();
+>
+> But the signal is delivered only after vmxexit, perhaps a sequence of
+> pthread_kill() and hv_vcpu_interrupt() is really needed.
+>
+> So, there are two race windows on kernel-to-user border in v2: just
+> before checking the deadline and vmenter and just after vmxexit and
+> re-arm of preemption timer, that's two places where kicks could be lost.
+> The approach you proposed seems to address them.
+>
+> Thanks,
+> Roman
+>
+> > >> You can also require the preemption time, all
+> > >> processor that support HVF have it, but never set it by default.  The
+> > >> deadline can be left at 0 all the time; instead, you toggle the bit in
+> > >> the pin-based controls.  In the signal handler you do:
+> > >>
+> > >>    if (atomic_xchg(&env->hvf_in_guest, false)) {
+> > >>            wvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS,
+> > >>                  rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS)
+> > >>                    | VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);
+> > >>    }
+> > >>
+> > >> In the main loop you do:
+> > >>
+> > >>    atomic_set(&env->hvf_guest_mode, true);
+> > >>    smp_mb();
+> > >>    hv_vcpu_run(...);
+> > >>    atomic_set(&env->hvf_guest_mode, false);
+> > >>
+> > >> and in the preemption timer vmexit handler:
+> > >>
+> > >>            wvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS,
+> > >>                  rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS)
+> > >>                    & ~VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);
+> > >>
+> > >
+>
+>
+
+--00000000000096c1c405a965c4fe
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">Thanks, sounds good! Of course the best solution would be=
+ in HVF itself, similar to KVM and WHPX, but at least it&#39;s possible to =
+work around it.<div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div></d=
+iv><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il =
+mer 1 lug 2020, 20:37 Roman Bolshakov &lt;<a href=3D"mailto:r.bolshakov@yad=
+ro.com">r.bolshakov@yadro.com</a>&gt; ha scritto:<br></div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
+ding-left:1ex">On Tue, Jun 30, 2020 at 06:04:23PM +0200, Paolo Bonzini wrot=
+e:<br>
+&gt; On 30/06/20 17:50, Roman Bolshakov wrote:<br>
+&gt; &gt; On Tue, Jun 30, 2020 at 02:33:42PM +0200, Paolo Bonzini wrote:<br=
+>
+&gt; &gt;&gt; Can a signal interrupt hv_vcpu_run?=C2=A0 If so you actually =
+don&#39;t need<br>
+&gt; &gt;&gt; hv_vcpu_interrupt at all.<br>
+&gt; &gt; <br>
+&gt; &gt; Existing signal masking and SIG_IPI didn&#39;t work IIRC when I t=
+ried to add<br>
+&gt; &gt; a primitive version of gdbstub support.<br>
+&gt; <br>
+&gt; You can try pthread_kill followed by hv_vcpu_interrupt if it doesn&#39=
+;t.<br>
+&gt; The signal would be delivered after return to userspace.<br>
+&gt; <br>
+<br>
+I looked at the signal setup for HVF again. I was wrong with regards to<br>
+SIG_IPI. It isn&#39;t delivered to vCPU because the signal is masked, this<=
+br>
+fixes it:<br>
+<br>
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c<br>
+index d81f569aed..7bf05bca21 100644<br>
+--- a/target/i386/hvf/hvf.c<br>
++++ b/target/i386/hvf/hvf.c<br>
+@@ -479,6 +479,7 @@ int hvf_init_vcpu(CPUState *cpu)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0pthread_sigmask(SIG_BLOCK, NULL, &amp;set);<br>
+=C2=A0 =C2=A0 =C2=A0sigdelset(&amp;set, SIG_IPI);<br>
++=C2=A0 =C2=A0 pthread_sigmask(SIG_SETMASK, &amp;set, NULL);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0init_emu();<br>
+=C2=A0 =C2=A0 =C2=A0init_decoder();<br>
+<br>
+But the signal is delivered only after vmxexit, perhaps a sequence of<br>
+pthread_kill() and hv_vcpu_interrupt() is really needed.<br>
+<br>
+So, there are two race windows on kernel-to-user border in v2: just<br>
+before checking the deadline and vmenter and just after vmxexit and<br>
+re-arm of preemption timer, that&#39;s two places where kicks could be lost=
+.<br>
+The approach you proposed seems to address them.<br>
+<br>
+Thanks,<br>
+Roman<br>
+<br>
+&gt; &gt;&gt; You can also require the preemption time, all<br>
+&gt; &gt;&gt; processor that support HVF have it, but never set it by defau=
+lt.=C2=A0 The<br>
+&gt; &gt;&gt; deadline can be left at 0 all the time; instead, you toggle t=
+he bit in<br>
+&gt; &gt;&gt; the pin-based controls.=C2=A0 In the signal handler you do:<b=
+r>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 if (atomic_xchg(&amp;env-&gt;hvf_in_guest, false=
+)) {<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wvmcs(cpu-&gt;hvf_fd=
+, VMCS_PIN_BASED_CTLS,<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ rvmcs(cpu-&gt;hvf_fd, VMCS_PIN_BASED_CTLS)<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 | VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 }<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; In the main loop you do:<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 atomic_set(&amp;env-&gt;hvf_guest_mode, true);<b=
+r>
+&gt; &gt;&gt;=C2=A0 =C2=A0 smp_mb();<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 hv_vcpu_run(...);<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 atomic_set(&amp;env-&gt;hvf_guest_mode, false);<=
+br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; and in the preemption timer vmexit handler:<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 <br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wvmcs(cpu-&gt;hvf_fd=
+, VMCS_PIN_BASED_CTLS,<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ rvmcs(cpu-&gt;hvf_fd, VMCS_PIN_BASED_CTLS)<br>
+&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 &amp; ~VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);<br>
+&gt; &gt;&gt;<br>
+&gt; &gt; <br>
+<br>
+</blockquote></div>
+
+--00000000000096c1c405a965c4fe--
 
 
