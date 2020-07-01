@@ -2,95 +2,108 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D6CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A30C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 888852067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:22:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91AA12067D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:23:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MSJJw2bL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888852067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O0m+3LSb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91AA12067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqddI-0004PV-Ob
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:22:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35390)
+	id 1jqdeO-0006Q2-RG
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:23:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdUc-0006fo-WC
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:43 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:43463)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqdUU-0000AL-49
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:13:42 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id j4so21585306wrp.10
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:13:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=t/NgCflCaACrU2hH35R4Vs2GHYuFdBrnkv6dSybnyMQ=;
- b=MSJJw2bLx/9i7JS5RuFfF0n43/7SO1e6waD5U2tWqIbhrzHFvcOfbIMUzucGK2vPSZ
- W4/X/OaAfnyI2VDiJbSnycXepzyMODc+mMRoRqM8rntDCmztWTnk1wtpBc9Mzz+dKnSU
- O3vXQ6Y9/+XJdfsEGfLhbAQI5wT8uGP5NtIKM0LPyZ9SlfDn01jchfB0ntwr0uR1z5Fi
- aLrpAkNZgneJPRuJwGxk+J9fPVew8a2XJQactegqD2tYObC9E2JdtDdQmbuz0VDnGVCM
- ED8bO4rHeS7EBpUYS5G9oERr+uP4ir83HawJ0FueGfRlt/PyZPryTByMGuaIdX/wZeY6
- /Q+A==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqdcd-0003O9-39
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:21:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50377
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqdcb-0001UR-Br
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:21:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593613316;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SJmnnOG9GG3BCeo8BnGqxBYs797f1abmxEEKMrx26C0=;
+ b=O0m+3LSbKq5uo8UWyw6zyDxX2baJkqUb5yWZnV2Vuq/5zqU4KNKX8GEymmpbbHsVMzXHF8
+ ZRPc9SGfmGEbrUDuJl+i1DQlmjBu0Rz4PaDriqq2DPsU+tC5ufGO4BHlW3A94H8WOa5PtX
+ yN965XsiL8faxLRr+iuCLrrOOqx8qHU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-nrnstg4RPJunhRN-WCSuCg-1; Wed, 01 Jul 2020 10:21:54 -0400
+X-MC-Unique: nrnstg4RPJunhRN-WCSuCg-1
+Received: by mail-wr1-f70.google.com with SMTP id s16so7819311wrv.1
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 07:21:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=t/NgCflCaACrU2hH35R4Vs2GHYuFdBrnkv6dSybnyMQ=;
- b=H6qJ/zvioa/rNKnxNaOeDHzKG5CD6pOOp4AsjXruC8TpIhRbsnZfAZzASeGmVyVK1Z
- IZV5eJpJ1EwBXNMSY1/jP8uMy0HZAe+HX+eLBXoCfdMcf0e+iFKdMkb+5xSE+5VoeO5P
- GhmGIVUP6NgvR7sr1/a7fwFxZopbUlfuaUGzYT55vCpmvlCc3I+SJFOKn+EeEYM/hE01
- G71QjUqUgv7BOCFnU5iZXOmhCdz/IyuqwwCqZF5ewyxSesk/mbVbSqOwJt+w3nRu0Yxq
- Dy0zds1GPIUmP5bSyESJZg1IhC+lBxX/WtHo2EhdM+DLsLd0Qt30C2YLzFoxbLlR9JoD
- lTAQ==
-X-Gm-Message-State: AOAM5313yEah2nMtBed/azNmSMXsaoaowg8UqaWK2V4DRjWwlqC5+AfP
- FSDmyK32UJAzVxGag87lWDVsOw==
-X-Google-Smtp-Source: ABdhPJycEGW7OXlqkTQGgKWjYPcLOil4KhOzwX0tZFdz6Hbax0kn5LRmOhLHw4Iq0F0iQFz+MUD8jQ==
-X-Received: by 2002:adf:fe46:: with SMTP id m6mr25602424wrs.192.1593612811344; 
- Wed, 01 Jul 2020 07:13:31 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 59sm7871261wrj.37.2020.07.01.07.13.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 07:13:27 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EAACA1FFB7;
- Wed,  1 Jul 2020 14:56:55 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v4 30/40] gitlab: add acceptance testing to system builds
-Date: Wed,  1 Jul 2020 14:56:42 +0100
-Message-Id: <20200701135652.1366-31-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200701135652.1366-1-alex.bennee@linaro.org>
-References: <20200701135652.1366-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SJmnnOG9GG3BCeo8BnGqxBYs797f1abmxEEKMrx26C0=;
+ b=e30ditEmOj0lpekhEBfCLhPTB6iYUPS8WE3KQ12lc8uOvD4lLzveNlK48IhpY4s9N0
+ BIU+9q+aYTpdOgQdfvSd6Kq5hgL3MywdQeo99KRxN2sZQbrKRg0wqsahe6b4PTaRGWdf
+ hS4fm/D1wUBaEBW7r13jNFXCgq7mmmdDEULeBHdwCVoKpnYoqHxzJgT/yMrivPA/gGaS
+ rV8i6YrX6L3Twb3JDxBkqfM+anYdh5kaEoVIFCBfn7+Y5r/8NqA4WO9ZlNet/BFnZvdc
+ yTlxrNPpkGpPkIyhQ3cxTfBdjVoqLnIDdhxlFirzQOb4jyhQmRj8OI9hgSO5SATjKpTD
+ dObA==
+X-Gm-Message-State: AOAM533hIF03Tz4zC8mh93BM797gLGLY5Ia5bap3LxxBpHK/oig8SUBA
+ jWfA4nbf2u5aRmCPoQVn6T0xjYo5MNl00/gfaywu2UZn4J6XClffZvDl26DY7Qjpm3Q2srIQYr3
+ zbUWBW7Co5czdHUQ=
+X-Received: by 2002:adf:9bc1:: with SMTP id e1mr26919750wrc.253.1593613313348; 
+ Wed, 01 Jul 2020 07:21:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxauVoKZf0WWTPGJsQhoVmG3PCnLF1aG+240I7UEfPiIbG/+z6/m5YTrLEyoACxFleS5M6lQ==
+X-Received: by 2002:adf:9bc1:: with SMTP id e1mr26919727wrc.253.1593613313065; 
+ Wed, 01 Jul 2020 07:21:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1?
+ ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
+ by smtp.gmail.com with ESMTPSA id k126sm7826976wme.17.2020.07.01.07.21.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 07:21:52 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: Correct the warning message of Intel PT
+To: Luwei Kang <luwei.kang@intel.com>, qemu-devel@nongnu.org
+References: <1593499113-4768-1-git-send-email-luwei.kang@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4292eab0-9a6b-80f8-2b90-4e2d9c4214a4@redhat.com>
+Date: Wed, 1 Jul 2020 16:21:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <1593499113-4768-1-git-send-email-luwei.kang@intel.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,200 +116,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- aurelien@aurel32.net
+Cc: ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As part of migrating things from Travis to GitLab add the acceptance
-tests. To do this:
+On 30/06/20 08:38, Luwei Kang wrote:
+> The CPUID level need to be set to 0x14 manually on old
+> machine-type if Intel PT is enabled in guest. E.g. the
+> CPUID[0].EAX(level)=7 and CPUID[7].EBX[25](intel-pt)=1 when the
+> Qemu with "-machine pc-i440fx-3.1 -cpu qemu64,+intel-pt" parameter.
+> 
+> This patch corrects the warning message of the previous
+> submission(ddc2fc9).
+> 
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> ---
+>  target/i386/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 90ffc5f..a0e39d1 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6375,7 +6375,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>              } else if (cpu->env.cpuid_min_level < 0x14) {
+>                  mark_unavailable_features(cpu, FEAT_7_0_EBX,
+>                      CPUID_7_0_EBX_INTEL_PT,
+> -                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,+intel-pt,level=0x14\"");
+> +                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,+intel-pt,min-level=0x14\"");
+>              }
+>          }
+>  
+> 
 
-  - rename system1 to system-ubuntu-main
-  - rename system2 to system-fedora-misc
-  - split into build/check/acceptance
-  - remove -j from check stages
-  - use artifacts to save build stage
-  - add post acceptance template and use
+Queued, thanks.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200622143204.12921-16-alex.bennee@linaro.org>
-
----
-v2
-  - updated with danp's docker changes
-  - use needs instead of dependancies
-  - touch all the build files to prevent rebuild
-v4
-  - fix misnamed check stage
-  - don't use : in stage names
-  - restore *post_acceptance post_script
-  - don't failfast on GITLAB_CI
----
- .gitlab-ci.yml         | 69 ++++++++++++++++++++++++++++++++++++++++--
- .travis.yml            | 23 --------------
- tests/Makefile.include |  2 +-
- 3 files changed, 67 insertions(+), 27 deletions(-)
-
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index a7abc55a5c6..93baf98232d 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -1,8 +1,12 @@
-+# Currently we have two build stages after our containers are built:
-+#  - build (for traditional build and test or first stage build)
-+#  - test (for test stages, using build artefacts from a build stage)
- stages:
-   - containers
-   - containers-layer2
-   - containers-layer3
-   - build
-+  - test
- 
- include:
-   - local: '/.gitlab-ci.d/edk2.yml'
-@@ -24,26 +28,85 @@ include:
-         ../configure --enable-werror $CONFIGURE_ARGS ;
-       fi
-     - make -j"$JOBS"
--    - make -j"$JOBS" $MAKE_CHECK_ARGS
-+    - if test -n "$MAKE_CHECK_ARGS";
-+      then
-+        make $MAKE_CHECK_ARGS ;
-+      fi
-+
-+.native_test_job_template: &native_test_job_definition
-+  stage: test
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - cd build
-+    - find . -type f -exec touch {} +
-+    - make $MAKE_CHECK_ARGS
-+
-+.post_acceptance_template: &post_acceptance
-+  after_script:
-+    - cd build
-+    - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-+    - du -chs $HOME/avocado/data/cache
- 
--build-system1:
-+build-system-ubuntu-main:
-   <<: *native_build_job_definition
-   variables:
-     IMAGE: ubuntu2004
-     TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu lm32-softmmu
-       moxie-softmmu microblazeel-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu
-       riscv64-softmmu sparc-softmmu
-+  artifacts:
-+    paths:
-+      - build
-+
-+check-system-ubuntu-main:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-ubuntu-main
-+      artifacts: true
-+  variables:
-+    IMAGE: ubuntu2004
-     MAKE_CHECK_ARGS: check
- 
--build-system2:
-+acceptance-system-ubuntu-main:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-ubuntu-main
-+      artifacts: true
-+  variables:
-+    IMAGE: ubuntu2004
-+    MAKE_CHECK_ARGS: check-acceptance
-+  <<: *post_acceptance
-+
-+build-system-fedora-alt:
-   <<: *native_build_job_definition
-   variables:
-     IMAGE: fedora
-     TARGETS: tricore-softmmu unicore32-softmmu microblaze-softmmu mips-softmmu
-       riscv32-softmmu s390x-softmmu sh4-softmmu sparc64-softmmu x86_64-softmmu
-       xtensa-softmmu nios2-softmmu or1k-softmmu
-+  artifacts:
-+    paths:
-+      - build
-+
-+check-system-fedora-alt:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-fedora-alt
-+      artifacts: true
-+  variables:
-+    IMAGE: fedora
-     MAKE_CHECK_ARGS: check
- 
-+acceptance-system-fedora-alt:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-fedora-alt
-+      artifacts: true
-+  variables:
-+    IMAGE: fedora
-+    MAKE_CHECK_ARGS: check-acceptance
-+  <<: *post_acceptance
-+
- build-disabled:
-   <<: *native_build_job_definition
-   variables:
-diff --git a/.travis.yml b/.travis.yml
-index 74158f741b1..c24dfbe377f 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -289,29 +289,6 @@ jobs:
-       python: 3.6
- 
- 
--    # Acceptance (Functional) tests
--    - name: "GCC check-acceptance"
--      dist: bionic
--      env:
--        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sh4-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
--        - TEST_CMD="make check-acceptance"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-acceptance"
--      after_script:
--        - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
--        - du -chs $HOME/avocado/data/cache
--      addons:
--        apt:
--          packages:
--            - python3-pil
--            - python3-pip
--            - python3-numpy
--            - python3-opencv
--            - python3-venv
--            - rpm2cpio
--            - tesseract-ocr
--            - tesseract-ocr-eng
--
--
-     # Using newer GCC with sanitizers
-     - name: "GCC9 with sanitizers (softmmu)"
-       addons:
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3f4448a20bc..c316e0d6647 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -944,7 +944,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
-             --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-             --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
-             $(AVOCADO_TAGS) \
--            --failfast=on tests/acceptance, \
-+            $(if $(GITLAB_CI),,--failfast=on) tests/acceptance, \
-             "AVOCADO", "tests/acceptance")
- 
- # Consolidated targets
--- 
-2.20.1
+Paolo
 
 
