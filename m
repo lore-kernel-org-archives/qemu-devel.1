@@ -2,63 +2,88 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE541C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0372AC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:06:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93DCF206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:05:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DCF206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC7F420760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:05:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVPudWdA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7F420760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfEJ-0002Ae-Sj
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:04:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36568)
+	id 1jqfFG-0003Pq-SY
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:05:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfAB-0005n5-4j; Wed, 01 Jul 2020 12:00:43 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:46584)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfA7-0004Bg-Mq; Wed, 01 Jul 2020 12:00:42 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07447194|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.273484-0.00573218-0.720784;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvvZdmX_1593619221; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvvZdmX_1593619221)
- by smtp.aliyun-inc.com(10.147.41.138);
- Thu, 02 Jul 2020 00:00:21 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 17/61] target/riscv: vector integer min/max instructions
-Date: Wed,  1 Jul 2020 23:25:05 +0800
-Message-Id: <20200701152549.1218-18-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqfDj-0001g8-0w
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:04:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44911
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqfDg-0004os-F9
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:04:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593619459;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gzfRBi+SA8gcr1TtSb39vjjSloXc7wy99tJc6PgzrNo=;
+ b=VVPudWdAoIOrhmbv0VQJGzUyn+5kzZTQHqdksX3+yXEMBmFqYCftuFaafCihsJWY3Zi4vb
+ A8BVZcZTEzJuIZb+itwKizR4/xw0OjjXlRuPIkmJeS3xi2TVSb+2w1k8B4/6lzbhl47xeX
+ DwZ/z2NJiWQloshNrTB47hLRfk5HGnk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-xeg-4fiEMcuff3b9tRcMGg-1; Wed, 01 Jul 2020 12:04:15 -0400
+X-MC-Unique: xeg-4fiEMcuff3b9tRcMGg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 180721898AB9;
+ Wed,  1 Jul 2020 16:03:38 +0000 (UTC)
+Received: from localhost (ovpn-113-121.ams2.redhat.com [10.36.113.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93AAD6109F;
+ Wed,  1 Jul 2020 16:03:29 +0000 (UTC)
+Date: Wed, 1 Jul 2020 17:03:28 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 12/12] block/nvme: Use per-queue AIO context
+Message-ID: <20200701160328.GS126613@stefanha-x1.localdomain>
+References: <20200630191318.30021-1-philmd@redhat.com>
+ <20200630191318.30021-13-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200630191318.30021-13-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Vy6UCbb9EK60RK4A"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,188 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 33 ++++++++++++
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
- target/riscv/vector_helper.c            | 71 +++++++++++++++++++++++++
- 4 files changed, 122 insertions(+)
+--Vy6UCbb9EK60RK4A
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 2bcb6c7889..9c576e1220 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -502,3 +502,36 @@ DEF_HELPER_6(vmsgt_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsgt_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsgt_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmsgt_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vminu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vminu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vminu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vminu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmin_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmax_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vminu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vminu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vminu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vminu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmin_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmin_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmin_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmin_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmaxu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 5d022ff414..3d8986c74d 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -357,6 +357,14 @@ vmsgtu_vx       011110 . ..... ..... 100 ..... 1010111 @r_vm
- vmsgtu_vi       011110 . ..... ..... 011 ..... 1010111 @r_vm
- vmsgt_vx        011111 . ..... ..... 100 ..... 1010111 @r_vm
- vmsgt_vi        011111 . ..... ..... 011 ..... 1010111 @r_vm
-+vminu_vv        000100 . ..... ..... 000 ..... 1010111 @r_vm
-+vminu_vx        000100 . ..... ..... 100 ..... 1010111 @r_vm
-+vmin_vv         000101 . ..... ..... 000 ..... 1010111 @r_vm
-+vmin_vx         000101 . ..... ..... 100 ..... 1010111 @r_vm
-+vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
-+vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
-+vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
-+vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 7d7e3d4cd8..861fd3bf1a 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1561,3 +1561,13 @@ GEN_OPIVI_TRANS(vmsleu_vi, 1, vmsleu_vx, opivx_cmp_check)
- GEN_OPIVI_TRANS(vmsle_vi, 0, vmsle_vx, opivx_cmp_check)
- GEN_OPIVI_TRANS(vmsgtu_vi, 1, vmsgtu_vx, opivx_cmp_check)
- GEN_OPIVI_TRANS(vmsgt_vi, 0, vmsgt_vx, opivx_cmp_check)
-+
-+/* Vector Integer Min/Max Instructions */
-+GEN_OPIVV_GVEC_TRANS(vminu_vv, umin)
-+GEN_OPIVV_GVEC_TRANS(vmin_vv,  smin)
-+GEN_OPIVV_GVEC_TRANS(vmaxu_vv, umax)
-+GEN_OPIVV_GVEC_TRANS(vmax_vv,  smax)
-+GEN_OPIVX_TRANS(vminu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 71f27146b3..b1ff767209 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -855,6 +855,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
- #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
- #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
-+#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
-+#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
-+#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
-+#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
- 
- /* operation of two vector elements */
- typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-@@ -1532,3 +1536,70 @@ GEN_VEXT_CMP_VX(vmsgt_vx_b, int8_t,  H1, DO_MSGT)
- GEN_VEXT_CMP_VX(vmsgt_vx_h, int16_t, H2, DO_MSGT)
- GEN_VEXT_CMP_VX(vmsgt_vx_w, int32_t, H4, DO_MSGT)
- GEN_VEXT_CMP_VX(vmsgt_vx_d, int64_t, H8, DO_MSGT)
-+
-+/* Vector Integer Min/Max Instructions */
-+RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
-+RVVCALL(OPIVV2, vminu_vv_h, OP_UUU_H, H2, H2, H2, DO_MIN)
-+RVVCALL(OPIVV2, vminu_vv_w, OP_UUU_W, H4, H4, H4, DO_MIN)
-+RVVCALL(OPIVV2, vminu_vv_d, OP_UUU_D, H8, H8, H8, DO_MIN)
-+RVVCALL(OPIVV2, vmin_vv_b, OP_SSS_B, H1, H1, H1, DO_MIN)
-+RVVCALL(OPIVV2, vmin_vv_h, OP_SSS_H, H2, H2, H2, DO_MIN)
-+RVVCALL(OPIVV2, vmin_vv_w, OP_SSS_W, H4, H4, H4, DO_MIN)
-+RVVCALL(OPIVV2, vmin_vv_d, OP_SSS_D, H8, H8, H8, DO_MIN)
-+RVVCALL(OPIVV2, vmaxu_vv_b, OP_UUU_B, H1, H1, H1, DO_MAX)
-+RVVCALL(OPIVV2, vmaxu_vv_h, OP_UUU_H, H2, H2, H2, DO_MAX)
-+RVVCALL(OPIVV2, vmaxu_vv_w, OP_UUU_W, H4, H4, H4, DO_MAX)
-+RVVCALL(OPIVV2, vmaxu_vv_d, OP_UUU_D, H8, H8, H8, DO_MAX)
-+RVVCALL(OPIVV2, vmax_vv_b, OP_SSS_B, H1, H1, H1, DO_MAX)
-+RVVCALL(OPIVV2, vmax_vv_h, OP_SSS_H, H2, H2, H2, DO_MAX)
-+RVVCALL(OPIVV2, vmax_vv_w, OP_SSS_W, H4, H4, H4, DO_MAX)
-+RVVCALL(OPIVV2, vmax_vv_d, OP_SSS_D, H8, H8, H8, DO_MAX)
-+GEN_VEXT_VV(vminu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vminu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vminu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vminu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmin_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmin_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmin_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmin_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmaxu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmaxu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmaxu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmaxu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmax_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmax_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmax_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmax_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vminu_vx_b, OP_UUU_B, H1, H1, DO_MIN)
-+RVVCALL(OPIVX2, vminu_vx_h, OP_UUU_H, H2, H2, DO_MIN)
-+RVVCALL(OPIVX2, vminu_vx_w, OP_UUU_W, H4, H4, DO_MIN)
-+RVVCALL(OPIVX2, vminu_vx_d, OP_UUU_D, H8, H8, DO_MIN)
-+RVVCALL(OPIVX2, vmin_vx_b, OP_SSS_B, H1, H1, DO_MIN)
-+RVVCALL(OPIVX2, vmin_vx_h, OP_SSS_H, H2, H2, DO_MIN)
-+RVVCALL(OPIVX2, vmin_vx_w, OP_SSS_W, H4, H4, DO_MIN)
-+RVVCALL(OPIVX2, vmin_vx_d, OP_SSS_D, H8, H8, DO_MIN)
-+RVVCALL(OPIVX2, vmaxu_vx_b, OP_UUU_B, H1, H1, DO_MAX)
-+RVVCALL(OPIVX2, vmaxu_vx_h, OP_UUU_H, H2, H2, DO_MAX)
-+RVVCALL(OPIVX2, vmaxu_vx_w, OP_UUU_W, H4, H4, DO_MAX)
-+RVVCALL(OPIVX2, vmaxu_vx_d, OP_UUU_D, H8, H8, DO_MAX)
-+RVVCALL(OPIVX2, vmax_vx_b, OP_SSS_B, H1, H1, DO_MAX)
-+RVVCALL(OPIVX2, vmax_vx_h, OP_SSS_H, H2, H2, DO_MAX)
-+RVVCALL(OPIVX2, vmax_vx_w, OP_SSS_W, H4, H4, DO_MAX)
-+RVVCALL(OPIVX2, vmax_vx_d, OP_SSS_D, H8, H8, DO_MAX)
-+GEN_VEXT_VX(vminu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vminu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vminu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vminu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmin_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmin_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmin_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmin_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmaxu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmaxu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmaxu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmaxu_vx_d, 8, 8,  clearq)
-+GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
--- 
-2.23.0
+On Tue, Jun 30, 2020 at 09:13:18PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> To be able to use multiple queues on the same hardware,
+> we need to have each queue able to receive IRQ notifications
+> in the correct AIO context.
+> The AIO context and the notification handler have to be proper
+> to each queue, not to the block driver. Move aio_context and
+> irq_notifier from BDRVNVMeState to NVMeQueuePair.
+
+If I understand correctly, after this patch:
+
+1. Each queue pair has an EventNotifier irq_notifier but only the admin
+   queuepair's irq_notifier is hooked up to VFIO. This means all
+   interrupts come via the admin queuepair.
+
+   (This also means all queuepairs still need to be polled for
+   completions when the interrupt fires because we don't know which
+   queuepair had a completion event.)
+
+2. AioContexts must be identical across all queuepairs and
+   BlockDriverStates. Although they all have their own AioContext
+   pointer there is no true support for different AioContexts yet.
+
+   (For example, nvme_cmd_sync() is called with a bs argument but
+   AIO_WAIT_WHILE(q->aio_context, ...) uses the queuepair aio_context so
+   the assumption is that they match.)
+
+Please confirm and add something equivalent into the commit description
+so the assumptions/limitations are clear.
+
+--Vy6UCbb9EK60RK4A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl78s9AACgkQnKSrs4Gr
+c8jKhggAtxXMK8Jq1ar63mDURxlPrb6LJIT5UtKR0OFnkZGp5wJAYBJnnaHTMzyD
+YoEjU1wiIrRMOj7GQ8JWNm9g7Y/eT+rfaeVhhLcp4L2NnEvLrzHyBL4tHaz82KPW
+CvvXRUgm+CVJmNYN7tk2l0xp609wIervUIVoiDpUbazq77SAE0V2Z1AS3ui8c7Vt
+WHvOrznPUxm1/pNoHrJGfU4oKcgUlc2PWO52tetXBIuq4gR7gTJK8CamDq+TCeap
+gTlAvUQIZgK2rUQu9UkPav8moDp+zIq3qYIykJEV/ckJIRaqDWyTRvERYrVAir7K
+f5GNX8VQZdfkDPfC6PRqyoL5ZBsrfw==
+=296D
+-----END PGP SIGNATURE-----
+
+--Vy6UCbb9EK60RK4A--
 
 
