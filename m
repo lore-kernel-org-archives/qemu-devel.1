@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D44BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2567EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50FBF2065D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:10:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDC012065D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pneo5J47"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50FBF2065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jOC9Geh9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDC012065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeNf-0003qj-Fm
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:10:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49984)
+	id 1jqeNj-0003yP-1o
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:10:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeHy-0003Kt-B2
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44123
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeHY-0002jk-5U
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48106
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqeHu-0001C9-GO
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:41 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeHV-00013Z-T6
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:04:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615877;
+ s=mimecast20190719; t=1593615853;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=poFCkMJ9GLH/8zD3IQqPm0BcWHJBKBklxLNfIpn8S+c=;
- b=Pneo5J47LL3Ts4GtsBePAjd5u9PR0taoTkl309wQjXjEtmkd1ysFfeyUASU8wy7c3YuO5v
- U7a/vkJxLOOOg30X/lzb89UA5O8sf7XTt23B3aH/ncCf85KutLnLQhXt2XVtQ5Hw8qeNEm
- MbKz9yQw/OoR9AW2F5mOoCCxkKsgc8I=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=33u0EOHLLC7S82HsuHdhucLSgDXGZsdfSoTPfO54t8g=;
+ b=jOC9Geh9aOs7a/nQ5s/t77B1VeAEbtmJNC9WL+emv1srPmjV6rNBxkflVyvAyGbgtZ45Wb
+ wZz5P8xmaLgtjZuxvL7tM4k97v5pNjGrZCcmcOY4ZsmSnt1JilgobjANlDDBVa6FEsVS5i
+ 3zWAWwBND6oe0OlsmY57Xa4gLBpUuWY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-P6IbOCF7OSixRYHdKjGJZg-1; Wed, 01 Jul 2020 11:04:35 -0400
-X-MC-Unique: P6IbOCF7OSixRYHdKjGJZg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-29-HoRSuRQwM7qo-ifnv4DwHA-1; Wed, 01 Jul 2020 11:04:11 -0400
+X-MC-Unique: HoRSuRQwM7qo-ifnv4DwHA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16DCE802ED4;
- Wed,  1 Jul 2020 15:04:34 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA2D67168D;
- Wed,  1 Jul 2020 15:04:30 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A637831E89; Wed,  1 Jul 2020 17:04:25 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 10/13] ati-vga: Support unaligned access to hardware cursor
- registers
-Date: Wed,  1 Jul 2020 17:04:22 +0200
-Message-Id: <20200701150425.13739-11-kraxel@redhat.com>
-In-Reply-To: <20200701150425.13739-1-kraxel@redhat.com>
-References: <20200701150425.13739-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F281119200CA;
+ Wed,  1 Jul 2020 15:02:45 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A58E73FC5;
+ Wed,  1 Jul 2020 15:02:26 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
+ jasowang@redhat.com
+Subject: [PATCH v4 14/14] vhost-vdpa: introduce vhost-vdpa net client
+Date: Wed,  1 Jul 2020 22:55:38 +0800
+Message-Id: <20200701145538.22333-15-lulu@redhat.com>
+In-Reply-To: <20200701145538.22333-1-lulu@redhat.com>
+References: <20200701145538.22333-1-lulu@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,159 +95,393 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, lulu@redhat.com, hanand@xilinx.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ Tiwei Bie <tiwei.bie@intel.com>, aadam@redhat.com, rdunlap@infradead.org,
+ maxime.coquelin@redhat.com, lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+This patch set introduces a new net client type: vhost-vdpa.
+vhost-vdpa net client will set up a vDPA device which is specified
+by a "vhostdev" parameter.
 
-This fixes horizontal mouse movement and pointer color with MacOS that
-writes these registers with access size less than 4 so previously only
-the last portion of access was effective overwriting previous partial
-writes.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-id: ba1d5ba97f246e8807f86f1243c2bdc6497dc8f2.1592737958.git.balaton@eik.bme.hu
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Lingshan Zhu <lingshan.zhu@intel.com>
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/display/ati.c | 85 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 57 insertions(+), 28 deletions(-)
+ include/net/vhost-vdpa.h |  22 ++++
+ net/Makefile.objs        |   2 +-
+ net/clients.h            |   2 +
+ net/net.c                |   3 +
+ net/vhost-vdpa.c         | 228 +++++++++++++++++++++++++++++++++++++++
+ qapi/net.json            |  28 ++++-
+ 6 files changed, 282 insertions(+), 3 deletions(-)
+ create mode 100644 include/net/vhost-vdpa.h
+ create mode 100644 net/vhost-vdpa.c
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 7216f7e08f87..245130d52f33 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -389,22 +389,28 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
-     case 0xf00 ... 0xfff:
-         val = pci_default_read_config(&s->dev, addr - 0xf00, size);
-         break;
--    case CUR_OFFSET:
--        val = s->regs.cur_offset;
-+    case CUR_OFFSET ... CUR_OFFSET + 3:
-+        val = ati_reg_read_offs(s->regs.cur_offset, addr - CUR_OFFSET, size);
-         break;
--    case CUR_HORZ_VERT_POSN:
--        val = s->regs.cur_hv_pos;
--        val |= s->regs.cur_offset & BIT(31);
-+    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
-+        val = ati_reg_read_offs(s->regs.cur_hv_pos,
-+                                addr - CUR_HORZ_VERT_POSN, size);
-+        if (addr + size > CUR_HORZ_VERT_POSN + 3) {
-+            val |= (s->regs.cur_offset & BIT(31)) >> (4 - size);
-+        }
-         break;
--    case CUR_HORZ_VERT_OFF:
--        val = s->regs.cur_hv_offs;
--        val |= s->regs.cur_offset & BIT(31);
-+    case CUR_HORZ_VERT_OFF ... CUR_HORZ_VERT_OFF + 3:
-+        val = ati_reg_read_offs(s->regs.cur_hv_offs,
-+                                addr - CUR_HORZ_VERT_OFF, size);
-+        if (addr + size > CUR_HORZ_VERT_OFF + 3) {
-+            val |= (s->regs.cur_offset & BIT(31)) >> (4 - size);
-+        }
-         break;
--    case CUR_CLR0:
--        val = s->regs.cur_color0;
-+    case CUR_CLR0 ... CUR_CLR0 + 3:
-+        val = ati_reg_read_offs(s->regs.cur_color0, addr - CUR_CLR0, size);
-         break;
--    case CUR_CLR1:
--        val = s->regs.cur_color1;
-+    case CUR_CLR1 ... CUR_CLR1 + 3:
-+        val = ati_reg_read_offs(s->regs.cur_color1, addr - CUR_CLR1, size);
-         break;
-     case DST_OFFSET:
-         val = s->regs.dst_offset;
-@@ -679,48 +685,71 @@ static void ati_mm_write(void *opaque, hwaddr addr,
-     case 0xf00 ... 0xfff:
-         /* read-only copy of PCI config space so ignore writes */
-         break;
--    case CUR_OFFSET:
--        if (s->regs.cur_offset != (data & 0x87fffff0)) {
--            s->regs.cur_offset = data & 0x87fffff0;
-+    case CUR_OFFSET ... CUR_OFFSET + 3:
-+    {
-+        uint32_t t = s->regs.cur_offset;
+diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
+new file mode 100644
+index 0000000000..45e34b7cfc
+--- /dev/null
++++ b/include/net/vhost-vdpa.h
+@@ -0,0 +1,22 @@
++/*
++ * vhost-vdpa.h
++ *
++ * Copyright(c) 2017-2018 Intel Corporation.
++ * Copyright(c) 2020 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+        ati_reg_write_offs(&t, addr - CUR_OFFSET, data, size);
-+        t &= 0x87fffff0;
-+        if (s->regs.cur_offset != t) {
-+            s->regs.cur_offset = t;
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_HORZ_VERT_POSN:
--        s->regs.cur_hv_pos = data & 0x3fff0fff;
--        if (data & BIT(31)) {
--            s->regs.cur_offset |= data & BIT(31);
-+    }
-+    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
-+    {
-+        uint32_t t = s->regs.cur_hv_pos | (s->regs.cur_offset & BIT(31));
++#ifndef VHOST_VDPA_H
++#define VHOST_VDPA_H
 +
-+        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_POSN, data, size);
-+        s->regs.cur_hv_pos = t & 0x3fff0fff;
-+        if (t & BIT(31)) {
-+            s->regs.cur_offset |= t & BIT(31);
-         } else if (s->regs.cur_offset & BIT(31)) {
-             s->regs.cur_offset &= ~BIT(31);
-             ati_cursor_define(s);
-         }
-         if (!s->cursor_guest_mode &&
--            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(data & BIT(31))) {
-+            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(t & BIT(31))) {
-             dpy_mouse_set(s->vga.con, s->regs.cur_hv_pos >> 16,
-                           s->regs.cur_hv_pos & 0xffff, 1);
-         }
-         break;
-+    }
-     case CUR_HORZ_VERT_OFF:
--        s->regs.cur_hv_offs = data & 0x3f003f;
--        if (data & BIT(31)) {
--            s->regs.cur_offset |= data & BIT(31);
-+    {
-+        uint32_t t = s->regs.cur_hv_offs | (s->regs.cur_offset & BIT(31));
++#define TYPE_VHOST_VDPA "vhost-vdpa"
 +
-+        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_OFF, data, size);
-+        s->regs.cur_hv_offs = t & 0x3f003f;
-+        if (t & BIT(31)) {
-+            s->regs.cur_offset |= t & BIT(31);
-         } else if (s->regs.cur_offset & BIT(31)) {
-             s->regs.cur_offset &= ~BIT(31);
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_CLR0:
--        if (s->regs.cur_color0 != (data & 0xffffff)) {
--            s->regs.cur_color0 = data & 0xffffff;
-+    }
-+    case CUR_CLR0 ... CUR_CLR0 + 3:
-+    {
-+        uint32_t t = s->regs.cur_color0;
++struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
++uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
 +
-+        ati_reg_write_offs(&t, addr - CUR_CLR0, data, size);
-+        t &= 0xffffff;
-+        if (s->regs.cur_color0 != t) {
-+            s->regs.cur_color0 = t;
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_CLR1:
++extern const int vdpa_feature_bits[];
++
++#endif /* VHOST_VDPA_H */
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index c5d076d19c..5ab45545db 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
+ tap-obj-y ?= tap-stub.o
+ common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
+ common-obj-$(CONFIG_WIN32) += tap-win32.o
+-
++common-obj-$(CONFIG_VHOST_NET_VDPA) += vhost-vdpa.o
+ vde.o-libs = $(VDE_LIBS)
+ 
+ common-obj-$(CONFIG_CAN_BUS) += can/
+diff --git a/net/clients.h b/net/clients.h
+index a6ef267e19..92f9b59aed 100644
+--- a/net/clients.h
++++ b/net/clients.h
+@@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char *name,
+ int net_init_vhost_user(const Netdev *netdev, const char *name,
+                         NetClientState *peer, Error **errp);
+ 
++int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
++                        NetClientState *peer, Error **errp);
+ #endif /* QEMU_NET_CLIENTS_H */
+diff --git a/net/net.c b/net/net.c
+index 9099a327dd..94dc546fb2 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -966,6 +966,9 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+ #ifdef CONFIG_VHOST_NET_USER
+         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
+ #endif
++#ifdef CONFIG_VHOST_NET_VDPA
++        [NET_CLIENT_DRIVER_VHOST_VDPA] = net_init_vhost_vdpa,
++#endif
+ #ifdef CONFIG_L2TPV3
+         [NET_CLIENT_DRIVER_L2TPV3]    = net_init_l2tpv3,
+ #endif
+diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+new file mode 100644
+index 0000000000..bc0e0d2d35
+--- /dev/null
++++ b/net/vhost-vdpa.c
+@@ -0,0 +1,228 @@
++/*
++ * vhost-vdpa.c
++ *
++ * Copyright(c) 2017-2018 Intel Corporation.
++ * Copyright(c) 2020 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "clients.h"
++#include "net/vhost_net.h"
++#include "net/vhost-vdpa.h"
++#include "hw/virtio/vhost-vdpa.h"
++#include "qemu/config-file.h"
++#include "qemu/error-report.h"
++#include "qemu/option.h"
++#include "qapi/error.h"
++#include <sys/ioctl.h>
++#include <err.h>
++#include "standard-headers/linux/virtio_net.h"
++#include "monitor/monitor.h"
++#include "hw/virtio/vhost.h"
++
++/* Todo:need to add the multiqueue support here */
++typedef struct VhostVDPAState {
++    NetClientState nc;
++    struct vhost_vdpa vhost_vdpa;
++    VHostNetState *vhost_net;
++    uint64_t acked_features;
++    bool started;
++} VhostVDPAState;
++
++const int vdpa_feature_bits[] = {
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_F_ANY_LAYOUT,
++    VIRTIO_F_VERSION_1,
++    VIRTIO_NET_F_CSUM,
++    VIRTIO_NET_F_GUEST_CSUM,
++    VIRTIO_NET_F_GSO,
++    VIRTIO_NET_F_GUEST_TSO4,
++    VIRTIO_NET_F_GUEST_TSO6,
++    VIRTIO_NET_F_GUEST_ECN,
++    VIRTIO_NET_F_GUEST_UFO,
++    VIRTIO_NET_F_HOST_TSO4,
++    VIRTIO_NET_F_HOST_TSO6,
++    VIRTIO_NET_F_HOST_ECN,
++    VIRTIO_NET_F_HOST_UFO,
++    VIRTIO_NET_F_MRG_RXBUF,
++    VIRTIO_NET_F_MTU,
++    VIRTIO_F_IOMMU_PLATFORM,
++    VIRTIO_F_RING_PACKED,
++    VIRTIO_NET_F_GUEST_ANNOUNCE,
++    VHOST_INVALID_FEATURE_BIT
++};
++
++VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
++{
++    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
++    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    return s->vhost_net;
++}
++
++uint64_t vhost_vdpa_get_acked_features(NetClientState *nc)
++{
++    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
++    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    s->acked_features = vhost_net_get_acked_features(s->vhost_net);
++
++    return s->acked_features;
++}
++
++static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
++{
++    uint32_t device_id;
++    int ret;
++    struct vhost_dev *hdev;
++
++    hdev = (struct vhost_dev *)&net->dev;
++    ret = hdev->vhost_ops->vhost_get_device_id(hdev, &device_id);
++    if (device_id != VIRTIO_ID_NET) {
++        return -ENOTSUP;
 +    }
-+    case CUR_CLR1 ... CUR_CLR1 + 3:
-         /*
-          * Update cursor unconditionally here because some clients set up
-          * other registers before actually writing cursor data to memory at
-          * offset so we would miss cursor change unless always updating here
-          */
--        s->regs.cur_color1 = data & 0xffffff;
-+        ati_reg_write_offs(&s->regs.cur_color1, addr - CUR_CLR1, data, size);
-+        s->regs.cur_color1 &= 0xffffff;
-         ati_cursor_define(s);
-         break;
-     case DST_OFFSET:
++    return ret;
++}
++
++static void vhost_vdpa_del(NetClientState *ncs)
++{
++    VhostVDPAState *s;
++    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    s = DO_UPCAST(VhostVDPAState, nc, ncs);
++    if (s->vhost_net) {
++        vhost_net_cleanup(s->vhost_net);
++    }
++}
++
++static int vhost_vdpa_add(NetClientState *ncs, void *be)
++{
++    VhostNetOptions options;
++    struct vhost_net *net = NULL;
++    VhostVDPAState *s;
++    int ret;
++
++    options.backend_type = VHOST_BACKEND_TYPE_VDPA;
++    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    s = DO_UPCAST(VhostVDPAState, nc, ncs);
++    options.net_backend = ncs;
++    options.opaque      = be;
++    options.busyloop_timeout = 0;
++
++    net = vhost_net_init(&options);
++    if (!net) {
++        error_report("failed to init vhost_net for queue");
++        goto err;
++    }
++    if (s->vhost_net) {
++        vhost_net_cleanup(s->vhost_net);
++        g_free(s->vhost_net);
++    }
++    s->vhost_net = net;
++    ret = vhost_vdpa_net_check_device_id(net);
++    if (ret) {
++        goto err;
++    }
++    return 0;
++err:
++    if (net) {
++        vhost_net_cleanup(net);
++    }
++    vhost_vdpa_del(ncs);
++    return -1;
++}
++
++static void vhost_vdpa_cleanup(NetClientState *nc)
++{
++    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
++
++    if (s->vhost_net) {
++        vhost_net_cleanup(s->vhost_net);
++        g_free(s->vhost_net);
++        s->vhost_net = NULL;
++    }
++}
++
++static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
++{
++    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++
++    return true;
++}
++
++static bool vhost_vdpa_has_ufo(NetClientState *nc)
++{
++    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
++    uint64_t features = 0;
++    features |= (1ULL << VIRTIO_NET_F_HOST_UFO);
++    features = vhost_net_get_features(s->vhost_net, features);
++    return !!(features & (1ULL << VIRTIO_NET_F_HOST_UFO));
++
++}
++
++static NetClientInfo net_vhost_vdpa_info = {
++        .type = NET_CLIENT_DRIVER_VHOST_VDPA,
++        .size = sizeof(VhostVDPAState),
++        .cleanup = vhost_vdpa_cleanup,
++        .has_vnet_hdr = vhost_vdpa_has_vnet_hdr,
++        .has_ufo = vhost_vdpa_has_ufo,
++};
++
++static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
++                               const char *name, const char *vhostdev)
++{
++    NetClientState *nc = NULL;
++    VhostVDPAState *s;
++    int vdpa_device_fd = -1;
++    int ret = 0;
++    assert(name);
++    nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
++    snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
++    nc->queue_index = 0;
++    s = DO_UPCAST(VhostVDPAState, nc, nc);
++    vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
++    if (vdpa_device_fd == -1) {
++        return -errno;
++    }
++    s->vhost_vdpa.device_fd = vdpa_device_fd;
++    ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
++    assert(s->vhost_net);
++    return ret;
++}
++
++static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
++{
++    const char *name = opaque;
++    const char *driver, *netdev;
++
++    driver = qemu_opt_get(opts, "driver");
++    netdev = qemu_opt_get(opts, "netdev");
++    if (!driver || !netdev) {
++        return 0;
++    }
++    if (strcmp(netdev, name) == 0 &&
++        !g_str_has_prefix(driver, "virtio-net-")) {
++        error_setg(errp, "vhost-vdpa requires frontend driver virtio-net-*");
++        return -1;
++    }
++    return 0;
++}
++
++int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
++                        NetClientState *peer, Error **errp)
++{
++    const NetdevVhostVDPAOptions *opts;
++
++    assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
++    opts = &netdev->u.vhost_vdpa;
++    /* verify net frontend */
++    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_net,
++                          (char *)name, errp)) {
++        return -1;
++    }
++    return net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name, opts->vhostdev);
++}
+diff --git a/qapi/net.json b/qapi/net.json
+index 9244c9af56..558d520a2f 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -428,16 +428,39 @@
+     '*vhostforce':    'bool',
+     '*queues':        'int' } }
+ 
++##
++# @NetdevVhostVDPAOptions:
++#
++# Vhost-vdpa network backend
++#
++# vDPA device is a device that uses a datapath which complies with the virtio
++# specifications with a vendor specific control path.
++#
++# @vhostdev: path of vhost-vdpa device
++#            (default:'/dev/vhost-vdpa-0')
++#
++# @queues: number of queues to be created for multiqueue vhost-vdpa
++#          (default: 1)
++#
++# Since: 5.1
++##
++{ 'struct': 'NetdevVhostVDPAOptions',
++  'data': {
++    '*vhostdev':     'str',
++    '*queues':       'int' } }
++
+ ##
+ # @NetClientDriver:
+ #
+ # Available netdev drivers.
+ #
+ # Since: 2.7
++#
++# @vhost-vdpa since 5.1
+ ##
+ { 'enum': 'NetClientDriver',
+   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+-            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
++            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
+ 
+ ##
+ # @Netdev:
+@@ -465,7 +488,8 @@
+     'bridge':   'NetdevBridgeOptions',
+     'hubport':  'NetdevHubPortOptions',
+     'netmap':   'NetdevNetmapOptions',
+-    'vhost-user': 'NetdevVhostUserOptions' } }
++    'vhost-user': 'NetdevVhostUserOptions',
++    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
+ 
+ ##
+ # @NetFilterDirection:
 -- 
-2.18.4
+2.21.1
 
 
