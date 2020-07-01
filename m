@@ -2,63 +2,99 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA152C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:44:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A543E2085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:43:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A543E2085B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 74B9D2085B
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:44:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cy5ds3Hh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B9D2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfpZ-0005fx-09
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
+	id 1jqfqI-0006Y5-NZ
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:44:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfox-0005C7-LX; Wed, 01 Jul 2020 12:42:51 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:53756)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfou-0003sJ-Bl; Wed, 01 Jul 2020 12:42:51 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07454938|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0261419-9.53996e-05-0.973763;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03301; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvwbIak_1593621757; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvwbIak_1593621757)
- by smtp.aliyun-inc.com(10.147.41.143);
- Thu, 02 Jul 2020 00:42:38 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 38/61] target/riscv: vector floating-point sign-injection
- instructions
-Date: Wed,  1 Jul 2020 23:25:26 +0800
-Message-Id: <20200701152549.1218-39-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqfpf-0005vx-RM
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:43:35 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39516)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqfpe-0003xc-06
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:43:35 -0400
+Received: by mail-wr1-x441.google.com with SMTP id q5so24761116wru.6
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:43:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=iJJFrsRgLgPVzDDdzBSoQ9owWAboOX6vG+wFvtEzsis=;
+ b=cy5ds3Hh6GC19MduR8JqWv5rze5lvPYFnLx1D1tJudT7UZpDbSfka2nKIQ1pYZALD0
+ ptnMv9tNOT7C9fe5JsOLN+sfzHpdM6/gY88C4sgIjBz2iWCD2LgKAmP765fqJBTbgbr0
+ tRugznknvvU+JhNCSkLOBwsliQLwjE+uMaRD7lcauRNXrtt2j3HkYOn4z4x8JV8fTj6j
+ q8yUCnJtJ/Saj4WOhmOxvYCTnURlP6QEZM0N0r7GeowDgKFYnsY/2IY0gsBh6V6E/cLr
+ +PsPw9wWq2g3f27kDut3fX2NQPzW7N8GOsjNj+CmWFDEHUQEE1iASv5TsmA3EkqYX0Yi
+ MB7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=iJJFrsRgLgPVzDDdzBSoQ9owWAboOX6vG+wFvtEzsis=;
+ b=ZzApvFQFLlmxWhC9Zl1o3lDL61qu7QQ0pq3wKYXKPUIKP/4GoRlwHglza7ObVHdKh1
+ K42YSrrcscbCT7X/GMFQKyiQVtG5ax9M9f/qiUxr711n2nRpl84b5klsEHOCHRlVprEa
+ LaGzWu25dHhnB+eIHx0xzjYRuSGttrIvGFTaoLGJgzQ1aKw5LboJF2D1ZY0sFgzHrRUL
+ YKL3jD1YxavA84FPzHZCicmaYDmEMK9n9rKLoQ1D16N6By5miPSnjk4Cz8dzr9OYjZot
+ hh6D1iqBKrffmAmwVS2Xnum/3WWRCRmawn0O2Ei3lKEdaU1Dqm/xiJi/lwI3pg16zLW+
+ dPnw==
+X-Gm-Message-State: AOAM533WWaLCoA/sMgNYJ9hJtgE30rR3H4Xr+XJNNZ8JpPecpHkmo9iI
+ 91NGp9abwoNH5OB1vIOtKNypAA==
+X-Google-Smtp-Source: ABdhPJzz8gc9nFyF16lw4ZSRUEp61iR1aVpQ8es6mUG5f1X/WuASrMuIdARewXEKA8iBTQvGqWYj0w==
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr29754692wrx.219.1593621812374; 
+ Wed, 01 Jul 2020 09:43:32 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m16sm2830193wro.0.2020.07.01.09.43.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jul 2020 09:43:31 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B6B9D1FF7E;
+ Wed,  1 Jul 2020 17:43:29 +0100 (BST)
+References: <20200701135652.1366-1-alex.bennee@linaro.org>
+ <20200701135652.1366-29-alex.bennee@linaro.org>
+ <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v4 28/40] tests/acceptance: skip multicore mips_malta
+ tests on GitLab
+In-reply-to: <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org>
+Date: Wed, 01 Jul 2020 17:43:29 +0100
+Message-ID: <87mu4jqj7y.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,177 +107,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ berrange@redhat.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
+ Cleber Rosa <crosa@redhat.com>, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 19 ++++++
- target/riscv/insn32.decode              |  6 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  8 +++
- target/riscv/vector_helper.c            | 85 +++++++++++++++++++++++++
- 4 files changed, 118 insertions(+)
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a080f8358a..eea4c59820 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -940,3 +940,22 @@ DEF_HELPER_6(vfmin_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+
-+DEF_HELPER_6(vfsgnj_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 854ff9a38f..0e173e9b71 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -496,6 +496,12 @@ vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
- vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
- vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
- vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnj_vv       001000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnj_vf       001000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b40e8eec53..460d9bce8c 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2138,3 +2138,11 @@ GEN_OPFVV_TRANS(vfmin_vv, opfvv_check)
- GEN_OPFVV_TRANS(vfmax_vv, opfvv_check)
- GEN_OPFVF_TRANS(vfmin_vf, opfvf_check)
- GEN_OPFVF_TRANS(vfmax_vf, opfvf_check)
-+
-+/* Vector Floating-Point Sign-Injection Instructions */
-+GEN_OPFVV_TRANS(vfsgnj_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjn_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
-+GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 6779e4b976..7f1b7a8614 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -3844,3 +3844,88 @@ RVVCALL(OPFVF2, vfmax_vf_d, OP_UUU_D, H8, H8, float64_maxnum)
- GEN_VEXT_VF(vfmax_vf_h, 2, 2, clearh)
- GEN_VEXT_VF(vfmax_vf_w, 4, 4, clearl)
- GEN_VEXT_VF(vfmax_vf_d, 8, 8, clearq)
-+
-+/* Vector Floating-Point Sign-Injection Instructions */
-+static uint16_t fsgnj16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 15, a);
-+}
-+
-+static uint32_t fsgnj32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 31, a);
-+}
-+
-+static uint64_t fsgnj64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnj_vv_h, OP_UUU_H, H2, H2, H2, fsgnj16)
-+RVVCALL(OPFVV2, vfsgnj_vv_w, OP_UUU_W, H4, H4, H4, fsgnj32)
-+RVVCALL(OPFVV2, vfsgnj_vv_d, OP_UUU_D, H8, H8, H8, fsgnj64)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnj_vf_h, OP_UUU_H, H2, H2, fsgnj16)
-+RVVCALL(OPFVF2, vfsgnj_vf_w, OP_UUU_W, H4, H4, fsgnj32)
-+RVVCALL(OPFVF2, vfsgnj_vf_d, OP_UUU_D, H8, H8, fsgnj64)
-+GEN_VEXT_VF(vfsgnj_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnj_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnj_vf_d, 8, 8, clearq)
-+
-+static uint16_t fsgnjn16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 15, a);
-+}
-+
-+static uint32_t fsgnjn32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 31, a);
-+}
-+
-+static uint64_t fsgnjn64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnjn_vv_h, OP_UUU_H, H2, H2, H2, fsgnjn16)
-+RVVCALL(OPFVV2, vfsgnjn_vv_w, OP_UUU_W, H4, H4, H4, fsgnjn32)
-+RVVCALL(OPFVV2, vfsgnjn_vv_d, OP_UUU_D, H8, H8, H8, fsgnjn64)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjn_vf_h, OP_UUU_H, H2, H2, fsgnjn16)
-+RVVCALL(OPFVF2, vfsgnjn_vf_w, OP_UUU_W, H4, H4, fsgnjn32)
-+RVVCALL(OPFVF2, vfsgnjn_vf_d, OP_UUU_D, H8, H8, fsgnjn64)
-+GEN_VEXT_VF(vfsgnjn_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjn_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjn_vf_d, 8, 8, clearq)
-+
-+static uint16_t fsgnjx16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 15, a);
-+}
-+
-+static uint32_t fsgnjx32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 31, a);
-+}
-+
-+static uint64_t fsgnjx64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnjx_vv_h, OP_UUU_H, H2, H2, H2, fsgnjx16)
-+RVVCALL(OPFVV2, vfsgnjx_vv_w, OP_UUU_W, H4, H4, H4, fsgnjx32)
-+RVVCALL(OPFVV2, vfsgnjx_vv_d, OP_UUU_D, H8, H8, H8, fsgnjx64)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjx_vf_h, OP_UUU_H, H2, H2, fsgnjx16)
-+RVVCALL(OPFVF2, vfsgnjx_vf_w, OP_UUU_W, H4, H4, fsgnjx32)
-+RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
-+GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
--- 
-2.23.0
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
+> On 7/1/20 3:56 PM, Alex Benn=C3=A9e wrote:
+>> For some reason these tests fail all the time on GitLab. I can
+>> re-create the hang around 3% of the time locally but it doesn't seem
+>> to be MTTCG related. For now skipIf on GITLAB_CI.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>> ---
+>>  tests/acceptance/machine_mips_malta.py | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>=20
+>> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/m=
+achine_mips_malta.py
+>> index 92b4f28a112..7c9a4ee4d2d 100644
+>> --- a/tests/acceptance/machine_mips_malta.py
+>> +++ b/tests/acceptance/machine_mips_malta.py
+>> @@ -15,6 +15,7 @@ from avocado import skipUnless
+>>  from avocado_qemu import Test
+>>  from avocado_qemu import wait_for_console_pattern
+>>  from avocado.utils import archive
+>> +from avocado import skipIf
+>>=20=20
+>>=20=20
+>>  NUMPY_AVAILABLE =3D True
+>> @@ -99,6 +100,7 @@ class MaltaMachineFramebuffer(Test):
+>>          """
+>>          self.do_test_i6400_framebuffer_logo(1)
+>>=20=20
+>
+> So the test works using a single core...
+> Good we have a test to figure the bug!
+
+It's about a 1-3% failure rate on my big test box but hits every time on
+CI. However I did disable MTTCG and still saw failures so I think it's a
+more subtle breakage than just a straight race.
+
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+>>      def test_mips_malta_i6400_framebuffer_logo_7cores(self):
+>>          """
+>>          :avocado: tags=3Darch:mips64el
+>> @@ -108,6 +110,7 @@ class MaltaMachineFramebuffer(Test):
+>>          """
+>>          self.do_test_i6400_framebuffer_logo(7)
+>>=20=20
+>> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+>>      def test_mips_malta_i6400_framebuffer_logo_8cores(self):
+>>          """
+>>          :avocado: tags=3Darch:mips64el
+>>=20
+
+
+--=20
+Alex Benn=C3=A9e
 
