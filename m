@@ -2,88 +2,62 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80770C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8576FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E1E7206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:55:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RDOBt04M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1E7206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54789207D0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:55:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54789207D0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqf5O-0006v9-EX
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:55:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33468)
+	id 1jqf5S-00077q-EP
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:55:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqezk-0007AR-KX
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:49:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42693
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jqezj-0001Bh-3M
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:49:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593618594;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=yWiXx0yc3DyFao0rIIM+wSF2OJWieBN3kpdzf4OkXPA=;
- b=RDOBt04Myw5MN2uG5nHGJB+bHzBd11WKKj7wwQXCuYFbcqFJI50j/05n5WztDuovsDVpmr
- T36ai3tnh0CPGh/Z5xucNMsOi+hLUdPyrOIuAVIowxY/xbP0It2iNFjAdSbBVW0WlMnDaR
- RtfRltt2kYHLYMD3CG17vtPSdWeG5Vk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-THyTnIbSP4Gp0Z7DUIg9Ag-1; Wed, 01 Jul 2020 11:49:52 -0400
-X-MC-Unique: THyTnIbSP4Gp0Z7DUIg9Ag-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AF2B193248F;
- Wed,  1 Jul 2020 15:49:51 +0000 (UTC)
-Received: from localhost (ovpn-113-121.ams2.redhat.com [10.36.113.121])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A17814F6B1;
- Wed,  1 Jul 2020 15:49:50 +0000 (UTC)
-Date: Wed, 1 Jul 2020 16:49:49 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 05/12] block/nvme: Rename local variable
-Message-ID: <20200701154949.GP126613@stefanha-x1.localdomain>
-References: <20200630191318.30021-1-philmd@redhat.com>
- <20200630191318.30021-6-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqf4E-0005Z5-8D; Wed, 01 Jul 2020 11:54:34 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56254)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqf4A-0002c2-EO; Wed, 01 Jul 2020 11:54:33 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=0.07436282|-1; BR=01201311R111ee; CH=green;
+ DM=|CONTINUE|false|; DS=SPAM|spam_ad|0.886079-0.000789594-0.113131;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvvOdCu_1593618859; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvvOdCu_1593618859)
+ by smtp.aliyun-inc.com(10.147.42.22); Wed, 01 Jul 2020 23:54:19 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 14/61] target/riscv: vector single-width bit shift
+ instructions
+Date: Wed,  1 Jul 2020 23:25:02 +0800
+Message-Id: <20200701152549.1218-15-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200630191318.30021-6-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="THYEXwetZJOK3OLY"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,45 +70,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---THYEXwetZJOK3OLY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 25 ++++++++
+ target/riscv/insn32.decode              |  9 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 52 ++++++++++++++++
+ target/riscv/vector_helper.c            | 79 +++++++++++++++++++++++++
+ 4 files changed, 165 insertions(+)
 
-On Tue, Jun 30, 2020 at 09:13:11PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> We are going to modify the code in the next commit. Renaming
-> the 'resp' variable to 'id' first makes the next commit easier
-> to review. No logical changes.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  block/nvme.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---THYEXwetZJOK3OLY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl78sJ0ACgkQnKSrs4Gr
-c8hFJwf/cK0LlGqt+TDa+cLGfcUbHAKF5sKJkQmWIhxWRzs3QSe65xf0YEEexTWj
-QbSKGg3i+rTu3YbFXYui9tTrsohkBapSIEuiTCI69ZCRWEnuMDrcg6V2+gwMniGs
-Ze9JWVLeuiPk+WTeAe4upCXslWiG65qwavBK6uhQFz/+q4xBABZ520RyVEGvcLBg
-DKYe3SZ+mHiPnlXfpSYk//Zo3y89DZTbLFE9xqoCaK+ZtedCQhDfrbaQZ90ewmAH
-M45FmV/YMhavznEkaLtd/lZs+1RmKSt288i7XnXyt0zfX0gTz1ZBP5c6tBQxzUOj
-NiAt7ZBw4KCG/klpqk0igLS2RihLxg==
-=zybr
------END PGP SIGNATURE-----
-
---THYEXwetZJOK3OLY--
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index f8b1c8a800..6805bf7dbd 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -407,3 +407,28 @@ DEF_HELPER_6(vxor_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vxor_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vsll_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsrl_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsra_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsll_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsrl_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 34d05a5917..e5334230df 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -322,6 +322,15 @@ vor_vi          001010 . ..... ..... 011 ..... 1010111 @r_vm
+ vxor_vv         001011 . ..... ..... 000 ..... 1010111 @r_vm
+ vxor_vx         001011 . ..... ..... 100 ..... 1010111 @r_vm
+ vxor_vi         001011 . ..... ..... 011 ..... 1010111 @r_vm
++vsll_vv         100101 . ..... ..... 000 ..... 1010111 @r_vm
++vsll_vx         100101 . ..... ..... 100 ..... 1010111 @r_vm
++vsll_vi         100101 . ..... ..... 011 ..... 1010111 @r_vm
++vsrl_vv         101000 . ..... ..... 000 ..... 1010111 @r_vm
++vsrl_vx         101000 . ..... ..... 100 ..... 1010111 @r_vm
++vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
++vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
++vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
++vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 1552534796..d2dbf701c8 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1373,3 +1373,55 @@ GEN_OPIVX_GVEC_TRANS(vxor_vx, xors)
+ GEN_OPIVI_GVEC_TRANS(vand_vi, 0, vand_vx, andi)
+ GEN_OPIVI_GVEC_TRANS(vor_vi, 0, vor_vx,  ori)
+ GEN_OPIVI_GVEC_TRANS(vxor_vi, 0, vxor_vx, xori)
++
++/* Vector Single-Width Bit Shift Instructions */
++GEN_OPIVV_GVEC_TRANS(vsll_vv,  shlv)
++GEN_OPIVV_GVEC_TRANS(vsrl_vv,  shrv)
++GEN_OPIVV_GVEC_TRANS(vsra_vv,  sarv)
++
++typedef void GVecGen2sFn32(unsigned, uint32_t, uint32_t, TCGv_i32,
++                           uint32_t, uint32_t);
++
++static inline bool
++do_opivx_gvec_shift(DisasContext *s, arg_rmrr *a, GVecGen2sFn32 *gvec_fn,
++                    gen_helper_opivx *fn)
++{
++    if (!opivx_check(s, a)) {
++        return false;
++    }
++
++    if (a->vm && s->vl_eq_vlmax) {
++        TCGv_i32 src1 = tcg_temp_new_i32();
++        TCGv tmp = tcg_temp_new();
++
++        gen_get_gpr(tmp, a->rs1);
++        tcg_gen_trunc_tl_i32(src1, tmp);
++        tcg_gen_extract_i32(src1, src1, 0, s->sew + 3);
++        gvec_fn(s->sew, vreg_ofs(s, a->rd), vreg_ofs(s, a->rs2),
++                src1, MAXSZ(s), MAXSZ(s));
++
++        tcg_temp_free_i32(src1);
++        tcg_temp_free(tmp);
++        return true;
++    }
++    return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fn, s);
++}
++
++#define GEN_OPIVX_GVEC_SHIFT_TRANS(NAME, SUF) \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                    \
++{                                                                         \
++    static gen_helper_opivx * const fns[4] = {                            \
++        gen_helper_##NAME##_b, gen_helper_##NAME##_h,                     \
++        gen_helper_##NAME##_w, gen_helper_##NAME##_d,                     \
++    };                                                                    \
++                                                                          \
++    return do_opivx_gvec_shift(s, a, tcg_gen_gvec_##SUF, fns[s->sew]);    \
++}
++
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsll_vx,  shls)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsrl_vx,  shrs)
++GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
++
++GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
++GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
++GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index bd77de110e..cd81f86faf 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1316,3 +1316,82 @@ GEN_VEXT_VX(vxor_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vxor_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vxor_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vxor_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Bit Shift Instructions */
++#define DO_SLL(N, M)  (N << (M))
++#define DO_SRL(N, M)  (N >> (M))
++
++/* generate the helpers for shift instructions with two vector operators */
++#define GEN_VEXT_SHIFT_VV(NAME, TS1, TS2, HS1, HS2, OP, MASK, CLEAR_FN)   \
++void HELPER(NAME)(void *vd, void *v0, void *vs1,                          \
++                  void *vs2, CPURISCVState *env, uint32_t desc)           \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t esz = sizeof(TS1);                                           \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                              \
++    uint32_t i;                                                           \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        TS1 s1 = *((TS1 *)vs1 + HS1(i));                                  \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                                  \
++        *((TS1 *)vd + HS1(i)) = OP(s2, s1 & MASK);                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                              \
++}
++
++GEN_VEXT_SHIFT_VV(vsll_vv_b, uint8_t,  uint8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsll_vv_h, uint16_t, uint16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsll_vv_w, uint32_t, uint32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsll_vv_d, uint64_t, uint64_t, H8, H8, DO_SLL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsrl_vv_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsrl_vv_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsrl_vv_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsrl_vv_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VV(vsra_vv_b, uint8_t,  int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VV(vsra_vv_h, uint16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VV(vsra_vv_w, uint32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VV(vsra_vv_d, uint64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++/* generate the helpers for shift instructions with one vector and one scalar */
++#define GEN_VEXT_SHIFT_VX(NAME, TD, TS2, HD, HS2, OP, MASK, CLEAR_FN) \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1,                \
++        void *vs2, CPURISCVState *env, uint32_t desc)                 \
++{                                                                     \
++    uint32_t mlen = vext_mlen(desc);                                  \
++    uint32_t vm = vext_vm(desc);                                      \
++    uint32_t vl = env->vl;                                            \
++    uint32_t esz = sizeof(TD);                                        \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                          \
++    uint32_t i;                                                       \
++                                                                      \
++    for (i = 0; i < vl; i++) {                                        \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                    \
++            continue;                                                 \
++        }                                                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                              \
++        *((TD *)vd + HD(i)) = OP(s2, s1 & MASK);                      \
++    }                                                                 \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                          \
++}
++
++GEN_VEXT_SHIFT_VX(vsll_vx_b, uint8_t, int8_t, H1, H1, DO_SLL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsll_vx_h, uint16_t, int16_t, H2, H2, DO_SLL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsll_vx_w, uint32_t, int32_t, H4, H4, DO_SLL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsll_vx_d, uint64_t, int64_t, H8, H8, DO_SLL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VX(vsrl_vx_b, uint8_t, uint8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsrl_vx_h, uint16_t, uint16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsrl_vx_w, uint32_t, uint32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsrl_vx_d, uint64_t, uint64_t, H8, H8, DO_SRL, 0x3f, clearq)
++
++GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
++GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
++GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
++GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
+-- 
+2.23.0
 
 
