@@ -2,64 +2,67 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 268E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6460AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:57:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE6720702
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36EFC20702
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:57:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEGpgWp6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE6720702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhlMKW4W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36EFC20702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeAp-0001FD-79
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:57:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47472)
+	id 1jqeB5-0001lC-Fe
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:57:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeA8-0000Zu-B6
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:56:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40227
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeAJ-0000kT-Nz
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:56:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46524
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeA5-0007dW-TM
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:56:35 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeAI-0007fA-2D
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:56:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615392;
+ s=mimecast20190719; t=1593615404;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Y2eMDNbdybPKZdD5/8Z8upjBGCLeNgPjiMXo77uIw30=;
- b=PEGpgWp6UfKoLdgF9F0Ra2qwNlrsc5Zh3smyRvqzMCGLVAV7Rl2ctFKUV5cPGC9uCyXPpt
- 8d+V0OK+s9H4xZS9sgxS7vhLW2fjNFra6SSJMEdTGWKFyRFfX7539/XTu9GoBhZTwlpKx1
- NnpaVydh56637jMngk6TVVZbAg+BS2g=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CwDzVv8vVIGdgufhvskvFm88w8TifsKMZGwYpyVL/sY=;
+ b=fhlMKW4WF5yDfKWYtjl1PIzNCAoMuDiJ1b9bmr7Rh/K8TKomiCamHXaCHwAgh5x3rEHwWE
+ Lbnb5B2MHk4NDrfiYJMJh396GHnHq32PIP8NSvo1KDK8ietxcubhSDSrf1j0+X7pQF4kIU
+ jMh1x6qFTlrxFVugOiVTQum+XJQwcTg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-ULYT296DPLahSEGFCMz-_A-1; Wed, 01 Jul 2020 10:56:27 -0400
-X-MC-Unique: ULYT296DPLahSEGFCMz-_A-1
+ us-mta-251-IgtxtWz9MQSdIPcx_wcdAw-1; Wed, 01 Jul 2020 10:56:43 -0400
+X-MC-Unique: IgtxtWz9MQSdIPcx_wcdAw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57F7119253F6;
- Wed,  1 Jul 2020 14:56:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2CDF106B247;
+ Wed,  1 Jul 2020 14:56:37 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D637873FC5;
- Wed,  1 Jul 2020 14:55:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CA295BAD5;
+ Wed,  1 Jul 2020 14:56:20 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v4 00/14]vDPA support in qemu
-Date: Wed,  1 Jul 2020 22:55:24 +0800
-Message-Id: <20200701145538.22333-1-lulu@redhat.com>
+Subject: [PATCH v4 01/14] net: introduce qemu_get_peer
+Date: Wed,  1 Jul 2020 22:55:25 +0800
+Message-Id: <20200701145538.22333-2-lulu@redhat.com>
+In-Reply-To: <20200701145538.22333-1-lulu@redhat.com>
+References: <20200701145538.22333-1-lulu@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
@@ -68,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,87 +106,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vDPA device is a device that uses a datapath which complies with the
-virtio specifications with vendor specific control path. vDPA devices
-can be both physically located on the hardware or emulated by software.
-This PATCH introduce the vDPA support in qemu
-TODO 
-1) vIOMMU support
-2) live migration support
-3) docs for vhost-vdpa
-4) config interrupt support 
+This is a small function that can get the peer
+from given NetClientState and queue_index
 
-Change from v1
-separate the patch of vhost_vq_get_addr
-separate the patch of vhost_dev_start
-introduce the docmation for vhost-vdpa.rst 
-other comments form last version 
-github address
-https://github.com/lulu-github-name/qemutmp.git PATCHV2
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ include/net/net.h | 1 +
+ net/net.c         | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-Change from v3
-fix the complie problem
-separate the patch of vhost_force_iommu
-other comments form last version 
-github address
-https://github.com/lulu-github-name/qemutmp.git PATCHV3
-
-Change from v3
-fix the centos7 test problem
-other comments form last version 
-github address
-https://github.com/lulu-github-name/qemutmp.git PATCHV4
-
-Cindy Lu (11):
-  net: introduce qemu_get_peer
-  vhost_net: use the function qemu_get_peer
-  vhost: introduce new VhostOps vhost_dev_start
-  vhost: implement vhost_dev_start method
-  vhost: introduce new VhostOps vhost_vq_get_addr
-  vhost: implement vhost_vq_get_addr method
-  vhost: introduce new VhostOps vhost_force_iommu
-  vhost: implement vhost_force_iommu method
-  vhost_net: introduce set_config & get_config
-  vhost-vdpa: introduce vhost-vdpa backend
-  vhost-vdpa: introduce vhost-vdpa net client
-
-Jason Wang (3):
-  virtio-bus: introduce queue_enabled method
-  virtio-pci: implement queue_enabled method
-  vhost: check the existence of vhost_set_iotlb_callback
-
- configure                         |  21 ++
- docs/interop/index.rst            |   1 +
- docs/interop/vhost-vdpa.rst       |  17 ++
- hw/net/vhost_net-stub.c           |  11 +
- hw/net/vhost_net.c                |  45 ++-
- hw/net/virtio-net.c               |  19 ++
- hw/virtio/Makefile.objs           |   1 +
- hw/virtio/vhost-backend.c         |   6 +
- hw/virtio/vhost-vdpa.c            | 475 ++++++++++++++++++++++++++++++
- hw/virtio/vhost.c                 |  52 +++-
- hw/virtio/virtio-pci.c            |  13 +
- hw/virtio/virtio.c                |   6 +
- include/hw/virtio/vhost-backend.h |  19 +-
- include/hw/virtio/vhost-vdpa.h    |  26 ++
- include/hw/virtio/vhost.h         |   7 +
- include/hw/virtio/virtio-bus.h    |   4 +
- include/net/net.h                 |   1 +
- include/net/vhost-vdpa.h          |  22 ++
- include/net/vhost_net.h           |   5 +
- net/Makefile.objs                 |   2 +-
- net/clients.h                     |   2 +
- net/net.c                         |  10 +
- net/vhost-vdpa.c                  | 228 ++++++++++++++
- qapi/net.json                     |  28 +-
- qemu-options.hx                   |  12 +
- 25 files changed, 1004 insertions(+), 29 deletions(-)
- create mode 100644 docs/interop/vhost-vdpa.rst
- create mode 100644 hw/virtio/vhost-vdpa.c
- create mode 100644 include/hw/virtio/vhost-vdpa.h
- create mode 100644 include/net/vhost-vdpa.h
- create mode 100644 net/vhost-vdpa.c
-
+diff --git a/include/net/net.h b/include/net/net.h
+index 39085d9444..e7ef42d62b 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -176,6 +176,7 @@ void hmp_info_network(Monitor *mon, const QDict *qdict);
+ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize,
+                         bool vnet_hdr);
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index);
+ 
+ /* NIC info */
+ 
+diff --git a/net/net.c b/net/net.c
+index d1130296e1..9099a327dd 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -325,6 +325,13 @@ void *qemu_get_nic_opaque(NetClientState *nc)
+     return nic->opaque;
+ }
+ 
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index)
++{
++    assert(nc != NULL);
++    NetClientState *ncs = nc + queue_index;
++    return ncs->peer;
++}
++
+ static void qemu_cleanup_net_client(NetClientState *nc)
+ {
+     QTAILQ_REMOVE(&net_clients, nc, next);
 -- 
 2.21.1
 
