@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1100C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 597E6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B14AB206E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2ECCC20702
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 14:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fRvUCuDO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B14AB206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdtAKQdL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ECCC20702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqeBb-0002Vt-Vc
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47672)
+	id 1jqeCh-0003rH-Ca
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 10:59:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeAe-0001GC-82
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:57:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41747
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeBR-0002aN-Ni
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:57:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45235
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeAc-0007iP-Gc
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:57:07 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqeBQ-0007lM-1p
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 10:57:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593615425;
+ s=mimecast20190719; t=1593615474;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ISW+sRA4nzGlcLP35HnzkU0vFxi6qWP4ttdgCor+hqA=;
- b=fRvUCuDOuYo0M0H7tV7WGV4HB1dCJPVx8+aaUDhoKePPhtwwd+L20EKzzJWG8kfmanmQrF
- 7DWyG6w03mK5dmzDgAXxfckU2wtaHZwyvq62K/bNIpu56heVzUJ1wWvtgGKQASVylfvzdP
- DcRHy/uqkArhONB1QVEvXpVIaPlcTL8=
+ bh=8ZesxalmhCuhZ6jk8xrSJ4YUFbv16yFo2IwkNdXZRec=;
+ b=BdtAKQdLoLu0XgFhtJD0BBGWfSO3LXzktmJH+WujHZqNlHMmO3nR+sVCmXz82wmSVDt0Pr
+ 6bIsQs/pgAhASkBrVTucqWbig7Ku27GAOCFh7J0Miqp+uyEj9YISYx0JtttuSHAJss51op
+ MLCJ1plv9+rEPdsWCLyENThtVLIl9Lw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-dAhhzNOvN5SSDMzwsSwO0w-1; Wed, 01 Jul 2020 10:57:02 -0400
-X-MC-Unique: dAhhzNOvN5SSDMzwsSwO0w-1
+ us-mta-18-xaMy-i3PM0aAduXHaX6xlA-1; Wed, 01 Jul 2020 10:57:49 -0400
+X-MC-Unique: xaMy-i3PM0aAduXHaX6xlA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 960301054F93;
- Wed,  1 Jul 2020 14:56:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 701D81005513;
+ Wed,  1 Jul 2020 14:57:46 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 971BF73FCE;
- Wed,  1 Jul 2020 14:56:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0DA4A73FC5;
+ Wed,  1 Jul 2020 14:57:27 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v4 02/14] vhost_net: use the function qemu_get_peer
-Date: Wed,  1 Jul 2020 22:55:26 +0800
-Message-Id: <20200701145538.22333-3-lulu@redhat.com>
+Subject: [PATCH v4 04/14] virtio-pci: implement queue_enabled method
+Date: Wed,  1 Jul 2020 22:55:28 +0800
+Message-Id: <20200701145538.22333-5-lulu@redhat.com>
 In-Reply-To: <20200701145538.22333-1-lulu@redhat.com>
 References: <20200701145538.22333-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lulu@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,80 +96,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
  saugatm@xilinx.com, lulu@redhat.com, hanand@xilinx.com, hch@infradead.org,
- eperezma@redhat.com, jgg@mellanox.com, Laurent Vivier <lvivier@redhat.com>,
- shahafs@mellanox.com, kevin.tian@intel.com, parav@mellanox.com,
- vmireyno@marvell.com, cunming.liang@intel.com, gdawar@xilinx.com,
- jiri@mellanox.com, xiao.w.wang@intel.com, stefanha@redhat.com,
- zhihong.wang@intel.com, aadam@redhat.com, rdunlap@infradead.org,
- maxime.coquelin@redhat.com, lingshan.zhu@intel.com
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, maxime.coquelin@redhat.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-user the qemu_get_peer to replace the old process
+From: Jason Wang <jasowang@redhat.com>
 
+With version 1, we can detect whether a queue is enabled via
+queue_enabled.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Cindy Lu <lulu@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/net/vhost_net.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ hw/virtio/virtio-pci.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index 6b82803fa7..4096d64aaf 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-+    struct vhost_net *net;
-     int r, e, i;
-+    NetClientState *peer;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 7bc8c1c056..8554cf2a03 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1107,6 +1107,18 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+     return pci_get_address_space(dev);
+ }
  
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
-@@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
++static bool virtio_pci_queue_enabled(DeviceState *d, int n)
++{
++    VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
++    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
++        return proxy->vqs[vdev->queue_sel].enabled;
++    }
++
++    return virtio_queue_enabled(vdev, n);
++}
++
+ static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
+                                    struct virtio_pci_cap *cap)
+ {
+@@ -2064,6 +2076,7 @@ static void virtio_pci_bus_class_init(ObjectClass *klass, void *data)
+     k->ioeventfd_enabled = virtio_pci_ioeventfd_enabled;
+     k->ioeventfd_assign = virtio_pci_ioeventfd_assign;
+     k->get_dma_as = virtio_pci_get_dma_as;
++    k->queue_enabled = virtio_pci_queue_enabled;
+ }
  
-     for (i = 0; i < total_queues; i++) {
--        struct vhost_net *net;
- 
--        net = get_vhost_net(ncs[i].peer);
-+        peer = qemu_get_peer(ncs, i);
-+        net = get_vhost_net(peer);
-         vhost_net_set_vq_index(net, i * 2);
- 
-         /* Suppress the masking guest notifiers on vhost user
-@@ -335,15 +337,16 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
- 
-     for (i = 0; i < total_queues; i++) {
--        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs, i);
-+        r = vhost_net_start_one(get_vhost_net(peer), dev);
- 
-         if (r < 0) {
-             goto err_start;
-         }
- 
--        if (ncs[i].peer->vring_enable) {
-+        if (peer->vring_enable) {
-             /* restore vring enable state */
--            r = vhost_set_vring_enable(ncs[i].peer, ncs[i].peer->vring_enable);
-+            r = vhost_set_vring_enable(peer, peer->vring_enable);
- 
-             if (r < 0) {
-                 goto err_start;
-@@ -355,7 +358,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
- 
- err_start:
-     while (--i >= 0) {
--        vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs , i);
-+        vhost_net_stop_one(get_vhost_net(peer), dev);
-     }
-     e = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
-     if (e < 0) {
+ static const TypeInfo virtio_pci_bus_info = {
 -- 
 2.21.1
 
