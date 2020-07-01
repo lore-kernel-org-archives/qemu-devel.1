@@ -2,88 +2,131 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F01C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCD2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:59:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E89C20780
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:58:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF66720780
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:59:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cG5ulUJ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E89C20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YTtWAuzR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF66720780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqcJf-0005OM-UK
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:58:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43220)
+	id 1jqcKr-0006bT-0V
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqcJ9-0004y2-00
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:57:47 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35846)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqcJ7-0004nc-7C
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:57:46 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k6so23720692wrn.3
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+nVhX7NB8wrnS9Nqox5TTJZx8RmFdgWv4sx0QvDxxFo=;
- b=cG5ulUJ0e/WSzASkDW53WR2D4hF+dgHY3+Ay+RDhMKpFFsWYgqUuRZoxrW1kX8g7/s
- U4IQ6dxsBnDAQ9ImWyAtKGxnK5QKknKeQpPOL3hE+MwI5F40lGQ0Xva4s/FFxapM+uC3
- N3YKgHomczrd1yV2aGcLG1kGgO3olqGukEacEFIp+TWWFtC9MkNXBLSaBP1tGlZWeMgW
- U1M5u425bwWcN+C/OkK2pMEhkbolsOSiyvtGPH+7s2He7lWWDnAY71CfhLyybcye+Lcd
- rffb+Ro6Va+yHm9o7d0LjQdp18OsR83t1ra+mjJKHt7baT/gkDwojuKxUoQPni0txMoT
- xcSA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqcK6-0005qC-Nd
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:58:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28097
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqcK4-0004sg-Q1
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:58:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593608324;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Q4kH6UYzzbB28jFGr6RdcF3XJO/pbyI6No/EeYQ0lPI=;
+ b=YTtWAuzRONqnnV8vXRpZVOprpredrcFvAbT0BxCUz3Moeh+rxj4J/Fj4/Q/KCkntx6wzIn
+ iiWeJSNl9lyXD4oCV8Vs8iQIcCtqTcz+F4Hu7qiNBZx1eKnu1N4rCKAkwMomyTgDo5u+9a
+ IL0KZWo8lwsNso5zwTK1kCytQFXhrKI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-el4F0bA6PzWH6RUHGLuyCg-1; Wed, 01 Jul 2020 08:58:39 -0400
+X-MC-Unique: el4F0bA6PzWH6RUHGLuyCg-1
+Received: by mail-ej1-f70.google.com with SMTP id q9so4624100ejr.21
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:58:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+nVhX7NB8wrnS9Nqox5TTJZx8RmFdgWv4sx0QvDxxFo=;
- b=mpPy/0jcvJByxBFbwKp/w3TZI0O1OIeJTyA50GlNB16H+TmgYHS55BSBukqSx9Y3c7
- 7ozi15MBML1arHmp87P7hW8EHsamZ+BJ127g4EyP5xD4Ruq33Dlu3LEWeesnRl2wYGlm
- Eq+LRvZkw7dM9W+5L2EJcBRrfR5MnE6MolWq6KOACQaDgevc3HSFNCJorJ57O+u3twAU
- 82+nUWYVVgId3rQ0ZVvt7gsGtfpaIWF0ufGJ0b9CvSri2zCv7alsObOBnZg6ilkfOwm5
- E8/Bq3fuxrfGAKG7hjjEmdMJaOM1cg3mquu5bMWsLxwFZ7dqJ1NyHhpxeR5KK4h4uaho
- BiQA==
-X-Gm-Message-State: AOAM530sIBzwRd3rgjPjU2TB5VbKfVoXd8Edv3/qIWJ04Hu7b6dwG2/0
- kJWovR6cfNxdulYYN/XbI+g/dY4w4d/R2x7xLJYbgg==
-X-Google-Smtp-Source: ABdhPJzY8HpiDaGDsTfGYKJ6Yqh3yJHXWmEZ3OUYVpowt6rdtqDHzs8TF5bd5tZb1Sr4NyGzqGB7QZFEn/Nsq6FVOhg=
-X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr3531336wru.147.1593608262755; 
- Wed, 01 Jul 2020 05:57:42 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=Q4kH6UYzzbB28jFGr6RdcF3XJO/pbyI6No/EeYQ0lPI=;
+ b=j2DJmkeX1JDHYbq5+ANu+IQePwgd01+kqT2l+YGA12kh6Hn9WeBVIHoJCFxaFt/DHz
+ hNENADVkeW64SyaRqqNS1CSyDj2rzxBKq2l/bRLaJyvX1GrnE2Yn/jw2yLdvgXBYnXjc
+ /UVmsDY++Uln+T7LHqCdxCRJgdjq6A3GNdSx8rzcM26JEx7eRz6bUaG2ULjhaVR/k8YV
+ jeCz6Q0H9thFqqmt8hdBMbPrhR8LFshPKnsThJTMqaPTXSWg8NYESmzdLW5MZ/JfAfMm
+ PEWkn9jxHi8l+btmZXs7+09IsFwSJftkzQPAMF13c95Zc5eSTXM2OsToZW/W9oA66B5T
+ 2qvw==
+X-Gm-Message-State: AOAM532e7/HpQBc9TcvD9INRRbWHpoz3w9XmtEH92hVggz7745SJeYsj
+ Vm8ytU93i1weHTIGW1H6zlVQQRUXGqKbmn/bxIO4XnG/BwZYX0pa9Ocj32QxIiQFUSj93WOvU5e
+ 2bpDykHB8rzn9Hbw=
+X-Received: by 2002:a50:931e:: with SMTP id m30mr30058849eda.341.1593608317935; 
+ Wed, 01 Jul 2020 05:58:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWQW9axunJwqMnuYDxr2AESpoA1db67qmSJCe1gb43BMi6VJ4kz06N5Xsris0Im11dNtBBNw==
+X-Received: by 2002:a50:931e:: with SMTP id m30mr30058830eda.341.1593608317717; 
+ Wed, 01 Jul 2020 05:58:37 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id u13sm4658716ejx.3.2020.07.01.05.58.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 05:58:36 -0700 (PDT)
+Subject: Re: [PATCH 0/2] hw/block/nvme: handle transient dma errors
+To: Klaus Jensen <its@irrelevant.dk>, qemu-devel@nongnu.org,
+ kwolf@redhat.com, mreitz@redhat.com
+References: <20200629202053.1223342-1-its@irrelevant.dk>
+ <159346486377.15477.6186679362319226240@d1fd068a5071>
+ <20200629213408.qlehce2mtgqodqd6@apples.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <30b8117f-25bd-e50b-98cb-db2e0a2690d0@redhat.com>
+Date: Wed, 1 Jul 2020 14:58:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200620133207.26849-1-aleksandar.qemu.devel@gmail.com>
- <20200620133207.26849-3-aleksandar.qemu.devel@gmail.com>
-In-Reply-To: <20200620133207.26849-3-aleksandar.qemu.devel@gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 1 Jul 2020 08:57:30 -0400
-Message-ID: <CAHiYmc4UsWEwxxXJn1i0ebgjwXKf5R_ntq5+qebqEr791UPy1w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] checkpatch: Change occurences of 'kernel' to 'qemu'
- in user messages
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200629213408.qlehce2mtgqodqd6@apples.localdomain>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,67 +139,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kbusch@kernel.org, k.jensen@samsung.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 20, 2020 at 9:32 AM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> It is odd that we inform user that, for example, his current working
-> directory is not kernel root, when, in face, we mean qemu root.
->
-> Replace that and few other similar odd user messages.
->
-> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> ---
+On 6/29/20 11:34 PM, Klaus Jensen wrote:
+> On Jun 29 14:07, no-reply@patchew.org wrote:
+>> Patchew URL: https://patchew.org/QEMU/20200629202053.1223342-1-its@irrelevant.dk/
 
-Paolo, Stefan, Michael,
+>> --- /tmp/qemu-test/src/tests/qemu-iotests/040.out       2020-06-29 20:12:10.000000000 +0000
+>> +++ /tmp/qemu-test/build/tests/qemu-iotests/040.out.bad 2020-06-29 20:58:48.288790818 +0000
+>> @@ -1,3 +1,5 @@
+>> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
+>> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga none -chardev socket,id=mon,path=/tmp/tmp.Jdol0fPScQ/qemu-21749-monitor.sock -mon chardev=mon,mode=control -qtest unix:path=/tmp/tmp.Jdol0fPScQ/qemu-21749-qtest.sock -accel qtest -nodefaults -display none -accel qtest
 
-Are some of you willing to select this patch for your queues?
+Kevin, Max, can iotests/040 be affected by this change?
 
-I could include it in my mips queue, scheduled to be sent soon, but I
-certainly don't want to be seen intruding into someone else's area.
+> 
+> 
+> Hmm, I can't seem to reproduce this locally and the test succeeded on
+> the next series[1] that is based on this.
+> 
+> Is this a flaky test? Or a bad test runner? I'm of course worried when
+> a qcow2 test fails and I touch something else than the nvme device ;)
+> 
+> 
+>   [1]: https://patchew.org/QEMU/20200629203155.1236860-1-its@irrelevant.dk/
+> 
 
-Truly yours, Aleksandar
-
->  scripts/checkpatch.pl | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index c760c5a4a9..f46c18e413 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -49,7 +49,7 @@ Version: $V
->
->  Options:
->    -q, --quiet                quiet
-> -  --no-tree                  run without a kernel tree
-> +  --no-tree                  run without a qemu tree
->    --no-signoff               do not check for 'Signed-off-by' line
->    --patch                    treat FILE as patchfile
->    --branch                   treat args as GIT revision list
-> @@ -57,7 +57,7 @@ Options:
->    --terse                    one line per report
->    -f, --file                 treat FILE as regular source file
->    --strict                   fail if only warnings are found
-> -  --root=PATH                PATH to the kernel tree root
-> +  --root=PATH                PATH to the qemu tree root
->    --no-summary               suppress the per-file summary
->    --mailback                 only produce a report in case of warnings/errors
->    --summary-file             include the filename in summary
-> @@ -203,7 +203,7 @@ if ($tree) {
->         }
->
->         if (!defined $root) {
-> -               print "Must be run from the top-level dir. of a kernel tree\n";
-> +               print "Must be run from the top-level dir. of a qemu tree\n";
->                 exit(2);
->         }
->  }
-> --
-> 2.20.1
->
 
