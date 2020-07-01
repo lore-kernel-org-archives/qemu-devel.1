@@ -2,103 +2,101 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7520C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ECE4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:41:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73AE72067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:14:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FA5B2073E
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:41:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NalfAOXi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73AE72067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cuaUn8zD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA5B2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqahS-0000ZV-ML
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 07:14:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49154)
+	id 1jqb7V-00008G-Cs
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 07:41:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqagp-00009K-VS
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:14:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23589
+ id 1jqb6v-00086o-KQ
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:41:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35984
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jqago-0005nV-6L
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:14:07 -0400
+ id 1jqb6t-0001Jy-IP
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:41:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593602045;
+ s=mimecast20190719; t=1593603662;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hQ5/bHeXwnWd1jfMZaTRHrFbjocAWvpemFv/3L7C24Q=;
- b=NalfAOXib3h8tV1mrLk09L+xbGzhUh+4TUR76sq57PwgQ5lLbA5OjFxYxq1zj2lwfwRS/f
- MqM07Y2ZNdvULVyXktYPY5ajwym4xcdkPwUzNLKbcpAUnNV06Mqd9xUqNuQDJHP8lVqawj
- hvIRkiUOGwoawzu+GDcrYNp+1gz1CVQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-dBQCDyqqNHGGgFamdeqKCQ-1; Wed, 01 Jul 2020 07:14:03 -0400
-X-MC-Unique: dBQCDyqqNHGGgFamdeqKCQ-1
-Received: by mail-ed1-f72.google.com with SMTP id 64so19079476edf.2
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 04:14:03 -0700 (PDT)
+ bh=KlXYYQw7nwLlH6/6TklDOMIPnY4O7ptiKnR9susBKVY=;
+ b=cuaUn8zD8MdcZPVh3Nyn2YUZXBIWivIZqTfwchPjvgJPWipwcaHwaHxTJkm8PwtqE3ySty
+ DEONQohPMQwHqhSxElSxEh0ZLxil/p5rLJ8PYWo55G86bSIP9P+BAcdSodfnkOkgBgyG98
+ cseyuip8GNubbJ3bZN87UyN3ndvPRlU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-5wWyWz1TPc-vJAqUihW-fw-1; Wed, 01 Jul 2020 07:41:00 -0400
+X-MC-Unique: 5wWyWz1TPc-vJAqUihW-fw-1
+Received: by mail-wm1-f70.google.com with SMTP id b13so20859757wme.9
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 04:41:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hQ5/bHeXwnWd1jfMZaTRHrFbjocAWvpemFv/3L7C24Q=;
- b=Ag094PRX9G4oFJuQZK+fkmS2RF2Q2yX734vdasxZgKHLXfcpW+iget0916QntpouTu
- rY2qO9sCbNdADNuESH5/DbDZvF8oK4yIqMOBgnHDbwnNhx3vdlLXF6qLnry0G+quh+1k
- BWblmk5qEiDT8UDrt9JPNi9Ux28a1lShx1Lj1Ht/iBQ62ZbkllQphG0XmFtyl/oFG7dm
- 7T/jaoHLU0+CYi1iQiA0DibzkvoC+TFCFqH05JBeZTTUdjGJKFkNJNDHo2AiP3TfWDW1
- DPunKGSRREVtPw7SO2ZNf0E0cY+WKhHcsHgMKlsBOj/0BOyoGg2/Ev69GOZPQ4JU9IOs
- otEA==
-X-Gm-Message-State: AOAM532OKOS33y/TZqD5vW675E130Tskgv6MAncUBAAhKszW/bnLHKip
- lYx48iIih/KtpSuss9HqKZir7KIZ7kmcEq4hLeoL5mFzfBIhr9y6C1WnyngNUd8usiq1pt6RUCZ
- z6NnfrGqJkjo3ToU=
-X-Received: by 2002:a17:906:e2ca:: with SMTP id
- gr10mr21592418ejb.81.1593602042663; 
- Wed, 01 Jul 2020 04:14:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy7gJN14r6fai0FwPbK7gIPk0WSnnk/vryMNP3zRcAJdLgySNqSgfhWHNj5IFPFsezI8fFxTQ==
-X-Received: by 2002:a17:906:e2ca:: with SMTP id
- gr10mr21592399ejb.81.1593602042477; 
- Wed, 01 Jul 2020 04:14:02 -0700 (PDT)
+ bh=KlXYYQw7nwLlH6/6TklDOMIPnY4O7ptiKnR9susBKVY=;
+ b=OS+jjEGecxI6LCMreKnCpSkpJa617cWvBLWA9jGGA3gQARbTjPAwdvcFQ0tGvTUHmt
+ p4ZRcUWoZ2iGCT/RKuW7G2OQT5Y+ru1pwwnge5lXTr38+yBCIVkcpeliNCQ+lbT7plSi
+ lLZ57i2ud7l9YB9PeuKJgdnCE4i4r1UyAiompw4j1AfRWFQcCUoUC/62Lo1OK6to8wSX
+ MlgYL2GOHUgkdmPk5B2oiE7fw7KrntAPMTdFnEJ1kDq0rrePs7NHW7uleiyZpyZLGrx1
+ e6mnUHWw9uaMqHPRlPyekfso4GVa06DOY3MOPC467uT3hFsA/6bqKWht2rUhPc9By62Z
+ h/1g==
+X-Gm-Message-State: AOAM530abCnTP8Ipm86Tcf+4h4GZFATirKkitUCAkse/HOruFOO3/Yrm
+ G3M784y0ThhIqA4wgygrElm99CHha1kfS11yhQUlaeWC/tmIuUEMRR+CnhSc/KophmEuW+fY7qB
+ 7AYC3Nhx8t7ZcBIA=
+X-Received: by 2002:a1c:2044:: with SMTP id g65mr25022381wmg.127.1593603659225; 
+ Wed, 01 Jul 2020 04:40:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxNPkEHHDTn7JxyULt/eK0/kF7Stbg+ikR0lUJt+ZpbQDQYmMBtU5wiAnvZl4vx3slOMcl5PA==
+X-Received: by 2002:a1c:2044:: with SMTP id g65mr25022359wmg.127.1593603658938; 
+ Wed, 01 Jul 2020 04:40:58 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1?
  ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
- by smtp.gmail.com with ESMTPSA id d24sm5515760edp.83.2020.07.01.04.14.01
+ by smtp.gmail.com with ESMTPSA id v11sm43783313wmb.3.2020.07.01.04.40.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 04:14:01 -0700 (PDT)
-Subject: Re: Race with atexit functions in system emulation
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-References: <87v9j7qyuh.fsf@linaro.org>
+ Wed, 01 Jul 2020 04:40:58 -0700 (PDT)
+Subject: Re: [PATCH 2/2] iscsi: return -EIO when sense fields are meaningless
+To: Xie Yongji <xieyongji@bytedance.com>, kwolf@redhat.com, mreitz@redhat.com
+References: <20200701105444.3226-1-xieyongji@bytedance.com>
+ <20200701105444.3226-2-xieyongji@bytedance.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <06ce5fd3-01fe-0d93-7147-8195e329c449@redhat.com>
-Date: Wed, 1 Jul 2020 13:14:01 +0200
+Message-ID: <8b9eaebc-0897-5348-79ef-a877e3300bd3@redhat.com>
+Date: Wed, 1 Jul 2020 13:40:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <87v9j7qyuh.fsf@linaro.org>
+In-Reply-To: <20200701105444.3226-2-xieyongji@bytedance.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -119,22 +117,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: elohimes@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/07/20 13:05, Alex Bennée wrote:
-> Should we maybe defer the exit to once the main loop has been exited
-> with a some sort of vmstop? Or could we have an atexit handler that
-> kills the main thread?
+On 01/07/20 12:54, Xie Yongji wrote:
+> When an I/O request failed, now we only return correct
+> value on scsi check condition. We should also have a
+> default errno such as -EIO in other case.
+> 
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>  block/iscsi.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 2964c9f8d2..387ed872ef 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -241,9 +241,11 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
+>  
+>      iTask->status = status;
+>      iTask->do_retry = 0;
+> +    iTask->err_code = 0;
+>      iTask->task = task;
+>  
+>      if (status != SCSI_STATUS_GOOD) {
+> +        iTask->err_code = -EIO;
+>          if (iTask->retries++ < ISCSI_CMD_RETRIES) {
+>              if (status == SCSI_STATUS_BUSY ||
+>                  status == SCSI_STATUS_TIMEOUT ||
+> 
 
-Yes, I think the way to do "exit" is to use
-qemu_system_shutdown_request.  Possibly halt the CPU?  This way you can
-also obey -no-shutdown and give the user an occasion to inspect the
-program.  You can add a global to pass back the exit code.
-
-Alternatively, replay_finish could just take the lock.
+Queued both, thanks.
 
 Paolo
 
