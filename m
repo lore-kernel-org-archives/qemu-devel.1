@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B322DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77611C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:30:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E96420722
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 497EC20747
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:30:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5Rp9JO7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E96420722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzZ57H36"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497EC20747
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqZ3T-0005MH-OX
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:29:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53688)
+	id 1jqZ4B-0006JA-KA
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:30:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2j-00046D-27
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44104
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ34-0004s5-SA
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53006
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2h-0005NY-D6
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:36 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ33-0005P4-6J
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593595714;
+ s=mimecast20190719; t=1593595736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rF9r7pf631yT4kewvrdEgptEGMLKP3lMFICG6ypU3Uk=;
- b=e5Rp9JO7iIUdsIxhXXyDQOfkekpmSwr6GPsHivV+CGg54rA3BczygEWez0WJGSK3sg70rN
- ggpeMkIO1y+nD8Ej4/d41ruPy0OsGg9Qu7k/apuGJ+Ka5c5nrDUBpgHly0jOU3/msibXxH
- ik3j17LvJtScjEbb5OkKAATCE30bJyY=
+ bh=wucbBw00c2V1/vl8huKUxgbZY/HPysQg4R/6AvM6MCw=;
+ b=gzZ57H36eGt71XHxQcntfF5tFpmkpELzfHfhiVYGEjCIwzbMaUJ4jMg2UNIlTBTHmp61tG
+ GydM4llKk+QS9gl8T3NQH5/GmLM+3WsXBJkBr3Gi6Y7XqqVazoMqCT1kxpMIf8AzhrZka3
+ LW0pbDabYMdkVeVVCawvjXIsduq0Y4o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-AlFOrmEqN6mAgsiAQX3YQQ-1; Wed, 01 Jul 2020 05:28:33 -0400
-X-MC-Unique: AlFOrmEqN6mAgsiAQX3YQQ-1
+ us-mta-206-F5AoMBHmPK6_koTaF0qujw-1; Wed, 01 Jul 2020 05:28:55 -0400
+X-MC-Unique: F5AoMBHmPK6_koTaF0qujw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 934AA87950B;
- Wed,  1 Jul 2020 09:28:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05B118FE872;
+ Wed,  1 Jul 2020 09:28:52 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F082A100164D;
- Wed,  1 Jul 2020 09:28:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 259C7100164D;
+ Wed,  1 Jul 2020 09:28:34 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v3 06/13] vhost: introduce new VhostOps vhost_dev_start
-Date: Wed,  1 Jul 2020 17:24:42 +0800
-Message-Id: <20200701092449.17451-7-lulu@redhat.com>
+Subject: [PATCH v3 07/13] vhost: implement vhost_dev_start method
+Date: Wed,  1 Jul 2020 17:24:43 +0800
+Message-Id: <20200701092449.17451-8-lulu@redhat.com>
 In-Reply-To: <20200701092449.17451-1-lulu@redhat.com>
 References: <20200701092449.17451-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -106,34 +106,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces new VhostOps vhost_dev_start callback which allows the
-vhost_net set the start/stop status to backend
+use the vhost_dev_start callback to send the status to backend
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- include/hw/virtio/vhost-backend.h | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/virtio/vhost.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 6f6670783f..b80f344cd6 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -112,6 +112,7 @@ typedef int (*vhost_get_inflight_fd_op)(struct vhost_dev *dev,
- typedef int (*vhost_set_inflight_fd_op)(struct vhost_dev *dev,
-                                         struct vhost_inflight *inflight);
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 10304b583e..32809e54b5 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1685,7 +1685,12 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+             goto fail_log;
+         }
+     }
+-
++    if (hdev->vhost_ops->vhost_dev_start) {
++        r = hdev->vhost_ops->vhost_dev_start(hdev, true);
++        if (r) {
++            goto fail_log;
++        }
++    }
+     if (vhost_dev_has_iommu(hdev) &&
+         hdev->vhost_ops->vhost_set_iotlb_callback) {
+             hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
+@@ -1723,6 +1728,9 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
+     /* should only be called after backend is connected */
+     assert(hdev->vhost_ops);
  
-+typedef int (*vhost_dev_start_op)(struct vhost_dev *dev, bool started);
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -152,6 +153,7 @@ typedef struct VhostOps {
-     vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
-     vhost_get_inflight_fd_op vhost_get_inflight_fd;
-     vhost_set_inflight_fd_op vhost_set_inflight_fd;
-+    vhost_dev_start_op vhost_dev_start;
- } VhostOps;
- 
- extern const VhostOps user_ops;
++    if (hdev->vhost_ops->vhost_dev_start) {
++        hdev->vhost_ops->vhost_dev_start(hdev, false);
++    }
+     for (i = 0; i < hdev->nvqs; ++i) {
+         vhost_virtqueue_stop(hdev,
+                              vdev,
 -- 
 2.21.1
 
