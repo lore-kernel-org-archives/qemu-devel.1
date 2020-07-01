@@ -2,87 +2,100 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C83DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 05:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB15C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 05:50:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32EA12053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 05:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E82572065D
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 05:50:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4PiJQfe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32EA12053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQV3BoVR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82572065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqVLl-0001an-DJ
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 01:32:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59690)
+	id 1jqVdf-00053I-2U
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 01:50:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqVKu-00011Q-US
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 01:31:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60102
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqVcy-0004bx-Vy
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 01:49:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23058
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqVKt-0002YD-0t
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 01:31:08 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqVcw-0004wJ-M7
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 01:49:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593581466;
+ s=mimecast20190719; t=1593582585;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f1GunwcsJ5x17bctzwNoWarXwYbAAcW7tbutl7cxIdk=;
- b=Z4PiJQfe1fwV54wyv0hQrF4w/tVMysWXq/RqIRXBlXr9Cr1MPe/hM+cvZfDjTOCH8eZlzJ
- Zn7+fWdijqInmfJGIUaocrisU6m1UExficgJv0CW7BZFZjMvD/2Vxi5EzSpjGTjUjwmWh1
- hKVeUqJsj/o+4XqugQRr+RHTUE+iC0U=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-K2gh_eQfOwCdk5OUzqjiXQ-1; Wed, 01 Jul 2020 01:31:04 -0400
-X-MC-Unique: K2gh_eQfOwCdk5OUzqjiXQ-1
-Received: by mail-pj1-f69.google.com with SMTP id j17so14697477pjy.8
- for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 22:31:04 -0700 (PDT)
+ bh=i+yBPnjmpehPev1iRxXrLx7KrY/xzdhXJtRLK0rtuPY=;
+ b=YQV3BoVRQMt6E94LffF19tmVzS5c3c8nmZlu7OeYAJ18zIOKm3RoQsnBEC8aFJc+JSrEwh
+ ZXxIsEHhELtjvCq0QRvq7+tOWlphhf4q7OIbrwUZiDcwusZEWRy9DDG6zvAkh0OwtRtwOx
+ d+tRjaXWuAjM6DQC8IvLXi8FRgMaN7U=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-_Xjeu5JHMDqGU_YHetXniw-1; Wed, 01 Jul 2020 01:49:43 -0400
+X-MC-Unique: _Xjeu5JHMDqGU_YHetXniw-1
+Received: by mail-ej1-f71.google.com with SMTP id do21so14067465ejc.2
+ for <qemu-devel@nongnu.org>; Tue, 30 Jun 2020 22:49:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=f1GunwcsJ5x17bctzwNoWarXwYbAAcW7tbutl7cxIdk=;
- b=lwYqeDe2+nCkEBcfkzRLXXljzVuSfiEI+S4EOIxU8pcpnceZJE9dpzzEvwHfOhZ9Wk
- yBxiZixloKhmsVgUO/cbFg8m0MWAXyULA4LzBKm383Yz6tPotVK2Laa8FN3Kt5yUFasV
- z+pzoWsFb4414g/vFeX5iqD+oJKvtN4t1+jesYPBKkBvUa+VGRBo0LvxD2ar8DxbSm9u
- bmt/Rp/8VqFjFJu92YPipmmjc0UkPY+e+VyknfO9Ah9hrW8/zD2US3ku3YWLznp//oxl
- tNFrf1OeaFRT3iNIWLNcgMB+RqHqr0Qn3Gqic1L2+lvO0GvEqt5Q18lVtQiCDr4qQxCT
- T9Pw==
-X-Gm-Message-State: AOAM533v3c02/rgc2FvGFY+YNqDy+tl6ozfCM0ESL60gJPXTKjDSi0JW
- 4r2MKZbKQKD/TEzCY9W3dR10Dw/0bt/uqGH9VN00F6sDvhaw7vOOG50l8eiSBVPt4c3+0J4YPP2
- 6KchnQSlkZNXc2LORb2ntPV1pp6Jg3ds=
-X-Received: by 2002:a63:ff52:: with SMTP id s18mr18697191pgk.203.1593581463483; 
- Tue, 30 Jun 2020 22:31:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEORnTy8oAc69k88tmN9pKejyf7acVqrfhvvP/D/J5Z7Z7Qthne2EkT5voe+0gudFqMP8KKlKzsmET0fbrpDY=
-X-Received: by 2002:a63:ff52:: with SMTP id s18mr18697151pgk.203.1593581463155; 
- Tue, 30 Jun 2020 22:31:03 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=i+yBPnjmpehPev1iRxXrLx7KrY/xzdhXJtRLK0rtuPY=;
+ b=g3bJtN5fy7gndl4dFUpWCPyZ3owQCw0PDe3YTM7LmdHR2rb3P0WY7r7oYsfoGVOxpB
+ Lz/AYPU+Fz+R8fnVqGLi405khTqQ3STkKJIL62urHQ2dUqmZ3qQBymQ4+dy7GkARMua1
+ NXhZJ6SllGNUt0z7cZVOTBvqizPhjmN2lzxCzk+d6cUJyYGaQXk5WijpnsQahec151UL
+ F9c+w/RBROR0K5XUG+0UIyp4hvUom2hBgVMm2KrPioVg+NKkuumYItWc4IEYd8e6W4Y+
+ G6M3BVq0A/rO6HFN13GtzMzeOCCms5UuTAZbR43k5B3tWH2V+4MpVk1VTAw4M22+8Rpw
+ 4HRg==
+X-Gm-Message-State: AOAM531ke0WTl06tYfNHFx6f7TERHcVXuFFKRuMdvcEvkbM5aF1nZYCq
+ aYOTlbdIur3l+a+taMMnUM/YDlZX/yW6pEOWPGwUlDR4q2zwiDgjALXyfeQkX9amvTtRzWOr7hL
+ TZaWHqkwgg5JjdoI=
+X-Received: by 2002:a17:906:3787:: with SMTP id
+ n7mr20655471ejc.551.1593582582626; 
+ Tue, 30 Jun 2020 22:49:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+Wsmn12/QxAwjhf2xZjVtu3GNdc4ClyU9sRuKBmn/U707px56eKOA6xHQvqY+/+V0EpEgiA==
+X-Received: by 2002:a17:906:3787:: with SMTP id
+ n7mr20655460ejc.551.1593582582410; 
+ Tue, 30 Jun 2020 22:49:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1?
+ ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
+ by smtp.gmail.com with ESMTPSA id t25sm3811506ejc.34.2020.06.30.22.49.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 30 Jun 2020 22:49:41 -0700 (PDT)
+Subject: Re: [PATCH] pc: fix leak in pc_system_flash_cleanup_unused
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20200701015859.29820-1-alxndr@bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <edb74f76-57a0-ef4b-17fa-f9f4b5dae8bc@redhat.com>
+Date: Wed, 1 Jul 2020 07:49:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <159354041626.15477.8604156689503337818@d1fd068a5071>
- <db885de8-9671-b847-f2f4-b67b245f1c9e@redhat.com>
-In-Reply-To: <db885de8-9671-b847-f2f4-b67b245f1c9e@redhat.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 1 Jul 2020 13:30:52 +0800
-Message-ID: <CACLfguVWuVytBbPTG882OzBmATjA8n-Zn7VCxNNFOZXmruPiwg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/12] vDPA support in qemu
-To: Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20200701015859.29820-1-alxndr@bu.edu>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -92,7 +105,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,108 +118,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, Michael Tsirkin <mst@redhat.com>,
- mhabets@solarflare.com, qemu-devel@nongnu.org,
- Rob Miller <rob.miller@broadcom.com>, saugatm@xilinx.com,
- Markus Armbruster <armbru@redhat.com>, hch@infradead.org,
- Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
- Shahaf Shuler <shahafs@mellanox.com>, kevin.tian@intel.com, parav@mellanox.com,
- Vitaly Mireyno <vmireyno@marvell.com>, "Liang,
- Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
- Zhihong" <zhihong.wang@intel.com>,
- Maxime Coquelin <maxime.coquelin@redhat.com>, Ariel Adam <aadam@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, hanand@xilinx.com, "Zhu,
- Lingshan" <lingshan.zhu@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks Jason, I'm working in this, Will update a new version soon
+On 01/07/20 03:58, Alexander Bulekov wrote:
+> fix a leak detected when building with --enable-sanitizers:
+> ./i386-softmmu/qemu-system-i386
+> Upon exit:
+> ==13576==ERROR: LeakSanitizer: detected memory leaks
+> 
+> Direct leak of 1216 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f9d2ed5c628 in malloc (/usr/lib/x86_64-linux-gnu/libasan.so.5)
+>     #1 0x7f9d2e963500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.)
+>     #2 0x55fa646d25cc in object_new_with_type /tmp/qemu/qom/object.c:686
+>     #3 0x55fa63dbaa88 in qdev_new /tmp/qemu/hw/core/qdev.c:140
+>     #4 0x55fa638a533f in pc_pflash_create /tmp/qemu/hw/i386/pc_sysfw.c:88
+>     #5 0x55fa638a54c4 in pc_system_flash_create /tmp/qemu/hw/i386/pc_sysfw.c:106
+>     #6 0x55fa646caa1d in object_init_with_type /tmp/qemu/qom/object.c:369
+>     #7 0x55fa646d20b5 in object_initialize_with_type /tmp/qemu/qom/object.c:511
+>     #8 0x55fa646d2606 in object_new_with_type /tmp/qemu/qom/object.c:687
+>     #9 0x55fa639431e9 in qemu_init /tmp/qemu/softmmu/vl.c:3878
+>     #10 0x55fa6335c1b8 in main /tmp/qemu/softmmu/main.c:48
+>     #11 0x7f9d2cf06e0a in __libc_start_main ../csu/libc-start.c:308
+>     #12 0x55fa6335f8e9 in _start (/tmp/qemu/build/i386-softmmu/qemu-system-i386)
+> 
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+> 
+> I am not very familiar with the QOM, so maybe this isn't the right way
+> of going about this. With the call to object_property_add_child in
+> pc_sysfw.c:pc_pflash_create, object_ref is called on the pflash device.
+> In the pc_system_flash_cleanup_unused function, there are calls to
+> object_propery_del and object_unparent, but it seems neither of these
+> calls object_unref. So do we need to manually decrement the refcount?
 
-On Wed, Jul 1, 2020 at 1:29 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/7/1 =E4=B8=8A=E5=8D=882:06, no-reply@patchew.org wrote:
-> > Patchew URL: https://patchew.org/QEMU/20200630174937.25560-1-lulu@redha=
-t.com/
-> >
-> >
-> >
-> > Hi,
-> >
-> > This series failed the docker-mingw@fedora build test. Please find the =
-testing commands and
-> > their output below. If you have Docker installed, you can probably repr=
-oduce it
-> > locally.
-> >
-> > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> > #! /bin/bash
-> > export ARCH=3Dx86_64
-> > make docker-image-fedora V=3D1 NETWORK=3D1
-> > time make docker-test-mingw@fedora J=3D14 NETWORK=3D1
->
->
-> Please fix this. You can reproduce this with the above commands.
->
-> Thanks
->
->
-> > =3D=3D=3D TEST SCRIPT END =3D=3D=3D
-> >
-> > /tmp/qemu-test/src/hw/net/virtio-net.c:173: undefined reference to `vho=
-st_dev_set_config'
-> > /usr/lib/gcc/x86_64-w64-mingw32/9.2.1/../../../../x86_64-w64-mingw32/bi=
-n/ld: hw/net/virtio-net.o: in function `virtio_net_get_config':
-> > /tmp/qemu-test/src/hw/net/virtio-net.c:149: undefined reference to `vho=
-st_dev_get_config'
-> > collect2: error: ld returned 1 exit status
-> > make[1]: *** [Makefile:208: qemu-system-x86_64w.exe] Error 1
-> > make: *** [Makefile:527: x86_64-softmmu/all] Error 2
-> > make: *** Waiting for unfinished jobs....
-> >    LINK    aarch64-softmmu/qemu-system-aarch64w.exe
-> > /usr/lib/gcc/x86_64-w64-mingw32/9.2.1/../../../../x86_64-w64-mingw32/bi=
-n/ld: hw/net/virtio-net.o: in function `virtio_net_set_config':
-> > /tmp/qemu-test/src/hw/net/virtio-net.c:173: undefined reference to `vho=
-st_dev_set_config'
-> > /usr/lib/gcc/x86_64-w64-mingw32/9.2.1/../../../../x86_64-w64-mingw32/bi=
-n/ld: hw/net/virtio-net.o: in function `virtio_net_get_config':
-> > /tmp/qemu-test/src/hw/net/virtio-net.c:149: undefined reference to `vho=
-st_dev_get_config'
-> > collect2: error: ld returned 1 exit status
-> > make[1]: *** [Makefile:208: qemu-system-aarch64w.exe] Error 1
-> > make: *** [Makefile:527: aarch64-softmmu/all] Error 2
-> > Traceback (most recent call last):
-> >    File "./tests/docker/docker.py", line 669, in <module>
-> >      sys.exit(main())
-> > ---
-> >      raise CalledProcessError(retcode, cmd)
-> > subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run',=
- '--label', 'com.qemu.instance.uuid=3D9f5def1ac1a840deb219e8827020f24d', '-=
-u', '1001', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET=
-_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '=
--e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D', '-e', 'CCACHE_DIR=3D/var/tmp/ccache',=
- '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '=
-/var/tmp/patchew-tester-tmp-lwyumgcs/src/docker-src.2020-06-30-14.01.04.321=
-02:/var/tmp/qemu:z,ro', 'qemu:fedora', '/var/tmp/qemu/run', 'test-mingw']' =
-returned non-zero exit status 2.
-> > filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3D9f5def1ac1a840deb2=
-19e8827020f24d
-> > make[1]: *** [docker-run] Error 1
-> > make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-lwyumgcs/src'
-> > make: *** [docker-run-test-mingw@fedora] Error 2
-> >
-> > real    5m52.723s
-> > user    0m8.824s
-> >
-> >
-> > The full log is available at
-> > http://patchew.org/logs/20200630174937.25560-1-lulu@redhat.com/testing.=
-docker-mingw@fedora/?type=3Dmessage.
-> > ---
-> > Email generated automatically by Patchew [https://patchew.org/].
-> > Please send your feedback to patchew-devel@redhat.com
->
+Yes; you can also add it in pc_pflash_create, because
+
+    /*
+     * Since object_property_add_child added a reference to the child object,
+     * we can drop the reference added by object_initialize(), so the child
+     * property will own the only reference to the object.
+     */
+
+(from object_initialize_childv).
+
+Paolo
+
+>  hw/i386/pc_sysfw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index ec2a3b3e7e..f69a93671a 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -123,6 +123,7 @@ static void pc_system_flash_cleanup_unused(PCMachineState *pcms)
+>              object_property_del(OBJECT(pcms), prop_name);
+>              g_free(prop_name);
+>              object_unparent(dev_obj);
+> +            object_unref(dev_obj);
+>              pcms->flash[i] = NULL;
+>          }
+>      }
+> 
 
 
