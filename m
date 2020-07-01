@@ -7,81 +7,84 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57EAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82189C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:38:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B02722065F
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BFDE20780
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXYUtjFA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B02722065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aqc6qRFg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BFDE20780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqgdu-0007q3-V2
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:35:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33550)
+	id 1jqggw-0001mA-I0
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqgco-0006Ui-BQ
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:34:22 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60525
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqggD-00019G-W6
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:37:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59015
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqgcl-0003qD-NO
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:34:21 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqggB-0004MD-9Y
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 13:37:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593624858;
+ s=mimecast20190719; t=1593625070;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=o7CYiMxTTKsmCbizwGsdw6TO9XJSalpeElFbgDVuJ1Q=;
- b=MXYUtjFA5kPeFH36GU0wabATQHGDj1vmXw84dhZyHKL5ZFwLDqa3xmWRsn/LucMBX9pHdq
- ROUMhCJ/te/IGSla9ckgqWRKQLyGClNNYfE7Ea12rhiWvHgx2SFLYo3iWChSvTC9Ajcip4
- lPckmBGnhcqROHkX/jYl/cVzl4bIcVU=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-ZVDS_7bYNlOE0g621VBstg-1; Wed, 01 Jul 2020 13:34:14 -0400
-X-MC-Unique: ZVDS_7bYNlOE0g621VBstg-1
-Received: by mail-ed1-f69.google.com with SMTP id dg19so22190759edb.6
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 10:34:14 -0700 (PDT)
+ bh=N1AIMtLnO34jJojq36VyLc4IKMwvI8EdLIzfsbYHg98=;
+ b=Aqc6qRFgdzYxHtu6yGEUgXWDTojN1Dl4yVYP4cUEX9RcJowqE00bws4KD1eXXZmxO59jg+
+ 07RzG0G05/Lw7eY6oQaNHdzn/DJaO+jiwRi9/gDQkgJQTNz3jIj0aJuRN3wKPD0vq7kqdw
+ WkTa4EETeUXDcG2yDi7pvmpujhL+4nM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-iJze01hfNjmVCvtQKAHvEw-1; Wed, 01 Jul 2020 13:37:46 -0400
+X-MC-Unique: iJze01hfNjmVCvtQKAHvEw-1
+Received: by mail-ed1-f72.google.com with SMTP id x20so22224708edr.20
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 10:37:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=o7CYiMxTTKsmCbizwGsdw6TO9XJSalpeElFbgDVuJ1Q=;
- b=COUnBb0TUerdg+vP4zP7/oh3ZcH4nm0CZBLTaAY1ahIAXkEdMVblm2aHD+qVYA47yQ
- ap2EGB9KKsmu0AxV/INwmgcrh89dlTWhlcWvly93vPEmFF2e89D1ae2Rdl4lfuthS3Hv
- W1phq5Kyass2xpsrFcfTPeVaX7Xg2p0traJyp5a2sr+KHoTtxftboic5wtS6Hrqecs2r
- 26NL3Qr3iCkUbERvS/d4lSjc8emvDZigBegThXJSAr7GaRjYBZW6Smi+YdAtP88Iwjny
- NEjxWZ5ze4Di0qXil0kmZXVUsOGhXC608AYSAO5xr52/DPFSJLH4HaFbtJjMZxn2m/nt
- PyLg==
-X-Gm-Message-State: AOAM532yqaW8fWsfWdrg472DDd293mQggsqcpb1s1OK8bo0zYj8ElX/n
- RVYHSGc+sAlYWdzqH17SpH4BpvMuRe/CaFyT5f3dBAYY0JeNfY78tFSTpVY22/6hRFOlH/h6B1z
- 4c0FueOGzrob+lD4=
-X-Received: by 2002:a50:f392:: with SMTP id g18mr8195340edm.151.1593624853591; 
- Wed, 01 Jul 2020 10:34:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyruqKAu93PMbi9+VMQAxm85uVPgGZ/Ktfyl+EPgWNqlyZtLWQzxeEit3fr6sZyp+8qq1xDcA==
-X-Received: by 2002:a50:f392:: with SMTP id g18mr8195318edm.151.1593624853387; 
- Wed, 01 Jul 2020 10:34:13 -0700 (PDT)
+ bh=N1AIMtLnO34jJojq36VyLc4IKMwvI8EdLIzfsbYHg98=;
+ b=gvQrb7ZTSRYsx0bcSFHDtIGqWlovBk1czol9HHU03wZmIp2vfa7WR2uwEDYhVbaZsR
+ q1JTQzXgqibuGaSNmxJ4UTuxa/mU4zyEsSOkZZmGkFXXl/+PwalBijrTOJiX2a7lGPFy
+ 790QH+1IVBeiW1+TkGlvqlzQjf19oLWi9S9N3FkYzK4cPL4CcT7i9qDsOY1ZOBLYGG45
+ HZL/WDnVvwEZ5A8YJmPwY3LpHxdIc2qZZd0qCzC6fj/pUe8CiZ1Y5wIfKHOlSYPd80ms
+ 0bCCkzMXZijNKbhdovXrUvDedhkaoIOCKYqevH4cJp4DdLS4yb+mku3TKpqVh06R61OE
+ WQ/A==
+X-Gm-Message-State: AOAM530W+SEMk45NpKF/lCwShAVv9rvAvEHjZuQq0m2miFi50ltbCYNF
+ /bLJmjmRnwT8VcwGKw4Xr1IOqxdA7dZ+3cIU68GoM7X1gw4ZQFnHXcpANmbUcYPu9UEkRLknDeu
+ yapsncewg+B3s8Vs=
+X-Received: by 2002:a17:906:3042:: with SMTP id
+ d2mr23078094ejd.420.1593625065829; 
+ Wed, 01 Jul 2020 10:37:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4lt8GbRH/4j6pU/ad2Hf+PjBPtf5l6DX6h76CG0Ul2gXuWh4c8y0h104PPsKDPJ/FUNiEdQ==
+X-Received: by 2002:a17:906:3042:: with SMTP id
+ d2mr23078079ejd.420.1593625065623; 
+ Wed, 01 Jul 2020 10:37:45 -0700 (PDT)
 Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e8sm4990087eja.101.2020.07.01.10.34.12
+ by smtp.gmail.com with ESMTPSA id j16sm4834836ejn.77.2020.07.01.10.37.44
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 10:34:12 -0700 (PDT)
+ Wed, 01 Jul 2020 10:37:45 -0700 (PDT)
 Subject: Re: [PATCH v4 01/40] hw/isa: check for current_cpu before generating
  IRQ
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 References: <20200701135652.1366-1-alex.bennee@linaro.org>
  <20200701135652.1366-2-alex.bennee@linaro.org>
  <85314d31-813a-8c20-7522-5186d5f31884@redhat.com> <87pn9fqjcd.fsf@linaro.org>
  <838d4d01-cd9e-d74a-5cd2-b23644172c9f@redhat.com> <87k0znqi03.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+ <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
  bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
@@ -105,12 +108,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
-Date: Wed, 1 Jul 2020 19:34:11 +0200
+Message-ID: <bc418946-9d67-6efa-d6c7-dd2d8c5d757c@redhat.com>
+Date: Wed, 1 Jul 2020 19:37:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87k0znqi03.fsf@linaro.org>
+In-Reply-To: <ef90b1f6-715a-8e38-069a-8c919b14d9b8@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -118,9 +121,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -149,73 +152,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Paolo
-
-On 7/1/20 7:09 PM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->> On 7/1/20 6:40 PM, Alex Bennée wrote:
->>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->>>
->>>> On 7/1/20 3:56 PM, Alex Bennée wrote:
->>>>> It's possible to trigger this function from qtest/monitor at which
->>>>> point current_cpu won't point at the right place. Check it and
->>>>> fall back to first_cpu if it's NULL.
->>>>>
->>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>>> Cc: Bug 1878645 <1878645@bugs.launchpad.net>
->>>>> ---
->>>>>  hw/isa/lpc_ich9.c | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
->>>>> index cd6e169d47a..791c878eb0b 100644
->>>>> --- a/hw/isa/lpc_ich9.c
->>>>> +++ b/hw/isa/lpc_ich9.c
->>>>> @@ -439,7 +439,7 @@ static void ich9_apm_ctrl_changed(uint32_t val, void *arg)
->>>>>                  cpu_interrupt(cs, CPU_INTERRUPT_SMI);
->>>>>              }
->>>>>          } else {
->>>>> -            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
->>>>> +            cpu_interrupt(current_cpu ? current_cpu : first_cpu, CPU_INTERRUPT_SMI);
->>>>
->>>> I'm not sure this change anything, as first_cpu is NULL when using
->>>> qtest accelerator or none-machine, see 508b4ecc39 ("gdbstub.c: fix
->>>> GDB connection segfault caused by empty machines").
->>>
->>> Good point - anyway feel free to ignore - it shouldn't have been in this
->>> series. It was just some random experimentation I was doing when looking
->>> at that bug.
->>
->> See commit c781a2cc42 ("hw/i386/vmport: Allow QTest use without
->> crashing") for a similar approach, but here I was thinking about
->> a more generic fix, not very intrusive:
->>
->> -- >8 --
->> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
->> index bce266b957..809afeb3e4 100644
->> --- a/hw/isa/apm.c
->> +++ b/hw/isa/apm.c
->> @@ -40,7 +40,7 @@ static void apm_ioport_writeb(void *opaque, hwaddr
->> addr, uint64_t val,
->>      if (addr == 0) {
->>          apm->apmc = val;
->>
->> -        if (apm->callback) {
->> +        if (apm->callback && !qtest_enabled()) {
->>              (apm->callback)(val, apm->arg);
->>          }
+On 7/1/20 7:34 PM, Philippe Mathieu-Daudé wrote:
+> +Paolo
 > 
-> But the other failure mode reported on the bug thread was via the
-> monitor - so I'm not sure just checking for qtest catches that.
+> On 7/1/20 7:09 PM, Alex Bennée wrote:
+>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>> On 7/1/20 6:40 PM, Alex Bennée wrote:
+>>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>>>
+>>>>> On 7/1/20 3:56 PM, Alex Bennée wrote:
+>>>>>> It's possible to trigger this function from qtest/monitor at which
+>>>>>> point current_cpu won't point at the right place. Check it and
+>>>>>> fall back to first_cpu if it's NULL.
+>>>>>>
+>>>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>>>> Cc: Bug 1878645 <1878645@bugs.launchpad.net>
+>>>>>> ---
+>>>>>>  hw/isa/lpc_ich9.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>>>>>> index cd6e169d47a..791c878eb0b 100644
+>>>>>> --- a/hw/isa/lpc_ich9.c
+>>>>>> +++ b/hw/isa/lpc_ich9.c
+>>>>>> @@ -439,7 +439,7 @@ static void ich9_apm_ctrl_changed(uint32_t val, void *arg)
+>>>>>>                  cpu_interrupt(cs, CPU_INTERRUPT_SMI);
+>>>>>>              }
+>>>>>>          } else {
+>>>>>> -            cpu_interrupt(current_cpu, CPU_INTERRUPT_SMI);
+>>>>>> +            cpu_interrupt(current_cpu ? current_cpu : first_cpu, CPU_INTERRUPT_SMI);
+>>>>>
+>>>>> I'm not sure this change anything, as first_cpu is NULL when using
+>>>>> qtest accelerator or none-machine, see 508b4ecc39 ("gdbstub.c: fix
+>>>>> GDB connection segfault caused by empty machines").
+>>>>
+>>>> Good point - anyway feel free to ignore - it shouldn't have been in this
+>>>> series. It was just some random experimentation I was doing when looking
+>>>> at that bug.
+>>>
+>>> See commit c781a2cc42 ("hw/i386/vmport: Allow QTest use without
+>>> crashing") for a similar approach, but here I was thinking about
+>>> a more generic fix, not very intrusive:
+>>>
+>>> -- >8 --
+>>> diff --git a/hw/isa/apm.c b/hw/isa/apm.c
+>>> index bce266b957..809afeb3e4 100644
+>>> --- a/hw/isa/apm.c
+>>> +++ b/hw/isa/apm.c
+>>> @@ -40,7 +40,7 @@ static void apm_ioport_writeb(void *opaque, hwaddr
+>>> addr, uint64_t val,
+>>>      if (addr == 0) {
+>>>          apm->apmc = val;
+>>>
+>>> -        if (apm->callback) {
+>>> +        if (apm->callback && !qtest_enabled()) {
+>>>              (apm->callback)(val, apm->arg);
+>>>          }
+>>
+>> But the other failure mode reported on the bug thread was via the
+>> monitor - so I'm not sure just checking for qtest catches that.
+> 
+> Ah indeed.
+> 
+> in exec.c:
+> 
+> /* current CPU in the current thread. It is only valid inside
+>    cpu_exec() */
+> __thread CPUState *current_cpu;
+> 
+> Maybe we shouldn't use current_cpu out of exec.c...
 
-Ah indeed.
-
-in exec.c:
-
-/* current CPU in the current thread. It is only valid inside
-   cpu_exec() */
-__thread CPUState *current_cpu;
-
-Maybe we shouldn't use current_cpu out of exec.c...
+I meant, out of cpu_exec(), a cpu thread. Here we access it
+from an I/O thread.
 
 
