@@ -2,122 +2,88 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC5CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07119C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0439206CB
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8C5D206CB
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 10:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rnNsYvWr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0439206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVgvrBTQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C5D206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqaQF-0007Lm-5L
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:56:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44736)
+	id 1jqaRS-0000aA-4G
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 06:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaNB-000274-Bn; Wed, 01 Jul 2020 06:53:49 -0400
-Received: from mail-eopbgr10106.outbound.protection.outlook.com
- ([40.107.1.106]:9187 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqaN9-0002Jl-Jo; Wed, 01 Jul 2020 06:53:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mipsvGHa1yWLC6VMYF3CMlzaof+BS8u39fn0fJsCAL9YjMtjhS2GvD5lHrGPM5991NaBZnfo8Mq+33dDJYdfZbbrfGHkPI82128UaS7HyFve6lKMF3GD7OcUi3a9a81ajnqeCL8iXiJQ0YuJuHftea9o+CJi3S/RqAc3EJbEwMgA9mNnWOD/1KuabNY8ogyBYHC5WS/9JN7bUXckwZliTbNL/rlnhqbaBYcVfy6snGuTchCS55u5r2+1wmKF5xH9/2o4lunaUL5cN8oDBtgpjsH/87NMtgH9y18hiPUKB4N2SD6MUoLRO6Q0xoqIQOZP2wesGOIVvutYOx3ygR1uVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aMZayBVdy65Ef8lV9b/bq1XSjq3qIc6iKRIc1Fnp604=;
- b=AXrIqL6fHMcSOags8NxAaFdHa0qJmN7iknzOzYdHIpPkxumh0h1LCzLPIkaJ/hNAlyL2lXiGo/vGOirqWS3QNgMsAuC2hXV32QKgMx/hZjIiEnO9ta9AaxBqCrZuaAzHE/PdSyJv2ap2IpvmddKoUc6iGK8KW0GZonLBK1f0xYfPYcrRCqnhz/7w5bXXPPzrW/1+BsP3aqkPVY9yhCLKHpn5+iSxQhivB2e1V0chXkpT8ff44/SZkAcx9FHOypwunJhh/XUhpVtxRxgH+mFBfMVUTIs1uGb313HgkPOlX7RSMif6DpJIe0XaLvQjTy53aEE3cazuAl8Znc5QPYMDVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aMZayBVdy65Ef8lV9b/bq1XSjq3qIc6iKRIc1Fnp604=;
- b=rnNsYvWriA+BakRJdGOqe5cRAK86fiW1SJqJtFoGYpS5R9bgTTDg9O51cyIxFCadG9CGcoATlrPTfVbV24vSYS/N9PUD47jhPmYD1qeSrUxe/8VAfXamAUMOfRCRpGyxKzTgg406U31k7kcAb81FyA+GEPil1lrKP78GaxXlq+I=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4850.eurprd08.prod.outlook.com (2603:10a6:20b:d2::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.26; Wed, 1 Jul
- 2020 10:53:41 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Wed, 1 Jul 2020
- 10:53:41 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 4/5] iotests.py: filter_testfiles(): filter SOCK_DIR too
-Date: Wed,  1 Jul 2020 13:53:30 +0300
-Message-Id: <20200701105331.121670-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20200701105331.121670-1-vsementsov@virtuozzo.com>
-References: <20200701105331.121670-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain
-X-ClientProxiedBy: AM0P190CA0004.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqaOq-0005NF-19
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 06:55:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39741
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jqaOn-0002bj-GN
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 06:55:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593600928;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Nj8BTxlguEF+YIEDiZdOzSLLLKwaG2+rHKwYIYM6uDE=;
+ b=QVgvrBTQSd/ceb8sCmAbQNVjdqtN3ihfP5PDBVsqQjA4PfnM6szLkTTLiUGp4R5CADvtSK
+ QEyDOfdOFJGrClQgRRQA1f50wwkCgnPaiF2gc7cJjvwwYkRlexPoA87GIELCrI7V1jUm53
+ sb7PTY7zWGCvz/5HhVbWCvJBphTI1Ww=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449--AUX9dE7Pt29ff_ZwD5T6A-1; Wed, 01 Jul 2020 06:55:24 -0400
+X-MC-Unique: -AUX9dE7Pt29ff_ZwD5T6A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4425818A0763;
+ Wed,  1 Jul 2020 10:55:22 +0000 (UTC)
+Received: from localhost (ovpn-113-121.ams2.redhat.com [10.36.113.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 482F060C81;
+ Wed,  1 Jul 2020 10:55:13 +0000 (UTC)
+Date: Wed, 1 Jul 2020 11:55:12 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH v7 15/21] multi-process: Synchronize remote memory
+Message-ID: <20200701105512.GH126613@stefanha-x1.localdomain>
+References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
+ <f9eb12b75572e91e7e0e530dbc9b8efae41f449e.1593273671.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.28) by
- AM0P190CA0004.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.20 via Frontend Transport; Wed, 1 Jul 2020 10:53:40 +0000
-X-Mailer: git-send-email 2.18.0
-X-Originating-IP: [185.215.60.28]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 33bf41a3-e514-4f35-ab7f-08d81dad0462
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4850:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4850ED12BF8927BA799A7A50C16C0@AM6PR08MB4850.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:65;
-X-Forefront-PRVS: 04519BA941
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Nv1UgIr1UVa6KRN8x1ULon3JIJH42jC17eMhrG0OI/+S//crFfok4f/q9BdUOA7mzBa2vNqq/YCEA3oez90rrn2wxwYEKbIniVLNQDIbxpHNks0PILHlI6unTjdUcDFxacYNMLWISg/bqzXBn6ovOhrVFuBVf1GK6Kw7wAXsDqqzImV/LjgPRaDqlvgsRsVrgDoCPyTQnO8b8tcZWYK26nCnkNUT4aYiSBfzcNzrLRKF59sOL8SYCE/c8/wbTQszcX3vxPDwiJ5jpxr89zeGSS+9cvm99c3nI5sG14V2makNKstcjAviwrSlVEs9Gn7DwTC1jdIolPCuX+KHgS/nvQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(366004)(39840400004)(376002)(346002)(396003)(2906002)(83380400001)(956004)(316002)(2616005)(6512007)(6916009)(107886003)(6666004)(66946007)(66556008)(4326008)(5660300002)(66476007)(86362001)(4744005)(1076003)(478600001)(186003)(6506007)(36756003)(52116002)(8936002)(26005)(16526019)(6486002)(8676002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: O3GVwxxGCv5NtesyHy+pjl8RPO72n+0REbcCVhnSv4Iyh3OB4VVzzbg0vWF9RcK8iusdPQXvYNfWPmAc07gXrXHHS2nb2hLH9o8fPeUdfb84NpM1qac7kVIB3uhs1fsrmd7+sNq3ki/igK/o7b45Al2wZs4vsVD33Q8XH3aixzZ+arOUNlh2oDujZpVSOwadKj1NvjbOMK1ltTk9m6h2lriOV6HcSHsB9G107Dd52OZoooXuAzmYad+3FLTR+/UZu5zdy4x2f96O6JrZ6cWiJnQQW1VgCwcF2Q5TGV4Sob0oRTLwKkpuVGX01Pl/5dnvcF+2N0bZTA4Wf//oEpoLPrQsVzvpTQLNIzqn5cXHqh3rDRc+Jk58apw4OEJSCxim7qzS3JJJ1Y6zC+OBhnmjJrrGVXAIhPmUQB6bUthlz6vOAkjxE0c5xOqsc517a4JLhvRoEld1zvQYSG/34NdWMm0IpR5olCZVSxXhlGFkLlM=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33bf41a3-e514-4f35-ab7f-08d81dad0462
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2020 10:53:41.4671 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H2o4Uz5ibHDk6A5wr4iv6LgcbUqJyP7mgZjNZeJBXmlpc6J3QvYeoTtL+ujzvS+Lh+1S5mAA8EEBoG4LCg3qtr17sQUzpvd4Ha1jq4vTcJY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4850
-Received-SPF: pass client-ip=40.107.1.106;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 06:53:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <f9eb12b75572e91e7e0e530dbc9b8efae41f449e.1593273671.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="l06SQqiZYCi8rTKz"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,34 +96,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/iotests.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+--l06SQqiZYCi8rTKz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index ac9d199a1e..31d4b105ca 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -345,8 +345,9 @@ def filter_qmp(qmsg, filter_fn):
-     return qmsg
- 
- def filter_testfiles(msg):
--    prefix = os.path.join(test_dir, "%s-" % (os.getpid()))
--    return msg.replace(prefix, 'TEST_DIR/PID-')
-+    pref1 = os.path.join(test_dir, "%s-" % (os.getpid()))
-+    pref2 = os.path.join(sock_dir, "%s-" % (os.getpid()))
-+    return msg.replace(pref1, 'TEST_DIR/PID-').replace(pref2, 'SOCK_DIR/PID-')
- 
- def filter_qmp_testfiles(qmsg):
-     def _filter(_key, value):
--- 
-2.18.0
+On Sat, Jun 27, 2020 at 10:09:37AM -0700, elena.ufimtseva@oracle.com wrote:
+> +static bool try_merge(RemoteMemSync *sync, MemoryRegionSection *section)
+> +{
+> +    uint64_t mrs_size, mrs_gpa, mrs_page;
+> +    MemoryRegionSection *prev_sec;
+> +    bool merged = false;
+> +    uintptr_t mrs_host;
+> +    RAMBlock *mrs_rb;
+> +
+> +    if (!sync->n_mr_sections) {
+> +        return false;
+> +    }
+> +
+> +    mrs_rb = section->mr->ram_block;
+> +    mrs_page = (uint64_t)qemu_ram_pagesize(mrs_rb);
+> +    mrs_size = int128_get64(section->size);
+> +    mrs_gpa = section->offset_within_address_space;
+> +    mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+> +               section->offset_within_region;
+> +
+> +    if (get_fd_from_hostaddr(mrs_host, NULL) < 0) {
+> +        return true;
+> +    }
+> +
+> +    mrs_host = mrs_host & ~(mrs_page - 1);
+> +    mrs_gpa = mrs_gpa & ~(mrs_page - 1);
+> +    mrs_size = ROUND_UP(mrs_size, mrs_page);
+> +
+> +    if (sync->n_mr_sections) {
+
+The check is unnecessary because of the if statement above:
+
+  if (!sync->n_mr_sections) {
+     return false;
+  }
+
+> +static void proxy_ml_commit(MemoryListener *listener)
+> +{
+> +    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
+> +    MPQemuMsg msg;
+> +    MemoryRegionSection section;
+> +    ram_addr_t offset;
+> +    uintptr_t host_addr;
+> +    int region;
+> +
+> +    memset(&msg, 0, sizeof(MPQemuMsg));
+> +
+> +    msg.cmd = SYNC_SYSMEM;
+> +    msg.bytestream = 0;
+> +    msg.num_fds = sync->n_mr_sections;
+> +    msg.size = sizeof(msg.data1);
+> +    assert(msg.num_fds <= REMOTE_MAX_FDS);
+> +
+> +    for (region = 0; region < sync->n_mr_sections; region++) {
+> +        section = sync->mr_sections[region];
+
+Why is section copied here? It's conventional to take a pointer to a
+struct instead of copying its value.
+
+> +        msg.data1.sync_sysmem.gpas[region] =
+> +            section.offset_within_address_space;
+> +        msg.data1.sync_sysmem.sizes[region] = int128_get64(section.size);
+> +        host_addr = (uintptr_t)memory_region_get_ram_ptr(section.mr) +
+> +                    section.offset_within_region;
+> +        msg.fds[region] = get_fd_from_hostaddr(host_addr, &offset);
+> +        msg.data1.sync_sysmem.offsets[region] = offset;
+> +    }
+> +    mpqemu_msg_send(&msg, sync->ioc);
+> +}
+> +
+> +void deconfigure_memory_sync(RemoteMemSync *sync)
+> +{
+
+Missing proxy_ml_begin() call to free sync->mr_sections[] and unref
+sections.
+
+> +    memory_listener_unregister(&sync->listener);
+> +}
+
+This function isn't called. It's good practice to implement the object
+lifecycle from the start.
+
+--l06SQqiZYCi8rTKz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl78a5AACgkQnKSrs4Gr
+c8ic4wf/X9CdnRnbCS4WhA9L0L2Q445ZGIOrahapAfbsrbnHeazrzdw1gsW1n5Oa
+4mwnP/JRR5K7W+dETQ677VJLILXmfi3nckZh/EFXJeSIudLeoYPXvEPtrfbPOoCl
+SyApENaW7Ei0IgBcEpwUwTNYM+ZX/IEXw1ADbMNpMUuJEtSEOBwT34CxP3M5mPUo
+EWxvF/9HFj5+YjUiznDpQN6S3iCpum5n7ExE5ZzTLih3u/9BUlSOoCzGPYUCz4HH
++/pMG4UsAvHak6Fz+2RwQKr4nF0GsO1Ikduak9rR1Le7xiZioln9MtExwmcDBJcw
+UhYHDfKScbF0TKCCVPPuXNzwyPodyQ==
+=c4+q
+-----END PGP SIGNATURE-----
+
+--l06SQqiZYCi8rTKz--
 
 
