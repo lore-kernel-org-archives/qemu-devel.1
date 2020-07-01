@@ -2,115 +2,100 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F16C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BADBCC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A77E2206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:01:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77E2206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 85C3B206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:03:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeqAR/fo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85C3B206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqbQH-0007CW-Uj
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:01:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57360)
+	id 1jqbSL-0000TN-HI
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:03:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jqbPR-0006Xd-Bq; Wed, 01 Jul 2020 08:00:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42494
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jqbPJ-0003zj-8j; Wed, 01 Jul 2020 08:00:13 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 061BVOVN123781; Wed, 1 Jul 2020 07:59:54 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 320s8assag-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 07:59:54 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 061BWWqW128662;
- Wed, 1 Jul 2020 07:59:54 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.108])
- by mx0b-001b2d01.pphosted.com with ESMTP id 320s8ass9p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 07:59:53 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
- by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061BwXBM003895;
- Wed, 1 Jul 2020 11:59:52 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma05fra.de.ibm.com with ESMTP id 31wwr8a95k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 11:59:51 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 061BxnJh786834
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 1 Jul 2020 11:59:49 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DDD8FA4062;
- Wed,  1 Jul 2020 11:59:48 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F3F3AA405C;
- Wed,  1 Jul 2020 11:59:47 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.149.130])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  1 Jul 2020 11:59:47 +0000 (GMT)
-Date: Wed, 1 Jul 2020 13:59:30 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-Message-ID: <20200701135930.3d8bb1dc.pasic@linux.ibm.com>
-In-Reply-To: <02a4d0c2-0009-470c-274f-d57bad5e063a@linux.ibm.com>
-References: <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
- <20200622140254.0dbe5d8c.cohuck@redhat.com>
- <20200625052518.GD172395@umbus.fritz.box>
- <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
- <20200626044259.GK172395@umbus.fritz.box>
- <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
- <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
- <20200626093257.GC1028934@redhat.com>
- <558e8978-01ba-d8e8-9986-15efbbcbca96@linux.ibm.com>
- <20200626102903.GD3087@work-vm>
- <20200626105846.GF1028934@redhat.com>
- <02a4d0c2-0009-470c-274f-d57bad5e063a@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbRG-0007wP-KA
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:02:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20815
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbRD-0004VQ-BW
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:02:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593604921;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=upttUj7UH7Jl5jYNi0LTgfL6ldsPtfhQGw7sDxV+vlA=;
+ b=PeqAR/fo2HToCWE32qIp59QklpNFFlilTItmLfQSzw17WoSq8nm9I0ayD4AG+kW5F/hOzw
+ h5pQLsdxMJqaYH1BbBdoz++J8TGOnqlGwXltojbK0i1s5Q+9HzxFKH7aX6B9+HrCOPHOpw
+ LIlpveQbCCbP08+brzoXB4dEVitBhxk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-C9ysPKbpPI2H86TPXvV53A-1; Wed, 01 Jul 2020 08:02:00 -0400
+X-MC-Unique: C9ysPKbpPI2H86TPXvV53A-1
+Received: by mail-wm1-f72.google.com with SMTP id q20so13094180wme.3
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:01:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=upttUj7UH7Jl5jYNi0LTgfL6ldsPtfhQGw7sDxV+vlA=;
+ b=ShcX2bF0gKilQ9DQX3t9e/9ZRP0Wbpe/nbZ5rqcv3IwrcHd3hqT72usRjrGF5QxirQ
+ OMdwTndI8QSQmg1k99se35eebLQuBLpKNJuypdbAS3zjFjvF4dU9aZOIP/cHLrZ10JS9
+ X4BeqZ5oGhtPyIQMDSTuRHFHWhLSoSwS+EE1QpHlF8Ln02tSkehK5GsYrsUvH4J0b1kA
+ iuRAyIZH+LUNsyAVHoTwAlG2jfdvdiw9bnyOHQjCMmzSDBGtY+bfQRKeLTDwSHoGhnxy
+ Ia/kYy3qdhRltWUhKAn0oALAe7Kj1+zjb20VR+Cq2qY6HvmMEL8pNK14bO03NOM7zdO7
+ rfQw==
+X-Gm-Message-State: AOAM532bSZ3h4TW2Z+7jaLbyWEaUcWe5MmOHZXQMzES4GQCLUMHq2CKp
+ ZdD9izJjUriXsRYXKmX5vOHZSNOdzKcmRpQYLQMUQFjW28l+GgCUff+/LCt/RTqMKlMjuR5AKL5
+ +S5ycZpEzl+SCdi8=
+X-Received: by 2002:a1c:5f45:: with SMTP id t66mr27819969wmb.144.1593604918703; 
+ Wed, 01 Jul 2020 05:01:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8evmIeEBwEbco9M+GUS4o4gTU6FaL4mEumz0IEAIqoi21t2HGkaK7uZ3V9CE9GERQLKApHg==
+X-Received: by 2002:a1c:5f45:: with SMTP id t66mr27819939wmb.144.1593604918365; 
+ Wed, 01 Jul 2020 05:01:58 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ u23sm7551973wru.94.2020.07.01.05.01.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jul 2020 05:01:57 -0700 (PDT)
+Date: Wed, 1 Jul 2020 08:01:55 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Subject: Re: [PATCH] acpi: Fix access to PM1 control and status registers
+Message-ID: <20200701075914-mutt-send-email-mst@kernel.org>
+References: <20200701110549.148522-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/We5mDa4tzwsjBOZY1NGd6NI"; protocol="application/pgp-signature"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-01_07:2020-07-01,
- 2020-07-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0
- suspectscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 bulkscore=0
- spamscore=0 mlxlogscore=999 cotscore=-2147483648 adultscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007010082
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 08:00:01
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+In-Reply-To: <20200701110549.148522-1-anthony.perard@citrix.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,212 +108,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, pair@us.ibm.com, brijesh.singh@amd.com,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- mst@redhat.com, pbonzini@redhat.com,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/We5mDa4tzwsjBOZY1NGd6NI
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 26 Jun 2020 14:49:37 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 6/26/20 12:58 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Jun 26, 2020 at 11:29:03AM +0100, Dr. David Alan Gilbert wrote:
-> >> * Janosch Frank (frankja@linux.ibm.com) wrote:
-> >>> On 6/26/20 11:32 AM, Daniel P. Berrang=C3=83=C2=A9 wrote:
-> >>>> On Fri, Jun 26, 2020 at 11:01:58AM +0200, Janosch Frank wrote:
-> >>>>> On 6/26/20 8:53 AM, David Hildenbrand wrote:
-> >>>>>>>>>> Does this have any implications when probing with the 'none' m=
-achine?
-> >>>>>>>>>
-> >>>>>>>>> I'm not sure.  In your case, I guess the cpu bit would still sh=
-ow up
-> >>>>>>>>> as before, so it would tell you base feature availability, but =
-not
-> >>>>>>>>> whether you can use the new configuration option.
-> >>>>>>>>>
-> >>>>>>>>> Since the HTL option is generic, you could still set it on the =
-"none"
-> >>>>>>>>> machine, though it wouldn't really have any effect.  That is, i=
-f you
-> >>>>>>>>> could create a suitable object to point it at, which would depe=
-nd on
-> >>>>>>>>> ... details.
-> >>>>>>>>>
-> >>>>>>>>
-> >>>>>>>> The important point is that we never want the (expanded) host cp=
-u model
-> >>>>>>>> look different when either specifying or not specifying the HTL
-> >>>>>>>> property.
-> >>>>>>>
-> >>>>>>> Ah, yes, I see your point.  So my current suggestion will satisfy
-> >>>>>>> that, basically it is:
-> >>>>>>>
-> >>>>>>> cpu has unpack (inc. by default) && htl specified
-> >>>>>>> 	=3D> works (allowing secure), as expected
-> >>>>>>
-> >>>>>> ack
-> >>>>>>
-> >>>>>>>
-> >>>>>>> !cpu has unpack && htl specified
-> >>>>>>> 	=3D> bails out with an error
-> >>>>>>
-> >>>>>> ack
-> >>>>>>
-> >>>>>>>
-> >>>>>>> !cpu has unpack && !htl specified
-> >>>>>>> 	=3D> works for a non-secure guest, as expected
-> >>>>>>> 	=3D> guest will fail if it attempts to go secure
-> >>>>>>
-> >>>>>> ack, behavior just like running on older hw without unpack
-> >>>>>>
-> >>>>>>>
-> >>>>>>> cpu has unpack && !htl specified
-> >>>>>>> 	=3D> works as expected for a non-secure guest (unpack feature is
-> >>>>>>> 	   present, but unused)
-> >>>>>>> 	=3D> secure guest may work "by accident", but only if all virtio
-> >>>>>>> 	   properties have the right values, which is the user's
-> >>>>>>> 	   problem
-> >>>>>>>
-> >>>>>>> That last case is kinda ugly, but I think it's tolerable.
-> >>>>>>
-> >>>>>> Right, we must not affect non-secure guests, and existing secure s=
-etups
-> >>>>>> (e.g., older qemu machines). Will have to think about this some mo=
-re,
-> >>>>>> but does not sound too crazy.
-> >>>>>
-> >>>>> I severely dislike having to specify things to make PV work.
-> >>>>> The IOMMU is already a thorn in our side and we're working on makin=
-g the
-> >>>>> whole ordeal completely transparent so the only requirement to make=
- this
-> >>>>> work is the right machine, kernel, qemu and kernel cmd line option
-> >>>>> "prot_virt=3D1". That's why we do the reboot into PV mode in the fi=
-rst place.
-> >>>>>
-> >>>>> I.e. the goal is that if customers convert compatible guests into
-> >>>>> protected ones and start them up on a z15 on a distro with PV suppo=
-rt
-> >>>>> they can just use the guest without having to change XML or command=
- line
-> >>>>> parameters.
-> >>>>
-> >>>> If you're exposing new features to the guest machine, then it is usu=
-ally
-> >>>> to be expected that XML and QEMU command line will change. Some simp=
-le
-> >>>> things might be hidable behind a new QEMU machine type or CPU model,=
- but
-> >>>> there's a limit to how much should be hidden that way while staying =
-sane.
-> >>>>
-> >>>> I'd really expect the configuration to change when switching a guest=
- to
-> >>>> a new hardware platform and wanting major new functionality to be en=
-abled.
-> >>>> The XML / QEMU config is a low level instantiation of a particular f=
-eature
-> >>>> set, optimized for a specific machine, rather than a high level desc=
-ription
-> >>>> of ideal "best" config independent of host machine.
-> >>>
-> >>> You still have to set the host command line and make sure that unpack=
- is
-> >>> available. Currently you also have to specify the IOMMU which we like=
- to
-> >>> drop as a requirement. Everything else is dependent on runtime
-> >>> information which tells us if we need to take a PV or non-PV branch.
-> >>> Having the unpack facility should be enough to use the unpack facilit=
-y.
-> >>>
-> >>> Keep in mind that we have no real concept of a special protected VM to
-> >>> begin with. If the VM never boots into a protected kernel it will nev=
-er
-> >>> be protected. On a reboot it drops from protected into unprotected mo=
-de
-> >>> to execute the bios and boot loader and then may or may not move back
-> >>> into a protected state.
-> >>
-> >> My worry isn't actually how painful adding all the iommu glue is, but
-> >> what happens when users forget; especially if they forget for one
-> >> device.
-> >>
-> >> I could appreciate having a machine option to cause iommu to then get
-> >> turned on with all other devices; but I think also we could do with
-> >> something that failed with a nice error if an iommu flag was missing.
-> >> For SEV this could be done pretty early, but for power/s390 I guess
-> >> you'd have to do this when someone tried to enable secure mode, but
-> >> I'm not sure you can tell.
-> >=20
-> > What is the cost / downside of turning on the iommu option for virtio
-> > devices ? Is it something that is reasonable for a mgmt app todo
-> > unconditionally, regardless of whether memory encryption is in use,
-> > or will that have a negative impact on things ?
->=20
-> speed, memory usage and compatibility problems.
-> There might also be a problem with s390 having to use <=3D2GB iommu areas
-> in the guest, I need to check with Halil if this is still true.
-
-It is partially true. The coherent_dma_mask is 31 bit and the dma_mask
-is 64. That means if iommu=3Don but !PV the coherent stuff will use <=3D 2GB
-(that stuff allocated by virtio core, like virtqueues, CCWs, etc.) but
-there will be no bounce buffering. We don't even initialize swiotlb if
-!PV.
-
-I agree with Janosch, we want iommu=3D'on' only when really needed. I've
-tried to make that point several times.
-
-Regards,
-Halil
-
->=20
-> Also, if the default or specified IOMMU buffer size isn't big enough for
-> your IO workload the guest is gonna have a very bad time. I.e. if
-> somebody has an alternative implementation of bounce buffers we'd be
-> happy to take it :)
->=20
-> >=20
-> > Regards,
-> > Daniel
-> >=20
->=20
->=20
+On Wed, Jul 01, 2020 at 12:05:49PM +0100, Anthony PERARD wrote:
+> The ACPI spec state that "Accesses to PM1 control registers are
+> accessed through byte and word accesses." (In section 4.7.3.2.1 PM1
+> Control Registers of my old spec copy rev 4.0a).
+> 
+> With commit 5d971f9e6725 ("memory: Revert "memory: accept mismatching
+> sizes in memory_region_access_valid""), it wasn't possible anymore to
+> access the pm1_cnt register by reading a single byte, and that is use
+> by at least a Xen firmware called "hvmloader".
+> 
+> Also, take care of the PM1 Status Registers which also have "Accesses
+> to the PM1 status registers are done through byte or word accesses"
+> (In section 4.7.3.1.1 PM1 Status Registers).
+> 
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 
 
---Sig_/We5mDa4tzwsjBOZY1NGd6NI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Can't we set impl.min_access_size to convert byte accesses
+to word accesses?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJe/HqyAAoJEA0vhuyXGx0AZSYP/2lWCdWbDLKx2N/r+FgqRVGC
-LZcERHnBp+uOH39T8+P9KmIjkiJCHYdfFXBOME9gbeM/+3EGMxVwtQ1iUmrjZtug
-4b/a3DfTC2cot1o+thatRO9H/sq29jFLHH1+pF58YqnBsY6eucRu0OER+tl2Jew6
-u9gMqRiZ4Y5n7292GrLNOsv1/RNOAjswTSxIZl0WiFn3QccUa2P8OcPub5kFIvdO
-q9Es0wqTSJQ+VhwUVmGTviziNQ3AKViMeYhUYvP40xt8JEddLLPCsoNzC3BkWRxX
-IN9zLrKXtmqvbafFnQOiRxM3GHZJkFKzUyn/SDCSU5sWyvxzhDt9yRfnthP7qV2z
-msH6Fhb3DeCyygttT6gR87VXKPfQD9K+RF/C+JknKDvhR9UngO65RotxMgMB682p
-bgSBu/ZNQyjiWsMe182rQ2tNECPDMWiI4uH9Zy2G5uegbfgd47g0mlfCJKbuQ6pO
-Z3ESyl+x0mJPKeclkZ1nDiF6x2XQrQZYqy3RtYq3l1iJCPcZFIj9tbhrclb8doru
-lwAZexBTwrVdIwaqqxVJGSPKxnabivF8UMtxF0Tv+SIUhoeevyj3OrPn+Sj1Amuw
-tw7vO1qvQN87QoLXjelpF0lSVf4ruQif27jMgNOIJe6eLUVyuiu8QpjlfZFRTBki
-3ZgT5MkbrRJAz/COefpi
-=Cp3K
------END PGP SIGNATURE-----
-
---Sig_/We5mDa4tzwsjBOZY1NGd6NI--
+> ---
+>  hw/acpi/core.c | 46 +++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 37 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> index 45cbed49abdd..31974e2f91bf 100644
+> --- a/hw/acpi/core.c
+> +++ b/hw/acpi/core.c
+> @@ -394,9 +394,17 @@ uint16_t acpi_pm1_evt_get_sts(ACPIREGS *ar)
+>      return ar->pm1.evt.sts;
+>  }
+>  
+> -static void acpi_pm1_evt_write_sts(ACPIREGS *ar, uint16_t val)
+> +static void acpi_pm1_evt_write_sts(ACPIREGS *ar, hwaddr addr, uint16_t val,
+> +                                   unsigned width)
+>  {
+>      uint16_t pm1_sts = acpi_pm1_evt_get_sts(ar);
+> +    if (width == 1) {
+> +        if (addr == 0) {
+> +            val |= pm1_sts & 0xff00;
+> +        } else if (addr == 1) {
+> +            val = (val << BITS_PER_BYTE) | (pm1_sts & 0xff);
+> +        }
+> +    }
+>      if (pm1_sts & val & ACPI_BITMASK_TIMER_STATUS) {
+>          /* if TMRSTS is reset, then compute the new overflow time */
+>          acpi_pm_tmr_calc_overflow_time(ar);
+> @@ -404,8 +412,16 @@ static void acpi_pm1_evt_write_sts(ACPIREGS *ar, uint16_t val)
+>      ar->pm1.evt.sts &= ~val;
+>  }
+>  
+> -static void acpi_pm1_evt_write_en(ACPIREGS *ar, uint16_t val)
+> +static void acpi_pm1_evt_write_en(ACPIREGS *ar, hwaddr addr, uint16_t val,
+> +                                  unsigned width)
+>  {
+> +    if (width == 1) {
+> +        if (addr == 0) {
+> +            val |= ar->pm1.evt.en & 0xff00;
+> +        } else if (addr == 1) {
+> +            val = (val << BITS_PER_BYTE) | (ar->pm1.evt.en & 0xff);
+> +        }
+> +    }
+>      ar->pm1.evt.en = val;
+>      qemu_system_wakeup_enable(QEMU_WAKEUP_REASON_RTC,
+>                                val & ACPI_BITMASK_RT_CLOCK_ENABLE);
+> @@ -434,9 +450,11 @@ static uint64_t acpi_pm_evt_read(void *opaque, hwaddr addr, unsigned width)
+>      ACPIREGS *ar = opaque;
+>      switch (addr) {
+>      case 0:
+> -        return acpi_pm1_evt_get_sts(ar);
+> +    case 1:
+> +        return acpi_pm1_evt_get_sts(ar) >> (addr * BITS_PER_BYTE);
+>      case 2:
+> -        return ar->pm1.evt.en;
+> +    case 3:
+> +        return ar->pm1.evt.en >> ((addr - 2) * BITS_PER_BYTE);
+>      default:
+>          return 0;
+>      }
+> @@ -448,11 +466,13 @@ static void acpi_pm_evt_write(void *opaque, hwaddr addr, uint64_t val,
+>      ACPIREGS *ar = opaque;
+>      switch (addr) {
+>      case 0:
+> -        acpi_pm1_evt_write_sts(ar, val);
+> +    case 1:
+> +        acpi_pm1_evt_write_sts(ar, addr, val, width);
+>          ar->pm1.evt.update_sci(ar);
+>          break;
+>      case 2:
+> -        acpi_pm1_evt_write_en(ar, val);
+> +    case 3:
+> +        acpi_pm1_evt_write_en(ar, addr - 2, val, width);
+>          ar->pm1.evt.update_sci(ar);
+>          break;
+>      }
+> @@ -461,7 +481,7 @@ static void acpi_pm_evt_write(void *opaque, hwaddr addr, uint64_t val,
+>  static const MemoryRegionOps acpi_pm_evt_ops = {
+>      .read = acpi_pm_evt_read,
+>      .write = acpi_pm_evt_write,
+> -    .valid.min_access_size = 2,
+> +    .valid.min_access_size = 1,
+>      .valid.max_access_size = 2,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>  };
+> @@ -590,19 +610,27 @@ void acpi_pm1_cnt_update(ACPIREGS *ar,
+>  static uint64_t acpi_pm_cnt_read(void *opaque, hwaddr addr, unsigned width)
+>  {
+>      ACPIREGS *ar = opaque;
+> -    return ar->pm1.cnt.cnt;
+> +    return ar->pm1.cnt.cnt >> (addr * BITS_PER_BYTE);
+>  }
+>  
+>  static void acpi_pm_cnt_write(void *opaque, hwaddr addr, uint64_t val,
+>                                unsigned width)
+>  {
+> +    ACPIREGS *ar = opaque;
+> +    if (width == 1) {
+> +        if (addr == 0) {
+> +            val |= ar->pm1.cnt.cnt & 0xff00;
+> +        } else if (addr == 1) {
+> +            val = (val << BITS_PER_BYTE) | (ar->pm1.cnt.cnt & 0xff);
+> +        }
+> +    }
+>      acpi_pm1_cnt_write(opaque, val);
+>  }
+>  
+>  static const MemoryRegionOps acpi_pm_cnt_ops = {
+>      .read = acpi_pm_cnt_read,
+>      .write = acpi_pm_cnt_write,
+> -    .valid.min_access_size = 2,
+> +    .valid.min_access_size = 1,
+>      .valid.max_access_size = 2,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>  };
+> -- 
+> Anthony PERARD
 
 
