@@ -2,69 +2,86 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B06C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 20:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBB9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 20:36:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE09120780
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 20:20:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE09120780
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8D69320760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 20:36:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R1KN1LQ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D69320760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqjDF-0006rX-5I
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 16:20:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53892)
+	id 1jqjSn-0004NR-Og
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 16:36:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqj99-0002DD-KZ
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 16:15:55 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:43966
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqj97-0006pM-1Z
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 16:15:55 -0400
-Received: from host86-182-221-233.range86-182.btcentralplus.com
- ([86.182.221.233] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jqj98-0005jj-Ld; Wed, 01 Jul 2020 21:15:58 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org,
-	laurent@vivier.eu
-Date: Wed,  1 Jul 2020 21:15:31 +0100
-Message-Id: <20200701201531.13828-3-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200701201531.13828-1-mark.cave-ayland@ilande.co.uk>
-References: <20200701201531.13828-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jqjRw-0003fY-6U
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 16:35:20 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37972)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jqjRt-0002OW-Jh
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 16:35:19 -0400
+Received: by mail-oi1-x241.google.com with SMTP id r8so21748518oij.5
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 13:35:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=y3cGLXL+oLjgwDn0qa1trwMqOTe9T9HabjmNfVDkYxY=;
+ b=R1KN1LQ7K81NccCyQSFwnG8nKNgiWST4BrkCE21nmqr3exQ9dB+k7dqS06k0k+FBld
+ BeOR6s6YdGfGKWIZqMpCWbA+sUewaFpaFbciZ7+ssWs/jiOxTw76vt5BOlmOWZqkJ67W
+ ecJyPTB4Gj2fnTuXazIMyVHQ6nepFpdWFwsScrN2e/0LptGAelTJH8k8H9MghZ+dMxgF
+ g7OYmsa63mfH66l1KbpLXnhj7/1UzI4YQ59KHp0F2vHhB74GaVDSt9yIdVODTSvwv5wx
+ GiGFcAViGfwd2qD1WNTJNBz8b7msJeLY7KnADYzbHkNPEYtS4T6t68PBzknoUUSM/R3E
+ fa2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=y3cGLXL+oLjgwDn0qa1trwMqOTe9T9HabjmNfVDkYxY=;
+ b=PqsNJpOMygAIs+o8iYeXorjXI/5otFYkpLyXYdhGdO2JWPq+NYpebX4uFkf0u6jipU
+ sYrdHGFUuG+Xv9WvSpDP8w/I8YjK/emcsfX7z+FLZ00+P7F2bGKHUWFmpVDzt9wFKn6W
+ qujoEf2t5L4zNZXesTfYNhu0K5kjolKKAo3sUJVC5A830OUaYijU/wTCUYXafoXGejTt
+ 23XRqmW0UXD/yocqpHP1qY6uvmlXlzGe+oQiYFUV/a2olQI7nNUZWuxI3hQ9IowUKKg5
+ BEhwbPeXxLk/M7YxjJlKnHcRJ2s5Yk8Lsn8HDM/18ETOeHiY29Z2SvqKoc443pnNRCq3
+ zA0A==
+X-Gm-Message-State: AOAM5332gzDWKb+jUHaYI7TTm8CqZyv36QuSN6eDCZuzJz3/ArE5IamI
+ dgT3+s0iW6k0kIgenRkBmCPI0oyWF+RpdeBhnZCrng==
+X-Google-Smtp-Source: ABdhPJzcyRWl2qed5Id9yUGEsyjF66UoDTyXkb48ygI1grlFQoidIroGQtKrx08maSf/PJvOlnr3QKjEZ6emcDSC0LI=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr15392872oix.48.1593635715971; 
+ Wed, 01 Jul 2020 13:35:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.182.221.233
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v4 2/2] target/m68k: consolidate physical translation offset
- into get_physical_address()
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+References: <20200701182100.26930-1-philmd@redhat.com>
+In-Reply-To: <20200701182100.26930-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 1 Jul 2020 21:35:04 +0100
+Message-ID: <CAFEAcA8ZKEVySwDAQ+x9xA9bosOs5q20CZLZjBvkXj_d6ZVBuA@mail.gmail.com>
+Subject: Re: [RFC PATCH] cpus: Initialize current_cpu with the first vCPU
+ created
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,77 +95,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Bug 1878645 <1878645@bugs.launchpad.net>,
+ QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since all callers to get_physical_address() now apply the same page offset to
-the translation result, move the logic into get_physical_address() itself to
-avoid duplication.
+On Wed, 1 Jul 2020 at 19:21, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> We can run I/O access with the 'i' or 'o' HMP commands in the
+> monitor. These commands are expected to run on a vCPU. The
+> monitor is not a vCPU thread. To avoid crashing, initialize
+> the 'current_cpu' variable with the first vCPU created. The
+> command executed on the monitor will end using it.
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/m68k/helper.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+>
+> RFC because I believe the correct fix is to NOT use current_cpu
+> out of cpus.c, at least use qemu_get_cpu(0) to get the first vCPU.
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 631eab7774..3ff5765795 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -643,7 +643,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                 /* Transparent Translation Register bit */
-                 env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
-             }
--            *physical = address & TARGET_PAGE_MASK;
-+            *physical = address;
-             *page_size = TARGET_PAGE_SIZE;
-             return 0;
-         }
-@@ -771,7 +771,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     }
-     *page_size = 1 << page_bits;
-     page_mask = ~(*page_size - 1);
--    *physical = next & page_mask;
-+    *physical = (next & page_mask) + (address & (*page_size - 1));
- 
-     if (access_type & ACCESS_PTEST) {
-         env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-@@ -826,8 +826,6 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         return -1;
-     }
- 
--    addr &= TARGET_PAGE_MASK;
--    phys_addr += addr & (page_size - 1);
-     return phys_addr;
- }
- 
-@@ -891,10 +889,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     ret = get_physical_address(&cpu->env, &physical, &prot,
-                                address, access_type, &page_size);
-     if (likely(ret == 0)) {
--        address &= TARGET_PAGE_MASK;
--        physical += address & (page_size - 1);
--        tlb_set_page(cs, address, physical,
--                     prot, mmu_idx, TARGET_PAGE_SIZE);
-+        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
-         return true;
-     }
- 
-@@ -1383,9 +1379,8 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
-     ret = get_physical_address(env, &physical, &prot, addr,
-                                access_type, &page_size);
-     if (ret == 0) {
--        addr &= TARGET_PAGE_MASK;
--        physical += addr & (page_size - 1);
--        tlb_set_page(env_cpu(env), addr, physical,
-+        tlb_set_page(env_cpu(env), addr & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK,
-                      prot, access_type & ACCESS_SUPER ?
-                      MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
-     }
--- 
-2.20.1
+Yes, I agree -- I don't think this is the correct fix.
+current_cpu is documented as "only valid inside cpu_exec()",
+ie if you're actually on a vcpu thread you can use it, but if
+you're not on a CPU thread, like the monitor, you need to
+say which vCPU you want to affect. For the monitor, that
+would be the current "default cpu" as set by the "cpu"
+command (cf monitor_set_cpu()). The bug here will be that
+somewhere along the line we are probably missing plumbing
+sufficient to pass down "which CPU do we want".
 
+https://bugs.launchpad.net/qemu/+bug/1602247 is a bug of
+a similar nature -- if the gdbstub does a memory access
+we know which CPU we're trying to do that memory access as,
+but it doesn't get plumbed through and so in the Arm GIC
+register read/write function that looks at current_cpu
+we get a segfault.
+
+One way to fix this would be to do something akin to how
+real hardware works -- encode into the MemTxAttrs an
+indication of what the transaction master was (eg the
+CPU number for CPUs); then the handful of devices that
+care about which CPU was doing the transaction can use
+that, rather than directly looking at current_cpu, and
+when gdbstub or monitor perform an access that should
+act like it's from a particular CPU they can indicate
+that by supplying appropriate transaction attributes.
+That would potentially be quite a bit of work though
+(but I think it would be a neat design if we want to
+try to fix this kind of "segfault if the user prods
+a device via the monitor" bug).
+
++    if (!current_cpu) {
++        current_cpu =3D cpu;
++    }
+
+Some more specific issues with this -- current_cpu is
+a thread-local variable, so this will set that for
+whatever thread happens to make this call, which
+might or might not be the one that ends up handling
+the monitor command. Also some code assumes that
+current_cpu is non-NULL only if this is a vCPU thread,
+eg sigbus_handler().
+
+thanks
+-- PMM
 
