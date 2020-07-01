@@ -6,62 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1801C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B322DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DC342078A
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E96420722
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 09:29:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KACLre/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC342078A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5Rp9JO7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E96420722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqZ3B-0004hm-Qy
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:29:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53636)
+	id 1jqZ3T-0005MH-OX
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 05:29:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2R-0003W1-Tr
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24383
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2j-00046D-27
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44104
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2P-0005Mz-UW
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:19 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jqZ2h-0005NY-D6
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 05:28:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593595697;
+ s=mimecast20190719; t=1593595714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Aqbn5cjLxcucAVNC8M/qELLxXLnelvNb6uqjwQ+9wms=;
- b=KACLre/C56ILdgZAOp9+mqPfc6EzTBbgQZkIVdFYT14Hh+KG0R1+nRKS2rNczTohQF4Q4s
- tzNwQa5B5F4KMeW9qbLz7fJiP8TO3+eLlF4Q6Gr5uLPJyipGs2u6GR3+EFD/8o5zz7n6Yw
- CSeE+se0EorfK+OlHpl9XDmLyHfG9iM=
+ bh=rF9r7pf631yT4kewvrdEgptEGMLKP3lMFICG6ypU3Uk=;
+ b=e5Rp9JO7iIUdsIxhXXyDQOfkekpmSwr6GPsHivV+CGg54rA3BczygEWez0WJGSK3sg70rN
+ ggpeMkIO1y+nD8Ej4/d41ruPy0OsGg9Qu7k/apuGJ+Ka5c5nrDUBpgHly0jOU3/msibXxH
+ ik3j17LvJtScjEbb5OkKAATCE30bJyY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-JdXL1ilXOMC_E2s0X77jDw-1; Wed, 01 Jul 2020 05:28:12 -0400
-X-MC-Unique: JdXL1ilXOMC_E2s0X77jDw-1
+ us-mta-135-AlFOrmEqN6mAgsiAQX3YQQ-1; Wed, 01 Jul 2020 05:28:33 -0400
+X-MC-Unique: AlFOrmEqN6mAgsiAQX3YQQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 814E2800D5C;
- Wed,  1 Jul 2020 09:28:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 934AA87950B;
+ Wed,  1 Jul 2020 09:28:30 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-12-19.pek2.redhat.com [10.72.12.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9ABC7100164D;
- Wed,  1 Jul 2020 09:27:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F082A100164D;
+ Wed,  1 Jul 2020 09:28:12 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
  jasowang@redhat.com
-Subject: [PATCH v3 05/13] vhost: check the existence of
- vhost_set_iotlb_callback
-Date: Wed,  1 Jul 2020 17:24:41 +0800
-Message-Id: <20200701092449.17451-6-lulu@redhat.com>
+Subject: [PATCH v3 06/13] vhost: introduce new VhostOps vhost_dev_start
+Date: Wed,  1 Jul 2020 17:24:42 +0800
+Message-Id: <20200701092449.17451-7-lulu@redhat.com>
 In-Reply-To: <20200701092449.17451-1-lulu@redhat.com>
 References: <20200701092449.17451-1-lulu@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +71,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,44 +106,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
+This patch introduces new VhostOps vhost_dev_start callback which allows the
+vhost_net set the start/stop status to backend
 
-Add the check of vhost_set_iotlb_callback
-before calling
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- hw/virtio/vhost.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ include/hw/virtio/vhost-backend.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 5fd25fe520..10304b583e 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1686,8 +1686,9 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-         }
-     }
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 6f6670783f..b80f344cd6 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -112,6 +112,7 @@ typedef int (*vhost_get_inflight_fd_op)(struct vhost_dev *dev,
+ typedef int (*vhost_set_inflight_fd_op)(struct vhost_dev *dev,
+                                         struct vhost_inflight *inflight);
  
--    if (vhost_dev_has_iommu(hdev)) {
--        hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
-+    if (vhost_dev_has_iommu(hdev) &&
-+        hdev->vhost_ops->vhost_set_iotlb_callback) {
-+            hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
++typedef int (*vhost_dev_start_op)(struct vhost_dev *dev, bool started);
+ typedef struct VhostOps {
+     VhostBackendType backend_type;
+     vhost_backend_init vhost_backend_init;
+@@ -152,6 +153,7 @@ typedef struct VhostOps {
+     vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
+     vhost_get_inflight_fd_op vhost_get_inflight_fd;
+     vhost_set_inflight_fd_op vhost_set_inflight_fd;
++    vhost_dev_start_op vhost_dev_start;
+ } VhostOps;
  
-         /* Update used ring information for IOTLB to work correctly,
-          * vhost-kernel code requires for this.*/
-@@ -1730,7 +1731,9 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
-     }
- 
-     if (vhost_dev_has_iommu(hdev)) {
--        hdev->vhost_ops->vhost_set_iotlb_callback(hdev, false);
-+        if (hdev->vhost_ops->vhost_set_iotlb_callback) {
-+            hdev->vhost_ops->vhost_set_iotlb_callback(hdev, false);
-+        }
-         memory_listener_unregister(&hdev->iommu_listener);
-     }
-     vhost_log_put(hdev, true);
+ extern const VhostOps user_ops;
 -- 
 2.21.1
 
