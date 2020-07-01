@@ -2,97 +2,107 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21FFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BDDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:24:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EF9F20760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:19:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86FD3206CB
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:24:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K6y7RDSN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF9F20760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bN77LSOt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86FD3206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqbi8-0001SB-Uo
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:19:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33118)
+	id 1jqbmT-0003KD-Rl
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:24:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbhV-0000wK-Ro
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:18:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34081
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqbli-0002XT-Af
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:23:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54550
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbhU-0006mS-9p
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:18:53 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqblg-0007WZ-MS
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:23:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593605931;
+ s=mimecast20190719; t=1593606191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ot8hJvCBs4XWvu8ck7o5DULM70/1ucJ1bc/r+61/3wA=;
- b=K6y7RDSN7Y853rv2r5pT0oVj+uhQnBPKsXBhQH6v6jnVERGkgMqQfAzL5t+rOS9Fz0jl6J
- CTrUXAwHXKDjLOOTFSer++KXnUGPzDoyDjYhUXFE0ClqAWRZwkH2me3bT/r2F9fYXwV1Ma
- nR7EhnYY7sEYNDrtkY/RJWxe+v6Wo/E=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-BJJJcnSiOJKlmovL-yxhng-1; Wed, 01 Jul 2020 08:18:48 -0400
-X-MC-Unique: BJJJcnSiOJKlmovL-yxhng-1
-Received: by mail-wr1-f71.google.com with SMTP id c6so1172593wru.7
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:18:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=KJ3FZnF1a+diUKq4h7d0EBrneFllvQ91isDeMSD+yJM=;
- b=lW8x0yPHHQ3oC/Rq2UOvzZp0XHePTDI2oXx2btQOt7ikIzXLP+tMOcYh962v2Aai+Q
- 1z8QUhTvX+5sGiFo/KKo4l5MQVYN9yE62wVj8Q9ov2v9g1RarsWeHVZvFBpyC/hxGcxV
- PWZLQ67dzDO1EPUxWuyqdJ6rzhGulLXMRWxBUEeAoGoacwtmvTtLSGhVcrP05xa3f7HA
- fUln1cKTRhKfsXvPavRp64aTsniRd7T/WbCgQ17dgl9txrayITvDEjI0Hb9VvtYh65ve
- 8Rk2k/gga/BbFRWWHVNuBMHDbYeyir34Biehvbc3mZaUk6+wIHd57khBdwwGc0YdsQL/
- hnqA==
-X-Gm-Message-State: AOAM532kT0RqIX5d/xoIiC2Z7J771XlnfEVHX3ebt+tDiZo7kCiiXmfR
- U2Y081TfyZNjAS1CTZNzw1Y20TpLDruWFiCSRICCJ5rb56kLiCPQ+LnN3qnfPEZ7sHa3yJuKkYN
- G8IEA2qr/jC5AA4k=
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr26485204wmq.18.1593605926967; 
- Wed, 01 Jul 2020 05:18:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxOuDfNmD/YeLMm0ZwBtwjdBeZEKppMst3K4dKKHwbE1lYUNo2O3l5/xs/LUOGsb8a419fubQ==
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr26485196wmq.18.1593605926792; 
- Wed, 01 Jul 2020 05:18:46 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- b10sm6586346wmj.30.2020.07.01.05.18.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 05:18:46 -0700 (PDT)
-Date: Wed, 1 Jul 2020 08:18:43 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH 1/2] pci: pass along the return value of dma_memory_rw
-Message-ID: <20200701081830-mutt-send-email-mst@kernel.org>
-References: <20200629202053.1223342-1-its@irrelevant.dk>
- <20200629202053.1223342-2-its@irrelevant.dk>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=rFFUO0qYrtd0k+l9LuKcTpyG02Ct2MnDwk6M5iQZbcI=;
+ b=bN77LSOt78kQ1/XHmoNpYxkTB3rxGGlkdXr2HSt4fPhHyoS2NTpsKzZA1zCIQV2bN4g14z
+ uOLEx5OfRFs1tGetZdbt1Kd4ibeBuYDFwBCBpM/X23ThrWW6eop6PfwSEV3SquJ25eW/mI
+ IjYk6OiEc8I9OFE5sUGLmhZ2XG8YQkI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-iY7eYiQ-NjmEs1rO35SqqA-1; Wed, 01 Jul 2020 08:23:09 -0400
+X-MC-Unique: iY7eYiQ-NjmEs1rO35SqqA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 285B11005513;
+ Wed,  1 Jul 2020 12:23:08 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-108.ams2.redhat.com
+ [10.36.113.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 56D2719C4F;
+ Wed,  1 Jul 2020 12:23:05 +0000 (UTC)
+Subject: Re: [PATCH v9 11/34] qcow2: Add offset_into_subcluster() and
+ size_to_subclusters()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1593342067.git.berto@igalia.com>
+ <980aaffef450241ffe683e387e9c3a0cf516a7ba.1593342067.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3789da4b-03d2-5733-9876-1f7be0ade6f6@redhat.com>
+Date: Wed, 1 Jul 2020 14:23:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200629202053.1223342-2-its@irrelevant.dk>
+In-Reply-To: <980aaffef450241ffe683e387e9c3a0cf516a7ba.1593342067.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="TCU1aunbGZIALqItYv92d7ejcwkmAOWWA"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -113,50 +123,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 10:20:52PM +0200, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
-> 
-> Some devices might want to know the return value of dma_memory_rw, so
-> pass it along instead of ignoring it.
-> 
-> There are no existing users of the return value, so this patch should be
-> safe.
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Keith Busch <kbusch@kernel.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TCU1aunbGZIALqItYv92d7ejcwkmAOWWA
+Content-Type: multipart/mixed; boundary="kUJTMJ00w0ueVnPJtuuhd5GkejeoblgU4"
 
-Feel free to merge with patch 2/2.
+--kUJTMJ00w0ueVnPJtuuhd5GkejeoblgU4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
+On 28.06.20 13:02, Alberto Garcia wrote:
+> Like offset_into_cluster() and size_to_clusters(), but for
+> subclusters.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  include/hw/pci/pci.h | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index a4e9c3341615..2347dc36bfb5 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -786,8 +786,7 @@ static inline AddressSpace *pci_get_address_space(PCIDevice *dev)
->  static inline int pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
->                               void *buf, dma_addr_t len, DMADirection dir)
->  {
-> -    dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
-> -    return 0;
-> +    return dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
->  }
->  
->  static inline int pci_dma_read(PCIDevice *dev, dma_addr_t addr,
-> -- 
-> 2.27.0
+>  block/qcow2.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--kUJTMJ00w0ueVnPJtuuhd5GkejeoblgU4--
+
+--TCU1aunbGZIALqItYv92d7ejcwkmAOWWA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl78gCcACgkQ9AfbAGHV
+z0CpTAgAgEbnW5V/5DNbJHj+L2Z/8Qwb7Elu7b0OgT5Z6QDeRTffvN6VugKqDJ5U
+o0dPE8ELyHINCEM4lhMXyqu9t+3Olznql6+21FIwREZpqmngWgmilp1pRPJHO3qr
+cCmMvW6bnXNR/eMsA2hlwOdV3A1qw+vbgxhwMk9pyf+wJIje4mDzWAVWZvvcVRi8
+5cQoaJdQ5aJ1wjcflXKBhRu6ew4y5qk/AvKFFmiop0SQbt+gR/ijvTzsiWAgbskE
+2nHi2NgLUdpOAvKNjdb7Znid+7ECgNA3T6Xy30a+p649NsdcnJ6PULMouF3oWeza
+o7WbNF7SCPPp0jnJIc/TACdHQcFPtA==
+=lVDs
+-----END PGP SIGNATURE-----
+
+--TCU1aunbGZIALqItYv92d7ejcwkmAOWWA--
 
 
