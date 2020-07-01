@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC913C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAD4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0E0C20771
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:32:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E0C20771
+	by mail.kernel.org (Postfix) with ESMTPS id CA07320771
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 00:32:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA07320771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqQfe-0001HM-SB
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 20:32:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35014)
+	id 1jqQfk-0001Hv-46
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jun 2020 20:32:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqQeQ-0000EK-9W
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 20:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45498)
+ id 1jqQeR-0000Fl-JH
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 20:31:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45482)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqQeM-0005nE-TX
- for qemu-devel@nongnu.org; Tue, 30 Jun 2020 20:30:58 -0400
+ id 1jqQeO-0005nD-0Y
+ for qemu-devel@nongnu.org; Tue, 30 Jun 2020 20:30:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jqQeI-0003QS-35
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 00:30:50 +0000
+ id 1jqQeH-0003Q9-PL
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 00:30:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 164B92E810D
- for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 00:30:50 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 818A42E811B
+ for <qemu-devel@nongnu.org>; Wed,  1 Jul 2020 00:30:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Jul 2020 00:22:44 -0000
+Date: Wed, 01 Jul 2020 00:21:27 -0000
 From: costinel <1869006@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: alex-l-williamson costinel dgilbert-h hrw pmaydell
 X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
 X-Launchpad-Bug-Modifier: costinel (costinel)
 References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Message-Id: <159356296459.2919.1158163796925681602.malone@wampee.canonical.com>
+Message-Id: <159356288768.1452.15206670327010504351.malone@chaenomeles.canonical.com>
 Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
  guest memory but fails on 4GB (vfio_dma_map invalid arg)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7a2365460a2a50b72555dae0bfa3015503ba8775
+X-Launchpad-Hash: 02aec4f07a965c28fa1db33a7ef65e21d3e755d4
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 20:30:50
@@ -90,8 +90,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-except that in my case the vm does not boot at all no matter how less
-memory I allocate to it.
+I am experiencing the same behaviour for x86_64 guest on x86_64 host to
+which I'm attempting to efi boot (not hotplug) with a pcie gpu
+passthrough
+
+This discussion (https://www.spinics.net/lists/iommu/msg40613.html)
+suggests a change in drivers/iommu/intel-iommu.c but it appears that in
+the kernel I tried, the change it is already implemented (linux-
+image-5.4.0-39-generic)
+
+hardware is a hp microserver gen8 with conrep physical slot excluded in
+bios (https://www.jimmdenton.com/proliant-intel-dpdk/) and the kernel is
+rebuild with rmrr patch (https://forum.proxmox.com/threads/compile-
+proxmox-ve-with-patched-intel-iommu-driver-to-remove-rmrr-check.36374/)
+
+also an user complains that on the same hardware it used to work with
+kernel 5.3 + rmrr patch (https://forum.level1techs.com/t/looking-for-
+vfio-wizards-to-troubleshoot-error-vfio-dma-map-22/153539) but it
+stopped working on the 5.4 kernel.
+
+is this the same issue I'm observing? my qemu complains with the similar
+message:
+
+ -device vfio-pci,host=3D07:00.0,id=3Dhostdev0,bus=3Dpci.4,addr=3D0x0:
+vfio_dma_map(0x556eb57939f0, 0xc0000, 0x3ff40000, 0x7f6fc7ec0000) =3D -22
+(Invalid argument)
+
+/sys/kernel/iommu_groups/1/reserved_regions shows:
+
+0x00000000000e8000  0x00000000000e8fff direct
+0x00000000000f4000 0x00000000000f4fff direct
+0x00000000d5f7e000 0x00000000d5f94fff direct
+0x00000000fee00000 0x00000000feefffff msi
 
 -- =
 
