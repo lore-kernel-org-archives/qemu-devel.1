@@ -2,63 +2,99 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD704C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE1BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7458206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:57:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7458206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D671206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 15:57:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rd/btaiw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D671206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqf7D-0002Ap-03
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:57:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33602)
+	id 1jqf7O-0002RO-D0
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 11:57:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqf0M-000841-EZ; Wed, 01 Jul 2020 11:50:34 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44730)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqf0E-0001KH-KD; Wed, 01 Jul 2020 11:50:34 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608247|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.577342-0.00014803-0.42251;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03303; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvvN26k_1593618617; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvvN26k_1593618617)
- by smtp.aliyun-inc.com(10.147.42.241);
- Wed, 01 Jul 2020 23:50:18 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 12/61] target/riscv: vector integer add-with-carry /
- subtract-with-borrow instructions
-Date: Wed,  1 Jul 2020 23:25:00 +0800
-Message-Id: <20200701152549.1218-13-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqf6N-00012w-Rb
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:56:47 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41145)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqf6M-0003Nb-9Y
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 11:56:47 -0400
+Received: by mail-ed1-x543.google.com with SMTP id e22so20376313edq.8
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 08:56:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=V5ulsk4xTWYO2ZTxAP7/b0Gc5JzWT50htbiSo62wLjg=;
+ b=Rd/btaiwa1Mt337yPcYWmirxAOZn0SOXv7uqk0ehyZqlyF937wb0KXku1kQaos1F0S
+ nDVBC4usktrT5II0Ruw3RLTD6yZkPOMnhmz7m+RoYfWi1QFZapZySt8Lc/7zLmup/Shw
+ sZCNPjXvHoe6yha9R9F2ycKF+NYvn3ireEK0cI4piLbYdhnjQocrd6AxUgg0T3v0GvMn
+ J3VVSo2fpK3SFo5qnQDdppZvdimO2L5IsKdSVZux3RdLQ/fnQYZrxeTrkgo3drApwmeR
+ rW1Nnvwx2gSbbFMXeT1Rfq6yBRO/KU9Rzh5H4owx2dvYl5JWh6rdrtLjcadX8iRDhTlo
+ VOZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=V5ulsk4xTWYO2ZTxAP7/b0Gc5JzWT50htbiSo62wLjg=;
+ b=r1o9CjlleP6PvUZKmdJJuuf6ffYajwjWnfokAK7KtTiHp4YsGh1N/dKg/hnU1+Dl9w
+ BZQ2y0CSrjnwkJAyiL2nmuEWwc/aDZNsIOyZVCMjMw8kyM/4v3vIn9n8ib40fuW7jod4
+ HvJ2W6rnhnT7rH6DF7PEKm8Eve2bAmlTwXGxw88vG0tKcU+vpNbH6E3B77KH4cUbtV3W
+ 6X2GWeRPjOwhoyCD/fYJT7cZCBnW5ZiweTvDPJD5Zn+lqy3P9cx3LgQCbW0y3b7ED7pR
+ PxoeQyefT/gslHofoZh810oNhmVTvafAsMJwXVS7EmplH/wb902QPPT4CqlFyHSyMkB4
+ mq7A==
+X-Gm-Message-State: AOAM530eBxa53dWncAyJAPXsPpHaKhc1et/jtEAuUDbE+pm91/gBF18/
+ a5PThXirekiZw26QGF1N2nw=
+X-Google-Smtp-Source: ABdhPJwuihzXtT53bM+9x+Ix52It38pcYnBVAHZN249FDMLztYhBmvAPJyhuxgEQeIIT0YracGcMiA==
+X-Received: by 2002:aa7:c504:: with SMTP id o4mr29210073edq.311.1593619004793; 
+ Wed, 01 Jul 2020 08:56:44 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id oz7sm4809777ejb.96.2020.07.01.08.56.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 08:56:44 -0700 (PDT)
+Subject: Re: [PATCH v4 28/40] tests/acceptance: skip multicore mips_malta
+ tests on GitLab
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200701135652.1366-1-alex.bennee@linaro.org>
+ <20200701135652.1366-29-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org>
+Date: Wed, 1 Jul 2020 17:56:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200701135652.1366-29-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,367 +107,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ berrange@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
+ Cleber Rosa <crosa@redhat.com>, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  33 ++++++
- target/riscv/insn32.decode              |  11 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 113 +++++++++++++++++++
- target/riscv/vector_helper.c            | 137 ++++++++++++++++++++++++
- 4 files changed, 294 insertions(+)
+On 7/1/20 3:56 PM, Alex Bennée wrote:
+> For some reason these tests fail all the time on GitLab. I can
+> re-create the hang around 3% of the time locally but it doesn't seem
+> to be MTTCG related. For now skipIf on GITLAB_CI.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> ---
+>  tests/acceptance/machine_mips_malta.py | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/machine_mips_malta.py
+> index 92b4f28a112..7c9a4ee4d2d 100644
+> --- a/tests/acceptance/machine_mips_malta.py
+> +++ b/tests/acceptance/machine_mips_malta.py
+> @@ -15,6 +15,7 @@ from avocado import skipUnless
+>  from avocado_qemu import Test
+>  from avocado_qemu import wait_for_console_pattern
+>  from avocado.utils import archive
+> +from avocado import skipIf
+>  
+>  
+>  NUMPY_AVAILABLE = True
+> @@ -99,6 +100,7 @@ class MaltaMachineFramebuffer(Test):
+>          """
+>          self.do_test_i6400_framebuffer_logo(1)
+>  
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index da6acc067b..67a2e64c4a 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -349,3 +349,36 @@ DEF_HELPER_6(vwadd_wx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 6ec166d0ed..be63e900c6 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -70,6 +70,7 @@
- @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
- @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
- @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
-+@r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
- @r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
- @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
- 
-@@ -302,6 +303,16 @@ vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
- vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
- vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
- vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
-+vadc_vvm        010000 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vadc_vxm        010000 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vadc_vim        010000 1 ..... ..... 011 ..... 1010111 @r_vm_1
-+vmadc_vvm       010001 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vmadc_vxm       010001 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vmadc_vim       010001 1 ..... ..... 011 ..... 1010111 @r_vm_1
-+vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r_vm_1
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 850df9df66..98bd5bcb79 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1249,3 +1249,116 @@ GEN_OPIWX_WIDEN_TRANS(vwaddu_wx)
- GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
- GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
- GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
-+
-+/* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
-+/* OPIVV without GVEC IR */
-+#define GEN_OPIVV_TRANS(NAME, CHECK)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (CHECK(s, a)) {                                             \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[4] = {            \
-+            gen_helper_##NAME##_b, gen_helper_##NAME##_h,          \
-+            gen_helper_##NAME##_w, gen_helper_##NAME##_d,          \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew]);        \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+/*
-+ * For vadc and vsbc, an illegal instruction exception is raised if the
-+ * destination vector register is v0 and LMUL > 1. (Section 12.3)
-+ */
-+static bool opivv_vadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            ((a->rd != 0) || (s->lmul == 0)));
-+}
-+
-+GEN_OPIVV_TRANS(vadc_vvm, opivv_vadc_check)
-+GEN_OPIVV_TRANS(vsbc_vvm, opivv_vadc_check)
-+
-+/*
-+ * For vmadc and vmsbc, an illegal instruction exception is raised if the
-+ * destination vector register overlaps a source vector register group.
-+ */
-+static bool opivv_vmadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
-+}
-+
-+GEN_OPIVV_TRANS(vmadc_vvm, opivv_vmadc_check)
-+GEN_OPIVV_TRANS(vmsbc_vvm, opivv_vmadc_check)
-+
-+static bool opivx_vadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            ((a->rd != 0) || (s->lmul == 0)));
-+}
-+
-+/* OPIVX without GVEC IR */
-+#define GEN_OPIVX_TRANS(NAME, CHECK)                                     \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (CHECK(s, a)) {                                                   \
-+        static gen_helper_opivx * const fns[4] = {                       \
-+            gen_helper_##NAME##_b, gen_helper_##NAME##_h,                \
-+            gen_helper_##NAME##_w, gen_helper_##NAME##_d,                \
-+        };                                                               \
-+                                                                         \
-+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);\
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVX_TRANS(vadc_vxm, opivx_vadc_check)
-+GEN_OPIVX_TRANS(vsbc_vxm, opivx_vadc_check)
-+
-+static bool opivx_vmadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
-+}
-+
-+GEN_OPIVX_TRANS(vmadc_vxm, opivx_vmadc_check)
-+GEN_OPIVX_TRANS(vmsbc_vxm, opivx_vmadc_check)
-+
-+/* OPIVI without GVEC IR */
-+#define GEN_OPIVI_TRANS(NAME, ZX, OPIVX, CHECK)                          \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (CHECK(s, a)) {                                                   \
-+        static gen_helper_opivx * const fns[4] = {                       \
-+            gen_helper_##OPIVX##_b, gen_helper_##OPIVX##_h,              \
-+            gen_helper_##OPIVX##_w, gen_helper_##OPIVX##_d,              \
-+        };                                                               \
-+        return opivi_trans(a->rd, a->rs1, a->rs2, a->vm,                 \
-+                           fns[s->sew], s, ZX);                          \
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVI_TRANS(vadc_vim, 0, vadc_vxm, opivx_vadc_check)
-+GEN_OPIVI_TRANS(vmadc_vim, 0, vmadc_vxm, opivx_vmadc_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 06435ed82a..e152641b4f 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -187,6 +187,14 @@ static void clearq(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-     vext_clear(cur, cnt, tot);
- }
- 
-+static inline void vext_set_elem_mask(void *v0, int mlen, int index,
-+        uint8_t value)
-+{
-+    int idx = (index * mlen) / 64;
-+    int pos = (index * mlen) % 64;
-+    uint64_t old = ((uint64_t *)v0)[idx];
-+    ((uint64_t *)v0)[idx] = deposit64(old, pos, mlen, value);
-+}
- 
- static inline int vext_elem_mask(void *v0, int mlen, int index)
- {
-@@ -1128,3 +1136,132 @@ GEN_VEXT_VX(vwadd_wx_w, 4, 8, clearq)
- GEN_VEXT_VX(vwsub_wx_b, 1, 2, clearh)
- GEN_VEXT_VX(vwsub_wx_h, 2, 4, clearl)
- GEN_VEXT_VX(vwsub_wx_w, 4, 8, clearq)
-+
-+/* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
-+#define DO_VADC(N, M, C) (N + M + C)
-+#define DO_VSBC(N, M, C) (N - M - C)
-+
-+#define GEN_VEXT_VADC_VVM(NAME, ETYPE, H, DO_OP, CLEAR_FN)    \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
-+                  CPURISCVState *env, uint32_t desc)          \
-+{                                                             \
-+    uint32_t mlen = vext_mlen(desc);                          \
-+    uint32_t vl = env->vl;                                    \
-+    uint32_t esz = sizeof(ETYPE);                             \
-+    uint32_t vlmax = vext_maxsz(desc) / esz;                  \
-+    uint32_t i;                                               \
-+                                                              \
-+    for (i = 0; i < vl; i++) {                                \
-+        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
-+                                                              \
-+        *((ETYPE *)vd + H(i)) = DO_OP(s2, s1, carry);         \
-+    }                                                         \
-+    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                  \
-+}
-+
-+GEN_VEXT_VADC_VVM(vadc_vvm_b, uint8_t,  H1, DO_VADC, clearb)
-+GEN_VEXT_VADC_VVM(vadc_vvm_h, uint16_t, H2, DO_VADC, clearh)
-+GEN_VEXT_VADC_VVM(vadc_vvm_w, uint32_t, H4, DO_VADC, clearl)
-+GEN_VEXT_VADC_VVM(vadc_vvm_d, uint64_t, H8, DO_VADC, clearq)
-+
-+GEN_VEXT_VADC_VVM(vsbc_vvm_b, uint8_t,  H1, DO_VSBC, clearb)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_h, uint16_t, H2, DO_VSBC, clearh)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_w, uint32_t, H4, DO_VSBC, clearl)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_d, uint64_t, H8, DO_VSBC, clearq)
-+
-+#define GEN_VEXT_VADC_VXM(NAME, ETYPE, H, DO_OP, CLEAR_FN)               \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,        \
-+                  CPURISCVState *env, uint32_t desc)                     \
-+{                                                                        \
-+    uint32_t mlen = vext_mlen(desc);                                     \
-+    uint32_t vl = env->vl;                                               \
-+    uint32_t esz = sizeof(ETYPE);                                        \
-+    uint32_t vlmax = vext_maxsz(desc) / esz;                             \
-+    uint32_t i;                                                          \
-+                                                                         \
-+    for (i = 0; i < vl; i++) {                                           \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                               \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);                     \
-+                                                                         \
-+        *((ETYPE *)vd + H(i)) = DO_OP(s2, (ETYPE)(target_long)s1, carry);\
-+    }                                                                    \
-+    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                             \
-+}
-+
-+GEN_VEXT_VADC_VXM(vadc_vxm_b, uint8_t,  H1, DO_VADC, clearb)
-+GEN_VEXT_VADC_VXM(vadc_vxm_h, uint16_t, H2, DO_VADC, clearh)
-+GEN_VEXT_VADC_VXM(vadc_vxm_w, uint32_t, H4, DO_VADC, clearl)
-+GEN_VEXT_VADC_VXM(vadc_vxm_d, uint64_t, H8, DO_VADC, clearq)
-+
-+GEN_VEXT_VADC_VXM(vsbc_vxm_b, uint8_t,  H1, DO_VSBC, clearb)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_h, uint16_t, H2, DO_VSBC, clearh)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_w, uint32_t, H4, DO_VSBC, clearl)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_d, uint64_t, H8, DO_VSBC, clearq)
-+
-+#define DO_MADC(N, M, C) (C ? (__typeof(N))(N + M + 1) <= N :           \
-+                          (__typeof(N))(N + M) < N)
-+#define DO_MSBC(N, M, C) (C ? N <= M : N < M)
-+
-+#define GEN_VEXT_VMADC_VVM(NAME, ETYPE, H, DO_OP)             \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
-+                  CPURISCVState *env, uint32_t desc)          \
-+{                                                             \
-+    uint32_t mlen = vext_mlen(desc);                          \
-+    uint32_t vl = env->vl;                                    \
-+    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
-+    uint32_t i;                                               \
-+                                                              \
-+    for (i = 0; i < vl; i++) {                                \
-+        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
-+                                                              \
-+        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1, carry));\
-+    }                                                         \
-+    for (; i < vlmax; i++) {                                  \
-+        vext_set_elem_mask(vd, mlen, i, 0);                   \
-+    }                                                         \
-+}
-+
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_b, uint8_t,  H1, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_h, uint16_t, H2, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_w, uint32_t, H4, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_d, uint64_t, H8, DO_MADC)
-+
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_b, uint8_t,  H1, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_h, uint16_t, H2, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_w, uint32_t, H4, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_d, uint64_t, H8, DO_MSBC)
-+
-+#define GEN_VEXT_VMADC_VXM(NAME, ETYPE, H, DO_OP)               \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1,          \
-+                  void *vs2, CPURISCVState *env, uint32_t desc) \
-+{                                                               \
-+    uint32_t mlen = vext_mlen(desc);                            \
-+    uint32_t vl = env->vl;                                      \
-+    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);          \
-+    uint32_t i;                                                 \
-+                                                                \
-+    for (i = 0; i < vl; i++) {                                  \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                      \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);            \
-+                                                                \
-+        vext_set_elem_mask(vd, mlen, i,                         \
-+                DO_OP(s2, (ETYPE)(target_long)s1, carry));      \
-+    }                                                           \
-+    for (; i < vlmax; i++) {                                    \
-+        vext_set_elem_mask(vd, mlen, i, 0);                     \
-+    }                                                           \
-+}
-+
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_b, uint8_t,  H1, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_h, uint16_t, H2, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_w, uint32_t, H4, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_d, uint64_t, H8, DO_MADC)
-+
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_b, uint8_t,  H1, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_h, uint16_t, H2, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_w, uint32_t, H4, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_d, uint64_t, H8, DO_MSBC)
--- 
-2.23.0
+So the test works using a single core...
+Good we have a test to figure the bug!
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+>      def test_mips_malta_i6400_framebuffer_logo_7cores(self):
+>          """
+>          :avocado: tags=arch:mips64el
+> @@ -108,6 +110,7 @@ class MaltaMachineFramebuffer(Test):
+>          """
+>          self.do_test_i6400_framebuffer_logo(7)
+>  
+> +    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+>      def test_mips_malta_i6400_framebuffer_logo_8cores(self):
+>          """
+>          :avocado: tags=arch:mips64el
+> 
 
