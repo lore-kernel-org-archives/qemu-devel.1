@@ -2,73 +2,115 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73303C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F16C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 335992073E
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 11:48:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Q4IgmkeX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 335992073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id A77E2206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:01:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77E2206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqbDb-0002PW-G4
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 07:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55136)
+	id 1jqbQH-0007CW-Uj
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:01:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jqbCw-00020u-Ey
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:47:18 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:37643)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jqbPR-0006Xd-Bq; Wed, 01 Jul 2020 08:00:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42494
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jqbCt-0002Do-Vh
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 07:47:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=Q2G7BoUgNRQMR3AeaS1do1Ry44yW/70zOUIlvVDxS+M=; b=Q4IgmkeXNgfskuKZ+FbxNd8Az7
- v67elN0jobGHE93GS8UlinwLwEry42v6Z/JM0vjzCUvnQcItyfociD6y7oPerdwT2NIGXsI0hAxXs
- siYCq9LjtQmqVjR8A1dHBrsT4eBp7o2RDs+i7lt62U+KAtdtCMzUI8Nq9m5fvOQCH22proVULOoCv
- 8Oo9+65LdwKkeEqoGJH5A7+Fy/+9oZI2YNVpk3NLjRzgnKLedB0tCdvG2LF2edSHR2w8nzZJoQ9tV
- 3gTXXIw2VcfLSBEh6ChAT2l2ZeXo4rlg+tV8oNH3dKfZEsQ/eGO0jQmWJ8U1WaokJS+alGSMCr9bn
- j0ipxNY0nP/j9dLB0YHsQQQllHSKq7b8On0FJaoQQqTyYzgq13UC6uiObB8ev6GtS6zMVyhlTVXIA
- KV1wPSNWUjFzl+K/1sxdjMfVseXA3NtUDfmaQyzO6T/yMnVEUv7uIdpTWKBLgYCFOZg6u8hl9Y9qN
- YfjEqpAWHA8h0j8iE/EaFiTRPuhleUthZahwq+k5AbmLsGmhH0emSI3V4BfHgKefw4H0SiCjsM5ik
- Ztcuzxz3yhFdBQlgmpo2qrZoEomOdTvVcNgS9erblhvK/ovOB/DeT8Gc/4hQUvPDa6Wlm1F6wenrZ
- bw5DKSNi5DGyq2JE+0s/56QVAHtoaAijWa8mQUnZA=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Date: Wed, 01 Jul 2020 13:47:12 +0200
-Message-ID: <3956126.q4pgddXim5@silver>
-In-Reply-To: <20200701120924.617532a3@bahia.lan>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <4716485.3Xd2u1jlTO@silver> <20200701120924.617532a3@bahia.lan>
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jqbPJ-0003zj-8j; Wed, 01 Jul 2020 08:00:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 061BVOVN123781; Wed, 1 Jul 2020 07:59:54 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 320s8assag-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 01 Jul 2020 07:59:54 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 061BWWqW128662;
+ Wed, 1 Jul 2020 07:59:54 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 320s8ass9p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 01 Jul 2020 07:59:53 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061BwXBM003895;
+ Wed, 1 Jul 2020 11:59:52 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma05fra.de.ibm.com with ESMTP id 31wwr8a95k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 01 Jul 2020 11:59:51 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 061BxnJh786834
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 1 Jul 2020 11:59:49 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DDD8FA4062;
+ Wed,  1 Jul 2020 11:59:48 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F3F3AA405C;
+ Wed,  1 Jul 2020 11:59:47 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.149.130])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed,  1 Jul 2020 11:59:47 +0000 (GMT)
+Date: Wed, 1 Jul 2020 13:59:30 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200701135930.3d8bb1dc.pasic@linux.ibm.com>
+In-Reply-To: <02a4d0c2-0009-470c-274f-d57bad5e063a@linux.ibm.com>
+References: <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ <20200626044259.GK172395@umbus.fritz.box>
+ <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
+ <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+ <20200626093257.GC1028934@redhat.com>
+ <558e8978-01ba-d8e8-9986-15efbbcbca96@linux.ibm.com>
+ <20200626102903.GD3087@work-vm>
+ <20200626105846.GF1028934@redhat.com>
+ <02a4d0c2-0009-470c-274f-d57bad5e063a@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 07:47:14
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/We5mDa4tzwsjBOZY1NGd6NI"; protocol="application/pgp-signature"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-01_07:2020-07-01,
+ 2020-07-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 malwarescore=0
+ suspectscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=999 cotscore=-2147483648 adultscore=0
+ lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2007010082
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 08:00:01
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,132 +123,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, pair@us.ibm.com, brijesh.singh@amd.com,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ mst@redhat.com, pbonzini@redhat.com,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 1. Juli 2020 12:09:24 CEST Greg Kurz wrote:
-> No I'm talking about code that isn't changed by this series:
-> 
->     if (initial_offset == 0) {
->         v9fs_co_rewinddir(pdu, fidp);
->     } else {
->         v9fs_co_seekdir(pdu, fidp, initial_offset);
->     }
->     count = v9fs_do_readdir(pdu, fidp, max_count);
-> 
-> Leaving these outside the critical section seems to negate
-> your arguments... please clarify.
+--Sig_/We5mDa4tzwsjBOZY1NGd6NI
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Yeah, I admit I have neglected this issue, as concurrent readdir requests with 
-same FID always was some kind of theoretical issue. But yes, you are right, 
-that should be addressed by 
+On Fri, 26 Jun 2020 14:49:37 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-1. entirely removing the rewinddir/seekdir code here
+> On 6/26/20 12:58 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Jun 26, 2020 at 11:29:03AM +0100, Dr. David Alan Gilbert wrote:
+> >> * Janosch Frank (frankja@linux.ibm.com) wrote:
+> >>> On 6/26/20 11:32 AM, Daniel P. Berrang=C3=83=C2=A9 wrote:
+> >>>> On Fri, Jun 26, 2020 at 11:01:58AM +0200, Janosch Frank wrote:
+> >>>>> On 6/26/20 8:53 AM, David Hildenbrand wrote:
+> >>>>>>>>>> Does this have any implications when probing with the 'none' m=
+achine?
+> >>>>>>>>>
+> >>>>>>>>> I'm not sure.  In your case, I guess the cpu bit would still sh=
+ow up
+> >>>>>>>>> as before, so it would tell you base feature availability, but =
+not
+> >>>>>>>>> whether you can use the new configuration option.
+> >>>>>>>>>
+> >>>>>>>>> Since the HTL option is generic, you could still set it on the =
+"none"
+> >>>>>>>>> machine, though it wouldn't really have any effect.  That is, i=
+f you
+> >>>>>>>>> could create a suitable object to point it at, which would depe=
+nd on
+> >>>>>>>>> ... details.
+> >>>>>>>>>
+> >>>>>>>>
+> >>>>>>>> The important point is that we never want the (expanded) host cp=
+u model
+> >>>>>>>> look different when either specifying or not specifying the HTL
+> >>>>>>>> property.
+> >>>>>>>
+> >>>>>>> Ah, yes, I see your point.  So my current suggestion will satisfy
+> >>>>>>> that, basically it is:
+> >>>>>>>
+> >>>>>>> cpu has unpack (inc. by default) && htl specified
+> >>>>>>> 	=3D> works (allowing secure), as expected
+> >>>>>>
+> >>>>>> ack
+> >>>>>>
+> >>>>>>>
+> >>>>>>> !cpu has unpack && htl specified
+> >>>>>>> 	=3D> bails out with an error
+> >>>>>>
+> >>>>>> ack
+> >>>>>>
+> >>>>>>>
+> >>>>>>> !cpu has unpack && !htl specified
+> >>>>>>> 	=3D> works for a non-secure guest, as expected
+> >>>>>>> 	=3D> guest will fail if it attempts to go secure
+> >>>>>>
+> >>>>>> ack, behavior just like running on older hw without unpack
+> >>>>>>
+> >>>>>>>
+> >>>>>>> cpu has unpack && !htl specified
+> >>>>>>> 	=3D> works as expected for a non-secure guest (unpack feature is
+> >>>>>>> 	   present, but unused)
+> >>>>>>> 	=3D> secure guest may work "by accident", but only if all virtio
+> >>>>>>> 	   properties have the right values, which is the user's
+> >>>>>>> 	   problem
+> >>>>>>>
+> >>>>>>> That last case is kinda ugly, but I think it's tolerable.
+> >>>>>>
+> >>>>>> Right, we must not affect non-secure guests, and existing secure s=
+etups
+> >>>>>> (e.g., older qemu machines). Will have to think about this some mo=
+re,
+> >>>>>> but does not sound too crazy.
+> >>>>>
+> >>>>> I severely dislike having to specify things to make PV work.
+> >>>>> The IOMMU is already a thorn in our side and we're working on makin=
+g the
+> >>>>> whole ordeal completely transparent so the only requirement to make=
+ this
+> >>>>> work is the right machine, kernel, qemu and kernel cmd line option
+> >>>>> "prot_virt=3D1". That's why we do the reboot into PV mode in the fi=
+rst place.
+> >>>>>
+> >>>>> I.e. the goal is that if customers convert compatible guests into
+> >>>>> protected ones and start them up on a z15 on a distro with PV suppo=
+rt
+> >>>>> they can just use the guest without having to change XML or command=
+ line
+> >>>>> parameters.
+> >>>>
+> >>>> If you're exposing new features to the guest machine, then it is usu=
+ally
+> >>>> to be expected that XML and QEMU command line will change. Some simp=
+le
+> >>>> things might be hidable behind a new QEMU machine type or CPU model,=
+ but
+> >>>> there's a limit to how much should be hidden that way while staying =
+sane.
+> >>>>
+> >>>> I'd really expect the configuration to change when switching a guest=
+ to
+> >>>> a new hardware platform and wanting major new functionality to be en=
+abled.
+> >>>> The XML / QEMU config is a low level instantiation of a particular f=
+eature
+> >>>> set, optimized for a specific machine, rather than a high level desc=
+ription
+> >>>> of ideal "best" config independent of host machine.
+> >>>
+> >>> You still have to set the host command line and make sure that unpack=
+ is
+> >>> available. Currently you also have to specify the IOMMU which we like=
+ to
+> >>> drop as a requirement. Everything else is dependent on runtime
+> >>> information which tells us if we need to take a PV or non-PV branch.
+> >>> Having the unpack facility should be enough to use the unpack facilit=
+y.
+> >>>
+> >>> Keep in mind that we have no real concept of a special protected VM to
+> >>> begin with. If the VM never boots into a protected kernel it will nev=
+er
+> >>> be protected. On a reboot it drops from protected into unprotected mo=
+de
+> >>> to execute the bios and boot loader and then may or may not move back
+> >>> into a protected state.
+> >>
+> >> My worry isn't actually how painful adding all the iommu glue is, but
+> >> what happens when users forget; especially if they forget for one
+> >> device.
+> >>
+> >> I could appreciate having a machine option to cause iommu to then get
+> >> turned on with all other devices; but I think also we could do with
+> >> something that failed with a nice error if an iommu flag was missing.
+> >> For SEV this could be done pretty early, but for power/s390 I guess
+> >> you'd have to do this when someone tried to enable secure mode, but
+> >> I'm not sure you can tell.
+> >=20
+> > What is the cost / downside of turning on the iommu option for virtio
+> > devices ? Is it something that is reasonable for a mgmt app todo
+> > unconditionally, regardless of whether memory encryption is in use,
+> > or will that have a negative impact on things ?
+>=20
+> speed, memory usage and compatibility problems.
+> There might also be a problem with s390 having to use <=3D2GB iommu areas
+> in the guest, I need to check with Halil if this is still true.
 
-2. passing initial_offset to v9fs_do_readdir(), which in turn would
-   pass it to readdir_many()
+It is partially true. The coherent_dma_mask is 31 bit and the dma_mask
+is 64. That means if iommu=3Don but !PV the coherent stuff will use <=3D 2GB
+(that stuff allocated by virtio core, like virtqueues, CCWs, etc.) but
+there will be no bounce buffering. We don't even initialize swiotlb if
+!PV.
 
-3. readdir_many() would handle rewinddir/seekdir exclusively in its crticial
-   section.
+I agree with Janosch, we want iommu=3D'on' only when really needed. I've
+tried to make that point several times.
 
-> There are indeed several issues with the current readdir:
-> 
-> 1) potential inconsistency on concurrent Treaddir requests
-> 
-> 2) excessive dispatching to worker threads
-> 
-> So we agreed that 1) should never happen with a regular linux
-> client (we could even dump the lock actually) but we want to
-> make it clear in the code anyway that actions on the directory
-> stream are serialized.
+Regards,
+Halil
 
-My point is you are trying to fix a merely thereotical issue on code that's 
-conceptually, inherently wrong and dead end code at first place. Top half code 
-should always be designed to be as thin as possible. The old readdir code 
-though is the complete opposite.
+>=20
+> Also, if the default or specified IOMMU buffer size isn't big enough for
+> your IO workload the guest is gonna have a very bad time. I.e. if
+> somebody has an alternative implementation of bounce buffers we'd be
+> happy to take it :)
+>=20
+> >=20
+> > Regards,
+> > Daniel
+> >=20
+>=20
+>=20
 
-> 2) basically means moving some logic from the frontend to the
-> backend, ie. called from v9fs_co_run_in_worker(). This implies
-> that a very long request (ie. one that would span on many calls
-> to readdir()) cannot be interrupted by the client anymore, as
-> opposed to what we have now BTW.
 
-3) Complexity of old readdir code is so much bigger compared to the new one
-   such that probability of additional issues is also significantly higher.
+--Sig_/We5mDa4tzwsjBOZY1NGd6NI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> I tend to think that addressing both issues in one "rush" is
-> as much "error prone".
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-No it's not. The optimized readdir implementation is quantifyable, 
-significantly less complex than the old implementation (i.e. significantly 
-smaller amount of branches and error pathes, determenistic clear separation of 
-thread's task assignments which includes much smaller amount of thread hops). 
-Less complexity and increased determinism consequently means reduced chance of 
-misbehaviours. So that's not a subjective, but rather a quantifyable, proven 
-statement.
+iQIcBAEBAgAGBQJe/HqyAAoJEA0vhuyXGx0AZSYP/2lWCdWbDLKx2N/r+FgqRVGC
+LZcERHnBp+uOH39T8+P9KmIjkiJCHYdfFXBOME9gbeM/+3EGMxVwtQ1iUmrjZtug
+4b/a3DfTC2cot1o+thatRO9H/sq29jFLHH1+pF58YqnBsY6eucRu0OER+tl2Jew6
+u9gMqRiZ4Y5n7292GrLNOsv1/RNOAjswTSxIZl0WiFn3QccUa2P8OcPub5kFIvdO
+q9Es0wqTSJQ+VhwUVmGTviziNQ3AKViMeYhUYvP40xt8JEddLLPCsoNzC3BkWRxX
+IN9zLrKXtmqvbafFnQOiRxM3GHZJkFKzUyn/SDCSU5sWyvxzhDt9yRfnthP7qV2z
+msH6Fhb3DeCyygttT6gR87VXKPfQD9K+RF/C+JknKDvhR9UngO65RotxMgMB682p
+bgSBu/ZNQyjiWsMe182rQ2tNECPDMWiI4uH9Zy2G5uegbfgd47g0mlfCJKbuQ6pO
+Z3ESyl+x0mJPKeclkZ1nDiF6x2XQrQZYqy3RtYq3l1iJCPcZFIj9tbhrclb8doru
+lwAZexBTwrVdIwaqqxVJGSPKxnabivF8UMtxF0Tv+SIUhoeevyj3OrPn+Sj1Amuw
+tw7vO1qvQN87QoLXjelpF0lSVf4ruQif27jMgNOIJe6eLUVyuiu8QpjlfZFRTBki
+3ZgT5MkbrRJAz/COefpi
+=Cp3K
+-----END PGP SIGNATURE-----
 
-You can't switch from the old (wrong) concept to the new concept without some 
-minimum amount of changes, which yes are not small, but I don't see any way to 
-make the change set smaller without yet introducing new negative side effects.
-
-I am now using words that I heard from your side before: please be realistic. 
-Currently man power on 9p code is extremely limited to put it mildly. Yes, we 
-could spend time on fixing this (theoretical) issue on the old readdir could. 
-But what would it buy? Due to the limited man power we can only move forward 
-with compromises; in this case you are fighting for code that's DOA. The only 
-thing that you achieve by still sticking to the old readdir code is you are 
-preventing that we move forward at all. Remember: I originally sent this patch 
-almost 7 months ago.
-
-> > Also: it does not make sense to move locking on this series from fs driver
-> > back to main I/O thread. Atomicity must retain on driver side, not on top
-> > half.
-> 
-> Then the whole seekdir/rewinddir/telldir/readdir sequence should
-> be called with a single v9fs_co_run_in_worker() invocation, in
-> which case the locking could just be something like:
-> 
-> int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
->                                       struct V9fsDirEnt **entries,
->                                       int32_t maxsize, bool dostat)
-> {
->     int err = 0;
-> 
->     if (v9fs_request_cancelled(pdu)) {
->         return -EINTR;
->     }
-> 
->     v9fs_readdir_lock(&fidp->fs.dir);
-> 
->     v9fs_co_run_in_worker({
->         err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
->     });
-> 
->     v9fs_readdir_unlock(&fidp->fs.dir);
->     return err;
-> }
-
-That's exactly what should be prevented. The lock must be on driver thread 
-side, not on main thread side. The goal is to reduce the time slice of 
-individual locks. If the lock is on main thread, the time slice of a lock 
-(even on huge directories with thousands of entries) is multiple factors 
-larger than if the lock is on driver thread side. So that's not just few 
-percent or so, it is huge.
-
-> This would technically leave the locking in the main I/O thread,
-> but it isn't conceptually different from locking at the beginning
-> of do_readdir_lock() and unlocking before returning. My concern
-> is that I don't know how coroutine mutexes behave with multiple
-> worker threads...
-
-Well, your Mutex -> CoMutex change was intended to fix a deadlock with the old 
-readdir implementation. That deadlock could not happen with the new readdir 
-implementation, which suggests that it probably makes sense to revert this 
-change (i.e. CoMutex -> Mutex) for this new implementation.
-
-Best regards,
-Christian Schoenebeck
-
+--Sig_/We5mDa4tzwsjBOZY1NGd6NI--
 
 
