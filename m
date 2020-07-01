@@ -2,62 +2,70 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DD4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8735C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0471220781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:27:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0471220781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6668520781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:28:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YQ4GLCpp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6668520781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfZw-00056Y-80
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:27:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
+	id 1jqfbP-0007m0-Hj
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfXQ-0008Rd-Vz; Wed, 01 Jul 2020 12:24:45 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45323)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqfXO-0000bt-2x; Wed, 01 Jul 2020 12:24:44 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436283|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.144939-0.000344041-0.854717;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03268; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvwI0Rt_1593620671; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvwI0Rt_1593620671)
- by smtp.aliyun-inc.com(10.147.42.22); Thu, 02 Jul 2020 00:24:31 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 29/61] target/riscv: vector narrowing fixed-point clip
- instructions
-Date: Wed,  1 Jul 2020 23:25:17 +0800
-Message-Id: <20200701152549.1218-30-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jqfZ7-00030y-9A; Wed, 01 Jul 2020 12:26:29 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:37260)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jqfZ3-00010J-AH; Wed, 01 Jul 2020 12:26:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=HVQcCvlJZVUxJGZT8wJUTkWih5ydhK9u2rICirn7H2A=; 
+ b=YQ4GLCpp7lA/6u90W3qrb6rAi4QXVyRZhOxtVZq1tbD1KcLnry/WYww60K4GW1/OIMR54+RqIN3355RhImEqJ3Ob8shuiqjo8J/ohIhnhP6ZUH3GLHrjGFLev3DIwZcAri36fZcrt0I0V7679woC6ll3/ABPachxreB9BwHZ56i3wpu5lZdItD4uJE+1a3hV8qhvxx1yIZAK+2cnSIoQvOeYgi3W8CqYr/dD5v/MP1uxam+UbKahna0WOOBwGHEdfg9NKy02gbRjI6KA8iyKIN3uTB4n3Mnxwpxgavi3LeHQWrDvRDb3oiXIrLPaUARDwJAd+dlTFfrWCgMuKbTpcQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jqfYf-0000le-KB; Wed, 01 Jul 2020 18:26:01 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jqfYf-0005PC-7j; Wed, 01 Jul 2020 18:26:01 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v9 14/34] qcow2: Add QCow2SubclusterType and
+ qcow2_get_subcluster_type()
+In-Reply-To: <fae77394-92fd-d170-0ae6-051c0a024d04@redhat.com>
+References: <cover.1593342067.git.berto@igalia.com>
+ <6ee75696d3eaed56b46e91fe242fdfab51feb066.1593342067.git.berto@igalia.com>
+ <fae77394-92fd-d170-0ae6-051c0a024d04@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Wed, 01 Jul 2020 18:26:01 +0200
+Message-ID: <w51mu4jurqe.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 12:26:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,241 +78,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   |  13 +++
- target/riscv/insn32.decode              |   6 +
- target/riscv/insn_trans/trans_rvv.inc.c |   8 ++
- target/riscv/vector_helper.c            | 141 ++++++++++++++++++++++++
- 4 files changed, 168 insertions(+)
+On Wed 01 Jul 2020 02:52:14 PM CEST, Max Reitz wrote:
+>>      if (l2_entry & QCOW_OFLAG_COMPRESSED) {
+>>          return QCOW2_CLUSTER_COMPRESSED;
+>> -    } else if (l2_entry & QCOW_OFLAG_ZERO) {
+>> +    } else if ((l2_entry & QCOW_OFLAG_ZERO) && !has_subclusters(s)) {
+>
+> OK, so now qcow2_get_cluster_type() reports zero clusters to be normal
+> or unallocated clusters when there are subclusters.  Seems weird to
+> me, because zero clusters are invalid clusters then.
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 78438f1ad6..5fa4330200 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -790,3 +790,16 @@ DEF_HELPER_6(vssra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vssra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vnclip_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclipu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnclip_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 7d5dfeb5c7..78e6da6205 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -439,6 +439,12 @@ vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
- vssra_vv        101011 . ..... ..... 000 ..... 1010111 @r_vm
- vssra_vx        101011 . ..... ..... 100 ..... 1010111 @r_vm
- vssra_vi        101011 . ..... ..... 011 ..... 1010111 @r_vm
-+vnclipu_vv      101110 . ..... ..... 000 ..... 1010111 @r_vm
-+vnclipu_vx      101110 . ..... ..... 100 ..... 1010111 @r_vm
-+vnclipu_vi      101110 . ..... ..... 011 ..... 1010111 @r_vm
-+vnclip_vv       101111 . ..... ..... 000 ..... 1010111 @r_vm
-+vnclip_vx       101111 . ..... ..... 100 ..... 1010111 @r_vm
-+vnclip_vi       101111 . ..... ..... 011 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 31be40f4ba..b9d29f4051 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1775,3 +1775,11 @@ GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
- GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
- GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
- GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
-+
-+/* Vector Narrowing Fixed-Point Clip Instructions */
-+GEN_OPIVV_NARROW_TRANS(vnclipu_vv)
-+GEN_OPIVV_NARROW_TRANS(vnclip_vv)
-+GEN_OPIVX_NARROW_TRANS(vnclipu_vx)
-+GEN_OPIVX_NARROW_TRANS(vnclip_vx)
-+GEN_OPIVI_NARROW_TRANS(vnclipu_vi, 1, vnclipu_vx)
-+GEN_OPIVI_NARROW_TRANS(vnclip_vi, 1, vnclip_vx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index acd44599ba..d7c51daca7 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -875,6 +875,12 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define WOP_SSU_B int16_t, int8_t, uint8_t, int16_t, uint16_t
- #define WOP_SSU_H int32_t, int16_t, uint16_t, int32_t, uint32_t
- #define WOP_SSU_W int64_t, int32_t, uint32_t, int64_t, uint64_t
-+#define NOP_SSS_B int8_t, int8_t, int16_t, int8_t, int16_t
-+#define NOP_SSS_H int16_t, int16_t, int32_t, int16_t, int32_t
-+#define NOP_SSS_W int32_t, int32_t, int64_t, int32_t, int64_t
-+#define NOP_UUU_B uint8_t, uint8_t, uint16_t, uint8_t, uint16_t
-+#define NOP_UUU_H uint16_t, uint16_t, uint32_t, uint16_t, uint32_t
-+#define NOP_UUU_W uint32_t, uint32_t, uint64_t, uint32_t, uint64_t
- 
- /* operation of two vector elements */
- typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-@@ -3009,6 +3015,7 @@ vssra64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-     res   = (a >> shift)  + round;
-     return res;
- }
-+
- RVVCALL(OPIVV2_RM, vssra_vv_b, OP_SSS_B, H1, H1, H1, vssra8)
- RVVCALL(OPIVV2_RM, vssra_vv_h, OP_SSS_H, H2, H2, H2, vssra16)
- RVVCALL(OPIVV2_RM, vssra_vv_w, OP_SSS_W, H4, H4, H4, vssra32)
-@@ -3026,3 +3033,137 @@ GEN_VEXT_VX_RM(vssra_vx_b, 1, 1, clearb)
- GEN_VEXT_VX_RM(vssra_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vssra_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_RM(vssra_vx_d, 8, 8, clearq)
-+
-+/* Vector Narrowing Fixed-Point Clip Instructions */
-+static inline int8_t
-+vnclip8(CPURISCVState *env, int vxrm, int16_t a, int8_t b)
-+{
-+    uint8_t round, shift = b & 0xf;
-+    int16_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT8_MAX) {
-+        env->vxsat = 0x1;
-+        return INT8_MAX;
-+    } else if (res < INT8_MIN) {
-+        env->vxsat = 0x1;
-+        return INT8_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline int16_t
-+vnclip16(CPURISCVState *env, int vxrm, int32_t a, int16_t b)
-+{
-+    uint8_t round, shift = b & 0x1f;
-+    int32_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT16_MAX) {
-+        env->vxsat = 0x1;
-+        return INT16_MAX;
-+    } else if (res < INT16_MIN) {
-+        env->vxsat = 0x1;
-+        return INT16_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline int32_t
-+vnclip32(CPURISCVState *env, int vxrm, int64_t a, int32_t b)
-+{
-+    uint8_t round, shift = b & 0x3f;
-+    int64_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > INT32_MAX) {
-+        env->vxsat = 0x1;
-+        return INT32_MAX;
-+    } else if (res < INT32_MIN) {
-+        env->vxsat = 0x1;
-+        return INT32_MIN;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+RVVCALL(OPIVV2_RM, vnclip_vv_b, NOP_SSS_B, H1, H2, H1, vnclip8)
-+RVVCALL(OPIVV2_RM, vnclip_vv_h, NOP_SSS_H, H2, H4, H2, vnclip16)
-+RVVCALL(OPIVV2_RM, vnclip_vv_w, NOP_SSS_W, H4, H8, H4, vnclip32)
-+GEN_VEXT_VV_RM(vnclip_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vnclip_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vnclip_vv_w, 4, 4, clearl)
-+
-+RVVCALL(OPIVX2_RM, vnclip_vx_b, NOP_SSS_B, H1, H2, vnclip8)
-+RVVCALL(OPIVX2_RM, vnclip_vx_h, NOP_SSS_H, H2, H4, vnclip16)
-+RVVCALL(OPIVX2_RM, vnclip_vx_w, NOP_SSS_W, H4, H8, vnclip32)
-+GEN_VEXT_VX_RM(vnclip_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vnclip_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vnclip_vx_w, 4, 4, clearl)
-+
-+static inline uint8_t
-+vnclipu8(CPURISCVState *env, int vxrm, uint16_t a, uint8_t b)
-+{
-+    uint8_t round, shift = b & 0xf;
-+    uint16_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT8_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT8_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline uint16_t
-+vnclipu16(CPURISCVState *env, int vxrm, uint32_t a, uint16_t b)
-+{
-+    uint8_t round, shift = b & 0x1f;
-+    uint32_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT16_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT16_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+static inline uint32_t
-+vnclipu32(CPURISCVState *env, int vxrm, uint64_t a, uint32_t b)
-+{
-+    uint8_t round, shift = b & 0x3f;
-+    int64_t res;
-+
-+    round = get_round(vxrm, a, shift);
-+    res   = (a >> shift)  + round;
-+    if (res > UINT32_MAX) {
-+        env->vxsat = 0x1;
-+        return UINT32_MAX;
-+    } else {
-+        return res;
-+    }
-+}
-+
-+RVVCALL(OPIVV2_RM, vnclipu_vv_b, NOP_UUU_B, H1, H2, H1, vnclipu8)
-+RVVCALL(OPIVV2_RM, vnclipu_vv_h, NOP_UUU_H, H2, H4, H2, vnclipu16)
-+RVVCALL(OPIVV2_RM, vnclipu_vv_w, NOP_UUU_W, H4, H8, H4, vnclipu32)
-+GEN_VEXT_VV_RM(vnclipu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vnclipu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vnclipu_vv_w, 4, 4, clearl)
-+
-+RVVCALL(OPIVX2_RM, vnclipu_vx_b, NOP_UUU_B, H1, H2, vnclipu8)
-+RVVCALL(OPIVX2_RM, vnclipu_vx_h, NOP_UUU_H, H2, H4, vnclipu16)
-+RVVCALL(OPIVX2_RM, vnclipu_vx_w, NOP_UUU_W, H4, H8, vnclipu32)
-+GEN_VEXT_VX_RM(vnclipu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vnclipu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vnclipu_vx_w, 4, 4, clearl)
--- 
-2.23.0
+I'm actually hesitant about this.
 
+In extended L2 entries QCOW_OFLAG_ZERO does not have any meaning so
+technically it doesn't need to be checked any more than the other
+reserved bits (1 to 8).
+
+The reason why we would want to check it is, of course, because that bit
+does have a meaning in regular L2 entries.
+
+But that bit is ignored in images with subclusters so the only reason
+why we would check it is to report corruption, not because we need to
+know its value.
+
+It's true that we do check it in v2 images, although in that case the
+entries are otherwise identical and there is a way to convert between
+both types.
+
+> I preferred just reporting them as zero clusters and letting the
+> caller deal with it, because it does mean an error in the image and so
+> it should be reported.
+
+Another alternative would be to add QCOW2_CLUSTER_INVALID and we could
+even include there other cases like unaligned offsets and things like
+that. But that would also affect the code that repairs corrupted images.
+
+Berto
 
