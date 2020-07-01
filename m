@@ -2,73 +2,124 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DBAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE55FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9CD2074D
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A7E620747
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:49:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="nMn2nych"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9CD2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZ1tAx6u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A7E620747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqYPE-0004q8-Bk
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:47:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41246)
+	id 1jqYQu-0005pD-Qh
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jqYOR-0003yz-N3
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:47:00 -0400
-Received: from collins.uni-paderborn.de ([2001:638:502:c003::14]:35746)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
- id 1jqYOO-0006Px-Rb
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:46:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=mail.uni-paderborn.de; s=20170601; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
- Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
- List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=72pn0uy8A0Xba4zvLJTwr3WyljwoaW0urRMjxWHvg9c=; b=nMn2nychi7kn0O5zOBC4g+EZ0
- amlywyQG5O0i4L6B0u1NsCZ+mC96EgzJ60m1HdIE7WIFlndruswMo4dZIrVt9xDVaGJa+dfYjKc/I
- 0LFPLX28jOYhRGaFVQf47RW3SW3GeeQa15Ppz2Xzr3cyXCsQDUq/ENi8xfjzVRQ3pQoQY=;
-Date: Wed, 1 Jul 2020 10:46:49 +0200
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-To: "Konopik, Andreas (EFS-GH2)" <andreas.konopik@efs-auto.de>
-Subject: Re: [PATCH v3 1/1] tricore: added triboard with tc27x_soc
-Message-ID: <20200701084649.lo77kx7gxqq6ddbe@schnipp-desktop>
-References: <4006678c6d834f4fb126314e83f99f5c@efs-auto.de>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqYQE-0005Nd-Dh
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:48:50 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38625)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqYQC-0006kQ-1z
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:48:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f18so22345955wml.3
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 01:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EYA5PGx66w5Cf7UwktK4axw40NVMQJrHJvxG+CeXA7A=;
+ b=LZ1tAx6ugiaB1ohRKN8mf3iuAZo2cwoz7NL+mGCyBafzTwEalWH+mq9MaS/4GbIExN
+ 3Th/EQObGML7Lgcbd6RRocOsNkDah8GDqvUeaOVLlkPk1MLk6gzyPpShXpifT9C85XTg
+ Hm0sZdI3qZNAfPKQKUPmLr2U0XQJ40ksiCBUcS+Uw/giP/bx4tzB7dEI8OmkAEstKIDv
+ rfdvphVrP9NdsuBKp0iSxGDBeiqev3Fdj0I7qbIqOHPD1cfUimZEmUoyRmqsRQ2/O5ME
+ RyQF8xrIXCrv3D6WokBex1Sg4oaxU40QQKL5k6WMdltL5GUFHYDDbl9/b0AOgMi/9XiQ
+ hKXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=EYA5PGx66w5Cf7UwktK4axw40NVMQJrHJvxG+CeXA7A=;
+ b=GYVKV5F8Zv5t4cmYi18JPvqjz3Nt7S0DgEXQ2Smu2UKmemYRXbROxVJazYZqXRs0BL
+ kK/IG/Ixmi1txRckKTHtpZxwIvanBuZ/QO56e63j2kOcAWrYpoaXSs9+fDIBCYwKv/dv
+ yPZrCEVuLKF00tVYvTpcw0x6/pyEQ39VPdnTxuo99vdimvPt5fNnev/YYmuFq2t6iqBR
+ xuFu0u5SCNxpE80sf/dX/w5yFYu1sELPCaw5/y/NWTqM9zgUedupFpB/mGIA5khTLQeG
+ 3+MKRpMmJ1EdiPmD4yaLsmKi7okqUOJw9RL0Wq+l4TlccA47rELGI6j4pYA8U1zAi7xy
+ j77g==
+X-Gm-Message-State: AOAM530v6mQUSyPmbE2qV0/7oB3hurSjAE9QQOw76Kp/s+KCqakEv176
+ K2ogAXACdjHX/hAwd444NR8=
+X-Google-Smtp-Source: ABdhPJxXOuh/StGOpg301gzCW47181AK31Tvz9YZjOO+DPeEJeu5/uBuQ1P9pcAQYyzJCCv4rCF3rg==
+X-Received: by 2002:a7b:c441:: with SMTP id l1mr24325712wmi.7.1593593325722;
+ Wed, 01 Jul 2020 01:48:45 -0700 (PDT)
+Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id t16sm7175050wru.9.2020.07.01.01.48.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 01:48:44 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] MAINTAINERS: Adjust MIPS maintainership
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-devel@nongnu.org
+References: <20200630164653.24880-1-aleksandar.qemu.devel@gmail.com>
+ <20200630164653.24880-3-aleksandar.qemu.devel@gmail.com>
+ <1fdab6eb-9258-7df1-75ea-b4717a9c2b87@amsat.org>
+ <3ae1ef05-8caa-b5ce-a1ce-9670fc0a7cd3@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <009f6fed-f043-cce3-f2c8-9aefd70d9601@amsat.org>
+Date: Wed, 1 Jul 2020 10:48:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4006678c6d834f4fb126314e83f99f5c@efs-auto.de>
-X-IMT-Spam-Score: 0.0 ()
-X-Sophos-SenderHistory: ip=2a02:908:2214:e5a0:6cad:915:5142:377d, fs=434106,
- da=81202275, mc=6, sc=0, hc=6, sp=0, fso=434106, re=0, sd=0, hd=0
-X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
- Antispam-Data: 2020.7.1.84217, AntiVirus-Engine: 5.74.0,
- AntiVirus-Data: 2020.7.1.5740000
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
-Received-SPF: pass client-ip=2001:638:502:c003::14;
- envelope-from=kbastian@mail.uni-paderborn.de; helo=collins.uni-paderborn.de
+In-Reply-To: <3ae1ef05-8caa-b5ce-a1ce-9670fc0a7cd3@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,48 +132,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Biermanski,
- Lars \(EFS-GH3\)" <lars.biermanski@efs-auto.de>, "Hofstetter,
- Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>, "Brenken,
- David \(EFS-GH5\)" <david.brenken@efs-auto.de>, "Rasche,
- Robert \(EFS-GH2\)" <robert.rasche@efs-auto.de>,
- David Brenken <david.brenken@efs-auto.org>
+Cc: aleksandar.rikalo@syrmia.com, Paul Burton <paulburton@kernel.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Andreas,
-
-On Tue, Jun 30, 2020 at 10:28:57AM +0000, Konopik, Andreas (EFS-GH2) wrote:
-> Hi Bastian,
+On 7/1/20 10:00 AM, Philippe Mathieu-Daudé wrote:
+> On 6/30/20 7:19 PM, Philippe Mathieu-Daudé wrote:
+>> On 6/30/20 6:46 PM, Aleksandar Markovic wrote:
+>>> Paul Burton and Aurelien Jarno removed for not being present.
+>>>
+>>> Huacai Chen and Jiaxun Yang step in as new energy.
+>>>
+>>> CC: Paul Burton <paulburton@kernel.org>
+>>> CC: Aurelien Jarno <aurelien@aurel32.net>
+>>> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> ---
+>>>  MAINTAINERS | 15 ++++++++++-----
+>>>  1 file changed, 10 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 5d8acf8d31..7fc16e21c9 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -213,7 +213,8 @@ F: disas/microblaze.c
+>>>  
+>>>  MIPS TCG CPUs
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> -R: Aurelien Jarno <aurelien@aurel32.net>
+>>> +M: Huacai Chen <chenhc@lemote.com>
+>>> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>>>  S: Maintained
+>>>  F: target/mips/
+>>> @@ -377,6 +378,7 @@ F: target/arm/kvm.c
+>>>  
+>>>  MIPS KVM CPUs
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> +M: Huacai Chen <chenhc@lemote.com>
+>>>  S: Odd Fixes
+>>>  F: target/mips/kvm.c
+>>>  
+>>> @@ -1052,6 +1054,7 @@ MIPS Machines
+>>>  -------------
+>>>  Jazz
+>>>  M: Hervé Poussineau <hpoussin@reactos.org>
+>>> +M: Huacai Chen <chenhc@lemote.com>
 > 
-> > On Mon, Jun 22, 2020 at 03:19:34PM +0200, David Brenken wrote:
-> > > From: Andreas Konopik <andreas.konopik@efs-auto.de>
-> > > +const MemmapEntry tc27x_soc_memmap[] = {
-> > > +    [TC27XD_DSPR2]     = { 0x50000000,   0x1E000 },
-> > > +    [TC27XD_DCACHE2]   = { 0x5001E000,    0x2000 },
-> > > +    [TC27XD_DTAG2]     = { 0x500C0000,     0xC00 },
-> > 
-> > The size changed from 0xa00 to 0xc00 from v2. The manual states that it has no
-> > size. I guess you inferred the size from the address range. How does real hw
-> > behave if you access DTAG2?
+> Hmm this is the Jazz hobbyist machine, Huacai are you sure this
+> the correct section you want to be?
 > 
-> DTAG size of 0xa00 was a mistake, 0xc00 is correct. Even though the manual does not assign sizes, DTAG and PTAG can be mapped for memory testing purposes.
-> Therefore memory accesses to DTAG/PTAG are possible (see Footnote 3 & 4 [1, Page 3-10]).
+> Anyway Hervé Poussineau has to ack that, Aleksandar, it would
+> be easier if you split this as a separate patch.
 > 
-> Real hardware has to be configured via MTU before accessing DTAG/PTAG. Because QEMU tricore has no MTU, we wanted to be less restrictive by mapping DTAG/PTAG into memory.
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>>>  S: Maintained
+>>>  F: hw/mips/jazz.c
+>>> @@ -1060,8 +1063,8 @@ F: hw/dma/rc4030.c
+>>>  
+>>>  Malta
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> +M: Huacai Chen <chenhc@lemote.com>
+>>>  M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> -R: Aurelien Jarno <aurelien@aurel32.net>
+> 
+> Last time Aurelien commented on the Malta machine, was on March 23,
+> 3 months ago, then there hasn't been Malta patches. As a reviewer
+> he is present and provides valuable feedback, why are you kicking
+> him out? See:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg691406.html
+> 
+> Huacai, has Jiangsu Lemote Tech Co., Ltd real interest to paid
+> employees to maintain the Malta board?
+> 
+>>>  S: Maintained
+>>>  F: hw/isa/piix4.c
+>>>  F: hw/acpi/piix4.c
+>>> @@ -1073,6 +1076,7 @@ F: tests/acceptance/machine_mips_malta.py
+>>>  
+>>>  Mipssim
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> +M: Huacai Chen <chenhc@lemote.com>
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>>>  S: Odd Fixes
+> 
+> Now that you have 2 maintainers, you can raise the status to Maintained.
+> 
+>>>  F: hw/mips/mipssim.c
+>>> @@ -1080,7 +1084,6 @@ F: hw/net/mipsnet.c
+>>>  
+>>>  R4000
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> -R: Aurelien Jarno <aurelien@aurel32.net>
+> 
+> I'm sure Aurelien will agree with this part. But let's wait
+> for his feedback.
+> 
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>>>  S: Obsolete
+>>>  F: hw/mips/r4k.c
+>>> @@ -1103,7 +1106,8 @@ S: Maintained
+>>>  F: hw/intc/loongson_liointc.c
+>>>  
+>>>  Boston
+>>> -M: Paul Burton <pburton@wavecomp.com>
+>>> +M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>
+>> Missing in the patch description that you are taking this
+>> machine over.
+> 
+> After some rest I remember Paul said he'd come back on QEMU,
+> so it doesn't look right to kick him out that way.
+> 
+> Also in this thread you said you never saw a Boston board:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg691778.html
+> 
+> Paul might welcome you as a co-maintainer, but I rather keep
+> him for his expertise.
 
-Ok, that sound reasonable to me.
+Looking in archives, on Oct 20 2019 Paul said "it would be a pain
+to me if the boston machine bitrotted or anything" and he planned
+to find time to improve "the CM & MT ASE emulation".
+
+This was before Feb 19 2020 when he announced "[his] time with MIPS
+the company has reached its end": https://lkml.org/lkml/2020/2/19/984
+
+Still this change requires an Ack from him.
 
 > 
-> > Why not use KiB/MiB sizes as before? I created a patch for that. Can you check
-> > that I didn't skrew up the sizes?
+>>
+>>> +M: Huacai Chen <chenhc@lemote.com>
 > 
-> Thank you, the patch looks good to me.
-> How do you want to proceed? Should we send you a Patch v4?
-
-Yes, that would be best.
-
-Cheers,
-Bastian
+> Huacai, similarly does Jiangsu Lemote Tech Co., Ltd have real
+> interest in time to provide developers to maintain the Boston
+> machine?
+> 
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>>>  S: Maintained
+>>>  F: hw/core/loader-fit.c
+>>> @@ -2677,7 +2681,8 @@ F: disas/i386.c
+>>>  
+>>>  MIPS TCG target
+>>>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>> -R: Aurelien Jarno <aurelien@aurel32.net>
+>>> +M: Huacai Chen <chenhc@lemote.com>
+> 
+> $ git log --author='Huacai Chen <chenhc@lemote.com>' tcg/mips/ | wc -l
+> 0
+> 
+> $ git log --grep='Reviewed-by: Huacai Chen <chenhc@lemote.com>'
+> tcg/mips/ | wc -l
+> 0
+> 
+> git log --grep='Acked-by: Huacai Chen <chenhc@lemote.com>' tcg/mips/ | wc -l
+> 0
+> 
+>>> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> 
+> $ git log --grep='Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>'
+> tcg/mips/ | wc -l
+> 0
+> 
+> $ git log --grep='Acked-by: Jiaxun Yang <jiaxun.yang@flygoat.com>'
+> tcg/mips/ | wc -l
+> 0
+> 
+> I think you are confusing sections, Since Huacai and Jiaxun never showed
+> interest in the TCG target code, how can they become maintainers?
+> 
+>>>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> 
+> $ git log --grep='Reviewed-by: Aleksandar Rikalo' tcg/mips/ | wc -l
+> 0
+> $ git log --grep='Acked-by: Aleksandar Rikalo' tcg/mips/ | wc -l
+> 0
+> 
+> Apparently Aleksandar Rikalo can be "removed for not being present."
+> 
+> OTOH FWIW:
+> $ git log --author='Philippe Mathieu-Daudé' tcg/mips/ | wc -l
+> 25
+> $ git log --grep='Reviewed-by: Philippe Mathieu-Daudé' tcg/mips/ | wc -l
+> 99
+> 
+> So for this section changes:
+> NAcked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> The rest is conditional of Paul Burton and Aurelien Jarno Ack-by.
+> 
+>>>  S: Maintained
+>>>  F: tcg/mips/
+>>>
+>>
+>>
+> 
 
