@@ -2,58 +2,64 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B11AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A6EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:25:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0136220760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:25:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0136220760
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 237A120760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:25:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 237A120760
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfY2-0000XH-A9
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:25:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43904)
+	id 1jqfY7-0000gY-DY
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:25:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqfWA-0006ZA-SN; Wed, 01 Jul 2020 12:23:26 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:50028)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfTU-00031a-Po; Wed, 01 Jul 2020 12:20:40 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42687)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jqfW7-0000DO-P3; Wed, 01 Jul 2020 12:23:26 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id AFD00BF64B;
- Wed,  1 Jul 2020 16:23:20 +0000 (UTC)
-Date: Wed, 1 Jul 2020 18:23:17 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v2 13/18] hw/block/nvme: Set Finish/Reset Zone
- Recommended attributes
-Message-ID: <20200701162317.ayl5a3ipraiu7nfo@apples.localdomain>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
- <20200617213415.22417-14-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jqfTR-00084o-RN; Wed, 01 Jul 2020 12:20:40 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.345499-0.00503094-0.64947;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvwMu31_1593620430; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HvwMu31_1593620430)
+ by smtp.aliyun-inc.com(10.147.42.198);
+ Thu, 02 Jul 2020 00:20:30 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v12 27/61] target/riscv: vector widening saturating scaled
+ multiply-add
+Date: Wed,  1 Jul 2020 23:25:15 +0800
+Message-Id: <20200701152549.1218-28-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200617213415.22417-14-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 12:11:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,253 +72,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 18 06:34, Dmitry Fomichev wrote:
-> Added logic to set and reset FZR and RZR zone attributes. Four new
-> driver properties are added to control the timing of setting and
-> resetting these attributes. FZR/RZR delay lasts from the zone
-> operation and until when the corresponding zone attribute is set.
-> FZR/RZR limits set the time period between setting FZR or RZR
-> attribute and resetting it simulating the internal controller action
-> on that zone.
-> 
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   |  22 +++
+ target/riscv/insn32.decode              |   7 +
+ target/riscv/insn_trans/trans_rvv.inc.c |   9 ++
+ target/riscv/vector_helper.c            | 205 ++++++++++++++++++++++++
+ 4 files changed, 243 insertions(+)
 
-Please correct me if I am wrong here, but I want to raise a question
-about the use of QEMU_CLOCK_REALTIME here. I agree that it makes sense
-that the limits are "absolute", but does this hold for emulation? In my
-view, when emulation is stopped, the world is stopped. Should we emulate
-the need for background operations in this case? I don't think so.
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index b2fc71c2ea..f123302b82 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -751,3 +751,25 @@ DEF_HELPER_6(vsmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vwsmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwsmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwsmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 1dfc5f7ca0..8cc2bf4864 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -426,6 +426,13 @@ vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
+ vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
+ vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
+ vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
++vwsmaccu_vv     111100 . ..... ..... 000 ..... 1010111 @r_vm
++vwsmaccu_vx     111100 . ..... ..... 100 ..... 1010111 @r_vm
++vwsmacc_vv      111101 . ..... ..... 000 ..... 1010111 @r_vm
++vwsmacc_vx      111101 . ..... ..... 100 ..... 1010111 @r_vm
++vwsmaccsu_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
++vwsmaccsu_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
++vwsmaccus_vx    111111 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 8e85a2aed3..5e36ee8de5 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1758,3 +1758,12 @@ GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
+ /* Vector Single-Width Fractional Multiply with Rounding and Saturation */
+ GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
+ GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
++
++/* Vector Widening Saturating Scaled Multiply-Add */
++GEN_OPIVV_WIDEN_TRANS(vwsmaccu_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwsmacc_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwsmaccsu_vv, opivv_widen_check)
++GEN_OPIVX_WIDEN_TRANS(vwsmaccu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwsmacc_vx)
++GEN_OPIVX_WIDEN_TRANS(vwsmaccsu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwsmaccus_vx)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index d062d904ca..d818c32d97 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2704,3 +2704,208 @@ GEN_VEXT_VX_RM(vsmul_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX_RM(vsmul_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vsmul_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vsmul_vx_d, 8, 8, clearq)
++
++/* Vector Widening Saturating Scaled Multiply-Add */
++static inline uint16_t
++vwsmaccu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b,
++          uint16_t c)
++{
++    uint8_t round;
++    uint16_t res = (uint16_t)a * b;
++
++    round = get_round(vxrm, res, 4);
++    res   = (res >> 4) + round;
++    return saddu16(env, vxrm, c, res);
++}
++
++static inline uint32_t
++vwsmaccu16(CPURISCVState *env, int vxrm, uint16_t a, uint16_t b,
++           uint32_t c)
++{
++    uint8_t round;
++    uint32_t res = (uint32_t)a * b;
++
++    round = get_round(vxrm, res, 8);
++    res   = (res >> 8) + round;
++    return saddu32(env, vxrm, c, res);
++}
++
++static inline uint64_t
++vwsmaccu32(CPURISCVState *env, int vxrm, uint32_t a, uint32_t b,
++           uint64_t c)
++{
++    uint8_t round;
++    uint64_t res = (uint64_t)a * b;
++
++    round = get_round(vxrm, res, 16);
++    res   = (res >> 16) + round;
++    return saddu64(env, vxrm, c, res);
++}
++
++#define OPIVV3_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
++static inline void                                                 \
++do_##NAME(void *vd, void *vs1, void *vs2, int i,                   \
++          CPURISCVState *env, int vxrm)                            \
++{                                                                  \
++    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
++    TD d = *((TD *)vd + HD(i));                                    \
++    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1, d);                \
++}
++
++RVVCALL(OPIVV3_RM, vwsmaccu_vv_b, WOP_UUU_B, H2, H1, H1, vwsmaccu8)
++RVVCALL(OPIVV3_RM, vwsmaccu_vv_h, WOP_UUU_H, H4, H2, H2, vwsmaccu16)
++RVVCALL(OPIVV3_RM, vwsmaccu_vv_w, WOP_UUU_W, H8, H4, H4, vwsmaccu32)
++GEN_VEXT_VV_RM(vwsmaccu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV_RM(vwsmaccu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_RM(vwsmaccu_vv_w, 4, 8, clearq)
++
++#define OPIVX3_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)         \
++static inline void                                                 \
++do_##NAME(void *vd, target_long s1, void *vs2, int i,              \
++          CPURISCVState *env, int vxrm)                            \
++{                                                                  \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
++    TD d = *((TD *)vd + HD(i));                                    \
++    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, (TX1)(T1)s1, d);       \
++}
++
++RVVCALL(OPIVX3_RM, vwsmaccu_vx_b, WOP_UUU_B, H2, H1, vwsmaccu8)
++RVVCALL(OPIVX3_RM, vwsmaccu_vx_h, WOP_UUU_H, H4, H2, vwsmaccu16)
++RVVCALL(OPIVX3_RM, vwsmaccu_vx_w, WOP_UUU_W, H8, H4, vwsmaccu32)
++GEN_VEXT_VX_RM(vwsmaccu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX_RM(vwsmaccu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX_RM(vwsmaccu_vx_w, 4, 8, clearq)
++
++static inline int16_t
++vwsmacc8(CPURISCVState *env, int vxrm, int8_t a, int8_t b, int16_t c)
++{
++    uint8_t round;
++    int16_t res = (int16_t)a * b;
++
++    round = get_round(vxrm, res, 4);
++    res   = (res >> 4) + round;
++    return sadd16(env, vxrm, c, res);
++}
++
++static inline int32_t
++vwsmacc16(CPURISCVState *env, int vxrm, int16_t a, int16_t b, int32_t c)
++{
++    uint8_t round;
++    int32_t res = (int32_t)a * b;
++
++    round = get_round(vxrm, res, 8);
++    res   = (res >> 8) + round;
++    return sadd32(env, vxrm, c, res);
++
++}
++
++static inline int64_t
++vwsmacc32(CPURISCVState *env, int vxrm, int32_t a, int32_t b, int64_t c)
++{
++    uint8_t round;
++    int64_t res = (int64_t)a * b;
++
++    round = get_round(vxrm, res, 16);
++    res   = (res >> 16) + round;
++    return sadd64(env, vxrm, c, res);
++}
++
++RVVCALL(OPIVV3_RM, vwsmacc_vv_b, WOP_SSS_B, H2, H1, H1, vwsmacc8)
++RVVCALL(OPIVV3_RM, vwsmacc_vv_h, WOP_SSS_H, H4, H2, H2, vwsmacc16)
++RVVCALL(OPIVV3_RM, vwsmacc_vv_w, WOP_SSS_W, H8, H4, H4, vwsmacc32)
++GEN_VEXT_VV_RM(vwsmacc_vv_b, 1, 2, clearh)
++GEN_VEXT_VV_RM(vwsmacc_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_RM(vwsmacc_vv_w, 4, 8, clearq)
++RVVCALL(OPIVX3_RM, vwsmacc_vx_b, WOP_SSS_B, H2, H1, vwsmacc8)
++RVVCALL(OPIVX3_RM, vwsmacc_vx_h, WOP_SSS_H, H4, H2, vwsmacc16)
++RVVCALL(OPIVX3_RM, vwsmacc_vx_w, WOP_SSS_W, H8, H4, vwsmacc32)
++GEN_VEXT_VX_RM(vwsmacc_vx_b, 1, 2, clearh)
++GEN_VEXT_VX_RM(vwsmacc_vx_h, 2, 4, clearl)
++GEN_VEXT_VX_RM(vwsmacc_vx_w, 4, 8, clearq)
++
++static inline int16_t
++vwsmaccsu8(CPURISCVState *env, int vxrm, uint8_t a, int8_t b, int16_t c)
++{
++    uint8_t round;
++    int16_t res = a * (int16_t)b;
++
++    round = get_round(vxrm, res, 4);
++    res   = (res >> 4) + round;
++    return ssub16(env, vxrm, c, res);
++}
++
++static inline int32_t
++vwsmaccsu16(CPURISCVState *env, int vxrm, uint16_t a, int16_t b, uint32_t c)
++{
++    uint8_t round;
++    int32_t res = a * (int32_t)b;
++
++    round = get_round(vxrm, res, 8);
++    res   = (res >> 8) + round;
++    return ssub32(env, vxrm, c, res);
++}
++
++static inline int64_t
++vwsmaccsu32(CPURISCVState *env, int vxrm, uint32_t a, int32_t b, int64_t c)
++{
++    uint8_t round;
++    int64_t res = a * (int64_t)b;
++
++    round = get_round(vxrm, res, 16);
++    res   = (res >> 16) + round;
++    return ssub64(env, vxrm, c, res);
++}
++
++RVVCALL(OPIVV3_RM, vwsmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, vwsmaccsu8)
++RVVCALL(OPIVV3_RM, vwsmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, vwsmaccsu16)
++RVVCALL(OPIVV3_RM, vwsmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, vwsmaccsu32)
++GEN_VEXT_VV_RM(vwsmaccsu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV_RM(vwsmaccsu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_RM(vwsmaccsu_vv_w, 4, 8, clearq)
++RVVCALL(OPIVX3_RM, vwsmaccsu_vx_b, WOP_SSU_B, H2, H1, vwsmaccsu8)
++RVVCALL(OPIVX3_RM, vwsmaccsu_vx_h, WOP_SSU_H, H4, H2, vwsmaccsu16)
++RVVCALL(OPIVX3_RM, vwsmaccsu_vx_w, WOP_SSU_W, H8, H4, vwsmaccsu32)
++GEN_VEXT_VX_RM(vwsmaccsu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX_RM(vwsmaccsu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX_RM(vwsmaccsu_vx_w, 4, 8, clearq)
++
++static inline int16_t
++vwsmaccus8(CPURISCVState *env, int vxrm, int8_t a, uint8_t b, int16_t c)
++{
++    uint8_t round;
++    int16_t res = (int16_t)a * b;
++
++    round = get_round(vxrm, res, 4);
++    res   = (res >> 4) + round;
++    return ssub16(env, vxrm, c, res);
++}
++
++static inline int32_t
++vwsmaccus16(CPURISCVState *env, int vxrm, int16_t a, uint16_t b, int32_t c)
++{
++    uint8_t round;
++    int32_t res = (int32_t)a * b;
++
++    round = get_round(vxrm, res, 8);
++    res   = (res >> 8) + round;
++    return ssub32(env, vxrm, c, res);
++}
++
++static inline int64_t
++vwsmaccus32(CPURISCVState *env, int vxrm, int32_t a, uint32_t b, int64_t c)
++{
++    uint8_t round;
++    int64_t res = (int64_t)a * b;
++
++    round = get_round(vxrm, res, 16);
++    res   = (res >> 16) + round;
++    return ssub64(env, vxrm, c, res);
++}
++
++RVVCALL(OPIVX3_RM, vwsmaccus_vx_b, WOP_SUS_B, H2, H1, vwsmaccus8)
++RVVCALL(OPIVX3_RM, vwsmaccus_vx_h, WOP_SUS_H, H4, H2, vwsmaccus16)
++RVVCALL(OPIVX3_RM, vwsmaccus_vx_w, WOP_SUS_W, H8, H4, vwsmaccus32)
++GEN_VEXT_VX_RM(vwsmaccus_vx_b, 1, 2, clearh)
++GEN_VEXT_VX_RM(vwsmaccus_vx_h, 2, 4, clearl)
++GEN_VEXT_VX_RM(vwsmaccus_vx_w, 4, 8, clearq)
+-- 
+2.23.0
 
-> ---
->  hw/block/nvme.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/block/nvme.h | 13 ++++++-
->  2 files changed, 111 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index a29cbfcc96..c3898448c7 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -201,6 +201,84 @@ static inline void nvme_aor_dec_active(NvmeCtrl *n, NvmeNamespace *ns)
->      assert(ns->nr_active_zones >= 0);
->  }
->  
-> +static void nvme_set_rzr(NvmeCtrl *n, NvmeNamespace *ns, NvmeZone *zone)
-> +{
-> +    assert(zone->flags & NVME_ZFLAGS_SET_RZR);
-> +    zone->tstamp = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +    zone->flags &= ~NVME_ZFLAGS_TS_DELAY;
-> +    zone->d.za |= NVME_ZA_RESET_RECOMMENDED;
-> +    zone->flags &= ~NVME_ZFLAGS_SET_RZR;
-> +    trace_pci_nvme_zone_reset_recommended(zone->d.zslba);
-> +}
-> +
-> +static void nvme_clear_rzr(NvmeCtrl *n, NvmeNamespace *ns,
-> +    NvmeZone *zone, bool notify)
-> +{
-> +    if (n->params.rrl_usec) {
-> +        zone->flags &= ~(NVME_ZFLAGS_SET_RZR | NVME_ZFLAGS_TS_DELAY);
-> +        notify = notify && (zone->d.za & NVME_ZA_RESET_RECOMMENDED);
-> +        zone->d.za &= ~NVME_ZA_RESET_RECOMMENDED;
-> +        zone->tstamp = 0;
-> +    }
-> +}
-> +
-> +static void nvme_set_fzr(NvmeCtrl *n, NvmeNamespace *ns, NvmeZone *zone)
-> +{
-> +    assert(zone->flags & NVME_ZFLAGS_SET_FZR);
-> +    zone->tstamp = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +    zone->flags &= ~NVME_ZFLAGS_TS_DELAY;
-> +    zone->d.za |= NVME_ZA_FINISH_RECOMMENDED;
-> +    zone->flags &= ~NVME_ZFLAGS_SET_FZR;
-> +    trace_pci_nvme_zone_finish_recommended(zone->d.zslba);
-> +}
-> +
-> +static void nvme_clear_fzr(NvmeCtrl *n, NvmeNamespace *ns,
-> +    NvmeZone *zone, bool notify)
-> +{
-> +    if (n->params.frl_usec) {
-> +        zone->flags &= ~(NVME_ZFLAGS_SET_FZR | NVME_ZFLAGS_TS_DELAY);
-> +        notify = notify && (zone->d.za & NVME_ZA_FINISH_RECOMMENDED);
-> +        zone->d.za &= ~NVME_ZA_FINISH_RECOMMENDED;
-> +        zone->tstamp = 0;
-> +    }
-> +}
-> +
-> +static void nvme_schedule_rzr(NvmeCtrl *n, NvmeNamespace *ns, NvmeZone *zone)
-> +{
-> +    if (n->params.frl_usec) {
-> +        zone->flags &= ~(NVME_ZFLAGS_SET_FZR | NVME_ZFLAGS_TS_DELAY);
-> +        zone->d.za &= ~NVME_ZA_FINISH_RECOMMENDED;
-> +        zone->tstamp = 0;
-> +    }
-> +    if (n->params.rrl_usec) {
-> +        zone->flags |= NVME_ZFLAGS_SET_RZR;
-> +        if (n->params.rzr_delay_usec) {
-> +            zone->tstamp = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +            zone->flags |= NVME_ZFLAGS_TS_DELAY;
-> +        } else {
-> +            nvme_set_rzr(n, ns, zone);
-> +        }
-> +    }
-> +}
-> +
-> +static void nvme_schedule_fzr(NvmeCtrl *n, NvmeNamespace *ns, NvmeZone *zone)
-> +{
-> +    if (n->params.rrl_usec) {
-> +        zone->flags &= ~(NVME_ZFLAGS_SET_RZR | NVME_ZFLAGS_TS_DELAY);
-> +        zone->d.za &= ~NVME_ZA_RESET_RECOMMENDED;
-> +        zone->tstamp = 0;
-> +    }
-> +    if (n->params.frl_usec) {
-> +        zone->flags |= NVME_ZFLAGS_SET_FZR;
-> +        if (n->params.fzr_delay_usec) {
-> +            zone->tstamp = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +            zone->flags |= NVME_ZFLAGS_TS_DELAY;
-> +        } else {
-> +            nvme_set_fzr(n, ns, zone);
-> +        }
-> +    }
-> +}
-> +
->  static void nvme_assign_zone_state(NvmeCtrl *n, NvmeNamespace *ns,
->      NvmeZone *zone, uint8_t state)
->  {
-> @@ -208,15 +286,19 @@ static void nvme_assign_zone_state(NvmeCtrl *n, NvmeNamespace *ns,
->          switch (nvme_get_zone_state(zone)) {
->          case NVME_ZONE_STATE_EXPLICITLY_OPEN:
->              nvme_remove_zone(n, ns, ns->exp_open_zones, zone);
-> +            nvme_clear_fzr(n, ns, zone, false);
->              break;
->          case NVME_ZONE_STATE_IMPLICITLY_OPEN:
->              nvme_remove_zone(n, ns, ns->imp_open_zones, zone);
-> +            nvme_clear_fzr(n, ns, zone, false);
->              break;
->          case NVME_ZONE_STATE_CLOSED:
->              nvme_remove_zone(n, ns, ns->closed_zones, zone);
-> +            nvme_clear_fzr(n, ns, zone, false);
->              break;
->          case NVME_ZONE_STATE_FULL:
->              nvme_remove_zone(n, ns, ns->full_zones, zone);
-> +            nvme_clear_rzr(n, ns, zone, false);
->          }
->     }
->  
-> @@ -225,15 +307,19 @@ static void nvme_assign_zone_state(NvmeCtrl *n, NvmeNamespace *ns,
->      switch (state) {
->      case NVME_ZONE_STATE_EXPLICITLY_OPEN:
->          nvme_add_zone_tail(n, ns, ns->exp_open_zones, zone);
-> +        nvme_schedule_fzr(n, ns, zone);
->          break;
->      case NVME_ZONE_STATE_IMPLICITLY_OPEN:
->          nvme_add_zone_tail(n, ns, ns->imp_open_zones, zone);
-> +        nvme_schedule_fzr(n, ns, zone);
->          break;
->      case NVME_ZONE_STATE_CLOSED:
->          nvme_add_zone_tail(n, ns, ns->closed_zones, zone);
-> +        nvme_schedule_fzr(n, ns, zone);
->          break;
->      case NVME_ZONE_STATE_FULL:
->          nvme_add_zone_tail(n, ns, ns->full_zones, zone);
-> +        nvme_schedule_rzr(n, ns, zone);
->          break;
->      default:
->          zone->d.za = 0;
-> @@ -555,6 +641,7 @@ static void nvme_auto_transition_zone(NvmeCtrl *n, NvmeNamespace *ns,
->              zone->d.za &= ~(NVME_ZA_FINISH_RECOMMENDED |
->                              NVME_ZA_RESET_RECOMMENDED);
->              zone->d.za |= NVME_ZA_FINISHED_BY_CTLR;
-> +            zone->flags = 0;
->              zone->tstamp = 0;
->              trace_pci_nvme_zone_finished_by_controller(zone->d.zslba);
->          }
-> @@ -2624,6 +2711,11 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
->      n->num_zones = nz;
->      n->zone_array_size = sizeof(NvmeZone) * nz;
->  
-> +    n->params.rzr_delay_usec *= SCALE_MS;
-> +    n->params.rrl_usec *= SCALE_MS;
-> +    n->params.fzr_delay_usec *= SCALE_MS;
-> +    n->params.frl_usec *= SCALE_MS;
-> +
-
-I would prefer that user-given parameters are not changed like this.
-Setting defaults for various reasons are OK, but when the meaning of the
-parameter changes (like the scale), its confusing. I would suggest that
-the namespace gets the set of *_usec members and the parameters are name
-without the usec.
-
->      /* Make sure that the values of all Zoned Command Set properties are sane */
->      if (n->params.max_open_zones > nz) {
->          n->params.max_open_zones = nz;
-> @@ -2651,6 +2743,8 @@ static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
->      /* MAR/MOR are zeroes-based, 0xffffffff means no limit */
->      ns->id_ns_zoned->mar = cpu_to_le32(n->params.max_active_zones - 1);
->      ns->id_ns_zoned->mor = cpu_to_le32(n->params.max_open_zones - 1);
-> +    ns->id_ns_zoned->rrl = cpu_to_le32(n->params.rrl_usec / (1000 * SCALE_MS));
-> +    ns->id_ns_zoned->frl = cpu_to_le32(n->params.frl_usec / (1000 * SCALE_MS));
->      ns->id_ns_zoned->zoc = cpu_to_le16(n->params.active_excursions ? 0x2 : 0);
->      ns->id_ns_zoned->ozcs = n->params.cross_zone_read ? 0x01 : 0x00;
->  
-> @@ -3012,6 +3106,11 @@ static Property nvme_props[] = {
->      DEFINE_PROP_UINT32("zone_append_max_size", NvmeCtrl, params.zamds_bs, 0),
->      DEFINE_PROP_INT32("max_active", NvmeCtrl, params.max_active_zones, 0),
->      DEFINE_PROP_INT32("max_open", NvmeCtrl, params.max_open_zones, 0),
-> +    DEFINE_PROP_UINT64("reset_rcmnd_delay", NvmeCtrl, params.rzr_delay_usec, 0),
-> +    DEFINE_PROP_UINT64("reset_rcmnd_limit", NvmeCtrl, params.rrl_usec, 0),
-> +    DEFINE_PROP_UINT64("finish_rcmnd_delay", NvmeCtrl,
-> +                       params.fzr_delay_usec, 0),
-> +    DEFINE_PROP_UINT64("finish_rcmnd_limit", NvmeCtrl, params.frl_usec, 0),
->      DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
->      DEFINE_PROP_BOOL("active_excursions", NvmeCtrl, params.active_excursions,
->                       false),
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 8a0aaeb09a..be1920f1ef 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -22,6 +22,10 @@ typedef struct NvmeParams {
->      uint64_t    zone_capacity;
->      int32_t     max_active_zones;
->      int32_t     max_open_zones;
-> +    uint64_t    rzr_delay_usec;
-> +    uint64_t    rrl_usec;
-> +    uint64_t    fzr_delay_usec;
-> +    uint64_t    frl_usec;
->  } NvmeParams;
->  
->  typedef struct NvmeAsyncEvent {
-> @@ -77,12 +81,19 @@ typedef struct NvmeCQueue {
->      QTAILQ_HEAD(, NvmeRequest) req_list;
->  } NvmeCQueue;
->  
-> +enum NvmeZoneFlags {
-> +    NVME_ZFLAGS_TS_DELAY = 1 << 0,
-> +    NVME_ZFLAGS_SET_RZR  = 1 << 1,
-> +    NVME_ZFLAGS_SET_FZR  = 1 << 2,
-> +};
-> +
->  typedef struct NvmeZone {
->      NvmeZoneDescr   d;
->      uint64_t        tstamp;
-> +    uint32_t        flags;
->      uint32_t        next;
->      uint32_t        prev;
-> -    uint8_t         rsvd80[8];
-> +    uint8_t         rsvd84[4];
->  } NvmeZone;
->  
->  #define NVME_ZONE_LIST_NIL    UINT_MAX
-> -- 
-> 2.21.0
-> 
-> 
 
