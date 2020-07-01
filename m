@@ -2,86 +2,86 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F374CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EE8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD90D20760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A880C20760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:16:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A9hRZQvs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD90D20760
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qT/4txte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A880C20760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfOw-0004Dg-VT
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:15:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40132)
+	id 1jqfOz-0004Jz-Ss
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:16:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqfL9-0007GY-8a
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:12:03 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54670)
+ id 1jqfL8-0007Ds-5m
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:12:02 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45830)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqfL6-0006Gu-Gk
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:12:02 -0400
-Received: by mail-wm1-x342.google.com with SMTP id o8so23020231wmh.4
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:11:59 -0700 (PDT)
+ id 1jqfL4-0006GM-Fc
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:12:01 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s10so24588250wrw.12
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cOgbqI8IByJK4hKbNOF3vXqsSmzYFMqTxbljVvHqKbI=;
- b=A9hRZQvsvnWolLV/1g+zGO5b8ovhFkRVxmmpl4IvSiFyB/LGpj8/oD2KBVcRfiJ7Mn
- Sy9ZEGPjjNd52wQwAL73n3fqvA7EP3SWvsXDL00V+5NSSLMHQBZ7tSHzHxtrZLrIzXDK
- c+2EQEicc6VS9g/YlvVRSLUq0D/XqhHd9Oyu1u1v54uoeEEjeLXSsxDCTSQo5QBJDbD7
- VpGTJw7SG5JpD7tR11NhuXtNaT45BiEPqok4jHGc/YtZ0w9MUHD+Jl9vb03zd5XEmsp0
- kM8bFf4nfX+3Rs+8rocEMPry5mPnURFaurg0AX6DQv+LmOCES5NsNajEOd29gDxxcRG5
- ohEA==
+ bh=plqX1uLjHS1JRtUyTbOdw9sOOjMvjpQ/src1XYAUVDM=;
+ b=qT/4txteqaajJk5C+0hMAnHFYeTIx/JBSqvSnfmpWrKhkPM+MCh0ieWDsBE3riGg5S
+ pwaFghfibw4x5VvpkTeBLf9mq7lbr//vb1L6lKK/P05QmrqtyDHtalxFKHI6MMSjcsy3
+ of8Wecu4iGPV7kjHnrvB7tMOX7eFtSvwWFRVPVs/Mz+kWAk6lZl3aW9p3EfT6+ZKpLtQ
+ W3KWGhl5dy+coKb12u7szq9y2A3Mf6eka05F/hmsRSH+md4i/wCSLYJQY4thgCT7lhZS
+ aGpNfZOjYgL4MnIReIqfuVEa6MrldM42YV5rTo60Vcpn+tYl3MteisEICZt7KyQ1Vpyi
+ fjkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cOgbqI8IByJK4hKbNOF3vXqsSmzYFMqTxbljVvHqKbI=;
- b=KUAZ3ZmM+xFziwtAhNYQqe6ve746/0J1vLqele9t/WI3xfdSqoHvf9C6jmUKMZYknQ
- WYYxxHjYrKcDufHDCIaCEJFLSs75vEOME/PlHWWX2XVxp9q5F5ugvyx5OqQ0A4HQCBeL
- wBLYBVghc0rRGcFmjDFgfzMFn5R0I2t7JwturYItrqbV6VTmC5M3nEwssWkiRSbu3+LN
- 9RI4isq9NHOu0B6c/XUP/F+joFAXY9YeeaV3SB/cv5tCWJ0UbI1x+C6/n6c2cBwlV9bX
- ZTq8Jg9b9oNv8ta79nH3t//It3HiY0bINjYtMmyABr6CrQFKivfzEF3+CbO+AGeu4irA
- fhNw==
-X-Gm-Message-State: AOAM531kdzUDSe97mAWK1JeCxxIRxjlubnySSjDAar5FetKC6wzyvWbg
- dA14gHjaJ9cjPYhrAcUr7FQGuw==
-X-Google-Smtp-Source: ABdhPJy83Q7nFIG1gUhlnNMSGxC2O0i4yVGJQEoYMgu1OSUOg7Gd81m35utDOS+IiElQswccMq9m7A==
-X-Received: by 2002:a1c:398b:: with SMTP id g133mr26420177wma.76.1593619917789; 
- Wed, 01 Jul 2020 09:11:57 -0700 (PDT)
+ bh=plqX1uLjHS1JRtUyTbOdw9sOOjMvjpQ/src1XYAUVDM=;
+ b=LGL7oZerFZhLbGt0oARIYOle/J4gYP9ej7EG/Fd+xHfq50z8jVhQ2Oqv8o6NH0M7Uh
+ ReABiCRnzud/K7FCTBSdSYizVFjJVCRFaxhMbU/RRAgoIXMtfF3oRUpRFN7wYRN7Ezmk
+ gZD3vNqnNI9tGfu34JcxlLCGcHZ5TmEnFDr6wl3p7DbtUn4Zv+d/gF62SHy+25cbHhnK
+ qjiGeT2EuAczZaHa8dHwNTVUySLgesiX4e7leYMsZqqr3VXlsucy34OTftWAf2z2ypuV
+ lpURVOL/6BLzEKszCB4isKthYyDoFdYDM5FA4o0Fndjz+Gzoz87QFpq4+ZlpgulNj2Va
+ KqNg==
+X-Gm-Message-State: AOAM533U9qI1FBu4DNH1c9s5XCiz9rlndc/zZ0wE3ZR3H3hPq9Cs8EOx
+ VlpaAr5oZRpkiU+I2u2s3S221Q==
+X-Google-Smtp-Source: ABdhPJxhbFM3ysjxh1hMwdGkW6s+aPuVHA0F88oKfI/tGJhhz3nBanOa/ZWjT9l1ZQ54APNIw+L7aQ==
+X-Received: by 2002:adf:f60c:: with SMTP id t12mr29586194wrp.198.1593619916565; 
+ Wed, 01 Jul 2020 09:11:56 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s18sm8655356wra.85.2020.07.01.09.11.54
+ by smtp.gmail.com with ESMTPSA id z17sm8248687wmc.3.2020.07.01.09.11.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 01 Jul 2020 09:11:54 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 685B01FF87;
+ by zen.linaroharston (Postfix) with ESMTP id 7EA2E1FF8C;
  Wed,  1 Jul 2020 17:11:53 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 1/3] docs/booting.rst: start documenting the boot process
-Date: Wed,  1 Jul 2020 17:11:51 +0100
-Message-Id: <20200701161153.30988-2-alex.bennee@linaro.org>
+Subject: [PATCH  v2 2/3] docs/devel: convert and update MTTCG design document
+Date: Wed,  1 Jul 2020 17:11:52 +0100
+Message-Id: <20200701161153.30988-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200701161153.30988-1-alex.bennee@linaro.org>
 References: <20200701161153.30988-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,208 +108,136 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While working on some test cases I realised there was quite a lot of
-assumed knowledge about how things boot up. I thought it would be
-worth gathering this together in a user facing document where we could
-pour in the details and background to the boot process. As it's quite
-wordy I thought it should be a separate document to the manual (which
-can obviously reference this).
-
-The document follows the socratic method and leaves the reader to ask
-themselves some questions in an effort to elucidate them about any
-problems they may be having.
+Do a light conversion to .rst and clean-up some of the language at the
+start now MTTCG has been merged for a while.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190308211557.22589-1-alex.bennee@linaro.org>
-
 ---
-v2
-  - fix a lot of it's/its
-  - mention microvm style booting
-  - add some questions to the end
----
- docs/interop/booting.rst | 159 +++++++++++++++++++++++++++++++++++++++
- docs/interop/index.rst   |   1 +
- 2 files changed, 160 insertions(+)
- create mode 100644 docs/interop/booting.rst
+ docs/devel/index.rst                          |  1 +
+ ...ti-thread-tcg.txt => multi-thread-tcg.rst} | 52 ++++++++++++-------
+ 2 files changed, 34 insertions(+), 19 deletions(-)
+ rename docs/devel/{multi-thread-tcg.txt => multi-thread-tcg.rst} (90%)
 
-diff --git a/docs/interop/booting.rst b/docs/interop/booting.rst
-new file mode 100644
-index 00000000000..8579a775d04
---- /dev/null
-+++ b/docs/interop/booting.rst
-@@ -0,0 +1,159 @@
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index bb8238c5d6d..4ecaea3643f 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -23,6 +23,7 @@ Contents:
+    decodetree
+    secure-coding-practices
+    tcg
++   multi-thread-tcg
+    tcg-plugins
+    bitops
+    reset
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.rst
+similarity index 90%
+rename from docs/devel/multi-thread-tcg.txt
+rename to docs/devel/multi-thread-tcg.rst
+index 3c85ac0eab9..42158b77c70 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.rst
+@@ -1,15 +1,17 @@
+-Copyright (c) 2015-2016 Linaro Ltd.
 +..
-+  Copyright (c) 2019-2020 Linaro Ltd.
-+
++  Copyright (c) 2015-2020 Linaro Ltd.
+ 
+-This work is licensed under the terms of the GNU GPL, version 2 or
+-later. See the COPYING file in the top-level directory.
 +  This work is licensed under the terms of the GNU GPL, version 2 or
 +  later. See the COPYING file in the top-level directory.
-+
-+=====================================
-+Anatomy of a Boot, a QEMU perspective
-+=====================================
-+
-+This document attempts to give an overview of how machines boot and
-+how this matters to QEMU. We will discuss firmware and BIOSes and the
-+things they do before the OS kernel is loaded and your usable system
-+is finally ready.
-+
-+Firmware
-+========
-+
-+When a CPU is powered up it knows nothing about its environment. The
-+internal state, including the program counter (PC), will be reset to a
-+defined set of values and it will attempt to fetch the first
-+instruction and execute it. It is the job of the firmware to bring a
-+CPU up from the initial few instructions to running in a relatively
-+sane execution environment. Firmware tends to be specific to the
-+hardware in question and is stored on non-volatile memory (memory that
-+survives a power off) usually a ROM or flash device on the computers
-+main board.
-+
-+Some examples of what firmware does include:
-+
-+Early Hardware Setup
-+--------------------
-+
-+Modern hardware often requires configuring before it is usable. For
-+example most modern systems won't have working RAM until the memory
-+controller has been programmed with the correct timings for whatever
-+memory is installed on the system. Processors may boot with a very
-+restricted view of the memory map until RAM and other key peripherals
-+have been configured to appear in its address space. Some hardware
-+may not even appear until some sort of blob has been loaded into it so
-+it can start responding to the CPU.
-+
-+Fortunately for QEMU we don't have to worry too much about this very
-+low level configuration. The device model we present to the CPU at
-+start-up will generally respond to IO access from processor straight
-+away.
-+
-+BIOS or Firmware Services
-+-------------------------
-+
-+In the early days of the PC era the BIOS or Basic Input/Output System
-+provided an abstraction interface to the operating system which
-+allowed them to do basic IO operations without having to directly
-+drive the hardware. Since then the scope of these firmware services
-+have grown as systems become more and more complex.
-+
-+Modern firmware often follows the Unified Extensible Firmware
-+Interface (UEFI) which provides services like secure boot, persistent
-+variables and external time-keeping.
-+
-+There can often be multiple levels of firmware service functions. For
-+example systems which support secure execution enclaves generally have
-+a firmware component that executes in this secure mode which the
-+operating system can call in a defined secure manner to undertake
-+security sensitive tasks on its behalf.
-+
-+Hardware Enumeration
-+--------------------
-+
-+It is easy to assume that modern hardware is built to be discover-able
-+and all the operating system needs to do is enumerate the various
-+buses on the system to find out what hardware exists. While buses like
-+PCI and USB do support discovery there is usually much more on a
-+modern system than just these two things.
-+
-+This process of discovery can take some time as devices usually need
-+to be probed and some time allowed for the buses to settle and the
-+probe complete. For purely virtual machines operating in on-demand
-+cloud environments you may operate with stripped down kernels that
-+only support a fixed expected environment so they can boot as fast as
-+possible.
-+
-+In the embedded world it used to be acceptable to have a similar
-+custom compiled kernel which knew where everything is meant to be.
-+However this was a brittle approach and not very flexible. For example
-+a general purpose distribution would have to ship a special kernel for
-+each variant of hardware you wanted to run on. If you try and use a
-+kernel compiled for one platform that nominally uses the same
-+processor as another platform the result will rarely work given a
-+processor rarely works in isolation.
-+
-+The more modern approach is to have a "generic" kernel that has a
-+number of different drivers compiled in which are then enabled based
-+on a hardware description provided by the firmware. This allows
-+flexibility on both sides. The software distribution is less concerned
-+about managing lots of different kernels for different pieces of
-+hardware. The hardware manufacturer is also able to make small changes
-+to the board over time to fix bugs or change minor components.
-+
-+The two main methods for this are the Advanced Configuration and Power
-+Interface (ACPI) and Device Trees. ACPI originated from the PC world
-+although it is becoming increasingly common for "enterprise" hardware
-+like servers. Device Trees of various forms have existed for a while
-+with perhaps the most common being Flattened Device Trees (FDT).
-+
-+Boot Code
-+=========
-+
-+The line between firmware and boot code is a very blurry one. However
-+from a functionality point of view we have moved from ensuring the
-+hardware is usable as a computing device to finding and loading a
-+kernel which is then going to take over control of the system. Modern
-+firmware often has the ability to boot a kernel directly and in some
-+systems you might chain through several boot loaders before the final
-+kernel takes control.
-+
-+The boot loader needs to do 3 things:
-+
-+  - find a kernel and load it into RAM
-+  - ensure the CPU is in the correct mode for the kernel to boot
-+  - pass any information the kernel may need to boot and can't find itself
-+
-+Once it has done these things it can jump to the kernel and let it get
-+on with things.
-+
-+Kernel
-+======
-+
-+The Kernel now takes over and will be in charge of the system from now
-+on. It will enumerate all the devices on the system (again) and load
-+drivers that can control them. It will then locate some sort of
-+file-system and eventually start running programs that actually do
-+work.
-+
-+Questions to ask yourself
-+=========================
-+
-+Having given this overview of booting here are some questions you
-+should ask when diagnosing boot problems.
-+
-+Hardware
-+~~~~~~~~
-+
-+ - is the platform fixed or dynamic?
-+ - is the platform enumeratable (e.g. PCI/USB)?
-+
-+Firmware
-+~~~~~~~~
-+
-+ - is the firmware built for the platform your are booting?
-+ - does the firmware need storage for variables (boot index etc)?
-+ - does the firmware provide a service to kernels (e.g. ACPI/EFI)?
-+
-+Kernel
-+~~~~~~
-+
-+ - is the kernel platform specific or generic?
-+ - how will the kernel enumerate the platform?
-+ - can the kernel interface talk to the firmware?
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 049387ac6de..58d587444b3 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -12,6 +12,7 @@ Contents:
- .. toctree::
-    :maxdepth: 2
  
-+   booting
-    bitmaps
-    dbus
-    dbus-vmstate
+ Introduction
+ ============
+ 
+-This document outlines the design for multi-threaded TCG system-mode
+-emulation. The current user-mode emulation mirrors the thread
+-structure of the translated executable. Some of the work will be
+-applicable to both system and linux-user emulation.
++This document outlines the design for multi-threaded TCG (a.k.a MTTCG)
++system-mode emulation. user-mode emulation has always mirrored the
++thread structure of the translated executable although some of the
++changes done for MTTCG system emulation have improved the stability of
++linux-user emulation.
+ 
+ The original system-mode TCG implementation was single threaded and
+ dealt with multiple CPUs with simple round-robin scheduling. This
+@@ -21,9 +23,18 @@ vCPU Scheduling
+ ===============
+ 
+ We introduce a new running mode where each vCPU will run on its own
+-user-space thread. This will be enabled by default for all FE/BE
+-combinations that have had the required work done to support this
+-safely.
++user-space thread. This is enabled by default for all FE/BE
++combinations where the host memory model is able to accommodate the
++guest (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO is zero) and the
++guest has had the required work done to support this safely
++(TARGET_SUPPORTS_MTTCG).
++
++System emulation will fall back to the original round robin approach
++if:
++
++* forced by --accel tcg,thread=single
++* enabling --icount mode
++* 64 bit guests on 32 bit hosts (TCG_OVERSIZED_GUEST)
+ 
+ In the general case of running translated code there should be no
+ inter-vCPU dependencies and all vCPUs should be able to run at full
+@@ -61,7 +72,9 @@ have their block-to-block jumps patched.
+ Global TCG State
+ ----------------
+ 
+-### User-mode emulation
++User-mode emulation
++~~~~~~~~~~~~~~~~~~~
++
+ We need to protect the entire code generation cycle including any post
+ generation patching of the translated code. This also implies a shared
+ translation buffer which contains code running on all cores. Any
+@@ -78,9 +91,11 @@ patching.
+ 
+ Code generation is serialised with mmap_lock().
+ 
+-### !User-mode emulation
++!User-mode emulation
++~~~~~~~~~~~~~~~~~~~~
++
+ Each vCPU has its own TCG context and associated TCG region, thereby
+-requiring no locking.
++requiring no locking during translation.
+ 
+ Translation Blocks
+ ------------------
+@@ -92,6 +107,7 @@ including:
+ 
+   - debugging operations (breakpoint insertion/removal)
+   - some CPU helper functions
++  - linux-user spawning it's first thread
+ 
+ This is done with the async_safe_run_on_cpu() mechanism to ensure all
+ vCPUs are quiescent when changes are being made to shared global
+@@ -250,8 +266,10 @@ to enforce a particular ordering of memory operations from the point
+ of view of external observers (e.g. another processor core). They can
+ apply to any memory operations as well as just loads or stores.
+ 
+-The Linux kernel has an excellent write-up on the various forms of
+-memory barrier and the guarantees they can provide [1].
++The Linux kernel has an excellent `write-up
++<https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/memory-barriers.txt>`
++on the various forms of memory barrier and the guarantees they can
++provide.
+ 
+ Barriers are often wrapped around synchronisation primitives to
+ provide explicit memory ordering semantics. However they can be used
+@@ -352,7 +370,3 @@ an exclusive lock which ensures all emulation is serialised.
+ While the atomic helpers look good enough for now there may be a need
+ to look at solutions that can more closely model the guest
+ architectures semantics.
+-
+-==========
+-
+-[1] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/memory-barriers.txt
 -- 
 2.20.1
 
