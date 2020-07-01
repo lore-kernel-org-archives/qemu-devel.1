@@ -2,59 +2,107 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2909CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 22:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6659FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 22:45:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F280B20853
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 22:17:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F280B20853
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8932082F
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 22:45:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJ1I8heJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8932082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jql2x-0005Jg-86
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 18:17:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44162)
+	id 1jqlTQ-0004wr-Ec
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 18:45:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <agraf@csgraf.de>)
- id 1jql20-0004kn-7n; Wed, 01 Jul 2020 18:16:41 -0400
-Received: from mail.csgraf.de ([188.138.100.120]:47266
- helo=zulu616.server4you.de) by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <agraf@csgraf.de>)
- id 1jql1x-0007Ms-AV; Wed, 01 Jul 2020 18:16:39 -0400
-Received: from macbook.alex.local (x4d024519.dyn.telefonica.de [77.2.69.25])
- by csgraf.de (Postfix) with ESMTPSA id 3CE65390039A;
- Thu,  2 Jul 2020 00:16:34 +0200 (CEST)
-Subject: Re: [PATCH] target/arm: Treat unknown SMC calls as NOP
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200701200848.26746-1-agraf@csgraf.de>
- <CAFEAcA9S5v0LHMNc4fu9JGUzecbg8DsogZuCEv_aGNqVxRAcDQ@mail.gmail.com>
-From: Alexander Graf <agraf@csgraf.de>
-Message-ID: <60440cb5-bd18-2928-afcf-974766222dd7@csgraf.de>
-Date: Thu, 2 Jul 2020 00:16:33 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1jqlSJ-0004PH-9a
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 18:43:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36885
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1jqlQv-0003tv-J3
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 18:43:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593643344;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YP51gbz2eFPGvHNAZn6Mpz/3yjbOdqbadWGyF3fyGtw=;
+ b=VJ1I8heJiDIwCZoMX5H7MaCscH6rSe82HIpBOAlrZUC/6MLnkw6RrDxjR/RthODSyYheRe
+ YrBYKsFTGrI5oleNre1E87ej2ZIlMPToo6bNzBv7+fggPK3JiKlMzE5qDmMcyaH1LkrbaR
+ 66rggD6I0XbIxZR9/8zTDlLjghWzwZg=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-KM31f6UBOo6uUo-uoF_daw-1; Wed, 01 Jul 2020 18:42:21 -0400
+X-MC-Unique: KM31f6UBOo6uUo-uoF_daw-1
+Received: by mail-qt1-f200.google.com with SMTP id o11so17874607qti.23
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 15:42:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YP51gbz2eFPGvHNAZn6Mpz/3yjbOdqbadWGyF3fyGtw=;
+ b=LR4xX/2FvdqBFGbcOoz0vOEc/2l5fIk5GjKJ1vl9N9HHq5/tRSAoAfTqWwffYF7zQs
+ F1N4ZNQYZcrr/20mWcrKpBKF4Lc5QePtt/OHWKafNU9q9mQWIqPs3J0WGHZu/Xy59t4w
+ SunzjO8mrx2HQmWb09tBEV7mj/cDjVb7wnLUAtRfvnXxQ7zPlISvHXB46RgFE4a4mkh9
+ EyuJGgjAuyLDZHsZfQErL1uBg1SZ+mBbPz3/Cs8xJ7SLnn/x7h17+pR6MgolAJXYNtwx
+ rxaCTcvjgpVODdG3yKsiicZdU8cTT1kwqG7jBL2V7kKR9bxIcIMNmGJ0T+EtR1cKSvuV
+ onwQ==
+X-Gm-Message-State: AOAM531NVzOi+ms/NayuGjlDGR6CJJmD1zF+XBPcOtuLo4zfGgfC+WJs
+ 805B9wc9lt8qYmtDnAC8dEDNOLQHj95VgWwk/ci+1JCPmt4hQVczsUa6AseMXFLLNcQ4poCelEY
+ frYiA/iKoVmkicPk=
+X-Received: by 2002:ac8:4411:: with SMTP id j17mr28208692qtn.77.1593643340983; 
+ Wed, 01 Jul 2020 15:42:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxuxeQMXI9tFpcEM6J9ofI/wy/zw3uH6UOaJvc2CIlfdZfgqy5ToBSaoNtSW2RQdp1Ga2Vxw==
+X-Received: by 2002:ac8:4411:: with SMTP id j17mr28208673qtn.77.1593643340708; 
+ Wed, 01 Jul 2020 15:42:20 -0700 (PDT)
+Received: from [192.168.0.172] (c-71-63-171-240.hsd1.or.comcast.net.
+ [71.63.171.240])
+ by smtp.gmail.com with ESMTPSA id k45sm7997921qtc.62.2020.07.01.15.42.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 15:42:20 -0700 (PDT)
+Subject: Re: [PATCH] block: Raise an error when backing file parameter is an
+ empty string
+From: Connor Kuehl <ckuehl@redhat.com>
+To: kwolf@redhat.com, mreitz@redhat.com
+References: <20200617182725.951119-1-ckuehl@redhat.com>
+Message-ID: <47f5b1fe-e6cd-2302-e36f-5ad071cd3374@redhat.com>
+Date: Wed, 1 Jul 2020 15:42:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9S5v0LHMNc4fu9JGUzecbg8DsogZuCEv_aGNqVxRAcDQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200617182725.951119-1-ckuehl@redhat.com>
 Content-Language: en-US
-Received-SPF: pass client-ip=188.138.100.120; envelope-from=agraf@csgraf.de;
- helo=zulu616.server4you.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 18:16:34
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ckuehl@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ckuehl@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 18:42:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,80 +115,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Kevin & Max,
 
-On 01.07.20 22:47, Peter Maydell wrote:
-> On Wed, 1 Jul 2020 at 21:08, Alexander Graf <agraf@csgraf.de> wrote:
->> We currently treat unknown SMC calls as UNDEF. This behavior is different
->> from KVM, which treats them as NOP.
->>
->> Unfortunately, the UNDEF exception breaks running Windows for ARM in QEMU,
->> as that probes an OEM SMCCC call on boot, but does not expect to receive
->> an UNDEF exception as response.
->>
->> So instead, let's follow the KVM path and ignore SMC calls that we don't
->> handle. This fixes booting the Windows 10 for ARM preview in TCG for me.
->>
->> Signed-off-by: Alexander Graf <agraf@csgraf.de>
->> +    if (cs->exception_index == EXCP_SMC &&
->> +        !arm_feature(env, ARM_FEATURE_EL3) &&
->> +        cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
-> This condition says: "we got an SMC, and this CPU doesn't
-> have EL3, and we're not imitating real EL3 firmware".
+Just pinging this patch for your consideration.
 
+Thank you,
 
-I like to think of it as "This CPU exposes an environment that looks
-like KVM, so it implements HVC calls (EL2) and is responsible for
-handling SMC calls as well.
+Connor
 
-The main difference between the two semantics is that in yours, you
-don't have EL3. In mine, there is an EL3, but it's virtualized by the
-same layer that implements EL2.
-
-
-> The architecturally correct behaviour here (since we don't
-> implement nested-virt yet, which might allow it to trap
-> to guest EL2) is to UNDEF, as far as I can see from a quick
-> look at the AArch64.CheckForSMCUndefOrTrap().
->
-> I'm not sure why KVM makes these NOP; if I'm right about the
-> architectural behaviour then making them NOP would be a KVM bug.
->
-> If Windows makes an SMC call on boot that seems like a guest
-> bug: it would crash on a real CPU without EL2/EL3 as well.
-
-
-I don't think there can be a real SBBR compatible CPU without EL2/EL3,
-because PSCI is a base requirement. That means either SMC calls succeed
-(Windows running in EL2) or SMC calls are trapped into EL2 and it's up
-to the hypervisor to decide what to do with them.
-
-
->
->       *  Conduit SMC, valid call  Trap to EL2         PSCI Call
->       *  Conduit SMC, inval call  Trap to EL2         Undef insn
-> -     *  Conduit not SMC          Undef insn          Undef insn
-> +     *  Conduit not SMC          nop                 nop
->
-> The line in this table that your commit message says you're
-> fixing is "Conduit SMC, inval call"; the line your code
-> change affects is "Conduit not SMC", which is not the same
-> thing. (I'd have to look at the PSCI spec to see what it
-> requires for SMCs that aren't valid PSCI calls.)
-
-
-The patch fixes the default environment, which is "Conduit HVC, PSCI
-over HVC implemented by QEMU". If the patch description wasn't clear,
-I'm happy to reword it :).
-
-
-Alex
-
+On 6/17/20 11:27 AM, Connor Kuehl wrote:
+> Providing an empty string for the backing file parameter like so:
+> 
+> 	qemu-img create -f qcow2 -b '' /tmp/foo
+> 
+> allows the flow of control to reach and subsequently fail an assert
+> statement because passing an empty string to
+> 
+> 	bdrv_get_full_backing_filename_from_filename()
+> 
+> simply results in NULL being returned without an error being raised.
+> 
+> To fix this, let's check for an empty string when getting the value from
+> the opts list.
+> 
+> Reported-by: Attila Fazekas <afazekas@redhat.com>
+> Fixes: https://bugzilla.redhat.com/1809553
+> Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
+> ---
+>   block.c                    |  4 ++++
+>   tests/qemu-iotests/298     | 47 ++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/298.out |  5 ++++
+>   tests/qemu-iotests/group   |  1 +
+>   4 files changed, 57 insertions(+)
+>   create mode 100755 tests/qemu-iotests/298
+>   create mode 100644 tests/qemu-iotests/298.out
+> 
+> diff --git a/block.c b/block.c
+> index 6dbcb7e083..b335d6bcb2 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -6116,6 +6116,10 @@ void bdrv_img_create(const char *filename, const char *fmt,
+>                                "same filename as the backing file");
+>               goto out;
+>           }
+> +        if (backing_file[0] == '\0') {
+> +            error_setg(errp, "Expected backing file name, got empty string");
+> +            goto out;
+> +        }
+>       }
+>   
+>       backing_fmt = qemu_opt_get(opts, BLOCK_OPT_BACKING_FMT);
+> diff --git a/tests/qemu-iotests/298 b/tests/qemu-iotests/298
+> new file mode 100755
+> index 0000000000..1e30caebec
+> --- /dev/null
+> +++ b/tests/qemu-iotests/298
+> @@ -0,0 +1,47 @@
+> +#!/usr/bin/env python3
+> +#
+> +# Copyright (C) 2020 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +
+> +
+> +
+> +# Regression test for avoiding an assertion when the 'backing file'
+> +# parameter (-b) is set to an empty string for qemu-img create
+> +#
+> +#   qemu-img create -f qcow2 -b '' /tmp/foo
+> +#
+> +# This ensures the invalid parameter is handled with a user-
+> +# friendly message instead of a failed assertion.
+> +
+> +import iotests
+> +
+> +class TestEmptyBackingFilename(iotests.QMPTestCase):
+> +
+> +
+> +    def test_empty_backing_file_name(self):
+> +        actual = iotests.qemu_img_pipe(
+> +                'create',
+> +                '-f', 'qcow2',
+> +                '-b', '',
+> +                '/tmp/foo'
+> +        )
+> +        expected = 'qemu-img: /tmp/foo: Expected backing file name,' \
+> +                   ' got empty string'
+> +
+> +        self.assertEqual(actual.strip(), expected.strip())
+> +
+> +
+> +if __name__ == '__main__':
+> +    iotests.main(supported_fmts=['raw', 'qcow2'])
+> diff --git a/tests/qemu-iotests/298.out b/tests/qemu-iotests/298.out
+> new file mode 100644
+> index 0000000000..ae1213e6f8
+> --- /dev/null
+> +++ b/tests/qemu-iotests/298.out
+> @@ -0,0 +1,5 @@
+> +.
+> +----------------------------------------------------------------------
+> +Ran 1 tests
+> +
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index d886fa0cb3..4bca2d9e05 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -302,3 +302,4 @@
+>   291 rw quick
+>   292 rw auto quick
+>   297 meta
+> +298 img auto quick
+> 
 
 
