@@ -2,123 +2,92 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA59C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2945B2073E
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ACA52073E
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChAoFenx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2945B2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dO1xnBDP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACA52073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqXgV-0006KH-D2
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:01:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
+	id 1jqXiQ-0007LP-J0
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqXfl-0005tI-Vt
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:00:51 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqXff-0007Qw-J9
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:00:49 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q5so22776357wru.6
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 01:00:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Vw9wSuKAFVQGZnys/rfuIJ6kqUP630Zp034UbfAD37o=;
- b=ChAoFenx7srAx+i6QMTaRrMBwQZjnoRA4mbAyQpJSZK674vkEdqS/TxGYyswS5+v8v
- T3hSfDpc/Vn7oo/8Xkzo2fwi06PyjWh20XT0VIFoRM7hMpTxezcg8IzSO5LO9+SzIAon
- jwtcVoHhV4QEwALSmkrfafkK0jaAXHLHihVfIYc3yuowA7m5WssIwjI8FML/pOBlDHEH
- fD7y5FsgAsv0pZqoG2ysUQxFBDOShhzcmnNVdQUUaQ7xJnpOb0NKy4hphIOZrRa8q/Mo
- r9bmZtZ8qgXBy0qnRBBGRCsh2XN37j4qpT4A4/FEeOW+jpp7n+v02VGGbLb0Ej+1oa7C
- 7weA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Vw9wSuKAFVQGZnys/rfuIJ6kqUP630Zp034UbfAD37o=;
- b=Ov0ASpV1fVPvZwwnRkCXGqQps5a9cREIYG8yBdDjlVMPzryKSTGoBsHg76shGEQ6Lq
- V/mYKQSnto9IbYmqPVnKFJ054y/jjtP8MHVhlY4uHH4vGD2EDZ8vZefyOL+q2/JaD+w5
- gspMIXpf9YIvnycoX4uRGatc/xmoecgUmawZ7seVqNqVLV4D4nN+gRCsXmJ8Ho99LTw3
- StGJx+neNQaTaDQgU7Ox7AaudnFkquHin3Q3kr6gdCxecolT09tFHafT2+kAaF25Dw3k
- sPCXwz53B3yQ1dDXAolQjszch93m0Xl2q4d8hIIT0z5zPluC7G4JAQLhvNmBqxf67RNQ
- 8aTg==
-X-Gm-Message-State: AOAM533Vl5hMN8sBeccPe2zqArkLJ3Cw9krnX8PmicTNLgFUaB7jAwC3
- bfeUyhzs2BzYZoF7CQS/QQg=
-X-Google-Smtp-Source: ABdhPJwSIWojtrKc1Pm9UTdFlWaEmUI+e2OIHplQnDwVcbxWvaZOhJ7WsR4P+Co8tSi3xIoaKD9U/A==
-X-Received: by 2002:a5d:464e:: with SMTP id j14mr25485641wrs.393.1593590441879; 
- Wed, 01 Jul 2020 01:00:41 -0700 (PDT)
-Received: from [192.168.1.40] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u2sm5849532wml.16.2020.07.01.01.00.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jul 2020 01:00:41 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: Adjust MIPS maintainership
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-devel@nongnu.org
-References: <20200630164653.24880-1-aleksandar.qemu.devel@gmail.com>
- <20200630164653.24880-3-aleksandar.qemu.devel@gmail.com>
- <1fdab6eb-9258-7df1-75ea-b4717a9c2b87@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <3ae1ef05-8caa-b5ce-a1ce-9670fc0a7cd3@amsat.org>
-Date: Wed, 1 Jul 2020 10:00:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqXhl-0006q8-Ua
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:02:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33161
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqXh2-0007fx-6h
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:02:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593590526;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aWw33BeuuKAUTzS6nM0K3WNFFDsLnygx3g0egqRr9+M=;
+ b=dO1xnBDPJK95DmfzUZcxyl//HDj97xa1XaDMjA25hYkR53W8GeBV1MZrcMHbKuWMFAWJp5
+ 74rBCJKKydh85ZwD1TR7h6dWKptfFtzaBSKRShbCVoyxVH0UHxnAqCSs0+bSVaKJwWfoWT
+ 7tgrmT8ua8SaWqrCSjF2s5EOH1lqdsg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-UyvsBWLzNGSooMZE8tzT8A-1; Wed, 01 Jul 2020 04:02:05 -0400
+X-MC-Unique: UyvsBWLzNGSooMZE8tzT8A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08A0D185B387;
+ Wed,  1 Jul 2020 08:02:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D3C42B6CF;
+ Wed,  1 Jul 2020 08:02:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2A11411384A6; Wed,  1 Jul 2020 10:02:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 10/46] qemu-option: Check return value instead of @err
+ where convenient
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-11-armbru@redhat.com>
+ <f8e32618-ff39-d505-9d49-1eddf71d364e@virtuozzo.com>
+Date: Wed, 01 Jul 2020 10:02:02 +0200
+In-Reply-To: <f8e32618-ff39-d505-9d49-1eddf71d364e@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Mon, 29 Jun 2020 12:11:42 +0300")
+Message-ID: <87v9j7br45.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1fdab6eb-9258-7df1-75ea-b4717a9c2b87@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 00:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,187 +100,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com, Aurelien Jarno <aurelien@aurel32.net>,
- Paul Burton <paulburton@kernel.org>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/30/20 7:19 PM, Philippe Mathieu-Daudé wrote:
-> On 6/30/20 6:46 PM, Aleksandar Markovic wrote:
->> Paul Burton and Aurelien Jarno removed for not being present.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+
+> 24.06.2020 19:43, Markus Armbruster wrote:
+>> Convert uses like
 >>
->> Huacai Chen and Jiaxun Yang step in as new energy.
+>>      opts = qemu_opts_create(..., &err);
+>>      if (err) {
+>>          ...
+>>      }
 >>
->> CC: Paul Burton <paulburton@kernel.org>
->> CC: Aurelien Jarno <aurelien@aurel32.net>
->> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>> to
+>>
+>>      opts = qemu_opts_create(..., &err);
+>>      if (!opts) {
+>>          ...
+>>      }
+>>
+>> Eliminate error_propagate() that are now unnecessary.  Delete @err
+>> that are now unused.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>  MAINTAINERS | 15 ++++++++++-----
->>  1 file changed, 10 insertions(+), 5 deletions(-)
+>>   block/parallels.c  |  4 ++--
+>>   blockdev.c         |  5 ++---
+>>   qdev-monitor.c     |  6 ++----
+>>   util/qemu-config.c | 10 ++++------
+>>   util/qemu-option.c | 12 ++++--------
+>>   5 files changed, 14 insertions(+), 23 deletions(-)
 >>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 5d8acf8d31..7fc16e21c9 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -213,7 +213,8 @@ F: disas/microblaze.c
->>  
->>  MIPS TCG CPUs
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> -R: Aurelien Jarno <aurelien@aurel32.net>
->> +M: Huacai Chen <chenhc@lemote.com>
->> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
->>  S: Maintained
->>  F: target/mips/
->> @@ -377,6 +378,7 @@ F: target/arm/kvm.c
->>  
->>  MIPS KVM CPUs
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> +M: Huacai Chen <chenhc@lemote.com>
->>  S: Odd Fixes
->>  F: target/mips/kvm.c
->>  
->> @@ -1052,6 +1054,7 @@ MIPS Machines
->>  -------------
->>  Jazz
->>  M: Hervé Poussineau <hpoussin@reactos.org>
->> +M: Huacai Chen <chenhc@lemote.com>
+>> diff --git a/block/parallels.c b/block/parallels.c
+>> index 860dbb80a2..b15c9ac28d 100644
+>> --- a/block/parallels.c
+>> +++ b/block/parallels.c
+>> @@ -823,8 +823,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+>>           }
+>>       }
+>>   -    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0,
+>> &local_err);
+>> -    if (local_err != NULL) {
+>> +    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, errp);
+>> +    if (!opts) {
+>>           goto fail_options;
+>>       }
+>
+> Honestly, I don't like this hunk. as already complicated code (crossing gotos) becomes more
+> complicated (add one more pattern to fail_options path: no-op error_propagate).
+>
+> At least, we'll need a follow-up patch, refactoring parallels_open() to drop "fail_options"
+> label completely.
 
-Hmm this is the Jazz hobbyist machine, Huacai are you sure this
-the correct section you want to be?
+For what it's worth, this is how it looks at the end of the series:
 
-Anyway Hervé Poussineau has to ack that, Aleksandar, it would
-be easier if you split this as a separate patch.
+    static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+                              Error **errp)
+    {
+        BDRVParallelsState *s = bs->opaque;
+        ParallelsHeader ph;
+        int ret, size, i;
+        QemuOpts *opts = NULL;
+        Error *local_err = NULL;
+        char *buf;
 
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
->>  S: Maintained
->>  F: hw/mips/jazz.c
->> @@ -1060,8 +1063,8 @@ F: hw/dma/rc4030.c
->>  
->>  Malta
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> +M: Huacai Chen <chenhc@lemote.com>
->>  M: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> -R: Aurelien Jarno <aurelien@aurel32.net>
+        bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+                                   BDRV_CHILD_IMAGE, false, errp);
+        if (!bs->file) {
+            return -EINVAL;
+        }
 
-Last time Aurelien commented on the Malta machine, was on March 23,
-3 months ago, then there hasn't been Malta patches. As a reviewer
-he is present and provides valuable feedback, why are you kicking
-him out? See:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg691406.html
+        ret = bdrv_pread(bs->file, 0, &ph, sizeof(ph));
+        if (ret < 0) {
+            goto fail;
+        }
 
-Huacai, has Jiangsu Lemote Tech Co., Ltd real interest to paid
-employees to maintain the Malta board?
+        bs->total_sectors = le64_to_cpu(ph.nb_sectors);
 
->>  S: Maintained
->>  F: hw/isa/piix4.c
->>  F: hw/acpi/piix4.c
->> @@ -1073,6 +1076,7 @@ F: tests/acceptance/machine_mips_malta.py
->>  
->>  Mipssim
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> +M: Huacai Chen <chenhc@lemote.com>
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
->>  S: Odd Fixes
+        if (le32_to_cpu(ph.version) != HEADER_VERSION) {
+            goto fail_format;
+        }
+        if (!memcmp(ph.magic, HEADER_MAGIC, 16)) {
+            s->off_multiplier = 1;
+            bs->total_sectors = 0xffffffff & bs->total_sectors;
+        } else if (!memcmp(ph.magic, HEADER_MAGIC2, 16)) {
+            s->off_multiplier = le32_to_cpu(ph.tracks);
+        } else {
+            goto fail_format;
+        }
 
-Now that you have 2 maintainers, you can raise the status to Maintained.
+        s->tracks = le32_to_cpu(ph.tracks);
+        if (s->tracks == 0) {
+            error_setg(errp, "Invalid image: Zero sectors per track");
+            ret = -EINVAL;
+            goto fail;
+        }
+        if (s->tracks > INT32_MAX/513) {
+            error_setg(errp, "Invalid image: Too big cluster");
+            ret = -EFBIG;
+            goto fail;
+        }
 
->>  F: hw/mips/mipssim.c
->> @@ -1080,7 +1084,6 @@ F: hw/net/mipsnet.c
->>  
->>  R4000
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> -R: Aurelien Jarno <aurelien@aurel32.net>
+        s->bat_size = le32_to_cpu(ph.bat_entries);
+        if (s->bat_size > INT_MAX / sizeof(uint32_t)) {
+            error_setg(errp, "Catalog too large");
+            ret = -EFBIG;
+            goto fail;
+        }
 
-I'm sure Aurelien will agree with this part. But let's wait
-for his feedback.
+        size = bat_entry_off(s->bat_size);
+        s->header_size = ROUND_UP(size, bdrv_opt_mem_align(bs->file->bs));
+        s->header = qemu_try_blockalign(bs->file->bs, s->header_size);
+        if (s->header == NULL) {
+            ret = -ENOMEM;
+            goto fail;
+        }
+        s->data_end = le32_to_cpu(ph.data_off);
+        if (s->data_end == 0) {
+            s->data_end = ROUND_UP(bat_entry_off(s->bat_size), BDRV_SECTOR_SIZE);
+        }
+        if (s->data_end < s->header_size) {
+            /* there is not enough unused space to fit to block align between BAT
+               and actual data. We can't avoid read-modify-write... */
+            s->header_size = size;
+        }
 
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
->>  S: Obsolete
->>  F: hw/mips/r4k.c
->> @@ -1103,7 +1106,8 @@ S: Maintained
->>  F: hw/intc/loongson_liointc.c
->>  
->>  Boston
->> -M: Paul Burton <pburton@wavecomp.com>
->> +M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> 
-> Missing in the patch description that you are taking this
-> machine over.
+        ret = bdrv_pread(bs->file, 0, s->header, s->header_size);
+        if (ret < 0) {
+            goto fail;
+        }
+        s->bat_bitmap = (uint32_t *)(s->header + 1);
 
-After some rest I remember Paul said he'd come back on QEMU,
-so it doesn't look right to kick him out that way.
+        for (i = 0; i < s->bat_size; i++) {
+            int64_t off = bat2sect(s, i);
+            if (off >= s->data_end) {
+                s->data_end = off + s->tracks;
+            }
+        }
 
-Also in this thread you said you never saw a Boston board:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg691778.html
+        if (le32_to_cpu(ph.inuse) == HEADER_INUSE_MAGIC) {
+            /* Image was not closed correctly. The check is mandatory */
+            s->header_unclean = true;
+            if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_CHECK)) {
+                error_setg(errp, "parallels: Image was not closed correctly; "
+                           "cannot be opened read/write");
+                ret = -EACCES;
+                goto fail;
+            }
+        }
 
-Paul might welcome you as a co-maintainer, but I rather keep
-him for his expertise.
+        opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, errp);
+        if (!opts) {
+            goto fail_options;
+        }
 
-> 
->> +M: Huacai Chen <chenhc@lemote.com>
+        if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+            goto fail_options;
+        }
 
-Huacai, similarly does Jiangsu Lemote Tech Co., Ltd have real
-interest in time to provide developers to maintain the Boston
-machine?
+        s->prealloc_size =
+            qemu_opt_get_size_del(opts, PARALLELS_OPT_PREALLOC_SIZE, 0);
+        s->prealloc_size = MAX(s->tracks, s->prealloc_size >> BDRV_SECTOR_BITS);
+        buf = qemu_opt_get_del(opts, PARALLELS_OPT_PREALLOC_MODE);
+        /* prealloc_mode can be downgraded later during allocate_clusters */
+        s->prealloc_mode = qapi_enum_parse(&prealloc_mode_lookup, buf,
+                                           PRL_PREALLOC_MODE_FALLOCATE,
+                                           &local_err);
+        g_free(buf);
+        if (local_err != NULL) {
+            error_propagate(errp, local_err);
+            goto fail_options;
+        }
 
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
->>  S: Maintained
->>  F: hw/core/loader-fit.c
->> @@ -2677,7 +2681,8 @@ F: disas/i386.c
->>  
->>  MIPS TCG target
->>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> -R: Aurelien Jarno <aurelien@aurel32.net>
->> +M: Huacai Chen <chenhc@lemote.com>
+        if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_INACTIVE)) {
+            s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
+            ret = parallels_update_header(bs);
+            if (ret < 0) {
+                goto fail;
+            }
+        }
 
-$ git log --author='Huacai Chen <chenhc@lemote.com>' tcg/mips/ | wc -l
-0
+        s->bat_dirty_block = 4 * qemu_real_host_page_size;
+        s->bat_dirty_bmap =
+            bitmap_new(DIV_ROUND_UP(s->header_size, s->bat_dirty_block));
 
-$ git log --grep='Reviewed-by: Huacai Chen <chenhc@lemote.com>'
-tcg/mips/ | wc -l
-0
+        /* Disable migration until bdrv_invalidate_cache method is added */
+        error_setg(&s->migration_blocker, "The Parallels format used by node '%s' "
+                   "does not support live migration",
+                   bdrv_get_device_or_node_name(bs));
+        ret = migrate_add_blocker(s->migration_blocker, errp);
+        if (ret < 0) {
+            error_free(s->migration_blocker);
+            goto fail;
+        }
+        qemu_co_mutex_init(&s->lock);
+        return 0;
 
-git log --grep='Acked-by: Huacai Chen <chenhc@lemote.com>' tcg/mips/ | wc -l
-0
+    fail_format:
+        error_setg(errp, "Image not in Parallels format");
+    fail_options:
+        ret = -EINVAL;
+    fail:
+        qemu_vfree(s->header);
+        return ret;
+    }
 
->> +R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Care to suggest further improvements?
 
-$ git log --grep='Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>'
-tcg/mips/ | wc -l
-0
+> Still, it should work and the rest is fine, so:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-$ git log --grep='Acked-by: Jiaxun Yang <jiaxun.yang@flygoat.com>'
-tcg/mips/ | wc -l
-0
+Thanks!
 
-I think you are confusing sections, Since Huacai and Jiaxun never showed
-interest in the TCG target code, how can they become maintainers?
-
->>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-
-$ git log --grep='Reviewed-by: Aleksandar Rikalo' tcg/mips/ | wc -l
-0
-$ git log --grep='Acked-by: Aleksandar Rikalo' tcg/mips/ | wc -l
-0
-
-Apparently Aleksandar Rikalo can be "removed for not being present."
-
-OTOH FWIW:
-$ git log --author='Philippe Mathieu-Daudé' tcg/mips/ | wc -l
-25
-$ git log --grep='Reviewed-by: Philippe Mathieu-Daudé' tcg/mips/ | wc -l
-99
-
-So for this section changes:
-NAcked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-The rest is conditional of Paul Burton and Aurelien Jarno Ack-by.
-
->>  S: Maintained
->>  F: tcg/mips/
->>
-> 
-> 
 
