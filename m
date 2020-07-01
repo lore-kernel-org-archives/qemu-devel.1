@@ -2,89 +2,118 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D7DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 527FBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:23:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E888120781
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DA2920781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fyim3fFu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E888120781
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZiJ9I5lP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DA2920781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqhNL-0005zp-79
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43762)
+	id 1jqhNv-0007CJ-EN
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:23:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqhMG-0004mo-Hw
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:21:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22633
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqhNA-00063Y-MS
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:22:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23109
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqhME-0003Tr-3e
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:21:20 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jqhN8-0003ZA-Rz
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:22:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593627677;
+ s=mimecast20190719; t=1593627733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=lFQ/ParbqOUevNI7Ylq2+nZP+mTmdCPF3opWIJ3joVA=;
- b=Fyim3fFu3VfKXXG0m8aEonBZC+SMvAuObdL2zxLAh8xlqBx3QW1wymPAoag79Mt5u0AV6/
- HosoUMnKzSg9lIulsvF2d7mDU8QGexhcDJWiiC5a0AG4fqnWe80QfuHXO1/ZdUer/ntEbI
- wGiNWW3kF1RI2EQunEHf4z4MoGSeevI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-rrzQaa3TPkSwQPlU_EGVuw-1; Wed, 01 Jul 2020 14:21:04 -0400
-X-MC-Unique: rrzQaa3TPkSwQPlU_EGVuw-1
-Received: by mail-ej1-f70.google.com with SMTP id yw17so16751733ejb.12
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 11:21:04 -0700 (PDT)
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Ke1rHIzL1Pt1iufsGeFTXuqybRMJ8MbA/Rv1Pn32Guo=;
+ b=ZiJ9I5lPei7XWxbuDZQbd9meoLR5yu3GMr5IYd77IXMh+m+nlBB/BqqscNYpUdAOS+fzVQ
+ TqJiT+YQhjoVbmiBfKs/t9/eEFFV2o/ikwzyUcqWwr2wi8l8hmdFxe0Vr+BQN2t6kgKo7G
+ uThqYvA0V93lo+cKzPJ6RRcQt9MBSSM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-bcYt1liWPn6NDn-4Q9I4Uw-1; Wed, 01 Jul 2020 14:22:12 -0400
+X-MC-Unique: bcYt1liWPn6NDn-4Q9I4Uw-1
+Received: by mail-ed1-f72.google.com with SMTP id u59so22401867edc.16
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 11:22:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=lFQ/ParbqOUevNI7Ylq2+nZP+mTmdCPF3opWIJ3joVA=;
- b=qYKeOXuEg4ePbZFW+6gdn9SZz9Df5kx1HV/W6fQ4J/QH4wiG92rNPk3GlZcPGfFJwG
- GkTgmE9eEscQdBq6neFFRzHFe4lsw/2aUBNC5FUcR20Cqe+EfJ9+7vOQ79Lj6rYxiEGb
- n9l3b5hj+iCprk3VemfIpwP16SE0fSUBILl0kUOGRGpf+0FxHUCbtqKl4ArX5vXFsq4C
- w6eHFgFq+mgD0awwsJ3iYI4atYeaWkDe7nYOnLrGVER67JfkeVGsXKdf15WVrZEHRBfU
- 10gOwCJTp/FAPnA+aYEeho+6tG94Ytd0JBrcTXlUGWfu9naTAxe80wIh20R7ec2SXxjW
- AxfA==
-X-Gm-Message-State: AOAM530twsogAf6vlH8S3LJvI07qq3W1jiHFO0MYUXSu6FWxXBvFFttV
- +hChetsOhh2S/4qAFwcwlwH3eR9I0jonluw8QTLzG9m7wNm6AeFTlf9+apLcRhb2sNHkaWbLsHp
- eeJ2U4sHMbmUX8EM=
-X-Received: by 2002:a50:d513:: with SMTP id u19mr29642723edi.241.1593627663368; 
- Wed, 01 Jul 2020 11:21:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWN+vhcdxt56U0xOXNPg96lhmzTQYYxByNFPiQL9HWYGbRV+f1Zs2OrwRWTwKSLceLasP3Hw==
-X-Received: by 2002:a50:d513:: with SMTP id u19mr29642696edi.241.1593627663150; 
- Wed, 01 Jul 2020 11:21:03 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ bh=Ke1rHIzL1Pt1iufsGeFTXuqybRMJ8MbA/Rv1Pn32Guo=;
+ b=mb7q21buJ1lhFwW2IkT3CE//OrpryiN2PjijyzhQqWzM0oyjyaVGsfzN9d0t4JmJOz
+ boepvL/cpQ7IVLUaWK3h6LG4OfPMMGo6M0Q7TztQtWUvGM9DY5gX1tgfAQa2DY76rvTX
+ zB8nwSyWMBYfWNpxtjSCoVw8k4/EhPGo+58whgaVwHG8Ua12RiHiTM+8ZJSmURHZvxLB
+ FNywqMTLv7OXjjN5jdgZYfTj/WwrwgcS5YcCRUrkntcjrz1LLmLRddt44VfSWYhbuCGz
+ uHBYPcAKdoHx4Twc/CCcWLC28b5iWhx+/jEsOeLryfhCvcjuM6aAN2q0MmaSDYAzkDXe
+ TEUw==
+X-Gm-Message-State: AOAM530cJwKUfT4HqkOwwX0at66U617w6Ai+yTuEGoZ8NTOue6WzdgTO
+ qxUaO0xn8J/VhlU5qO4uuwy8g+YkTDntRVZzYuy6TVSEzjiXImr5r9FFPbT49NPNrAAHBNOeuGm
+ BBPT5mapnayAIJ7s=
+X-Received: by 2002:aa7:c749:: with SMTP id c9mr28845824eds.107.1593627731197; 
+ Wed, 01 Jul 2020 11:22:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxujd7IHEeJ2M0C3jAkPGjBmKSv7Gql6fIWvBEXjvf6QBdPY5Okk3Yh/hvzjTd7wb4fyxoBw==
+X-Received: by 2002:aa7:c749:: with SMTP id c9mr28845811eds.107.1593627731044; 
+ Wed, 01 Jul 2020 11:22:11 -0700 (PDT)
+Received: from [192.168.1.37] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id p14sm6770815edr.23.2020.07.01.11.21.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 11:21:02 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] cpus: Initialize current_cpu with the first vCPU created
-Date: Wed,  1 Jul 2020 20:21:00 +0200
-Message-Id: <20200701182100.26930-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ by smtp.gmail.com with ESMTPSA id d2sm7181758edk.4.2020.07.01.11.22.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 11:22:10 -0700 (PDT)
+Subject: Re: [PATCH] util/drm: make portable
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ David Carlier <devnexen@gmail.com>
+References: <20200701180302.14821-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <4bc05de7-01eb-c695-bb68-8ef0d50bc1d1@redhat.com>
+Date: Wed, 1 Jul 2020 20:22:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200701180302.14821-1-kraxel@redhat.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -109,81 +138,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Alexander Bulekov <alxndr@bu.edu>, Bug 1878645 <1878645@bugs.launchpad.net>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can run I/O access with the 'i' or 'o' HMP commands in the
-monitor. These commands are expected to run on a vCPU. The
-monitor is not a vCPU thread. To avoid crashing, initialize
-the 'current_cpu' variable with the first vCPU created. The
-command executed on the monitor will end using it.
+On 7/1/20 8:03 PM, Gerd Hoffmann wrote:
+> Given this isn't perforance critical at all lets avoid the non-portable
+> d_type and use fstat instead to check whenever the file is a chardev.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-This fixes:
+Reported-by: David Carlier <devnexen@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-  $ cat << EOF| qemu-system-i386 -M q35 -nographic -serial none -monitor stdio
-  o/4 0xcf8 0x8400f841
-  o/4 0xcfc 0xaa215d6d
-  o/4 0x6d30 0x2ef8ffbe
-  o/1 0xb2 0x20
-  EOF
-  Segmentation fault (core dumped)
-
-  Thread 1 "qemu-system-i38" received signal SIGSEGV, Segmentation fault.
-  0x00005555558946c7 in tcg_handle_interrupt (cpu=0x0, mask=64) at accel/tcg/tcg-all.c:57
-  57          old_mask = cpu->interrupt_request;
-  (gdb) bt
-  #0  0x00005555558946c7 in tcg_handle_interrupt (cpu=0x0, mask=64) at accel/tcg/tcg-all.c:57
-  #1  0x00005555558ed7d2 in cpu_interrupt (cpu=0x0, mask=64) at include/hw/core/cpu.h:877
-  #2  0x00005555558ee776 in ich9_apm_ctrl_changed (val=32, arg=0x555556e2ff50) at hw/isa/lpc_ich9.c:442
-  #3  0x0000555555b47f96 in apm_ioport_writeb (opaque=0x555556e308c0, addr=0, val=32, size=1) at hw/isa/apm.c:44
-  #4  0x0000555555879931 in memory_region_write_accessor (mr=0x555556e308e0, addr=0, value=0x7fffffffb9f8, size=1, shift=0, mask=255, attrs=...) at memory.c:483
-  #5  0x0000555555879b5a in access_with_adjusted_size (addr=0, value=0x7fffffffb9f8, size=4, access_size_min=1, access_size_max=1, access_fn=
-      0x55555587984e <memory_region_write_accessor>, mr=0x555556e308e0, attrs=...) at memory.c:544
-  #6  0x000055555587ca32 in memory_region_dispatch_write (mr=0x555556e308e0, addr=0, data=32, op=MO_32, attrs=...) at memory.c:1465
-  #7  0x000055555581b7e9 in flatview_write_continue (fv=0x55555698a790, addr=178, attrs=..., ptr=0x7fffffffbb84, len=4, addr1=0, l=4, mr=0x555556e308e0) at exec.c:3198
-  #8  0x000055555581b92e in flatview_write (fv=0x55555698a790, addr=178, attrs=..., buf=0x7fffffffbb84, len=4) at exec.c:3238
-  #9  0x000055555581bc81 in address_space_write (as=0x555556441220 <address_space_io>, addr=178, attrs=..., buf=0x7fffffffbb84, len=4) at exec.c:3329
-  #10 0x0000555555873f08 in cpu_outl (addr=178, val=32) at ioport.c:80
-  #11 0x000055555598a26a in hmp_ioport_write (mon=0x5555567621b0, qdict=0x555557702600) at monitor/misc.c:937
-  #12 0x0000555555c9c5a5 in handle_hmp_command (mon=0x5555567621b0, cmdline=0x55555676aae1 "/1 0xb2 0x20") at monitor/hmp.c:1082
-  #13 0x0000555555c99e02 in monitor_command_cb (opaque=0x5555567621b0, cmdline=0x55555676aae0 "o/1 0xb2 0x20", readline_opaque=0x0) at monitor/hmp.c:47
-                            ^
-    HMP command from monitor
-
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1878645
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-Cc: Bug 1878645 <1878645@bugs.launchpad.net>
-
-RFC because I believe the correct fix is to NOT use current_cpu
-out of cpus.c, at least use qemu_get_cpu(0) to get the first vCPU.
----
- cpus.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/cpus.c b/cpus.c
-index 41d1c5099f..1f6f43d221 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2106,6 +2106,9 @@ void qemu_init_vcpu(CPUState *cpu)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
- 
-+    if (!current_cpu) {
-+        current_cpu = cpu;
-+    }
-     cpu->nr_cores = ms->smp.cores;
-     cpu->nr_threads =  ms->smp.threads;
-     cpu->stopped = true;
--- 
-2.21.3
+> ---
+>  util/drm.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+> 
+> diff --git a/util/drm.c b/util/drm.c
+> index a23ff2453826..6ba87f34f4ee 100644
+> --- a/util/drm.c
+> +++ b/util/drm.c
+> @@ -24,7 +24,8 @@ int qemu_drm_rendernode_open(const char *rendernode)
+>  {
+>      DIR *dir;
+>      struct dirent *e;
+> -    int r, fd;
+> +    struct stat st;
+> +    int r, fd, ret;
+>      char *p;
+>  
+>      if (rendernode) {
+> @@ -38,10 +39,6 @@ int qemu_drm_rendernode_open(const char *rendernode)
+>  
+>      fd = -1;
+>      while ((e = readdir(dir))) {
+> -        if (e->d_type != DT_CHR) {
+> -            continue;
+> -        }
+> -
+>          if (strncmp(e->d_name, "renderD", 7)) {
+>              continue;
+>          }
+> @@ -53,6 +50,16 @@ int qemu_drm_rendernode_open(const char *rendernode)
+>              g_free(p);
+>              continue;
+>          }
+> +
+> +        /* prefer fstat() over checking e->d_type == DT_CHR for
+> +         * portability reasons */
+> +        ret = fstat(r, &st);
+> +        if (ret < 0 || (st.st_mode & S_IFMT) != S_IFCHR) {
+> +            close(r);
+> +            g_free(p);
+> +            continue;
+> +        }
+> +
+>          fd = r;
+>          g_free(p);
+>          break;
+> 
 
 
