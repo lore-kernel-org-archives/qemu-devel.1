@@ -7,45 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7DEC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE541C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:05:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ED38207D0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:03:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ED38207D0
+	by mail.kernel.org (Postfix) with ESMTPS id 93DCF206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:05:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DCF206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqfD4-0000Tv-RB
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:03:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35290)
+	id 1jqfEJ-0002Ae-Sj
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:04:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqf6A-0000k9-FM; Wed, 01 Jul 2020 11:56:34 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33386)
+ id 1jqfAB-0005n5-4j; Wed, 01 Jul 2020 12:00:43 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:46584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqf67-0003LU-Pz; Wed, 01 Jul 2020 11:56:34 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608423|-1; CH=green;
+ id 1jqfA7-0004Bg-Mq; Wed, 01 Jul 2020 12:00:42 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07447194|-1; CH=green;
  DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.723719-8.98328e-05-0.276191;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03294; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HvvUfxG_1593618980; 
+ DS=CONTINUE|ham_system_inform|0.273484-0.00573218-0.720784;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HvvZdmX_1593619221; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HvvUfxG_1593618980)
- by smtp.aliyun-inc.com(10.147.40.233);
- Wed, 01 Jul 2020 23:56:20 +0800
+ fp:SMTPD_---.HvvZdmX_1593619221)
+ by smtp.aliyun-inc.com(10.147.41.138);
+ Thu, 02 Jul 2020 00:00:21 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v12 15/61] target/riscv: vector narrowing integer right shift
- instructions
-Date: Wed,  1 Jul 2020 23:25:03 +0800
-Message-Id: <20200701152549.1218-16-zhiwei_liu@c-sky.com>
+Subject: [PATCH v12 17/61] target/riscv: vector integer min/max instructions
+Date: Wed,  1 Jul 2020 23:25:05 +0800
+Message-Id: <20200701152549.1218-18-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
 References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
@@ -83,170 +82,176 @@ Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   | 13 ++++
- target/riscv/insn32.decode              |  6 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 90 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 14 ++++
- 4 files changed, 123 insertions(+)
+ target/riscv/helper.h                   | 33 ++++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
+ target/riscv/vector_helper.c            | 71 +++++++++++++++++++++++++
+ 4 files changed, 122 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 6805bf7dbd..1ec2202814 100644
+index 2bcb6c7889..9c576e1220 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -432,3 +432,16 @@ DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+@@ -502,3 +502,36 @@ DEF_HELPER_6(vmsgt_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 +
-+DEF_HELPER_6(vnsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index e5334230df..435415f9f9 100644
+index 5d022ff414..3d8986c74d 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -331,6 +331,12 @@ vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
- vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
- vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
- vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsrl_vv        101100 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsrl_vx        101100 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsrl_vi        101100 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsra_vv        101101 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsra_vx        101101 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsra_vi        101101 . ..... ..... 011 ..... 1010111 @r_vm
+@@ -357,6 +357,14 @@ vmsgtu_vx       011110 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgtu_vi       011110 . ..... ..... 011 ..... 1010111 @r_vm
+ vmsgt_vx        011111 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgt_vi        011111 . ..... ..... 011 ..... 1010111 @r_vm
++vminu_vv        000100 . ..... ..... 000 ..... 1010111 @r_vm
++vminu_vx        000100 . ..... ..... 100 ..... 1010111 @r_vm
++vmin_vv         000101 . ..... ..... 000 ..... 1010111 @r_vm
++vmin_vx         000101 . ..... ..... 100 ..... 1010111 @r_vm
++vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
++vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
++vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
++vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index d2dbf701c8..9d2c327366 100644
+index 7d7e3d4cd8..861fd3bf1a 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1425,3 +1425,93 @@ GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
- GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
- GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
- GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
+@@ -1561,3 +1561,13 @@ GEN_OPIVI_TRANS(vmsleu_vi, 1, vmsleu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsle_vi, 0, vmsle_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgtu_vi, 1, vmsgtu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgt_vi, 0, vmsgt_vx, opivx_cmp_check)
 +
-+/* Vector Narrowing Integer Right Shift Instructions */
-+static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
-+                2 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+/* OPIVV with NARROW */
-+#define GEN_OPIVV_NARROW_TRANS(NAME)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (opivv_narrow_check(s, a)) {                                \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[3] = {            \
-+            gen_helper_##NAME##_b,                                 \
-+            gen_helper_##NAME##_h,                                 \
-+            gen_helper_##NAME##_w,                                 \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew]);        \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+GEN_OPIVV_NARROW_TRANS(vnsra_vv)
-+GEN_OPIVV_NARROW_TRANS(vnsrl_vv)
-+
-+static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
-+                2 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+/* OPIVX with NARROW */
-+#define GEN_OPIVX_NARROW_TRANS(NAME)                                     \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (opivx_narrow_check(s, a)) {                                      \
-+        static gen_helper_opivx * const fns[3] = {                       \
-+            gen_helper_##NAME##_b,                                       \
-+            gen_helper_##NAME##_h,                                       \
-+            gen_helper_##NAME##_w,                                       \
-+        };                                                               \
-+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);\
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVX_NARROW_TRANS(vnsra_vx)
-+GEN_OPIVX_NARROW_TRANS(vnsrl_vx)
-+
-+/* OPIVI with NARROW */
-+#define GEN_OPIVI_NARROW_TRANS(NAME, ZX, OPIVX)                          \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (opivx_narrow_check(s, a)) {                                      \
-+        static gen_helper_opivx * const fns[3] = {                       \
-+            gen_helper_##OPIVX##_b,                                      \
-+            gen_helper_##OPIVX##_h,                                      \
-+            gen_helper_##OPIVX##_w,                                      \
-+        };                                                               \
-+        return opivi_trans(a->rd, a->rs1, a->rs2, a->vm,                 \
-+                           fns[s->sew], s, ZX);                          \
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVI_NARROW_TRANS(vnsra_vi, 1, vnsra_vx)
-+GEN_OPIVI_NARROW_TRANS(vnsrl_vi, 1, vnsrl_vx)
++/* Vector Integer Min/Max Instructions */
++GEN_OPIVV_GVEC_TRANS(vminu_vv, umin)
++GEN_OPIVV_GVEC_TRANS(vmin_vv,  smin)
++GEN_OPIVV_GVEC_TRANS(vmaxu_vv, umax)
++GEN_OPIVV_GVEC_TRANS(vmax_vv,  smax)
++GEN_OPIVX_TRANS(vminu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
++GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index cd81f86faf..96e3467353 100644
+index 71f27146b3..b1ff767209 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -1395,3 +1395,17 @@ GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
- GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
- GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
- GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
+@@ -855,6 +855,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
+ #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
+ #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
++#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
++#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
++#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
++#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+ 
+ /* operation of two vector elements */
+ typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+@@ -1532,3 +1536,70 @@ GEN_VEXT_CMP_VX(vmsgt_vx_b, int8_t,  H1, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_h, int16_t, H2, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_w, int32_t, H4, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_d, int64_t, H8, DO_MSGT)
 +
-+/* Vector Narrowing Integer Right Shift Instructions */
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
++/* Vector Integer Min/Max Instructions */
++RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_h, OP_UUU_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_w, OP_UUU_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_d, OP_UUU_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_b, OP_SSS_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_h, OP_SSS_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_w, OP_SSS_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_d, OP_SSS_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmaxu_vv_b, OP_UUU_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_h, OP_UUU_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_w, OP_UUU_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_d, OP_UUU_D, H8, H8, H8, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_b, OP_SSS_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_h, OP_SSS_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_w, OP_SSS_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_d, OP_SSS_D, H8, H8, H8, DO_MAX)
++GEN_VEXT_VV(vminu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vminu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vminu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vminu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmin_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmin_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmin_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmin_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmaxu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmaxu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmaxu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmaxu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmax_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmax_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmax_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmax_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2, vminu_vx_b, OP_UUU_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_h, OP_UUU_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_w, OP_UUU_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_d, OP_UUU_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_b, OP_SSS_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_h, OP_SSS_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_w, OP_SSS_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_d, OP_SSS_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmaxu_vx_b, OP_UUU_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_h, OP_UUU_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_w, OP_UUU_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_d, OP_UUU_D, H8, H8, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_b, OP_SSS_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_h, OP_SSS_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_w, OP_SSS_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_d, OP_SSS_D, H8, H8, DO_MAX)
++GEN_VEXT_VX(vminu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vminu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vminu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vminu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmin_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmin_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmin_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmin_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmaxu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmaxu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmaxu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmaxu_vx_d, 8, 8,  clearq)
++GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
 -- 
 2.23.0
 
