@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6156C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1493DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:45:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 894C4207E8
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:45:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894C4207E8
+	by mail.kernel.org (Postfix) with ESMTPS id DDFE5207E8
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 23:45:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDFE5207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqmQH-0001oz-Os
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 19:45:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48526)
+	id 1jqmQO-0002A7-5d
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 19:45:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jqmOa-0008Pe-0J; Wed, 01 Jul 2020 19:44:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61408)
+ id 1jqmOX-0008OT-KI; Wed, 01 Jul 2020 19:44:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jqmOV-0002C6-Vm; Wed, 01 Jul 2020 19:44:03 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ id 1jqmOV-0002Aa-SO; Wed, 01 Jul 2020 19:44:01 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 061NXPQW082288; Wed, 1 Jul 2020 19:43:54 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 320s29cry9-1
+ 061NVUNC105148; Wed, 1 Jul 2020 19:43:48 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320s22n10b-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 19:43:54 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061NdwZF002906;
- Wed, 1 Jul 2020 23:43:53 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma02dal.us.ibm.com with ESMTP id 31wwr9d2rn-1
+ Wed, 01 Jul 2020 19:43:48 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 061NeZbG009984;
+ Wed, 1 Jul 2020 23:43:47 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma05wdc.us.ibm.com with ESMTP id 31wwr9424v-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 01 Jul 2020 23:43:53 +0000
+ Wed, 01 Jul 2020 23:43:47 +0000
 Received: from b03ledav001.gho.boulder.ibm.com
  (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 061NhqBo48628014
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 061NhjhD13304098
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 1 Jul 2020 23:43:52 GMT
+ Wed, 1 Jul 2020 23:43:45 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 458066E04E;
- Wed,  1 Jul 2020 23:43:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E89F26E04C;
+ Wed,  1 Jul 2020 23:43:46 +0000 (GMT)
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6EB586E04C;
- Wed,  1 Jul 2020 23:43:51 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1D0166E04E;
+ Wed,  1 Jul 2020 23:43:46 +0000 (GMT)
 Received: from pompom.ibm.com (unknown [9.160.126.23])
  by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed,  1 Jul 2020 23:43:51 +0000 (GMT)
+ Wed,  1 Jul 2020 23:43:45 +0000 (GMT)
 From: Lijun Pan <ljp@linux.ibm.com>
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v4 06/11] Update PowerPC AT_HWCAP2 definition
-Date: Wed,  1 Jul 2020 18:43:41 -0500
-Message-Id: <20200701234344.91843-7-ljp@linux.ibm.com>
+Subject: [PATCH v4 01/11] target/ppc: Introduce Power ISA 3.1 flag
+Date: Wed,  1 Jul 2020 18:43:36 -0500
+Message-Id: <20200701234344.91843-2-ljp@linux.ibm.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20200701234344.91843-1-ljp@linux.ibm.com>
 References: <20200701234344.91843-1-ljp@linux.ibm.com>
@@ -76,15 +76,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-01_15:2020-07-01,
  2020-07-01 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 impostorscore=0
- phishscore=0 cotscore=-2147483648 priorityscore=1501 adultscore=0
- mlxscore=0 spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007010162
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
+ phishscore=0 mlxlogscore=861
+ bulkscore=0 impostorscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ cotscore=-2147483648 spamscore=0 mlxscore=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2007010161
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=ljp@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 19:43:54
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -109,30 +109,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add PPC2_FEATURE2_ARCH_3_10 to the PowerPC AT_HWCAP2 definitions.
+This flag will be used for Power10 instructions.
 
 Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
 ---
-v4: add missing changes, and split to 5/11, 6/11, 7/11
-v3: use tcg_gen_gvec_mul()
-v2: fix coding style
-    use Power ISA 3.1 flag
+v4: split to 01/11 and 02/11
+v2: add Power ISA 3.1 flag
 
- include/elf.h | 1 +
- 1 file changed, 1 insertion(+)
+ target/ppc/cpu.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index 8fbfe60e09..1858b95acf 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -554,6 +554,7 @@ typedef struct {
- #define PPC_FEATURE2_HTM_NOSC           0x01000000
- #define PPC_FEATURE2_ARCH_3_00          0x00800000
- #define PPC_FEATURE2_HAS_IEEE128        0x00400000
-+#define PPC_FEATURE2_ARCH_3_10          0x00200000
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 1988b436cb..a5e9c08dcc 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2191,6 +2191,8 @@ enum {
+     PPC2_PM_ISA206     = 0x0000000000040000ULL,
+     /* POWER ISA 3.0                                                         */
+     PPC2_ISA300        = 0x0000000000080000ULL,
++    /* POWER ISA 3.1                                                         */
++    PPC2_ISA310        = 0x0000000000100000ULL,
  
- /* Bits present in AT_HWCAP for Sparc.  */
- 
+ #define PPC_TCG_INSNS2 (PPC2_BOOKE206 | PPC2_VSX | PPC2_PRCNTL | PPC2_DBRX | \
+                         PPC2_ISA205 | PPC2_VSX207 | PPC2_PERM_ISA206 | \
 -- 
 2.23.0
 
