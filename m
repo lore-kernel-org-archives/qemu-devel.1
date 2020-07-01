@@ -2,92 +2,106 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 943E6C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A93AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:17:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CFF520760
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A0D720760
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 12:17:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mj3bwoDk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CFF520760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOl92/2d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A0D720760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqbea-00072n-Kw
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:15:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60664)
+	id 1jqbgB-000833-CJ
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 08:17:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbdl-0006WS-Px
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:15:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58939
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jqbfJ-0007Z6-6D
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:16:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45706
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqbdi-00067z-QN
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:15:00 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jqbfG-0006S5-Me
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 08:16:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593605697;
+ s=mimecast20190719; t=1593605793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=rCeLkVXuGN8EJqQ+gwY5J+yWh9OPz0BgJSsPx1vNxrQ=;
- b=Mj3bwoDkYO7lFF/5aACzLMgZdmW6KaFY1IZcD9cP9nW/TsfKxj/eUJSYg04kdd0ueKVAWx
- LrCYM9mtWriIXf0QImOikTjGm3WVrr2a1ZmAQssPMYrskCgqLgULVdLkflvdvPerei2JBG
- zd6Bolvfj+66fynKSxJq2xnoL01TW7g=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-He5k2Zs8Nqu3FgJJe-EGJQ-1; Wed, 01 Jul 2020 08:14:54 -0400
-X-MC-Unique: He5k2Zs8Nqu3FgJJe-EGJQ-1
-Received: by mail-wm1-f70.google.com with SMTP id g6so17165522wmk.4
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:14:53 -0700 (PDT)
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rEZqRyA1feFr4Gu2xP1Ey2UTnpIIG61cFcXKKIArD/I=;
+ b=SOl92/2dEOglEgpqcTFdRmamI0PehGs9o5X4Olq9N1bFKV8tBlroGL1Z1GhqPPvmn8rNoX
+ m9vT3kDmtL9PuO+jlVvooBZK574qrrxtAycvfXABM6qCP7IpDuNO5k6roKTGI0+JKZR+FA
+ 0KDTnrpKDBY3HFS3hv42R72ikOuTUHM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-Ms1T3nFqOP2mWPNui8xshA-1; Wed, 01 Jul 2020 08:16:30 -0400
+X-MC-Unique: Ms1T3nFqOP2mWPNui8xshA-1
+Received: by mail-qk1-f200.google.com with SMTP id 13so5079299qkk.10
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 05:16:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=rCeLkVXuGN8EJqQ+gwY5J+yWh9OPz0BgJSsPx1vNxrQ=;
- b=KDIikhKwyCV/IuKDhqdnUOoqK8stnKIRi9IKsup/pZYXaLfTUc94f62wk4t7Ds2YzA
- uZxqXPhoylqOanNUnBxTwhEYP7ID3gTa3jiDcFhEKNa+ud8kwMj4h7HpWyp27fucRccM
- dmFO0/t8dAbL2QJqJxODNqPtWoR/PzzI4eMe/oXoc5C91nKGwlvxTJVqPLLW/T5xYSfF
- v/PCuwUWvuOXpOpl5m+tXZp4mBFWfDQtRLqfwuZXi/Q6keBszZeN+pYC2AKbNP1ZeMbK
- zrxWhbwrB3SP9DciVDAVvk6euaPqVKTu9anHXLrvL3Kkkz+xQpP2VllDCEcij5YIP+VQ
- vuGA==
-X-Gm-Message-State: AOAM532vtejA98tsZtZnweWWUrestZqfTmNW4UeMLlu1uvWxzz2R0eUe
- fbaQTr/ndXEYrwzJ96vJjRTkeWoTH1a+X1Zreu49r9ePbs+/1VjKQfzdDGyuzx5hbZDUs50gVwe
- nrIntKJEnSmC6zmc=
-X-Received: by 2002:adf:ecc8:: with SMTP id s8mr26932734wro.317.1593605692521; 
- Wed, 01 Jul 2020 05:14:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5dta08u/ewz1ZVYxSFDREEnW+mgKKtB92k89Ht1RjXfBjyxoOHPvLbl6GQm8TsQmgqKk+Fg==
-X-Received: by 2002:adf:ecc8:: with SMTP id s8mr26932714wro.317.1593605692308; 
- Wed, 01 Jul 2020 05:14:52 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- c11sm6857787wmb.45.2020.07.01.05.14.50
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=rEZqRyA1feFr4Gu2xP1Ey2UTnpIIG61cFcXKKIArD/I=;
+ b=BCP5edclIYJ5mz8VXdtY6Mf0Bm7NvwH8DGkG+FKBw7lfNliNFmMLLI0sa5YG5XgAqX
+ kq6g0ojWTYHELlK8c2JZGvSZBj7g61dIX2HBdsjDCXGz3hmFhONkJWiDfkF2peFptn2O
+ dBBSo2UzK9p+KzGl3GBeTBbkCnE6Co4oMayL0cuel7teEbgvOGA5V0oiREd+ntEZgeqi
+ JwQSSPYHIs7LYBgwy6bMk8U1hkRGFCnx399BXGW+3sAYqKIvNZXvbYIacHHASyFysn8u
+ A0Kgcs92MInX92DHgHRr01/fbNHjMneuRDRycCvsu1E8alGtPudySQqt+syUgR7eqexh
+ 85rA==
+X-Gm-Message-State: AOAM532gPqok3kdwZrV6wW8cYAMe74wmbLqtZCerV15C0SXld4a76GUe
+ vbjDZn73mZaJH2+FlJOHSJuNa+xBpz79xZIx2sBL3j1dB/TSClQGeB4oYVAH5DWlyIf2Ar+c33D
+ LGxex/dV4bUO0OoM=
+X-Received: by 2002:a05:620a:79a:: with SMTP id
+ 26mr18039783qka.169.1593605789846; 
+ Wed, 01 Jul 2020 05:16:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8qCpsidGBZzPvV0pBW8BqmYyw1Uyrvb0alDsqxK2C9tpgo5K0k9hNjSthsufsLEPrrkUvuw==
+X-Received: by 2002:a05:620a:79a:: with SMTP id
+ 26mr18039755qka.169.1593605789532; 
+ Wed, 01 Jul 2020 05:16:29 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id c24sm6182101qtd.82.2020.07.01.05.16.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 05:14:51 -0700 (PDT)
-Date: Wed, 1 Jul 2020 08:14:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tests: disassemble-aml.sh: generate AML in readable format
-Message-ID: <20200701121349.50523-1-mst@redhat.com>
+ Wed, 01 Jul 2020 05:16:28 -0700 (PDT)
+Date: Wed, 1 Jul 2020 08:16:26 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Message-ID: <20200701121626.GD40675@xz-x1>
+References: <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
+ <20200628144746.GA239443@xz-x1>
+ <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
+ <20200629133403.GA266532@xz-x1>
+ <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
+ <1b4eaaaf-c2ab-0da8-afb4-1b7b4221e6cf@redhat.com>
+ <20200630052148-mutt-send-email-mst@kernel.org>
+ <49f547e1-dd87-7abe-1075-9dcece75b641@redhat.com>
+ <20200630152050.GC3138@xz-x1>
+ <d9dd8662-33e3-03fe-f227-f519858534e0@redhat.com>
 MIME-Version: 1.0
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+In-Reply-To: <d9dd8662-33e3-03fe-f227-f519858534e0@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:05:53
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=peterx@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,7 +109,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,99 +122,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On systems where the IASL tool exists, we can convert
-extected ACPI tables to ASL format, which is useful
-for debugging and documentation purposes.
-This script does this for all ACPI tables under tests/data/acpi/.
+On Wed, Jul 01, 2020 at 04:11:49PM +0800, Jason Wang wrote:
+> 
+> On 2020/6/30 下午11:20, Peter Xu wrote:
+> > On Tue, Jun 30, 2020 at 05:23:31PM +0800, Jason Wang wrote:
+> > > > > Ok, we had a dedicated mr for interrupt:
+> > > > > 
+> > > > > memory_region_add_subregion_overlap(MEMORY_REGION(&vtd_dev_as->iommu),
+> > > > > VTD_INTERRUPT_ADDR_FIRST,
+> > > > > &vtd_dev_as->iommu_ir, 1);
+> > > > > 
+> > > > > So it should be fine. I guess the reason that I'm asking is that I thought
+> > > > > "IR" means "Interrupt remapping" but in fact it means "Interrupt Region"?
+> > I was meaning "interrupt remapping", and of course it's the interrupt region
+> > too when IR enabled...
+> 
+> 
+> Right.
+> 
+> 
+> > 
+> > > > > But I'm still not clear about the invalidation part for interrupt region,
+> > > > > maybe you can elaborate a little more on this.
+> > > > > 
+> > > > > Btw, I think guest can trigger the assert in vtd_do_iommu_translate() if we
+> > > > > teach vhost to DMA to that region:
+> > > > Why would we want to?
+> > > 
+> > > I meant a buggy(malicious) guest driver.
+> > Yes seems possible.  Do you want to post a patch?  Let me know if you want me
+> > to...  Thanks,
+> 
+> 
+> Yes please.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Oh wait...  Actually the comment above explains...
 
-changes from v1:
-    - suggest the script from rebuild-expected-aml.sh
-    - fix subject typo
+    /*
+     * We have standalone memory region for interrupt addresses, we
+     * should never receive translation requests in this region.
+     */
+    assert(!vtd_is_interrupt_addr(addr));
 
- tests/data/acpi/disassemle-aml.sh       | 52 +++++++++++++++++++++++++
- tests/data/acpi/rebuild-expected-aml.sh |  1 +
- 2 files changed, 53 insertions(+)
- create mode 100755 tests/data/acpi/disassemle-aml.sh
+I overlooked myself that the IR region will be there even if ir=off.  So I
+think the assert should stand.
 
-diff --git a/tests/data/acpi/disassemle-aml.sh b/tests/data/acpi/disassemle-aml.sh
-new file mode 100755
-index 0000000000..1d8a4d0301
---- /dev/null
-+++ b/tests/data/acpi/disassemle-aml.sh
-@@ -0,0 +1,52 @@
-+#!/usr/bin/bash
-+
-+outdir=
-+while getopts "o:" arg; do
-+  case ${arg} in
-+    o )
-+        outdir=$OPTARG
-+        ;;
-+    \? )
-+        echo "Usage: ./tests/data/acpi/disassemle-aml.sh [-o <output-directory>]"
-+        exit 1
-+        ;;
-+
-+  esac
-+done
-+
-+for machine in tests/data/acpi/*
-+do
-+    if [[ ! -d "$machine" ]];
-+    then
-+        continue
-+    fi
-+
-+    if [[ "${outdir}" ]];
-+    then
-+        mkdir -p "${outdir}"/${machine} || exit $?
-+    fi
-+    for aml in $machine/*
-+    do
-+        if [[ "$aml" == $machine/*.dsl ]];
-+        then
-+            continue
-+        fi
-+        if [[ "$aml" == $machine/SSDT*.* ]];
-+        then
-+            dsdt=${aml/SSDT*./DSDT.}
-+            extra="-e ${dsdt}"
-+        elif [[ "$aml" == $machine/SSDT* ]];
-+        then
-+            dsdt=${aml/SSDT*/DSDT};
-+            extra="-e ${dsdt}"
-+        else
-+            extra=""
-+        fi
-+        asl=${aml}.dsl
-+        if [[ "${outdir}" ]];
-+        then
-+            asl="${outdir}"/${machine}/${asl}
-+        fi
-+        iasl -d -p ${asl} ${extra} ${aml}
-+    done
-+done
-diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
-index 9cbaab1a4d..76cd797d1e 100755
---- a/tests/data/acpi/rebuild-expected-aml.sh
-+++ b/tests/data/acpi/rebuild-expected-aml.sh
-@@ -36,6 +36,7 @@ old_allowed_dif=`grep -v -e 'List of comma-separated changed AML files to ignore
- echo '/* List of comma-separated changed AML files to ignore */' > ${SRC_PATH}/tests/qtest/bios-tables-test-allowed-diff.h
- 
- echo "The files were rebuilt and can be added to git."
-+echo "You can use ${SRC_PATH}/tests/data/acpi/disassemle-aml.sh to disassemble them to ASL."
- 
- if [ -z "$old_allowed_dif" ]; then
-     echo "Note! Please do not commit expected files with source changes"
 -- 
-MST
+Peter Xu
 
 
