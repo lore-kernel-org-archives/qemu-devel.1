@@ -2,62 +2,91 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD1BDC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEDBC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:00:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0DAC20748
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 16:59:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0DAC20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDA2620781
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 17:00:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N8ecaIvu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA2620781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqg5U-00076W-0E
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 12:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52494)
+	id 1jqg6T-0008Te-4N
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 13:00:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqg4T-0005qq-Ek; Wed, 01 Jul 2020 12:58:53 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34815)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jqg4Q-0006OP-Qg; Wed, 01 Jul 2020 12:58:53 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.122102|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.432005-0.000103955-0.567891;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.Hvx0KRN_1593622724; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.Hvx0KRN_1593622724)
- by smtp.aliyun-inc.com(10.147.42.16); Thu, 02 Jul 2020 00:58:44 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v12 46/61] target/riscv: vector wideing integer reduction
- instructions
-Date: Wed,  1 Jul 2020 23:25:34 +0800
-Message-Id: <20200701152549.1218-47-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
-References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqg2V-0003E5-NL
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:56:51 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36754)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqg2T-0006D7-TP
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 12:56:51 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id h22so11289968pjf.1
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 09:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lrbOuw8wmrLaMoNbXCjk0t8awozGHEsmEarRx+CDXgI=;
+ b=N8ecaIvuxoEkPcNx0xw6sc+yWFKAbe7xcifByzf3rGIdtmVIqmvvuEwstPq2/39Wju
+ A0MJ/7fzDz25rnRuPH0BBiz6m+P20VrtcI+NGf4FhXdeLTHoW+9pUrKpe98HdKswqxa4
+ FpWPLabQl5wzEAe/Am8zcF9Y/1Zkh+/IkQqGUYc76rjczu0p03dUqILl2CFoh5wD6PJD
+ ojEleMynnAEMLbOHWs7k1AwNlG8ROABvc5EVsX98MIZzB93/8K+7B5mAhx9uukvtpzq6
+ XtUu/TK9i2R5fR5arsEWP8fNjU1CxwLqTgHGg2EHV3klsFyu5HF0OcU+l/VDaUT2IP3m
+ jt6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lrbOuw8wmrLaMoNbXCjk0t8awozGHEsmEarRx+CDXgI=;
+ b=MVYnXYajd+cJ65RY4C+d5XAoEFm6HOFdZQ7ydCNZCLVqmK+0Iq05vPM7YGae4kWaTy
+ zI8Z6gFvy6Rk4pt3ixEFEpU15FSryekyzXVI+ShIuw+Wt9wVUtXWn8VilpFkTM30ijBc
+ yve1UqnuLwZIt4SxAFCQvxh49V8R7DE/F7NS9zwUaCUmSY8LPMUuwaQsO6L791wdLgQ9
+ QsutYSmX47RDgja0Tq29cb1BJwm7Kar9K03Tl7qRfjrFeia5mKEMgp2/0/mly8KZchMG
+ 2YS+vR/P4T12w/h0phvpH5yxEZHc7bn2n4z6IFPGYcQyrbjWm5prgdQByBT1fmS3HcGz
+ n2eg==
+X-Gm-Message-State: AOAM532xPOIl5igylN1Z0OLeNxRAC7t/QlCKOD52jfXzesQ8/9Uvg1xg
+ CCdOySgUO7JCFwFkaM4Nk2TA1OhWuKs=
+X-Google-Smtp-Source: ABdhPJx1wIfKW0CxviKuZhEcR7cEd97qhrvafH/KeNrRJmVPothUsJn2Ct1nyS/dfvrYVwhB7nqAOw==
+X-Received: by 2002:a17:90a:2a09:: with SMTP id
+ i9mr14029827pjd.50.1593622607859; 
+ Wed, 01 Jul 2020 09:56:47 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id s1sm5814930pjp.14.2020.07.01.09.56.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jul 2020 09:56:47 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] tcg: Fix do_nonatomic_op_* vs signed operations
+Date: Wed,  1 Jul 2020 09:56:46 -0700
+Message-Id: <20200701165646.1901320-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 11:22:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,83 +99,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Alistair.Francis@wdc.com, zhiwei_liu@c-sky.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   |  7 +++++++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
- target/riscv/vector_helper.c            | 11 +++++++++++
- 4 files changed, 24 insertions(+)
+The smin/smax/umin/umax operations require the operands to be
+properly sign extended.  Do not drop the MO_SIGN bit from the
+load, and additionally extend the val input.
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a7fe4443e4..1c1277c0d1 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1072,3 +1072,10 @@ DEF_HELPER_6(vredxor_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_6(vwredsumu_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 878eeecb7e..b78fd8bc04 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -539,6 +539,8 @@ vredminu_vs     000100 . ..... ..... 010 ..... 1010111 @r_vm
- vredmin_vs      000101 . ..... ..... 010 ..... 1010111 @r_vm
- vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
- vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
-+vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+Reported-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index e60b74fb82..4b8a473fad 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -3189,8 +3189,9 @@ static void do_nonatomic_op_i32(TCGv_i32 ret, TCGv addr, TCGv_i32 val,
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b4e3f904d3..91fc1fd059 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2342,3 +2342,7 @@ GEN_OPIVV_TRANS(vredmin_vs, reduction_check)
- GEN_OPIVV_TRANS(vredand_vs, reduction_check)
- GEN_OPIVV_TRANS(vredor_vs, reduction_check)
- GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
-+
-+/* Vector Widening Integer Reduction Instructions */
-+GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
-+GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 41564b3237..72b812c743 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4406,3 +4406,14 @@ GEN_VEXT_RED(vredxor_vs_b, int8_t, int8_t, H1, H1, DO_XOR, clearb)
- GEN_VEXT_RED(vredxor_vs_h, int16_t, int16_t, H2, H2, DO_XOR, clearh)
- GEN_VEXT_RED(vredxor_vs_w, int32_t, int32_t, H4, H4, DO_XOR, clearl)
- GEN_VEXT_RED(vredxor_vs_d, int64_t, int64_t, H8, H8, DO_XOR, clearq)
-+
-+/* Vector Widening Integer Reduction Instructions */
-+/* signed sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsum_vs_b, int16_t, int8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsum_vs_h, int32_t, int16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
-+
-+/* Unsigned sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
+     memop = tcg_canonicalize_memop(memop, 0, 0);
+ 
+-    tcg_gen_qemu_ld_i32(t1, addr, idx, memop & ~MO_SIGN);
+-    gen(t2, t1, val);
++    tcg_gen_qemu_ld_i32(t1, addr, idx, memop);
++    tcg_gen_ext_i32(t2, val, memop);
++    gen(t2, t1, t2);
+     tcg_gen_qemu_st_i32(t2, addr, idx, memop);
+ 
+     tcg_gen_ext_i32(ret, (new_val ? t2 : t1), memop);
+@@ -3232,8 +3233,9 @@ static void do_nonatomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
+ 
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+ 
+-    tcg_gen_qemu_ld_i64(t1, addr, idx, memop & ~MO_SIGN);
+-    gen(t2, t1, val);
++    tcg_gen_qemu_ld_i64(t1, addr, idx, memop);
++    tcg_gen_ext_i64(t2, val, memop);
++    gen(t2, t1, t2);
+     tcg_gen_qemu_st_i64(t2, addr, idx, memop);
+ 
+     tcg_gen_ext_i64(ret, (new_val ? t2 : t1), memop);
 -- 
-2.23.0
+2.25.1
 
 
