@@ -2,92 +2,94 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99B7C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3474CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F12F207F5
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05F8220853
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 18:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nhi0FCg7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F12F207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q8MlOkPa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F8220853
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqhSR-0002Jl-Ng
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:27:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44636)
+	id 1jqhVA-0004AI-8Y
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 14:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqhR8-0000Yy-Ho
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:26:22 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:40755)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqhUA-0003fU-2P
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:29:30 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35220)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jqhR5-00049Q-Hx
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:26:22 -0400
-Received: by mail-ej1-x642.google.com with SMTP id o18so21558235eje.7
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 11:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/XnIS6XF5CC1zqf9zQ7/SX/fLjnbwp9fJEnkQPx0xiE=;
- b=nhi0FCg7VrIMZZMZ2pUN8TA0y6Mt+fDcjnNplIb2jgx8SYhnzKIPktozDzUmsYiKfY
- g/uKdCYKm8lvd3Hdg8ybAJjcUPfOb/uNyp5xoKoW6hLq8tSOU+sWSBZzSO06AczDwdLX
- 3YwIqCI00slzoLBjOBASqpAVrun0Uzat3oAUZUsb61sDej/TaGLEYMM8nl/0yve0IvAW
- pIb2zlhBQzvZbYxeUv3ztIFSdwzuQ2FbFNo9Q6g9dpysYVe80+b90GH3GcQhqZOrA4DQ
- Ww83wTkWDKXGDIxk10fkmxdjqFPALXKYJYvamLZ/oBSe8hQe+rCPMEErT3vW9OjmF4TS
- Dn9g==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jqhU8-0004Va-DZ
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 14:29:29 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id f16so993855pjt.0
+ for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 11:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=SGGGhmdBRttWqp65C+GvmngAI4GTDFyswA+RF0iIQ6o=;
+ b=Q8MlOkPasCUSUqOj5VgZ7s4pcZUt282r2MU2TpDwaiCc64LS/2NYs/ptbIU0CTnAVx
+ lWKLTPRm7Ci7JiD0qTKIX+u0hmL2yw100ew56yRJE4zCo63RNX0IgK0nx3/KOsUCYOUV
+ L29Eb3zPMa9+GudwidxSznQAmd+kZBoNq+Yy1K3m5VcnC6tu5S9gTFOPvW6tAAA7AesS
+ g0dkWzHbXyr+vEIAgaLCI6tou/uUuUxxg6YbS5p6HFf92GDpsG6e/Yx2HxS9Z5uoS9Xx
+ YVw41k6wBGN92fSamYWy9sAeHs0G0KTQtTn2fysbOEPv4cN0XCSoQjP2huFYaZ7m8NZp
+ ZXjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/XnIS6XF5CC1zqf9zQ7/SX/fLjnbwp9fJEnkQPx0xiE=;
- b=GhH00tcCDI4WlEXuJ44JtfZdtjNILLA7tPOQRemOrAftvRyBvWoHE1hGdZniUC9+e4
- eHnbChbmi2ib2h+4UlrDEXF0oMGddTLlCR+TIiBBV8o85vXVs2Vt+nFSMxOg3z97GpHj
- I4OEDUE/LOAy4LgLx7Dx82k656wLZpK4gNsfK31UnoG/Qnk9ekwh37TE9Eb79rHVoyJD
- 35QbkXffSqGOLmnBWLcsoUKefDRtScvGgb9obz0muPHG7aeUXMYlSOUz6UIxeK4LUiot
- PQtiAeADwt/Ox0+gPpRtsmmkmwnXINI3gzk45i2qhTZR071pnSHJz9Rx/beYGe+3GRCq
- Dfrw==
-X-Gm-Message-State: AOAM533m+fvxiqCdKVQ9zOKjcS3DKBeuw4eqVjjWDZDiNb65dE+jpbSW
- 23gtqn1OCMTVCw8cy7EKg+APFvJk
-X-Google-Smtp-Source: ABdhPJwPCeaziShSALaSc/EwzhiAy5S9+7i/hQGemULBJrfmeHPxnng7KJki7DZ4TM3bE6QX0wKlVA==
-X-Received: by 2002:a17:906:cd18:: with SMTP id
- oz24mr23790047ejb.118.1593627977654; 
- Wed, 01 Jul 2020 11:26:17 -0700 (PDT)
-Received: from localhost.localdomain ([109.245.225.97])
- by smtp.gmail.com with ESMTPSA id y22sm4809333ejf.108.2020.07.01.11.26.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jul 2020 11:26:17 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] MAINTAINERS: Adjust MIPS maintainership
-Date: Wed,  1 Jul 2020 20:25:58 +0200
-Message-Id: <20200701182559.28841-3-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
-References: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SGGGhmdBRttWqp65C+GvmngAI4GTDFyswA+RF0iIQ6o=;
+ b=TC0bJNbo7Q0QMvHYj9n1sxAJu/3mCYsokbzcR/o/aZWMDK5IC0VTyIQeW1NVWljHp4
+ 7oSTKuDJ95O/UEUCW8wrD+xR+30QhmKbEoqwOHISHpV6B3QNv48iS48M2z4ckbrobGbf
+ uFcky2238SNomm5KP1mdjBjSbw6jdvXd8osyOyc08bDz9WBhvBKf8YvoSv8qpTHZo9fj
+ ITZ4iDMDW1KTT/LtPqU5nshqPEApM+lcgqkxlxtce0cDWyuzXTXgx4bCXAZqqvlHigD6
+ WCO+wvGQyfp+NxWh7KHgFoI1dr7VDeYemUQQolsyAqipczJqDvbT37DRDpvIuAYm8G1N
+ l50Q==
+X-Gm-Message-State: AOAM531Pg0i2dhD91Y663fVi4VQkUofzQ154Lm19d+QrF3XhF5A8Et78
+ 3XJO/lp6cZZx4clxZ94zgJ1hmGIZUlY=
+X-Google-Smtp-Source: ABdhPJyn+CJ6tl5+HzPqRqprx73DFnXPBEBSlSgVzdgkCP3u4PJp+F3od1Xs2f+lhc4xuIHkNwL3Ig==
+X-Received: by 2002:a17:902:8b8a:: with SMTP id
+ ay10mr23400435plb.235.1593628166189; 
+ Wed, 01 Jul 2020 11:29:26 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id b4sm5786673pjn.38.2020.07.01.11.29.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 01 Jul 2020 11:29:25 -0700 (PDT)
+Subject: Re: [PATCH] target-i386: remove gen_io_end
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200626104419.15504-1-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c2415ac1-94eb-31d2-847b-3759fc9c12aa@linaro.org>
+Date: Wed, 1 Jul 2020 11:29:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ej1-x642.google.com
+In-Reply-To: <20200626104419.15504-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -102,87 +104,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com, Paul Burton <paulburton@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paul Burton and Aurelien Jarno removed for not being present.
-A polite email was sent to them with question whether they
-intend to actively participate, but there was no response.
-In cases where needed, other persons step in instead.
+On 6/26/20 3:44 AM, Paolo Bonzini wrote:
+> Force the end of a translation block after an I/O instruction in
+> icount mode.  For consistency, all CF_USE_ICOUNT code is kept in
+> disas_insn instead of having it in gen_ins and gen_outs.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/translate.c | 22 +++++++++-------------
+>  1 file changed, 9 insertions(+), 13 deletions(-)
 
-Huacai Chen and Jiaxun Yang step in as new energy.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-CC: Paul Burton <paulburton@kernel.org>
-CC: Aurelien Jarno <aurelien@aurel32.net>
-CC: Huacai Chen <chenhc@lemote.com>
-CC: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
----
- MAINTAINERS | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5d8acf8d31..6f96c03f3e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -213,7 +213,8 @@ F: disas/microblaze.c
- 
- MIPS TCG CPUs
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
--R: Aurelien Jarno <aurelien@aurel32.net>
-+R: Huacai Chen <chenhc@lemote.com>
-+R: Jiaxun Yang <jiaxun.yang@flygoat.com>
- R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: target/mips/
-@@ -377,6 +378,7 @@ F: target/arm/kvm.c
- 
- MIPS KVM CPUs
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+M: Huacai Chen <chenhc@lemote.com>
- S: Odd Fixes
- F: target/mips/kvm.c
- 
-@@ -1061,7 +1063,6 @@ F: hw/dma/rc4030.c
- Malta
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
- M: Philippe Mathieu-Daudé <f4bug@amsat.org>
--R: Aurelien Jarno <aurelien@aurel32.net>
- S: Maintained
- F: hw/isa/piix4.c
- F: hw/acpi/piix4.c
-@@ -1080,7 +1081,6 @@ F: hw/net/mipsnet.c
- 
- R4000
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
--R: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Obsolete
- F: hw/mips/r4k.c
-@@ -1103,8 +1103,7 @@ S: Maintained
- F: hw/intc/loongson_liointc.c
- 
- Boston
--M: Paul Burton <pburton@wavecomp.com>
--R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-+M: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
-@@ -2677,7 +2676,7 @@ F: disas/i386.c
- 
- MIPS TCG target
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
--R: Aurelien Jarno <aurelien@aurel32.net>
-+R: Jiaxun Yang <jiaxun.yang@flygoat.com>
- R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
- S: Maintained
- F: tcg/mips/
--- 
-2.20.1
-
+r~
 
