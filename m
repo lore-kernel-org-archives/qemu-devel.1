@@ -2,93 +2,83 @@ Return-Path: <SRS0=qPFU=AM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C068C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3098EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6742206A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F28AE206A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jul 2020 08:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvjWx0/r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6742206A1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtIqfJ/i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F28AE206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqXrg-0003Gw-3C
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33020)
+	id 1jqXsY-0004Et-7O
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 04:14:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqXr6-0002pP-6S
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:12:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58416
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqXrk-0003Us-FR
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:13:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56139
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqXr4-0000wU-GZ
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:12:31 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqXri-00010k-Qr
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 04:13:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593591149;
+ s=mimecast20190719; t=1593591189;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H3VPICKX6tj3pzGRL6nRJWdlI6LeqjG/YhflFT8go1E=;
- b=bvjWx0/rLi6Or8Ou/eE/Be9jR5+OuwLhXw2uU7u6hU8qVk+5nsuGdFFzodYy6Cy3b9Y3uN
- bxZhhqOeYYxi7vnZ1FdCay4snlGrTBF/24nlPuCQfKodSuRk0oPZ0KTJhKqNfPjomeFou9
- usYQih/1+0eCrwSNLQa0/hUYhNKHYhc=
+ bh=MjAaM+6+ouia1UlBi8y3YGl261UN2GrNI4Yi6HExdss=;
+ b=GtIqfJ/il9TAMwoJsa4K6heRn1KDwUTbYif/Tr5nkvmpbl7pHGY7jWHmnvwUw6lCpBdf6p
+ VQHB+Wx0yJNjDhqaPiChk8b6jfLpTWf5L1xABQ6ZMjGSz/goBbjPtV59uOB0KKP6Y979DD
+ AxtSGiIxjZMGwroKIJ8BEYGJSoDzLOQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-t6dOeRmROLagn2uOKScu2A-1; Wed, 01 Jul 2020 04:12:27 -0400
-X-MC-Unique: t6dOeRmROLagn2uOKScu2A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-250-dShzZQ7QOb-BvoHklDaBlg-1; Wed, 01 Jul 2020 04:13:08 -0400
+X-MC-Unique: dShzZQ7QOb-BvoHklDaBlg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4A0083DE6F;
- Wed,  1 Jul 2020 08:12:24 +0000 (UTC)
-Received: from [10.72.13.177] (ovpn-13-177.pek2.redhat.com [10.72.13.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E790E5C1D0;
- Wed,  1 Jul 2020 08:11:54 +0000 (UTC)
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-To: Peter Xu <peterx@redhat.com>
-References: <20200626064122.9252-2-eperezma@redhat.com>
- <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
- <20200629133403.GA266532@xz-x1>
- <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
- <1b4eaaaf-c2ab-0da8-afb4-1b7b4221e6cf@redhat.com>
- <20200630052148-mutt-send-email-mst@kernel.org>
- <49f547e1-dd87-7abe-1075-9dcece75b641@redhat.com>
- <20200630152050.GC3138@xz-x1>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d9dd8662-33e3-03fe-f227-f519858534e0@redhat.com>
-Date: Wed, 1 Jul 2020 16:11:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 134CF18FE861;
+ Wed,  1 Jul 2020 08:13:07 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D4AFEB3A7E;
+ Wed,  1 Jul 2020 08:13:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5756411384A6; Wed,  1 Jul 2020 10:13:05 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 14/46] qemu-option: Factor out helper opt_create()
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-15-armbru@redhat.com>
+ <eb4e324e-7028-8e86-5e5c-1063080017c6@virtuozzo.com>
+Date: Wed, 01 Jul 2020 10:13:05 +0200
+In-Reply-To: <eb4e324e-7028-8e86-5e5c-1063080017c6@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Mon, 29 Jun 2020 13:09:11 +0300")
+Message-ID: <87mu4jbqlq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200630152050.GC3138@xz-x1>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 01:29:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/30 22:25:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -109,50 +99,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-On 2020/6/30 下午11:20, Peter Xu wrote:
-> On Tue, Jun 30, 2020 at 05:23:31PM +0800, Jason Wang wrote:
->>>> Ok, we had a dedicated mr for interrupt:
->>>>
->>>> memory_region_add_subregion_overlap(MEMORY_REGION(&vtd_dev_as->iommu),
->>>> VTD_INTERRUPT_ADDR_FIRST,
->>>> &vtd_dev_as->iommu_ir, 1);
->>>>
->>>> So it should be fine. I guess the reason that I'm asking is that I thought
->>>> "IR" means "Interrupt remapping" but in fact it means "Interrupt Region"?
-> I was meaning "interrupt remapping", and of course it's the interrupt region
-> too when IR enabled...
-
-
-Right.
-
-
->
->>>> But I'm still not clear about the invalidation part for interrupt region,
->>>> maybe you can elaborate a little more on this.
->>>>
->>>> Btw, I think guest can trigger the assert in vtd_do_iommu_translate() if we
->>>> teach vhost to DMA to that region:
->>> Why would we want to?
+> 24.06.2020 19:43, Markus Armbruster wrote:
+>> There is just one use so far.  The next commit will add more.
 >>
->> I meant a buggy(malicious) guest driver.
-> Yes seems possible.  Do you want to post a patch?  Let me know if you want me
-> to...  Thanks,
-
-
-Yes please.
-
-Thanks
-
-
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   util/qemu-option.c | 27 ++++++++++++++++++---------
+>>   1 file changed, 18 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/util/qemu-option.c b/util/qemu-option.c
+>> index d9293814b4..3cdf0c0800 100644
+>> --- a/util/qemu-option.c
+>> +++ b/util/qemu-option.c
+>> @@ -502,6 +502,23 @@ int qemu_opt_unset(QemuOpts *opts, const char *name)
+>>       }
+>>   }
+>>   +static QemuOpt *opt_create(QemuOpts *opts, const char *name, char
+>> *value,
+>> +                           bool prepend)
+>> +{
+>> +    QemuOpt *opt = g_malloc0(sizeof(*opt));
 >
+> I'd prefer g_new0(QemuOpt, 1)
+
+I generally prefer g_new0() over g_malloc0(), too.  But the pattern
+
+    lhs = g_malloc0(sizeof(*lhs))
+
+is fine with me, provided sizeof(*lhs) is at least as readable as the
+type of *lhs.  Looks like a wash here, so I'm refraining from messing
+with the moved code.
+
+> anyway:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Thanks!
 
 
