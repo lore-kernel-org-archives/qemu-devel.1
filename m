@@ -2,130 +2,84 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F9BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD86C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91A2620720
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17443207D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:42:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="lsH/FPcF";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="aMBNmvPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A2620720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUla+VIZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17443207D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqpa2-0002u2-Sx
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 23:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37998)
+	id 1jqq7Y-0000h2-8E
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 23:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jqpZS-0002HZ-Dl
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:07:30 -0400
-Received: from relay1.mymailcheap.com ([149.56.97.132]:60225)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jqpZP-0001yh-JF
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:07:29 -0400
-Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
- [149.56.130.247])
- by relay1.mymailcheap.com (Postfix) with ESMTPS id 8F6DA3F157;
- Wed,  1 Jul 2020 23:07:24 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
- by filter1.mymailcheap.com (Postfix) with ESMTP id 6AF332A0C5;
- Wed,  1 Jul 2020 23:07:24 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1593659244;
- bh=xqpK3Zq/ivhIU1Zi/WF8LnIVsq7K/pN4mGMWvSMefwU=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=lsH/FPcFBG842LR9ltum1O5YJBzvPJlQDnObmb7EK+dekpuIeamFPMkWNuNLopo6J
- Ktd3WfFfvQKsACXL3MmVObakl5y6ljSvv7z6pgDqqlfWtys/l8CFCz/vLWx3Jv61qB
- JoymhiypFxLjZ3srPAO+cx9I+73fpVMN/8PG2Rt4=
-X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
-Received: from filter1.mymailcheap.com ([127.0.0.1])
- by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pjVZ2FDuxMPv; Wed,  1 Jul 2020 23:07:23 -0400 (EDT)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
- (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by filter1.mymailcheap.com (Postfix) with ESMTPS;
- Wed,  1 Jul 2020 23:07:22 -0400 (EDT)
-Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
- by mail20.mymailcheap.com (Postfix) with ESMTP id 420FA403B3;
- Thu,  2 Jul 2020 03:07:20 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="aMBNmvPR"; 
- dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (ec2-18-163-238-147.ap-east-1.compute.amazonaws.com
- [18.163.238.147])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id 73E10403B3;
- Thu,  2 Jul 2020 03:07:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1593659231;
- bh=xqpK3Zq/ivhIU1Zi/WF8LnIVsq7K/pN4mGMWvSMefwU=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=aMBNmvPRhjZVtxar2SYyfz945uiUwMXgeG6Wu21qHZjf1N+YQmL1SHKEmVoFSCn2J
- KAWDPmjBH4T4JIVCHNi8RwBSBSjQaZCXs40AQ6/Io0lStgJ0NLFRR6umbO1hiMISW5
- xfNchDVnC3s/bDL53P+Rb/pSwdA8UQ7BRaLStIEs=
-Subject: Re: [PATCH v4 28/40] tests/acceptance: skip multicore mips_malta
- tests on GitLab
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200701135652.1366-1-alex.bennee@linaro.org>
- <20200701135652.1366-29-alex.bennee@linaro.org>
- <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org> <87mu4jqj7y.fsf@linaro.org>
- <0eecc9ed-f0d4-97b4-37e2-d98ec0fd9b6b@amsat.org>
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <af8d2234-5e0b-d1f0-8542-539329819979@flygoat.com>
-Date: Thu, 2 Jul 2020 11:06:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jqq6g-0008PD-7E; Wed, 01 Jul 2020 23:41:50 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:37580)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jqq6e-0006Lo-0x; Wed, 01 Jul 2020 23:41:49 -0400
+Received: by mail-il1-x143.google.com with SMTP id r12so15774231ilh.4;
+ Wed, 01 Jul 2020 20:41:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yNwobVEksdS2Gpchur0lOc57DnwW2l5wRH3mF2zeAkg=;
+ b=mUla+VIZ5aKj3t81o9fsG6uubL7fSlG0DNto5yJniaOkcdCcP2VvhWrEtK3XDnFM4F
+ KSA5tvgQPbahbWQLfQxBF0dk32x6NWxhVS6TDh5jGm65SVqtBK78raJvheMmB9rmUCGT
+ q6pUgo9pVnGPbiCxPaOVy6nt5SWahcj4jUV9NKDWj6jehz+aFwLk3u6j2oM715IGruoc
+ GXgGVheknGapGq+BzwKe8D/KsPS1r7wOHaDELgEFsx1oN5Z2xS957o02WAonDYdsCOCS
+ XG6lIgs2ecHvc8FtWv/JjXud4DOMelnCT+kjjvzxsTRhMoljF4vGbfuBZ4rmRxLLPcc7
+ 1Ehg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yNwobVEksdS2Gpchur0lOc57DnwW2l5wRH3mF2zeAkg=;
+ b=A1p7hZKkVD8ftunhtcTgw7exzWcL5cYXnVo7AoeQ52ksFHGjd1TWMFBXLre0RUPNrl
+ I747TEg6LAQ0MlnHLHJUY8vQ3by6N22DbV1BXHVPmuzuQE5jwJ3bTsMK/MVBNLsUFTy5
+ w41A4/ckWShRh42pRTQjcT4qOjlZb49lzJOuE6FjIlE9S9kFHLMZ2pWx9513tM+gXUlN
+ eoHhlETbHELlj642u235ahwpLri/bYfruxgIQZSBHzzTt3MDOufOtAZYgk9pFHn9ig7C
+ x0fo0CIkaLKSD2zodAycFYx7aCY4O5UiBEoOUeG+aXOGI+1pnwm0o1c3+CJRTwnpCGbW
+ niFQ==
+X-Gm-Message-State: AOAM531UTc4ABOqpmc8Cm3GZiwYmdvlvMtrLekf+J6Ix1ZL9r7FWU++Q
+ IWM/3h0QBrmontZ2hHTu5vdec1RphruL6CcRiuI=
+X-Google-Smtp-Source: ABdhPJx5h6LDtbZ1KCWJ03wKCTvwzUU7RsRmC4D8LAYETXROo+k+puT8BN/S7TldsgsS51YwXutnGHOpRvSGeQB1DXs=
+X-Received: by 2002:a92:bb84:: with SMTP id x4mr11178355ilk.177.1593661306102; 
+ Wed, 01 Jul 2020 20:41:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0eecc9ed-f0d4-97b4-37e2-d98ec0fd9b6b@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 420FA403B3
-X-Spamd-Result: default: False [1.40 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
- ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
- MID_RHS_MATCH_FROM(0.00)[]; FROM_HAS_DN(0.00)[];
- TO_DN_SOME(0.00)[]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
- TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
- MIME_GOOD(-0.10)[text/plain]; R_SPF_SOFTFAIL(0.00)[~all];
- HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1];
- ML_SERVERS(-3.10)[213.133.102.83];
- DKIM_TRACE(0.00)[flygoat.com:+];
- DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
- RCPT_COUNT_TWELVE(0.00)[13];
- RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
- DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
- RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
- MIME_TRACE(0.00)[0:+];
- ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
- FREEMAIL_CC(0.00)[euphon.net,syrmia.com,redhat.com,linaro.org,nongnu.org,gmail.com,braap.org,aurel32.net];
- SUSPICIOUS_RECIPS(1.50)[]; RCVD_COUNT_TWO(0.00)[2]
-X-Rspamd-Server: mail20.mymailcheap.com
-Received-SPF: pass client-ip=149.56.97.132;
- envelope-from=jiaxun.yang@flygoat.com; helo=relay1.mymailcheap.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 23:07:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200701152549.1218-1-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 1 Jul 2020 20:32:00 -0700
+Message-ID: <CAKmqyKN8jSq+uNmmrF-a6cSqVT2tjPRs-nSPfFXBzjViirXjEw@mail.gmail.com>
+Subject: Re: [PATCH v12 00/61] target/riscv: support vector extension v0.7.1
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,77 +92,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- berrange@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-在 2020/7/2 1:01, Philippe Mathieu-Daudé 写道:
-> On 7/1/20 6:43 PM, Alex Bennée wrote:
->> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>
->>> On 7/1/20 3:56 PM, Alex Bennée wrote:
->>>> For some reason these tests fail all the time on GitLab. I can
->>>> re-create the hang around 3% of the time locally but it doesn't seem
->>>> to be MTTCG related. For now skipIf on GITLAB_CI.
->>>>
->>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->>>> ---
->>>>   tests/acceptance/machine_mips_malta.py | 3 +++
->>>>   1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/machine_mips_malta.py
->>>> index 92b4f28a112..7c9a4ee4d2d 100644
->>>> --- a/tests/acceptance/machine_mips_malta.py
->>>> +++ b/tests/acceptance/machine_mips_malta.py
->>>> @@ -15,6 +15,7 @@ from avocado import skipUnless
->>>>   from avocado_qemu import Test
->>>>   from avocado_qemu import wait_for_console_pattern
->>>>   from avocado.utils import archive
->>>> +from avocado import skipIf
->>>>   
->>>>   
->>>>   NUMPY_AVAILABLE = True
->>>> @@ -99,6 +100,7 @@ class MaltaMachineFramebuffer(Test):
->>>>           """
->>>>           self.do_test_i6400_framebuffer_logo(1)
->>>>   
->>> So the test works using a single core...
->>> Good we have a test to figure the bug!
->> It's about a 1-3% failure rate on my big test box but hits every time on
->> CI. However I did disable MTTCG and still saw failures so I think it's a
->> more subtle breakage than just a straight race.
-> I first thought it was a MTTCG problem, but then I realized you didn't
-> disable the single core test. When using >1 core, the malta uses a
-> different device, the CPS for Coherent Processing System. It contains
-> a Inter-Thread Communication Unit and a Global Interrupt Controller.
-> There might be a I/O locking problem. In particular, some of these
-> devices access the &cpu->env (the ITU is more of micro-architecture).
+On Wed, Jul 1, 2020 at 8:26 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
 >
-> This is why I was excited by your finding :) We might have a way
-> to figure it out.
+> This patchset implements the vector extension for RISC-V on QEMU.
+>
+> You can also find the patchset and all *test cases* in
+> my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v12).
+> All the test cases are in the directory qemu/tests/riscv/vector/. They are
+> riscv64 linux user mode programs.
+>
+> You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
+>
+> Features:
+>   * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
+>   * support basic vector extension.
+>   * support Zvlsseg.
+>   * support Zvamo.
+>   * not support Zvediv as it is changing.
+>   * SLEN always equals VLEN.
+>   * element width support 8bit, 16bit, 32bit, 64bit.
+>
+> Changelog:
+>
+> v12
+>   * fix compile error on big endian machines.
 
-FYI: This issue seems relative with the performence of host machine.
+Thanks!
 
-I can reproduce the issue in high frequency if I unplug my laptop from
+Applied to riscv-to-apply.next
 
-AC adapter (it will switch to powersave governor).
+Alistair
 
-
-So my first thought was it just because TCG runs too slow so cores failed
-
-to respond IPI timely.
-
-
-Thanks.
-
-- Jiaxun
+>
+> v11
+>   * fix all non-ASCII characters.
+>
+> v10
+>   * rebase to https://github.com/alistair23/qemu/tree/riscv-to-apply.next.
+>   * fix compile error in patch 57/61.
+>   * fix review tag typo.
+>
+> v9
+>   * always set dynamic rounding mode for vector float insns.
+>   * bug fix atomic implementation.
+>   * bug fix first-only-fault.
+>   * some small tidy up.
+>
+> v8
+>   * support different float rounding modes for vector instructions.
+>   * use lastest released TCG GVEC DUP IR.
+>   * set RV_VLEN_MAX to 256 bits, as GVEC IR uses simd_desc.
+>
+> v7
+>   * move vl == 0 check to translation time by add a global cpu_vl.
+>   * implement vector element inline load and store function by TCG IR.
+>   * based on vec_element_load(store), implement some permutation instructions.
+>   * implement rsubs GVEC IR.
+>   * fixup vsmul, vmfne, vfmerge, vslidedown.
+>   * some other small bugs and indentation errors.
+>
+> v6
+>   * use gvec_dup Gvec IR to accellerate move and merge.
+>   * a better way to implement fixed point instructions.
+>   * a global check when vl == 0.
+>   * limit some macros to only one inline function call.
+>   * fixup sew error when use Gvec IR.
+>   * fixup bugs for corner cases.
+>
+> v5
+>   * fixup a bug in tb flags.
+>
+> v4
+>   * no change
+>
+> v3
+>   * move check code from execution-time to translation-time
+>   * use a continous memory block for vector register description.
+>   * vector registers as direct fields in RISCVCPUState.
+>   * support VLEN configure from qemu command line.
+>   * support ELEN configure from qemu command line.
+>   * support vector specification version configure from qemu command line.
+>   * probe pages before real load or store access.
+>   * use probe_page_check for no-fault operations in linux user mode.
+>   * generation atomic exit exception when in parallel environment.
+>   * fixup a lot of concrete bugs.
+>
+> V2
+>   * use float16_compare{_quiet}
+>   * only use GETPC() in outer most helper
+>   * add ctx.ext_v Property
+>
+>
+> LIU Zhiwei (61):
+>   target/riscv: add vector extension field in CPURISCVState
+>   target/riscv: implementation-defined constant parameters
+>   target/riscv: support vector extension csr
+>   target/riscv: add vector configure instruction
+>   target/riscv: add an internals.h header
+>   target/riscv: add vector stride load and store instructions
+>   target/riscv: add vector index load and store instructions
+>   target/riscv: add fault-only-first unit stride load
+>   target/riscv: add vector amo operations
+>   target/riscv: vector single-width integer add and subtract
+>   target/riscv: vector widening integer add and subtract
+>   target/riscv: vector integer add-with-carry / subtract-with-borrow
+>     instructions
+>   target/riscv: vector bitwise logical instructions
+>   target/riscv: vector single-width bit shift instructions
+>   target/riscv: vector narrowing integer right shift instructions
+>   target/riscv: vector integer comparison instructions
+>   target/riscv: vector integer min/max instructions
+>   target/riscv: vector single-width integer multiply instructions
+>   target/riscv: vector integer divide instructions
+>   target/riscv: vector widening integer multiply instructions
+>   target/riscv: vector single-width integer multiply-add instructions
+>   target/riscv: vector widening integer multiply-add instructions
+>   target/riscv: vector integer merge and move instructions
+>   target/riscv: vector single-width saturating add and subtract
+>   target/riscv: vector single-width averaging add and subtract
+>   target/riscv: vector single-width fractional multiply with rounding
+>     and saturation
+>   target/riscv: vector widening saturating scaled multiply-add
+>   target/riscv: vector single-width scaling shift instructions
+>   target/riscv: vector narrowing fixed-point clip instructions
+>   target/riscv: vector single-width floating-point add/subtract
+>     instructions
+>   target/riscv: vector widening floating-point add/subtract instructions
+>   target/riscv: vector single-width floating-point multiply/divide
+>     instructions
+>   target/riscv: vector widening floating-point multiply
+>   target/riscv: vector single-width floating-point fused multiply-add
+>     instructions
+>   target/riscv: vector widening floating-point fused multiply-add
+>     instructions
+>   target/riscv: vector floating-point square-root instruction
+>   target/riscv: vector floating-point min/max instructions
+>   target/riscv: vector floating-point sign-injection instructions
+>   target/riscv: vector floating-point compare instructions
+>   target/riscv: vector floating-point classify instructions
+>   target/riscv: vector floating-point merge instructions
+>   target/riscv: vector floating-point/integer type-convert instructions
+>   target/riscv: widening floating-point/integer type-convert
+>     instructions
+>   target/riscv: narrowing floating-point/integer type-convert
+>     instructions
+>   target/riscv: vector single-width integer reduction instructions
+>   target/riscv: vector wideing integer reduction instructions
+>   target/riscv: vector single-width floating-point reduction
+>     instructions
+>   target/riscv: vector widening floating-point reduction instructions
+>   target/riscv: vector mask-register logical instructions
+>   target/riscv: vector mask population count vmpopc
+>   target/riscv: vmfirst find-first-set mask bit
+>   target/riscv: set-X-first mask bit
+>   target/riscv: vector iota instruction
+>   target/riscv: vector element index instruction
+>   target/riscv: integer extract instruction
+>   target/riscv: integer scalar move instruction
+>   target/riscv: floating-point scalar move instructions
+>   target/riscv: vector slide instructions
+>   target/riscv: vector register gather instruction
+>   target/riscv: vector compress instruction
+>   target/riscv: configure and turn on vector extension from command line
+>
+>  target/riscv/Makefile.objs              |    2 +-
+>  target/riscv/cpu.c                      |   50 +
+>  target/riscv/cpu.h                      |   82 +-
+>  target/riscv/cpu_bits.h                 |   15 +
+>  target/riscv/csr.c                      |   75 +-
+>  target/riscv/fpu_helper.c               |   33 +-
+>  target/riscv/helper.h                   | 1069 +++++
+>  target/riscv/insn32-64.decode           |   11 +
+>  target/riscv/insn32.decode              |  372 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c | 2888 +++++++++++++
+>  target/riscv/internals.h                |   41 +
+>  target/riscv/translate.c                |   27 +-
+>  target/riscv/vector_helper.c            | 4899 +++++++++++++++++++++++
+>  13 files changed, 9520 insertions(+), 44 deletions(-)
+>  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>  create mode 100644 target/riscv/internals.h
+>  create mode 100644 target/riscv/vector_helper.c
+>
+> --
+> 2.23.0
+>
+>
 
