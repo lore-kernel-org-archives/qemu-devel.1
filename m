@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8594C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD04C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B7020720
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:35:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A65D920720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="V8SIm8p2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B7020720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hGESMtAx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65D920720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2BF-0007CJ-Rj
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:35:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33442)
+	id 1jr2CF-0001L9-Rz
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:36:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr29Z-0003X4-0y
+ id 1jr29Z-0003YQ-SH
  for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:37 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44864)
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44875)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr29V-00008e-L0
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:36 -0400
+ id 1jr29X-0000AD-UF
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707613; x=1625243613;
+ t=1593707615; x=1625243615;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=b1Ls40SLOrF/dDm3uwiXCXSUeExSWQX70TCAAQ9ReiI=;
- b=V8SIm8p2Uaz5PCnzjaDSnVkqsZJQ5LYdGHLmDfrqSRVaS8OCSxxyZXNL
- h3tXqZP9GRX117LZotdWeYyDjzePLQTF6qCtFJpjZUw0yHucMV0C4o9VL
- 6m9mSFWAca59GBg2h66jw7LFzFgIkaNT+eMET8JuFDU2yUKvU6lh5Aphu
- WDmexMjdyz8gkMlUcXHxfX81uen+w1eVsPqNg/RKcvWIHcKVhk0r6/kMs
- XvUknfjYoZJ79r1fLZyZjwWxBN+Gatd+ABhtXZzoYE2YtJh3WeE1IcIsK
- NfOA/Qkurcy+r02jAF/EmoHEcsHLv0Ec06kl30a/nWWNQqUvHLcIadD8Y A==;
-IronPort-SDR: iimmEOBg6Wl9SiJUdPbWJ1EVAdluE0Dhfl6AAbyYcqyeW5eIBdEU+Nx2iF9aFxQ9thEoumRe5/
- Ak/uqmEYTqp5oZbjG662hJ0t3O2zeRDXkHcOsGUb8H5fDWc2HBkr68IO8fjqGv5LeYsJ+K7BeC
- JpK/gwY8GlfSIvWpT9XxTBWosj8GytPpxT6EFR/H0GJrzuXwHb6wt57hU9Iuh2pgjh0vWEECvE
- rrMRdWybFnKmkBV8TmQjLCUFVuRPLjDULDdBYu9gA8I6RhytgZ74QSqWC/V/ryatfjBNsAevci
- y0k=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498460"
+ bh=D2Vh/QRpt0AodHQ6EDxh6Wqu+PBuRVSvD9geAaTNtds=;
+ b=hGESMtAxNnCVVnsWw+O54URWMiuWdt8+CzWPOmQifp+HLvsHQKXS6WGT
+ Q7YQ2BzH+khaBUleohHd6hog83rzSWMXFBB2yl0RaZjBtr191JiG7q04W
+ 4P9newLt/ndOaLfbqA9l/pkKY50sT/zh3fBOUNO+Ju/i6LvLKgcdgkCwR
+ 79xrAA2BN8vN8VMHVn1BLE49pscKg/qAHIuBEVxiscZlwY5adhZHZA6T9
+ ByIcDQOIFZz+WOCtixkpTAeamtbUJmzSCIp16Z1oP5j1pnHPwExBVDOJc
+ Wq+9wNfV4kJgV3ezPuj/StKb5dnn6lhc2JpMtpY4i418yy04VQtGVAW4H A==;
+IronPort-SDR: oGYTJ7UemHNF5lBZg+rU5k8g+IswRE88ZEs/yZl+2lR7Gy/F4c0DGIXZp+UzbCd383boGPwG2S
+ NM/nig4JSdNx8Wr9wZ0mcdhl195vdHCYrR4YqyPCnQtBSMjcVdK2CV/L30crvBsLM+tQButwcC
+ kMW0IGxuRfTlpJRtQWem/rIn86bTXDjXEcYRQWRZv1OFTSCNlI1YLFTqO+JyEVRaN8Hc2ORoxp
+ AUDY6DxXDfrRkpoRHD8nU8FZymy0Y70R7snOACCCNsFv876WpRtpuKeGsi2wbSIWjywA3n5n2L
+ 14A=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498463"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:19 +0800
-IronPort-SDR: E/14KFnljLZQtGZRpxdiTUUSWw1F/gzBIS6HxiVcIyosuF44PzeihmRkW9PRUqonwF+Ok0GW3b
- E57artNVfteP06Ekrd/5xJbKDvQFXEeoo=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:20 +0800
+IronPort-SDR: 6O0He1zUgHEun4hTFDsnyPjvPg6iIiP1IdIHMUOp39qlxo0AE163oYHSaMnm2lf67Ar2L0nNDg
+ HrJqzqj0DapmJMtp2Fz79gjcelgCkyW+E=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:34 -0700
-IronPort-SDR: 1BgRUGXq1Hlan9xTzf6daD2BQIod+mFniYxt/kBrljGZ5w4Q2dWOJRNiSWHuBtoQwe3HT9+0go
- eA/0dqQSkTtA==
+ 02 Jul 2020 09:21:35 -0700
+IronPort-SDR: +BtPlX/Lvl35HspGrH+u6gie+KDDcbsSigaVvfddsNkDBgXuO3cAFqVXPkmSu7vDw7gGwOffWp
+ o+fyErEQ2ilg==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
@@ -71,9 +71,9 @@ Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 01/64] riscv: plic: Honour source priorities
-Date: Thu,  2 Jul 2020 09:22:51 -0700
-Message-Id: <20200702162354.928528-2-alistair.francis@wdc.com>
+Subject: [PULL v2 03/64] hw/riscv: Allow 64 bit access to SiFive CLINT
+Date: Thu,  2 Jul 2020 09:22:53 -0700
+Message-Id: <20200702162354.928528-4-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -104,64 +104,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Jessica Clarke <jrtc27@jrtc27.com>
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jessica Clarke <jrtc27@jrtc27.com>
+Commit 5d971f9e672507210e77d020d89e0e89165c8fc9
+"memory: Revert "memory: accept mismatching sizes in
+memory_region_access_valid"" broke most RISC-V boards as they do 64 bit
+accesses to the CLINT and QEMU would trigger a fault. Fix this failure
+by allowing 8 byte accesses.
 
-The source priorities can be used to order sources with respect to other
-sources, not just as a way to enable/disable them based off a threshold.
-We must therefore always claim the highest-priority source, rather than
-the first source we find.
-
-Signed-off-by: Jessica Clarke <jrtc27@jrtc27.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200618202343.20455-1-jrtc27@jrtc27.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: LIU Zhiwei<zhiwei_liu@c-sky.com>
+Message-Id: <122b78825b077e4dfd39b444d3a46fe894a7804c.1593547870.git.alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_plic.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ hw/riscv/sifive_clint.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 4f216c5585..d91e82b8ab 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -166,6 +166,9 @@ static void sifive_plic_update(SiFivePLICState *plic)
- static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
- {
-     int i, j;
-+    uint32_t max_irq = 0;
-+    uint32_t max_prio = plic->target_priority[addrid];
-+
-     for (i = 0; i < plic->bitfield_words; i++) {
-         uint32_t pending_enabled_not_claimed =
-             (plic->pending[i] & ~plic->claimed[i]) &
-@@ -177,14 +180,18 @@ static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
-             int irq = (i << 5) + j;
-             uint32_t prio = plic->source_priority[irq];
-             int enabled = pending_enabled_not_claimed & (1 << j);
--            if (enabled && prio > plic->target_priority[addrid]) {
--                sifive_plic_set_pending(plic, irq, false);
--                sifive_plic_set_claimed(plic, irq, true);
--                return irq;
-+            if (enabled && prio > max_prio) {
-+                max_irq = irq;
-+                max_prio = prio;
-             }
-         }
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index b11ffa0edc..669c21adc2 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -181,7 +181,7 @@ static const MemoryRegionOps sifive_clint_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 4,
+-        .max_access_size = 4
++        .max_access_size = 8
      }
--    return 0;
-+
-+    if (max_irq) {
-+        sifive_plic_set_pending(plic, max_irq, false);
-+        sifive_plic_set_claimed(plic, max_irq, true);
-+    }
-+    return max_irq;
- }
+ };
  
- static uint64_t sifive_plic_read(void *opaque, hwaddr addr, unsigned size)
 -- 
 2.27.0
 
