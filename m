@@ -2,96 +2,92 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0E3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:38:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77E272073E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 994582073E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:38:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kz6VhfwT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77E272073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAzbGJKB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994582073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqwY8-0000Ib-Q9
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:34:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42734)
+	id 1jqwcK-0001vV-UT
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:38:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqwXS-0007z9-QM
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:33:55 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42321)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqwbm-0001Qm-N0
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:38:22 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:40517)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jqwXR-0005Ks-4N
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:33:54 -0400
-Received: by mail-wr1-x444.google.com with SMTP id o11so27553146wrv.9
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 03:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=0uCRVeduNuwf650i2h0i7N2KoNZWZ+UGutSNwQ5wIR8=;
- b=kz6VhfwTrGLSTGh8zOLO3eGBnterYufXzOKMmYsGAVa/6cvUpccVZaf2cqYtRL2hT3
- T2DuOwnnFttqIbBR72Cvl+OaHcjjKhn+z4VrF8zii+RfKQMlqkiTHRmC9QrCMh8kVFOf
- 8LlMLy+eGwwBB+U+7d0cX7NzQRoUK2TGWomNk9yR7HThKmS4JzdzD6tsldEEanxP6mm4
- HKfdUeRd5od23kHmtFNcBdx7wnxgXutL93efvtl2eafhlB1809cKXYZE8QnnCSZUtzSQ
- 8DwKYxPBZJuSsquhO8zHd4qtQbHkiq35+MFBpzV7wfdpM2C9qBZgL9ixE58Cb4mYUbOF
- e/Gg==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jqwbl-00063B-1r
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:38:22 -0400
+Received: by mail-ed1-x543.google.com with SMTP id b15so23093970edy.7
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 03:38:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mEdie+sgoovn6l4efVOCgpUKqagorM8gT9QHHsKXzTk=;
+ b=VAzbGJKByjGH0Gjm8ufb9m837QgodA37JVrFQ15uBAIdGlAVVYEqzqaZ9pS1wXMTWa
+ 4e5ML6oTpt5ywKhRVJYdrFguWZRI1Yc65RHLGhIJA/6AtYpxCELAm6W5bDPA5L2IQ2AB
+ FT/w5Cr39MGkHSK6KKihS/C1A/JMfv7LvhttFcn6KPxnFoyAcO86cktmReicHmtHqRXr
+ CFkzJcNX8CHvrzAV0QB95q3/KkTDYUbJ/1OuEli+HOFYldsj9fxSn1ts+e+6CkFg6PSg
+ PZDprnXin+wrYDzz5bWPzDx2jMiqGNzVS9FdD+cvA7u595fWo8AAXcAFgo9EYI9/XsWV
+ DHdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=0uCRVeduNuwf650i2h0i7N2KoNZWZ+UGutSNwQ5wIR8=;
- b=hos31PSevA0dAttZLSehSR9Te+nDCkKdxcnIFtX+jPAnbpjEp7nVv/9nJG3Qglw9s8
- 0muuytAI4uCfiD7wa7VkRXFvJy3JGGf9gmvNYcQH040qWMmymJ9jbgJ8hBz6PxNxcnwb
- fRgIpV68PsQH/phJFDvxhyhudMfE3QL2qmCO+Ml4ICd1kCzI0pD7b+52z4GPlQo6sh7l
- 9MzqPkJO0L5PciAgByTwZkQEt+4Bc0Xqky3pvN0k5U5CI9o2Bxmbf0RLOjwh4mXVlm4u
- EwszgBl3M+gp2UTntolFc0PiBsOac3i31ln3p/j7ouLORnv3ScKYkTXyeAgwMteXAh4g
- 3A2g==
-X-Gm-Message-State: AOAM531rQQ1M7oGg/EJWzyECY8EULXtH1G4s53Fd2yXu3nzExv7kW8Vw
- f7FiEft122zJzD/6vrX6DNRZ1qj2eDY=
-X-Google-Smtp-Source: ABdhPJwpaTsRaeOE4+tvCEAYEYkd0Lwm7Qeqt2Dfpiw78Kal5GmuHZzC6b5jQ/J+iLbEPwapKaCW7A==
-X-Received: by 2002:adf:d0d0:: with SMTP id z16mr32473825wrh.95.1593686029769; 
- Thu, 02 Jul 2020 03:33:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b10sm9609138wmj.30.2020.07.02.03.33.48
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=mEdie+sgoovn6l4efVOCgpUKqagorM8gT9QHHsKXzTk=;
+ b=DqelCEpbsrVmeVRimzey+kS7/Aizrj7l/JNi8ArHqu4l/LB3HmreOT5aFX5o7KFOMR
+ 6pMLEurXVKrjC4ef0EW9BHyQ6ufw3yQGc7MxqL+imKZ07+ghsiOq13ZLQz9Q48Wx5xrt
+ d/nRM8aO2y2V6XvFzKkg9Ha9Kn0pMAzZp6q3EGJ5EA0CKgVK8tVYhKAA1jJRvv4FDKkA
+ QZO7dUkl5Z7IMRqCaUhzU3UbkjuYsk0KODs3lYWs5xj24iHxBjI6wTYpoOrkgp4ouzTT
+ q57m4xrTCK9p1RUP0CBPwcRdm7QY+2cNoUoIw1cldixzn1ayHJFo7y5+lBVRzqA4LY8p
+ 6cvA==
+X-Gm-Message-State: AOAM531PUC4r+bCs7miNGIO+98NXRHN7wM163xNmvVwHk6g7vKkQZ0yB
+ /nrlIiP+aalTIFUe4AMAxgSxxf1O2+o=
+X-Google-Smtp-Source: ABdhPJyyX6DbAB+bOG5d0NMTW668wbTs7VgnvXU3c6vFe+d0zqCg2kqculbs94Hg7K3IOHepwUq3iA==
+X-Received: by 2002:a50:9f8c:: with SMTP id c12mr30760386edf.149.1593686298513; 
+ Thu, 02 Jul 2020 03:38:18 -0700 (PDT)
+Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id d23sm6495413eja.27.2020.07.02.03.38.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 03:33:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1579C1FF7E;
- Thu,  2 Jul 2020 11:33:48 +0100 (BST)
-References: <20200701175432.18892-1-philmd@redhat.com>
- <b476ded8-fbd6-f9d5-66b7-67e7128e86fd@redhat.com>
- <34ef8d81-4559-9887-3420-c0045bb83d46@redhat.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] cpus: Move CPU code from exec.c to cpus.c
-In-reply-to: <34ef8d81-4559-9887-3420-c0045bb83d46@redhat.com>
-Date: Thu, 02 Jul 2020 11:33:48 +0100
-Message-ID: <87wo3mp5o3.fsf@linaro.org>
+ Thu, 02 Jul 2020 03:38:17 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] cpus: Move CPU code from exec.c to cpus-common.c
+Date: Thu,  2 Jul 2020 12:38:16 +0200
+Message-Id: <20200702103816.13798-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,117 +100,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This code was introduced with SMP support in commit 6a00d60127,
+later commit 267f685b8b moved CPU list management to common code
+but forgot this code. Move now and simplify ifdef'ry.
 
-> On 02/07/20 11:38, Paolo Bonzini wrote:
->> On 01/07/20 19:54, Philippe Mathieu-Daud=C3=A9 wrote:
->>> This code was introduced with SMP support in commit 6a00d60127,
->>> later commit 296af7c952 moved CPU parts to cpus.c but forgot this
->>> code. Move now and simplify ifdef'ry.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>  cpus.c | 18 ++++++++++++++++++
->>>  exec.c | 22 ----------------------
->>>  2 files changed, 18 insertions(+), 22 deletions(-)
->>>
->>> diff --git a/cpus.c b/cpus.c
->>> index 41d1c5099f..472686cbbc 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -92,6 +92,11 @@ static unsigned int throttle_percentage;
->>>  #define CPU_THROTTLE_PCT_MAX 99
->>>  #define CPU_THROTTLE_TIMESLICE_NS 10000000
->>>=20=20
->>> +CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
->>> +
->>> +/* current CPU in the current thread. It is only valid inside cpu_exec=
-() */
->>> +__thread CPUState *current_cpu;
->>> +
->>>  bool cpu_is_stopped(CPUState *cpu)
->>>  {
->>>      return cpu->stopped || !runstate_is_running();
->>> @@ -134,6 +139,19 @@ static bool all_cpu_threads_idle(void)
->>>      return true;
->>>  }
->>>=20=20
->>> +CPUState *qemu_get_cpu(int index)
->>> +{
->>> +    CPUState *cpu;
->>> +
->>> +    CPU_FOREACH(cpu) {
->>> +        if (cpu->cpu_index =3D=3D index) {
->>> +            return cpu;
->>> +        }
->>> +    }
->>> +
->>> +    return NULL;
->>> +}
->>> +
->>>  /***********************************************************/
->>>  /* guest cycle counter */
->>>=20=20
->>> diff --git a/exec.c b/exec.c
->>> index 21926dc9c7..997b7db15f 100644
->>> --- a/exec.c
->>> +++ b/exec.c
->>> @@ -98,12 +98,6 @@ AddressSpace address_space_memory;
->>>  static MemoryRegion io_mem_unassigned;
->>>  #endif
->>>=20=20
->>> -CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
->>> -
->>> -/* current CPU in the current thread. It is only valid inside
->>> -   cpu_exec() */
->>> -__thread CPUState *current_cpu;
->>> -
->>>  uintptr_t qemu_host_page_size;
->>>  intptr_t qemu_host_page_mask;
->>>=20=20
->>> @@ -832,22 +826,6 @@ const VMStateDescription vmstate_cpu_common =3D {
->>>      }
->>>  };
->>>=20=20
->>> -#endif
->>> -
->>> -CPUState *qemu_get_cpu(int index)
->>> -{
->>> -    CPUState *cpu;
->>> -
->>> -    CPU_FOREACH(cpu) {
->>> -        if (cpu->cpu_index =3D=3D index) {
->>> -            return cpu;
->>> -        }
->>> -    }
->>> -
->>> -    return NULL;
->>> -}
->>> -
->>> -#if !defined(CONFIG_USER_ONLY)
->>>  void cpu_address_space_init(CPUState *cpu, int asidx,
->>>                              const char *prefix, MemoryRegion *mr)
->>>  {
->>>
->>=20
->> Queued, thanks.
->>=20
->> Paolo
->>=20
->>=20
->
-> Wait... this is in exec.c because cpus.c is not linked into user-mode
-> emulators.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ cpus-common.c | 18 ++++++++++++++++++
+ exec.c        | 22 ----------------------
+ 2 files changed, 18 insertions(+), 22 deletions(-)
 
-cpus-common then?
+diff --git a/cpus-common.c b/cpus-common.c
+index 8f5512b3d7..34044f4e4c 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -72,6 +72,8 @@ static int cpu_get_free_index(void)
+     return max_cpu_index;
+ }
+ 
++CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
++
+ void cpu_list_add(CPUState *cpu)
+ {
+     QEMU_LOCK_GUARD(&qemu_cpu_list_lock);
+@@ -96,6 +98,22 @@ void cpu_list_remove(CPUState *cpu)
+     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+ }
+ 
++CPUState *qemu_get_cpu(int index)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        if (cpu->cpu_index == index) {
++            return cpu;
++        }
++    }
++
++    return NULL;
++}
++
++/* current CPU in the current thread. It is only valid inside cpu_exec() */
++__thread CPUState *current_cpu;
++
+ struct qemu_work_item {
+     QSIMPLEQ_ENTRY(qemu_work_item) node;
+     run_on_cpu_func func;
+diff --git a/exec.c b/exec.c
+index 21926dc9c7..997b7db15f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -98,12 +98,6 @@ AddressSpace address_space_memory;
+ static MemoryRegion io_mem_unassigned;
+ #endif
+ 
+-CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
+-
+-/* current CPU in the current thread. It is only valid inside
+-   cpu_exec() */
+-__thread CPUState *current_cpu;
+-
+ uintptr_t qemu_host_page_size;
+ intptr_t qemu_host_page_mask;
+ 
+@@ -832,22 +826,6 @@ const VMStateDescription vmstate_cpu_common = {
+     }
+ };
+ 
+-#endif
+-
+-CPUState *qemu_get_cpu(int index)
+-{
+-    CPUState *cpu;
+-
+-    CPU_FOREACH(cpu) {
+-        if (cpu->cpu_index == index) {
+-            return cpu;
+-        }
+-    }
+-
+-    return NULL;
+-}
+-
+-#if !defined(CONFIG_USER_ONLY)
+ void cpu_address_space_init(CPUState *cpu, int asidx,
+                             const char *prefix, MemoryRegion *mr)
+ {
+-- 
+2.21.3
 
---=20
-Alex Benn=C3=A9e
 
