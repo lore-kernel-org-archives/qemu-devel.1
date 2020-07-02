@@ -2,79 +2,78 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89638C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8DEC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 577542068F
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:08:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C4322068F
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:09:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MreRsNw8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577542068F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bu7Fkn+N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4322068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1lB-00066B-Jc
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:08:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51252)
+	id 1jr1lj-0006rh-J6
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:08:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jr1XF-0006p2-VH
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:54:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42398
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1U1-0000gA-6C
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31559
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jr1XD-0006Jd-Nc
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:54:01 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tf-0004rp-Rv
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593705234;
+ s=mimecast20190719; t=1593705011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6F0pn31T2up3ICt/iJXrFCdCSdWcs8hbH1AX9/BUPtM=;
- b=MreRsNw8UAQFi5dKdWjOzDqskmDwYmvceFtkmzGjA2sbsBKNbjvdbg0I48b8VSrAyTEfoH
- OcUboCdVQm+FW4QMS6ZnDZuu8RQCQTbBC0Q8H+CmagtcBn0qdNtknSfeX31pq3qdiaxzog
- 2Sux9LUizFE5KAZVFYs+rcKNWrpk6p0=
+ bh=UxDOpClcnLAhxHW/NLpsvSsMAM7eX6u60yG3VVvYYZY=;
+ b=Bu7Fkn+NyIuE71Iv0YHayAkCh8qwAncSCZ0yRGcH374YDLYgunFG8cfbOH9JmSkrqFawH3
+ y2G+oC9HHaj5tXZ2my7sB1aToyuuUs+muimtn/pckxNJzXZW4YT3vkJroSiuWMKYK9gPR0
+ /FM8oz0iN3gZl3CCIp48PRrzmaTNBPw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-nq_1UlVFNCGYzfcil3X5qg-1; Thu, 02 Jul 2020 11:53:39 -0400
-X-MC-Unique: nq_1UlVFNCGYzfcil3X5qg-1
+ us-mta-348-ColH2QpuPKSNzYONi356kw-1; Thu, 02 Jul 2020 11:50:09 -0400
+X-MC-Unique: ColH2QpuPKSNzYONi356kw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66BE3804006;
- Thu,  2 Jul 2020 15:53:38 +0000 (UTC)
-Received: from work-vm (ovpn-114-239.ams2.redhat.com [10.36.114.239])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9147D10023A5;
- Thu,  2 Jul 2020 15:53:36 +0000 (UTC)
-Date: Thu, 2 Jul 2020 16:53:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/1] SEV: QMP support for Inject-Launch-Secret
-Message-ID: <20200702155240.GD14863@work-vm>
-References: <20200630134102.46777-1-tobin@linux.vnet.ibm.com>
- <20200630134102.46777-2-tobin@linux.vnet.ibm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B414A107ACF2;
+ Thu,  2 Jul 2020 15:50:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58F3310023A5;
+ Thu,  2 Jul 2020 15:50:08 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 322FA113524E; Thu,  2 Jul 2020 17:50:01 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 37/44] error: Reduce unnecessary error propagation
+Date: Thu,  2 Jul 2020 17:49:53 +0200
+Message-Id: <20200702155000.3455325-38-armbru@redhat.com>
+In-Reply-To: <20200702155000.3455325-1-armbru@redhat.com>
+References: <20200702155000.3455325-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200630134102.46777-2-tobin@linux.vnet.ibm.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,279 +96,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
-> From: Tobin Feldman-Fitzthum <tobin@ibm.com>
-> 
-> AMD SEV allows a guest owner to inject a secret blob
-> into the memory of a virtual machine. The secret is
-> encrypted with the SEV Transport Encryption Key and
-> integrity is guaranteed with the Transport Integrity
-> Key. Although QEMU faciliates the injection of the
-> launch secret, it cannot access the secret.
-> 
-> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
-> ---
->  include/monitor/monitor.h |  3 ++
->  include/sysemu/sev.h      |  2 ++
->  monitor/misc.c            |  8 ++---
->  qapi/misc-target.json     | 18 +++++++++++
->  target/i386/monitor.c     |  9 ++++++
->  target/i386/sev-stub.c    |  5 +++
->  target/i386/sev.c         | 66 +++++++++++++++++++++++++++++++++++++++
->  target/i386/trace-events  |  1 +
->  8 files changed, 108 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index 1018d754a6..bf049c5b00 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -4,6 +4,7 @@
->  #include "block/block.h"
->  #include "qapi/qapi-types-misc.h"
->  #include "qemu/readline.h"
-> +#include "include/exec/hwaddr.h"
->  
->  extern __thread Monitor *cur_mon;
->  typedef struct MonitorHMP MonitorHMP;
-> @@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
->  int monitor_set_cpu(int cpu_index);
->  int monitor_get_cpu_index(void);
->  
-> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp);
-> +
->  void monitor_read_command(MonitorHMP *mon, int show_prompt);
->  int monitor_read_password(MonitorHMP *mon, ReadLineFunc *readline_func,
->                            void *opaque);
-> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> index 98c1ec8d38..b279b293e8 100644
-> --- a/include/sysemu/sev.h
-> +++ b/include/sysemu/sev.h
-> @@ -18,4 +18,6 @@
->  
->  void *sev_guest_init(const char *id);
->  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-> +int sev_inject_launch_secret(const char *hdr, const char *secret,
-> +                             uint64_t gpa);
->  #endif
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 89bb970b00..b9ec8ba410 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
->      memory_dump(mon, count, format, size, addr, 1);
->  }
->  
-> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
-> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp)
->  {
->      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
-> -                                                 addr, 1);
-> +                                                 addr, size);
->  
->      if (!mrs.mr) {
->          error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
-> @@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
->      MemoryRegion *mr = NULL;
->      void *ptr;
->  
-> -    ptr = gpa2hva(&mr, addr, &local_err);
-> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->      if (local_err) {
->          error_report_err(local_err);
->          return;
-> @@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
->      void *ptr;
->      uint64_t physaddr;
->  
-> -    ptr = gpa2hva(&mr, addr, &local_err);
-> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->      if (local_err) {
->          error_report_err(local_err);
->          return;
-> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> index dee3b45930..d145f916b3 100644
-> --- a/qapi/misc-target.json
-> +++ b/qapi/misc-target.json
-> @@ -200,6 +200,24 @@
->  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
->    'if': 'defined(TARGET_I386)' }
->  
-> +##
-> +# @sev-inject-launch-secret:
-> +#
-> +# This command injects a secret blob into memory of SEV guest.
-> +#
-> +# @packet-header: the launch secret packet header encoded in base64
-> +#
-> +# @secret: the launch secret data to be injected encoded in base64
-> +#
-> +# @gpa: the guest physical address where secret will be injected.
-> +#
-> +# Since: 5.1
-> +#
-> +##
-> +{ 'command': 'sev-inject-launch-secret',
-> +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' },
-> +  'if': 'defined(TARGET_I386)' }
-> +
->  ##
->  # @dump-skeys:
->  #
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 27ebfa3ad2..42bcfe6dc0 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
->  
->      return data;
->  }
-> +
-> +void qmp_sev_inject_launch_secret(const char *packet_hdr,
-> +                                  const char *secret, uint64_t gpa,
-> +                                  Error **errp)
-> +{
-> +    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
-> +        error_setg(errp, "SEV inject secret failed");
-> +    }
-> +}
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> index e5ee13309c..fed4588185 100644
-> --- a/target/i386/sev-stub.c
-> +++ b/target/i386/sev-stub.c
-> @@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
->  {
->      return NULL;
->  }
-> +int sev_inject_launch_secret(const char *hdr, const char *secret,
-> +                             uint64_t gpa)
-> +{
-> +    return 1;
-> +}
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index d273174ad3..b35f1ddc0c 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -28,6 +28,8 @@
->  #include "sysemu/runstate.h"
->  #include "trace.h"
->  #include "migration/blocker.h"
-> +#include "exec/address-spaces.h"
-> +#include "monitor/monitor.h"
->  
->  #define TYPE_SEV_GUEST "sev-guest"
->  #define SEV_GUEST(obj)                                          \
-> @@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
->      return 0;
->  }
->  
-> +int sev_inject_launch_secret(const char *packet_hdr,
-> +                             const char *secret, uint64_t gpa)
-> +{
-> +    struct kvm_sev_launch_secret input;
-> +    guchar *data = NULL, *hdr = NULL;
-> +    int error, ret = 1;
-> +    void *hva;
-> +    gsize hdr_sz = 0, data_sz = 0;
-> +    Error *local_err = NULL;
-> +    MemoryRegion *mr = NULL;
-> +
-> +    /* secret can be inject only in this state */
-> +    if (!sev_check_state(SEV_STATE_LAUNCH_SECRET)) {
+When all we do with an Error we receive into a local variable is
+propagating to somewhere else, we can just as well receive it there
+right away, even when we need to keep error_propagate() for other
+error paths.
 
-This gives a build error for me; sev_check_state is declared as :
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ block.c             | 2 +-
+ block/gluster.c     | 8 ++++----
+ block/parallels.c   | 2 +-
+ block/quorum.c      | 2 +-
+ block/replication.c | 3 +--
+ block/vxhs.c        | 4 ++--
+ hw/core/qdev.c      | 2 +-
+ hw/net/virtio-net.c | 4 ++--
+ 8 files changed, 13 insertions(+), 14 deletions(-)
 
-static bool
-sev_check_state(const SevGuestState *sev, SevState state)
-
-so it's expecting the state.
-
-> +        error_report("SEV: Not in correct state. (LSECRET) %x",
-> +                     sev_state->state);
-
-also it's showing as sev_state undeclared.
-
-> +        return 1;
-> +    }
-> +
-> +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
-> +    if (!hdr || hdr_sz != 52) {
-
-Here and ...
-
-> +        error_report("SEV: Failed to decode sequence header");
-> +        return 1;
-> +    }
-> +
-> +    data = g_base64_decode(secret, &data_sz);
-> +    if (!data || data_sz <= 0 || data_sz > 0x3E80) {
-
-here - please don't embed magic constants; they should be a #define
-or const somewhere so we can tell what they are.
-
-> +        error_report("SEV: Failed to decode data");
-> +        goto err;
-> +    }
-> +
-> +    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
-> +    if (!hva) {
-> +        error_report("SEV: Failed to calculate guest address.");
-> +        goto err;
-> +    }
-> +
-> +    input.hdr_uaddr = (unsigned long)hdr;
-> +    input.hdr_len = hdr_sz;
-> +
-> +    input.trans_uaddr = (unsigned long)data;
-> +    input.trans_len = data_sz;
-> +
-> +    input.guest_uaddr = (unsigned long)hva;
-> +    input.guest_len = data_sz;
-
-I'd probably use casts to uint64_t here for hdr, data, and hva
-since that's what the structure you are assigning to has.
-
-> +
-> +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
-> +                                input.trans_uaddr, input.trans_len);
-> +
-> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_SECRET,
-> +                    &input, &error);
-> +    if (ret) {
-> +        error_report("SEV: failed to inject secret ret=%d fw_error=%d '%s'",
-> +                     ret, error, fw_error_to_str(error));
-> +        goto err;
-> +    }
-> +
-> +    ret = 0;
-> +
-> +err:
-> +    g_free(data);
-> +    g_free(hdr);
-> +    return ret;
-> +}
-> +
->  static void
->  sev_register_types(void)
->  {
-> diff --git a/target/i386/trace-events b/target/i386/trace-events
-> index 789c700d4a..9f299e94a2 100644
-> --- a/target/i386/trace-events
-> +++ b/target/i386/trace-events
-> @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
->  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
->  kvm_sev_launch_measurement(const char *value) "data %s"
->  kvm_sev_launch_finish(void) ""
-> +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
-> -- 
-> 2.20.1 (Apple Git-117)
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/block.c b/block.c
+index 60d2945c2c..2dcf9afd61 100644
+--- a/block.c
++++ b/block.c
+@@ -6073,7 +6073,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+ 
+     /* Parse -o options */
+     if (options) {
+-        if (!qemu_opts_do_parse(opts, options, NULL, &local_err)) {
++        if (!qemu_opts_do_parse(opts, options, NULL, errp)) {
+             goto out;
+         }
+     }
+diff --git a/block/gluster.c b/block/gluster.c
+index c620880f27..4f1448e2bc 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -523,7 +523,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+ 
+     /* create opts info from runtime_json_opts list */
+     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
+-    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+         goto out;
+     }
+ 
+@@ -554,7 +554,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+ 
+         /* create opts info from runtime_type_opts list */
+         opts = qemu_opts_create(&runtime_type_opts, NULL, 0, &error_abort);
+-        if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
++        if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
+             goto out;
+         }
+ 
+@@ -584,7 +584,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         if (gsconf->type == SOCKET_ADDRESS_TYPE_INET) {
+             /* create opts info from runtime_inet_opts list */
+             opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
+-            if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
++            if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
+                 goto out;
+             }
+ 
+@@ -632,7 +632,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         } else {
+             /* create opts info from runtime_unix_opts list */
+             opts = qemu_opts_create(&runtime_unix_opts, NULL, 0, &error_abort);
+-            if (!qemu_opts_absorb_qdict(opts, backing_options, &local_err)) {
++            if (!qemu_opts_absorb_qdict(opts, backing_options, errp)) {
+                 goto out;
+             }
+ 
+diff --git a/block/parallels.c b/block/parallels.c
+index 324085ccea..c259799111 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -827,7 +827,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail_options;
+     }
+ 
+-    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+         goto fail_options;
+     }
+ 
+diff --git a/block/quorum.c b/block/quorum.c
+index 5d52e605db..6df9449fc2 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -921,7 +921,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     opts = qemu_opts_create(&quorum_runtime_opts, NULL, 0, &error_abort);
+-    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+         ret = -EINVAL;
+         goto exit;
+     }
+diff --git a/block/replication.c b/block/replication.c
+index dcd430624e..0c70215784 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -85,7 +85,6 @@ static int replication_open(BlockDriverState *bs, QDict *options,
+ {
+     int ret;
+     BDRVReplicationState *s = bs->opaque;
+-    Error *local_err = NULL;
+     QemuOpts *opts = NULL;
+     const char *mode;
+     const char *top_id;
+@@ -99,7 +98,7 @@ static int replication_open(BlockDriverState *bs, QDict *options,
+ 
+     ret = -EINVAL;
+     opts = qemu_opts_create(&replication_runtime_opts, NULL, 0, &error_abort);
+-    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+         goto fail;
+     }
+ 
+diff --git a/block/vxhs.c b/block/vxhs.c
+index fecaeb82c9..dc0e254730 100644
+--- a/block/vxhs.c
++++ b/block/vxhs.c
+@@ -318,7 +318,7 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
+ 
+-    if (!qemu_opts_absorb_qdict(opts, options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(opts, options, errp)) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -345,7 +345,7 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     /* get the 'server.' arguments */
+     qdict_extract_subqdict(options, &backing_options, VXHS_OPT_SERVER".");
+ 
+-    if (!qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err)) {
++    if (!qemu_opts_absorb_qdict(tcp_opts, backing_options, errp)) {
+         ret = -EINVAL;
+         goto out;
+     }
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 17bd8fc2ec..62b45af8e9 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -869,7 +869,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     }
+ 
+     if (value && !dev->realized) {
+-        if (!check_only_migratable(obj, &local_err)) {
++        if (!check_only_migratable(obj, errp)) {
+             goto fail;
+         }
+ 
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 04b012e487..7502ff0b1e 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -3119,8 +3119,8 @@ static bool failover_replug_primary(VirtIONet *n, Error **errp)
+     qdev_set_parent_bus(n->primary_dev, n->primary_bus);
+     n->primary_should_be_hidden = false;
+     if (!qemu_opt_set_bool(n->primary_device_opts,
+-                           "partially_hotplugged", true, &err)) {
+-        goto out;
++                           "partially_hotplugged", true, errp)) {
++        return false;
+     }
+     hotplug_ctrl = qdev_get_hotplug_handler(n->primary_dev);
+     if (hotplug_ctrl) {
+-- 
+2.26.2
 
 
