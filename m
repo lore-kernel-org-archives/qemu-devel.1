@@ -2,92 +2,72 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66118C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D77CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 317D52084C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:07:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MG4OSjNw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 317D52084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD1542073E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:12:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD1542073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3cf-0004ON-FE
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:07:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57166)
+	id 1jr3h4-0006PQ-0H
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:12:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr3bx-0003wZ-Vz
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 14:07:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46976
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr3gR-0005sL-W3; Thu, 02 Jul 2020 14:11:40 -0400
+Resent-Date: Thu, 02 Jul 2020 14:11:39 -0400
+Resent-Message-Id: <E1jr3gR-0005sL-W3@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21328)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr3bv-0005wN-VB
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 14:07:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593713218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cfYHqJAZOT6eVg4OasYslhkmhaOwcE6CkZsCGWHsqIo=;
- b=MG4OSjNw8iRqBvpLTbUKDt00IOWzG86mMoi9HBo5QGW5sSf9gm0sa9bGxTExGa/ZO7NpXk
- rWnynAygPncrxjYYP55Hb5LcXicTpy+Z24ZZFFtoqc+0A6jKKD6zGBHTzY4T0ZoCcXFKOf
- MNnhaGWN/Z4R40nWjjXr+fgeRiVmuzM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-mH66x2NLObm74jppuyiSzQ-1; Thu, 02 Jul 2020 14:06:57 -0400
-X-MC-Unique: mH66x2NLObm74jppuyiSzQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEB8064AD6;
- Thu,  2 Jul 2020 18:06:55 +0000 (UTC)
-Received: from [10.3.112.202] (ovpn-112-202.phx2.redhat.com [10.3.112.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E2BC77899;
- Thu,  2 Jul 2020 18:06:55 +0000 (UTC)
-Subject: Re: [PATCH v2 35/44] error: Eliminate error_propagate() with
- Coccinelle, part 2
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200702155000.3455325-1-armbru@redhat.com>
- <20200702155000.3455325-36-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <cb3ec58e-8eb3-510b-92a3-71f6e19151bf@redhat.com>
-Date: Thu, 2 Jul 2020 13:06:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr3gO-0006R3-EI; Thu, 02 Jul 2020 14:11:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593713490; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=XPvtCXBvNYfQA1uXGLg/w6nntBo45bQiANsXIsbKthWz6kepvR+GmkyVO/BXQ8AnizVEpSDpJOE4Mp+TWtcClBExLQ8fpnZ7qfzeqfq+TZHF4kpXMBl1hiNk3yjCXTOcMvePBwISZvrhsEBan3Hc4rHd1WmAf7HvFrY9YcGT7Kg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593713490;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=R20PCf4v3h0MoaU7hoQ/D/7Ua2YZ7bc/NkV7xA7AxX0=; 
+ b=GuUU+a2OJZOKypAyouXoVEOn/Cx3R+PPx9X7VA0WE4qvLbSJA5+nQmn9IOv0FkCPBYm57wUYrxsDX0SDm+BP6oroyIKlIDfT2jp+S9FHZrnJQMilNJ4IJS2imhri74XU9lL1vDM8X9h6JyejfRTLHOZmyBkytNJhGdPy6u8CIAI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593713489446354.0498403225233;
+ Thu, 2 Jul 2020 11:11:29 -0700 (PDT)
+Message-ID: <159371348834.6440.15747631286416621479@d1fd068a5071>
+Subject: Re: [PATCH v3 00/19] mailmap: Add more entries to sanitize 'git log'
+ output
+In-Reply-To: <20200702173818.14651-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20200702155000.3455325-36-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: f4bug@amsat.org
+Date: Thu, 2 Jul 2020 11:11:29 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:58:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,73 +80,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/20 10:49 AM, Markus Armbruster wrote:
-> When all we do with an Error we receive into a local variable is
-> propagating to somewhere else, we can just as well receive it there
-> right away.  The previous commit did that with a Coccinelle script I
-> consider fairly trustworthy.  This commit uses the same script with
-> the matching of return taken out, i.e. we convert
-> 
->      if (!foo(..., &err)) {
-> 	...
-> 	error_propagate(errp, err);
-> 	...
->      }
-> 
-> to
-> 
->      if (!foo(..., errp)) {
-> 	...
-> 	...
->      }
-> 
-> This is unsound: @err could still be read between afterwards.  I don't
-> know how to express "no read of @err without an intervening write" in
-> Coccinelle.  Instead, I manually double-checked for uses of @err.
-> 
-> Suboptimal line breaks tweaked manually.  qdev_realize() simplified
-> further to placate scripts/checkpatch.pl.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   block.c              |  6 ++----
->   block/blkdebug.c     |  7 ++-----
->   block/blklogwrites.c |  3 +--
->   block/blkverify.c    |  3 +--
->   block/crypto.c       |  4 +---
->   block/file-posix.c   |  6 ++----
->   block/file-win32.c   |  6 ++----
->   block/gluster.c      |  4 +---
->   block/iscsi.c        |  3 +--
->   block/nbd.c          |  8 ++------
->   block/qcow2.c        | 13 ++++---------
->   block/raw-format.c   |  4 +---
->   block/sheepdog.c     |  8 ++------
->   block/ssh.c          |  4 +---
->   block/throttle.c     |  4 +---
->   block/vmdk.c         |  4 +---
->   block/vpc.c          |  3 +--
->   block/vvfat.c        |  3 +--
->   blockdev.c           |  3 +--
->   hw/intc/xics.c       |  4 +---
->   hw/vfio/pci.c        |  3 +--
->   net/tap.c            |  3 +--
->   qom/object.c         |  4 +---
->   23 files changed, 32 insertions(+), 78 deletions(-)
-
-Small enough to review each instance.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMjE3MzgxOC4xNDY1
+MS0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVz
+dCBvbiBGcmVlQlNEIGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
+aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
+Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
+YW5jaAppZiBxZW11LXN5c3RlbS14ODZfNjQgLS1oZWxwID4vZGV2L251bGwgMj4mMTsgdGhlbgog
+IFFFTVU9cWVtdS1zeXN0ZW0teDg2XzY0CmVsaWYgL3Vzci9saWJleGVjL3FlbXUta3ZtIC0taGVs
+cCA+L2Rldi9udWxsIDI+JjE7IHRoZW4KICBRRU1VPS91c3IvbGliZXhlYy9xZW11LWt2bQplbHNl
+CiAgZXhpdCAxCmZpCm1ha2Ugdm0tYnVpbGQtZnJlZWJzZCBKPTIxIFFFTVU9JFFFTVUKZXhpdCAw
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNzAyMTczODE4LjE0NjUxLTEtZjRidWdAYW1z
+YXQub3JnL3Rlc3RpbmcuRnJlZUJTRC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
