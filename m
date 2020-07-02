@@ -2,74 +2,95 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 792DAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7657A20771
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C073206BE
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="dwAo23Gx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7657A20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATVgMRzg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C073206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2xQ-00031A-Ol
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45488)
+	id 1jr2xi-0003dN-IU
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jr2wQ-0001oF-SS
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:24:07 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:36209)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jr2wO-0003XD-Fn
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:24:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=noqrcHnElbnc1ITBkAEW9OJn0u3aj8lhMULqMbSVTDc=; b=dwAo23Gx11GPkpP0VJyc1suUT1
- /m94buCS8CqLkBtGjBXZerOuofhbcguMeB7KnPrG/GDWt4COIUBq3ca1yveWdcM74r16ME7nXQpQR
- /8yEoqwJykjGY0N/7TyJwyCgLRQZn6ILOv+0PwHXS76yjfgMOlVmtHeRZUY5Bq2uRGQxvuNwQlVpj
- /dx8JyDF6+ECp/hlCP9QcQPk0fr59KgmU0068jnj5TQtDU59df7vJwFFpUj+7fywQfj+7071BCDrR
- PgrruAJXSlY5kp1u6GmkApL+ZxTh42S5cr7mxilmxDSPZg+1/VjL7/VY8b5lCHLzm1xcH29+o6JlN
- aQUPLhC17B3Pny5Auqgd0KWujLBkNwA1zNVHTlebIhN7Du8K7HODFc77TGjTftBGxOATZFYSL0zAg
- JeIY8l37nxxPZu+FbZ0rinCWB1hXdnTjhNK024TEMKnXflbs/aOVwmRL00DGFzoVzo3eKNsCCVp/D
- LHJjK6t8Euws2tOMyD3ltJDh0UZFHpWapO+32MUM62yA5i+oulMqv/aAI6cFjD9d4jymSk9bMnc7K
- 4TNcRm8GAyzPvCV2poPuAnL7ctX+sQqzJFb8hbon2nCTcuKtZ6uQSkghHmbMS1hh9LX9pA+riN7Qi
- 5cXJAmi1agI5RT/rLn+vmM+n/j44esNpNzVURZrUA=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+ (Exim 4.90_1) (envelope-from <vincent.mc.li@gmail.com>)
+ id 1jr2g9-0006P8-LG
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:07:17 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42419)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <vincent.mc.li@gmail.com>)
+ id 1jr2g6-00009u-2f
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:07:17 -0400
+Received: by mail-pl1-x642.google.com with SMTP id w19so863420ply.9
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 10:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:date:to:cc:subject:message-id:user-agent:mime-version;
+ bh=eounZF97POuDpcNpC87VXF7s2ZlFi1rW0HaHSCyxdVg=;
+ b=ATVgMRzg15F538aTMSViWjSIf0wIc4REeL31qphq14lchyu6lZm5UUegLu7CaoNbtH
+ FANC59ZcZ9Zgi/XE7je0JC+17q0BSEU0VlXhPiiQotKKAJYezusgEnyONPtPm0yHx4ix
+ cq/iuGr3AiKs4VhVM0lRcK2ECLsrRx43ad0PaXOi7W8fgbXWCzcXGRLBzSHvusT1bLPe
+ IRDuIaFxo1Lt4PguehKRmmUjOC+HifRUjSEvuBy3BSzW5o9rgSafL2NwNNsq62pP2q3H
+ bpncIHxpXzxhpBZeModqc7STz9XsygDoFI0mWE0EsBwh1GonDJD+OjX4/3zOHM7ZBgMd
+ hjRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:user-agent
+ :mime-version;
+ bh=eounZF97POuDpcNpC87VXF7s2ZlFi1rW0HaHSCyxdVg=;
+ b=qdyqNaymPziMC+ACfnnRjMNjckw3ASXC219DqfYdmtPYqg5z73mb+Kapz3HJE/WsRp
+ HcXpUtuqO9VS4TFGqOIHNNH18sedN3km+FEY9h1TFHyJ/gtOY3XU3evgyhRlETqT+w+F
+ 0xGR+uJ+GglbpRcHSJwMdQO0ZyuuhH7Y65pxtQ/Sur0XqppqeI0yu6mmqXLvSymWitbf
+ yCGoZOQY0HJS2q7tVRmAyHMyx/KXU4OU3EKLrwsX/LqjRtckXB8IzVgsVEJUHdKpoKHY
+ r9SOOHEa4AUSmCp2m6WAy+nMe8gdrEqkH3M2J2HFzY6QdD8Ubw+RDD2Zx10yQIdfB/5+
+ OJKg==
+X-Gm-Message-State: AOAM532sP9A3r0+ljP5qWCQQf0WGRBMoUNU4qlmASQCXRUtto0dO6ZFA
+ Rpr4nQYyspPO7yPz/IC+t5pv8Ts3
+X-Google-Smtp-Source: ABdhPJxGf4nYoOPt6qLBySIoBGJP2L+UqTgtgn0fj/VwzY5aEjdc7t6t1p7Bue+d0oOAbVvbFrAfHw==
+X-Received: by 2002:a17:90b:3685:: with SMTP id
+ mj5mr26974876pjb.123.1593709631568; 
+ Thu, 02 Jul 2020 10:07:11 -0700 (PDT)
+Received: from sin-l-00030390.olympus.f5net.com
+ (c-71-231-121-172.hsd1.wa.comcast.net. [71.231.121.172])
+ by smtp.gmail.com with ESMTPSA id r8sm9244803pfg.147.2020.07.02.10.07.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Jul 2020 10:07:10 -0700 (PDT)
+From: Vincent Li <vincent.mc.li@gmail.com>
+X-Google-Original-From: Vincent Li <vli@gmail.com>
+Date: Thu, 2 Jul 2020 10:07:09 -0700 (PDT)
+X-X-Sender: vli@sea-ml-00029224.olympus.f5net.com
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Date: Thu, 02 Jul 2020 19:23:35 +0200
-Message-ID: <5261112.usFQB0EGfy@silver>
-In-Reply-To: <20200702173500.27f2b0a5@bahia.lan>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <1814766.vrYqd63b1M@silver> <20200702173500.27f2b0a5@bahia.lan>
+Subject: Question about virtio-net: implement RX RSS processing
+Message-ID: <alpine.OSX.2.21.2007020914350.260@sea-ml-00029224.olympus.f5net.com>
+User-Agent: Alpine 2.21 (OSX 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 13:24:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=vincent.mc.li@gmail.com; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ MALFORMED_FREEMAIL=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+X-Mailman-Approved-At: Thu, 02 Jul 2020 13:24:30 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,232 +102,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 2. Juli 2020 17:35:00 CEST Greg Kurz wrote:
-> > > It isn't readdir only, most requests span over multiple v9fs_co_*()
-> > > calls...> 
-> > Right, I know! And that's actually my root motivation to finally bring
-> > this
-> > patch set forward, since I am very aware that this patch set is just a
-> > small brick in the overall procecss of fixing similarly affected code
-> > portions. So yes, that's my plan to fix them with upcoming patch sets,
-> > too.
-> > 
-> > Having said that, could we probably try to make future reviews a bit more
-> > efficient at certain aspects? For instance it would help a lot if the
-> > patch
-> > set was reviewed entirely, and not stopped at the very first issue spotted
-> > and then suspended to ++version, as this creates large latencies in the
-> > overall review process?
-> 
-> Review of 9pfs is a best effort thing... I usually stop reviewing when I'm
-> fed up or when all the time I could reasonably invest is elapsed. Breaking
-> down the series in smaller patches is the usual improvement for that.
 
-No need to defend, you do these things voluntarily. I am glad that you spend 
-time on this project at all. I would appreciate though if we could reduce the 
-overall time for a patch set a bit, and my suggestion trying to walk through 
-an entire set before re-posting a new version might indeed bring an 
-improvement without anybody having to invest more time, but rather less.
+Hi,
 
-> > And likewise it would also help if review is prioritized on relevant
-> > behaviour aspects (concept, design) first before arguing about code style
-> > details like variable names or other details invisible to users.
-> 
-> I don't remember questioning the overall concept behind these changes
-> because it looks reasonable enough (even if I would appreciate to be
-> able to verify them with a working reproducer).
+I noticed the [PULL V2 02/33] virtio-net: implement RX RSS processing 
+https://marc.info/?l=qemu-devel&m=159248675403246&w=2 and cloned  
+https://github.com/jasowang/qemu.git tags/net-pull-request for testing the 
+RX RSS feature, but I am not clear how to test this feature and see if it 
+meets my needs.
 
-What exactly do you mean here with working reproducer?
+I am running F-Stack Nginx applications 
+https://github.com/F-Stack/f-stack/tree/dev/app/nginx-1.16.1 in KVM guest, 
+F-Stack is FreeBSD TCP/IP stack ported to support DPDK, and F-Stack set 
+RSS mode as code below 
+https://github.com/F-Stack/f-stack/blob/dev/lib/ff_dpdk_if.c#L605
 
-> Even if it is invisible to the users, coding style or how a series is
-> broken down in patches is important for developers.
+     /* Set RSS mode */
+     uint64_t default_rss_hf = ETH_RSS_PROTO_MASK;
+     port_conf.rxmode.mq_mode = ETH_MQ_RX_RSS;
+     port_conf.rx_adv_conf.rss_conf.rss_hf = default_rss_hf;
+     if (dev_info.hash_key_size == 52) {
+         port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_52bytes;
+         port_conf.rx_adv_conf.rss_conf.rss_key_len = 52;
+         use_rsskey_52bytes = 1;
+     } else {
+         port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_40bytes;
+         port_conf.rx_adv_conf.rss_conf.rss_key_len = 40;
+     }
+     port_conf.rx_adv_conf.rss_conf.rss_hf &= dev_info.flow_type_rss_offloads;
+     if (port_conf.rx_adv_conf.rss_conf.rss_hf != ETH_RSS_PROTO_MASK) {
+         printf("Port %u modified RSS hash function based on hardware support,"
+         "requested:%#"PRIx64" configured:%#"PRIx64"\n",
+         port_id, default_rss_hf, port_conf.rx_adv_conf.rss_conf.rss_hf);
+     }
 
-Dedication for detail beyond a certain fine graded level is luxury, and for 
-that reason it is designated for projects which clearly can afford it. On 
-(sub)projects with low activity and high latency (like this one) it easily 
-leads to frustration, which is obviously contra productive.
+But  DPDK virtio PMD does not support RSS as below commit shows:
 
-I don't say don't care about code style, details et al., but caring a bit less 
-on reviews would not hurt, so to say. A bit of (invisible) tolerance avoids 
-friction and stagnancy.
+commit 13b3137f3b7c8f866947a9b34e06a8aec0d084f7
+Author: Dilshod Urazov 
+Date:   Wed Oct 9 13:32:07 2019 +0100
 
-> > And finally: compromises. As man power on 9p is very limited, it would
-> > make
-> > sense to limit patch sets at a certain extent and agree to postpone
-> > certain
-> > non-critical issues to subsequent patches (or sets of), otherwise a patch
-> > set will grow and grow and it will take ages to get forward.
-> 
-> FWIW this patchset was more than 10 patches and now it is only 5 :)
+    net/virtio: reject unsupported Rx multi-queue modes
+    
+    This driver supports none of DCB, RSS or VMDQ modes, therefore must
+    check and return error if configured incorrectly.
+    
+    Virtio can distribute Rx packets across multi-queue, but there is
+    no controls (algorithm, redirection table, hash function) except
+    number of Rx queues and ETH_MQ_RX_NONE is the best fit meaning
+    no method is enforced on how to route packets to MQs.
+    
+    Fixes: c1f86306a026 ("virtio: add new driver")
+    Cc: stable@dpdk.org
+    
+    Signed-off-by: Dilshod Urazov 
+    Signed-off-by: Andrew Rybchenko 
+    Reviewed-by: Maxime Coquelin 
 
-Hey, no misleading number crunching please. ;-) Three dropped patches were 
-never intended to be merged, they were pure benchmarks.
-
-> The good news is that you'll soon be able to merge things by yourself.
-> I'll help you when I can but I won't be the gating factor anymore.
-> 
-> Hurrah !
-
-Yep, I'll do my best to pursue your work, I appreciate what you did and that 
-you still volunteer to help!
-
-> > > > > 2) basically means moving some logic from the frontend to the
-> > > > > backend, ie. called from v9fs_co_run_in_worker(). This implies
-> > > > > that a very long request (ie. one that would span on many calls
-> > > > > to readdir()) cannot be interrupted by the client anymore, as
-> > > > > opposed to what we have now BTW.
-> > > 
-> > > ... most likely to allow clients to interrupt a long request with a
-> > > Tflush. Have you considered this aspect in your changes ?
-> > 
-> > In this particular patch set, no, as for readdir this should not be an
-> > issue in practice for anybody. After this patch set is applied, even on
-> > huge directories, the fs driver's duration for readdir would barely be
-> > measurable. In fact the server's latency would always be much higher,
-> > yet.
-> 
-> Reproducer ? Numbers ? ;)
-
-Well, you have already seen and run the benchmark in this series yourself. You 
-can easily hit several hundred ms server latency, which is very hard to top 
-with any fs driver reading a directory. Ok, maybe with a tape drive you could, 
-but that's pretty much it. :) With a 'normal' system the fs driver would 
-rather block for something between <1ms .. 8ms, i.e. fs driver completes 
-before it would be able to actually see a flush request.
-
-But to make it also clear: it would not bite with the new design either. If 
-someone really would see a necessity to abort readdir requests, that would be 
-possible without huge changes.
-
-> > > > > Then the whole seekdir/rewinddir/telldir/readdir sequence should
-> > > > > be called with a single v9fs_co_run_in_worker() invocation, in
-> > > > > which case the locking could just be something like:
-> > > > > 
-> > > > > int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState
-> > > > > *fidp,
-> > > > > 
-> > > > >                                       struct V9fsDirEnt **entries,
-> > > > >                                       int32_t maxsize, bool dostat)
-> > > > > 
-> > > > > {
-> > > > > 
-> > > > >     int err = 0;
-> > > > >     
-> > > > >     if (v9fs_request_cancelled(pdu)) {
-> > > > >     
-> > > > >         return -EINTR;
-> > > > >     
-> > > > >     }
-> > > > >     
-> > > > >     v9fs_readdir_lock(&fidp->fs.dir);
-> > > > >     
-> > > > >     v9fs_co_run_in_worker({
-> > > > >     
-> > > > >         err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
-> > > > >     
-> > > > >     });
-> > > > >     
-> > > > >     v9fs_readdir_unlock(&fidp->fs.dir);
-> > > > >     return err;
-> > > > > 
-> > > > > }
-> > > > 
-> > > > That's exactly what should be prevented. The lock must be on driver
-> > > > thread
-> > > > side, not on main thread side. The goal is to reduce the time slice of
-> > > > individual locks. If the lock is on main thread, the time slice of a
-> > > > lock
-> > > > (even on huge directories with thousands of entries) is multiple
-> > > > factors
-> > > > larger than if the lock is on driver thread side. So that's not just
-> > > > few
-> > > > percent or so, it is huge.
-> > > 
-> > > Sorry I don't get it...  In a contention-less situation, which is the
-> > > case we really care for, qemu_co_mutex_lock() has no overhead.
-> > 
-> > Yes, it only kicks in if there is concurrency.
-> 
-> And we don't care to preserve performance for silly clients, do we ?
-
-We don't necessarily need to preserve performance for them, that's right. But 
-it is already handled appropriately for them, so destroying it (i.e. slowing 
-them down) only makes sense if there is a good reason for that.
-
-> > > > > This would technically leave the locking in the main I/O thread,
-> > > > > but it isn't conceptually different from locking at the beginning
-> > > > > of do_readdir_lock() and unlocking before returning. My concern
-> > > > > is that I don't know how coroutine mutexes behave with multiple
-> > > > > worker threads...
-> > > > 
-> > > > Well, your Mutex -> CoMutex change was intended to fix a deadlock with
-> > > > the
-> > > > old readdir implementation. That deadlock could not happen with the
-> > > > new
-> > > > readdir implementation, which suggests that it probably makes sense to
-> > > > revert this change (i.e. CoMutex -> Mutex) for this new
-> > > > implementation.
-> > > 
-> > > No we can't because it is also used with 9p2000.u, that you said you
-> > > don't want to fix.
-> > 
-> > Yes and no, I did not say I don't want to fix readdir for 9p2000.u at all.
-> > What I said was I want to prioritize and concentrate on the most relevant
-> > issues first. 9p2000.L is the most commonly used protocol variant, so I
-> > would like to fix the most severe (e.g. performance) issues for 9p2000.L
-> > first before spending time on 9p2000.u which is AFAICS barely used in
-> > comparison, which I personally don't use at all, and which I am hence not
-> > testing in the same degree and cannot serve with the same quality as
-> > 9p2000.L right now.
-> > 
-> > Plus if there are really users caring for 9p2000.u, I can gladly assist
-> > them to address these issues for 9p2000.u as well, provided that they
-> > help at least with testing the required 9p2000.u changes.
-> 
-> I would personally do the opposite... again ;)
-> 
-> Like you say we essentially care for 9p2000.L and we only do limited
-> support for 9p2000.u. If we have a change that we really want for
-> 9p2000.L but it has an impact on 9p2000.u because of shared code,
-> it is fine to do the changes anyway, including changes to the 9p2000.u
-> specific code. Very basic testing of 9p2000.u (mount/ls or find/umount)
-> or maybe running pjd-fstest is enough IMHO. If we break someone's setup
-> and he complains, then we can ask him to test a fix before we merge it.
-
-Well, so you want to handle the relevant 9p2000.u readdir optimizations by 
-yourself, and you would send it as follow-up patch set (after this set is 
-through), including test cases?
-
-> > Back to the actual topic: so what do we do about the mutex then? CoMutex
-> > for 9p2000.u and Mutex for 9p2000.L? I know you find that ugly, but it
-> > would just be a transitional measure.
-> 
-> That would ruin my day...
-> 
-> More seriously, the recent fix for a deadlock condition that was present
-> for years proves that nobody seems to be using silly clients with QEMU.
-> So I think we should just dump the lock and add a one-time warning in
-> the top level handlers when we detect a duplicate readdir request on
-> the same fid. This should be a very simple patch (I can take care of
-> it right away).
-
-Looks like we have a consensus! Then I wait for your patch removing the lock, 
-and for your feedback whether or not you see anything else in this patch set?
-
-> > Best regards,
-> > Christian Schoenebeck
-> 
-> Cheers,
-> 
-> --
-> Greg
-
-Best regards,
-Christian Schoenebeck
+diff --git a/drivers/net/virtio/virtio_ethdev.c 
+           b/drivers/net/virtio/virtio_ethdev.c
+index 0a2ed2e50..76bd40a3e 100644
+--- a/drivers/net/virtio/virtio_ethdev.c
++++ b/drivers/net/virtio/virtio_ethdev.c
+@@ -2066,6 +2066,13 @@ virtio_dev_configure(struct rte_eth_dev *dev)
+        PMD_INIT_LOG(DEBUG, "configure");
+        req_features = VIRTIO_PMD_DEFAULT_GUEST_FEATURES;
+ 
++       if (rxmode->mq_mode != ETH_MQ_RX_NONE) {
++               PMD_DRV_LOG(ERR,
++                       "Unsupported Rx multi queue mode %d",
++                       rxmode->mq_mode);
++               return -EINVAL;
++       }
++
+        if (dev->data->dev_conf.intr_conf.rxq) {
+                ret = virtio_init_device(dev, hw->req_guest_features);
+                if (ret < 0)
 
 
+
+So the problem is I can't run F-Stack Applications in KVM/Qemu guest with 
+multi queue/vCPU/RSS  support, this problem seems apply to DPDK TCP 
+applications require multi queue/RSS support in KVM/Qemu guest, for 
+example mTCP https://github.com/mtcp-stack/mtcp I tested has similar 
+problem.
+
+I am not clear on the picture of how everything work together for  this 
+virtio-net RSS feature.
+
+I have read following blogs
+
+https://www.redhat.com/en/blog/introduction-virtio-networking-and-vhost-net
+https://www.redhat.com/en/blog/how-vhost-user-came-being-virtio-networking-and-dpdk
+
+Someone told me that in order for DPDK frond end virtio PMD in guest support RSS, the backend 
+also needs to support RSS, including vhost-net and vhost-user, it should 
+have nothing to do with this Qemu virtio-net RSS, is that correct?  if 
+correct, I have following questions:
+
+1, What is the use case for this Qemu virtio-net RSS?
+2, How to test the use case?
+3, Are there any plan to improve vhost-net/vhost-user, DPDK virtio PMD to support RSS?
+
+For 3,  I think this is important for KVM/Qemu/OVS-DPDK/Vhost-net environment for DPDK TCP/UDP applications. 
+
+Note I have no problem running F-Stack or mTCP applications in VMware ESXi 
+guest environment with multi queue/vCPU/RSS requirement since DPDK vmxnet3 
+PMD support RSS and I assume VMware ESXi backend support RSS, so it looks VMware has 
+advantage over this.
+
+Thank you for your patience to read this email 
+
+Regards,
+
+Vincent     
 
