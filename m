@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5173C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6887C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 806EE20885
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8568A20885
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJ9gq1qN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 806EE20885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aydsHEdA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8568A20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3FR-0003HF-Nr
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:43:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49380)
+	id 1jr3GO-0005PZ-O4
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3AM-0003qn-6T; Thu, 02 Jul 2020 13:38:30 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:41259)
+ id 1jr3AV-0003xg-Tf; Thu, 02 Jul 2020 13:38:41 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:32971)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3AK-0007BJ-Hn; Thu, 02 Jul 2020 13:38:29 -0400
-Received: by mail-ej1-x644.google.com with SMTP id dp18so30733391ejc.8;
- Thu, 02 Jul 2020 10:38:27 -0700 (PDT)
+ id 1jr3AR-0007KE-Fp; Thu, 02 Jul 2020 13:38:37 -0400
+Received: by mail-ej1-x630.google.com with SMTP id n26so16789745ejx.0;
+ Thu, 02 Jul 2020 10:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7julCGiGF9JJmMXluhtA9EWXD+I+RvsjAFbGDldCUJk=;
- b=BJ9gq1qNYr4uw/5mZz5Q0SCEhQqt84swdf5C2UXyJlmilA7aFOy0zqa6vp0F0BXQPM
- n037ntdmwAH18xa+QMo0fzMWXzsMEKU5MgwBYkXcbdKiQT53HFta7uarN7lRRQXp9WHg
- H051VMvoxHlQaRobVwrb8uOnbxGNQhn/PIKWiAZKzX7QHdAaL7/iuof2VEo2miInl295
- sBqZjqyNRqVbo5CCDeCI/QAlmqY4bbniIuQkqdCZLYomQeeSTZYOsRROpkbC9BEqkuPP
- A49FH09slCc259RSVFYOzUUCwxg/QCTiaWD4Oq0kNUalo2h5LteQbajPDdbRAHBaUjyQ
- deWA==
+ bh=AKg0voXZ64/Pok3jOijrDQeL9nahXXS43ecQ7LVwOZ4=;
+ b=aydsHEdA9TkO9FyNZ9lnF9Std0U3bZ83arw197YB3KzZ63j36NYbD1HQKWljeWUkL+
+ K/R+RZ5JaJvFbtL1JYxy5/57mQTh4VhPPrmVfd+wPBqKlRVSZbSjuUdmmKXxSDesnol4
+ Jr9hkCLe2dURILWx3F/9r9fUmOsetbDzFRbSjj7z7yT0DggM9eZhNpxG7tM506l+lKSQ
+ Lf6tntWlJ9jK7UiyDPs2ER+iQZESSJnIbpf9bCImS3J3diDcmzJmn9ywKv/GOBxQ0OEl
+ CVRw1bEcMm+fo5rbLE5Y58BGWb0DLtM20kqBXmNPPpk66U5MTWT36rzUA5Bg1Mm1Bmjl
+ UGgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=7julCGiGF9JJmMXluhtA9EWXD+I+RvsjAFbGDldCUJk=;
- b=f8DdYlhxS/VWCwbZQPdzuWhojuc0R4zErhp5M+LnMKXS3IOaS5OVM/Pt5zIoBAj6p2
- bpuZXb+Vs8eZ0i/ifWqpgf7U3MNVqau3Sk/STkKuEqYbiv0Pu+2ao/gCLTit0Eb/gQCP
- JY6Fo9hedBNFAVfwQYuRH1QvUb0Z+IGfNAubgqdPRFeGYXg5Wck3tZT7LPj6bWYU7VxW
- DMsBnn+B20rsqYuVgxKWOJviMn8mcNsbQ2SRrk20KcGYoIJyXUwgUCOADRDoVR8rJFwN
- XBua91qORQlTd3MBrTX0M/VZSxUCs0LEmZMkTg62DEMl4E1Y/U6aly4sOoqMYKEmgPMU
- SuIA==
-X-Gm-Message-State: AOAM531iNTpPBitLoNwrNDrX8xGRZQkXRBGOOQWI3UXDFTzQuFMfepUz
- 9HATYSHS2vuwCAKBhQ/e5PpXeOrpYj4=
-X-Google-Smtp-Source: ABdhPJwZnNwWRFKfTZzhLV8BHnHfaQ1OW0Aejrug46Oc1FH5LKP2+gYhz8fdQLR4RRRZjcTc0rqqSA==
-X-Received: by 2002:a17:907:94cf:: with SMTP id
- dn15mr30797271ejc.457.1593711506189; 
- Thu, 02 Jul 2020 10:38:26 -0700 (PDT)
+ bh=AKg0voXZ64/Pok3jOijrDQeL9nahXXS43ecQ7LVwOZ4=;
+ b=unZmCxYvI4/yguYoVXjLs+vo/pXQ5I7IZbiqXUqXWTWqa+ja2qIldeW8HrxantdPvi
+ LcEBiTOLvzVX69RfrPVqcfHxVARpO2MRFudG0phiZvHlZ+K3BWqSrluzOR4iLI0bsSit
+ rI7utwOQIbFoQWdnA/Q4GkzrTitrUzLPq3l5osxrBdMhOmiQeKpcURfk2hJoJvdlOuyc
+ po3UDICt/BdEd3uUKlDIvJCUMcmLlyx9Fp22seHsX0z5CS8A+IGqea3XZf6UKQTEUjzx
+ bKqQQwKIJrckvWUW/0Y8kIBwkURXPT7PGuP8XCh90EXrI+N5k9CXi4QKoDnVZqoZIMwN
+ mIdQ==
+X-Gm-Message-State: AOAM532p0xRWMxw3u/Bkpz+qhKaKnTeWbmMoKkLpIvFDZGanijki1jzG
+ deP33jjRSy2UH8pgfG4NKtEpj0fiT5g=
+X-Google-Smtp-Source: ABdhPJzX+L8rBnYo2koic36vpil+J4mu/+iR9A2CvOHskZOwAYF6jsQS0VzHZikerHY3NfBVL97HZA==
+X-Received: by 2002:a17:906:7017:: with SMTP id
+ n23mr12669488ejj.262.1593711513282; 
+ Thu, 02 Jul 2020 10:38:33 -0700 (PDT)
 Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id w20sm5710344eds.21.2020.07.02.10.38.25
+ by smtp.gmail.com with ESMTPSA id w20sm5710344eds.21.2020.07.02.10.38.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 10:38:25 -0700 (PDT)
+ Thu, 02 Jul 2020 10:38:32 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 05/19] .mailmap: Display correctly Chen Fan name
-Date: Thu,  2 Jul 2020 19:38:04 +0200
-Message-Id: <20200702173818.14651-6-f4bug@amsat.org>
+Subject: [PATCH v3 11/19] .mailmap: Display Lili Huang name correctly
+Date: Thu,  2 Jul 2020 19:38:10 +0200
+Message-Id: <20200702173818.14651-12-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200702173818.14651-1-f4bug@amsat.org>
 References: <20200702173818.14651-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x630.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -101,19 +101,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Chen Fan <chen.fan.fnst@cn.fujitsu.com>,
+Cc: qemu-trivial@nongnu.org, Lili Huang <huanglili.huang@huawei.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix Chen Fan name in the following commit:
+Correctly display Lili Huang name in the following commits:
 
-  $ git log --author='chenfan <chen.fan.fnst@cn.fujitsu.com>' --oneline
- 5bb4c35dca target-i386/cpu.c: Fix two error output indentation
+  $ git log --committer=huanglili.huang@huawei.com --oneline
+  76349f5ba8 bootdevice: add check in restore_boot_order()
+  f05f47bb5f bootdevice: check boot order argument validation before vm running
 
-Cc: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
+Cc: Lili Huang <huanglili.huang@huawei.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
@@ -121,17 +122,17 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/.mailmap b/.mailmap
-index dbf674066f..1d444e4fce 100644
+index 70a9848cfe..efb012f357 100644
 --- a/.mailmap
 +++ b/.mailmap
-@@ -79,6 +79,7 @@ Brijesh Singh <brijesh.singh@amd.com>
- Brilly Wu <brillywu@viatech.com.cn>
- Cédric Vincent <cedric.vincent@st.com>
- CheneyLin <linzc@zju.edu.cn>
-+Chen Fan <chen.fan.fnst@cn.fujitsu.com>
- Chen Gang <chengang@emindsoft.com.cn>
- Chen Gang <gang.chen.5i5j@gmail.com>
- Chen Gang <gang.chen@sunrus.com.cn>
+@@ -112,6 +112,7 @@ Jun Li <junmuzi@gmail.com>
+ Laurent Vivier <Laurent@lvivier.info>
+ Leandro Lupori <leandro.lupori@gmail.com>
+ Li Guang <lig.fnst@cn.fujitsu.com>
++Lili Huang <huanglili.huang@huawei.com>
+ Liming Wang <walimisdev@gmail.com>
+ linzhecheng <linzc@zju.edu.cn>
+ Liran Schour <lirans@il.ibm.com>
 -- 
 2.21.3
 
