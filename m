@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD04C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65D920720
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B65A20720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:36:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hGESMtAx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65D920720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jWAEHprz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B65A20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2CF-0001L9-Rz
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:36:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33468)
+	id 1jr2CH-0001Sh-NP
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:36:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr29Z-0003YQ-SH
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:37 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44875)
+ id 1jr29c-0003d3-1S
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:40 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr29X-0000AD-UF
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:37 -0400
+ id 1jr29a-0000Ah-03
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707615; x=1625243615;
+ t=1593707618; x=1625243618;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=D2Vh/QRpt0AodHQ6EDxh6Wqu+PBuRVSvD9geAaTNtds=;
- b=hGESMtAxNnCVVnsWw+O54URWMiuWdt8+CzWPOmQifp+HLvsHQKXS6WGT
- Q7YQ2BzH+khaBUleohHd6hog83rzSWMXFBB2yl0RaZjBtr191JiG7q04W
- 4P9newLt/ndOaLfbqA9l/pkKY50sT/zh3fBOUNO+Ju/i6LvLKgcdgkCwR
- 79xrAA2BN8vN8VMHVn1BLE49pscKg/qAHIuBEVxiscZlwY5adhZHZA6T9
- ByIcDQOIFZz+WOCtixkpTAeamtbUJmzSCIp16Z1oP5j1pnHPwExBVDOJc
- Wq+9wNfV4kJgV3ezPuj/StKb5dnn6lhc2JpMtpY4i418yy04VQtGVAW4H A==;
-IronPort-SDR: oGYTJ7UemHNF5lBZg+rU5k8g+IswRE88ZEs/yZl+2lR7Gy/F4c0DGIXZp+UzbCd383boGPwG2S
- NM/nig4JSdNx8Wr9wZ0mcdhl195vdHCYrR4YqyPCnQtBSMjcVdK2CV/L30crvBsLM+tQButwcC
- kMW0IGxuRfTlpJRtQWem/rIn86bTXDjXEcYRQWRZv1OFTSCNlI1YLFTqO+JyEVRaN8Hc2ORoxp
- AUDY6DxXDfrRkpoRHD8nU8FZymy0Y70R7snOACCCNsFv876WpRtpuKeGsi2wbSIWjywA3n5n2L
- 14A=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498463"
+ bh=2NR0rdsh0Rrl8qfDlkfVbeEumPy6kNma3icdpRuXaL4=;
+ b=jWAEHprzSSW74Qguhg3YYbfoAj9Fyrsf3hZo/Zz/jKvtTcHFSNVy9dzK
+ LSZ8AY5vJ+VwUmjnFu4EhP/TABCHTQu2lZiPviifdtUIVsBU5IicbbAlB
+ 5fI3qPhXOqI5RgPQxZPlDsK0pZbWCB+e4SgtWXHDPzm/rGS1BwcxMOiu/
+ NszczmukSPwb8sYF/s3bdqbBVcjRXcOgLAv1NIfJJIPX69YPB9GJibtED
+ 2HlheljVfQf/HJ2YqSBK71/pKWDj7jyQuBfe9o4dUh8vdMli9FXm7vCXE
+ qBdjvBcFBokIrz+EM0Sr66WosIqhy5VVVsoqccbk5SWh3HESr4Oq2AFNy Q==;
+IronPort-SDR: IykxTGloAh3JygVHMr+lSNpJ2otPV9RSQvANX1Vy2AH05YdjBSYvs8iHEVrAYYoHvSpXMzdcTp
+ 5myJPBREeB9z4lWZoN9kiQYMCszm8yPnC28FF/iPxCOvIuQYQ5K50Wc1fakSwNVE95kjQKZOqB
+ NaOHjs2rFdvqxZZnjIed+fQ0IILngII4cUQQTL5nDJT6YIyl4iCQ9gDXcWMTLx1OlWesFHTanv
+ DMYromeeHepk1LbR+LDizrKWeNKQxoyVf19NIGdA9rB4e7vO1ZjGgo+syMYY+4+xV8Qiy+9+yU
+ R50=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498469"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:20 +0800
-IronPort-SDR: 6O0He1zUgHEun4hTFDsnyPjvPg6iIiP1IdIHMUOp39qlxo0AE163oYHSaMnm2lf67Ar2L0nNDg
- HrJqzqj0DapmJMtp2Fz79gjcelgCkyW+E=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:21 +0800
+IronPort-SDR: iNRZVkS5VmMPuFzUyaeJ/jzuy2mTRxQfY7PONCVWX3FoN7JM/dThZrhzMMe/MeEfxhm+RyMdda
+ MaNK8w+p3mM7TUtIeYe8maBYcFvlEHnwM=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:35 -0700
-IronPort-SDR: +BtPlX/Lvl35HspGrH+u6gie+KDDcbsSigaVvfddsNkDBgXuO3cAFqVXPkmSu7vDw7gGwOffWp
- o+fyErEQ2ilg==
+ 02 Jul 2020 09:21:36 -0700
+IronPort-SDR: y0QGL4S9cfC8d+BDCEp/J2vnqONWjP6bD0Fs3y22iK0n1e2Dxd+vchSlyRSQOsOQcRQeiJ3ySc
+ 1PVCPNHBfucg==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:19 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:21 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 03/64] hw/riscv: Allow 64 bit access to SiFive CLINT
-Date: Thu,  2 Jul 2020 09:22:53 -0700
-Message-Id: <20200702162354.928528-4-alistair.francis@wdc.com>
+Subject: [PULL v2 08/64] target/riscv: add an internals.h header
+Date: Thu,  2 Jul 2020 09:22:58 -0700
+Message-Id: <20200702162354.928528-9-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -103,38 +103,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 5d971f9e672507210e77d020d89e0e89165c8fc9
-"memory: Revert "memory: accept mismatching sizes in
-memory_region_access_valid"" broke most RISC-V boards as they do 64 bit
-accesses to the CLINT and QEMU would trigger a fault. Fix this failure
-by allowing 8 byte accesses.
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
+The internals.h keeps things that are not relevant to the actual architecture,
+only to the implementation, separate.
+
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200701152549.1218-6-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: LIU Zhiwei<zhiwei_liu@c-sky.com>
-Message-Id: <122b78825b077e4dfd39b444d3a46fe894a7804c.1593547870.git.alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_clint.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/internals.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 target/riscv/internals.h
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index b11ffa0edc..669c21adc2 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -181,7 +181,7 @@ static const MemoryRegionOps sifive_clint_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
-     .valid = {
-         .min_access_size = 4,
--        .max_access_size = 4
-+        .max_access_size = 8
-     }
- };
- 
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+new file mode 100644
+index 0000000000..22a49af413
+--- /dev/null
++++ b/target/riscv/internals.h
+@@ -0,0 +1,24 @@
++/*
++ * QEMU RISC-V CPU -- internal functions and types
++ *
++ * Copyright (c) 2020 T-Head Semiconductor Co., Ltd. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef RISCV_CPU_INTERNALS_H
++#define RISCV_CPU_INTERNALS_H
++
++#include "hw/registerfields.h"
++
++#endif
 -- 
 2.27.0
 
