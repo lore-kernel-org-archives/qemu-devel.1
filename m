@@ -2,106 +2,73 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60232C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 14:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863D0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 14:12:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CDFB20772
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 14:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D47820772
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 14:12:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InIWjcK4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CDFB20772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+8446/0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D47820772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqznB-0008Gx-DK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 10:02:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46786)
+	id 1jqzwd-0004K4-KR
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 10:12:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqzmU-0007lF-Jn
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 10:01:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32704
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jqzw4-0003t6-HF
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 10:11:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31214
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqzmT-0006Fw-4p
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 10:01:38 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jqzw2-0004h9-4Z
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 10:11:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593698496;
+ s=mimecast20190719; t=1593699089;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=J+FBpR4LLJeOzyo9VXjemXW0eD6wDZZW5cLWs3eYVT0=;
- b=InIWjcK4G99DRYDg4jCm42mX1+HzmcrehJZQd5ps/yGwPomJbTgjiPE+/Cs0rSWufItCMD
- s0oVtpAKoiWTl9r6CO5JS+yIYKtJKHZ8n+gDV6kAYWpn8uRH7UhK0hEt680SCtuHjv5+rC
- pfq/JxoIcVBJYC6piBhXQTfztRm0Eqk=
+ to:to:cc:cc:content-type:content-type;
+ bh=SXaCF1m22heYMaP0+WYyZ58+YxG+xaCZKZEn/IQcyXk=;
+ b=f+8446/0Xk/9Vt5Snp2wYcWZLaCbQQsaQuOs67Lsk5ypTOPsPiIiQqAX8tl1QrhNIE+xwm
+ elnO4sTdHUrmqffdbcW4p747NSXDrDXoXG+uke2f2sD/YTjbfEOWhaJT1yHp7qtX7oeILr
+ 9jek+b+jlP4/qE7rOO3kwANoJHi2oN8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-ItsGpP7tN3S-_bnk0cGWBg-1; Thu, 02 Jul 2020 10:01:32 -0400
-X-MC-Unique: ItsGpP7tN3S-_bnk0cGWBg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-196-qjYWt_1hNHi0IpruZ2OW2Q-1; Thu, 02 Jul 2020 10:11:09 -0400
+X-MC-Unique: qjYWt_1hNHi0IpruZ2OW2Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1B7A87950C;
- Thu,  2 Jul 2020 14:01:30 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-196.ams2.redhat.com
- [10.36.113.196])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 313E45C1B0;
- Thu,  2 Jul 2020 14:01:28 +0000 (UTC)
-Subject: Re: [PATCH v9 25/34] qcow2: Update L2 bitmap in
- qcow2_alloc_cluster_link_l2()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1593342067.git.berto@igalia.com>
- <bdd6cca475832860905ccc4150af5cf8169c68be.1593342067.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d6b4193c-d6a5-bdff-724f-62587bc14535@redhat.com>
-Date: Thu, 2 Jul 2020 16:01:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <bdd6cca475832860905ccc4150af5cf8169c68be.1593342067.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 990091051EAA;
+ Thu,  2 Jul 2020 14:10:53 +0000 (UTC)
+Received: from thuth.com (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B85810013D4;
+ Thu,  2 Jul 2020 14:10:52 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: [PATCH] tests/acceptance: Add a test for the sun4u sparc64 machine
+Date: Thu,  2 Jul 2020 16:10:50 +0200
+Message-Id: <20200702141050.30073-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="bBNnEmdIRfERrPeqqx8KSfdWhcWi2e70f"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -109,7 +76,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,59 +89,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bBNnEmdIRfERrPeqqx8KSfdWhcWi2e70f
-Content-Type: multipart/mixed; boundary="CNm9idRvYARyGqghdbGnAFGUAL4Qrbvq4"
+We can use the image from the advent calendar 2018 to test the sun4u
+machine. It's not using the "QEMU advent calendar" string, so we can
+not use the do_test_advcal_2018() from boot_linux_console.py, thus
+let's also put it into a separate file to also be able to add an
+entry to the MAINTAINERS file.
 
---CNm9idRvYARyGqghdbGnAFGUAL4Qrbvq4
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS                               |  1 +
+ tests/acceptance/machine_sparc64_sun4u.py | 35 +++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+ create mode 100644 tests/acceptance/machine_sparc64_sun4u.py
 
-On 28.06.20 13:02, Alberto Garcia wrote:
-> The L2 bitmap needs to be updated after each write to indicate what
-> new subclusters are now allocated. This needs to happen even if the
-> cluster was already allocated and the L2 entry was otherwise valid.
->=20
-> In some cases however a write operation doesn't need change the L2
-> bitmap (because all affected subclusters were already allocated). This
-> is detected in calculate_l2_meta(), and qcow2_alloc_cluster_link_l2()
-> is never called in those cases.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2-cluster.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---CNm9idRvYARyGqghdbGnAFGUAL4Qrbvq4--
-
---bBNnEmdIRfERrPeqqx8KSfdWhcWi2e70f
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl796LYACgkQ9AfbAGHV
-z0CWOAgAqTieVaX6nF2NoD3sMBLCL4UKRW6MKWSSCB7vYxYYhw/38IA2KDLEf5zO
-6MKFxWmGAEDo0Ub8LblAKbYb9e0dBJf9KeAcsvk1VnE2kmn+pbXvBBHFQ8LRK+xT
-o0sajiVJDgNcVQqXkCGpt9oS2ApHQT43yweD6duE3UXk8VWtyJhM+RAY8HshlFLS
-eaE4gPEQ2rIviHDvRsC3Zed7voSfskaNpVQK7Dq6ZBVC2+73ur54wIsgUClwL2sE
-mSgeS1OguWQdp51xWba4canI1Il52W+knL0tu8taDdQ+CbgoUgCu/9xh4GUzZa/M
-iZBLtY6Y1VnkAVUHT5Xbs3K3waj/9A==
-=YhCK
------END PGP SIGNATURE-----
-
---bBNnEmdIRfERrPeqqx8KSfdWhcWi2e70f--
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dec252f38b..c26bc06e39 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1318,6 +1318,7 @@ F: include/hw/pci-host/sabre.h
+ F: hw/pci-bridge/simba.c
+ F: include/hw/pci-bridge/simba.h
+ F: pc-bios/openbios-sparc64
++F: tests/acceptance/machine_sparc64_sun4u.py
+ 
+ Sun4v
+ M: Artyom Tarasenko <atar4qemu@gmail.com>
+diff --git a/tests/acceptance/machine_sparc64_sun4u.py b/tests/acceptance/machine_sparc64_sun4u.py
+new file mode 100644
+index 0000000000..2506eefe3f
+--- /dev/null
++++ b/tests/acceptance/machine_sparc64_sun4u.py
+@@ -0,0 +1,35 @@
++# Functional test that boots a Linux kernel and checks the console
++#
++# Copyright (c) 2020 Red Hat, Inc.
++#
++# Author:
++#  Thomas Huth <thuth@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later. See the COPYING file in the top-level directory.
++
++import os
++
++from avocado_qemu import Test
++from avocado_qemu import wait_for_console_pattern
++from avocado.utils import archive
++
++class Sun4uMachine(Test):
++    """Boots the Linux kernel and checks that the console is operational"""
++
++    timeout = 90
++
++    def test_sparc64_sun4u(self):
++        """
++        :avocado: tags=arch:sparc64
++        :avocado: tags=machine:sun4u
++        """
++        tar_url = ('https://www.qemu-advent-calendar.org'
++                   '/2018/download/day23.tar.xz')
++        tar_hash = '142db83cd974ffadc4f75c8a5cad5bcc5722c240'
++        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
++        archive.extract(file_path, self.workdir)
++        self.vm.set_console()
++        self.vm.add_args('-kernel', self.workdir + '/day23/vmlinux')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Starting logging: OK')
+-- 
+2.18.1
 
 
