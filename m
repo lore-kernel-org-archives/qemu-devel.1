@@ -2,98 +2,104 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9C1C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8685FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA4F42088E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:23:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CBD220672
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:25:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbZDB8Br"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA4F42088E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0qdXh9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CBD220672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqzBN-00026l-VE
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:23:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
+	id 1jqzDL-0003ko-JK
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:25:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqzAe-0001ae-EE
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:22:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35870
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqzCR-0002qV-UM
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:24:23 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22441
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqzAc-00034w-HJ
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:22:32 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqzCQ-0006T9-GT
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:24:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593696149;
+ s=mimecast20190719; t=1593696261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=kOKchWCsU9m3qyiSX5ZYSYb1UpvJi45eNR1o30K2pZc=;
- b=GbZDB8BrDJML5hznxakaixDJNylZc4qCOudQfLh2A+alXIWKOTmtq7Q1ECmpM971KaFABJ
- o+NWqhEyaNq9Ga53PGQOr3sMUs0isHVy3fe4Y5AyxrocLwVJ62ykNeMEFLWE6cYO3FbrJe
- SLIRdETwz+cbj6vrSYLq1FxxEmSLPZw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-t47vuU3hPRm6g4ALqjj_tw-1; Thu, 02 Jul 2020 09:22:28 -0400
-X-MC-Unique: t47vuU3hPRm6g4ALqjj_tw-1
-Received: by mail-wm1-f69.google.com with SMTP id f68so13568851wmf.1
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 06:22:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=kOKchWCsU9m3qyiSX5ZYSYb1UpvJi45eNR1o30K2pZc=;
- b=J6cxd2GaaBeTeU8NvEsnGSwsB9Km6eBTsAMgt1cQUe+zE6d2BHGl7XBrVSFmwPANta
- kJ/OU1VyUIeOMxNOlThoAqRdxtmKSNwbjcObtH5z2G4BL2cxKHB896REj9fgmd6RWyJG
- TTuE6pHCHdtt1eBxMihFBBLGIKbLLOajEr7W7H0nctA/b6m5nJQwdSVpfWDo28dtd6kl
- FDhLG9BRXCz5/MURU5x5NfDpJBJoFGhtj/MCagveg58fUX36S9Sft9+TV5F5VJUSM1mM
- a2mJ95OeQN0l6YJK/Afo3FCphY8K3X9eYh421X7WML9yAcD5IyvFMIUXfPDuSEC+0K+j
- lS+Q==
-X-Gm-Message-State: AOAM531L9sODmaB5FjI198yjzSY4bl09d1KHHoGNr73/i/xLNusAujkd
- nARc/xKobrjGv9oNC0MbEH0YEqTFa5eND6SLxAQRn+uQrK//s3bwFoVb5L03qVighb6s3CF00CA
- dg9t94R+7B+sK8QE=
-X-Received: by 2002:adf:94a1:: with SMTP id 30mr2326341wrr.37.1593696142260;
- Thu, 02 Jul 2020 06:22:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJPmuszX68tqfE8LgYASyl/AFeFTWQvBXejhuLgMNVQVPWezhWXU/Xz2dZE/N5Vmp1vQ88Ag==
-X-Received: by 2002:adf:94a1:: with SMTP id 30mr2326319wrr.37.1593696141988;
- Thu, 02 Jul 2020 06:22:21 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- y7sm10651991wrt.11.2020.07.02.06.22.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 06:22:20 -0700 (PDT)
-Date: Thu, 2 Jul 2020 09:22:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
-Message-ID: <20200702091937-mutt-send-email-mst@kernel.org>
-References: <20200629102758.421552-1-cohuck@redhat.com>
- <20200630121037.GC91444@stefanha-x1.localdomain>
- <20200630142504.688aa989.cohuck@redhat.com>
- <20200630090327-mutt-send-email-mst@kernel.org>
- <20200701181917.62538421.cohuck@redhat.com>
- <20200702060555-mutt-send-email-mst@kernel.org>
- <20200702124538.0ba5d334.cohuck@redhat.com>
- <20200702071627-mutt-send-email-mst@kernel.org>
- <20200702135559.761fb165.cohuck@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=a6bidkqcPV19eU0Irjdzm6jGOy6gnrH/LixtnYgjxLk=;
+ b=X0qdXh9M2JIrsAbYWaVYBy54rHJfEHZZ+nGIxpUhl0Xza+G8vdMWH7cVvFQEl/P3S3AEZX
+ 8faybSmuyVNhap5o69pqCQMpYladvmDHP1HsfegRx8y9VpmhCBcZeScAR+XCfCXDAc9ZOW
+ o8avK59cK5aWhBdBT1LRKoYXiCFN3K4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-Uf0sSnyANq-GA80tcBXqUg-1; Thu, 02 Jul 2020 09:24:19 -0400
+X-MC-Unique: Uf0sSnyANq-GA80tcBXqUg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FA65107ACF4;
+ Thu,  2 Jul 2020 13:24:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-196.ams2.redhat.com
+ [10.36.113.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46D0D7611C;
+ Thu,  2 Jul 2020 13:24:12 +0000 (UTC)
+Subject: Re: [PATCH v9 23/34] qcow2: Add subcluster support to
+ discard_in_l2_slice()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1593342067.git.berto@igalia.com>
+ <42685fa7a479b996eca7c185acfebe09483331b3.1593342067.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <be446b38-725c-73a1-3f90-5230d74c39c4@redhat.com>
+Date: Thu, 2 Jul 2020 15:24:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200702135559.761fb165.cohuck@redhat.com>
+In-Reply-To: <42685fa7a479b996eca7c185acfebe09483331b3.1593342067.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="pmEwpCfwKJ9WamKZr4d33NTzEHMaHpYBi"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -116,144 +122,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 02, 2020 at 01:55:59PM +0200, Cornelia Huck wrote:
-> On Thu, 2 Jul 2020 07:22:49 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Thu, Jul 02, 2020 at 12:45:38PM +0200, Cornelia Huck wrote:
-> > > On Thu, 2 Jul 2020 06:16:06 -0400
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >   
-> > > > On Wed, Jul 01, 2020 at 06:19:17PM +0200, Cornelia Huck wrote:  
-> > > > > On Tue, 30 Jun 2020 09:04:38 -0400
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > >     
-> > > > > > On Tue, Jun 30, 2020 at 02:25:04PM +0200, Cornelia Huck wrote:    
-> > > > >     
-> > > > > > > What bothers me most is that you need to explicitly request a device to
-> > > > > > > be modern-only, while that should be the default for any newly added
-> > > > > > > device. Hence the approach with the centralized list of device types
-> > > > > > > mentioned in a parallel thread. The main problem with that is that the
-> > > > > > > proxy device starts getting realized before the virtio device with its
-> > > > > > > id is present... I failed to find a solution so far. But I'd really
-> > > > > > > like an approach that can work for all transports.      
-> > > > > > 
-> > > > > > So how about simply validating that the device is modern only,
-> > > > > > unless it's one of the whitelist?    
-> > > > > 
-> > > > > Who would do the validation, the virtio core? How can it distinguish
-> > > > > between transitional and non-transitional? But maybe I'm just not
-> > > > > getting your idea.    
-> > > > 
-> > > > OK I've been thinking about two ideas, we can use them both:
-> > > > 1. virtio core: that can detect VIRTIO_1 being clear
-> > > > in virtio_validate_features.  
-> > > 
-> > > After feature negotiation is complete? That feels like a regression in
-> > > behaviour: You would be able to add a device that may not be usable
-> > > (and you'll only find out after the guest tried to use it), instead of
-> > > making sure that only a non-transitional device can be added to start
-> > > with.  
-> > 
-> > I mean, we can still have transports validate, that is point 2.
-> > It seems prudent to check though, since guest could be buggy
-> > ignoring bits that it got.
-> > 
-> > > (We do not validate if the guest did not negotiate VERSION_1, but we
-> > > can certainly add a special case for the "guest did not accept offered
-> > > VERSION_1" case.)  
-> > 
-> > exaclty.
-> > 
-> > >   
-> > > > 2. transports: could use a core API to detect whether
-> > > > device can be a legacy one, to block device creation.  
-> > > 
-> > > That would be the best, but how do we get around the "transport does
-> > > not know the device type until it is too late" problem? Unless you want
-> > > to redo the internal interfaces.  
-> > 
-> > Oh. I think I am missing something.
-> > So I'm considering virtio_pci_device_plugged for example.
-> > 
-> > 
-> > static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-> > {
-> >     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-> >     VirtioBusState *bus = &proxy->bus;
-> >     bool legacy = virtio_pci_legacy(proxy);
-> >     bool modern;
-> >     bool modern_pio = proxy->flags & VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY;
-> >     uint8_t *config;
-> >     uint32_t size;
-> >     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-> > 
-> >     /*
-> > 
-> > ..
-> > 
-> > }
-> > 
-> > can't we check device type here and make sure it matches the "legacy"
-> > flag?
-> 
-> It would be a change in behaviour: Currently, I can specify e.g.
-> 
-> -device virtio-gpu-pci,disable-legacy=off,disable-modern=true
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pmEwpCfwKJ9WamKZr4d33NTzEHMaHpYBi
+Content-Type: multipart/mixed; boundary="zgrwsTKljg9agjyjYXQBdPe8zt8935W03"
 
-I don't think we care about this at all.
-User is explicitly asking for a non-compliant configuration,
-user gets to keep both pieces.
+--zgrwsTKljg9agjyjYXQBdPe8zt8935W03
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 28.06.20 13:02, Alberto Garcia wrote:
+> Two things need to be taken into account here:
+>=20
+> 1) With full_discard =3D=3D true the L2 entry must be cleared completely.
+>    This also includes the L2 bitmap if the image has extended L2
+>    entries.
+>=20
+> 2) With full_discard =3D=3D false we have to make the discarded cluster
+>    read back as zeroes. With normal L2 entries this is done with the
+>    QCOW_OFLAG_ZERO bit, whereas with extended L2 entries this is done
+>    with the individual 'all zeroes' bits for each subcluster.
+>=20
+>    Note however that QCOW_OFLAG_ZERO is not supported in v2 qcow2
+>    images so, if there is a backing file, discard cannot guarantee
+>    that the image will read back as zeroes. If this is important for
+>    the caller it should forbid it as qcow2_co_pdiscard() does (see
+>    80f5c01183 for more details).
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2-cluster.c | 52 +++++++++++++++++++------------------------
+>  1 file changed, 23 insertions(+), 29 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--zgrwsTKljg9agjyjYXQBdPe8zt8935W03--
 
+--pmEwpCfwKJ9WamKZr4d33NTzEHMaHpYBi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> and the code in the realize function would force it to a modern-only
-> device. Checking in the plugged function would cause it to fail. This
-> might be preferable, but could break existing command lines.
+-----BEGIN PGP SIGNATURE-----
 
-> Note that ccw is different: if I specify
-> 
-> -device virtio-gpu-ccw,max_revision=0
-> 
-> it actually fails with
-> 
-> qemu-system-s390x: -device virtio-gpu-ccw,max_revision=0: Invalid value of property max_rev (is 0 expected >= 1)
-> 
-> so moving to the plugged function would not cause a change in behaviour
-> from the user's point of view.
-> 
-> > 
-> > 
-> > 
-> > > > 
-> > > >   
-> > > > > Also, ccw does not currently have a way to explicitly configure a
-> > > > > device non-transitional; the revisions can be used to fence off newer
-> > > > > features, going down to legacy-only, but fencing off older features is
-> > > > > not possible (that is only done by the device, if it has no legacy
-> > > > > support).    
-> > > > 
-> > > > I guess for ccw only option 1 works.
-> > > >   
-> > > 
-> > > Or keep it as-is, and disallow legacy for the individual device types,
-> > > with the validate check as a safety net during development.  
-> > 
-> > Problem is people cut and paste from transitional devices.
-> 
-> That should not be a problem for ccw (as transitional and
-> non-transitional are the same on the command line); moreover, people
-> are unlikely to set max_revision themselves (this is usually only done
-> by compat machines).
-> 
-> If changing the behaviour for pci is acceptable, we can sure move to
-> the plugged approach.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl793/oACgkQ9AfbAGHV
+z0CH1AgAo3hMbyHpjjVRchYAmlHEJfiF1QzM7XPcSpdBvppLW9Pj+pJiq9ugfHFw
+343eFkPL8gYbJaBIhPP7ERsEmeiv3eyTKKb45E2xUkA5/csxdXVkZihkafhMfclt
+s2rvaREj+Ig/ek8oxNX6utC9JCBixOSNsFOizFhfW1JIPK7bx8zWRr/B1/kM2sb4
+y0JbC8+NodLnmZ+Z8rlFF66tesHCkPr8++NKUSbIbK52GndrQgTgk/f/1UjwAIsh
+9GgJJSIQMqm6nLJ4jEkxAs3dV9Vi61p41A/RNi+1NAq+yTMLJ4AOn0KBlqmo0WAz
+4uYJ5wsOjmPBwXAyNinpbbGM9MEPDg==
+=QvzK
+-----END PGP SIGNATURE-----
+
+--pmEwpCfwKJ9WamKZr4d33NTzEHMaHpYBi--
 
 
