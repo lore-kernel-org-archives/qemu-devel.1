@@ -2,99 +2,130 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89875C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F9BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:08:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53A2120720
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91A2620720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 03:08:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CvNYw9yS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53A2120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="lsH/FPcF";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="aMBNmvPR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A2620720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqpVH-0001Ce-LC
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 23:03:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36828)
+	id 1jqpa2-0002u2-Sx
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jul 2020 23:08:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqpUZ-0000jd-Ru
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:02:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32524
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jqpUX-00074y-Vp
- for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:02:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593658944;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JaGAntuRJG/BQYw+DXI94GE65g0vkbj1B2sex0mrXgk=;
- b=CvNYw9ySAvvl5Fj/+evt8VC92ogWRxb1/XRfVTzLu35tS3mSYFJWwCSdiXpyRLaPd4Xgt/
- E5a0+Fxn6hXJ3BJeYzGZgkGSpAsR3/4rj25yjjtqdsTrLLUW/LcTYAo7O8Kt28wv0Ncdtm
- MjiJYIfFxjlFx6vRAd6AWeUmRZ7c7r4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-sRG-5WiuOk24WfOKeYbjIg-1; Wed, 01 Jul 2020 23:02:15 -0400
-X-MC-Unique: sRG-5WiuOk24WfOKeYbjIg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1jqpZS-0002HZ-Dl
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:07:30 -0400
+Received: from relay1.mymailcheap.com ([149.56.97.132]:60225)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1jqpZP-0001yh-JF
+ for qemu-devel@nongnu.org; Wed, 01 Jul 2020 23:07:29 -0400
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
+ [149.56.130.247])
+ by relay1.mymailcheap.com (Postfix) with ESMTPS id 8F6DA3F157;
+ Wed,  1 Jul 2020 23:07:24 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+ by filter1.mymailcheap.com (Postfix) with ESMTP id 6AF332A0C5;
+ Wed,  1 Jul 2020 23:07:24 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+ s=default; t=1593659244;
+ bh=xqpK3Zq/ivhIU1Zi/WF8LnIVsq7K/pN4mGMWvSMefwU=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=lsH/FPcFBG842LR9ltum1O5YJBzvPJlQDnObmb7EK+dekpuIeamFPMkWNuNLopo6J
+ Ktd3WfFfvQKsACXL3MmVObakl5y6ljSvv7z6pgDqqlfWtys/l8CFCz/vLWx3Jv61qB
+ JoymhiypFxLjZ3srPAO+cx9I+73fpVMN/8PG2Rt4=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+ by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pjVZ2FDuxMPv; Wed,  1 Jul 2020 23:07:23 -0400 (EDT)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+ (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD4EA185B39A;
- Thu,  2 Jul 2020 03:02:14 +0000 (UTC)
-Received: from [10.72.13.248] (ovpn-13-248.pek2.redhat.com [10.72.13.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C35115C220;
- Thu,  2 Jul 2020 03:01:55 +0000 (UTC)
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-From: Jason Wang <jasowang@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-References: <20200626064122.9252-1-eperezma@redhat.com>
- <20200626064122.9252-2-eperezma@redhat.com> <20200626212917.GD175520@xz-x1>
- <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
- <20200629133403.GA266532@xz-x1>
- <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
- <20200630153911.GD3138@xz-x1>
- <69f6d6e7-a0b1-abae-894e-4e81b7e0cc90@redhat.com>
-Message-ID: <ff9e7af0-18c4-57e8-fc94-904fdce1123a@redhat.com>
-Date: Thu, 2 Jul 2020 11:01:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by filter1.mymailcheap.com (Postfix) with ESMTPS;
+ Wed,  1 Jul 2020 23:07:22 -0400 (EDT)
+Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
+ by mail20.mymailcheap.com (Postfix) with ESMTP id 420FA403B3;
+ Thu,  2 Jul 2020 03:07:20 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
+ unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="aMBNmvPR"; 
+ dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (ec2-18-163-238-147.ap-east-1.compute.amazonaws.com
+ [18.163.238.147])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
+ SHA256) (No client certificate requested)
+ by mail20.mymailcheap.com (Postfix) with ESMTPSA id 73E10403B3;
+ Thu,  2 Jul 2020 03:07:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+ s=default; t=1593659231;
+ bh=xqpK3Zq/ivhIU1Zi/WF8LnIVsq7K/pN4mGMWvSMefwU=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=aMBNmvPRhjZVtxar2SYyfz945uiUwMXgeG6Wu21qHZjf1N+YQmL1SHKEmVoFSCn2J
+ KAWDPmjBH4T4JIVCHNi8RwBSBSjQaZCXs40AQ6/Io0lStgJ0NLFRR6umbO1hiMISW5
+ xfNchDVnC3s/bDL53P+Rb/pSwdA8UQ7BRaLStIEs=
+Subject: Re: [PATCH v4 28/40] tests/acceptance: skip multicore mips_malta
+ tests on GitLab
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200701135652.1366-1-alex.bennee@linaro.org>
+ <20200701135652.1366-29-alex.bennee@linaro.org>
+ <2c5aab2c-5001-9d1a-d3f7-8afed1c4af1b@amsat.org> <87mu4jqj7y.fsf@linaro.org>
+ <0eecc9ed-f0d4-97b4-37e2-d98ec0fd9b6b@amsat.org>
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <af8d2234-5e0b-d1f0-8542-539329819979@flygoat.com>
+Date: Thu, 2 Jul 2020 11:06:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <69f6d6e7-a0b1-abae-894e-4e81b7e0cc90@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <0eecc9ed-f0d4-97b4-37e2-d98ec0fd9b6b@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 23:00:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Rspamd-Queue-Id: 420FA403B3
+X-Spamd-Result: default: False [1.40 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
+ ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+ MID_RHS_MATCH_FROM(0.00)[]; FROM_HAS_DN(0.00)[];
+ TO_DN_SOME(0.00)[]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
+ TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
+ MIME_GOOD(-0.10)[text/plain]; R_SPF_SOFTFAIL(0.00)[~all];
+ HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1];
+ ML_SERVERS(-3.10)[213.133.102.83];
+ DKIM_TRACE(0.00)[flygoat.com:+];
+ DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+ RCPT_COUNT_TWELVE(0.00)[13];
+ RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
+ DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+ RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
+ MIME_TRACE(0.00)[0:+];
+ ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
+ FREEMAIL_CC(0.00)[euphon.net,syrmia.com,redhat.com,linaro.org,nongnu.org,gmail.com,braap.org,aurel32.net];
+ SUSPICIOUS_RECIPS(1.50)[]; RCVD_COUNT_TWO(0.00)[2]
+X-Rspamd-Server: mail20.mymailcheap.com
+Received-SPF: pass client-ip=149.56.97.132;
+ envelope-from=jiaxun.yang@flygoat.com; helo=relay1.mymailcheap.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/01 23:07:24
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,152 +138,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ berrange@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/7/1 下午4:09, Jason Wang wrote:
->
-> On 2020/6/30 下午11:39, Peter Xu wrote:
->> On Tue, Jun 30, 2020 at 10:41:10AM +0800, Jason Wang wrote:
->>>>       /* According to ATS spec table 2.4:
->>>>        * S = 0, bits 15:12 = xxxx     range size: 4K
->>>>        * S = 1, bits 15:12 = xxx0     range size: 8K
->>>>        * S = 1, bits 15:12 = xx01     range size: 16K
->>>>        * S = 1, bits 15:12 = x011     range size: 32K
->>>>        * S = 1, bits 15:12 = 0111     range size: 64K
->>>>        * ...
->>>>        */
->>>
->>> Right, but the comment is probably misleading here, since it's for 
->>> the PCI-E
->>> transaction between IOMMU and device not for the device IOTLB 
->>> invalidation
->>> descriptor.
->>>
->>> For device IOTLB invalidation descriptor, spec allows a [0, ~0ULL]
->>> invalidation:
->>>
->>> "
->>>
->>> 6.5.2.5 Device-TLB Invalidate Descriptor
->>>
->>> ...
->>>
->>> Size (S): The size field indicates the number of consecutive pages 
->>> targeted
->>> by this invalidation
->>> request. If S field is zero, a single page at page address specified by
->>> Address [63:12] is requested
->>> to be invalidated. If S field is Set, the least significant bit in the
->>> Address field with value 0b
->>> indicates the invalidation address range. For example, if S field is 
->>> Set and
->>> Address[12] is Clear, it
->>> indicates an 8KB invalidation address range with base address in 
->>> Address
->>> [63:13]. If S field and
->>> Address[12] is Set and bit 13 is Clear, it indicates a 16KB 
->>> invalidation
->>> address range with base
->>> address in Address [63:14], etc.
->>>
->>> "
->>>
->>> So if we receive an address whose [63] is 0 and the rest is all 1, 
->>> it's then
->>> a [0, ~0ULL] invalidation.
->> Yes.  I think invalidating the whole range is always fine.  It's 
->> still not
->> arbitrary, right?  E.g., we can't even invalidate (0x1000, 0x3000) with
->> device-iotlb because of the address mask, not to say sub-pages.
->
->
-> Yes.
->
->
+在 2020/7/2 1:01, Philippe Mathieu-Daudé 写道:
+> On 7/1/20 6:43 PM, Alex Bennée wrote:
+>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 >>
->>>
->>>>>>> How about just convert to use a range [start, end] for any 
->>>>>>> notifier and move
->>>>>>> the checks (e.g the assert) into the actual notifier implemented 
->>>>>>> (vhost or
->>>>>>> vfio)?
->>>>>> IOMMUTLBEntry itself is the abstraction layer of TLB entry.  
->>>>>> Hardware TLB entry
->>>>>> is definitely not arbitrary range either (because AFAICT the 
->>>>>> hardware should
->>>>>> only cache PFN rather than address, so at least PAGE_SIZE aligned).
->>>>>> Introducing this flag will already make this trickier just to 
->>>>>> avoid introducing
->>>>>> another similar struct to IOMMUTLBEntry, but I really don't want 
->>>>>> to make it a
->>>>>> default option...  Not to mention I probably have no reason to 
->>>>>> urge the rest
->>>>>> iommu notifier users (tcg, vfio) to change their existing good 
->>>>>> code to suite
->>>>>> any of the backend who can cooperate with arbitrary address 
->>>>>> ranges...
->>>>> Ok, so it looks like we need a dedicated notifiers to device IOTLB.
->>>> Or we can also make a new flag for device iotlb just like current 
->>>> UNMAP? Then
->>>> we replace the vhost type from UNMAP to DEVICE_IOTLB.  But IMHO 
->>>> using the
->>>> ARBITRARY_LENGTH flag would work in a similar way. DEVICE_IOTLB 
->>>> flag could
->>>> also allow virtio/vhost to only receive one invalidation (now IIUC 
->>>> it'll
->>>> receive both iotlb and device-iotlb for unmapping a page when 
->>>> ats=on), but then
->>>> ats=on will be a must and it could break some old (misconfiged) 
->>>> qemu because
->>>> afaict previously virtio/vhost could even work with vIOMMU 
->>>> (accidentally) even
->>>> without ats=on.
->>>
->>> That's a bug and I don't think we need to workaround 
->>> mis-configurated qemu
->>> :)
->> IMHO it depends on the strictness we want on the qemu cmdline API. :)
->>
->> We should at least check libvirt to make sure it's using ats=on 
->> always, then I
->> agree maybe we can avoid considering the rest...
->>
->> Thanks,
+>>> On 7/1/20 3:56 PM, Alex Bennée wrote:
+>>>> For some reason these tests fail all the time on GitLab. I can
+>>>> re-create the hang around 3% of the time locally but it doesn't seem
+>>>> to be MTTCG related. For now skipIf on GITLAB_CI.
+>>>>
+>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>>>> ---
+>>>>   tests/acceptance/machine_mips_malta.py | 3 +++
+>>>>   1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/machine_mips_malta.py
+>>>> index 92b4f28a112..7c9a4ee4d2d 100644
+>>>> --- a/tests/acceptance/machine_mips_malta.py
+>>>> +++ b/tests/acceptance/machine_mips_malta.py
+>>>> @@ -15,6 +15,7 @@ from avocado import skipUnless
+>>>>   from avocado_qemu import Test
+>>>>   from avocado_qemu import wait_for_console_pattern
+>>>>   from avocado.utils import archive
+>>>> +from avocado import skipIf
+>>>>   
+>>>>   
+>>>>   NUMPY_AVAILABLE = True
+>>>> @@ -99,6 +100,7 @@ class MaltaMachineFramebuffer(Test):
+>>>>           """
+>>>>           self.do_test_i6400_framebuffer_logo(1)
+>>>>   
+>>> So the test works using a single core...
+>>> Good we have a test to figure the bug!
+>> It's about a 1-3% failure rate on my big test box but hits every time on
+>> CI. However I did disable MTTCG and still saw failures so I think it's a
+>> more subtle breakage than just a straight race.
+> I first thought it was a MTTCG problem, but then I realized you didn't
+> disable the single core test. When using >1 core, the malta uses a
+> different device, the CPS for Coherent Processing System. It contains
+> a Inter-Thread Communication Unit and a Global Interrupt Controller.
+> There might be a I/O locking problem. In particular, some of these
+> devices access the &cpu->env (the ITU is more of micro-architecture).
 >
->
-> Cc libvirt list, but I think we should fix libvirt if they don't 
-> provide "ats=on".
->
-> Thanks
+> This is why I was excited by your finding :) We might have a way
+> to figure it out.
+
+FYI: This issue seems relative with the performence of host machine.
+
+I can reproduce the issue in high frequency if I unplug my laptop from
+
+AC adapter (it will switch to powersave governor).
 
 
-Libvirt looks fine, according to the domain  XML documentation[1]:
+So my first thought was it just because TCG runs too slow so cores failed
 
-  QEMU's virtio devices have some attributes related to the virtio 
-transport under the driver element: The iommu attribute enables the use 
-of emulated IOMMU by the device. The attribute ats controls the Address 
-Translation Service support for PCIe devices. This is needed to make use 
-of IOTLB support (see IOMMU device). Possible values are on or off. 
-Since 3.5.0
-
-So I think we agree that a new notifier is needed?
-
-Thanks
-
-[1] https://libvirt.org/formatdomain.html
+to respond IPI timely.
 
 
->
->
->
+Thanks.
 
+- Jiaxun
 
