@@ -2,92 +2,89 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BABC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A62C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8644220702
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 784FE20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:47:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oJ6wg1Ag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8644220702
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOc8rr3T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784FE20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3Iw-0001mG-PT
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49558)
+	id 1jr3Iz-0001sP-JO
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:47:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3Ab-00041F-IO; Thu, 02 Jul 2020 13:38:45 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39372)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3AW-0007N8-1b; Thu, 02 Jul 2020 13:38:45 -0400
-Received: by mail-ed1-x543.google.com with SMTP id d18so19187455edv.6;
- Thu, 02 Jul 2020 10:38:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=l6wuKz2C8HP67deoIdZIR1YuTZFXJvtoU6qcCbCDPz0=;
- b=oJ6wg1AgtkrqK7KVpfODrvTY8YIDPRTLJ60W6mW9Uguad6Ig3ZjDICBDkGoi7nKRCc
- Ro1BcIKbb+fvmGUclbtaPrcYlX3Cmvbr90RjMuis7P7qHAb2UKXGpgWW+qZjuuTzNQof
- 2BwcVrzl1LiXrPR2Hxv+/UTLgK5nyq+pxyKKpZC//2LR/t5afeuEVMQqyBud48c2czsl
- TWaLYY3TE352sn0A1THxCRZ+g9fWml1U67qeW2/EjUiWnww9C8iHsc29M8nfRypJgwTw
- sL1n/HsEL6h/Ygr9pOKwqk9HdGl2ApRJ4go4eB9UVnaV5e4l7avafdqCC+IShqmLqJ5R
- sAVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=l6wuKz2C8HP67deoIdZIR1YuTZFXJvtoU6qcCbCDPz0=;
- b=OEHrfhkoyzs1cgDtyT1OK4cXQs/rL9BT1YiVN0M8bqTmHtgHu0e3f5q6rg9a/gRupz
- W2yOXhoMw+RSdO+BTGTeeMeHpm38CUZtJo/ii7f+Xdz41OfJgnIoY+5UNk8doFU71+NY
- u5/q+TfldHGs96wKwJS3EhJOK+MKvcBDfTscyaffQwPiBoBlV+f8me9Nna2LOQYnssh2
- v8KzgoKaoVY5SfOqOI/+YgxydKSmsZuexeALi8nvu9TZJNnHj33wLFBCEl+ckAGHFA29
- xn6o+Puxfo5z16Dg0icJ+kKBoCeLFTpPRt4NzN4vEds3POFiy0FKFGxOFdlmeEIIfazK
- o1ww==
-X-Gm-Message-State: AOAM531Z9uxR3uKo7ML9tZs70lFvzwCb+AfCoHyWeE9iegNwi/8x8yHe
- gKxU3f/5K48AkVbKKY4HTPvvVFcss2Q=
-X-Google-Smtp-Source: ABdhPJypmdlZlAIoz7X8Mg/fTz6Xe/gBYgAvBmCqARRXYqYlP2zWzhvE7WDRG8JgsC3biTtmqcgDpQ==
-X-Received: by 2002:a50:fd07:: with SMTP id i7mr1973816eds.221.1593711516709; 
- Thu, 02 Jul 2020 10:38:36 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id w20sm5710344eds.21.2020.07.02.10.38.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 10:38:36 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/19] .mailmap: Display correct email address for Michael
- Tokarev
-Date: Thu,  2 Jul 2020 19:38:13 +0200
-Message-Id: <20200702173818.14651-15-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200702173818.14651-1-f4bug@amsat.org>
-References: <20200702173818.14651-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jr3Aa-00040I-CU
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:38:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46579
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jr3AV-0007P3-Li
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:38:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593711518;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XWkiP2riByo+oCZwlGXBL90XYfCVObEALO4uM2yw4ao=;
+ b=OOc8rr3TjHTAlUv4T1m4FRLRIDcivLsaqENbCn+J1yp/krASBeW9OIzjhT6uUYNPKB3TeL
+ RrFS5DFB3OvIkhcz3yu4t7YtcuStAXIHPEx2A0JIAqCD8sDb9mRHwd4q5N6wTPQagx1PcW
+ Y9vIzGztHR8aIVjMNGOQxXbkOBfCUJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-0yTqEWzZO_u7fbaHNtXhrA-1; Thu, 02 Jul 2020 13:38:33 -0400
+X-MC-Unique: 0yTqEWzZO_u7fbaHNtXhrA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A60981940922;
+ Thu,  2 Jul 2020 17:38:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A3CC101042D;
+ Thu,  2 Jul 2020 17:38:31 +0000 (UTC)
+Subject: Re: [PATCH] configure / util: Auto-detect the availability of
+ openpty()
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200702143955.678-1-thuth@redhat.com>
+ <20200702144650.GM1888119@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c7a0d182-8df1-9ac6-4ef1-65745ebf358a@redhat.com>
+Date: Thu, 2 Jul 2020 19:38:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200702144650.GM1888119@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,53 +98,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Peter Tribble <peter.tribble@gmail.com>, qemu-devel@nongnu.org,
+ Michele Denber <denber@mindspring.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix Michael Tokarev email address in the following commits:
+On 02/07/2020 16.46, Daniel P. Berrangé wrote:
+> On Thu, Jul 02, 2020 at 04:39:55PM +0200, Thomas Huth wrote:
+>> Recent versions of Solaris (v11.4) now feature an openpty() function,
+>> too, causing a build failure since we ship our own implementation of
+>> openpty() for Solaris in util/qemu-openpty.c so far. Since there are
+>> now both variants available in the wild, with and without this function,
+>> let's introduce a proper HAVE_OPENPTY define for this to fix the build
+>> failure.
+> 
+> 11.4 has been out since Aug 2018
+> 
+> The previous verison of solaris  11.3 was from Oct 2015, with EOL
+> in Oct 2020 [1].
+> 
+> Solaris isn't an officially supported platform for QEMU, but if it
+> was, then we'd probably consider it a long life distro, and thus
+> consider 11.3 to be out of scope for QEMU by now.
+> 
+> IOW, instead of checking for openpty being missing, I think there's
+> a decent argument to be made that we can just assume openpty exists,
+> and delete the old solaris compat code entirely.
 
-  $ git log --committer=mjt@gandalf --oneline
-  eb83c2030a hw/net/e1000e: Fix compiler warning
-  5ce747cfac target-m68k: fix get_mac_extf helper
-  3224e8786f timer/cpus: fix some typos and update some comments
-  04ecbb7834 timer.h: fix inconsistency between comment and function prototype
-  083b96e221 timer.h: fix typo
-  e2f310ec38 maint: Ignore generated version file
-  32945472ce Document that curses usually needs -k option too
-  deff0ddb86 trace-event: display "%d" instead of "0x%d"
-  8223f345b9 linux-user, trivial: display "0x%x" instead of "0x%d"
-  8928473699 pic: fix typo in error message: KVM_GET_IRQCHIP -> KVM_SET_IRQCHIP
-  a337f295de sparc: Use g_memdup() instead of g_new0() + memcpy()
-  bc82585a8f vl: remove unnecessary duplicate call to tpm_cleanup
-  39cba610a7 arm: spelling fix: mismatch
-  0aadb5a15f hw/dma/omap: spelling fix: endianness
-  270a4b6739 hw/bt/hci: spelling fix: endianness
-  37e3645ad3 docs: Fix description of the leaky bucket algorithm in throttle.txt
+I'd normally agree, but according to Peter, illumos also does not have 
+this function yet:
 
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- .mailmap | 1 +
- 1 file changed, 1 insertion(+)
+  https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09276.html
 
-diff --git a/.mailmap b/.mailmap
-index eaed43a178..9bc80771e0 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -131,6 +131,7 @@ Marek Dolata <mkdolata@us.ibm.com>
- Michael Avdienko <whitearchey@gmail.com>
- Michael S. Tsirkin <mst@redhat.com>
- Michael S. Tsirkin <mst@redhat.com> <mst@robin.(none)>
-+Michael Tokarev <mjt@tls.msk.ru> <mjt@gandalf>
- Munkyu Im <munkyu.im@samsung.com>
- Nicholas Bellinger <nab@linux-iscsi.org>
- Nicholas Thomas <nick@bytemark.co.uk>
--- 
-2.21.3
+... so I think we should keep it around for a little bit longer until at 
+least the open source versions of Solaris have that function, too.
+(Maybe someone will still finally provide a VM based on one of the 
+illumos distros for our regression tests...?)
+
+  Thomas
 
 
