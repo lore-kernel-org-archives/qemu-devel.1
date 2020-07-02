@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 791DDC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12218C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:10:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3825520760
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B208520760
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FB3IhCTP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3825520760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OhasFKu5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B208520760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2iQ-0001B3-Hk
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34326)
+	id 1jr2je-0002DQ-Ui
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:10:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2An-0006jl-9v
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:53 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44861)
+ id 1jr2Au-000738-5h
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:00 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44889)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Al-00008W-A7
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:52 -0400
+ id 1jr2Ar-0000BG-EK
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707691; x=1625243691;
+ t=1593707697; x=1625243697;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=001vdMcQ+PNzQ7pj2gtHV0C3fLJ4dE5a4mTIxOQVY4Y=;
- b=FB3IhCTPF/36OEuzKfXtZo3LrP170yK1Op4zZOKPjmJ1+fK2U/uQkH7P
- ZK74hhmR1XSQGabLIR6DWISoYL+CDQkTWWeGqrDyaj1fzUGb2t6/zq0s3
- fsLQ7ZFe6qVuKnoMvLnXW3e8SPMQl5yK5bPi1uBIZ+FfJeJbR8AsDmZQq
- ELz3rIzryr3+vh/8/7L8xNa9r0s5caeNMpiDBAgZ3CDM9KRhV6ZLS4iwb
- zjhYYKm1RxuwrAferKqzzDAqBXfbw2ILwadRyWlfcqyJu+2Z235eo+D9x
- kEUjDqnkA9A5vm7vRPMAvpyWSYHEgGxrfFDhyqsRAF+adgnR4HJtNxhVw A==;
-IronPort-SDR: mMRtKPe/dyevYb2JZBjVo9NFmI7O6D4Af7aOlyKC9vt8vq/gK4JayqIHnuj+PL3u9uGlwLvQuq
- CpinMEtOAJpEa2vj3tAtQrvl3tchCwcgB8O7FnYpiogPh4SsN38rimiIvhczDCIzj2tJyxX4yO
- KbvZ7YHuEQz42Taf028pH24+dbmn6AMkZUunQfazhHpKoXI2CjBJUI7KWEim+v1cS+SkGbc64p
- +khntzYJvIPFwQP7ZB4nS3GtYXPMUH0la3l3hRmphPlibkGN4A2P7n2tlbXAcNceooMCcj8NHh
- kPs=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498543"
+ bh=RCa4xejBSpLdNFeVGXL4jC7B93Wrbo3TOvUFEgTe1Bg=;
+ b=OhasFKu5n43CNbueozdfXbLK4agcdajBeOkxLHRtWW3qqLSf+ZnSlRJB
+ xY9AidC4sUG5qXwjATYgxdk9hqRxd8DV6l4gMlFb5hHbzua5GlDKCAdrt
+ Tr4ayPZxfJxaBcHQOxxSTzgPaf7gSohXIS6dIDHow9TXgpKCIhYfY9viC
+ c9ILbv4D/BTPbS/mOpvKMK6NuyF4sBTh11x0uqhalioP3CzvhIdHkbWC5
+ 1+UYds2gtxroe/PV3IO1wtvCqgfVUA142j7VLMi1x8+YJmQ8oA+vFGA18
+ xYPfbViqssyE+ec/KluRry+7YiwDK9/vf9lf78NLxgp0HO6kcNNJPXgpI w==;
+IronPort-SDR: iqsDJh02uMosv3FZkF0KagPQDv/aP/EnYdK34FbDkxH5q0tOO+gcZhPn3KmyQeAfAcnKP9Sx5O
+ Epw2n8p+UtrwseTZ+Q+aonsH6Py6bDeb6jkE7F/1Ew8Zgr5dGuBHGfF/rvijheU5t5g/FjfyV7
+ 5v02SODRlehJZD7r4MzAfySh3q0TLci+MZfCiECR0ASBi0KJ9whmcF5qcDNGEyj5x/g4dXodFQ
+ 7ryBr/TY3t5VTYxaDAdwBHDX0wZhedC+5xvqCm7v76sLVT7cSAQz4a8lmk3xZ9pnnayp4uB8zC
+ sJs=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498555"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:33 +0800
-IronPort-SDR: 9Ka6vaS0iT6S70H05FDkar1aOJqDAz234SUekPVb3WObsKdO3QfQsBaEchmkWdfvxyJJwHYUqr
- vN0ZwsSKL7DWIgy+wdNFlLsDqxCyhVi7c=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:34 +0800
+IronPort-SDR: ZEtKaCCorWbypdwYaQX6szZwE0yoOFYe0OZuyUpcBirTSsXR4aDeaf50FVTRv9gTogaKV3R9rj
+ myZLcdAEiOy7tDeTxA+Y79WuFunupeRKE=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:48 -0700
-IronPort-SDR: 7dTjChmEe9Vz2ZfNY/e2wr8/Pd0AkwOtYGL60cBC9UArgRDTmpnDmFbtiCF6dneePFpJXMBHP/
- ivJfv/zbUdcA==
+ 02 Jul 2020 09:21:50 -0700
+IronPort-SDR: 9z/1W6ekGUCwumCKxgHrXBXr8d37e31ILP/mUrY2SBOjComzLTVCGO3OzKhir7DP+gXshzxVBy
+ rDMuLAWSJIdA==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:33 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:34 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 49/64] target/riscv: vector wideing integer reduction
- instructions
-Date: Thu,  2 Jul 2020 09:23:39 -0700
-Message-Id: <20200702162354.928528-50-alistair.francis@wdc.com>
+Subject: [PULL v2 55/64] target/riscv: set-X-first mask bit
+Date: Thu,  2 Jul 2020 09:23:45 -0700
+Message-Id: <20200702162354.928528-56-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -115,75 +114,148 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200701152549.1218-47-zhiwei_liu@c-sky.com>
+Message-Id: <20200701152549.1218-53-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  7 +++++++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
- target/riscv/vector_helper.c            | 11 +++++++++++
- 4 files changed, 24 insertions(+)
+ target/riscv/helper.h                   |  4 ++
+ target/riscv/insn32.decode              |  3 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 28 +++++++++++
+ target/riscv/vector_helper.c            | 63 +++++++++++++++++++++++++
+ 4 files changed, 98 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index a7fe4443e4..1c1277c0d1 100644
+index 28aeb74f43..0f9012be7e 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1072,3 +1072,10 @@ DEF_HELPER_6(vredxor_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredxor_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+@@ -1105,3 +1105,7 @@ DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_4(vmpopc_m, tl, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
 +
-+DEF_HELPER_6(vwredsumu_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vmsbf_m, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vmsif_m, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vmsof_m, void, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 878eeecb7e..b78fd8bc04 100644
+index a0f3315dbc..fab4a0b7e2 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -539,6 +539,8 @@ vredminu_vs     000100 . ..... ..... 010 ..... 1010111 @r_vm
- vredmin_vs      000101 . ..... ..... 010 ..... 1010111 @r_vm
- vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
- vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
-+vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+@@ -557,6 +557,9 @@ vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
+ vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
+ vmpopc_m        010100 . ..... ----- 010 ..... 1010111 @r2_vm
+ vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
++vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
++vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
++vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b4e3f904d3..91fc1fd059 100644
+index 01c32a3278..33ffe5dc1a 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2342,3 +2342,7 @@ GEN_OPIVV_TRANS(vredmin_vs, reduction_check)
- GEN_OPIVV_TRANS(vredand_vs, reduction_check)
- GEN_OPIVV_TRANS(vredor_vs, reduction_check)
- GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
+@@ -2453,3 +2453,31 @@ static bool trans_vmfirst_m(DisasContext *s, arg_rmr *a)
+     }
+     return false;
+ }
 +
-+/* Vector Widening Integer Reduction Instructions */
-+GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
-+GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
++/* vmsbf.m set-before-first mask bit */
++/* vmsif.m set-includ-first mask bit */
++/* vmsof.m set-only-first mask bit */
++#define GEN_M_TRANS(NAME)                                          \
++static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
++{                                                                  \
++    if (vext_check_isa_ill(s)) {                                   \
++        uint32_t data = 0;                                         \
++        gen_helper_gvec_3_ptr *fn = gen_helper_##NAME;             \
++        TCGLabel *over = gen_new_label();                          \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd),                     \
++                           vreg_ofs(s, 0), vreg_ofs(s, a->rs2),    \
++                           cpu_env, 0, s->vlen / 8, data, fn);     \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++
++GEN_M_TRANS(vmsbf_m)
++GEN_M_TRANS(vmsif_m)
++GEN_M_TRANS(vmsof_m)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 41564b3237..72b812c743 100644
+index e0ec02cda3..a58809a3cd 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -4406,3 +4406,14 @@ GEN_VEXT_RED(vredxor_vs_b, int8_t, int8_t, H1, H1, DO_XOR, clearb)
- GEN_VEXT_RED(vredxor_vs_h, int16_t, int16_t, H2, H2, DO_XOR, clearh)
- GEN_VEXT_RED(vredxor_vs_w, int32_t, int32_t, H4, H4, DO_XOR, clearl)
- GEN_VEXT_RED(vredxor_vs_d, int64_t, int64_t, H8, H8, DO_XOR, clearq)
+@@ -4581,3 +4581,66 @@ target_ulong HELPER(vmfirst_m)(void *v0, void *vs2, CPURISCVState *env,
+     }
+     return -1LL;
+ }
 +
-+/* Vector Widening Integer Reduction Instructions */
-+/* signed sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsum_vs_b, int16_t, int8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsum_vs_h, int32_t, int16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
++enum set_mask_type {
++    ONLY_FIRST = 1,
++    INCLUDE_FIRST,
++    BEFORE_FIRST,
++};
 +
-+/* Unsigned sum reduction into double-width accumulator */
-+GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
-+GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
-+GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
++static void vmsetm(void *vd, void *v0, void *vs2, CPURISCVState *env,
++                   uint32_t desc, enum set_mask_type type)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    int i;
++    bool first_mask_bit = false;
++
++    for (i = 0; i < vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        /* write a zero to all following active elements */
++        if (first_mask_bit) {
++            vext_set_elem_mask(vd, mlen, i, 0);
++            continue;
++        }
++        if (vext_elem_mask(vs2, mlen, i)) {
++            first_mask_bit = true;
++            if (type == BEFORE_FIRST) {
++                vext_set_elem_mask(vd, mlen, i, 0);
++            } else {
++                vext_set_elem_mask(vd, mlen, i, 1);
++            }
++        } else {
++            if (type == ONLY_FIRST) {
++                vext_set_elem_mask(vd, mlen, i, 0);
++            } else {
++                vext_set_elem_mask(vd, mlen, i, 1);
++            }
++        }
++    }
++    for (; i < vlmax; i++) {
++        vext_set_elem_mask(vd, mlen, i, 0);
++    }
++}
++
++void HELPER(vmsbf_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
++                     uint32_t desc)
++{
++    vmsetm(vd, v0, vs2, env, desc, BEFORE_FIRST);
++}
++
++void HELPER(vmsif_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
++                     uint32_t desc)
++{
++    vmsetm(vd, v0, vs2, env, desc, INCLUDE_FIRST);
++}
++
++void HELPER(vmsof_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
++                     uint32_t desc)
++{
++    vmsetm(vd, v0, vs2, env, desc, ONLY_FIRST);
++}
 -- 
 2.27.0
 
