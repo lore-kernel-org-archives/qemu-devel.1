@@ -6,91 +6,102 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BEEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A550AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2415A20885
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:40:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F20B20885
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:43:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XW9kVTSd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2415A20885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GitIor/t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F20B20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqyW2-0007Rs-EB
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:40:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
+	id 1jqyYt-0008VE-OZ
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:43:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqyVJ-0006yQ-4L
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:39:49 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36683)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqyVH-0004wO-NO
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:39:48 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k6so28111309wrn.3
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 05:39:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vubpZi/mRE5M1Rf4FEjDKdzxGMYDJkWsMdW9+7FWEwo=;
- b=XW9kVTSdsN+Mj01oUOMlm7WVz9iB2N1oo6W6tyCMj3FVHKL63fZkGYgazJukMBS1XA
- TeQCMLzbZLX6Xr7EaB5/jyPHfd8yu0kdr1lKylhH3yKcS4iTlfu/DSX9MnOBrj5e4zmQ
- DYhFeY9Fsx1yEhbHrBaZZ+Wn1pPhMtpIEgh+yBT3aVfEQEUTbhnAKEMJZHZtpyjeIrUx
- h9SL9qMvbbhai1Zs1jVwdWJH2m9PMFWlizzX5eaMgsXHF/02Icn0TlHwVqmPiVT/SCv2
- Jzjq8J566Ho3212rjb69Y+74vrg4Ej7j/TC9au1p1OP38ZXvZPH93lqcLr7/uwbuomgZ
- Gz5Q==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqyYL-000867-KK
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:42:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28246
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jqyYF-0007xQ-8e
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:42:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593693770;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dZbBizG1eXmsnIIjvVwhdsP0UNZWwQPVIRudKPYczds=;
+ b=GitIor/t3MWmWcfgZnRSr7jD6US52N+0wbnZbtMp+RwRN5BsI889sqiTe8bTKrfsrH5edq
+ 6SRm/a3ZIUzdv3FUsyo4bWcNBEo+51AnF/FPho+ryz4F0IRf9ggn6uLq4ejThaIskL5SI6
+ GgDZaYUvmOgujpfB8QHXlb20iYndnKA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-vLiTU4dgOJ2kJG6fJ7t0sg-1; Thu, 02 Jul 2020 08:42:48 -0400
+X-MC-Unique: vLiTU4dgOJ2kJG6fJ7t0sg-1
+Received: by mail-wm1-f70.google.com with SMTP id o13so28821744wmh.9
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 05:42:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=vubpZi/mRE5M1Rf4FEjDKdzxGMYDJkWsMdW9+7FWEwo=;
- b=ayXNj84Le1FJalDS4KvdxZJcRP6Yzh1F4cksoJ6IyJIdGGc+trfUAoU2oNuq9JimDo
- XCDStyNHKsChi+uqkEDGblLDrZ5M3f8LE5PtvhFyeMiUfosGUEbowUVDr1UPEPAxP6bu
- RA7cd79t7+MAVELzhh9ESo/1y1MmxRj/7cX3e/MFusbDHU6J8fDBysxytj3E2Pir9FZO
- Egd/qPS3FDXW1y7lJ1R8xqOQQBAHeaSUoCmzqQoGoDvqQC+7M3qETimZJrgSZWfD9MPE
- jdSobOvTc5wwozzwryRaHSwFN0CdVqyIZ5LTfHtw87GJ46Xa9UVBITQskRFj6vAwHbvP
- ZvgA==
-X-Gm-Message-State: AOAM5314+tn+iN+Mq9931+lpJjeh35+g8Wxqea+uVpk6pSNw8eeMKROJ
- ltK2CEXhs6egO7eRrUItK88=
-X-Google-Smtp-Source: ABdhPJxOu9OLgayXKMaJCfCuSepo4jwpb86ybGqNPvydD160F+IThXdhRcZe0OdRY8hX/tw/1Bi3Yg==
-X-Received: by 2002:a5d:6288:: with SMTP id k8mr30547107wru.373.1593693586177; 
- Thu, 02 Jul 2020 05:39:46 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id y17sm11171685wrd.58.2020.07.02.05.39.45
+ bh=dZbBizG1eXmsnIIjvVwhdsP0UNZWwQPVIRudKPYczds=;
+ b=WQMptr73pLdl8uyiIY5wayW1p4GkmnWy0oXJEED3idac1U6vfgYUGpxJ1oarDQt0Qm
+ BrQ9SadSHHC5WGBHCCS/jp2x4RktL9BonP3US+dPyIhtU94HXZWpqR3Bq0xrMSxXzRYO
+ 5iEXqrbtN82Q/GQcf2sDSkY92FVinXUF0XyeSWLnoCcqYLoTqDVtJfDgnBuEziavbPLP
+ cExRnWeSORYV9hzEjgORbgw++bMLV+H+i3lygDiFA6HXBUEqkuugWH/JLgasvfX4KMJe
+ 76cpXIE6gmjHK02owSyslfsE9VBovlX4hsd1A4S6PqE0QersR/DtoVJ8QReoQAXYHhBw
+ NSDg==
+X-Gm-Message-State: AOAM532InVQtlUEvBRsY8YaCnyz1TvCBH3TC+BSyQ4MfAwR6uqhXZvHK
+ jppK8XxSyhWFCSfJbD4lp4yWnAMQJzgkLWjMKKbmQfwvG1lIJKNp1CsTYSNPEqeYTQg7k4cN12h
+ Fn9fNI8OIBD5TF9w=
+X-Received: by 2002:adf:f9c8:: with SMTP id w8mr30848236wrr.354.1593693767206; 
+ Thu, 02 Jul 2020 05:42:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypVQ/f9UHW+fZ9skzQSrsV+rXAE9FcJ4ssJU5KsNMo6/EXsL1Jgh0Ztp/5Inz4nALWj4uC/w==
+X-Received: by 2002:adf:f9c8:: with SMTP id w8mr30848200wrr.354.1593693766841; 
+ Thu, 02 Jul 2020 05:42:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2cad:376b:7d21:868e?
+ ([2001:b07:6468:f312:2cad:376b:7d21:868e])
+ by smtp.gmail.com with ESMTPSA id 30sm11532750wrm.74.2020.07.02.05.42.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jul 2020 05:39:45 -0700 (PDT)
-Subject: Re: [PATCH v3 0/2] target mips: Misc fixes and improvements
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-devel@nongnu.org
-References: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a97c16a0-4f21-ef84-b2cf-9b861efcbe11@amsat.org>
-Date: Thu, 2 Jul 2020 14:39:44 +0200
+ Thu, 02 Jul 2020 05:42:46 -0700 (PDT)
+Subject: Re: [PATCH v3] i386: hvf: Implement CPU kick
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+References: <20200702105721.75333-1-r.bolshakov@yadro.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fa29e532-a891-cf61-a8a2-af5e36e7834f@redhat.com>
+Date: Thu, 2 Jul 2020 14:42:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200702105721.75333-1-r.bolshakov@yadro.com>
 Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,29 +115,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@syrmia.com,
- Paul Burton <paulburton@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Claudio Fontana <cfontana@suse.de>,
+ Cameron Esfahani <dirty@apple.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 8:25 PM, Aleksandar Markovic wrote:
-> A collection of pending fixes and improvements.
-> 
-> v2->v3:
-> 
->     - minor content and commit message changes
-> 
-> v1->v2:
-> 
->     - minor content and commit message changes
-> 
-> Aleksandar Markovic (2):
->   target/mips: Remove identical if/else branches
->   MAINTAINERS: Adjust MIPS maintainership
+On 02/07/20 12:57, Roman Bolshakov wrote:
+> There's still a small chance of kick loss, on user-to-kernel border
+> between atomic_mb_set's just before the entry to hv_vcpu_run and just
+> after it.
 
-Thanks, added to mips-next, splitting the 2nd patch in 3:
-MAINTAINERS: Adjust MIPS maintainership (remove Aurelien Jarno)
-MAINTAINERS: Adjust MIPS maintainership (remove Paul Burton)
-MAINTAINERS: Adjust MIPS maintainership (Add Huacai Chen & Jiaxun Yang)
+Good point, but we can fix it.
+
+> -static void dummy_signal(int sig)
+> +static void hvf_handle_ipi(int sig)
+>  {
+> +    CPUState *cpu = pthread_getspecific(hvf_cpu);
+
+You can use current_cpu here.  If it's NULL, just return (it's a
+per-thread variable).
+
+> +    X86CPU *x86_cpu = X86_CPU(cpu);
+> +    CPUX86State *env = &x86_cpu->env;
+> +
+> +    if (!atomic_xchg(&env->hvf_in_guest, false)) {
+
+Here, thinking more about it, we need not write hvf_in_guest, so:
+
+	/* Write cpu->exit_request before reading env->hvf_in_guest.  */
+	smp_mb();
+	if (!atomic_read(&env->hvf_in_guest)) {
+		...
+	}
+
+> +        wvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS,
+> +              rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS)
+> +                | VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);
+> +    }
+>  }
+>  
+>  int hvf_init_vcpu(CPUState *cpu)
+> @@ -631,7 +650,9 @@ int hvf_vcpu_exec(CPUState *cpu)
+>              return EXCP_HLT;
+>          }
+>  
+> +        atomic_mb_set(&env->hvf_in_guest, true);
+>          hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
+> +        atomic_mb_set(&env->hvf_in_guest, false);
+
+
+And here you can do instead:
+
+	atomic_set(&env->hvf_in_guest, true);
+	/* Read cpu->exit_request after writing env->hvf_in_guest.  */
+	smp_mb();
+	if (atomic_read(&cpu->exit_request)) {
+	    qemu_mutex_lock_iothread();
+	    atomic_set(&env->hvf_in_guest, false);
+	    return EXCP_INTERRUPT;
+	}
+	hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
+	atomic_store_release(&env->hvf_in_guest, false);
+
+This matching "write A/smp_mb()/read B" and "write B/smp_mb()/read A" is
+a very common idiom for lock-free signaling between threads.
+
+Paolo
+
 
