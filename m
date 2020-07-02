@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C2AC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16938C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:03:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38D5B20885
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D835D2088E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:03:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UmId49Qf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D5B20885
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yqj1pxEE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D835D2088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2cE-0000Si-Ge
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34362)
+	id 1jr2cW-0000us-5K
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:03:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Aq-0006uO-QD
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:56 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44883)
+ id 1jr2AU-0005u2-3t
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:34 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44871)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Ao-0000Az-Hi
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:56 -0400
+ id 1jr2AR-00009X-Od
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707694; x=1625243694;
+ t=1593707671; x=1625243671;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=Nht9iyie5hUYDHGdQBvfft0oYNHogNWeH8Y5eO2+JbY=;
- b=UmId49QfZsgUQVfD/5BHA/dCLbdfp9hTsIv/Yj3fYFHdmEvlktvtC+4p
- 4wh37/S87xpPY9h3scUy5BsQNdeaN6EArq7X9oySr5/iBezmBpSD1nWdm
- 4YkaSrxtNuyuQVQ9fxLlGfSX/7CibFNtT6uZZmdNpcNCG55La5RCd5a6P
- 0JaJes2Rw3HqccvdNW3pHQprmpbXur605K0ZK9sIrBgCsC0HaMIXWqATy
- qqecsYT5ndmTSkbEPNbNcCbkGCVYJLJKsE7rQA6efZJPKo18NIuGvktwn
- P41KdTREeZatzraaBJmm6xazsZGYk2pbebRFMHsIe/FfdPaMriepwo1q4 A==;
-IronPort-SDR: wKrVukooZMUJyP+olDRocUfKVYMwTgJR0vNVgUiujyXvYaWREoQLtq/TJejLmpMFONp6/esRAd
- 00Kp/NpSDLPzmLdBPbOh5muGVJ3E3xGH6ean2r8u/WicGkch/yR6C30qUI2f0YYiOnJUBAFcOA
- 6y9EZVvDhLhSZrUqKJv91HfQaV4z3REWtV9vIc1OlFuW+enkJZCYbUViTz44iC34eVJCuAhWcn
- t8CT/YjTLH16attHzlCyZs6F807q+5aaBjyM9qulunjFlx+W4FJR0++1L+jf9yWIKMhixgjYg1
- LQ4=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498549"
+ bh=mnJUCVYgjkrmaNnANvWypBUz7KgZxM4JdjC17ylaeTg=;
+ b=Yqj1pxEEDyBD0jn+vukbK3miGkp5HTRNx8WpwayNs1WYaUqkym7KJ3b7
+ 8hGnzzEgB+QSlJsmjk3dLyP/tOdEUlFxZvfgGROijzi6vCRfeIROJYTbW
+ uxuGSceN13jDzVS1T2qt+64IbKoR7nghFm0cx0o61XREH+FaXFWN1tV33
+ wp4qsUmr07bERssGCrbYlXIuimFIB6o7fdQPjjhDiQssTYwCOoqepslQa
+ h40NgyTXLFecemwLoo0/z7r2uHD+FvoqdOep+KMsrQWfp1UPMJ1KWTZqK
+ FYrxZUWV/CM0uc5u7uzHQW7Lro7DlhTd/k9LG1Y75LnuQ+wkgyaaxPOGR w==;
+IronPort-SDR: gvT/2xbub4qVebF4X3uCxu4nx8H9jKuVUDIvRxtM0uVlPLk6TpffRAvq1RWd/FVCOiiczUKuE+
+ M8gibsLXCOpFmPWJgjfN1rQjg4LK2OKNbOQ1Mk3KrAqRRZp4auFzUV59KcrbqfkitxftsZfyRa
+ 4oonXCg9eXQQwnF00rlIeY+kKkhsHm2qLCqpmNt8GgJfWKG6WA11J31VgmReJgFQh998Cy2rZb
+ SPE4ih6DPq1Pc94KIeASb1HmZ/zTJ/is4ouK2o3EqTPrUfzgfiZWnF36UZWgRuXZnaygIUfasI
+ lNA=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498517"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:34 +0800
-IronPort-SDR: JweNh0ouxioI9jMeMCIkpRpqxQgHCCZ8YA6zm0JCcq0H4ehCbiH/6j8FuGb2WwpcwyaTxjCZb8
- Qa7uI+ZplCIHgZjE5mAXid17PpdfSGMyE=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:30 +0800
+IronPort-SDR: diiNPYDq6adkUQBzLYeEploZJOKt23lcPkPudW+8OqNXq1hsixZQdFG3uwD5Ey24GMkodgjBAQ
+ u1uvkezxGB8HgGrh9Kz2Ws+gsjBHnKeaM=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:49 -0700
-IronPort-SDR: GdeVkSE9Jh/r60hfZNchox1oFfTTEMemmqs9jqddujHZPiQOSRi5RIxjAJXk5Jcjyyx6C+FnIb
- RUCGENMACCJQ==
+ 02 Jul 2020 09:21:45 -0700
+IronPort-SDR: yb6fhM4nKmtCxcVupPX9T7R47P8KiuCbHVqy2fmScoXcWzmLl+dDgSAPPHMVQ40o/QV1xl6WbI
+ vCGyG9yGODng==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:33 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:29 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 52/64] target/riscv: vector mask-register logical
- instructions
-Date: Thu,  2 Jul 2020 09:23:42 -0700
-Message-Id: <20200702162354.928528-53-alistair.francis@wdc.com>
+Subject: [PULL v2 38/64] target/riscv: vector widening floating-point fused
+ multiply-add instructions
+Date: Thu,  2 Jul 2020 09:23:28 -0700
+Message-Id: <20200702162354.928528-39-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -115,142 +115,177 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200701152549.1218-50-zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20200701152549.1218-36-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  9 ++++++
- target/riscv/insn32.decode              |  8 +++++
- target/riscv/insn_trans/trans_rvv.inc.c | 35 ++++++++++++++++++++++
- target/riscv/vector_helper.c            | 40 +++++++++++++++++++++++++
- 4 files changed, 92 insertions(+)
+ target/riscv/helper.h                   | 17 +++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 +++
+ target/riscv/vector_helper.c            | 91 +++++++++++++++++++++++++
+ 4 files changed, 126 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 217f09a55c..292279f0c5 100644
+index 108a177f25..b537030a11 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -1092,3 +1092,12 @@ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
- 
- DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+@@ -906,3 +906,20 @@ DEF_HELPER_6(vfmsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfnmsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfnmsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfnmsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 +
-+DEF_HELPER_6(vmand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmandnot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwnmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwnmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwnmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwnmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwmacc_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwmacc_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwnmacc_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwnmacc_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwmsac_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwnmsac_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwnmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 2668d483a7..c71cbef182 100644
+index 9ca765d37f..c9d5078385 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -547,6 +547,14 @@ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
- vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
- # Vector widening ordered and unordered float reduction sum
- vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
-+vmand_mm        011001 - ..... ..... 010 ..... 1010111 @r
-+vmnand_mm       011101 - ..... ..... 010 ..... 1010111 @r
-+vmandnot_mm     011000 - ..... ..... 010 ..... 1010111 @r
-+vmxor_mm        011011 - ..... ..... 010 ..... 1010111 @r
-+vmor_mm         011010 - ..... ..... 010 ..... 1010111 @r
-+vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
-+vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
-+vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
+@@ -481,6 +481,14 @@ vfmsub_vv       101010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfmsub_vf       101010 . ..... ..... 101 ..... 1010111 @r_vm
+ vfnmsub_vv      101011 . ..... ..... 001 ..... 1010111 @r_vm
+ vfnmsub_vf      101011 . ..... ..... 101 ..... 1010111 @r_vm
++vfwmacc_vv      111100 . ..... ..... 001 ..... 1010111 @r_vm
++vfwmacc_vf      111100 . ..... ..... 101 ..... 1010111 @r_vm
++vfwnmacc_vv     111101 . ..... ..... 001 ..... 1010111 @r_vm
++vfwnmacc_vf     111101 . ..... ..... 101 ..... 1010111 @r_vm
++vfwmsac_vv      111110 . ..... ..... 001 ..... 1010111 @r_vm
++vfwmsac_vf      111110 . ..... ..... 101 ..... 1010111 @r_vm
++vfwnmsac_vv     111111 . ..... ..... 001 ..... 1010111 @r_vm
++vfwnmsac_vf     111111 . ..... ..... 101 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index b78829be36..e2954aa99a 100644
+index ee601fd790..3a5fd0cf89 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2354,3 +2354,38 @@ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
- 
- /* Vector Widening Floating-Point Reduction Instructions */
- GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
+@@ -2079,3 +2079,13 @@ GEN_OPFVF_TRANS(vfmadd_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfnmadd_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfmsub_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfnmsub_vf, opfvf_check)
 +
-+/*
-+ *** Vector Mask Operations
-+ */
-+
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_MM_TRANS(NAME)                                         \
-+static bool trans_##NAME(DisasContext *s, arg_r *a)                \
-+{                                                                  \
-+    if (vext_check_isa_ill(s)) {                                   \
-+        uint32_t data = 0;                                         \
-+        gen_helper_gvec_4_ptr *fn = gen_helper_##NAME;             \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fn);                 \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+GEN_MM_TRANS(vmand_mm)
-+GEN_MM_TRANS(vmnand_mm)
-+GEN_MM_TRANS(vmandnot_mm)
-+GEN_MM_TRANS(vmxor_mm)
-+GEN_MM_TRANS(vmor_mm)
-+GEN_MM_TRANS(vmnor_mm)
-+GEN_MM_TRANS(vmornot_mm)
-+GEN_MM_TRANS(vmxnor_mm)
++/* Vector Widening Floating-Point Fused Multiply-Add Instructions */
++GEN_OPFVV_WIDEN_TRANS(vfwmacc_vv, opfvv_widen_check)
++GEN_OPFVV_WIDEN_TRANS(vfwnmacc_vv, opfvv_widen_check)
++GEN_OPFVV_WIDEN_TRANS(vfwmsac_vv, opfvv_widen_check)
++GEN_OPFVV_WIDEN_TRANS(vfwnmsac_vv, opfvv_widen_check)
++GEN_OPFVF_WIDEN_TRANS(vfwmacc_vf)
++GEN_OPFVF_WIDEN_TRANS(vfwnmacc_vf)
++GEN_OPFVF_WIDEN_TRANS(vfwmsac_vf)
++GEN_OPFVF_WIDEN_TRANS(vfwnmsac_vf)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 3ebf2482b8..ca44e733e8 100644
+index 29dc1d1d73..607fcc8742 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -4502,3 +4502,43 @@ void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
-     *((uint64_t *)vd) = s1;
-     clearq(vd, 1, sizeof(uint64_t), tot);
- }
+@@ -3683,3 +3683,94 @@ RVVCALL(OPFVF3, vfnmsub_vf_d, OP_UUU_D, H8, H8, fnmsub64)
+ GEN_VEXT_VF(vfnmsub_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfnmsub_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfnmsub_vf_d, 8, 8, clearq)
 +
-+/*
-+ *** Vector Mask Operations
-+ */
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_VEXT_MASK_VV(NAME, OP)                        \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
-+                  void *vs2, CPURISCVState *env,          \
-+                  uint32_t desc)                          \
-+{                                                         \
-+    uint32_t mlen = vext_mlen(desc);                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;   \
-+    uint32_t vl = env->vl;                                \
-+    uint32_t i;                                           \
-+    int a, b;                                             \
-+                                                          \
-+    for (i = 0; i < vl; i++) {                            \
-+        a = vext_elem_mask(vs1, mlen, i);                 \
-+        b = vext_elem_mask(vs2, mlen, i);                 \
-+        vext_set_elem_mask(vd, mlen, i, OP(b, a));        \
-+    }                                                     \
-+    for (; i < vlmax; i++) {                              \
-+        vext_set_elem_mask(vd, mlen, i, 0);               \
-+    }                                                     \
++/* Vector Widening Floating-Point Fused Multiply-Add Instructions */
++static uint32_t fwmacc16(uint16_t a, uint16_t b, uint32_t d, float_status *s)
++{
++    return float32_muladd(float16_to_float32(a, true, s),
++                        float16_to_float32(b, true, s), d, 0, s);
 +}
 +
-+#define DO_NAND(N, M)  (!(N & M))
-+#define DO_ANDNOT(N, M)  (N & !M)
-+#define DO_NOR(N, M)  (!(N | M))
-+#define DO_ORNOT(N, M)  (N | !M)
-+#define DO_XNOR(N, M)  (!(N ^ M))
++static uint64_t fwmacc32(uint32_t a, uint32_t b, uint64_t d, float_status *s)
++{
++    return float64_muladd(float32_to_float64(a, s),
++                        float32_to_float64(b, s), d, 0, s);
++}
 +
-+GEN_VEXT_MASK_VV(vmand_mm, DO_AND)
-+GEN_VEXT_MASK_VV(vmnand_mm, DO_NAND)
-+GEN_VEXT_MASK_VV(vmandnot_mm, DO_ANDNOT)
-+GEN_VEXT_MASK_VV(vmxor_mm, DO_XOR)
-+GEN_VEXT_MASK_VV(vmor_mm, DO_OR)
-+GEN_VEXT_MASK_VV(vmnor_mm, DO_NOR)
-+GEN_VEXT_MASK_VV(vmornot_mm, DO_ORNOT)
-+GEN_VEXT_MASK_VV(vmxnor_mm, DO_XNOR)
++RVVCALL(OPFVV3, vfwmacc_vv_h, WOP_UUU_H, H4, H2, H2, fwmacc16)
++RVVCALL(OPFVV3, vfwmacc_vv_w, WOP_UUU_W, H8, H4, H4, fwmacc32)
++GEN_VEXT_VV_ENV(vfwmacc_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwmacc_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF3, vfwmacc_vf_h, WOP_UUU_H, H4, H2, fwmacc16)
++RVVCALL(OPFVF3, vfwmacc_vf_w, WOP_UUU_W, H8, H4, fwmacc32)
++GEN_VEXT_VF(vfwmacc_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwmacc_vf_w, 4, 8, clearq)
++
++static uint32_t fwnmacc16(uint16_t a, uint16_t b, uint32_t d, float_status *s)
++{
++    return float32_muladd(float16_to_float32(a, true, s),
++                        float16_to_float32(b, true, s), d,
++                        float_muladd_negate_c | float_muladd_negate_product, s);
++}
++
++static uint64_t fwnmacc32(uint32_t a, uint32_t b, uint64_t d, float_status *s)
++{
++    return float64_muladd(float32_to_float64(a, s),
++                        float32_to_float64(b, s), d,
++                        float_muladd_negate_c | float_muladd_negate_product, s);
++}
++
++RVVCALL(OPFVV3, vfwnmacc_vv_h, WOP_UUU_H, H4, H2, H2, fwnmacc16)
++RVVCALL(OPFVV3, vfwnmacc_vv_w, WOP_UUU_W, H8, H4, H4, fwnmacc32)
++GEN_VEXT_VV_ENV(vfwnmacc_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwnmacc_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF3, vfwnmacc_vf_h, WOP_UUU_H, H4, H2, fwnmacc16)
++RVVCALL(OPFVF3, vfwnmacc_vf_w, WOP_UUU_W, H8, H4, fwnmacc32)
++GEN_VEXT_VF(vfwnmacc_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwnmacc_vf_w, 4, 8, clearq)
++
++static uint32_t fwmsac16(uint16_t a, uint16_t b, uint32_t d, float_status *s)
++{
++    return float32_muladd(float16_to_float32(a, true, s),
++                        float16_to_float32(b, true, s), d,
++                        float_muladd_negate_c, s);
++}
++
++static uint64_t fwmsac32(uint32_t a, uint32_t b, uint64_t d, float_status *s)
++{
++    return float64_muladd(float32_to_float64(a, s),
++                        float32_to_float64(b, s), d,
++                        float_muladd_negate_c, s);
++}
++
++RVVCALL(OPFVV3, vfwmsac_vv_h, WOP_UUU_H, H4, H2, H2, fwmsac16)
++RVVCALL(OPFVV3, vfwmsac_vv_w, WOP_UUU_W, H8, H4, H4, fwmsac32)
++GEN_VEXT_VV_ENV(vfwmsac_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwmsac_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF3, vfwmsac_vf_h, WOP_UUU_H, H4, H2, fwmsac16)
++RVVCALL(OPFVF3, vfwmsac_vf_w, WOP_UUU_W, H8, H4, fwmsac32)
++GEN_VEXT_VF(vfwmsac_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwmsac_vf_w, 4, 8, clearq)
++
++static uint32_t fwnmsac16(uint16_t a, uint16_t b, uint32_t d, float_status *s)
++{
++    return float32_muladd(float16_to_float32(a, true, s),
++                        float16_to_float32(b, true, s), d,
++                        float_muladd_negate_product, s);
++}
++
++static uint64_t fwnmsac32(uint32_t a, uint32_t b, uint64_t d, float_status *s)
++{
++    return float64_muladd(float32_to_float64(a, s),
++                        float32_to_float64(b, s), d,
++                        float_muladd_negate_product, s);
++}
++
++RVVCALL(OPFVV3, vfwnmsac_vv_h, WOP_UUU_H, H4, H2, H2, fwnmsac16)
++RVVCALL(OPFVV3, vfwnmsac_vv_w, WOP_UUU_W, H8, H4, H4, fwnmsac32)
++GEN_VEXT_VV_ENV(vfwnmsac_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwnmsac_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF3, vfwnmsac_vf_h, WOP_UUU_H, H4, H2, fwnmsac16)
++RVVCALL(OPFVF3, vfwnmsac_vf_w, WOP_UUU_W, H8, H4, fwnmsac32)
++GEN_VEXT_VF(vfwnmsac_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwnmsac_vf_w, 4, 8, clearq)
 -- 
 2.27.0
 
