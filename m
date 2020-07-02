@@ -2,84 +2,93 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2B7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD09C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B33720772
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:12:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC5E2207CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:14:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UmwP6LA7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B33720772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M3qPhlg8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC5E2207CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqz1K-00049r-S3
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:12:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58480)
+	id 1jqz2k-0005Z9-1a
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:14:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqz0j-0003i8-MY
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:12:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45344
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqz1K-0004Ir-Mz
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:12:54 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23247
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jqz0h-0007Jm-6I
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:12:17 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqz1I-0007NW-Tl
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:12:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593695533;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1593695571;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=5hSc0LRJriY8gQ6hI4w5zVvjhmVWDeWx9xdN5pyhPlg=;
- b=UmwP6LA7pnXcg8DROLFozEcOaksYjAYULaowD1/h5l0l91wBa6T+GO+EBTGKRJPHOIwcSj
- eH8sZ2oEH6vnGUM3aNhYn3xRfxzZrboWamgZ4XgKj/Q7IMFuOR5HfpWW0ROZtLzUw64Kok
- 9qq7tzK3BwbX3m9zsHsr8HLZrBNbHQ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-o8dW6KH6PRSV_6gqt3mzrg-1; Thu, 02 Jul 2020 09:12:11 -0400
-X-MC-Unique: o8dW6KH6PRSV_6gqt3mzrg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 776D5800597;
- Thu,  2 Jul 2020 13:12:10 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0503B2B4C2;
- Thu,  2 Jul 2020 13:12:08 +0000 (UTC)
-Date: Thu, 2 Jul 2020 14:12:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Subject: Re: [PATCH 2/2] configure: add support for Control-Flow Integrity
-Message-ID: <20200702131204.GK1888119@redhat.com>
-References: <20200702054948.10257-1-dbuono@linux.vnet.ibm.com>
- <20200702054948.10257-3-dbuono@linux.vnet.ibm.com>
- <20200702095252.GF1888119@redhat.com>
- <0ed44c55-1f5d-6866-9555-82134ef628fb@linux.vnet.ibm.com>
+ bh=wtoZB/DrdHCTwgcGC7eYMqB3u+s8DLGCkVcpAP9QXiU=;
+ b=M3qPhlg8PfuKmcTo9QA5M/4iOyW6/LWhC+bcyjBlqMFwex8TfxQu4ztaTfUEb4xYLiM5Mv
+ le+Gmzip9CqYFL1bDCiJcUkIDeBJcTTKg0rl1tZYdmkVacpJNWCmCUOS3MGk01r9ckGWhF
+ ulEvOMXd+v4EcV1Pqdl0t3TZXMq2NzM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-LcMCOW_WMT6sIv_zLnKclA-1; Thu, 02 Jul 2020 09:12:49 -0400
+X-MC-Unique: LcMCOW_WMT6sIv_zLnKclA-1
+Received: by mail-wr1-f71.google.com with SMTP id h28so25670220wrc.18
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 06:12:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wtoZB/DrdHCTwgcGC7eYMqB3u+s8DLGCkVcpAP9QXiU=;
+ b=ZyEF+fSaUkOpYVGpQTpUwyTJEa620CRxb58aQrJhjV3NuLGpRH5mLzh6SXNcIYLN6e
+ XnFt698OHhuwj3Xhe8mF4/D8DaNHg7/EjKSMJyQBVmI/lnEzy7xf0pDaJbFzsWqqZd6+
+ 6jl9cEtnLfjO+BT6gVoiVyEuznkplapth5itQNdipnWob2Yxx5KHhKIREM4mGILhlHKC
+ q1ydFrLRzUNeIVEaR2Lt1sBccp2ApeGA+xUABV/MsfZvK82n78vBb1kkyCAkNkbxvWQW
+ qe+vMsZnx27u4h2gv/N+NTtb0olp95aBIVaL16e5mQdSh6ALXW5Jbirjp1apgyzB8NfP
+ jSoQ==
+X-Gm-Message-State: AOAM533/6pQJXJQD+ibVZ33MLw6OL09gLD09EwxToi/ce0sWWMzcTSbb
+ Ngv6pyiFiWDfNHT3phXOFj5Pw71H1g6gjckFWZBtn1VyGmqYGV/BuS0gCMMhq/TfKjxGqT1rR4G
+ ZhugZPZH8or0cDl4=
+X-Received: by 2002:a5d:40ca:: with SMTP id b10mr34077484wrq.56.1593695567920; 
+ Thu, 02 Jul 2020 06:12:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyi1Ao0kwBf67yAs3GDLxHd/S5DUvjOXuouTqyf1R8ICwfyIeV2LAFSAZMG0TxDpfUxFe+biA==
+X-Received: by 2002:a5d:40ca:: with SMTP id b10mr34077465wrq.56.1593695567699; 
+ Thu, 02 Jul 2020 06:12:47 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ x7sm10933520wrr.72.2020.07.02.06.12.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Jul 2020 06:12:46 -0700 (PDT)
+Date: Thu, 2 Jul 2020 09:12:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v7 0/5] VIRTIO-IOMMU probe request support and MSI bypass
+ on ARM
+Message-ID: <20200702091222-mutt-send-email-mst@kernel.org>
+References: <20200629070404.10969-1-eric.auger@redhat.com>
+ <20200702072655-mutt-send-email-mst@kernel.org>
+ <e514c6d7-280f-6e18-659a-94854779451f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0ed44c55-1f5d-6866-9555-82134ef628fb@linux.vnet.ibm.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <e514c6d7-280f-6e18-659a-94854779451f@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -89,7 +98,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,153 +111,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jean-philippe@linaro.org, armbru@redhat.com,
+ peterx@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ pbonzini@redhat.com, bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 02, 2020 at 08:50:08AM -0400, Daniele Buono wrote:
+On Thu, Jul 02, 2020 at 02:01:46PM +0200, Auger Eric wrote:
+> Hi Michael,
 > 
+> On 7/2/20 1:28 PM, Michael S. Tsirkin wrote:
+> > On Mon, Jun 29, 2020 at 09:03:59AM +0200, Eric Auger wrote:
+> >> By default the virtio-iommu translates MSI transactions. This
+> >> behavior is inherited from ARM SMMU. However the virt machine
+> >> code knows where the MSI doorbells are, so we can easily
+> >> declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
+> >> setting the guest iommu subsystem will not need to map MSIs.
+> >> This setup will simplify the VFIO integration.
+> >>
+> >> In this series, the ITS or GICV2M doorbells are declared as
+> >> HW MSI regions to be bypassed by the VIRTIO-IOMMU.
+> >>
+> >> This also paves the way to the x86 integration where the MSI
+> >> region, [0xFEE00000,0xFEEFFFFF], will be exposed by the q35
+> >> machine.  However this will be handled in a separate series
+> >> when not-DT support gets resolved.
+> > 
+> > 
+> > virtio things:
+> > 
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > 
+> > ARM tree makes sense for this, right?
 > 
-> On 7/2/2020 5:52 AM, Daniel P. Berrangé wrote:
-> > On Thu, Jul 02, 2020 at 01:49:48AM -0400, Daniele Buono wrote:
-> > > This patch adds a flag to enable/disable control flow integrity checks
-> > > on indirect function calls. This feature is only provided by LLVM/Clang
-> > > v3.9 or higher, and only allows indirect function calls to functions
-> > > with compatible signatures.
-> > > 
-> > > We also add an option to enable a debugging version of cfi, with verbose
-> > > output in case of a CFI violation.
-> > > 
-> > > CFI on indirect function calls does not support calls to functions in
-> > > shared libraries (since they were not known at compile time), and such
-> > > calls are forbidden. QEMU relies on dlopen/dlsym when using modules,
-> > > so we make modules incompatible with CFI.
-> > > 
-> > > We introduce a blacklist file, to disable CFI checks in a limited number
-> > > of TCG functions.
-> > > 
-> > > The feature relies on link-time optimization (lto), which requires the
-> > > use of the gold linker, and the LLVM versions of ar, ranlib and nm.
-> > > This patch take care of checking that all the compiler toolchain
-> > > dependencies are met.
-> > > 
-> > > Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
-> > > ---
-> > >   cfi-blacklist.txt |  27 +++++++
-> > >   configure         | 177 ++++++++++++++++++++++++++++++++++++++++++++++
-> > >   2 files changed, 204 insertions(+)
-> > >   create mode 100644 cfi-blacklist.txt
-> > > 
-> > > diff --git a/cfi-blacklist.txt b/cfi-blacklist.txt
-> > > new file mode 100644
-> > > index 0000000000..bf804431a5
-> > > --- /dev/null
-> > > +++ b/cfi-blacklist.txt
-> > > @@ -0,0 +1,27 @@
-> > > +# List of functions that should not be compiled with Control-Flow Integrity
-> > > +
-> > > +[cfi-icall]
-> > > +# TCG creates binary blobs at runtime, with the transformed code.
-> > > +# When it's time to execute it, the code is called with an indirect function
-> > > +# call. Since such function did not exist at compile time, the runtime has no
-> > > +# way to verify its signature. Disable CFI checks in the function that calls
-> > > +# the binary blob
-> > > +fun:cpu_tb_exec
-> > > +
-> > > +# TCI (Tiny Compiler Interpreter) is an interpreter for TCG pseudo code.
-> > > +# One possible operation in the pseudo code is a call to binary code.
-> > > +# Therefore, disable CFI checks in the interpreter function
-> > > +fun:tcg_qemu_tb_exec
-> > > +
-> > > +# TCG Plugins Callback Functions. The mechanism rely on opening external
-> > > +# shared libraries at runtime and get pointers to functions in such libraries
-> > > +# Since these pointers are external to the QEMU binary, the runtime cannot
-> > > +# verify their signature. Disable CFI Checks in all the functions that use
-> > > +# such pointers.
-> > > +fun:plugin_vcpu_cb__simple
-> > > +fun:plugin_cb__simple
-> > > +fun:plugin_cb__udata
-> > > +fun:qemu_plugin_tb_trans_cb
-> > > +fun:qemu_plugin_vcpu_syscall
-> > > +fun:qemu_plugin_vcpu_syscall_ret
-> > > +fun:plugin_load
-> > 
-> > The need to maintain this list of functions makes me feel very
-> > uneasy.
-> > 
-> > How can we have any confidence that this list of functions is
-> > accurate ? How will maintainers ensure that they correctly update
-> > it as they are writing/changing code, and how will they test the
-> > result ?
-> > 
-> > It feels like it has the same general maint problem as the original
-> > seccomp code we used, where we were never confident we had added
-> > the right exceptions to let QEMU run without crashing when users
-> > tickled some feature we forgot about.
-> > 
-> > 
-> > Regards,
-> > Daniel
-> > 
+> Yes I think so.
 > 
-> I agree with you that keeping that list updated is a daunting task. In my
-> opinion, however, it is not as difficult as a seccomp filter, for the
-> following reasons:
+> Thanks
 > 
-> 1) Seccomp covers everything that runs in your process, including shared
-> libraries that you have no control over. CFI covers only the code in the
-> QEMU binary. So at least we don't have to guess what other libraries used by
-> QEMU will or won't do during execution.
-> 
-> 2) With seccomp you have to filter behavior that, while admissible, should
-> not happen in your code. CFI can be seen as a run-time type checking system;
-> if the signature of the function is wrong, that is a coding error... in
-> theory. In practice, there is a corner-case because the type checking
-> doesn't know the signature of code loaded or written at run-time, and that
-> is why you have to use a CFI filter.
-
-Can you elaborate on this function signature rules here ? Is this referring
-to scenarios where you cast between 2 different function prototypes ?
-
-I'm wondering if this applies to the way GLib's main loop source callbacks
-are registered.
-
-eg the g_source_set_callback method takes a callback with a signature
-of "GSourceFunc" which is
-
-  gboolean (*)(void *)
-
-but the way GSources are implemented means that each implementation gets
-to define its own custom callback signature. So for example, in QIOChannel
-we use
-
-  int (*)(struct QIOChannel *, enum <anonymous>,  void *)
-
-Thus, we always have an intentional bad function cast when invoking the
-g_source_set_callback method.
-
-GCC is able to warn about these if we add -Wcast-function-type, but we
-don't do that because these bad casts are intentional.
-
-eg
-
-io/channel.c: In function ‘qio_channel_add_watch_full’:
-io/channel.c:315:35: error: cast between incompatible function types from ‘QIOChannelFunc’ {aka ‘int (*)(struct QIOChannel *, enum <anonymous>,  void *)’} to ‘gboolean (*)(void *)’ {aka ‘int (*)(void *)’} [-Werror=cast-function-type]
-  315 |     g_source_set_callback(source, (GSourceFunc)func, user_data, notify);
-      |                                   ^
-io/channel.c: In function ‘qio_channel_wait’:
-io/channel.c:507:27: error: cast between incompatible function types from ‘gboolean (*)(QIOChannel *, GIOCondition,  void *)’ {aka ‘int (*)(struct QIOChannel *, enum <anonymous>,  void *)’} to ‘gboolean (*)(void *)’ {aka ‘int (*)(void *)’} [-Werror=cast-function-type]
-  507 |                           (GSourceFunc)qio_channel_wait_complete,
-      |                           ^
+> Eric
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Okay. Feel free to merge through ARM tree pls.
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> > 
+> > 
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> This series can be found at:
+> >> https://github.com/eauger/qemu/tree/v5.0.0-virtio-iommu-msi-bypass-v7
+> >>
+> >> History:
+> >>
+> >> v6 -> v7:
+> >> - fix the hint message
+> >> - put the assert again on probe request
+> >>
+> >> v5 -> v6:
+> >> - do not hardcode start/end addresses of doorbells
+> >> - check reserved region type on realize()
+> >>
+> >> v4 -> v5:
+> >> - Take into account some additional comments from Markus:
+> >>   - reserved region type becomes an unsigned + some comment/desc
+> >>     rewording
+> >>   - assert if the type is not RESERVED or MSI
+> >>
+> >> v3 -> v4:
+> >> - collected Jean and markus's R-bs
+> >> - tool into account all Markus' comments in [1/5] (except removal of
+> >>   goto)
+> >> - use ':' as delimitor instead of commas
+> >> - add example in 4/5 commit message as suggested by Markus
+> >>
+> >> v2 -> v3:
+> >> - Introduce VIRT_MSI_CTRL_NONE in VirtMSIControllerType
+> >> - do not fill the remainder of the probe buffer
+> >>
+> >> v1 -> v2:
+> >> - check which MSI controller is in use and advertise the
+> >>   corresponding MSI doorbell
+> >> - managed for both ITS and GICv2M
+> >> - various fixes spotted by Peter and Jean-Philippe, see
+> >>   individual logs
+> >>
+> >> v1: Most of those patches were respinned from
+> >>   [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
+> >>   except the last one which is new
+> >>
+> >>
+> >> Eric Auger (5):
+> >>   qdev: Introduce DEFINE_PROP_RESERVED_REGION
+> >>   virtio-iommu: Implement RESV_MEM probe request
+> >>   virtio-iommu: Handle reserved regions in the translation process
+> >>   virtio-iommu-pci: Add array of Interval properties
+> >>   hw/arm/virt: Let the virtio-iommu bypass MSIs
+> >>
+> >>  include/exec/memory.h            |   6 ++
+> >>  include/hw/arm/virt.h            |   7 ++
+> >>  include/hw/qdev-properties.h     |   3 +
+> >>  include/hw/virtio/virtio-iommu.h |   2 +
+> >>  include/qemu/typedefs.h          |   1 +
+> >>  hw/arm/virt.c                    |  30 ++++++++
+> >>  hw/core/qdev-properties.c        |  89 ++++++++++++++++++++++++
+> >>  hw/virtio/virtio-iommu-pci.c     |  11 +++
+> >>  hw/virtio/virtio-iommu.c         | 114 +++++++++++++++++++++++++++++--
+> >>  hw/virtio/trace-events           |   1 +
+> >>  10 files changed, 260 insertions(+), 4 deletions(-)
+> >>
+> >> -- 
+> >> 2.20.1
+> > 
+> > 
 
 
