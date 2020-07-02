@@ -2,72 +2,96 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D77CEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:13:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD1542073E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:12:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD1542073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0916E2073E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:13:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nr8KaqPg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0916E2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3h4-0006PQ-0H
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:12:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58414)
+	id 1jr3if-0008Mf-Ay
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:13:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jr3gR-0005sL-W3; Thu, 02 Jul 2020 14:11:40 -0400
-Resent-Date: Thu, 02 Jul 2020 14:11:39 -0400
-Resent-Message-Id: <E1jr3gR-0005sL-W3@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21328)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jr3gO-0006R3-EI; Thu, 02 Jul 2020 14:11:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593713490; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=XPvtCXBvNYfQA1uXGLg/w6nntBo45bQiANsXIsbKthWz6kepvR+GmkyVO/BXQ8AnizVEpSDpJOE4Mp+TWtcClBExLQ8fpnZ7qfzeqfq+TZHF4kpXMBl1hiNk3yjCXTOcMvePBwISZvrhsEBan3Hc4rHd1WmAf7HvFrY9YcGT7Kg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593713490;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=R20PCf4v3h0MoaU7hoQ/D/7Ua2YZ7bc/NkV7xA7AxX0=; 
- b=GuUU+a2OJZOKypAyouXoVEOn/Cx3R+PPx9X7VA0WE4qvLbSJA5+nQmn9IOv0FkCPBYm57wUYrxsDX0SDm+BP6oroyIKlIDfT2jp+S9FHZrnJQMilNJ4IJS2imhri74XU9lL1vDM8X9h6JyejfRTLHOZmyBkytNJhGdPy6u8CIAI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593713489446354.0498403225233;
- Thu, 2 Jul 2020 11:11:29 -0700 (PDT)
-Message-ID: <159371348834.6440.15747631286416621479@d1fd068a5071>
-Subject: Re: [PATCH v3 00/19] mailmap: Add more entries to sanitize 'git log'
- output
-In-Reply-To: <20200702173818.14651-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jr3hc-00071I-FQ
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 14:12:52 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44297)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jr3ha-0006ZU-4J
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 14:12:52 -0400
+Received: by mail-pg1-x543.google.com with SMTP id j19so6977041pgm.11
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 11:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=52SjRpelGDDZQz+t//MCqquF09vSsud6vEySKialctw=;
+ b=Nr8KaqPgERw/vNWZbbe9qxT4T1QunDqtLc6tlE/gJBGahjHpWqMPm39FWrwK5o4ZX6
+ OOqLDcJiuxG+zPSqoqwENNaNS2zD89GJZ0Ykz86BoX6Th0jZYwWPe7aLYyBDl+rhw+/J
+ BY8Tn1PCFv6jd7Vca8YGEbs1wM9vvk2pUaPUZo9RsjPOABfhMEYJgdWUDM7Wr2M/UUj9
+ wROfPXHttOVWPFMj1hCQxhr/FNZ7Vy4yxzugxMHTXun5zwA0NdcIrn3vdrKqkTjoH9BW
+ O+H9qBmbyOv2u6s8E7ZOBlGHFmEyaV9BidgpnhO7FCeL2rY37oqhprkvhLckXL/0VBrw
+ ZHSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=52SjRpelGDDZQz+t//MCqquF09vSsud6vEySKialctw=;
+ b=seJHtBPoe5WwqVOa/EdtW/uHK6XJDMaeqXlAh8eORHGPlgXpYx33Ce8CEzMfiMzfB+
+ xBanTo0w5c9MpnV168ScG/PeofsF4OjV4PEIFNRc0Uym/9r/hSROf6ynlHi8ImpL08Zb
+ MnY2mE417Y4quX9N6BYnRSaGrlw07Sf0UxVrh5Dt9clGXEKgF7c1wG67KYWwKX1EtbZ8
+ JS1pNqyKt+8msAze1YcG6jQK5TTePvJFvyLLMz+Fp1jA0v/09DMOJJxuLF4KPSgD30gH
+ qUen+zsKrIF8dvR8iiTk0WNm9UHZqWlFjSx00TPpzog93vhhc95zeH6bxUdB5cuCi1Ac
+ FzDQ==
+X-Gm-Message-State: AOAM533VYJCo9HStQsfedp97IecyT7QcAsGpAP37asQGHLs2RbH4JVdV
+ jOOaDdtFaARrNf2uJss+OTLcRA==
+X-Google-Smtp-Source: ABdhPJyasbKQat8LmyNeONfDOvDwCxj2fDsPpvSVFWxC9DvCQa5xf3349F5X1X/6oe5arJIwsTPuxQ==
+X-Received: by 2002:a63:2241:: with SMTP id t1mr25233366pgm.440.1593713568323; 
+ Thu, 02 Jul 2020 11:12:48 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id a17sm8386940pjh.31.2020.07.02.11.12.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 02 Jul 2020 11:12:47 -0700 (PDT)
+Subject: Re: [PATCH 1/3] target/nios2: add DISAS_NORETURN case for nothing
+ more to generate
+To: Wentong Wu <wentong.wu@intel.com>, qemu-devel@nongnu.org
+References: <20200629160535.3910-1-wentong.wu@intel.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a87dfee-add3-dda0-829b-87d97a4c3bdd@linaro.org>
+Date: Thu, 2 Jul 2020 11:12:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Thu, 2 Jul 2020 11:11:29 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:58:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200629160535.3910-1-wentong.wu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,25 +104,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, f4bug@amsat.org
+Cc: qemu-trivial@nongnu.org, marex@denx.de, crwulff@gmail.com,
+ peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMjE3MzgxOC4xNDY1
-MS0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVz
-dCBvbiBGcmVlQlNEIGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
-aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
-Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
-YW5jaAppZiBxZW11LXN5c3RlbS14ODZfNjQgLS1oZWxwID4vZGV2L251bGwgMj4mMTsgdGhlbgog
-IFFFTVU9cWVtdS1zeXN0ZW0teDg2XzY0CmVsaWYgL3Vzci9saWJleGVjL3FlbXUta3ZtIC0taGVs
-cCA+L2Rldi9udWxsIDI+JjE7IHRoZW4KICBRRU1VPS91c3IvbGliZXhlYy9xZW11LWt2bQplbHNl
-CiAgZXhpdCAxCmZpCm1ha2Ugdm0tYnVpbGQtZnJlZWJzZCBKPTIxIFFFTVU9JFFFTVUKZXhpdCAw
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNzAyMTczODE4LjE0NjUxLTEtZjRidWdAYW1z
-YXQub3JnL3Rlc3RpbmcuRnJlZUJTRC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 6/29/20 9:05 AM, Wentong Wu wrote:
+> Add DISAS_NORETURN case for nothing more to generate because at runtime
+> execution will never return from some helper call. And at the same time
+> replace DISAS_UPDATE in t_gen_helper_raise_exception and gen_exception
+> with the newly added DISAS_NORETURN.
+> 
+> Signed-off-by: Wentong Wu <wentong.wu@intel.com>
+> ---
+>  target/nios2/translate.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
 
