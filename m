@@ -2,129 +2,97 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0B7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C129C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B3BB2075D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:50:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18D862075D
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:50:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vTjozl7C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B3BB2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZG3jiiV0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18D862075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqwnR-0000uv-FL
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:50:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
+	id 1jqwna-00015y-Bd
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:50:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqwmZ-00007b-Us; Thu, 02 Jul 2020 06:49:31 -0400
-Received: from mail-eopbgr60111.outbound.protection.outlook.com
- ([40.107.6.111]:4480 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jqwmX-0000Nh-7T; Thu, 02 Jul 2020 06:49:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LzsEkap34EK/7pLRmAfZcmQnJo9RZyhd+YC9/G+CJICrJPDpZfomYMASenRt5EmKbMEVYf72zOyUtbP26+S19o75tp2u/GVjfAK1/CS1o7DsnH1xCh9zu024qWM+3VO7veFhpfVPjbxazt5ydtGeV5n5Tvq4GSd4fzhTPiHgOaEH5VoAQfNLOj5MpDO0bbOq3xnC0LXkynst37xy1gq/cD8hWLvxCHW9geAQkvgJhpY3SfEMob2RsQS/DftmkOyPzlSvKBWbfkC62UicXZ5M5xV+b4BiRKdy2ASmUHt0CjwsU/pZ1fHXpCmTpWW3PCTUkmA92stocCkVFT/NO5cGLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=knIuqIX45BPTlNQRJPcmW0Kj4R/iZNHKvqrGmixvxEc=;
- b=Lfzux+iGAVldHlB2H9noY5gunzFBiFAyjaC7PWRU8U+itlu9ImnT3LHZyQ1koTumG0F9aezXkW4PLO2lf8k4lIlH8CWQ1uC6y9K0/8Z1JaXXYO4Zxt7GT2kgxixllpt9asdN3MXppLWBWpNY1WgI253A+fuDc674BqixniSqYKQvm+bjEayZplSAFMBXfNeM3nC+gczQzuqOBnDX4mHB7c5bm5AixrUocJUFr/oqdEUnaPCDPFbd4KadQzMtuKj+rYvHDPUSGU5P4D3FBr0/LbNpQh6KbUz1kmDuR7Huj7Jm9X9iSe2B1hOJ2bctWlSjcWPfaR06M85/oH1BXqVySA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=knIuqIX45BPTlNQRJPcmW0Kj4R/iZNHKvqrGmixvxEc=;
- b=vTjozl7CcKMlVSlvuzUqPdw8yHtPhuEgb6A/qoghC8v9ky2P5DXYMXY64rdzn7/kQLyfn95st5TwjDt8YDB69I9Ba7FyoAMTTj+8y+rtGmOho64JF99hWzhMbaooiKewIHIsyD+jGYCFYkBVYhBYlulHVitKUlnsZVr01MVUNH8=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4788.eurprd08.prod.outlook.com (2603:10a6:20b:c4::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Thu, 2 Jul
- 2020 10:49:25 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Thu, 2 Jul 2020
- 10:49:25 +0000
-Subject: Re: [PATCH 2/4] migration: Add block-bitmap-mapping parameter
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200630084552.46362-1-mreitz@redhat.com>
- <20200630084552.46362-3-mreitz@redhat.com>
- <635e40aa-f289-da2f-274f-17c9d0e05003@virtuozzo.com>
- <02586cc8-138c-2bc8-c79a-cf3371a5afd4@redhat.com>
- <72cc50dd-d204-0de4-21cc-11d4d78f7c47@virtuozzo.com>
- <889082d7-c917-ba7c-6da3-e854d8c44a32@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5171e8a2-0cf0-d8db-4dd1-0138fe2b15f5@virtuozzo.com>
-Date: Thu, 2 Jul 2020 13:49:23 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <889082d7-c917-ba7c-6da3-e854d8c44a32@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0302CA0022.eurprd03.prod.outlook.com
- (2603:10a6:205:2::35) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqwmd-0000Bi-3R
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:49:35 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35709)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jqwmb-0000O5-4F
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:49:34 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z2so5333315wrp.2
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 03:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=2F6lcGvLmFa0e9xgXAjlmesqhyKxwu86lXj5HPfoHpk=;
+ b=ZG3jiiV0s5jma/xPA8pj+NufZbOr9Hz3n1iE0E5j2QmHzO7N4SzjjF+8nUo8fT1hla
+ WPXP4os2WYhIKtp6/K2IAqgYVP4Niw13loWGZGF3Gi05+1xC/oEyHVhDJSjqUFpLtWe6
+ k/5JumfT5KhL2sfXio9xCce/pzMcmWC5uaQcY9FfgK094hhhDewscfPbs/wrO0gnAF1I
+ 35GZY7tm78C0R91UqAD8zODzpZSAnJ1y5x02YiJag65SQH5EWXQMC5SyG5+NNHXtF2re
+ awmcqjYy4yvNo0LQswnmx88b+hUGnQquAD52Fd5rzea258LWN0y6R884RKrwe9yhgWE2
+ veyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=2F6lcGvLmFa0e9xgXAjlmesqhyKxwu86lXj5HPfoHpk=;
+ b=SiJVORdh5irRaqinngjMnHxdpjxiOQWqJN3m4L1twPAz5DSTCzVgambMHT8BdiOnrW
+ PZUQD7WNTrHpLMIRHByWJcBab/4yTbOttp8aTSjnNIlr2L4D9S53+YbtJUCbVgWGUPYs
+ /zg3OF8+cgaadRI2RefR8S8e/RI5aZpTVWKq+fYaVPj/esDgCi+xobjCEfn5pLAvzBnn
+ PaJU0a5ZNzDAT60tgHEn5bRwn0MsTtste3MFiFlrMAKKsEwZf3CfHwJws7GK9yIzbYKK
+ cR2INgP277PXCW6iodCB2Pkupoe98CBcvVM+bYlxkcHnAgyf/KFm9Xo1SzAOBzC4z+fD
+ CABg==
+X-Gm-Message-State: AOAM531zStBFSEVxxokcpAveC/inYRhAyYyYVGSiHqgzahIdiSbeLTGH
+ CeeJL6ZtaoD2wJQ0RpbfSBAcbA==
+X-Google-Smtp-Source: ABdhPJycBD/ZJKVFjLhmhv4aBcrOFpN6zChXoP6zGW9IkfdSldep87bkAg8iMpJTRv+3OwDMFS2GQg==
+X-Received: by 2002:adf:f707:: with SMTP id r7mr30533789wrp.70.1593686971466; 
+ Thu, 02 Jul 2020 03:49:31 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g14sm6371536wrw.83.2020.07.02.03.49.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Jul 2020 03:49:30 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id ADB321FF7E;
+ Thu,  2 Jul 2020 11:49:29 +0100 (BST)
+References: <20200701182100.26930-1-philmd@redhat.com>
+ <CAFEAcA8ZKEVySwDAQ+x9xA9bosOs5q20CZLZjBvkXj_d6ZVBuA@mail.gmail.com>
+ <70b04307-fe22-c9bd-3194-f2612d41e197@redhat.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH] cpus: Initialize current_cpu with the first vCPU
+ created
+In-reply-to: <70b04307-fe22-c9bd-3194-f2612d41e197@redhat.com>
+Date: Thu, 02 Jul 2020 11:49:29 +0100
+Message-ID: <87r1tup4xy.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.54) by
- AM4PR0302CA0022.eurprd03.prod.outlook.com (2603:10a6:205:2::35) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.22 via Frontend
- Transport; Thu, 2 Jul 2020 10:49:24 +0000
-X-Originating-IP: [185.215.60.54]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cb06763f-6eff-44c8-2424-08d81e75962c
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4788:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4788B34B1758BA63D4B98FEDC16D0@AM6PR08MB4788.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0452022BE1
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sEsXGZhZbfmQDzZRmttGHP9afL7BuBO0fyxMZwlspjvTrwpTv9pEspXC33KVXFt79in9/HP763MoXwreJgpvNIgep41swjYdPDgs53c1jKTXCwyTtArcOHwLuRqpUsykS2tGZMLfhxFUK9mtENauMwmEFVNm5do7cIH2pCypXgj3BuT1+tzEswYJXs3NAx9yDPSZqULHbn1maFvBZY1FZO4ZB2yuaZOWzbk2BwedFF+4WlO51BTmYrKqXJ2+ggAFcu3zDo1nCA9441aqeA89IaLixERrjbq+lOEDarB0k72/W8drDllYViNpkL45L9vygnD9heEmMNJTpKeI38G6sSePn4KMrl+6FBo72lnCyuCsfQcClfu9kDyTSi7p3OFZ
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(346002)(39840400004)(376002)(136003)(396003)(66476007)(66556008)(186003)(316002)(66946007)(16576012)(2906002)(86362001)(478600001)(36756003)(31686004)(8676002)(8936002)(5660300002)(16526019)(6486002)(54906003)(4326008)(26005)(31696002)(52116002)(956004)(2616005)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 3fX2zRXpKF84k3lQkhv3qOqG21W8KUEiyEG6Y7c3V0lPrQXzeL6Pw+Xwux9Iq4qD1LmhSRSMDncFtSPhZ+32ZtpV5KSfxIV/yHe4VV6YfeW+r+W8h+oUwvCOQ1t/T6TzA4xNeTdvNuuIT6639LYnjhdPDbmtcmSAwPm5HvPbYOKZlaiGA45nyOUh8yV51sHTUmNZS7VhnPjf/GXYfE+wRYvElmFQ6fwAXck6G7afLlhonlgomg3R4o8De0IWO/87RyDfkcEQgFRncX7SK6osGQKP3eNR4GU2izVYsm6vNsojsLYFl1LbKbadLi8tjPQz9rPG2Xc61RM6uP376BIxUnlcKuAZE845yKsKDVgDlTREYI2aviKI/UtIDZl85Ji1DC/2+wTH32jFlvqLYHGAj78MwuM62/7tGb0I8yWFn5LSJ6An+5pbTOVItWo10jYJRWJlwRBRXNlTME6sB3f1PVp7T9QsWKWOdw6xOj/5AMw=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb06763f-6eff-44c8-2424-08d81e75962c
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2020 10:49:25.3860 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HPjcYCq8DwvACuiLjjmvzMSdByogf5oX9htQ1UEwP/8+PlVmIfQI5zutqd76ExHOpRKEtzv7U/tj7zO+xX4LUph3becjUfVEj/NX9PIuVuE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4788
-Received-SPF: pass client-ip=40.107.6.111;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 06:49:27
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,40 +105,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Bug 1878645 <1878645@bugs.launchpad.net>,
+ QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Philippe =?utf-8?Q?Mathieu-D?= =?utf-8?Q?aud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.07.2020 12:41, Max Reitz wrote:
->>> I don’t know if doing it differently would actually be beneficial for
->>> anyone, but OTOH naively it seems like a more invasive code change.
->>>
->> I don't see real benefits, we can go either way, so, not worth rewriting
->> the patch.
->>
->> ===
->>
->> I feel like a stupid reviewer:)
-> Huh?  If anything, a stupid review on a design-changing patch would be a
-> plain “R-b” without having actually considered the impact.  You do
-> consider the impact and question it in all places.
-> 
-> I don’t think I need to mention this, but that’s a very good and
-> important thing to do, because it forces me to reason why we’d want this
-> or that design.  Without being questioned, I wouldn’t have to reason
-> about that.  (Which may be a problem in our patch workflow – authors
-> don’t need to reason unless questioned.[1])
-> 
-> Sorry if I gave the impression of dismissing your comments.  It should
-> be my burden to reason why I took certain design decisions.
 
-No problem. I should better describe reasons for my suggestions as well, or
-if I have no one, mark it as "thinking-out-loud" instead of recommended change.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
--- 
-Best regards,
-Vladimir
+> On 01/07/20 22:35, Peter Maydell wrote:
+>> For the monitor, that
+>> would be the current "default cpu" as set by the "cpu"
+>> command (cf monitor_set_cpu()). The bug here will be that
+>> somewhere along the line we are probably missing plumbing
+>> sufficient to pass down "which CPU do we want".
+>
+> Yeah, the fix is probably to add a functions that returns either
+> current_cpu or the monitor CPU, and use it in device emulation if
+> applicable.
+>
+> The problem with current_cpu is that it affects stuff like run_on_cpu,
+> and that is guaranteed to cause havoc to code that expects to run on a
+> given CPU and therefore doesn't use locks.
+
+IIRC the original reported bug was in a APM callback which was triggered
+by an MMIO operation. Currently we don't expose the current cpu via the
+memory dispatch routines. Should we to ensure there is always something
+valid there?
+
+>
+> Paolo
+
+
+--=20
+Alex Benn=C3=A9e
 
