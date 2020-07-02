@@ -2,73 +2,88 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A01C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCF7C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B761420781
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:30:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B761420781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CCBDA20781
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:31:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDrJineX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCBDA20781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1Aw-0006Iq-Ry
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:30:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43342)
+	id 1jr1Bf-0006rB-2W
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:31:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17c-0000gx-OG
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:32 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:36085)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17Z-0006Jy-6H
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:32 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MWAjC-1jKRTc3KLi-00XdDH; Thu, 02 Jul 2020 17:27:15 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 03/12] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Date: Thu,  2 Jul 2020 17:27:01 +0200
-Message-Id: <20200702152710.84602-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
-References: <20200702152710.84602-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jr17r-0001Md-R9
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42060
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jr17q-0006QX-8U
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593703665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=C4qLqUFnjHc7wzCPN/LQ1XBPh1dVzrlm59KIf9UKpNI=;
+ b=SDrJineXFohaQ+QDJKOmPCqatbLBhI1sOIjZR0s6geUTq8Pnkp8s83Wg1Ld+o34+yBiY+M
+ CLBz1cMj1C3Qj42KV0BScTJTFokS/PXlot+PVHV6D4UoC5/O7guK/GJPfsXbB3TsgulBJ2
+ 3q907M7XPZS/5BX4pFXDJBg1+NmWljw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-SOYhJYvxPsO4tZsivXU2sw-1; Thu, 02 Jul 2020 11:27:42 -0400
+X-MC-Unique: SOYhJYvxPsO4tZsivXU2sw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2127A8CA88B;
+ Thu,  2 Jul 2020 15:27:40 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 394B15DC1E;
+ Thu,  2 Jul 2020 15:27:37 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v2 4/9] hw/arm/smmu: Simplify the IOTLB key format
+Date: Thu,  2 Jul 2020 17:26:54 +0200
+Message-Id: <20200702152659.8522-5-eric.auger@redhat.com>
+In-Reply-To: <20200702152659.8522-1-eric.auger@redhat.com>
+References: <20200702152659.8522-1-eric.auger@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:A01o3pm6jUNrpc8TrQTyHer9BFukw6HaiLJ1ZfemwHHX+QyGSd6
- vyON53tz8te2buwjGbwjzRUjX+FIogUfRFfZbhsMhgIzQAdnRTWm5NtqpSafHUhBVLue3cH
- /P9DArNfUbbdDGlWtC6BL9EvHzbIdNP7jPNZM6yysekJ5fUylddNFNppPFq09C2/eCVEDUS
- LN2Mj7sblCchsT9eo9WzA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JhWTqS+2J74=:c/h0QWwelUFwE0ogSyk0Jl
- tPEYXWiAswAUnW/x0dEybNfIRcibtidVu1P/8ia07/A5zyswlyOBlZ0xOeKut46umYYeBLpnf
- y3xfkTZuDSJnXZp31GuxTqfrurTcwQ3LpYTFxXkU9apCuzH84+hywcKA+NoGbz+wFbRJJb5zq
- NK53Zo0PIBr4CqPrgkvvKXDAlWJNwyW2sxJrSmDzKMfXvYDgr2f6z2c2m02c0vIiNi0NgTDIc
- ZBId5E3N0A9gFhRB3AoCpBFBtTAgcDgXQeg5jWwqexhrTb9USUONUbt1pTn2WHA2fRNIDxsP3
- wzWfqlOuLWI1x1rOIokO0rJ/cirs64S7nBkD3uwi/TMbBBwpoeSLPGj3Ilg+dttTe2joO662G
- hidfg7+Ckla01G5KSOE4pGC8yMyo3I9ZxIElbrv8PD4L9YA41v5mEdoR08AsNYd0y6t9M0I0n
- aB0cWQHznhqN0KrnbbMRrKlBsTba6F9SUVMZ4oAtX4TiQQLRDlZsaQrNx1V4LaZqEJrWM7W66
- D+YYoCs8FQE4yvhIk0N4XwtY6nqQLVfEI8xnBjuwpq2J2vL1YRvR8L0R7IcOQvYRE36aM/i+1
- gztLYb439Z2SEnNe+QGoi8Ct+TUa4+8fAbElbFGv86WlbZOo6uR8xBGQ+V7IfVer8mzuZEAgv
- opbEV4+yEhEiwTifrKWgXb70OEyQF9noaBK5cOraomKlYLR6yacSNuuQJHM7iA9zHjoOjtGFX
- eVwkXND2KSIXYh+uICWAkm6Km/bOfLaOr06FVNFvAENJKoM56b5viCPSUf4hrHg9mhNO/+ljW
- bJoDNooreqN9vhGywlFAnttOWsR2kgYBFsh8/EU+CH49QLDnxI=
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:27:21
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,245 +96,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Gang <chengang@emindsoft.com.cn>, Riku Voipio <riku.voipio@iki.fi>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
+Instead of using a Jenkins hash function to generate
+the key let's just use a 64 bit unsigned integer that
+contains the asid and the 40 upper bits of the iova.
+A maximum of 52-bit IOVA is supported. This change in the
+key format also prepares for the addition of new fields
+in subsequent patches (granule and level).
 
-Another DRM_IOCTL_* commands will be done later.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200605013221.22828-1-chengang@emindsoft.com.cn>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- configure                  | 10 ++++
- linux-user/ioctls.h        |  5 ++
- linux-user/syscall.c       | 98 ++++++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  | 15 ++++++
- linux-user/syscall_types.h | 11 +++++
- 5 files changed, 139 insertions(+)
 
-diff --git a/configure b/configure
-index 4a22dcd5631d..2014c72b674d 100755
---- a/configure
-+++ b/configure
-@@ -3194,6 +3194,13 @@ if ! check_include "ifaddrs.h" ; then
-   have_ifaddrs_h=no
- fi
- 
-+#########################################
-+# libdrm check
-+have_drm_h=no
-+if check_include "libdrm/drm.h" ; then
-+    have_drm_h=yes
-+fi
-+
- ##########################################
- # VTE probe
- 
-@@ -7377,6 +7384,9 @@ fi
- if test "$have_ifaddrs_h" = "yes" ; then
-     echo "HAVE_IFADDRS_H=y" >> $config_host_mak
- fi
-+if test "$have_drm_h" = "yes" ; then
-+  echo "HAVE_DRM_H=y" >> $config_host_mak
-+fi
- if test "$have_broken_size_max" = "yes" ; then
-     echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
- fi
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0defa1d8c18d..f2e2fa9c878b 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -574,6 +574,11 @@
-   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
-                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
- 
-+#ifdef HAVE_DRM_H
-+  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-+#endif
-+
- #ifdef TARGET_TIOCSTART
-   IOCTL_IGNORE(TIOCSTART)
-   IOCTL_IGNORE(TIOCSTOP)
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 97de9fb5c92a..17ed7f8d6b59 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -112,6 +112,9 @@
- #include <linux/if_alg.h>
- #include <linux/rtc.h>
- #include <sound/asound.h>
-+#ifdef HAVE_DRM_H
-+#include <libdrm/drm.h>
-+#endif
- #include "linux_loop.h"
- #include "uname.h"
- 
-@@ -5276,6 +5279,101 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+v1 -> v2:
+- split the inital patch into 2 patches and keep SMMUIOTLBKey type
+---
+ hw/arm/smmu-internal.h       |  5 ++++-
+ include/hw/arm/smmu-common.h |  5 +----
+ hw/arm/smmu-common.c         | 23 +++--------------------
+ 3 files changed, 8 insertions(+), 25 deletions(-)
+
+diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
+index 3104f768cd..2ecb6f1dc6 100644
+--- a/hw/arm/smmu-internal.h
++++ b/hw/arm/smmu-internal.h
+@@ -96,5 +96,8 @@ uint64_t iova_level_offset(uint64_t iova, int inputsize,
+             MAKE_64BIT_MASK(0, gsz - 3);
  }
+ 
+-#define SMMU_IOTLB_ASID(key) ((key).asid)
++#define SMMU_IOTLB_ASID_SHIFT  40
++
++#define SMMU_IOTLB_ASID(key) (((key) >> SMMU_IOTLB_ASID_SHIFT) & 0xFFFF)
++#define SMMU_IOTLB_IOVA(key) (((key) & MAKE_64BIT_MASK(0, 40)) << 12)
  #endif
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 5f9f3535d2..455d7855b2 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -88,10 +88,7 @@ typedef struct SMMUPciBus {
+     SMMUDevice   *pbdev[]; /* Parent array is sparse, so dynamically alloc */
+ } SMMUPciBus;
  
-+#ifdef HAVE_DRM_H
-+
-+static void unlock_drm_version(struct drm_version *host_ver,
-+                               struct target_drm_version *target_ver,
-+                               bool copy)
-+{
-+    unlock_user(host_ver->name, target_ver->name,
-+                                copy ? host_ver->name_len : 0);
-+    unlock_user(host_ver->date, target_ver->date,
-+                                copy ? host_ver->date_len : 0);
-+    unlock_user(host_ver->desc, target_ver->desc,
-+                                copy ? host_ver->desc_len : 0);
-+}
-+
-+static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
-+                                          struct target_drm_version *target_ver)
-+{
-+    memset(host_ver, 0, sizeof(*host_ver));
-+
-+    __get_user(host_ver->name_len, &target_ver->name_len);
-+    if (host_ver->name_len) {
-+        host_ver->name = lock_user(VERIFY_WRITE, target_ver->name,
-+                                   target_ver->name_len, 0);
-+        if (!host_ver->name) {
-+            return -EFAULT;
-+        }
-+    }
-+
-+    __get_user(host_ver->date_len, &target_ver->date_len);
-+    if (host_ver->date_len) {
-+        host_ver->date = lock_user(VERIFY_WRITE, target_ver->date,
-+                                   target_ver->date_len, 0);
-+        if (!host_ver->date) {
-+            goto err;
-+        }
-+    }
-+
-+    __get_user(host_ver->desc_len, &target_ver->desc_len);
-+    if (host_ver->desc_len) {
-+        host_ver->desc = lock_user(VERIFY_WRITE, target_ver->desc,
-+                                   target_ver->desc_len, 0);
-+        if (!host_ver->desc) {
-+            goto err;
-+        }
-+    }
-+
-+    return 0;
-+err:
-+    unlock_drm_version(host_ver, target_ver, false);
-+    return -EFAULT;
-+}
-+
-+static inline void host_to_target_drmversion(
-+                                          struct target_drm_version *target_ver,
-+                                          struct drm_version *host_ver)
-+{
-+    __put_user(host_ver->version_major, &target_ver->version_major);
-+    __put_user(host_ver->version_minor, &target_ver->version_minor);
-+    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
-+    __put_user(host_ver->name_len, &target_ver->name_len);
-+    __put_user(host_ver->date_len, &target_ver->date_len);
-+    __put_user(host_ver->desc_len, &target_ver->desc_len);
-+    unlock_drm_version(host_ver, target_ver, true);
-+}
-+
-+static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                             int fd, int cmd, abi_long arg)
-+{
-+    struct drm_version *ver;
-+    struct target_drm_version *target_ver;
-+    abi_long ret;
-+
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_VERSION:
-+        if (!lock_user_struct(VERIFY_WRITE, target_ver, arg, 0)) {
-+            return -TARGET_EFAULT;
-+        }
-+        ver = (struct drm_version *)buf_temp;
-+        ret = target_to_host_drmversion(ver, target_ver);
-+        if (!is_error(ret)) {
-+            ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-+            if (is_error(ret)) {
-+                unlock_drm_version(ver, target_ver, false);
-+            } else {
-+                host_to_target_drmversion(target_ver, ver);
-+            }
-+        }
-+        unlock_user_struct(target_ver, arg, 0);
-+        return ret;
-+    }
-+    return -TARGET_ENOSYS;
-+}
-+
-+#endif
-+
- static IOCTLEntry ioctl_entries[] = {
- #define IOCTL(cmd, access, ...) \
-     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 152ec637cba6..3c261cff0e5e 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
- #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
- #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
+-typedef struct SMMUIOTLBKey {
+-    uint64_t iova;
+-    uint16_t asid;
+-} SMMUIOTLBKey;
++ typedef uint64_t SMMUIOTLBKey;
  
-+/* drm ioctls */
-+#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-+
- /* from asm/termbits.h */
+ typedef struct SMMUState {
+     /* <private> */
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 7dc8541e8b..5e85e30bdf 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -34,34 +34,17 @@
  
- #define TARGET_NCC 8
-@@ -2598,6 +2601,18 @@ struct target_mq_attr {
-     abi_long mq_curmsgs;
- };
+ static guint smmu_iotlb_key_hash(gconstpointer v)
+ {
+-    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
+-    uint32_t a, b, c;
+-
+-    /* Jenkins hash */
+-    a = b = c = JHASH_INITVAL + sizeof(*key);
+-    a += key->asid;
+-    b += extract64(key->iova, 0, 32);
+-    c += extract64(key->iova, 32, 32);
+-
+-    __jhash_mix(a, b, c);
+-    __jhash_final(a, b, c);
+-
+-    return c;
++    return (guint)*(const uint64_t *)v;
+ }
  
-+struct target_drm_version {
-+    int version_major;
-+    int version_minor;
-+    int version_patchlevel;
-+    abi_ulong name_len;
-+    abi_ulong name;
-+    abi_ulong date_len;
-+    abi_ulong date;
-+    abi_ulong desc_len;
-+    abi_ulong desc;
-+};
-+
- #include "socket.h"
+ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+ {
+-    const SMMUIOTLBKey *k1 = v1;
+-    const SMMUIOTLBKey *k2 = v2;
+-
+-    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
++    return *((const uint64_t *)v1) == *((const uint64_t *)v2);
+ }
  
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e12c1661ea6..e2b0484f50e5 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
- STRUCT(dm_target_msg,
-        TYPE_ULONGLONG) /* sector */
+ SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
+ {
+-    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
+-
+-    return key;
++    return iova >> 12 | (uint64_t)(asid) << SMMU_IOTLB_ASID_SHIFT;
+ }
  
-+STRUCT(drm_version,
-+       TYPE_INT, /* version_major */
-+       TYPE_INT, /* version_minor */
-+       TYPE_INT, /* version_patchlevel */
-+       TYPE_ULONG, /* name_len */
-+       TYPE_PTRVOID, /* name */
-+       TYPE_ULONG, /* date_len */
-+       TYPE_PTRVOID, /* date */
-+       TYPE_ULONG, /* desc_len */
-+       TYPE_PTRVOID) /* desc */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
+ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
 -- 
-2.26.2
+2.21.3
 
 
