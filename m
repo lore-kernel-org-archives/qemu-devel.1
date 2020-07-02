@@ -2,125 +2,71 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA96C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7668AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 19:08:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64F79207CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:58:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Z+9AZum0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64F79207CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 44669221EE
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 19:08:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44669221EE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr4QC-0006Bn-Me
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:58:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41668)
+	id 1jr4Zk-0001fg-E8
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 15:08:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jr4PB-0005hN-NN; Thu, 02 Jul 2020 14:57:54 -0400
-Received: from mail-vi1eur05on2115.outbound.protection.outlook.com
- ([40.107.21.115]:17513 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jr4P8-0000ls-Gx; Thu, 02 Jul 2020 14:57:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fQj3/qvAe/iAGq3bU0v4ghz8lxfdI0eRKI51jBxWiKywCUr5ROM+jOWHmq0XGof6WiGmNodSSXI4h3WKv0erNObCn8chygie+/8e0rJh1AMfeSOBqFpkdrhybT7Z1P/KNJvL7NWkmdD+s4rKlTRFUuE4c0x/kWG7AunhMz37gQZS8n2w+QhWjJsAKH/GyQqamQd/cG53ov5bqwzX7fH070vN2upwhLJBhBwFRXhqeZ3SPGQYU7cErTtbdYm7p+T8ZiJEKe7rvJNRik/98f2ltuWpISu58RlkzOjkh1+bZi4NJ5m1P3LllBII5aaX/KpdI3q4IjExmqxdNY4li1JgcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oK2TQmU//w4ESOuVPrTrQRWfAM5/ab1XTdFVTwfjF4E=;
- b=n8hKC7fFULorQqTBZ3GobaUkp2e89lhypeCoyWK3fULGyUKWIOnfMC4jSraTYNB/bDj0ZbYxwGlgMNnYm+JAPzjvz/GPOvu3MKwStV6mP1B2tqfA4LAUyA1L/qG9x8oqIsAmToP2ZJ0YVKVw+SKAX6hla5129ll7F6gCETlKj1LLOEu/qKrQDyaGxpDDdnxPmajnswI6oaLBno0TdwJzDXNu/8AelFuAZLmoVNTa0y+MvLzc3UPsX+fnc/Bgxtzk3ZmTyc5WqIaZ2gj6rg6iUYmq0j8pGhj6iU10H37/UMpO25fRVmlY5t9cET7qLYSCEP8PL6Ty4e+kqEH7iwcOug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oK2TQmU//w4ESOuVPrTrQRWfAM5/ab1XTdFVTwfjF4E=;
- b=Z+9AZum0+JbvZVVoDU6u6Vo2LcWjrkDBqzKFiCW5y1tktWe4FZeqW0o3B/oL953oDL2FQspbsBPzZnxynlNzVaAyO3dY9xq59YYfUXd/u9Hb4++NxPQ7HOHBOi23vnwxn5c3MJ0QwTzgL5hTqRC1MTpmzt3dlBFP4sVV1pu9SLQ=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3766.eurprd08.prod.outlook.com (2603:10a6:20b:83::32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.21; Thu, 2 Jul
- 2020 18:57:46 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Thu, 2 Jul 2020
- 18:57:46 +0000
-Subject: Re: [PATCH v2 03/44] qdev: Use returned bool to check for
- qdev_realize() etc. failure
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200702155000.3455325-1-armbru@redhat.com>
- <20200702155000.3455325-4-armbru@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4d9bb0b7-5e30-095b-00b1-1fe9315a6db8@virtuozzo.com>
-Date: Thu, 2 Jul 2020 21:57:44 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200702155000.3455325-4-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR02CA0001.eurprd02.prod.outlook.com
- (2603:10a6:208:3e::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr4Z0-0000rQ-4r; Thu, 02 Jul 2020 15:08:02 -0400
+Resent-Date: Thu, 02 Jul 2020 15:08:02 -0400
+Resent-Message-Id: <E1jr4Z0-0000rQ-4r@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21753)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr4Yx-0001sU-Gl; Thu, 02 Jul 2020 15:08:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593716868; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=hqHpicSK2w5N5qyKaWpcDzwC2BHED+61sjatPQcxrX4IjSi7SVIqBe+eF/dp4l/4F3hpBOfXak89A92+Xdt6NJAmlR84oGCJx26K/XEPlemYIQLSlznAwUG334kyTrP/yOZlOlVaeWWjW7px5XNT5jaaEodx/DYFGqOHfqF9BBk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593716868;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=fezJ/bBZTRCVObwExQK6/76td24xT+fP8LhRigTFe0g=; 
+ b=kShkLlFNlKbgFBVGLEykPezYPr0N/1S4Nxwo0rIyHmVk0OgES4b5Zuh2aMeSOXTFOjWRNHxhi/SbBwfuVgxFGxEw90TG3utTtmxTYtKPeZWdZhMbkW07JCrqkYJzRc7DLjjG/hBNMbzXRL2Gjk5m8RPmebCjcoZ973zfecmjGtU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593716867077747.620860493987;
+ Thu, 2 Jul 2020 12:07:47 -0700 (PDT)
+Message-ID: <159371686538.6600.1753620947486453851@d1fd068a5071>
+Subject: Re: [PATCH 0/6] migration: bring savevm/loadvm/delvm over to QMP
+In-Reply-To: <20200702175754.2211821-1-berrange@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.54) by
- AM0PR02CA0001.eurprd02.prod.outlook.com (2603:10a6:208:3e::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.20 via Frontend Transport; Thu, 2 Jul 2020 18:57:45 +0000
-X-Originating-IP: [185.215.60.54]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fafc3eac-02fc-4336-957a-08d81eb9cef6
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3766:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3766B127BDDE42FE78845A33C16D0@AM6PR08MB3766.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 0452022BE1
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DGk3AaPxSiFY1VTSj+zWasNFxehd2jW4svX9tQ1N9BpqetAI46CAn1h3qnkhezhwkC/brHht74plTpABIUYD8m9NGQ8LTNvl4eygNskjCs70ZbMB0uW1Wx0V2sFJCkazCwrN/zx9jFK2hC/IAGnHzTC3psP7xzF3X57is9+PZJMk57E9iGQKW5xTq48ZeNmAmcsaXGzCp+i9wTcfkILIxt4YvEyfXTzemIAqlRwel9AJfO3S2OAFmEplXCraq47OOIhO9KaO7aTFl4SJiER/8E0qvuIvnzvXcGrzQSwl1VCS30vejVRh+XL3raEF3OsI5ND/6/zJs7rvuiSDkZZDnoAt2xouDdms8sVncajhZXenw81AxLsOdiR0NIM0UGdS
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(366004)(136003)(346002)(396003)(376002)(478600001)(2906002)(186003)(16526019)(31696002)(5660300002)(86362001)(66946007)(66556008)(66476007)(16576012)(2616005)(31686004)(316002)(36756003)(956004)(4326008)(6486002)(83380400001)(52116002)(26005)(8936002)(8676002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Nd//koQo/xjOovHBOb+VJj7XqYcuA1Z/0lnY7kV/Vj9DRie3ZZ17ubxRncpYkCA3yRmxFXkxWqWj3VJZT+4OnYWcsQjmFasn+EuhHn3Cq34cSPgM/EIceqaeW5+wd0GX/fC1wwZE7QgU33zGwhif1FdTYevzYuadguwEl2Gpboxo7GjDi4BdIZIMMM0aGfWUunsS9BumnybEfm9dm6he1qHIzSX5h8qn5qzDeeKpIpqliPrp9Kc92TfRLkxlB8D0Ie60lE6VnczS3+k/ZjigUYQBAQeJLo8JKxgzVKDwfNPWFxRCrlzHbLGQTPo+zfruevdVWAasH8ZHtjvvLNqVgKIlfsJoa33RPqOxjOdHf+00dvGFjLXhPfoJa5BHkwvC6OTi8GRJv+WAVuforYZVq6SUs54vX2BEdbbFzl1MHyEGMjp/E5atvuhiyeFYXu2Eg7aEfASX+aCm9q8NuBwpPfZ0GA1Qkcj0yljeT2mRfvQ=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fafc3eac-02fc-4336-957a-08d81eb9cef6
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2020 18:57:46.4707 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aJF7fbrUQe7MjrM0qByO7i2WXiuG9oHjwi+msVZTBm5F/krJe1s8YMrP2GB0LwenyOXQI95RNh79sXo7MCgkymC5E/XCH+B9+BwC6ZJmDjw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3766
-Received-SPF: pass client-ip=40.107.21.115;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 14:57:47
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: berrange@redhat.com
+Date: Thu, 2 Jul 2020 12:07:47 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:03:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,144 +79,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, berrange@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.07.2020 18:49, Markus Armbruster wrote:
-> Convert
-> 
->      foo(..., &err);
->      if (err) {
->          ...
->      }
-> 
-> to
-> 
->      if (!foo(..., &err)) {
->          ...
->      }
-> 
-> for qdev_realize(), qdev_realize_and_unref(), qbus_realize() and their
-> wrappers isa_realize_and_unref(), pci_realize_and_unref(),
-> sysbus_realize(), sysbus_realize_and_unref(), usb_realize_and_unref().
-> Coccinelle script:
-> 
->      @@
->      identifier fun = {isa_realize_and_unref, pci_realize_and_unref, qbus_realize, qdev_realize, qdev_realize_and_unref, sysbus_realize, sysbus_realize_and_unref, usb_realize_and_unref};
->      expression list args, args2;
->      typedef Error;
->      Error *err;
->      @@
->      -    fun(args, &err, args2);
->      -    if (err)
->      +    if (!fun(args, &err, args2))
->           {
->               ...
->           }
-> 
-> Chokes on hw/arm/musicpal.c's lcd_refresh() with the unhelpful error
-> message "no position information".  Nothing to convert there; skipped.
-> 
-> Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
-> ARMSSE being used both as typedef and function-like macro there.
-> Converted manually.
-> 
-> A few line breaks tidied up manually.
-> 
-> Signed-off-by: Markus Armbruster<armbru@redhat.com>
-
-
-Sorry me, reviewing this patch with help of script:
-#!/usr/bin/env python3
-
-import sys
-import re
-
-with open(sys.argv[1]) as f:
-     patch = f.read()
-
-regex = re.compile(r'^- *(?P<func_call>(?P<func>\w+)\(.*, &(?P<err>\w+)\));\n'
-                    r'^- *if \((?P=err)( != NULL)?\) \{\n'
-                    r'^\+ *if \(!(?P=func_call)\) \{$', flags=re.MULTILINE)
-
-for chunk in re.split('^@', patch, flags=re.MULTILINE):
-     filtered = regex.sub('OK', chunk)
-
-     if re.search('^[+-][^+-]', filtered, flags=re.MULTILINE):
-         print(re.sub('^', '   ', '@' + chunk, flags=re.MULTILINE))
-
-
-funcs = set()
-
-for m in regex.finditer(patch):
-     funcs.add(m.group('func'))
-
-print()
-for func in funcs:
-     print(func)
-
-
-====
-output:
-
-    @@ -34,9 +34,7 @@ static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-         Error *local_error = NULL;
-     
-         virtio_pci_force_virtio_1(vpci_dev);
-    -    qdev_realize(vdev, BUS(&vpci_dev->bus), &local_error);
-    -
-    -    if (local_error) {
-    +    if (!qdev_realize(vdev, BUS(&vpci_dev->bus), &local_error)) {
-             error_propagate(errp, local_error);
-             return;
-         }
-    diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-    index 67f409e106..0fc00fee1f 100644
-    --- a/hw/display/virtio-vga.c
-    +++ b/hw/display/virtio-vga.c
-    
-    @@ -444,15 +444,13 @@ static void realize_event_facility(DeviceState *dev, Error **errp)
-         SCLPEventFacility *event_facility = EVENT_FACILITY(dev);
-         Error *local_err = NULL;
-     
-    -    qdev_realize(DEVICE(&event_facility->quiesce),
-    -                 BUS(&event_facility->sbus), &local_err);
-    -    if (local_err) {
-    +    if (!qdev_realize(DEVICE(&event_facility->quiesce),
-    +                      BUS(&event_facility->sbus), &local_err)) {
-             error_propagate(errp, local_err);
-             return;
-         }
-    -    qdev_realize(DEVICE(&event_facility->cpu_hotplug),
-    -                 BUS(&event_facility->sbus), &local_err);
-    -    if (local_err) {
-    +    if (!qdev_realize(DEVICE(&event_facility->cpu_hotplug),
-    +                      BUS(&event_facility->sbus), &local_err)) {
-             error_propagate(errp, local_err);
-             qdev_unrealize(DEVICE(&event_facility->quiesce));
-             return;
-    diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-    index 142e52a8ff..0517901024 100644
-    --- a/hw/s390x/s390-pci-bus.c
-    +++ b/hw/s390x/s390-pci-bus.c
-    
-
-usb_realize_and_unref
-sysbus_realize
-sysbus_realize_and_unref
-qdev_realize
-qdev_realize_and_unref
-
-===
-
-So, the remaning non-matching seems correct, and all found functions seems to have corresponding semantics:
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMjE3NTc1NC4yMjEx
+ODIxLTEtYmVycmFuZ2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
+IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
+IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogKHFlbXUpIGluZm8gc25h
+cHNob3RzCiBObyBhdmFpbGFibGUgYmxvY2sgZGV2aWNlIHN1cHBvcnRzIHNuYXBzaG90cwogKHFl
+bXUpIGxvYWR2bSBzbmFwMAotRXJyb3I6IE5vIGJsb2NrIGRldmljZSBzdXBwb3J0cyBzbmFwc2hv
+dHMKK0Vycm9yOiBObyBibG9jayBkZXZpY2UgY2FuIGFjY2VwdCBzbmFwc2hvdHMKIChxZW11KSBx
+dWl0CiAKIAotLS0KIFRlc3Rpbmc6IC1ibG9ja2RldiBkcml2ZXI9ZmlsZSxmaWxlbmFtZT1URVNU
+X0RJUi90LklNR0ZNVCxub2RlLW5hbWU9ZmlsZQogUUVNVSBYLlkuWiBtb25pdG9yIC0gdHlwZSAn
+aGVscCcgZm9yIG1vcmUgaW5mb3JtYXRpb24KIChxZW11KSBzYXZldm0gc25hcDAKLUVycm9yOiBE
+ZXZpY2UgJycgaXMgd3JpdGFibGUgYnV0IGRvZXMgbm90IHN1cHBvcnQgc25hcHNob3RzCitFcnJv
+cjogRGV2aWNlICdmaWxlJyBpcyB3cml0YWJsZSBidXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hv
+dHMKIChxZW11KSBpbmZvIHNuYXBzaG90cwogTm8gYXZhaWxhYmxlIGJsb2NrIGRldmljZSBzdXBw
+b3J0cyBzbmFwc2hvdHMKIChxZW11KSBsb2Fkdm0gc25hcDAKLUVycm9yOiBEZXZpY2UgJycgaXMg
+d3JpdGFibGUgYnV0IGRvZXMgbm90IHN1cHBvcnQgc25hcHNob3RzCitFcnJvcjogRGV2aWNlICdm
+aWxlJyBpcyB3cml0YWJsZSBidXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hvdHMKIChxZW11KSBx
+dWl0CiAKIEZvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1HRk1UJywgZm10PUlNR0ZNVCBzaXplPTEz
+NDIxNzcyOAotLS0KTm90IHJ1bjogMjU5CkZhaWx1cmVzOiAyNjcKRmFpbGVkIDEgb2YgMTE5IGlv
+dGVzdHMKbWFrZTogKioqIFtjaGVjay10ZXN0cy9jaGVjay1ibG9jay5zaF0gRXJyb3IgMQptYWtl
+OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stcXRl
+c3QtYWFyY2g2NDogdGVzdHMvcXRlc3QvdGVzdC1obXAKICBURVNUICAgIGNoZWNrLXF0ZXN0LWFh
+cmNoNjQ6IHRlc3RzL3F0ZXN0L3Fvcy10ZXN0Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vy
+cm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQg
+J1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5z
+dGFuY2UudXVpZD04MGVjYWJmZGMzYjQ0Y2RhYmQ5MTViNDI3ZDc5MWFmZScsICctdScsICcxMDAz
+JywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywg
+J1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0n
+LCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScs
+ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2Fj
+aGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC12bHVib2piNy9zcmMvZG9ja2VyLXNyYy4yMDIwLTA3LTAyLTE0
+LjUyLjU2LjMxMTA2Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90
+bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1
+cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD04MGVjYWJm
+ZGMzYjQ0Y2RhYmQ5MTViNDI3ZDc5MWFmZQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9y
+IDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC12bHVib2piNy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczdd
+IEVycm9yIDIKCnJlYWwgICAgMTRtNDkuNjY4cwp1c2VyICAgIDBtOC45MzFzCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDcwMjE3NTc1
+NC4yMjExODIxLTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50
+b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
