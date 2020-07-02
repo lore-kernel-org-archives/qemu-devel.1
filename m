@@ -2,66 +2,65 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D031CC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE35C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B70720672
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81EAF20672
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:52:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBC1cvxu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B70720672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApG6gQjj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81EAF20672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr6An-0007QS-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 16:51:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54530)
+	id 1jr6CE-0001TU-O2
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 16:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr693-0004Ca-2J
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44803
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr691-0004Al-SK
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27450
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr690-0003X7-7Y
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:20 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr68z-0003X2-W4
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1593722957;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=iZ8q6BNQD71G/ReGAtp/ZouIvCh6XyxiS1/Hett2Vw4=;
- b=dBC1cvxucaRCOutwDPUTpQSysJt58hYiPPjk+zVNV/sOqvEv3iZxeidqMxyihnooZ3+YAC
- HTui2NS5khdlSzSJLm+lAWyq5XHfnx5WiU9E1UeE4JXN4vFOrBATH2hb/yGgwMajjqMo+0
- ExSahQnL4Osvn1G90nZF4yvhq7DkMq0=
+ references:references; bh=d/4SzrO51wLCoiHfnRNqtnLD968Kuwi1FHNsO/et+5g=;
+ b=ApG6gQjj/EKZfgn3m7MmdnanCqhTogtwg1U63FmC/dMZqG0zGDFV14Y3V0oY15UF2gy87k
+ hLUEZ7OKuCY6QyVk4dn7zg47LZhpV6syOeutjW8yoYS8WLcqS9Jeok1GaHKmf+ZGzp8O8Z
+ y2+cSCiZfj/fpXTyYaAcCQZf/EJmtPY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-t2U6IrGlPBGVrhw3hxrHkg-1; Thu, 02 Jul 2020 16:49:14 -0400
-X-MC-Unique: t2U6IrGlPBGVrhw3hxrHkg-1
+ us-mta-291-wwrqCUHTP7Wol-GABUN_bg-1; Thu, 02 Jul 2020 16:49:13 -0400
+X-MC-Unique: wwrqCUHTP7Wol-GABUN_bg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAE2080183C;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5395A800402;
  Thu,  2 Jul 2020 20:49:12 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
  [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BB685C1C5;
- Thu,  2 Jul 2020 20:49:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B33DB5C1D0;
+ Thu,  2 Jul 2020 20:49:05 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E7BEA31E62; Thu,  2 Jul 2020 22:48:59 +0200 (CEST)
+ id C8E83204AE; Thu,  2 Jul 2020 22:48:59 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 04/21] acpi: ged: add control regs
-Date: Thu,  2 Jul 2020 22:48:42 +0200
-Message-Id: <20200702204859.9876-5-kraxel@redhat.com>
+Subject: [PATCH v4 01/21] microvm: name qboot binary qboot.rom
+Date: Thu,  2 Jul 2020 22:48:39 +0200
+Message-Id: <20200702204859.9876-2-kraxel@redhat.com>
 In-Reply-To: <20200702204859.9876-1-kraxel@redhat.com>
 References: <20200702204859.9876-1-kraxel@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -104,108 +103,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add control regs (sleep, reset) for hw-reduced acpi.
+qboot isn't a bios and shouldnt be named that way.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/acpi/generic_event_device.h |  7 ++++
- hw/acpi/generic_event_device.c         | 44 ++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ hw/i386/microvm.c                       |   4 ++--
+ pc-bios/{bios-microvm.bin => qboot.rom} | Bin
+ roms/Makefile                           |   6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+ rename pc-bios/{bios-microvm.bin => qboot.rom} (100%)
 
-diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index 90a9180db572..474c92198080 100644
---- a/include/hw/acpi/generic_event_device.h
-+++ b/include/hw/acpi/generic_event_device.h
-@@ -72,6 +72,12 @@
- #define ACPI_GED_EVT_SEL_OFFSET    0x0
- #define ACPI_GED_EVT_SEL_LEN       0x4
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 5e931975a06d..1300c396947b 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -47,7 +47,7 @@
+ #include "kvm_i386.h"
+ #include "hw/xen/start_info.h"
  
-+#define ACPI_GED_REG_SLEEP_CTL     0x00
-+#define ACPI_GED_REG_SLEEP_STS     0x01
-+#define ACPI_GED_REG_RESET         0x02
-+#define   ACPI_GED_RESET_VALUE     0x42
-+#define ACPI_GED_REG_COUNT         0x03
-+
- #define GED_DEVICE      "GED"
- #define AML_GED_EVT_REG "EREG"
- #define AML_GED_EVT_SEL "ESEL"
-@@ -87,6 +93,7 @@
+-#define MICROVM_BIOS_FILENAME "bios-microvm.bin"
++#define MICROVM_QBOOT_FILENAME "qboot.rom"
  
- typedef struct GEDState {
-     MemoryRegion evt;
-+    MemoryRegion regs;
-     uint32_t     sel;
- } GEDState;
- 
-diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-index b8abdefa1c77..491df80a5cc7 100644
---- a/hw/acpi/generic_event_device.c
-+++ b/hw/acpi/generic_event_device.c
-@@ -20,6 +20,7 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "qemu/error-report.h"
-+#include "sysemu/runstate.h"
- 
- static const uint32_t ged_supported_events[] = {
-     ACPI_GED_MEM_HOTPLUG_EVT,
-@@ -176,6 +177,45 @@ static const MemoryRegionOps ged_evt_ops = {
-     },
- };
- 
-+static uint64_t ged_regs_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    return 0;
-+}
-+
-+static void ged_regs_write(void *opaque, hwaddr addr, uint64_t data,
-+                           unsigned int size)
-+{
-+    bool slp_en;
-+    int slp_typ;
-+
-+    switch (addr) {
-+    case ACPI_GED_REG_SLEEP_CTL:
-+        slp_typ = (data >> 2) & 0x07;
-+        slp_en  = (data >> 5) & 0x01;
-+        if (slp_en && slp_typ == 5) {
-+            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+        }
-+        return;
-+    case ACPI_GED_REG_SLEEP_STS:
-+        return;
-+    case ACPI_GED_REG_RESET:
-+        if (data == ACPI_GED_RESET_VALUE) {
-+            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+        }
-+        return;
-+    }
-+}
-+
-+static const MemoryRegionOps ged_regs_ops = {
-+    .read = ged_regs_read,
-+    .write = ged_regs_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
- static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
-                                     DeviceState *dev, Error **errp)
+ static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
  {
-@@ -332,6 +372,10 @@ static void acpi_ged_initfn(Object *obj)
-      sysbus_init_mmio(sbd, &s->container_memhp);
-      acpi_memory_hotplug_init(&s->container_memhp, OBJECT(dev),
-                               &s->memhp_state, 0);
-+
-+    memory_region_init_io(&ged_st->regs, obj, &ged_regs_ops, ged_st,
-+                          TYPE_ACPI_GED "-regs", ACPI_GED_REG_COUNT);
-+    sysbus_init_mmio(sbd, &ged_st->regs);
- }
+@@ -158,7 +158,7 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+     }
  
- static void acpi_ged_class_init(ObjectClass *class, void *data)
+     if (bios_name == NULL) {
+-        bios_name = MICROVM_BIOS_FILENAME;
++        bios_name = MICROVM_QBOOT_FILENAME;
+     }
+     x86_bios_rom_init(get_system_memory(), true);
+ }
+diff --git a/pc-bios/bios-microvm.bin b/pc-bios/qboot.rom
+similarity index 100%
+rename from pc-bios/bios-microvm.bin
+rename to pc-bios/qboot.rom
+diff --git a/roms/Makefile b/roms/Makefile
+index f9acf39954dc..b185c880541c 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -68,7 +68,7 @@ default help:
+ 	@echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
+ 	@echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
+ 	@echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
+-	@echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
++	@echo "  qboot              -- update qboot"
+ 	@echo "  clean              -- delete the files generated by the previous" \
+ 	                              "build targets"
+ 
+@@ -194,9 +194,9 @@ opensbi64-sifive_u:
+ 		PLATFORM="sifive/fu540"
+ 	cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+ 
+-bios-microvm:
++qboot:
+ 	$(MAKE) -C qboot
+-	cp qboot/bios.bin ../pc-bios/bios-microvm.bin
++	cp qboot/bios.bin ../pc-bios/qboot.rom
+ 
+ clean:
+ 	rm -rf seabios/.config seabios/out seabios/builds
 -- 
 2.18.4
 
