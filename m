@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0C1C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8861C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:16:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 687FE20720
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:16:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F7E420720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:16:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gI6U9Fo3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687FE20720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EaLqQBqe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7E420720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1sZ-0003v6-Kj
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:16:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50546)
+	id 1jr1su-0004Od-NU
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:16:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1UC-0001EX-KM
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22319
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1U8-00010v-8c
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43984
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tg-0004yY-Nu
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:52 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tg-0004zd-4n
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593705017;
+ s=mimecast20190719; t=1593705019;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Izv+sgHtaI8N5HGC0fQb/7KDEUeoAjLDO6+CjtUF99M=;
- b=gI6U9Fo3+EXc/pqNuVKBuDXz81oIAm675TD6lTNJng2ejFL1rvzLrrCWOrIky3n3uciEsP
- WkliOgvnJ+JY7R+fTzIfrLlUWnQ+1FDFUggBrYabjmA+pls9yjGvUcHF6C6IwHr/O/s2CL
- 3LiBF9dzExTRImYZSusTsjL//fTbdIM=
+ bh=VIPyFCR6Gzr4FNOMn0zCoGBwzib1mQ0xcUBEFvSbxqk=;
+ b=EaLqQBqeiAQzGPrxclnYiIOMjcMZP7TRRbpIDQ9VjHxgMX3gCSvwTUUlWCM6yh2i+n/lqJ
+ u7AmqJwUbKsPm0xvD/hYszF3vMkUVv00VhH+JkgBEbsGTzMs8HnWRpp++RlVq4JdL6NT4Z
+ vrRHN65ys7GKhhrik5GI8mh03Ad3360=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-1cZKAjVRNaey6mEnHoCDpA-1; Thu, 02 Jul 2020 11:50:11 -0400
-X-MC-Unique: 1cZKAjVRNaey6mEnHoCDpA-1
+ us-mta-296-OFzgZABVMQK94cOI9d9Ozg-1; Thu, 02 Jul 2020 11:50:09 -0400
+X-MC-Unique: OFzgZABVMQK94cOI9d9Ozg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0EFE18FE863;
- Thu,  2 Jul 2020 15:50:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA19A80183C;
+ Thu,  2 Jul 2020 15:50:07 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B0A073FE8;
- Thu,  2 Jul 2020 15:50:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54A2373FF8;
+ Thu,  2 Jul 2020 15:50:05 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1F68B113523A; Thu,  2 Jul 2020 17:50:01 +0200 (CEST)
+ id C472511358CD; Thu,  2 Jul 2020 17:50:00 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 33/44] error: Avoid unnecessary error_propagate() after
- error_setg()
-Date: Thu,  2 Jul 2020 17:49:49 +0200
-Message-Id: <20200702155000.3455325-34-armbru@redhat.com>
+Subject: [PATCH v2 16/44] qapi: Make visitor functions taking Error ** return
+ bool, not void
+Date: Thu,  2 Jul 2020 17:49:32 +0200
+Message-Id: <20200702155000.3455325-17-armbru@redhat.com>
 In-Reply-To: <20200702155000.3455325-1-armbru@redhat.com>
 References: <20200702155000.3455325-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -74,9 +74,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,1294 +103,2619 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace
-
-    error_setg(&err, ...);
-    error_propagate(errp, err);
-
-by
-
-    error_setg(errp, ...);
-
-Related pattern:
-
-    if (...) {
-        error_setg(&err, ...);
-        goto out;
-    }
-    ...
- out:
-    error_propagate(errp, err);
-    return;
-
-When all paths to label out are that way, replace by
-
-    if (...) {
-        error_setg(errp, ...);
-        return;
-    }
-
-and delete the label along with the error_propagate().
-
-When we have at most one other path that actually needs to propagate,
-and maybe one at the end that where propagation is unnecessary, e.g.
-
-    foo(..., &err);
-    if (err) {
-        goto out;
-    }
-    ...
-    bar(..., &err);
- out:
-    error_propagate(errp, err);
-    return;
-
-move the error_propagate() to where it's needed, like
-
-    if (...) {
-        foo(..., &err);
-        error_propagate(errp, err);
-        return;
-    }
-    ...
-    bar(..., errp);
-    return;
-
-and transform the error_setg() as above.
-
-Bonus: the elimination of gotos will make later patches in this series
-easier to review.
-
-Candidates for conversion tracked down with this Coccinelle script:
-
-    @@
-    identifier err, errp;
-    expression list args;
-    @@
-    -    error_setg(&err, args);
-    +    error_setg(errp, args);
-	 ... when != err
-	 error_propagate(errp, err);
+See recent commit "error: Document Error API usage rules" for
+rationale.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- backends/cryptodev.c        | 11 +++---
- backends/hostmem-file.c     | 19 +++-------
- backends/hostmem-memfd.c    | 15 ++++----
- backends/hostmem.c          | 27 ++++++--------
- block/quorum.c              | 16 ++++----
- block/replication.c         | 11 +++---
- block/throttle-groups.c     | 22 +++++------
- block/vxhs.c                |  9 ++---
- hw/acpi/core.c              | 15 +++-----
- hw/hyperv/vmbus.c           |  5 +--
- hw/i386/pc.c                | 35 ++++++------------
- hw/mem/nvdimm.c             | 17 ++++-----
- hw/mem/pc-dimm.c            | 14 +++----
- hw/misc/aspeed_sdmc.c       |  3 +-
- hw/ppc/rs6000_mc.c          |  9 ++---
- hw/ppc/spapr.c              | 73 ++++++++++++++++---------------------
- hw/ppc/spapr_pci.c          | 14 +++----
- hw/s390x/ipl.c              | 23 +++++-------
- hw/xen/xen_pt_config_init.c |  3 +-
- iothread.c                  | 12 +++---
- net/colo-compare.c          | 20 ++++------
- net/dump.c                  | 10 ++---
- net/filter-buffer.c         | 10 ++---
- qga/commands-win32.c        | 19 +++-------
- 24 files changed, 169 insertions(+), 243 deletions(-)
+ docs/devel/qapi-code-gen.txt  |  51 +++++------
+ include/qapi/clone-visitor.h  |   8 +-
+ include/qapi/visitor-impl.h   |  26 +++---
+ include/qapi/visitor.h        | 102 ++++++++++++---------
+ audio/audio_legacy.c          |  15 ++--
+ qapi/opts-visitor.c           |  58 +++++++-----
+ qapi/qapi-clone-visitor.c     |  67 ++++++++------
+ qapi/qapi-dealloc-visitor.c   |  27 ++++--
+ qapi/qapi-visit-core.c        | 165 ++++++++++++++++++----------------
+ qapi/qobject-input-visitor.c  | 109 +++++++++++++---------
+ qapi/qobject-output-visitor.c |  27 ++++--
+ qapi/string-input-visitor.c   |  62 +++++++------
+ qapi/string-output-visitor.c  |  32 ++++---
+ scripts/qapi/visit.py         |  58 +++++-------
+ 14 files changed, 452 insertions(+), 355 deletions(-)
 
-diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-index 72b7077475..4de378532b 100644
---- a/backends/cryptodev.c
-+++ b/backends/cryptodev.c
-@@ -158,16 +158,15 @@ cryptodev_backend_set_queues(Object *obj, Visitor *v, const char *name,
-     uint32_t value;
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index a7794ef658..9bfc57063c 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1408,42 +1408,38 @@ Example:
+     #include "example-qapi-types.h"
  
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
--                   PRIu32 "'", object_get_typename(obj), name, value);
--        goto out;
-+        error_setg(errp, "Property '%s.%s' doesn't take value '%" PRIu32 "'",
-+                   object_get_typename(obj), name, value);
-+        return;
-     }
-     backend->conf.peers.queues = value;
--out:
--    error_propagate(errp, local_err);
- }
  
- static void
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 320dffbaa9..a44f5a61ac 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -114,18 +114,16 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
-     uint64_t val;
+-    void visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp);
+-    void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp);
+-    void visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp);
++    bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp);
++    bool visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp);
++    bool visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp);
  
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property '%s' of %s",
--                   name, object_get_typename(o));
--        goto out;
-+        error_setg(errp, "cannot change property '%s' of %s", name,
-+                   object_get_typename(o));
-+        return;
-     }
+-    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp);
++    bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp);
  
-     if (!visit_type_size(v, name, &val, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     fb->align = val;
--
-- out:
--    error_propagate(errp, local_err);
- }
+     #endif /* EXAMPLE_QAPI_VISIT_H */
+     $ cat qapi-generated/example-qapi-visit.c
+ [Uninteresting stuff omitted...]
  
- static bool file_memory_backend_get_pmem(Object *o, Error **errp)
-@@ -139,7 +137,6 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+-    void visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
++    bool visit_type_UserDefOne_members(Visitor *v, UserDefOne *obj, Error **errp)
+     {
+         Error *err = NULL;
  
-     if (host_memory_backend_mr_inited(backend)) {
--
-         error_setg(errp, "cannot change property 'pmem' of %s.",
-                    object_get_typename(o));
-         return;
-@@ -147,13 +144,9 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
- 
- #ifndef CONFIG_LIBPMEM
-     if (value) {
--        Error *local_err = NULL;
--
--        error_setg(&local_err,
--                   "Lack of libpmem support while setting the 'pmem=on'"
-+        error_setg(errp, "Lack of libpmem support while setting the 'pmem=on'"
-                    " of %s. We can't ensure data persistence.",
-                    object_get_typename(o));
--        error_propagate(errp, local_err);
-         return;
-     }
- #endif
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index d4281c0032..1e74a2b92f 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -81,21 +81,20 @@ memfd_backend_set_hugetlbsize(Object *obj, Visitor *v, const char *name,
-     uint64_t value;
- 
-     if (host_memory_backend_mr_inited(MEMORY_BACKEND(obj))) {
--        error_setg(&local_err, "cannot change property value");
--        goto out;
-+        error_setg(errp, "cannot change property value");
-+        return;
-     }
- 
-     if (!visit_type_size(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
--                   PRIu64 "'", object_get_typename(obj), name, value);
--        goto out;
-+        error_setg(errp, "Property '%s.%s' doesn't take value '%" PRIu64 "'",
-+                   object_get_typename(obj), name, value);
-+        return;
-     }
-     m->hugetlbsize = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 4e4103ac09..5cc264b0db 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -58,23 +58,22 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-     uint64_t value;
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property %s of %s ",
--                   name, object_get_typename(obj));
--        goto out;
-+        error_setg(errp, "cannot change property %s of %s ", name,
-+                   object_get_typename(obj));
-+        return;
-     }
- 
-     if (!visit_type_size(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "property '%s' of %s doesn't take value '%" PRIu64 "'",
-                    name, object_get_typename(obj), value);
--        goto out;
-+        return;
-     }
-     backend->size = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void
-@@ -257,17 +256,15 @@ static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor *v,
-     uint32_t value;
- 
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (value <= 0) {
--        error_setg(&local_err,
--                   "property '%s' of %s doesn't take value '%d'",
--                   name, object_get_typename(obj), value);
--        goto out;
-+        error_setg(errp, "property '%s' of %s doesn't take value '%d'", name,
-+                   object_get_typename(obj), value);
-+        return;
-     }
-     backend->prealloc_threads = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void host_memory_backend_init(Object *obj)
-diff --git a/block/quorum.c b/block/quorum.c
-index beb3b6dbcc..5d52e605db 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -910,13 +910,12 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-     /* count how many different children are present */
-     s->num_children = qdict_array_entries(options, "children.");
-     if (s->num_children < 0) {
--        error_setg(&local_err, "Option children is not a valid array");
-+        error_setg(errp, "Option children is not a valid array");
-         ret = -EINVAL;
-         goto exit;
-     }
-     if (s->num_children < 1) {
--        error_setg(&local_err,
--                   "Number of provided children must be 1 or more");
-+        error_setg(errp, "Number of provided children must be 1 or more");
-         ret = -EINVAL;
-         goto exit;
-     }
-@@ -929,7 +928,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     s->threshold = qemu_opt_get_number(opts, QUORUM_OPT_VOTE_THRESHOLD, 0);
-     /* and validate it against s->num_children */
--    ret = quorum_valid_threshold(s->threshold, s->num_children, &local_err);
-+    ret = quorum_valid_threshold(s->threshold, s->num_children, errp);
-     if (ret < 0) {
-         goto exit;
-     }
-@@ -942,7 +941,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-                               -EINVAL, NULL);
-     }
-     if (ret < 0) {
--        error_setg(&local_err, "Please set read-pattern as fifo or quorum");
-+        error_setg(errp, "Please set read-pattern as fifo or quorum");
-         goto exit;
-     }
-     s->read_pattern = ret;
-@@ -950,7 +949,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-     if (s->read_pattern == QUORUM_READ_PATTERN_QUORUM) {
-         s->is_blkverify = qemu_opt_get_bool(opts, QUORUM_OPT_BLKVERIFY, false);
-         if (s->is_blkverify && (s->num_children != 2 || s->threshold != 2)) {
--            error_setg(&local_err, "blkverify=on can only be set if there are "
-+            error_setg(errp, "blkverify=on can only be set if there are "
-                        "exactly two files and vote-threshold is 2");
-             ret = -EINVAL;
-             goto exit;
-@@ -959,7 +958,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-         s->rewrite_corrupted = qemu_opt_get_bool(opts, QUORUM_OPT_REWRITE,
-                                                  false);
-         if (s->rewrite_corrupted && s->is_blkverify) {
--            error_setg(&local_err,
-+            error_setg(errp,
-                        "rewrite-corrupted=on cannot be used with blkverify=on");
-             ret = -EINVAL;
-             goto exit;
-@@ -979,6 +978,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-                                          &child_of_bds, BDRV_CHILD_DATA, false,
-                                          &local_err);
-         if (local_err) {
-+            error_propagate(errp, local_err);
-             ret = -EINVAL;
-             goto close_exit;
-         }
-@@ -1004,8 +1004,6 @@ close_exit:
-     g_free(opened);
- exit:
-     qemu_opts_del(opts);
--    /* propagate error */
--    error_propagate(errp, local_err);
-     return ret;
- }
- 
-diff --git a/block/replication.c b/block/replication.c
-index 5701eeb9e8..b844a09eb1 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -105,7 +105,7 @@ static int replication_open(BlockDriverState *bs, QDict *options,
- 
-     mode = qemu_opt_get(opts, REPLICATION_MODE);
-     if (!mode) {
--        error_setg(&local_err, "Missing the option mode");
-+        error_setg(errp, "Missing the option mode");
-         goto fail;
-     }
- 
-@@ -113,7 +113,8 @@ static int replication_open(BlockDriverState *bs, QDict *options,
-         s->mode = REPLICATION_MODE_PRIMARY;
-         top_id = qemu_opt_get(opts, REPLICATION_TOP_ID);
-         if (top_id) {
--            error_setg(&local_err, "The primary side does not support option top-id");
-+            error_setg(errp,
-+                       "The primary side does not support option top-id");
-             goto fail;
-         }
-     } else if (!strcmp(mode, "secondary")) {
-@@ -121,11 +122,11 @@ static int replication_open(BlockDriverState *bs, QDict *options,
-         top_id = qemu_opt_get(opts, REPLICATION_TOP_ID);
-         s->top_id = g_strdup(top_id);
-         if (!s->top_id) {
--            error_setg(&local_err, "Missing the option top-id");
-+            error_setg(errp, "Missing the option top-id");
-             goto fail;
-         }
-     } else {
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "The option mode's value should be primary or secondary");
-         goto fail;
-     }
-@@ -136,8 +137,6 @@ static int replication_open(BlockDriverState *bs, QDict *options,
- 
- fail:
-     qemu_opts_del(opts);
--    error_propagate(errp, local_err);
--
-     return ret;
- }
- 
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index e411051160..3d7e7cf990 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -819,16 +819,17 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
-      * transaction, as certain combinations are invalid.
-      */
-     if (tg->is_initialized) {
--        error_setg(&local_err, "Property cannot be set after initialization");
--        goto ret;
-+        error_setg(errp, "Property cannot be set after initialization");
-+        return;
-     }
- 
-     if (!visit_type_int64(v, name, &value, &local_err)) {
--        goto ret;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (value < 0) {
--        error_setg(&local_err, "Property values cannot be negative");
--        goto ret;
-+        error_setg(errp, "Property values cannot be negative");
-+        return;
-     }
- 
-     cfg = &tg->ts.cfg;
-@@ -841,9 +842,9 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
-         break;
-     case BURST_LENGTH:
-         if (value > UINT_MAX) {
--            error_setg(&local_err, "%s value must be in the"
--                       "range [0, %u]", info->name, UINT_MAX);
--            goto ret;
-+            error_setg(errp, "%s value must be in the" "range [0, %u]",
-+                       info->name, UINT_MAX);
-+            return;
-         }
-         cfg->buckets[info->type].burst_length = value;
-         break;
-@@ -851,11 +852,6 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
-         cfg->op_size = value;
-         break;
-     }
--
--ret:
--    error_propagate(errp, local_err);
--    return;
--
- }
- 
- static void throttle_group_get(Object *obj, Visitor *v, const char *name,
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 237df4f185..fecaeb82c9 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -326,14 +326,14 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
-     /* vdisk-id is the disk UUID */
-     vdisk_id_opt = qemu_opt_get(opts, VXHS_OPT_VDISK_ID);
-     if (!vdisk_id_opt) {
--        error_setg(&local_err, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
-+        error_setg(errp, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
-         ret = -EINVAL;
-         goto out;
-     }
- 
-     /* vdisk-id may contain a leading '/' */
-     if (strlen(vdisk_id_opt) > UUID_FMT_LEN + 1) {
--        error_setg(&local_err, "vdisk-id cannot be more than %d characters",
-+        error_setg(errp, "vdisk-id cannot be more than %d characters",
-                    UUID_FMT_LEN);
-         ret = -EINVAL;
-         goto out;
-@@ -352,14 +352,14 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
- 
-     server_host_opt = qemu_opt_get(tcp_opts, VXHS_OPT_HOST);
-     if (!server_host_opt) {
--        error_setg(&local_err, QERR_MISSING_PARAMETER,
-+        error_setg(errp, QERR_MISSING_PARAMETER,
-                    VXHS_OPT_SERVER"."VXHS_OPT_HOST);
-         ret = -EINVAL;
-         goto out;
-     }
- 
-     if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
--        error_setg(&local_err, "server.host cannot be more than %d characters",
-+        error_setg(errp, "server.host cannot be more than %d characters",
-                    MAXHOSTNAMELEN);
-         ret = -EINVAL;
-         goto out;
-@@ -412,7 +412,6 @@ out:
- 
-     if (ret < 0) {
-         vxhs_unref();
--        error_propagate(errp, local_err);
-         g_free(s->vdisk_hostinfo.host);
-         g_free(s->vdisk_guid);
-         g_free(s->tlscredsid);
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49ab..226f2496ac 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -239,7 +239,6 @@ static void acpi_table_install(const char unsigned *blob, size_t bloblen,
- void acpi_table_add(const QemuOpts *opts, Error **errp)
- {
-     AcpiTableOptions *hdrs = NULL;
--    Error *err = NULL;
-     char **pathnames = NULL;
-     char **cur;
-     size_t bloblen = 0;
-@@ -257,13 +256,13 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         goto out;
-     }
-     if (hdrs->has_file == hdrs->has_data) {
--        error_setg(&err, "'-acpitable' requires one of 'data' or 'file'");
-+        error_setg(errp, "'-acpitable' requires one of 'data' or 'file'");
-         goto out;
-     }
- 
-     pathnames = g_strsplit(hdrs->has_file ? hdrs->file : hdrs->data, ":", 0);
-     if (pathnames == NULL || pathnames[0] == NULL) {
--        error_setg(&err, "'-acpitable' requires at least one pathname");
-+        error_setg(errp, "'-acpitable' requires at least one pathname");
-         goto out;
-     }
- 
-@@ -272,7 +271,7 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         int fd = open(*cur, O_RDONLY | O_BINARY);
- 
-         if (fd < 0) {
--            error_setg(&err, "can't open file %s: %s", *cur, strerror(errno));
-+            error_setg(errp, "can't open file %s: %s", *cur, strerror(errno));
-             goto out;
-         }
- 
-@@ -288,8 +287,8 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-                 memcpy(blob + bloblen, data, r);
-                 bloblen += r;
-             } else if (errno != EINTR) {
--                error_setg(&err, "can't read file %s: %s",
--                           *cur, strerror(errno));
-+                error_setg(errp, "can't read file %s: %s", *cur,
-+                           strerror(errno));
-                 close(fd);
-                 goto out;
-             }
-@@ -298,14 +297,12 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         close(fd);
-     }
- 
--    acpi_table_install(blob, bloblen, hdrs->has_file, hdrs, &err);
-+    acpi_table_install(blob, bloblen, hdrs->has_file, hdrs, errp);
- 
- out:
-     g_free(blob);
-     g_strfreev(pathnames);
-     qapi_free_AcpiTableOptions(hdrs);
--
--    error_propagate(errp, err);
- }
- 
- unsigned acpi_table_len(void *current)
-diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-index a8bcb41026..34392e892a 100644
---- a/hw/hyperv/vmbus.c
-+++ b/hw/hyperv/vmbus.c
-@@ -1459,8 +1459,8 @@ static void create_channels(VMBus *vmbus, VMBusDevice *dev, Error **errp)
- 
-     dev->num_channels = vdc->num_channels ? vdc->num_channels(dev) : 1;
-     if (dev->num_channels < 1) {
--        error_setg(&err, "invalid #channels: %u", dev->num_channels);
--        goto error_out;
-+        error_setg(errp, "invalid #channels: %u", dev->num_channels);
-+        return;
-     }
- 
-     dev->channels = g_new0(VMBusChannel, dev->num_channels);
-@@ -1477,7 +1477,6 @@ err_init:
-     while (i--) {
-         deinit_channel(&dev->channels[i]);
-     }
--error_out:
-     error_propagate(errp, err);
- }
- 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 55e1940675..70771d6632 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1327,7 +1327,6 @@ out:
- static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
- {
--    Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
- 
-     /*
-@@ -1336,21 +1335,18 @@ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
-      * addition to cover this case.
-      */
-     if (!pcms->acpi_dev || !x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "memory hotplug is not enabled: missing acpi device or acpi disabled");
--        goto out;
-+        return;
-     }
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
--        error_setg(&local_err,
--                   "nvdimm device hot unplug is not supported yet.");
--        goto out;
-+        error_setg(errp, "nvdimm device hot unplug is not supported yet.");
-+        return;
-     }
- 
-     hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
--                                   &local_err);
--out:
--    error_propagate(errp, local_err);
-+                                   errp);
- }
- 
- static void pc_memory_unplug(HotplugHandler *hotplug_dev,
-@@ -1430,31 +1426,23 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
- {
-     int idx = -1;
--    Error *local_err = NULL;
-     X86CPU *cpu = X86_CPU(dev);
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
- 
-     if (!pcms->acpi_dev) {
--        error_setg(&local_err, "CPU hot unplug not supported without ACPI");
--        goto out;
-+        error_setg(errp, "CPU hot unplug not supported without ACPI");
-+        return;
-     }
- 
-     pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
-     assert(idx != -1);
-     if (idx == 0) {
--        error_setg(&local_err, "Boot CPU is unpluggable");
--        goto out;
-+        error_setg(errp, "Boot CPU is unpluggable");
-+        return;
-     }
- 
-     hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
--                                   &local_err);
--    if (local_err) {
--        goto out;
--    }
--
-- out:
--    error_propagate(errp, local_err);
--
-+                                   errp);
- }
- 
- static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
-@@ -1859,10 +1847,9 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-         return;
-     }
-     if (value > 4 * GiB) {
--        error_setg(&error,
-+        error_setg(errp,
-                    "Machine option 'max-ram-below-4g=%"PRIu64
-                    "' expects size less than or equal to 4G", value);
--        error_propagate(errp, error);
-         return;
-     }
- 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index 1fa976c56c..838ebcd227 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -49,23 +49,22 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
-     uint64_t value;
- 
-     if (nvdimm->nvdimm_mr) {
--        error_setg(&local_err, "cannot change property value");
--        goto out;
-+        error_setg(errp, "cannot change property value");
-+        return;
-     }
- 
-     if (!visit_type_size(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (value < MIN_NAMESPACE_LABEL_SIZE) {
--        error_setg(&local_err, "Property '%s.%s' (0x%" PRIx64 ") is required"
--                   " at least 0x%lx", object_get_typename(obj),
--                   name, value, MIN_NAMESPACE_LABEL_SIZE);
--        goto out;
-+        error_setg(errp, "Property '%s.%s' (0x%" PRIx64 ") is required"
-+                   " at least 0x%lx", object_get_typename(obj), name, value,
-+                   MIN_NAMESPACE_LABEL_SIZE);
-+        return;
-     }
- 
-     nvdimm->label_size = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void nvdimm_get_uuid(Object *obj, Visitor *v, const char *name,
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 8a075fbf72..9d3f0b9691 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -44,24 +44,24 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
-                                    &error_abort);
-     if ((slot < 0 || slot >= machine->ram_slots) &&
-          slot != PC_DIMM_UNASSIGNED_SLOT) {
--        error_setg(&local_err, "invalid slot number %d, valid range is [0-%"
--                   PRIu64 "]", slot, machine->ram_slots - 1);
--        goto out;
-+        error_setg(errp,
-+                   "invalid slot number %d, valid range is [0-%" PRIu64 "]",
-+                   slot, machine->ram_slots - 1);
-+        return;
-     }
- 
-     slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
-                                  machine->ram_slots, &local_err);
-     if (local_err) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     object_property_set_int(OBJECT(dimm), PC_DIMM_SLOT_PROP, slot,
-                             &error_abort);
-     trace_mhp_pc_dimm_assigned_slot(slot);
- 
-     memory_device_pre_plug(MEMORY_DEVICE(dimm), machine, legacy_align,
--                           &local_err);
--out:
--    error_propagate(errp, local_err);
-+                           errp);
- }
- 
- void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp)
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index 28874445c3..40682af0b3 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -240,9 +240,8 @@ static void aspeed_sdmc_set_ram_size(Object *obj, Visitor *v, const char *name,
-     }
- 
-     sz = size_to_str(value);
--    error_setg(&local_err, "Invalid RAM size %s", sz);
-+    error_setg(errp, "Invalid RAM size %s", sz);
-     g_free(sz);
--    error_propagate(errp, local_err);
- }
- 
- static void aspeed_sdmc_initfn(Object *obj)
-diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
-index f8a498bd8a..ce97365f5e 100644
---- a/hw/ppc/rs6000_mc.c
-+++ b/hw/ppc/rs6000_mc.c
-@@ -169,7 +169,8 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
-             memory_region_init_ram(&s->simm[socket], OBJECT(dev), name,
-                                    s->simm_size[socket] * MiB, &local_err);
-             if (local_err) {
--                goto out;
-+                error_propagate(errp, local_err);
-+                return;
-             }
-             memory_region_add_subregion_overlap(get_system_memory(), 0,
-                                                 &s->simm[socket], socket);
-@@ -177,10 +178,10 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
-     }
-     if (ram_size) {
-         /* unable to push all requested RAM in SIMMs */
--        error_setg(&local_err, "RAM size incompatible with this board. "
-+        error_setg(errp, "RAM size incompatible with this board. "
-                    "Try again with something else, like %" PRId64 " MB",
-                    s->ram_size / MiB - ram_size);
--        goto out;
-+        return;
-     }
- 
-     if (s->autoconfigure) {
-@@ -196,8 +197,6 @@ static void rs6000mc_realize(DeviceState *dev, Error **errp)
- 
-     isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
-                              rs6000mc_port_list, s, "rs6000mc");
--out:
--    error_propagate(errp, local_err);
- }
- 
- static const VMStateDescription vmstate_rs6000mc = {
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 68e8b504b5..299908cc73 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2497,23 +2497,23 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-     unsigned int smp_threads = ms->smp.threads;
- 
-     if (!kvm_enabled() && (smp_threads > 1)) {
--        error_setg(&local_err, "TCG cannot support more than 1 thread/core "
--                     "on a pseries machine");
--        goto out;
-+        error_setg(errp, "TCG cannot support more than 1 thread/core "
-+                   "on a pseries machine");
-+        return;
-     }
-     if (!is_power_of_2(smp_threads)) {
--        error_setg(&local_err, "Cannot support %d threads/core on a pseries "
--                     "machine because it must be a power of 2", smp_threads);
--        goto out;
-+        error_setg(errp, "Cannot support %d threads/core on a pseries "
-+                   "machine because it must be a power of 2", smp_threads);
-+        return;
-     }
- 
-     /* Detemine the VSMT mode to use: */
-     if (vsmt_user) {
-         if (spapr->vsmt < smp_threads) {
--            error_setg(&local_err, "Cannot support VSMT mode %d"
--                         " because it must be >= threads/core (%d)",
--                         spapr->vsmt, smp_threads);
+-        visit_type_int(v, "integer", &obj->integer, &err);
+-        if (err) {
 -            goto out;
-+            error_setg(errp, "Cannot support VSMT mode %d"
-+                       " because it must be >= threads/core (%d)",
-+                       spapr->vsmt, smp_threads);
-+            return;
++        if (!visit_type_int(v, "integer", &obj->integer, errp)) {
++            return false;
          }
-         /* In this case, spapr->vsmt has been set by the command line */
-     } else if (!smc->smp_threads_vsmt) {
-@@ -2543,8 +2543,6 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-              * behaviour will be correct */
-             if ((kvm_smt >= smp_threads) && ((spapr->vsmt % kvm_smt) == 0)) {
-                 warn_report_err(local_err);
--                local_err = NULL;
+         if (visit_optional(v, "string", &obj->has_string)) {
+-            visit_type_str(v, "string", &obj->string, &err);
+-            if (err) {
 -                goto out;
-             } else {
-                 if (!vsmt_user) {
-                     error_append_hint(&local_err,
-@@ -2554,13 +2552,11 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-                                       smp_threads, kvm_smt, spapr->vsmt);
-                 }
-                 kvmppc_error_append_smt_possible_hint(&local_err);
--                goto out;
-+                error_propagate(errp, local_err);
++            if (!visit_type_str(v, "string", &obj->string, errp)) {
++                return false;
              }
          }
-     }
-     /* else TCG: nothing to do currently */
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void spapr_init_cpus(SpaprMachineState *spapr)
-@@ -3686,9 +3682,8 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-     SpaprDrc *drc;
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
--        error_setg(&local_err,
--                   "nvdimm device hot unplug is not supported yet.");
--        goto out;
-+        error_setg(errp, "nvdimm device hot unplug is not supported yet.");
-+        return;
+-
+-    out:
+         error_propagate(errp, err);
++        return !err;
      }
  
-     size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &error_abort);
-@@ -3697,7 +3692,8 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-     addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-                                          &local_err);
-     if (local_err) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
+-    void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp)
++    bool visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp)
+     {
+         Error *err = NULL;
+ 
+-        visit_start_struct(v, name, (void **)obj, sizeof(UserDefOne), &err);
+-        if (err) {
+-            goto out;
++        if (!visit_start_struct(v, name, (void **)obj, sizeof(UserDefOne), errp)) {
++            return false;
+         }
+         if (!*obj) {
+             /* incomplete */
+@@ -1461,19 +1457,18 @@ Example:
+             qapi_free_UserDefOne(*obj);
+             *obj = NULL;
+         }
+-    out:
+         error_propagate(errp, err);
++        return !err;
      }
  
-     /*
-@@ -3707,10 +3703,9 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-      * bail out to avoid detaching DRCs that were already released.
+-    void visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp)
++    bool visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp)
+     {
+         Error *err = NULL;
+         UserDefOneList *tail;
+         size_t size = sizeof(**obj);
+ 
+-        visit_start_list(v, name, (GenericList **)obj, size, &err);
+-        if (err) {
+-            goto out;
++        if (!visit_start_list(v, name, (GenericList **)obj, size, errp)) {
++            return false;
+         }
+ 
+         for (tail = *obj; tail;
+@@ -1492,21 +1487,19 @@ Example:
+             qapi_free_UserDefOneList(*obj);
+             *obj = NULL;
+         }
+-    out:
+         error_propagate(errp, err);
++        return !err;
+     }
+ 
+-    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
++    bool visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
+     {
+         Error *err = NULL;
+ 
+-        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
+-        if (err) {
+-            goto out;
++        if (!visit_type_UserDefOneList(v, "arg1", &obj->arg1, errp)) {
++            return false;
+         }
+-
+-    out:
+         error_propagate(errp, err);
++        return !err;
+     }
+ 
+ [Uninteresting stuff omitted...]
+diff --git a/include/qapi/clone-visitor.h b/include/qapi/clone-visitor.h
+index 5b665ee38c..adf9a788e2 100644
+--- a/include/qapi/clone-visitor.h
++++ b/include/qapi/clone-visitor.h
+@@ -20,10 +20,10 @@
+  */
+ typedef struct QapiCloneVisitor QapiCloneVisitor;
+ 
+-void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
++void *qapi_clone(const void *src, bool (*visit_type)(Visitor *, const char *,
+                                                      void **, Error **));
+ void qapi_clone_members(void *dst, const void *src, size_t sz,
+-                        void (*visit_type_members)(Visitor *, void *,
++                        bool (*visit_type_members)(Visitor *, void *,
+                                                    Error **));
+ 
+ /*
+@@ -34,7 +34,7 @@ void qapi_clone_members(void *dst, const void *src, size_t sz,
+  */
+ #define QAPI_CLONE(type, src)                                           \
+     ((type *)qapi_clone(src,                                            \
+-                        (void (*)(Visitor *, const char *, void**,      \
++                        (bool (*)(Visitor *, const char *, void **,     \
+                                   Error **))visit_type_ ## type))
+ 
+ /*
+@@ -45,7 +45,7 @@ void qapi_clone_members(void *dst, const void *src, size_t sz,
+  */
+ #define QAPI_CLONE_MEMBERS(type, dst, src)                              \
+     qapi_clone_members(dst, src, sizeof(type),                          \
+-                       (void (*)(Visitor *, void *,                     \
++                       (bool (*)(Visitor *, void *,                     \
+                                  Error **))visit_type_ ## type ## _members)
+ 
+ #endif
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index 98dc533d39..7362c043be 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -48,31 +48,31 @@ struct Visitor
       */
-     if (spapr_pending_dimm_unplugs_find(spapr, dimm)) {
--        error_setg(&local_err,
--                   "Memory unplug already in progress for device %s",
-+        error_setg(errp, "Memory unplug already in progress for device %s",
-                    dev->id);
--        goto out;
-+        return;
-     }
  
-     spapr_pending_dimm_unplugs_add(spapr, nr_lmbs, dimm);
-@@ -3729,8 +3724,6 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-                           addr_start / SPAPR_MEMORY_BLOCK_SIZE);
-     spapr_hotplug_req_remove_by_count_indexed(SPAPR_DR_CONNECTOR_TYPE_LMB,
-                                               nr_lmbs, spapr_drc_index(drc));
--out:
--    error_propagate(errp, local_err);
- }
+     /* Must be set to visit structs */
+-    void (*start_struct)(Visitor *v, const char *name, void **obj,
++    bool (*start_struct)(Visitor *v, const char *name, void **obj,
+                          size_t size, Error **errp);
  
- /* Callback to be called during DRC release. */
-@@ -3891,7 +3884,6 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     /* Optional; intended for input visitors */
+-    void (*check_struct)(Visitor *v, Error **errp);
++    bool (*check_struct)(Visitor *v, Error **errp);
+ 
+     /* Must be set to visit structs */
+     void (*end_struct)(Visitor *v, void **obj);
+ 
+     /* Must be set; implementations may require @list to be non-null,
+      * but must document it. */
+-    void (*start_list)(Visitor *v, const char *name, GenericList **list,
++    bool (*start_list)(Visitor *v, const char *name, GenericList **list,
+                        size_t size, Error **errp);
+ 
+     /* Must be set */
+     GenericList *(*next_list)(Visitor *v, GenericList *tail, size_t size);
+ 
+     /* Optional; intended for input visitors */
+-    void (*check_list)(Visitor *v, Error **errp);
++    bool (*check_list)(Visitor *v, Error **errp);
+ 
+     /* Must be set */
+     void (*end_list)(Visitor *v, void **list);
+ 
+     /* Must be set by input and clone visitors to visit alternates */
+-    void (*start_alternate)(Visitor *v, const char *name,
++    bool (*start_alternate)(Visitor *v, const char *name,
+                             GenericAlternate **obj, size_t size,
+                             Error **errp);
+ 
+@@ -80,33 +80,33 @@ struct Visitor
+     void (*end_alternate)(Visitor *v, void **obj);
+ 
+     /* Must be set */
+-    void (*type_int64)(Visitor *v, const char *name, int64_t *obj,
++    bool (*type_int64)(Visitor *v, const char *name, int64_t *obj,
+                        Error **errp);
+ 
+     /* Must be set */
+-    void (*type_uint64)(Visitor *v, const char *name, uint64_t *obj,
++    bool (*type_uint64)(Visitor *v, const char *name, uint64_t *obj,
+                         Error **errp);
+ 
+     /* Optional; fallback is type_uint64() */
+-    void (*type_size)(Visitor *v, const char *name, uint64_t *obj,
++    bool (*type_size)(Visitor *v, const char *name, uint64_t *obj,
+                       Error **errp);
+ 
+     /* Must be set */
+-    void (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
++    bool (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
+ 
+     /* Must be set */
+-    void (*type_str)(Visitor *v, const char *name, char **obj, Error **errp);
++    bool (*type_str)(Visitor *v, const char *name, char **obj, Error **errp);
+ 
+     /* Must be set to visit numbers */
+-    void (*type_number)(Visitor *v, const char *name, double *obj,
++    bool (*type_number)(Visitor *v, const char *name, double *obj,
+                         Error **errp);
+ 
+     /* Must be set to visit arbitrary QTypes */
+-    void (*type_any)(Visitor *v, const char *name, QObject **obj,
++    bool (*type_any)(Visitor *v, const char *name, QObject **obj,
+                      Error **errp);
+ 
+     /* Must be set to visit explicit null values.  */
+-    void (*type_null)(Visitor *v, const char *name, QNull **obj,
++    bool (*type_null)(Visitor *v, const char *name, QNull **obj,
+                       Error **errp);
+ 
+     /* Must be set for input visitors to visit structs, optional otherwise.
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index 5573906966..ebc19ede7f 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -60,7 +60,7 @@
+  * All QAPI types have a corresponding function with a signature
+  * roughly compatible with this:
+  *
+- * void visit_type_FOO(Visitor *v, const char *name, T obj, Error **errp);
++ * bool visit_type_FOO(Visitor *v, const char *name, T obj, Error **errp);
+  *
+  * where T is FOO for scalar types, and FOO * otherwise.  The scalar
+  * visitors are declared here; the remaining visitors are generated in
+@@ -95,14 +95,16 @@
+  * incomplete object, such an object is possible only by manual
+  * construction.
+  *
++ * visit_type_FOO() returns true on success, false on error.
++ *
+  * For the QAPI object types (structs, unions, and alternates), there
+  * is an additional generated function in qapi-visit-MODULE.h
+  * compatible with:
+  *
+- * void visit_type_FOO_members(Visitor *v, FOO *obj, Error **errp);
++ * bool visit_type_FOO_members(Visitor *v, FOO *obj, Error **errp);
+  *
+  * for visiting the members of a type without also allocating the QAPI
+- * struct.
++ * struct.  It also returns true on success, false on error.
+  *
+  * Additionally, QAPI pointer types (structs, unions, alternates, and
+  * lists) have a generated function in qapi-types-MODULE.h compatible
+@@ -131,8 +133,7 @@
+  *  Visitor *v;
+  *
+  *  v = FOO_visitor_new(...);
+- *  visit_type_Foo(v, NULL, &f, &err);
+- *  if (err) {
++ *  if (!visit_type_Foo(v, NULL, &f, &err)) {
+  *      ...handle error...
+  *  } else {
+  *      ...use f...
+@@ -148,8 +149,7 @@
+  *  Visitor *v;
+  *
+  *  v = FOO_visitor_new(...);
+- *  visit_type_FooList(v, NULL, &l, &err);
+- *  if (err) {
++ *  if (!visit_type_FooList(v, NULL, &l, &err)) {
+  *      ...handle error...
+  *  } else {
+  *      for ( ; l; l = l->next) {
+@@ -186,34 +186,32 @@
+  * <example>
+  *  Visitor *v;
+  *  Error *err = NULL;
++ *  bool ok = false;
+  *  int value;
+  *
+  *  v = FOO_visitor_new(...);
+- *  visit_start_struct(v, NULL, NULL, 0, &err);
+- *  if (err) {
++ *  if (!visit_start_struct(v, NULL, NULL, 0, &err)) {
+  *      goto out;
+  *  }
+- *  visit_start_list(v, "list", NULL, 0, &err);
+- *  if (err) {
++ *  if (!visit_start_list(v, "list", NULL, 0, &err)) {
+  *      goto outobj;
+  *  }
+  *  value = 1;
+- *  visit_type_int(v, NULL, &value, &err);
+- *  if (err) {
++ *  if (!visit_type_int(v, NULL, &value, &err)) {
+  *      goto outlist;
+  *  }
+  *  value = 2;
+- *  visit_type_int(v, NULL, &value, &err);
+- *  if (err) {
++ *  if (!visit_type_int(v, NULL, &value, &err)) {
+  *      goto outlist;
+  *  }
++ *  ok = true;
+  * outlist:
+- *  if (!err) {
+- *      visit_check_list(v, &err);
++ *  if (ok) {
++ *      ok = visit_check_list(v, &err);
+  *  }
+  *  visit_end_list(v, NULL);
+- *  if (!err) {
+- *      visit_check_struct(v, &err);
++ *  if (ok) {
++ *      ok = visit_check_struct(v, &err);
+  *  }
+  * outobj:
+  *  visit_end_struct(v, NULL);
+@@ -286,6 +284,8 @@ void visit_free(Visitor *v);
+  * On failure, set *@obj to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * After visit_start_struct() succeeds, the caller may visit its
+  * members one after the other, passing the member's name and address
+  * within the struct.  Finally, visit_end_struct() needs to be called
+@@ -295,7 +295,7 @@ void visit_free(Visitor *v);
+  * FIXME Should this be named visit_start_object, since it is also
+  * used for QAPI unions, and maps to JSON objects?
+  */
+-void visit_start_struct(Visitor *v, const char *name, void **obj,
++bool visit_start_struct(Visitor *v, const char *name, void **obj,
+                         size_t size, Error **errp);
+ 
+ /*
+@@ -304,12 +304,14 @@ void visit_start_struct(Visitor *v, const char *name, void **obj,
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * Should be called prior to visit_end_struct() if all other
+  * intermediate visit steps were successful, to allow the visitor one
+  * last chance to report errors.  May be skipped on a cleanup path,
+  * where there is no need to check for further errors.
+  */
+-void visit_check_struct(Visitor *v, Error **errp);
++bool visit_check_struct(Visitor *v, Error **errp);
+ 
+ /*
+  * Complete an object visit started earlier.
+@@ -341,6 +343,8 @@ void visit_end_struct(Visitor *v, void **obj);
+  * On failure, set *@list to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * After visit_start_list() succeeds, the caller may visit its members
+  * one after the other.  A real visit (where @list is non-NULL) uses
+  * visit_next_list() for traversing the linked list, while a virtual
+@@ -351,7 +355,7 @@ void visit_end_struct(Visitor *v, void **obj);
+  * same @list to clean up, even if intermediate visits fail.  See the
+  * examples above.
+  */
+-void visit_start_list(Visitor *v, const char *name, GenericList **list,
++bool visit_start_list(Visitor *v, const char *name, GenericList **list,
+                       size_t size, Error **errp);
+ 
+ /*
+@@ -376,12 +380,14 @@ GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size);
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * Should be called prior to visit_end_list() if all other
+  * intermediate visit steps were successful, to allow the visitor one
+  * last chance to report errors.  May be skipped on a cleanup path,
+  * where there is no need to check for further errors.
+  */
+-void visit_check_list(Visitor *v, Error **errp);
++bool visit_check_list(Visitor *v, Error **errp);
+ 
+ /*
+  * Complete a list visit started earlier.
+@@ -412,11 +418,13 @@ void visit_end_list(Visitor *v, void **list);
+  * On failure, set *@obj to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * If successful, this must be paired with visit_end_alternate() with
+  * the same @obj to clean up, even if visiting the contents of the
+  * alternate fails.
+  */
+-void visit_start_alternate(Visitor *v, const char *name,
++bool visit_start_alternate(Visitor *v, const char *name,
+                            GenericAlternate **obj, size_t size,
+                            Error **errp);
+ 
+@@ -468,12 +476,14 @@ bool visit_optional(Visitor *v, const char *name, bool *present);
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * May call visit_type_str() under the hood, and the enum visit may
+  * fail even if the corresponding string visit succeeded; this implies
+  * that an input visitor's visit_type_str() must have no unwelcome
+  * side effects.
+  */
+-void visit_type_enum(Visitor *v, const char *name, int *obj,
++bool visit_type_enum(Visitor *v, const char *name, int *obj,
+                      const QEnumLookup *lookup, Error **errp);
+ 
+ /*
+@@ -499,28 +509,30 @@ bool visit_is_dealloc(Visitor *v);
+  *
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
++ *
++ * Return true on success, false on failure.
+  */
+-void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp);
++bool visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp);
+ 
+ /*
+  * Visit a uint8_t value.
+  * Like visit_type_int(), except clamps the value to uint8_t range.
+  */
+-void visit_type_uint8(Visitor *v, const char *name, uint8_t *obj,
++bool visit_type_uint8(Visitor *v, const char *name, uint8_t *obj,
+                       Error **errp);
+ 
+ /*
+  * Visit a uint16_t value.
+  * Like visit_type_int(), except clamps the value to uint16_t range.
+  */
+-void visit_type_uint16(Visitor *v, const char *name, uint16_t *obj,
++bool visit_type_uint16(Visitor *v, const char *name, uint16_t *obj,
+                        Error **errp);
+ 
+ /*
+  * Visit a uint32_t value.
+  * Like visit_type_int(), except clamps the value to uint32_t range.
+  */
+-void visit_type_uint32(Visitor *v, const char *name, uint32_t *obj,
++bool visit_type_uint32(Visitor *v, const char *name, uint32_t *obj,
+                        Error **errp);
+ 
+ /*
+@@ -528,34 +540,34 @@ void visit_type_uint32(Visitor *v, const char *name, uint32_t *obj,
+  * Like visit_type_int(), except clamps the value to uint64_t range,
+  * that is, ensures it is unsigned.
+  */
+-void visit_type_uint64(Visitor *v, const char *name, uint64_t *obj,
++bool visit_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+                        Error **errp);
+ 
+ /*
+  * Visit an int8_t value.
+  * Like visit_type_int(), except clamps the value to int8_t range.
+  */
+-void visit_type_int8(Visitor *v, const char *name, int8_t *obj, Error **errp);
++bool visit_type_int8(Visitor *v, const char *name, int8_t *obj, Error **errp);
+ 
+ /*
+  * Visit an int16_t value.
+  * Like visit_type_int(), except clamps the value to int16_t range.
+  */
+-void visit_type_int16(Visitor *v, const char *name, int16_t *obj,
++bool visit_type_int16(Visitor *v, const char *name, int16_t *obj,
+                       Error **errp);
+ 
+ /*
+  * Visit an int32_t value.
+  * Like visit_type_int(), except clamps the value to int32_t range.
+  */
+-void visit_type_int32(Visitor *v, const char *name, int32_t *obj,
++bool visit_type_int32(Visitor *v, const char *name, int32_t *obj,
+                       Error **errp);
+ 
+ /*
+  * Visit an int64_t value.
+  * Identical to visit_type_int().
+  */
+-void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
++bool visit_type_int64(Visitor *v, const char *name, int64_t *obj,
+                       Error **errp);
+ 
+ /*
+@@ -564,7 +576,7 @@ void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
+  * recognize additional syntax, such as suffixes for easily scaling
+  * values.
+  */
+-void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
++bool visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+                      Error **errp);
+ 
+ /*
+@@ -578,8 +590,10 @@ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+  *
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
++ *
++ * Return true on success, false on failure.
+  */
+-void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp);
++bool visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp);
+ 
+ /*
+  * Visit a string value.
+@@ -598,9 +612,11 @@ void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp);
+  * On failure, set *@obj to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * FIXME: Callers that try to output NULL *obj should not be allowed.
+  */
+-void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp);
++bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp);
+ 
+ /*
+  * Visit a number (i.e. double) value.
+@@ -614,8 +630,10 @@ void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp);
+  *
+  * On failure, store an error through @errp.  Can happen only when @v
+  * is an input visitor.
++ *
++ * Return true on success, false on failure.
+  */
+-void visit_type_number(Visitor *v, const char *name, double *obj,
++bool visit_type_number(Visitor *v, const char *name, double *obj,
+                        Error **errp);
+ 
+ /*
+@@ -631,11 +649,13 @@ void visit_type_number(Visitor *v, const char *name, double *obj,
+  * On failure, set *@obj to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
+  *
++ * Return true on success, false on failure.
++ *
+  * Note that some kinds of input can't express arbitrary QObject.
+  * E.g. the visitor returned by qobject_input_visitor_new_keyval()
+  * can't create numbers or booleans, only strings.
+  */
+-void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp);
++bool visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp);
+ 
+ /*
+  * Visit a JSON null value.
+@@ -648,8 +668,10 @@ void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp);
+  *
+  * On failure, set *@obj to NULL and store an error through @errp.
+  * Can happen only when @v is an input visitor.
++ *
++ * Return true on success, false on failure.
+  */
+-void visit_type_null(Visitor *v, const char *name, QNull **obj,
++bool visit_type_null(Visitor *v, const char *name, QNull **obj,
+                      Error **errp);
+ 
+ #endif
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index ebd7d9fa0d..ffdbd0bcce 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -421,11 +421,12 @@ typedef struct {
+     GList *path;
+ } LegacyPrintVisitor;
+ 
+-static void lv_start_struct(Visitor *v, const char *name, void **obj,
++static bool lv_start_struct(Visitor *v, const char *name, void **obj,
+                             size_t size, Error **errp)
  {
-     MachineState *machine = MACHINE(OBJECT(hotplug_dev));
-     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
--    Error *local_err = NULL;
-     CPUCore *cc = CPU_CORE(dev);
-     const char *base_core_type = spapr_get_cpu_core_type(machine->cpu_type);
-     const char *type = object_get_typename(OBJECT(dev));
-@@ -3900,18 +3892,18 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     unsigned int smp_threads = machine->smp.threads;
- 
-     if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
--        error_setg(&local_err, "CPU hotplug not supported for this machine");
--        goto out;
-+        error_setg(errp, "CPU hotplug not supported for this machine");
-+        return;
-     }
- 
-     if (strcmp(base_core_type, type)) {
--        error_setg(&local_err, "CPU core type should be %s", base_core_type);
--        goto out;
-+        error_setg(errp, "CPU core type should be %s", base_core_type);
-+        return;
-     }
- 
-     if (cc->core_id % smp_threads) {
--        error_setg(&local_err, "invalid core id %d", cc->core_id);
--        goto out;
-+        error_setg(errp, "invalid core id %d", cc->core_id);
-+        return;
-     }
- 
-     /*
-@@ -3921,26 +3913,23 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-      * total vcpus not a multiple of threads-per-core.
-      */
-     if (mc->has_hotpluggable_cpus && (cc->nr_threads != smp_threads)) {
--        error_setg(&local_err, "invalid nr-threads %d, must be %d",
--                   cc->nr_threads, smp_threads);
--        goto out;
-+        error_setg(errp, "invalid nr-threads %d, must be %d", cc->nr_threads,
-+                   smp_threads);
-+        return;
-     }
- 
-     core_slot = spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index);
-     if (!core_slot) {
--        error_setg(&local_err, "core id %d out of range", cc->core_id);
--        goto out;
-+        error_setg(errp, "core id %d out of range", cc->core_id);
-+        return;
-     }
- 
-     if (core_slot->cpu) {
--        error_setg(&local_err, "core %d already populated", cc->core_id);
--        goto out;
-+        error_setg(errp, "core %d already populated", cc->core_id);
-+        return;
-     }
- 
--    numa_cpu_pre_plug(core_slot, dev, &local_err);
--
--out:
--    error_propagate(errp, local_err);
-+    numa_cpu_pre_plug(core_slot, dev, errp);
+     LegacyPrintVisitor *lv = (LegacyPrintVisitor *) v;
+     lv->path = g_list_append(lv->path, g_strdup(name));
++    return true;
  }
  
- int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 223bb8f464..2a6a48744a 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1499,10 +1499,10 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-          * we need to let them know it's not enabled
-          */
-         if (plugged_dev->hotplugged) {
--            error_setg(&local_err, QERR_BUS_NO_HOTPLUG,
-+            error_setg(errp, QERR_BUS_NO_HOTPLUG,
-                        object_get_typename(OBJECT(phb)));
-         }
--        goto out;
-+        return;
-     }
- 
-     g_assert(drc);
-@@ -1517,15 +1517,16 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-      */
-     if (plugged_dev->hotplugged && bus->devices[PCI_DEVFN(slotnr, 0)] &&
-         PCI_FUNC(pdev->devfn) != 0) {
--        error_setg(&local_err, "PCI: slot %d function 0 already ocuppied by %s,"
-+        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-                    " additional functions can no longer be exposed to guest.",
-                    slotnr, bus->devices[PCI_DEVFN(slotnr, 0)]->name);
--        goto out;
-+        return;
-     }
- 
-     spapr_drc_attach(drc, DEVICE(pdev), &local_err);
-     if (local_err) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
- 
-     /* If this is function 0, signal hotplug for all the device functions.
-@@ -1551,9 +1552,6 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-             }
-         }
-     }
--
--out:
--    error_propagate(errp, local_err);
+ static void lv_end_struct(Visitor *v, void **obj)
+@@ -453,27 +454,30 @@ static void lv_print_key(Visitor *v, const char *name)
+     printf("%s=", name);
  }
  
- static void spapr_pci_bridge_unplug(SpaprPhbState *phb,
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 7c893e5683..d46b1f094f 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -117,7 +117,6 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-     uint64_t pentry;
-     char *magic;
-     int kernel_size;
--    Error *err = NULL;
- 
-     int bios_size;
-     char *bios_filename;
-@@ -135,8 +134,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
- 
-         bios_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-         if (bios_filename == NULL) {
--            error_setg(&err, "could not find stage1 bootloader");
--            goto error;
-+            error_setg(errp, "could not find stage1 bootloader");
-+            return;
-         }
- 
-         bios_size = load_elf(bios_filename, NULL,
-@@ -155,8 +154,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-         g_free(bios_filename);
- 
-         if (bios_size == -1) {
--            error_setg(&err, "could not load bootloader '%s'", bios_name);
--            goto error;
-+            error_setg(errp, "could not load bootloader '%s'", bios_name);
-+            return;
-         }
- 
-         /* default boot target is the bios */
-@@ -170,8 +169,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-         if (kernel_size < 0) {
-             kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-             if (kernel_size < 0) {
--                error_setg(&err, "could not load kernel '%s'", ipl->kernel);
--                goto error;
-+                error_setg(errp, "could not load kernel '%s'", ipl->kernel);
-+                return;
-             }
-             /* if this is Linux use KERN_IMAGE_START */
-             magic = rom_ptr(LINUX_MAGIC_ADDR, 6);
-@@ -183,8 +182,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-                 if (ipl_psw) {
-                     pentry = be32_to_cpu(*ipl_psw) & PSW_MASK_SHORT_ADDR;
-                 } else {
--                    error_setg(&err, "Could not get IPL PSW");
--                    goto error;
-+                    error_setg(errp, "Could not get IPL PSW");
-+                    return;
-                 }
-             }
-         }
-@@ -217,8 +216,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-             initrd_size = load_image_targphys(ipl->initrd, initrd_offset,
-                                               ram_size - initrd_offset);
-             if (initrd_size == -1) {
--                error_setg(&err, "could not load initrd '%s'", ipl->initrd);
--                goto error;
-+                error_setg(errp, "could not load initrd '%s'", ipl->initrd);
-+                return;
-             }
- 
-             /*
-@@ -248,8 +247,6 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-      * TODO: there should be a better way to do this.
-      */
-     qemu_register_reset(resettable_cold_reset_fn, dev);
--error:
--    error_propagate(errp, err);
- }
- 
- static Property s390_ipl_properties[] = {
-diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
-index 31ec5add1d..d0d7c720a6 100644
---- a/hw/xen/xen_pt_config_init.c
-+++ b/hw/xen/xen_pt_config_init.c
-@@ -2052,10 +2052,9 @@ void xen_pt_config_init(XenPCIPassthroughState *s, Error **errp)
-                                                   reg_grp_offset,
-                                                   &reg_grp_entry->size);
-             if (rc < 0) {
--                error_setg(&err, "Failed to initialize %d/%zu, type = 0x%x,"
-+                error_setg(errp, "Failed to initialize %d/%zu, type = 0x%x,"
-                            " rc: %d", i, ARRAY_SIZE(xen_pt_emu_reg_grps),
-                            xen_pt_emu_reg_grps[i].grp_type, rc);
--                error_propagate(errp, err);
-                 xen_pt_config_delete(s);
-                 return;
-             }
-diff --git a/iothread.c b/iothread.c
-index cb65ef0e56..aa8830fed2 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -244,13 +244,14 @@ static void iothread_set_poll_param(Object *obj, Visitor *v,
-     int64_t value;
- 
-     if (!visit_type_int64(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
- 
-     if (value < 0) {
--        error_setg(&local_err, "%s value must be in range [0, %"PRId64"]",
-+        error_setg(errp, "%s value must be in range [0, %" PRId64 "]",
-                    info->name, INT64_MAX);
--        goto out;
-+        return;
-     }
- 
-     *field = value;
-@@ -260,11 +261,8 @@ static void iothread_set_poll_param(Object *obj, Visitor *v,
-                                     iothread->poll_max_ns,
-                                     iothread->poll_grow,
-                                     iothread->poll_shrink,
--                                    &local_err);
-+                                    errp);
-     }
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void iothread_class_init(ObjectClass *klass, void *class_data)
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 6835d42363..d75169e28f 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -1097,17 +1097,15 @@ static void compare_set_timeout(Object *obj, Visitor *v,
-     uint32_t value;
- 
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+        error_setg(errp, "Property '%s.%s' requires a positive value",
-                    object_get_typename(obj), name);
--        goto out;
-+        return;
-     }
-     s->compare_timeout = value;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void compare_get_expired_scan_cycle(Object *obj, Visitor *v,
-@@ -1129,17 +1127,15 @@ static void compare_set_expired_scan_cycle(Object *obj, Visitor *v,
-     uint32_t value;
- 
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+        error_setg(errp, "Property '%s.%s' requires a positive value",
-                    object_get_typename(obj), name);
--        goto out;
-+        return;
-     }
-     s->expired_scan_cycle = value;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void compare_pri_rs_finalize(SocketReadState *pri_rs)
-diff --git a/net/dump.c b/net/dump.c
-index 8c487a5590..f7a302f56c 100644
---- a/net/dump.c
-+++ b/net/dump.c
-@@ -196,17 +196,15 @@ static void filter_dump_set_maxlen(Object *obj, Visitor *v, const char *name,
-     uint32_t value;
- 
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (value == 0) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%u'",
-+        error_setg(errp, "Property '%s.%s' doesn't take value '%u'",
-                    object_get_typename(obj), name, value);
--        goto out;
-+        return;
-     }
-     nfds->maxlen = value;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static char *file_dump_get_filename(Object *obj, Error **errp)
-diff --git a/net/filter-buffer.c b/net/filter-buffer.c
-index 8e42934b37..143627fcaf 100644
---- a/net/filter-buffer.c
-+++ b/net/filter-buffer.c
-@@ -174,17 +174,15 @@ static void filter_buffer_set_interval(Object *obj, Visitor *v,
-     uint32_t value;
- 
-     if (!visit_type_uint32(v, name, &value, &local_err)) {
--        goto out;
-+        error_propagate(errp, local_err);
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+        error_setg(errp, "Property '%s.%s' requires a positive value",
-                    object_get_typename(obj), name);
--        goto out;
-+        return;
-     }
-     s->interval = value;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void filter_buffer_init(Object *obj)
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 5ba56327dd..0f4911082f 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -278,13 +278,10 @@ out:
- static void execute_async(DWORD WINAPI (*func)(LPVOID), LPVOID opaque,
+-static void lv_type_int64(Visitor *v, const char *name, int64_t *obj,
++static bool lv_type_int64(Visitor *v, const char *name, int64_t *obj,
                            Error **errp)
  {
--    Error *local_err = NULL;
--
-     HANDLE thread = CreateThread(NULL, 0, func, opaque, 0, NULL);
-     if (!thread) {
--        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                    "failed to dispatch asynchronous command");
--        error_propagate(errp, local_err);
+     lv_print_key(v, name);
+     printf("%" PRIi64, *obj);
++    return true;
+ }
+ 
+-static void lv_type_uint64(Visitor *v, const char *name, uint64_t *obj,
++static bool lv_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+                            Error **errp)
+ {
+     lv_print_key(v, name);
+     printf("%" PRIu64, *obj);
++    return true;
+ }
+ 
+-static void lv_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
++static bool lv_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+     lv_print_key(v, name);
+     printf("%s", *obj ? "on" : "off");
++    return true;
+ }
+ 
+-static void lv_type_str(Visitor *v, const char *name, char **obj, Error **errp)
++static bool lv_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ {
+     const char *str = *obj;
+     lv_print_key(v, name);
+@@ -484,6 +488,7 @@ static void lv_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+         }
+         putchar(*str++);
+     }
++    return true;
+ }
+ 
+ static void lv_complete(Visitor *v, void *opaque)
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 5fe0276c1c..6d8f4b6928 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -133,7 +133,7 @@ opts_visitor_insert(GHashTable *unprocessed_opts, const QemuOpt *opt)
+ }
+ 
+ 
+-static void
++static bool
+ opts_start_struct(Visitor *v, const char *name, void **obj,
+                   size_t size, Error **errp)
+ {
+@@ -144,7 +144,7 @@ opts_start_struct(Visitor *v, const char *name, void **obj,
+         *obj = g_malloc0(size);
+     }
+     if (ov->depth++ > 0) {
+-        return;
++        return true;
+     }
+ 
+     ov->unprocessed_opts = g_hash_table_new_full(&g_str_hash, &g_str_equal,
+@@ -163,10 +163,11 @@ opts_start_struct(Visitor *v, const char *name, void **obj,
+         ov->fake_id_opt->str = g_strdup(ov->opts_root->id);
+         opts_visitor_insert(ov->unprocessed_opts, ov->fake_id_opt);
+     }
++    return true;
+ }
+ 
+ 
+-static void
++static bool
+ opts_check_struct(Visitor *v, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -174,7 +175,7 @@ opts_check_struct(Visitor *v, Error **errp)
+     GQueue *any;
+ 
+     if (ov->depth > 1) {
+-        return;
++        return true;
+     }
+ 
+     /* we should have processed all (distinct) QemuOpt instances */
+@@ -184,7 +185,9 @@ opts_check_struct(Visitor *v, Error **errp)
+ 
+         first = g_queue_peek_head(any);
+         error_setg(errp, QERR_INVALID_PARAMETER, first->name);
++        return false;
+     }
++    return true;
+ }
+ 
+ 
+@@ -221,7 +224,7 @@ lookup_distinct(const OptsVisitor *ov, const char *name, Error **errp)
+ }
+ 
+ 
+-static void
++static bool
+ opts_start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+                 Error **errp)
+ {
+@@ -238,6 +241,7 @@ opts_start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+     } else {
+         *list = NULL;
+     }
++    return true;
+ }
+ 
+ 
+@@ -285,13 +289,14 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
+ }
+ 
+ 
+-static void
++static bool
+ opts_check_list(Visitor *v, Error **errp)
+ {
+     /*
+      * Unvisited list elements will be reported later when checking
+      * whether unvisited struct members remain.
+      */
++    return true;
+ }
+ 
+ 
+@@ -341,7 +346,7 @@ processed(OptsVisitor *ov, const char *name)
+ }
+ 
+ 
+-static void
++static bool
+ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -350,7 +355,7 @@ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+     opt = lookup_scalar(ov, name, errp);
+     if (!opt) {
+         *obj = NULL;
+-        return;
++        return false;
+     }
+     *obj = g_strdup(opt->str ? opt->str : "");
+     /* Note that we consume a string even if this is called as part of
+@@ -359,11 +364,12 @@ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+      * consumed only matters to visit_end_struct() as the final error
+      * check if there were no other failures during the visit.  */
+     processed(ov, name);
++    return true;
+ }
+ 
+ 
+ /* mimics qemu-option.c::parse_option_bool() */
+-static void
++static bool
+ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -371,7 +377,7 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ 
+     opt = lookup_scalar(ov, name, errp);
+     if (!opt) {
+-        return;
++        return false;
+     }
+ 
+     if (opt->str) {
+@@ -386,17 +392,18 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+         } else {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+                        "on|yes|y|off|no|n");
+-            return;
++            return false;
+         }
+     } else {
+         *obj = true;
+     }
+ 
+     processed(ov, name);
++    return true;
+ }
+ 
+ 
+-static void
++static bool
+ opts_type_int64(Visitor *v, const char *name, int64_t *obj, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -407,12 +414,12 @@ opts_type_int64(Visitor *v, const char *name, int64_t *obj, Error **errp)
+ 
+     if (ov->list_mode == LM_SIGNED_INTERVAL) {
+         *obj = ov->range_next.s;
+-        return;
++        return true;
+     }
+ 
+     opt = lookup_scalar(ov, name, errp);
+     if (!opt) {
+-        return;
++        return false;
+     }
+     str = opt->str ? opt->str : "";
+ 
+@@ -425,7 +432,7 @@ opts_type_int64(Visitor *v, const char *name, int64_t *obj, Error **errp)
+         if (*endptr == '\0') {
+             *obj = val;
+             processed(ov, name);
+-            return;
++            return true;
+         }
+         if (*endptr == '-' && ov->list_mode == LM_IN_PROGRESS) {
+             long long val2;
+@@ -442,17 +449,18 @@ opts_type_int64(Visitor *v, const char *name, int64_t *obj, Error **errp)
+ 
+                 /* as if entering on the top */
+                 *obj = ov->range_next.s;
+-                return;
++                return true;
+             }
+         }
+     }
+     error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+                (ov->list_mode == LM_NONE) ? "an int64 value" :
+                                             "an int64 value or range");
++    return false;
+ }
+ 
+ 
+-static void
++static bool
+ opts_type_uint64(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -463,12 +471,12 @@ opts_type_uint64(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+ 
+     if (ov->list_mode == LM_UNSIGNED_INTERVAL) {
+         *obj = ov->range_next.u;
+-        return;
++        return true;
+     }
+ 
+     opt = lookup_scalar(ov, name, errp);
+     if (!opt) {
+-        return;
++        return false;
+     }
+     str = opt->str;
+ 
+@@ -479,7 +487,7 @@ opts_type_uint64(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+         if (*endptr == '\0') {
+             *obj = val;
+             processed(ov, name);
+-            return;
++            return true;
+         }
+         if (*endptr == '-' && ov->list_mode == LM_IN_PROGRESS) {
+             unsigned long long val2;
+@@ -494,17 +502,18 @@ opts_type_uint64(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+ 
+                 /* as if entering on the top */
+                 *obj = ov->range_next.u;
+-                return;
++                return true;
+             }
+         }
+     }
+     error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+                (ov->list_mode == LM_NONE) ? "a uint64 value" :
+                                             "a uint64 value or range");
++    return false;
+ }
+ 
+ 
+-static void
++static bool
+ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+ {
+     OptsVisitor *ov = to_ov(v);
+@@ -513,17 +522,18 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+ 
+     opt = lookup_scalar(ov, name, errp);
+     if (!opt) {
+-        return;
++        return false;
+     }
+ 
+     err = qemu_strtosz(opt->str ? opt->str : "", NULL, obj);
+     if (err < 0) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+                    "a size value");
+-        return;
++        return false;
+     }
+ 
+     processed(ov, name);
++    return true;
+ }
+ 
+ 
+diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+index daab6819b4..5a54bd593f 100644
+--- a/qapi/qapi-clone-visitor.c
++++ b/qapi/qapi-clone-visitor.c
+@@ -24,7 +24,7 @@ static QapiCloneVisitor *to_qcv(Visitor *v)
+     return container_of(v, QapiCloneVisitor, visitor);
+ }
+ 
+-static void qapi_clone_start_struct(Visitor *v, const char *name, void **obj,
++static bool qapi_clone_start_struct(Visitor *v, const char *name, void **obj,
+                                     size_t size, Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+@@ -34,11 +34,12 @@ static void qapi_clone_start_struct(Visitor *v, const char *name, void **obj,
+         /* Only possible when visiting an alternate's object
+          * branch. Nothing further to do here, since the earlier
+          * visit_start_alternate() already copied memory. */
+-        return;
++        return true;
+     }
+ 
+     *obj = g_memdup(*obj, size);
+     qcv->depth++;
++    return true;
+ }
+ 
+ static void qapi_clone_end(Visitor *v, void **obj)
+@@ -51,11 +52,12 @@ static void qapi_clone_end(Visitor *v, void **obj)
      }
  }
  
-@@ -1270,35 +1267,31 @@ typedef enum {
- static void check_suspend_mode(GuestSuspendMode mode, Error **errp)
+-static void qapi_clone_start_list(Visitor *v, const char *name,
++static bool qapi_clone_start_list(Visitor *v, const char *name,
+                                   GenericList **listp, size_t size,
+                                   Error **errp)
  {
-     SYSTEM_POWER_CAPABILITIES sys_pwr_caps;
+     qapi_clone_start_struct(v, name, (void **)listp, size, errp);
++    return true;
+ }
+ 
+ static GenericList *qapi_clone_next_list(Visitor *v, GenericList *tail,
+@@ -69,45 +71,49 @@ static GenericList *qapi_clone_next_list(Visitor *v, GenericList *tail,
+     return tail->next;
+ }
+ 
+-static void qapi_clone_start_alternate(Visitor *v, const char *name,
++static bool qapi_clone_start_alternate(Visitor *v, const char *name,
+                                        GenericAlternate **obj, size_t size,
+                                        Error **errp)
+ {
+     qapi_clone_start_struct(v, name, (void **)obj, size, errp);
++    return true;
+ }
+ 
+-static void qapi_clone_type_int64(Visitor *v, const char *name, int64_t *obj,
+-                                   Error **errp)
+-{
+-    QapiCloneVisitor *qcv = to_qcv(v);
+-
+-    assert(qcv->depth);
+-    /* Value was already cloned by g_memdup() */
+-}
+-
+-static void qapi_clone_type_uint64(Visitor *v, const char *name,
+-                                    uint64_t *obj, Error **errp)
+-{
+-    QapiCloneVisitor *qcv = to_qcv(v);
+-
+-    assert(qcv->depth);
+-    /* Value was already cloned by g_memdup() */
+-}
+-
+-static void qapi_clone_type_bool(Visitor *v, const char *name, bool *obj,
++static bool qapi_clone_type_int64(Visitor *v, const char *name, int64_t *obj,
+                                   Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+ 
+     assert(qcv->depth);
+     /* Value was already cloned by g_memdup() */
++    return true;
+ }
+ 
+-static void qapi_clone_type_str(Visitor *v, const char *name, char **obj,
++static bool qapi_clone_type_uint64(Visitor *v, const char *name,
++                                   uint64_t *obj, Error **errp)
++{
++    QapiCloneVisitor *qcv = to_qcv(v);
++
++    assert(qcv->depth);
++    /* Value was already cloned by g_memdup() */
++    return true;
++}
++
++static bool qapi_clone_type_bool(Visitor *v, const char *name, bool *obj,
+                                  Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+ 
++    assert(qcv->depth);
++    /* Value was already cloned by g_memdup() */
++    return true;
++}
++
++static bool qapi_clone_type_str(Visitor *v, const char *name, char **obj,
++                                Error **errp)
++{
++    QapiCloneVisitor *qcv = to_qcv(v);
++
+     assert(qcv->depth);
+     /*
+      * Pointer was already cloned by g_memdup; create fresh copy.
+@@ -117,24 +123,27 @@ static void qapi_clone_type_str(Visitor *v, const char *name, char **obj,
+      * string is intended.
+      */
+     *obj = g_strdup(*obj ?: "");
++    return true;
+ }
+ 
+-static void qapi_clone_type_number(Visitor *v, const char *name, double *obj,
+-                                    Error **errp)
++static bool qapi_clone_type_number(Visitor *v, const char *name, double *obj,
++                                   Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+ 
+     assert(qcv->depth);
+     /* Value was already cloned by g_memdup() */
++    return true;
+ }
+ 
+-static void qapi_clone_type_null(Visitor *v, const char *name, QNull **obj,
++static bool qapi_clone_type_null(Visitor *v, const char *name, QNull **obj,
+                                  Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+ 
+     assert(qcv->depth);
+     *obj = qnull();
++    return true;
+ }
+ 
+ static void qapi_clone_free(Visitor *v)
+@@ -167,7 +176,7 @@ static Visitor *qapi_clone_visitor_new(void)
+     return &v->visitor;
+ }
+ 
+-void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
++void *qapi_clone(const void *src, bool (*visit_type)(Visitor *, const char *,
+                                                      void **, Error **))
+ {
+     Visitor *v;
+@@ -184,7 +193,7 @@ void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
+ }
+ 
+ void qapi_clone_members(void *dst, const void *src, size_t sz,
+-                        void (*visit_type_members)(Visitor *, void *,
++                        bool (*visit_type_members)(Visitor *, void *,
+                                                    Error **))
+ {
+     Visitor *v;
+diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+index 2239fc6417..ef283f2966 100644
+--- a/qapi/qapi-dealloc-visitor.c
++++ b/qapi/qapi-dealloc-visitor.c
+@@ -22,9 +22,10 @@ struct QapiDeallocVisitor
+     Visitor visitor;
+ };
+ 
+-static void qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
++static bool qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
+                                       size_t unused, Error **errp)
+ {
++    return true;
+ }
+ 
+ static void qapi_dealloc_end_struct(Visitor *v, void **obj)
+@@ -41,10 +42,11 @@ static void qapi_dealloc_end_alternate(Visitor *v, void **obj)
+     }
+ }
+ 
+-static void qapi_dealloc_start_list(Visitor *v, const char *name,
++static bool qapi_dealloc_start_list(Visitor *v, const char *name,
+                                     GenericList **list, size_t size,
+                                     Error **errp)
+ {
++    return true;
+ }
+ 
+ static GenericList *qapi_dealloc_next_list(Visitor *v, GenericList *tail,
+@@ -59,48 +61,55 @@ static void qapi_dealloc_end_list(Visitor *v, void **obj)
+ {
+ }
+ 
+-static void qapi_dealloc_type_str(Visitor *v, const char *name, char **obj,
++static bool qapi_dealloc_type_str(Visitor *v, const char *name, char **obj,
+                                   Error **errp)
+ {
+     if (obj) {
+         g_free(*obj);
+     }
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_int64(Visitor *v, const char *name, int64_t *obj,
++static bool qapi_dealloc_type_int64(Visitor *v, const char *name, int64_t *obj,
+                                     Error **errp)
+ {
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_uint64(Visitor *v, const char *name,
++static bool qapi_dealloc_type_uint64(Visitor *v, const char *name,
+                                      uint64_t *obj, Error **errp)
+ {
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_bool(Visitor *v, const char *name, bool *obj,
++static bool qapi_dealloc_type_bool(Visitor *v, const char *name, bool *obj,
+                                    Error **errp)
+ {
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_number(Visitor *v, const char *name, double *obj,
++static bool qapi_dealloc_type_number(Visitor *v, const char *name, double *obj,
+                                      Error **errp)
+ {
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_anything(Visitor *v, const char *name,
++static bool qapi_dealloc_type_anything(Visitor *v, const char *name,
+                                        QObject **obj, Error **errp)
+ {
+     if (obj) {
+         qobject_unref(*obj);
+     }
++    return true;
+ }
+ 
+-static void qapi_dealloc_type_null(Visitor *v, const char *name,
++static bool qapi_dealloc_type_null(Visitor *v, const char *name,
+                                    QNull **obj, Error **errp)
+ {
+     if (obj) {
+         qobject_unref(*obj);
+     }
++    return true;
+ }
+ 
+ static void qapi_dealloc_free(Visitor *v)
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 74aa9c04bd..5a9c47aabf 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -36,7 +36,7 @@ void visit_free(Visitor *v)
+     }
+ }
+ 
+-void visit_start_struct(Visitor *v, const char *name, void **obj,
++bool visit_start_struct(Visitor *v, const char *name, void **obj,
+                         size_t size, Error **errp)
+ {
+     Error *err = NULL;
+@@ -51,14 +51,13 @@ void visit_start_struct(Visitor *v, const char *name, void **obj,
+         assert(!err != !*obj);
+     }
+     error_propagate(errp, err);
++    return !err;
+ }
+ 
+-void visit_check_struct(Visitor *v, Error **errp)
++bool visit_check_struct(Visitor *v, Error **errp)
+ {
+     trace_visit_check_struct(v);
+-    if (v->check_struct) {
+-        v->check_struct(v, errp);
+-    }
++    return v->check_struct ? v->check_struct(v, errp) : true;
+ }
+ 
+ void visit_end_struct(Visitor *v, void **obj)
+@@ -67,7 +66,7 @@ void visit_end_struct(Visitor *v, void **obj)
+     v->end_struct(v, obj);
+ }
+ 
+-void visit_start_list(Visitor *v, const char *name, GenericList **list,
++bool visit_start_list(Visitor *v, const char *name, GenericList **list,
+                       size_t size, Error **errp)
+ {
+     Error *err = NULL;
+@@ -79,6 +78,7 @@ void visit_start_list(Visitor *v, const char *name, GenericList **list,
+         assert(!(err && *list));
+     }
+     error_propagate(errp, err);
++    return !err;
+ }
+ 
+ GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
+@@ -88,12 +88,10 @@ GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
+     return v->next_list(v, tail, size);
+ }
+ 
+-void visit_check_list(Visitor *v, Error **errp)
++bool visit_check_list(Visitor *v, Error **errp)
+ {
+     trace_visit_check_list(v);
+-    if (v->check_list) {
+-        v->check_list(v, errp);
+-    }
++    return v->check_list ? v->check_list(v, errp) : true;
+ }
+ 
+ void visit_end_list(Visitor *v, void **obj)
+@@ -102,7 +100,7 @@ void visit_end_list(Visitor *v, void **obj)
+     v->end_list(v, obj);
+ }
+ 
+-void visit_start_alternate(Visitor *v, const char *name,
++bool visit_start_alternate(Visitor *v, const char *name,
+                            GenericAlternate **obj, size_t size,
+                            Error **errp)
+ {
+@@ -118,6 +116,7 @@ void visit_start_alternate(Visitor *v, const char *name,
+         assert(v->start_alternate && !err != !*obj);
+     }
+     error_propagate(errp, err);
++    return !err;
+ }
+ 
+ void visit_end_alternate(Visitor *v, void **obj)
+@@ -147,155 +146,168 @@ bool visit_is_dealloc(Visitor *v)
+     return v->type == VISITOR_DEALLOC;
+ }
+ 
+-void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
++bool visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_int(v, name, obj);
+-    v->type_int64(v, name, obj, errp);
++    return v->type_int64(v, name, obj, errp);
+ }
+ 
+-static void visit_type_uintN(Visitor *v, uint64_t *obj, const char *name,
++static bool visit_type_uintN(Visitor *v, uint64_t *obj, const char *name,
+                              uint64_t max, const char *type, Error **errp)
+ {
+-    Error *err = NULL;
+     uint64_t value = *obj;
+ 
+     assert(v->type == VISITOR_INPUT || value <= max);
+ 
+-    v->type_uint64(v, name, &value, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-    } else if (value > max) {
++    if (!v->type_uint64(v, name, &value, errp)) {
++        return false;
++    }
++    if (value > max) {
+         assert(v->type == VISITOR_INPUT);
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    name ? name : "null", type);
+-    } else {
+-        *obj = value;
++        return false;
+     }
++    *obj = value;
++    return true;
+ }
+ 
+-void visit_type_uint8(Visitor *v, const char *name, uint8_t *obj,
++bool visit_type_uint8(Visitor *v, const char *name, uint8_t *obj,
+                       Error **errp)
+ {
+     uint64_t value;
++    bool ok;
+ 
+     trace_visit_type_uint8(v, name, obj);
+     value = *obj;
+-    visit_type_uintN(v, &value, name, UINT8_MAX, "uint8_t", errp);
++    ok = visit_type_uintN(v, &value, name, UINT8_MAX, "uint8_t", errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_uint16(Visitor *v, const char *name, uint16_t *obj,
++bool visit_type_uint16(Visitor *v, const char *name, uint16_t *obj,
+                        Error **errp)
+ {
+     uint64_t value;
++    bool ok;
+ 
+     trace_visit_type_uint16(v, name, obj);
+     value = *obj;
+-    visit_type_uintN(v, &value, name, UINT16_MAX, "uint16_t", errp);
++    ok = visit_type_uintN(v, &value, name, UINT16_MAX, "uint16_t", errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_uint32(Visitor *v, const char *name, uint32_t *obj,
++bool visit_type_uint32(Visitor *v, const char *name, uint32_t *obj,
+                        Error **errp)
+ {
+     uint64_t value;
++    bool ok;
+ 
+     trace_visit_type_uint32(v, name, obj);
+     value = *obj;
+-    visit_type_uintN(v, &value, name, UINT32_MAX, "uint32_t", errp);
++    ok = visit_type_uintN(v, &value, name, UINT32_MAX, "uint32_t", errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_uint64(Visitor *v, const char *name, uint64_t *obj,
++bool visit_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+                        Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_uint64(v, name, obj);
+-    v->type_uint64(v, name, obj, errp);
++    return v->type_uint64(v, name, obj, errp);
+ }
+ 
+-static void visit_type_intN(Visitor *v, int64_t *obj, const char *name,
++static bool visit_type_intN(Visitor *v, int64_t *obj, const char *name,
+                             int64_t min, int64_t max, const char *type,
+                             Error **errp)
+ {
+-    Error *err = NULL;
+     int64_t value = *obj;
+ 
+     assert(v->type == VISITOR_INPUT || (value >= min && value <= max));
+ 
+-    v->type_int64(v, name, &value, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-    } else if (value < min || value > max) {
++    if (!v->type_int64(v, name, &value, errp)) {
++        return false;
++    }
++    if (value < min || value > max) {
+         assert(v->type == VISITOR_INPUT);
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    name ? name : "null", type);
+-    } else {
+-        *obj = value;
++        return false;
+     }
++    *obj = value;
++    return true;
+ }
+ 
+-void visit_type_int8(Visitor *v, const char *name, int8_t *obj, Error **errp)
++bool visit_type_int8(Visitor *v, const char *name, int8_t *obj, Error **errp)
+ {
+     int64_t value;
++    bool ok;
+ 
+     trace_visit_type_int8(v, name, obj);
+     value = *obj;
+-    visit_type_intN(v, &value, name, INT8_MIN, INT8_MAX, "int8_t", errp);
++    ok = visit_type_intN(v, &value, name, INT8_MIN, INT8_MAX, "int8_t", errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_int16(Visitor *v, const char *name, int16_t *obj,
++bool visit_type_int16(Visitor *v, const char *name, int16_t *obj,
+                       Error **errp)
+ {
+     int64_t value;
++    bool ok;
+ 
+     trace_visit_type_int16(v, name, obj);
+     value = *obj;
+-    visit_type_intN(v, &value, name, INT16_MIN, INT16_MAX, "int16_t", errp);
++    ok = visit_type_intN(v, &value, name, INT16_MIN, INT16_MAX, "int16_t",
++                         errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_int32(Visitor *v, const char *name, int32_t *obj,
++bool visit_type_int32(Visitor *v, const char *name, int32_t *obj,
+                       Error **errp)
+ {
+     int64_t value;
++    bool ok;
+ 
+     trace_visit_type_int32(v, name, obj);
+     value = *obj;
+-    visit_type_intN(v, &value, name, INT32_MIN, INT32_MAX, "int32_t", errp);
++    ok = visit_type_intN(v, &value, name, INT32_MIN, INT32_MAX, "int32_t",
++                        errp);
+     *obj = value;
++    return ok;
+ }
+ 
+-void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
++bool visit_type_int64(Visitor *v, const char *name, int64_t *obj,
+                       Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_int64(v, name, obj);
+-    v->type_int64(v, name, obj, errp);
++    return v->type_int64(v, name, obj, errp);
+ }
+ 
+-void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
++bool visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+                      Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_size(v, name, obj);
+     if (v->type_size) {
+-        v->type_size(v, name, obj, errp);
+-    } else {
+-        v->type_uint64(v, name, obj, errp);
++        return v->type_size(v, name, obj, errp);
+     }
++    return v->type_uint64(v, name, obj, errp);
+ }
+ 
+-void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
++bool visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_bool(v, name, obj);
+-    v->type_bool(v, name, obj, errp);
++    return v->type_bool(v, name, obj, errp);
+ }
+ 
+-void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
++bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ {
+     Error *err = NULL;
+ 
+@@ -310,89 +322,88 @@ void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+         assert(!err != !*obj);
+     }
+     error_propagate(errp, err);
++    return !err;
+ }
+ 
+-void visit_type_number(Visitor *v, const char *name, double *obj,
++bool visit_type_number(Visitor *v, const char *name, double *obj,
+                        Error **errp)
+ {
+     assert(obj);
+     trace_visit_type_number(v, name, obj);
+-    v->type_number(v, name, obj, errp);
++    return v->type_number(v, name, obj, errp);
+ }
+ 
+-void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp)
++bool visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok;
+ 
+     assert(obj);
+     assert(v->type != VISITOR_OUTPUT || *obj);
+     trace_visit_type_any(v, name, obj);
+-    v->type_any(v, name, obj, &err);
++    ok = v->type_any(v, name, obj, errp);
+     if (v->type == VISITOR_INPUT) {
+-        assert(!err != !*obj);
++        assert(ok != !*obj);
+     }
+-    error_propagate(errp, err);
++    return ok;
+ }
+ 
+-void visit_type_null(Visitor *v, const char *name, QNull **obj,
++bool visit_type_null(Visitor *v, const char *name, QNull **obj,
+                      Error **errp)
+ {
+     trace_visit_type_null(v, name, obj);
+-    v->type_null(v, name, obj, errp);
++    return v->type_null(v, name, obj, errp);
+ }
+ 
+-static void output_type_enum(Visitor *v, const char *name, int *obj,
++static bool output_type_enum(Visitor *v, const char *name, int *obj,
+                              const QEnumLookup *lookup, Error **errp)
+ {
+     int value = *obj;
+     char *enum_str;
+ 
+     enum_str = (char *)qapi_enum_lookup(lookup, value);
+-    visit_type_str(v, name, &enum_str, errp);
++    return visit_type_str(v, name, &enum_str, errp);
+ }
+ 
+-static void input_type_enum(Visitor *v, const char *name, int *obj,
++static bool input_type_enum(Visitor *v, const char *name, int *obj,
+                             const QEnumLookup *lookup, Error **errp)
+ {
 -    Error *local_err = NULL;
+     int64_t value;
+     char *enum_str;
  
-     ZeroMemory(&sys_pwr_caps, sizeof(sys_pwr_caps));
-     if (!GetPwrCapabilities(&sys_pwr_caps)) {
--        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                    "failed to determine guest suspend capabilities");
--        goto out;
-+        return;
+-    visit_type_str(v, name, &enum_str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
++    if (!visit_type_str(v, name, &enum_str, errp)) {
++        return false;
      }
  
-     switch (mode) {
-     case GUEST_SUSPEND_MODE_DISK:
-         if (!sys_pwr_caps.SystemS4) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "suspend-to-disk not supported by OS");
+     value = qapi_enum_parse(lookup, enum_str, -1, NULL);
+     if (value < 0) {
+         error_setg(errp, QERR_INVALID_PARAMETER, enum_str);
+         g_free(enum_str);
+-        return;
++        return false;
+     }
+ 
+     g_free(enum_str);
+     *obj = value;
++    return true;
+ }
+ 
+-void visit_type_enum(Visitor *v, const char *name, int *obj,
++bool visit_type_enum(Visitor *v, const char *name, int *obj,
+                      const QEnumLookup *lookup, Error **errp)
+ {
+     assert(obj && lookup);
+     trace_visit_type_enum(v, name, obj);
+     switch (v->type) {
+     case VISITOR_INPUT:
+-        input_type_enum(v, name, obj, lookup, errp);
+-        break;
++        return input_type_enum(v, name, obj, lookup, errp);
+     case VISITOR_OUTPUT:
+-        output_type_enum(v, name, obj, lookup, errp);
+-        break;
++        return output_type_enum(v, name, obj, lookup, errp);
+     case VISITOR_CLONE:
+         /* nothing further to do, scalar value was already copied by
+          * g_memdup() during visit_start_*() */
+-        break;
++        return true;
+     case VISITOR_DEALLOC:
+         /* nothing to deallocate for a scalar */
+-        break;
++        return true;
++    default:
++        abort();
+     }
+ }
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 5ce3ec2e5f..f918a05e5f 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -237,7 +237,7 @@ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
+ }
+ 
+ 
+-static void qobject_input_check_struct(Visitor *v, Error **errp)
++static bool qobject_input_check_struct(Visitor *v, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
+@@ -250,7 +250,9 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
+     if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+         error_setg(errp, "Parameter '%s' is unexpected",
+                    full_name(qiv, key));
++        return false;
+     }
++    return true;
+ }
+ 
+ static void qobject_input_stack_object_free(StackObject *tos)
+@@ -272,7 +274,7 @@ static void qobject_input_pop(Visitor *v, void **obj)
+     qobject_input_stack_object_free(tos);
+ }
+ 
+-static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
++static bool qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+                                        size_t size, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -282,12 +284,12 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+         *obj = NULL;
+     }
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     if (qobject_type(qobj) != QTYPE_QDICT) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "object");
+-        return;
++        return false;
+     }
+ 
+     qobject_input_push(qiv, name, qobj, obj);
+@@ -295,6 +297,7 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+     if (obj) {
+         *obj = g_malloc0(size);
+     }
++    return true;
+ }
+ 
+ static void qobject_input_end_struct(Visitor *v, void **obj)
+@@ -307,7 +310,7 @@ static void qobject_input_end_struct(Visitor *v, void **obj)
+ }
+ 
+ 
+-static void qobject_input_start_list(Visitor *v, const char *name,
++static bool qobject_input_start_list(Visitor *v, const char *name,
+                                      GenericList **list, size_t size,
+                                      Error **errp)
+ {
+@@ -319,18 +322,19 @@ static void qobject_input_start_list(Visitor *v, const char *name,
+         *list = NULL;
+     }
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     if (qobject_type(qobj) != QTYPE_QLIST) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "array");
+-        return;
++        return false;
+     }
+ 
+     entry = qobject_input_push(qiv, name, qobj, list);
+     if (entry && list) {
+         *list = g_malloc0(size);
+     }
++    return true;
+ }
+ 
+ static GenericList *qobject_input_next_list(Visitor *v, GenericList *tail,
+@@ -348,7 +352,7 @@ static GenericList *qobject_input_next_list(Visitor *v, GenericList *tail,
+     return tail->next;
+ }
+ 
+-static void qobject_input_check_list(Visitor *v, Error **errp)
++static bool qobject_input_check_list(Visitor *v, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
+@@ -358,7 +362,9 @@ static void qobject_input_check_list(Visitor *v, Error **errp)
+     if (tos->entry) {
+         error_setg(errp, "Only %u list elements expected in %s",
+                    tos->index + 1, full_name_nth(qiv, NULL, 1));
++        return false;
+     }
++    return true;
+ }
+ 
+ static void qobject_input_end_list(Visitor *v, void **obj)
+@@ -370,7 +376,7 @@ static void qobject_input_end_list(Visitor *v, void **obj)
+     qobject_input_pop(v, obj);
+ }
+ 
+-static void qobject_input_start_alternate(Visitor *v, const char *name,
++static bool qobject_input_start_alternate(Visitor *v, const char *name,
+                                           GenericAlternate **obj, size_t size,
+                                           Error **errp)
+ {
+@@ -379,13 +385,14 @@ static void qobject_input_start_alternate(Visitor *v, const char *name,
+ 
+     if (!qobj) {
+         *obj = NULL;
+-        return;
++        return false;
+     }
+     *obj = g_malloc0(size);
+     (*obj)->type = qobject_type(qobj);
++    return true;
+ }
+ 
+-static void qobject_input_type_int64(Visitor *v, const char *name, int64_t *obj,
++static bool qobject_input_type_int64(Visitor *v, const char *name, int64_t *obj,
+                                      Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -393,33 +400,37 @@ static void qobject_input_type_int64(Visitor *v, const char *name, int64_t *obj,
+     QNum *qnum;
+ 
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     qnum = qobject_to(QNum, qobj);
+     if (!qnum || !qnum_get_try_int(qnum, obj)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "integer");
++        return false;
+     }
++    return true;
+ }
+ 
+-static void qobject_input_type_int64_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_int64_keyval(Visitor *v, const char *name,
+                                             int64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+     if (!str) {
+-        return;
++        return false;
+     }
+ 
+     if (qemu_strtoi64(str, NULL, 0, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "integer");
++        return false;
+     }
++    return true;
+ }
+ 
+-static void qobject_input_type_uint64(Visitor *v, const char *name,
++static bool qobject_input_type_uint64(Visitor *v, const char *name,
+                                       uint64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -428,7 +439,7 @@ static void qobject_input_type_uint64(Visitor *v, const char *name,
+     int64_t val;
+ 
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     qnum = qobject_to(QNum, qobj);
+     if (!qnum) {
+@@ -436,38 +447,41 @@ static void qobject_input_type_uint64(Visitor *v, const char *name,
+     }
+ 
+     if (qnum_get_try_uint(qnum, obj)) {
+-        return;
++        return true;
+     }
+ 
+     /* Need to accept negative values for backward compatibility */
+     if (qnum_get_try_int(qnum, &val)) {
+         *obj = val;
+-        return;
++        return true;
+     }
+ 
+ err:
+     error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                full_name(qiv, name), "uint64");
++    return false;
+ }
+ 
+-static void qobject_input_type_uint64_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_uint64_keyval(Visitor *v, const char *name,
+                                              uint64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+     if (!str) {
+-        return;
++        return false;
+     }
+ 
+     if (qemu_strtou64(str, NULL, 0, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "integer");
++        return false;
+     }
++    return true;
+ }
+ 
+-static void qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
++static bool qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
+                                     Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -475,26 +489,27 @@ static void qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
+     QBool *qbool;
+ 
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     qbool = qobject_to(QBool, qobj);
+     if (!qbool) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "boolean");
+-        return;
++        return false;
+     }
+ 
+     *obj = qbool_get_bool(qbool);
++    return true;
+ }
+ 
+-static void qobject_input_type_bool_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
+                                            bool *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+     if (!str) {
+-        return;
++        return false;
+     }
+ 
+     if (!strcmp(str, "on")) {
+@@ -504,10 +519,12 @@ static void qobject_input_type_bool_keyval(Visitor *v, const char *name,
+     } else {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "'on' or 'off'");
++        return false;
+     }
++    return true;
+ }
+ 
+-static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
++static bool qobject_input_type_str(Visitor *v, const char *name, char **obj,
+                                    Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -516,28 +533,30 @@ static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
+ 
+     *obj = NULL;
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     qstr = qobject_to(QString, qobj);
+     if (!qstr) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "string");
+-        return;
++        return false;
+     }
+ 
+     *obj = g_strdup(qstring_get_str(qstr));
++    return true;
+ }
+ 
+-static void qobject_input_type_str_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_str_keyval(Visitor *v, const char *name,
+                                           char **obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+     *obj = g_strdup(str);
++    return !!str;
+ }
+ 
+-static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
++static bool qobject_input_type_number(Visitor *v, const char *name, double *obj,
+                                       Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -545,19 +564,20 @@ static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
+     QNum *qnum;
+ 
+     if (!qobj) {
+-        return;
++        return false;
+     }
+     qnum = qobject_to(QNum, qobj);
+     if (!qnum) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "number");
+-        return;
++        return false;
+     }
+ 
+     *obj = qnum_get_double(qnum);
++    return true;
+ }
+ 
+-static void qobject_input_type_number_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_number_keyval(Visitor *v, const char *name,
+                                              double *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -565,20 +585,21 @@ static void qobject_input_type_number_keyval(Visitor *v, const char *name,
+     double val;
+ 
+     if (!str) {
+-        return;
++        return false;
+     }
+ 
+     if (qemu_strtod_finite(str, NULL, &val)) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "number");
+-        return;
++        return false;
+     }
+ 
+     *obj = val;
++    return true;
+ }
+ 
+-static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
++static bool qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
+                                    Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -586,13 +607,14 @@ static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
+ 
+     *obj = NULL;
+     if (!qobj) {
+-        return;
++        return false;
+     }
+ 
+     *obj = qobject_ref(qobj);
++    return true;
+ }
+ 
+-static void qobject_input_type_null(Visitor *v, const char *name,
++static bool qobject_input_type_null(Visitor *v, const char *name,
+                                     QNull **obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -600,32 +622,35 @@ static void qobject_input_type_null(Visitor *v, const char *name,
+ 
+     *obj = NULL;
+     if (!qobj) {
+-        return;
++        return false;
+     }
+ 
+     if (qobject_type(qobj) != QTYPE_QNULL) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "null");
+-        return;
++        return false;
+     }
+     *obj = qnull();
++    return true;
+ }
+ 
+-static void qobject_input_type_size_keyval(Visitor *v, const char *name,
++static bool qobject_input_type_size_keyval(Visitor *v, const char *name,
+                                            uint64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+     if (!str) {
+-        return;
++        return false;
+     }
+ 
+     if (qemu_strtosz(str, NULL, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "size");
++        return false;
+     }
++    return true;
+ }
+ 
+ static void qobject_input_optional(Visitor *v, const char *name, bool *present)
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index 26d7be5ec9..ba6f6ac8a7 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -103,7 +103,7 @@ static void qobject_output_add_obj(QObjectOutputVisitor *qov, const char *name,
+     }
+ }
+ 
+-static void qobject_output_start_struct(Visitor *v, const char *name,
++static bool qobject_output_start_struct(Visitor *v, const char *name,
+                                         void **obj, size_t unused, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+@@ -111,6 +111,7 @@ static void qobject_output_start_struct(Visitor *v, const char *name,
+ 
+     qobject_output_add(qov, name, dict);
+     qobject_output_push(qov, dict, obj);
++    return true;
+ }
+ 
+ static void qobject_output_end_struct(Visitor *v, void **obj)
+@@ -120,7 +121,7 @@ static void qobject_output_end_struct(Visitor *v, void **obj)
+     assert(qobject_type(value) == QTYPE_QDICT);
+ }
+ 
+-static void qobject_output_start_list(Visitor *v, const char *name,
++static bool qobject_output_start_list(Visitor *v, const char *name,
+                                       GenericList **listp, size_t size,
+                                       Error **errp)
+ {
+@@ -129,6 +130,7 @@ static void qobject_output_start_list(Visitor *v, const char *name,
+ 
+     qobject_output_add(qov, name, list);
+     qobject_output_push(qov, list, listp);
++    return true;
+ }
+ 
+ static GenericList *qobject_output_next_list(Visitor *v, GenericList *tail,
+@@ -144,28 +146,31 @@ static void qobject_output_end_list(Visitor *v, void **obj)
+     assert(qobject_type(value) == QTYPE_QLIST);
+ }
+ 
+-static void qobject_output_type_int64(Visitor *v, const char *name,
++static bool qobject_output_type_int64(Visitor *v, const char *name,
+                                       int64_t *obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qnum_from_int(*obj));
++    return true;
+ }
+ 
+-static void qobject_output_type_uint64(Visitor *v, const char *name,
++static bool qobject_output_type_uint64(Visitor *v, const char *name,
+                                        uint64_t *obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qnum_from_uint(*obj));
++    return true;
+ }
+ 
+-static void qobject_output_type_bool(Visitor *v, const char *name, bool *obj,
++static bool qobject_output_type_bool(Visitor *v, const char *name, bool *obj,
+                                      Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qbool_from_bool(*obj));
++    return true;
+ }
+ 
+-static void qobject_output_type_str(Visitor *v, const char *name, char **obj,
++static bool qobject_output_type_str(Visitor *v, const char *name, char **obj,
+                                     Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+@@ -174,28 +179,32 @@ static void qobject_output_type_str(Visitor *v, const char *name, char **obj,
+     } else {
+         qobject_output_add(qov, name, qstring_from_str(""));
+     }
++    return true;
+ }
+ 
+-static void qobject_output_type_number(Visitor *v, const char *name,
++static bool qobject_output_type_number(Visitor *v, const char *name,
+                                        double *obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qnum_from_double(*obj));
++    return true;
+ }
+ 
+-static void qobject_output_type_any(Visitor *v, const char *name,
++static bool qobject_output_type_any(Visitor *v, const char *name,
+                                     QObject **obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+ 
+     qobject_output_add_obj(qov, name, qobject_ref(*obj));
++    return true;
+ }
+ 
+-static void qobject_output_type_null(Visitor *v, const char *name,
++static bool qobject_output_type_null(Visitor *v, const char *name,
+                                      QNull **obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qnull());
++    return true;
+ }
+ 
+ /* Finish building, and return the root object.
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 730fa4630d..d0ca10aefa 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -60,7 +60,7 @@ static StringInputVisitor *to_siv(Visitor *v)
+     return container_of(v, StringInputVisitor, visitor);
+ }
+ 
+-static void start_list(Visitor *v, const char *name, GenericList **list,
++static bool start_list(Visitor *v, const char *name, GenericList **list,
+                        size_t size, Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -80,6 +80,7 @@ static void start_list(Visitor *v, const char *name, GenericList **list,
          }
-         break;
-     case GUEST_SUSPEND_MODE_RAM:
-         if (!sys_pwr_caps.SystemS3) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "suspend-to-ram not supported by OS");
-         }
-         break;
+         siv->lm = LM_UNPARSED;
+     }
++    return true;
+ }
+ 
+ static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
+@@ -102,7 +103,7 @@ static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
+     return tail->next;
+ }
+ 
+-static void check_list(Visitor *v, Error **errp)
++static bool check_list(Visitor *v, Error **errp)
+ {
+     const StringInputVisitor *siv = to_siv(v);
+ 
+@@ -111,9 +112,9 @@ static void check_list(Visitor *v, Error **errp)
+     case LM_UINT64_RANGE:
+     case LM_UNPARSED:
+         error_setg(errp, "Fewer list elements expected");
+-        return;
++        return false;
+     case LM_END:
+-        return;
++        return true;
      default:
--        error_setg(&local_err, QERR_INVALID_PARAMETER_VALUE, "mode",
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "mode",
-                    "GuestSuspendMode");
+         abort();
      }
+@@ -178,7 +179,7 @@ static int try_parse_int64_list_entry(StringInputVisitor *siv, int64_t *obj)
+     return 0;
+ }
+ 
+-static void parse_type_int64(Visitor *v, const char *name, int64_t *obj,
++static bool parse_type_int64(Visitor *v, const char *name, int64_t *obj,
+                              Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -188,17 +189,17 @@ static void parse_type_int64(Visitor *v, const char *name, int64_t *obj,
+     case LM_NONE:
+         /* just parse a simple int64, bail out if not completely consumed */
+         if (qemu_strtoi64(siv->string, NULL, 0, &val)) {
+-                error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+-                           name ? name : "null", "int64");
+-            return;
++            error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                       name ? name : "null", "int64");
++            return false;
+         }
+         *obj = val;
+-        return;
++        return true;
+     case LM_UNPARSED:
+         if (try_parse_int64_list_entry(siv, obj)) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
+                        "list of int64 values or ranges");
+-            return;
++            return false;
+         }
+         assert(siv->lm == LM_INT64_RANGE);
+         /* fall through */
+@@ -211,10 +212,10 @@ static void parse_type_int64(Visitor *v, const char *name, int64_t *obj,
+             /* end of range, check if there is more to parse */
+             siv->lm = siv->unparsed_string[0] ? LM_UNPARSED : LM_END;
+         }
+-        return;
++        return true;
+     case LM_END:
+         error_setg(errp, "Fewer list elements expected");
+-        return;
++        return false;
+     default:
+         abort();
+     }
+@@ -268,7 +269,7 @@ static int try_parse_uint64_list_entry(StringInputVisitor *siv, uint64_t *obj)
+     return 0;
+ }
+ 
+-static void parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
++static bool parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+                               Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -280,15 +281,15 @@ static void parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+         if (qemu_strtou64(siv->string, NULL, 0, &val)) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
+                        "uint64");
+-            return;
++            return false;
+         }
+         *obj = val;
+-        return;
++        return true;
+     case LM_UNPARSED:
+         if (try_parse_uint64_list_entry(siv, obj)) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
+                        "list of uint64 values or ranges");
+-            return;
++            return false;
+         }
+         assert(siv->lm == LM_UINT64_RANGE);
+         /* fall through */
+@@ -301,16 +302,16 @@ static void parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+             /* end of range, check if there is more to parse */
+             siv->lm = siv->unparsed_string[0] ? LM_UNPARSED : LM_END;
+         }
+-        return;
++        return true;
+     case LM_END:
+         error_setg(errp, "Fewer list elements expected");
+-        return;
++        return false;
+     default:
+         abort();
+     }
+ }
+ 
+-static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
++static bool parse_type_size(Visitor *v, const char *name, uint64_t *obj,
+                             Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -320,13 +321,14 @@ static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
+     assert(siv->lm == LM_NONE);
+     if (!parse_option_size(name, siv->string, &val, &err)) {
+         error_propagate(errp, err);
+-        return;
++        return false;
+     }
+ 
+     *obj = val;
++    return true;
+ }
+ 
+-static void parse_type_bool(Visitor *v, const char *name, bool *obj,
++static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
+                             Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -336,29 +338,31 @@ static void parse_type_bool(Visitor *v, const char *name, bool *obj,
+         !strcasecmp(siv->string, "yes") ||
+         !strcasecmp(siv->string, "true")) {
+         *obj = true;
+-        return;
++        return true;
+     }
+     if (!strcasecmp(siv->string, "off") ||
+         !strcasecmp(siv->string, "no") ||
+         !strcasecmp(siv->string, "false")) {
+         *obj = false;
+-        return;
++        return true;
+     }
+ 
+     error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                "boolean");
++    return false;
+ }
+ 
+-static void parse_type_str(Visitor *v, const char *name, char **obj,
++static bool parse_type_str(Visitor *v, const char *name, char **obj,
+                            Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+ 
+     assert(siv->lm == LM_NONE);
+     *obj = g_strdup(siv->string);
++    return true;
+ }
+ 
+-static void parse_type_number(Visitor *v, const char *name, double *obj,
++static bool parse_type_number(Visitor *v, const char *name, double *obj,
+                               Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -368,13 +372,14 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+     if (qemu_strtod_finite(siv->string, NULL, &val)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "number");
+-        return;
++        return false;
+     }
+ 
+     *obj = val;
++    return true;
+ }
+ 
+-static void parse_type_null(Visitor *v, const char *name, QNull **obj,
++static bool parse_type_null(Visitor *v, const char *name, QNull **obj,
+                             Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -385,10 +390,11 @@ static void parse_type_null(Visitor *v, const char *name, QNull **obj,
+     if (siv->string[0]) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "null");
+-        return;
++        return false;
+     }
+ 
+     *obj = qnull();
++    return true;
+ }
+ 
+ static void string_input_free(Visitor *v)
+diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+index 0d93605d77..b74aa4d44c 100644
+--- a/qapi/string-output-visitor.c
++++ b/qapi/string-output-visitor.c
+@@ -123,7 +123,7 @@ static void format_string(StringOutputVisitor *sov, Range *r, bool next,
+     }
+ }
+ 
+-static void print_type_int64(Visitor *v, const char *name, int64_t *obj,
++static bool print_type_int64(Visitor *v, const char *name, int64_t *obj,
+                              Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+@@ -138,7 +138,7 @@ static void print_type_int64(Visitor *v, const char *name, int64_t *obj,
+         sov->range_start.s = *obj;
+         sov->range_end.s = *obj;
+         sov->list_mode = LM_IN_PROGRESS;
+-        return;
++        return true;
+ 
+     case LM_IN_PROGRESS:
+         if (sov->range_end.s + 1 == *obj) {
+@@ -155,7 +155,7 @@ static void print_type_int64(Visitor *v, const char *name, int64_t *obj,
+             sov->range_start.s = *obj;
+             sov->range_end.s = *obj;
+         }
+-        return;
++        return true;
+ 
+     case LM_END:
+         if (sov->range_end.s + 1 == *obj) {
+@@ -197,17 +197,19 @@ static void print_type_int64(Visitor *v, const char *name, int64_t *obj,
+         }
+         g_string_append(sov->string, ")");
+     }
++
++    return true;
+ }
+ 
+-static void print_type_uint64(Visitor *v, const char *name, uint64_t *obj,
++static bool print_type_uint64(Visitor *v, const char *name, uint64_t *obj,
+                              Error **errp)
+ {
+     /* FIXME: print_type_int64 mishandles values over INT64_MAX */
+     int64_t i = *obj;
+-    print_type_int64(v, name, &i, errp);
++    return print_type_int64(v, name, &i, errp);
+ }
+ 
+-static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
++static bool print_type_size(Visitor *v, const char *name, uint64_t *obj,
+                             Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+@@ -217,7 +219,7 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+     if (!sov->human) {
+         out = g_strdup_printf("%"PRIu64, *obj);
+         string_output_set(sov, out);
+-        return;
++        return true;
+     }
+ 
+     val = *obj;
+@@ -226,16 +228,18 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+     string_output_set(sov, out);
+ 
+     g_free(psize);
++    return true;
+ }
+ 
+-static void print_type_bool(Visitor *v, const char *name, bool *obj,
++static bool print_type_bool(Visitor *v, const char *name, bool *obj,
+                             Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+     string_output_set(sov, g_strdup(*obj ? "true" : "false"));
++    return true;
+ }
+ 
+-static void print_type_str(Visitor *v, const char *name, char **obj,
++static bool print_type_str(Visitor *v, const char *name, char **obj,
+                            Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+@@ -247,16 +251,18 @@ static void print_type_str(Visitor *v, const char *name, char **obj,
+         out = g_strdup(*obj ? *obj : "");
+     }
+     string_output_set(sov, out);
++    return true;
+ }
+ 
+-static void print_type_number(Visitor *v, const char *name, double *obj,
++static bool print_type_number(Visitor *v, const char *name, double *obj,
+                               Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+     string_output_set(sov, g_strdup_printf("%f", *obj));
++    return true;
+ }
+ 
+-static void print_type_null(Visitor *v, const char *name, QNull **obj,
++static bool print_type_null(Visitor *v, const char *name, QNull **obj,
+                             Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+@@ -268,9 +274,10 @@ static void print_type_null(Visitor *v, const char *name, QNull **obj,
+         out = g_strdup("");
+     }
+     string_output_set(sov, out);
++    return true;
+ }
+ 
+-static void
++static bool
+ start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+            Error **errp)
+ {
+@@ -285,6 +292,7 @@ start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+     if (*list && (*list)->next) {
+         sov->list_mode = LM_STARTED;
+     }
++    return true;
+ }
+ 
+ static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index d5d7a1031f..ba0cf0b074 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -23,7 +23,7 @@ def gen_visit_decl(name, scalar=False):
+     if not scalar:
+         c_type += '*'
+     return mcgen('''
+-void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_type)sobj, Error **errp);
++bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_type)sobj, Error **errp);
+ ''',
+                  c_name=c_name(name), c_type=c_type)
+ 
+@@ -31,7 +31,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_type)sobj, Error **
+ def gen_visit_members_decl(name):
+     return mcgen('''
+ 
+-void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp);
++bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp);
+ ''',
+                  c_name=c_name(name))
+ 
+@@ -39,7 +39,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp);
+ def gen_visit_object_members(name, base, members, variants):
+     ret = mcgen('''
+ 
+-void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
++bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+ {
+     Error *err = NULL;
+ 
+@@ -48,9 +48,8 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+ 
+     if base:
+         ret += mcgen('''
+-    visit_type_%(c_type)s_members(v, (%(c_type)s *)obj, &err);
+-    if (err) {
+-        goto out;
++    if (!visit_type_%(c_type)s_members(v, (%(c_type)s *)obj, errp)) {
++        return false;
+     }
+ ''',
+                      c_type=base.c_name())
+@@ -64,9 +63,8 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+                          name=memb.name, c_name=c_name(memb.name))
+             push_indent()
+         ret += mcgen('''
+-    visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, &err);
+-    if (err) {
+-        goto out;
++    if (!visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, errp)) {
++        return false;
+     }
+ ''',
+                      c_type=memb.type.c_name(), name=memb.name,
+@@ -112,15 +110,9 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+     }
+ ''')
+ 
+-    # 'goto out' produced for base, for each member, and if variants were
+-    # present
+-    if base or members or variants:
+-        ret += mcgen('''
 -
 -out:
--    error_propagate(errp, local_err);
+-''')
+     ret += mcgen('''
+     error_propagate(errp, err);
++    return !err;
  }
+ ''')
+     return ret
+@@ -129,15 +121,14 @@ out:
+ def gen_visit_list(name, element_type):
+     return mcgen('''
  
- static DWORD WINAPI do_suspend(LPVOID opaque)
+-void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
++bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+     Error *err = NULL;
+     %(c_name)s *tail;
+     size_t size = sizeof(**obj);
+ 
+-    visit_start_list(v, name, (GenericList **)obj, size, &err);
+-    if (err) {
+-        goto out;
++    if (!visit_start_list(v, name, (GenericList **)obj, size, errp)) {
++        return false;
+     }
+ 
+     for (tail = *obj; tail;
+@@ -156,8 +147,8 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
+     }
+-out:
+     error_propagate(errp, err);
++    return !err;
+ }
+ ''',
+                  c_name=c_name(name), c_elt_type=element_type.c_name())
+@@ -166,11 +157,12 @@ out:
+ def gen_visit_enum(name):
+     return mcgen('''
+ 
+-void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error **errp)
++bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error **errp)
+ {
+     int value = *obj;
+-    visit_type_enum(v, name, &value, &%(c_name)s_lookup, errp);
++    bool ok = visit_type_enum(v, name, &value, &%(c_name)s_lookup, errp);
+     *obj = value;
++    return ok;
+ }
+ ''',
+                  c_name=c_name(name))
+@@ -179,14 +171,13 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error
+ def gen_visit_alternate(name, variants):
+     ret = mcgen('''
+ 
+-void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
++bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+     Error *err = NULL;
+ 
+-    visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**obj),
+-                          &err);
+-    if (err) {
+-        goto out;
++    if (!visit_start_alternate(v, name, (GenericAlternate **)obj,
++                               sizeof(**obj), errp)) {
++        return false;
+     }
+     if (!*obj) {
+         /* incomplete */
+@@ -245,8 +236,8 @@ out_obj:
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
+     }
+-out:
+     error_propagate(errp, err);
++    return !err;
+ }
+ ''',
+                  name=name, c_name=c_name(name))
+@@ -257,13 +248,12 @@ out:
+ def gen_visit_object(name, base, members, variants):
+     return mcgen('''
+ 
+-void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
++bool visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+ {
+     Error *err = NULL;
+ 
+-    visit_start_struct(v, name, (void **)obj, sizeof(%(c_name)s), &err);
+-    if (err) {
+-        goto out;
++    if (!visit_start_struct(v, name, (void **)obj, sizeof(%(c_name)s), errp)) {
++        return false;
+     }
+     if (!*obj) {
+         /* incomplete */
+@@ -281,8 +271,8 @@ out_obj:
+         qapi_free_%(c_name)s(*obj);
+         *obj = NULL;
+     }
+-out:
+     error_propagate(errp, err);
++    return !err;
+ }
+ ''',
+                  c_name=c_name(name))
 -- 
 2.26.2
 
