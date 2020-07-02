@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D5BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 572E3C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:05:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDBFB20760
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:04:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 247322063A
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 18:05:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFn49tGR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBFB20760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4hjEZNC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247322063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3ZK-0000xQ-Vi
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:04:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54530)
+	id 1jr3aX-0002Ld-Cw
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 14:05:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jr3To-00027q-2o
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:58:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47035
+ id 1jr3Tr-0002EW-HA
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:58:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24718
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jr3Tl-0003lM-S8
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:58:35 -0400
+ id 1jr3Tp-0003mj-HQ
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:58:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593712713;
+ s=mimecast20190719; t=1593712716;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tWV/1I/IjGPsoIAyNec9bR5w4pDHH9o9N+zoRMO4Jdw=;
- b=dFn49tGR9DaRl6vk7RiXGt2zZVm8HmWH2dMiZ9nAYW/WJ1ThAecbm0AJRi8X4J/o9V0XMJ
- h4gPlyExcyItW5riPM+3q5JaiK6ltUxeYlCWuRxk1ocpspng0oUUCfkWM2beU3tZtKtr6P
- zgyGodRqXIgf1iDeNOvPZJW6PsRpQ7w=
+ bh=NROZs6HderGG4OkHrcO2CRQWMJbU1tMrf9Vi7ZxYT0w=;
+ b=R4hjEZNCBXlkGlMVo3WBOusWBqHBggkYUFHUFXFRVJyn62EH3cvywgwMxGbcyBkRV5r3/Y
+ otmnHsG7FWEGyOeBy5MXWD00ESTd/dbxsGA5ufmMlgBwNeuZX67q3wYx4UljBuGXqi65aB
+ uJ1S1+tSjZLbR15NYhMb8WwwU9/vpTw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-jafgEZnzMAuxqUy91tq4fw-1; Thu, 02 Jul 2020 13:58:31 -0400
-X-MC-Unique: jafgEZnzMAuxqUy91tq4fw-1
+ us-mta-155-2jf1QIiKNkaz73YUukb6ag-1; Thu, 02 Jul 2020 13:58:35 -0400
+X-MC-Unique: 2jf1QIiKNkaz73YUukb6ag-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F3A8107ACCD;
- Thu,  2 Jul 2020 17:58:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28CC5185B3B3;
+ Thu,  2 Jul 2020 17:58:34 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.110.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6BF95D9CA;
- Thu,  2 Jul 2020 17:58:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B17D25D9CA;
+ Thu,  2 Jul 2020 17:58:30 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] migration: support excluding block devs in QMP snapshot
+Subject: [PATCH 6/6] migration: support picking vmstate disk in QMP snapshot
  commands
-Date: Thu,  2 Jul 2020 18:57:53 +0100
-Message-Id: <20200702175754.2211821-6-berrange@redhat.com>
+Date: Thu,  2 Jul 2020 18:57:54 +0100
+Message-Id: <20200702175754.2211821-7-berrange@redhat.com>
 In-Reply-To: <20200702175754.2211821-1-berrange@redhat.com>
 References: <20200702175754.2211821-1-berrange@redhat.com>
 MIME-Version: 1.0
@@ -107,321 +107,218 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This wires up support for a new "exclude" parameter to the QMP commands
-for snapshots (savevm, loadvm, delvm). This parameter accepts a list of
-block driver state node names.
+This wires up support for a new "vmstate" parameter to the QMP commands
+for snapshots (savevm, loadvm). This parameter accepts block driver
+state node name.
 
 One use case for this would be a VM using OVMF firmware where the
-variables store is a raw disk image. Ideally the variable store would be
-qcow2, allowing its contents to be included in the snapshot, but
-typically today the variable store is raw. It is still useful to be able
-to snapshot VMs using OVMF, even if the varstore is excluded, as the
-main OS disk content is usually the stuff the user cares about.
+variables store is the first snapshottable disk image. The vmstate
+snapshot usually wants to be stored in the primary root disk of the
+VM, not the firmeware varstore. Thus there needs to be a mechanism
+to override the default choice of disk.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- include/migration/snapshot.h |  6 ++++--
- migration/savevm.c           | 38 +++++++++++++++++++++---------------
- monitor/hmp-cmds.c           |  6 +++---
- qapi/migration.json          | 21 ++++++++++++++------
+ include/migration/snapshot.h |  8 ++++++--
+ migration/savevm.c           | 16 ++++++++++------
+ monitor/hmp-cmds.c           |  6 ++++--
+ qapi/migration.json          |  6 ++++++
  replay/replay-snapshot.c     |  4 ++--
  softmmu/vl.c                 |  2 +-
- 6 files changed, 47 insertions(+), 30 deletions(-)
+ 6 files changed, 29 insertions(+), 13 deletions(-)
 
 diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
-index c85b6ec75b..dffb84dbe5 100644
+index dffb84dbe5..721147d3c1 100644
 --- a/include/migration/snapshot.h
 +++ b/include/migration/snapshot.h
-@@ -15,7 +15,9 @@
- #ifndef QEMU_MIGRATION_SNAPSHOT_H
- #define QEMU_MIGRATION_SNAPSHOT_H
+@@ -17,7 +17,11 @@
  
--int save_snapshot(const char *name, Error **errp);
--int load_snapshot(const char *name, Error **errp);
-+#include "qapi/qapi-builtin-types.h"
-+
-+int save_snapshot(const char *name, strList *exclude, Error **errp);
-+int load_snapshot(const char *name, strList *exclude, Error **errp);
+ #include "qapi/qapi-builtin-types.h"
+ 
+-int save_snapshot(const char *name, strList *exclude, Error **errp);
+-int load_snapshot(const char *name, strList *exclude, Error **errp);
++int save_snapshot(const char *name,
++                  const char *vmstate, strList *exclude,
++                  Error **errp);
++int load_snapshot(const char *name,
++                  const char *vmstate, strList *exclude,
++                  Error **errp);
  
  #endif
 diff --git a/migration/savevm.c b/migration/savevm.c
-index b11c6a882d..4b040676f7 100644
+index 4b040676f7..5fd593e475 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -2624,7 +2624,7 @@ int qemu_load_device_state(QEMUFile *f)
+@@ -2624,7 +2624,8 @@ int qemu_load_device_state(QEMUFile *f)
      return 0;
  }
  
--int save_snapshot(const char *name, Error **errp)
-+int save_snapshot(const char *name, strList *exclude, Error **errp)
+-int save_snapshot(const char *name, strList *exclude, Error **errp)
++int save_snapshot(const char *name, const char *vmstate,
++                  strList *exclude, Error **errp)
  {
      BlockDriverState *bs, *bs1;
      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
-@@ -2646,7 +2646,7 @@ int save_snapshot(const char *name, Error **errp)
-         return ret;
-     }
- 
--    if (!bdrv_all_can_snapshot(NULL, &bs)) {
-+    if (!bdrv_all_can_snapshot(exclude, &bs)) {
-         error_setg(errp, "Device '%s' is writable but does not support "
-                    "snapshots", bdrv_get_device_or_node_name(bs));
-         return ret;
-@@ -2654,7 +2654,7 @@ int save_snapshot(const char *name, Error **errp)
- 
-     /* Delete old snapshots of the same name */
-     if (name) {
--        ret = bdrv_all_delete_snapshot(name, NULL, &bs1, errp);
-+        ret = bdrv_all_delete_snapshot(name, exclude, &bs1, errp);
-         if (ret < 0) {
-             error_prepend(errp, "Error while deleting snapshot on device "
-                           "'%s': ", bdrv_get_device_or_node_name(bs1));
-@@ -2662,7 +2662,7 @@ int save_snapshot(const char *name, Error **errp)
+@@ -2662,7 +2663,7 @@ int save_snapshot(const char *name, strList *exclude, Error **errp)
          }
      }
  
--    bs = bdrv_all_find_vmstate_bs(NULL, NULL, errp);
-+    bs = bdrv_all_find_vmstate_bs(NULL, exclude, errp);
+-    bs = bdrv_all_find_vmstate_bs(NULL, exclude, errp);
++    bs = bdrv_all_find_vmstate_bs(vmstate, exclude, errp);
      if (bs == NULL) {
          return ret;
      }
-@@ -2724,7 +2724,7 @@ int save_snapshot(const char *name, Error **errp)
-     aio_context_release(aio_context);
-     aio_context = NULL;
- 
--    ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, NULL, &bs);
-+    ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, exclude, &bs);
-     if (ret < 0) {
-         error_setg(errp, "Error while creating snapshot on '%s'",
-                    bdrv_get_device_or_node_name(bs));
-@@ -2827,7 +2827,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+@@ -2827,7 +2828,8 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
      migration_incoming_state_destroy();
  }
  
--int load_snapshot(const char *name, Error **errp)
-+int load_snapshot(const char *name, strList *exclude, Error **errp)
+-int load_snapshot(const char *name, strList *exclude, Error **errp)
++int load_snapshot(const char *name, const char *vmstate,
++                  strList *exclude, Error **errp)
  {
      BlockDriverState *bs, *bs_vm_state;
      QEMUSnapshotInfo sn;
-@@ -2842,13 +2842,13 @@ int load_snapshot(const char *name, Error **errp)
-         return -EINVAL;
-     }
- 
--    if (!bdrv_all_can_snapshot(NULL, &bs)) {
-+    if (!bdrv_all_can_snapshot(exclude, &bs)) {
-         error_setg(errp,
-                    "Device '%s' is writable but does not support snapshots",
-                    bdrv_get_device_or_node_name(bs));
-         return -ENOTSUP;
-     }
--    ret = bdrv_all_find_snapshot(name, NULL, &bs);
-+    ret = bdrv_all_find_snapshot(name, exclude, &bs);
-     if (ret < 0) {
-         error_setg(errp,
-                    "Device '%s' does not have the requested snapshot '%s'",
-@@ -2856,7 +2856,7 @@ int load_snapshot(const char *name, Error **errp)
+@@ -2856,7 +2858,7 @@ int load_snapshot(const char *name, strList *exclude, Error **errp)
          return ret;
      }
  
--    bs_vm_state = bdrv_all_find_vmstate_bs(NULL, NULL, errp);
-+    bs_vm_state = bdrv_all_find_vmstate_bs(NULL, exclude, errp);
+-    bs_vm_state = bdrv_all_find_vmstate_bs(NULL, exclude, errp);
++    bs_vm_state = bdrv_all_find_vmstate_bs(vmstate, exclude, errp);
      if (!bs_vm_state) {
          return -ENOTSUP;
      }
-@@ -2877,7 +2877,7 @@ int load_snapshot(const char *name, Error **errp)
-     /* Flush all IO requests so they don't interfere with the new state.  */
-     bdrv_drain_all_begin();
- 
--    ret = bdrv_all_goto_snapshot(name, NULL, &bs, errp);
-+    ret = bdrv_all_goto_snapshot(name, exclude, &bs, errp);
-     if (ret < 0) {
-         error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
-                       name, bdrv_get_device_or_node_name(bs));
-@@ -2942,27 +2942,33 @@ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
-     return !(vmsd && vmsd->unmigratable);
+@@ -2943,13 +2945,15 @@ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
  }
  
--void qmp_savevm(const char *tag, Error **errp)
-+void qmp_savevm(const char *tag,
-+                bool has_exclude, strList *exclude,
-+                Error **errp)
+ void qmp_savevm(const char *tag,
++                bool has_vmstate, const char *vmstate,
+                 bool has_exclude, strList *exclude,
+                 Error **errp)
  {
--    save_snapshot(tag, errp);
-+    save_snapshot(tag, exclude, errp);
+-    save_snapshot(tag, exclude, errp);
++    save_snapshot(tag, vmstate, exclude, errp);
  }
  
--void qmp_loadvm(const char *tag, Error **errp)
-+void qmp_loadvm(const char *tag,
-+                bool has_exclude, strList *exclude,
-+                Error **errp)
+ void qmp_loadvm(const char *tag,
++                bool has_vmstate, const char *vmstate,
+                 bool has_exclude, strList *exclude,
+                 Error **errp)
  {
-     int saved_vm_running  = runstate_is_running();
+@@ -2957,7 +2961,7 @@ void qmp_loadvm(const char *tag,
  
      vm_stop(RUN_STATE_RESTORE_VM);
  
--    if (load_snapshot(tag, errp) == 0 && saved_vm_running) {
-+    if (load_snapshot(tag, exclude, errp) == 0 && saved_vm_running) {
+-    if (load_snapshot(tag, exclude, errp) == 0 && saved_vm_running) {
++    if (load_snapshot(tag, vmstate, exclude, errp) == 0 && saved_vm_running) {
          vm_start();
      }
  }
- 
--void qmp_delvm(const char *tag, Error **errp)
-+void qmp_delvm(const char *tag,
-+               bool has_exclude, strList *exclude,
-+               Error **errp)
- {
-     BlockDriverState *bs;
- 
--    if (bdrv_all_delete_snapshot(tag, NULL, &bs, errp) < 0) {
-+    if (bdrv_all_delete_snapshot(tag, exclude, &bs, errp) < 0) {
-         error_prepend(errp,
-                       "deleting snapshot on device '%s': ",
-                       bdrv_get_device_or_node_name(bs));
 diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 26a5a1a701..fcde649100 100644
+index fcde649100..586676e179 100644
 --- a/monitor/hmp-cmds.c
 +++ b/monitor/hmp-cmds.c
-@@ -1091,7 +1091,7 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
+@@ -1091,7 +1091,8 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
  {
      Error *err = NULL;
  
--    qmp_loadvm(qdict_get_str(qdict, "name"), &err);
-+    qmp_loadvm(qdict_get_str(qdict, "name"), false, NULL, &err);
+-    qmp_loadvm(qdict_get_str(qdict, "name"), false, NULL, &err);
++    qmp_loadvm(qdict_get_str(qdict, "name"),
++               false, NULL, false, NULL, &err);
      hmp_handle_error(mon, err);
  }
  
-@@ -1099,7 +1099,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+@@ -1099,7 +1100,8 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
  {
      Error *err = NULL;
  
--    qmp_savevm(qdict_get_try_str(qdict, "name"), &err);
-+    qmp_savevm(qdict_get_try_str(qdict, "name"), false, NULL, &err);
-     hmp_handle_error(mon, err);
- }
- 
-@@ -1107,7 +1107,7 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
- 
--    qmp_delvm(qdict_get_str(qdict, "name"), &err);
-+    qmp_delvm(qdict_get_str(qdict, "name"), false, NULL, &err);
+-    qmp_savevm(qdict_get_try_str(qdict, "name"), false, NULL, &err);
++    qmp_savevm(qdict_get_try_str(qdict, "name"),
++               false, NULL, false, NULL, &err);
      hmp_handle_error(mon, err);
  }
  
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 849de38fb0..2388664077 100644
+index 2388664077..91173f5b06 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -1629,6 +1629,7 @@
- #
+@@ -1630,6 +1630,7 @@
  # @tag: name of the snapshot to create. If it already
  # exists it will be replaced.
-+# @exclude: list of block device node names to exclude
+ # @exclude: list of block device node names to exclude
++# @vmstate: block device node name to save vmstate to
  #
  # Note that execution of the VM will be paused during the time
  # it takes to save the snapshot
-@@ -1639,7 +1640,8 @@
- #
+@@ -1641,6 +1642,7 @@
  # -> { "execute": "savevm",
  #      "data": {
--#         "tag": "my-snap"
-+#         "tag": "my-snap",
-+#         "exclude": ["pflash0-vars"]
+ #         "tag": "my-snap",
++#         "vmstate": "disk0",
+ #         "exclude": ["pflash0-vars"]
  #      }
  #    }
- # <- { "return": { } }
-@@ -1647,7 +1649,8 @@
- # Since: 5.2
+@@ -1650,6 +1652,7 @@
  ##
  { 'command': 'savevm',
--  'data': { 'tag': 'str' } }
-+  'data': { 'tag': 'str',
-+            '*exclude': ['str'] } }
+   'data': { 'tag': 'str',
++            '*vmstate': 'str',
+             '*exclude': ['str'] } }
  
  ##
- # @loadvm:
-@@ -1655,6 +1658,7 @@
- # Load a VM snapshot
+@@ -1659,6 +1662,7 @@
  #
  # @tag: name of the snapshot to load.
-+# @exclude: list of block device node names to exclude
+ # @exclude: list of block device node names to exclude
++# @vmstate: block device node name to load vmstate from
  #
  # Returns: nothing
  #
-@@ -1662,7 +1666,8 @@
- #
+@@ -1667,6 +1671,7 @@
  # -> { "execute": "loadvm",
  #      "data": {
--#         "tag": "my-snap"
-+#         "tag": "my-snap",
-+#         "exclude": ["pflash0-vars"]
+ #         "tag": "my-snap",
++#         "vmstate": "disk0",
+ #         "exclude": ["pflash0-vars"]
  #      }
  #    }
- # <- { "return": { } }
-@@ -1670,7 +1675,8 @@
- # Since: 5.2
+@@ -1676,6 +1681,7 @@
  ##
  { 'command': 'loadvm',
--  'data': { 'tag': 'str' } }
-+  'data': { 'tag': 'str',
-+            '*exclude': ['str'] } }
+   'data': { 'tag': 'str',
++            '*vmstate': 'str',
+             '*exclude': ['str'] } }
  
  ##
- # @delvm:
-@@ -1678,6 +1684,7 @@
- # Delete a VM snapshot
- #
- # @tag: name of the snapshot to delete.
-+# @exclude: list of block device node names to exclude
- #
- # Note that execution of the VM will be paused during the time
- # it takes to delete the snapshot
-@@ -1688,7 +1695,8 @@
- #
- # -> { "execute": "delvm",
- #      "data": {
--#         "tag": "my-snap"
-+#         "tag": "my-snap",
-+#         "exclude": ["pflash0-vars"]
- #      }
- #    }
- # <- { "return": { } }
-@@ -1696,4 +1704,5 @@
- # Since: 5.2
- ##
- { 'command': 'delvm',
--  'data': { 'tag': 'str' } }
-+  'data': { 'tag': 'str',
-+            '*exclude': ['str'] } }
 diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index e26fa4c892..1351170c67 100644
+index 1351170c67..f0f45a4f24 100644
 --- a/replay/replay-snapshot.c
 +++ b/replay/replay-snapshot.c
 @@ -77,13 +77,13 @@ void replay_vmstate_init(void)
  
      if (replay_snapshot) {
          if (replay_mode == REPLAY_MODE_RECORD) {
--            if (save_snapshot(replay_snapshot, &err) != 0) {
-+            if (save_snapshot(replay_snapshot, NULL, &err) != 0) {
+-            if (save_snapshot(replay_snapshot, NULL, &err) != 0) {
++            if (save_snapshot(replay_snapshot, NULL, NULL, &err) != 0) {
                  error_report_err(err);
                  error_report("Could not create snapshot for icount record");
                  exit(1);
              }
          } else if (replay_mode == REPLAY_MODE_PLAY) {
--            if (load_snapshot(replay_snapshot, &err) != 0) {
-+            if (load_snapshot(replay_snapshot, NULL, &err) != 0) {
+-            if (load_snapshot(replay_snapshot, NULL, &err) != 0) {
++            if (load_snapshot(replay_snapshot, NULL, NULL, &err) != 0) {
                  error_report_err(err);
                  error_report("Could not load snapshot for icount replay");
                  exit(1);
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 3e15ee2435..f7c8be8c6a 100644
+index f7c8be8c6a..fbaa326675 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
 @@ -4452,7 +4452,7 @@ void qemu_init(int argc, char **argv, char **envp)
      register_global_state();
      if (loadvm) {
          Error *local_err = NULL;
--        if (load_snapshot(loadvm, &local_err) < 0) {
-+        if (load_snapshot(loadvm, NULL, &local_err) < 0) {
+-        if (load_snapshot(loadvm, NULL, &local_err) < 0) {
++        if (load_snapshot(loadvm, NULL, NULL, &local_err) < 0) {
              error_report_err(local_err);
              autostart = 0;
              exit(1);
