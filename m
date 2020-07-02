@@ -4,72 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 963E2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFEAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 705942073E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:28:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705942073E
+	by mail.kernel.org (Postfix) with ESMTPS id 159852073E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:28:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159852073E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr18R-0002AQ-KV
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43164)
+	id 1jr18T-0002Fl-9p
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:28:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17U-0000Rj-Ut
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:24 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:58457)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17V-0000SC-6T
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:53833)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17T-0006IQ-1y
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17R-0006IG-Ix
  for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:24 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M1HuU-1jpMQV1iI6-002ofL; Thu, 02 Jul 2020 17:27:13 +0200
+ id 1MTi9N-1jMved0xQr-00U4JY; Thu, 02 Jul 2020 17:27:18 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/12] linux-user/sparc64: Fix the handling of window spill
- trap
-Date: Thu,  2 Jul 2020 17:27:00 +0200
-Message-Id: <20200702152710.84602-3-laurent@vivier.eu>
+Subject: [PULL v2 07/12] linux-user: Add strace support for printing arguments
+ of lseek()
+Date: Thu,  2 Jul 2020 17:27:05 +0200
+Message-Id: <20200702152710.84602-8-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
 References: <20200702152710.84602-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:QBrQcB5DztA7knOhNhU9kAxyVGIrVZW7MQBvZv3bpPXqcmpr0PD
- lJt0QL1MGpdhzf5aHF7bxXcge9ko2BCJcRzzS1MBjQ6dQ/Bs8t+MuFZzf/gcNBPDFiMp95A
- ivpDodPlYSg4mgyheFQ5J7RbSqmDijyhb4WLKqzu69M6XaYQMRlZdCOpE92toWPCPEFrC/T
- R6mHxfNFsLxrL9xaqjxiw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JYTIK/MwxHE=:/zhJXYbYcO8mylBuhAhOky
- pe334IqDBNuUIb4/Gl4cUHPyc3u3EkmhbsDjiZCsK5NpxwaGxgsr+dtvIADPSRbQpILPhRCkZ
- gN+3OZiqlI758sJFFInIKxNxFQEXS82Uw+v8YqYjOan3Nl5shnSupTVc6bhC/JHLtjm3V18g4
- s+dZ8GEKrPudxL7qJuWjxQPwee0awWsPNnCUax0i87ayrbFxZDuos0r0Ymcs+FdZPPAsmuLZP
- 26nKeFY2dzPEsLA7HV1pLyGX3cFCAERHYEwjkxHTKztJU1tEWOh+niets0CR8IUiZ76nWDLbA
- niuG7mQnLMnm0BwsQPMX8db+4A2zOt24KedxatWtxLyIHorgeFrc2JM7cimsAfbfMYZRaBkMT
- Po/n+eHIFpV0AzTmhm6tFAx7cYwXYocb5n3T+wL3sQTo2ln1n/BWZ32f1A8tEZcC7Fl9FStnA
- 1ZPylbxyel5FXDoZ/Wy0Z5D6qvbUfk5xW+YdwGCGak94xPGFW4q1N5kfgsBAkwhU4o3KNn/Yy
- gKP/n4QR/c8FjoNeVwOYWLKfyLTiWQ/xvf+xSHNRq6WVrrUDZ8KAhFci2rT57e1ux6dZgiZwx
- RxbCoYKHEPQu9fCBlTPwvKRU2N03faNullWmFF5Pl4EN13++veO0lT7RpjBzeYdTkQ0EZ4tJN
- pL43Gvm0VDS7sh0De5FehFNyn0IsvcEQfr23C6ZQ+2Oc8xqqHofiUj/CVwhsjFxcmE1E+gcJl
- nJPwax7XSRz2T2KXl1oXtgySPaqm7N7Aqas30+7JBXLGyq/hyHoO4ESw6q+wado4ExAtZbFfy
- kdnlG6u1mWkTMT78pfw8lag3yGy1E7ZTlGsxdeh1AovYurJ2IE=
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:MS247B+cncjovVzKNv2NhuUL3/8iqUyBUSgZ1hmQE++EIQRwNLx
+ jPatrNpAbmjUICNEd57J0k/QUUFuj9TzuXgX5AJfBsjUieDK6M1j/XgpD/PE2uXLjFc6t64
+ sVASvCdKUXeBnrJGNBhN5Lw+Vmlosbmhkf4FQKBZ7m2+xk9xbOwXnS5dDFR0zWJfNYl/Vx1
+ kZDmwn/k7Xclxcouw3lag==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kyeEI88sOJk=:Y2bHPOyoGrJ7VtdQhmFkzS
+ inZq9SICvnStcpBuYQw2yD0iNAMIUI2p1sEKiPlZV8MCmRsNUJ3Bu/j0LCzXqcXtgAkCxa61I
+ 2rmF5QRNzsoA7AL/8ZHJjWTLLVpdlAYnDOyp1csm+BNExfT+70mEnlOgQhXT/JZpdBwinRM0J
+ QqQ6GDloQjkTausxe9zXZdGD1bL7yWP+Y/T05JDOaq5vd2iUiwWIu4Hq5WbfHl8KYNBwcklX9
+ Lp4pEMOQrxH3Y9Csb9JXH+9hb+bnmJggUzqUwbIRKWK0l4NVAa7mIGEheyLJr/8s2GFxF/2/o
+ FMf59gct92nJOGPQiQNzt+6Yu2TW/lpH10Zd1A2P+NjyBUZAAX0JEJpeGl8dOXmuy+128aTHz
+ JQdYNZ1yCIi/e0/w+5Y7iR1yUKG20epHZ2RiAaPNpl1lS2ZSrMKzmtjLrY3dadydAaPF+waBJ
+ amMUy5/WIG7Km7Hxf/3L22u+W+kiSiu7yFlL5G/o91jiLbWm+S5P9/bvhE/v8F2cJo4Zeew7Y
+ wX2Fs32eZnSuhqcQ4N9+mCyg+/sbwdikrwtuBSvX2568mjUxvtTczyJ9Wlg7ggtJ4hOoceZ4Q
+ QLwFxa/n5UD0Owv3lkHphRVFSgo8gVC1PjmaONp3U72BUR0dlYgjAwK+ATHjq8tSdR86ILWN5
+ DQTf9yeZrR7XSMQqoK5Q+5nw/nDAHwSrAggmiorIZui/d15YzQ6Sg4We/YbzYjua2O/Yvnk+O
+ +CxehaHRa6Ik/OlbTxHdP5aXr59fYmBew/baAQoKrZY1spZNkG8q2AAQpx5W+3mGvWoa0EgSj
+ WUJ7H+878L4p64HSqjOPtWClvFZ1dwQXLOBQXSlCASaYaO/PUc=
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 10:57:57
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:27:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,63 +83,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>, Riku Voipio <riku.voipio@iki.fi>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
  Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Giuseppe Musacchio <thatlemon@gmail.com>
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-Fix the handling of window spill traps by keeping cansave into account
-when calculating the new CWP.
+This patch implements strace argument printing functionality for syscall:
 
-Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+    *lseek - reposition read/write file offset
+
+         off_t lseek(int fd, off_t offset, int whence)
+         man page: https://www.man7.org/linux/man-pages/man2/lseek.2.html
+
+Implementation notes:
+
+    The syscall's third argument "whence" has predefined values:
+    "SEEK_SET","SEEK_CUR","SEEK_END","SEEK_DATA","SEEK_HOLE"
+    and thus a separate printing function "print_lseek" was stated
+    in file "strace.list". This function is defined in "strace.c"
+    by using an existing function "print_raw_param()" to print
+    the first and second argument and a switch(case) statement
+    for the predefined values of the third argument.
+    Values "SEEK_DATA" and "SEEK_HOLE" are defined in kernel version 3.1.
+    That is the reason why case statements for these values are
+    enwrapped in #ifdef directive.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200619123331.17387-5-filip.bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200625091204.3186186-3-laurent@vivier.eu>
 ---
- bsd-user/main.c             | 6 +++++-
- linux-user/sparc/cpu_loop.c | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ linux-user/strace.c    | 31 +++++++++++++++++++++++++++++++
+ linux-user/strace.list |  2 +-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 0bfe46cff93e..ac40d79bfaac 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -413,7 +413,11 @@ static void save_window(CPUSPARCState *env)
-     save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-     env->wim = new_wim;
- #else
--    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-+    /*
-+     * cansave is zero if the spill trap handler is triggered by `save` and
-+     * nonzero if triggered by a `flushw`
-+     */
-+    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
-     env->cansave++;
-     env->canrestore--;
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 760020132b5a..a26736516bab 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1833,6 +1833,37 @@ print__llseek(const struct syscallname *name,
+ }
  #endif
-diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-index 7645cc04ca73..02532f198df8 100644
---- a/linux-user/sparc/cpu_loop.c
-+++ b/linux-user/sparc/cpu_loop.c
-@@ -69,7 +69,11 @@ static void save_window(CPUSPARCState *env)
-     save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-     env->wim = new_wim;
- #else
--    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-+    /*
-+     * cansave is zero if the spill trap handler is triggered by `save` and
-+     * nonzero if triggered by a `flushw`
-+     */
-+    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
-     env->cansave++;
-     env->canrestore--;
+ 
++#ifdef TARGET_NR_lseek
++static void
++print_lseek(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_raw_param(TARGET_ABI_FMT_ld, arg1, 0);
++    switch (arg2) {
++    case SEEK_SET:
++        qemu_log("SEEK_SET"); break;
++    case SEEK_CUR:
++        qemu_log("SEEK_CUR"); break;
++    case SEEK_END:
++        qemu_log("SEEK_END"); break;
++#ifdef SEEK_DATA
++    case SEEK_DATA:
++        qemu_log("SEEK_DATA"); break;
++#endif
++#ifdef SEEK_HOLE
++    case SEEK_HOLE:
++        qemu_log("SEEK_HOLE"); break;
++#endif
++    default:
++        print_raw_param("%#x", arg2, 1);
++    }
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #if defined(TARGET_NR_socket)
+ static void
+ print_socket(const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index d04ad507b0fb..a4a8c61969cd 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -516,7 +516,7 @@
+ { TARGET_NR_lremovexattr, "lremovexattr" , NULL, print_lremovexattr, NULL },
  #endif
+ #ifdef TARGET_NR_lseek
+-{ TARGET_NR_lseek, "lseek" , NULL, NULL, NULL },
++{ TARGET_NR_lseek, "lseek" , NULL, print_lseek, NULL },
+ #endif
+ #ifdef TARGET_NR_lsetxattr
+ { TARGET_NR_lsetxattr, "lsetxattr" , NULL, NULL, NULL },
 -- 
 2.26.2
 
