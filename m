@@ -2,102 +2,116 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22671C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 09:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D818FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 09:58:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE3EE2084C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 09:55:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4C7F2084C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 09:58:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZAxqsLKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE3EE2084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8ochZZu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C7F2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqvwg-0004bm-7Y
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 05:55:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60002)
+	id 1jqvzG-0005tE-Vs
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 05:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqvuY-0002ae-Iy
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 05:53:43 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37163
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqvyf-0005Pr-FJ
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 05:57:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58132
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqvuW-0007C0-VS
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 05:53:42 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jqvyd-0008FG-V7
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 05:57:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593683620;
+ s=mimecast20190719; t=1593683875;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=O26eO9dww7SoZj+u4N4xZ3FyGyXieM9XWjJjsAoiUAw=;
- b=ZAxqsLKJklWWKXrSMknWvnL38HyHJgyexcLQCY6F8QmaTy+oQ21l/1qGNwghbLlBsgT/UT
- AbTniOziSIvwMeyfP0ZabfgqkCK/pcScHtpoWlpy/HikD0CVO3Mje6d6T9N6Spwr3zm+Xv
- nFzKVyVGXAzT7hcrGXa0bPnMHnT/AQs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-by4Z-72nOeWI8o6lpJQFCg-1; Thu, 02 Jul 2020 05:53:38 -0400
-X-MC-Unique: by4Z-72nOeWI8o6lpJQFCg-1
-Received: by mail-wm1-f69.google.com with SMTP id g138so18899010wme.7
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 02:53:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=O26eO9dww7SoZj+u4N4xZ3FyGyXieM9XWjJjsAoiUAw=;
- b=leWcCaFJ+5rJ0S7b8ozU+oSUuGC4m3Q8txAO3qcdNigsy/nD7KI7O8URLB6LSRLcbk
- MAgvuwERuUH+XZGxIblzSf9e4MMegSDH5v6WwEKEd/N2l0ns1xycJ9f69NPAyVqVsC0l
- JrsYNAjKQBVjt581XG788/auREbB/NTFuaHp5pY+B8rotifAMYMJaammNH56SQ5tYjiJ
- P8Gp34Xx4ZAykrTgTvfP9HKsMKdDFbbMeQbGS3jPYOi0bypF4q7dS1DNH8BSzbshI3FJ
- UrikbJJO9qAdznm/ubWWm8nL6EvzRLXBOq8KEH1mXQ9UVPkquuLnyjE/xvGm39NmOlIP
- s5zw==
-X-Gm-Message-State: AOAM5314HKf5nZfZB+SAHd2zPIVCaarNB6d0ZaOROUcx9ju373HkIdp4
- p0LCYq0qNfkkvjr1AWAt7KZ6GoODLcj8TrqEK9yx+umM2fAChfm9xMXcQzgH1HVkJXq7qZ0fGoS
- 5o5Y1nCkySxLbt3E=
-X-Received: by 2002:a7b:c185:: with SMTP id y5mr32069307wmi.85.1593683617231; 
- Thu, 02 Jul 2020 02:53:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZo9eVf1robnTalfkW8acuZDzuyGpZMGiCg4UylNcT7p/f66302iEKqhRfZO8ShVFD/fvE5w==
-X-Received: by 2002:a7b:c185:: with SMTP id y5mr32069273wmi.85.1593683616997; 
- Thu, 02 Jul 2020 02:53:36 -0700 (PDT)
-Received: from redhat.com ([93.157.82.4])
- by smtp.gmail.com with ESMTPSA id d13sm10213851wrq.89.2020.07.02.02.53.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 02:53:36 -0700 (PDT)
-Date: Thu, 2 Jul 2020 05:53:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
- machine types
-Message-ID: <20200702055245-mutt-send-email-mst@kernel.org>
-References: <20200629140938.17566-1-drjones@redhat.com>
- <20200629140938.17566-4-drjones@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=eBxObTQVLaLR6b+x+NpJB30XM74uiz+qnSSAOOs/0i0=;
+ b=f8ochZZuKGHOkAtwusmqIqmHJhwfFwSIkVSuLUhIIzjyLmKmFKCVpypxmhlgWVN14ouzCl
+ a54gu3PiNsbvcYdORSa9gUHb89t+p8h3LVEJWZA3czXLKbnrFfONcFf70L5Sf9UKK9Hrh+
+ nCCNOHvVgPaEzw7fYyUsxEzNuZg2qEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-X3zi-pg9P6Wd5R-eNoEXqQ-1; Thu, 02 Jul 2020 05:57:51 -0400
+X-MC-Unique: X3zi-pg9P6Wd5R-eNoEXqQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F32AD107ACF4;
+ Thu,  2 Jul 2020 09:57:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-196.ams2.redhat.com
+ [10.36.113.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12E9279231;
+ Thu,  2 Jul 2020 09:57:47 +0000 (UTC)
+Subject: Re: [PATCH v9 14/34] qcow2: Add QCow2SubclusterType and
+ qcow2_get_subcluster_type()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1593342067.git.berto@igalia.com>
+ <6ee75696d3eaed56b46e91fe242fdfab51feb066.1593342067.git.berto@igalia.com>
+ <fae77394-92fd-d170-0ae6-051c0a024d04@redhat.com>
+ <w51mu4jurqe.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6c06d36e-c074-fff0-fad8-fa96962b4906@redhat.com>
+Date: Thu, 2 Jul 2020 11:57:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200629140938.17566-4-drjones@redhat.com>
+In-Reply-To: <w51mu4jurqe.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="3wi3PFeZ5yvi0QCn9ANfGGkLme5v4eGs4"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 2
-X-Spam_score: 0.2
-X-Spam_bar: /
-X-Spam_report: (0.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- RCVD_IN_SBL_CSS=3.335, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,96 +124,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
- ard.biesheuvel@arm.com, imammedo@redhat.com, lersek@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 29, 2020 at 04:09:37PM +0200, Andrew Jones wrote:
-> The flash device is exclusively for the host-controlled firmware, so
-> we should not expose it to the OS. Exposing it risks the OS messing
-> with it, which could break firmware runtime services and surprise the
-> OS when all its changes disappear after reboot.
-> 
-> As firmware needs the device and uses DT, we leave the device exposed
-> there. It's up to firmware to remove the nodes from DT before sending
-> it on to the OS. However, there's no need to force firmware to remove
-> tables from ACPI (which it doesn't know how to do anyway), so we
-> simply don't add the tables in the first place. But, as we've been
-> adding the tables for quite some time and don't want to change the
-> default hardware exposed to versioned machines, then we only stop
-> exposing the flash device tables for 5.1 and later machine types.
-> 
-> Suggested-by: Ard Biesheuvel <ard.biesheuvel@arm.com>
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3wi3PFeZ5yvi0QCn9ANfGGkLme5v4eGs4
+Content-Type: multipart/mixed; boundary="mcSag7eap2wCbJ8CbnZbXyuQg8vCpJ4L8"
 
-So who's merging this? Mostly ACPI things so I guess my tree?
-If so can I get acks from ARM maintainers pls?
+--mcSag7eap2wCbJ8CbnZbXyuQg8vCpJ4L8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
+On 01.07.20 18:26, Alberto Garcia wrote:
+> On Wed 01 Jul 2020 02:52:14 PM CEST, Max Reitz wrote:
+>>>      if (l2_entry & QCOW_OFLAG_COMPRESSED) {
+>>>          return QCOW2_CLUSTER_COMPRESSED;
+>>> -    } else if (l2_entry & QCOW_OFLAG_ZERO) {
+>>> +    } else if ((l2_entry & QCOW_OFLAG_ZERO) && !has_subclusters(s)) {
+>>
+>> OK, so now qcow2_get_cluster_type() reports zero clusters to be normal
+>> or unallocated clusters when there are subclusters.  Seems weird to
+>> me, because zero clusters are invalid clusters then.
+>=20
+> I'm actually hesitant about this.
+>=20
+> In extended L2 entries QCOW_OFLAG_ZERO does not have any meaning so
+> technically it doesn't need to be checked any more than the other
+> reserved bits (1 to 8).
 
-> ---
->  hw/arm/virt-acpi-build.c | 5 ++++-
->  hw/arm/virt.c            | 3 +++
->  include/hw/arm/virt.h    | 1 +
->  3 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 1384a2cf2ab4..91f0df7b13a3 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -749,6 +749,7 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
->  static void
->  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->      Aml *scope, *dsdt;
->      MachineState *ms = MACHINE(vms);
->      const MemMapEntry *memmap = vms->memmap;
-> @@ -767,7 +768,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
->      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
->                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> -    acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> +    if (vmc->acpi_expose_flash) {
-> +        acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> +    }
->      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
->      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index cd0834ce7faf..5adc9ff799ef 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2482,9 +2482,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
->  
->  static void virt_machine_5_0_options(MachineClass *mc)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
->      virt_machine_5_1_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
->      mc->numa_mem_supported = true;
-> +    vmc->acpi_expose_flash = true;
->  }
->  DEFINE_VIRT_MACHINE(5, 0)
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 31878ddc7223..c65be5fe0bb6 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -119,6 +119,7 @@ typedef struct {
->      bool no_highmem_ecam;
->      bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
->      bool kvm_no_adjvtime;
-> +    bool acpi_expose_flash;
->  } VirtMachineClass;
->  
->  typedef struct {
-> -- 
-> 2.25.4
+Good point.  That convinces me.
+
+> The reason why we would want to check it is, of course, because that bit
+> does have a meaning in regular L2 entries.
+>=20
+> But that bit is ignored in images with subclusters so the only reason
+> why we would check it is to report corruption, not because we need to
+> know its value.
+
+Sure.  But isn=E2=80=99t that the whole point of having QCOW2_SUBCLUSTER_IN=
+VALID
+in the first place?
+
+> It's true that we do check it in v2 images, although in that case the
+> entries are otherwise identical and there is a way to convert between
+> both types.
+>=20
+>> I preferred just reporting them as zero clusters and letting the
+>> caller deal with it, because it does mean an error in the image and so
+>> it should be reported.
+>=20
+> Another alternative would be to add QCOW2_CLUSTER_INVALID and we could
+> even include there other cases like unaligned offsets and things like
+> that. But that would also affect the code that repairs corrupted images.
+
+Interesting.  Well, and that=E2=80=99d be definitely too much for this seri=
+es,
+as you already said.
+
+So:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--mcSag7eap2wCbJ8CbnZbXyuQg8vCpJ4L8--
+
+--3wi3PFeZ5yvi0QCn9ANfGGkLme5v4eGs4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl79r5oACgkQ9AfbAGHV
+z0CGJAf/Uy0zCamRYcFu5WQGEGgXd5zNo1J3g5YZ2oQ7oVPdzJuTBoC5z3+PIX4r
+TLZ7X+4M5jYQZt1FxQqo9311cwZhC8zKcXW4XTawwtcurirr7/fb39VlLKumvHJJ
+oWb7O3JvJmquwlqDj8B0nJoKNYGyxw44Zlr7dUcvJF3K0RhTyAOaELD5eR2+quj6
+NYe77RPQ5TduO/Ij4gS5p7Z30Y2RmwFzucyCeS6+Lvc8nD8+0Z35N1i6WuoUssq9
+P1ivcnCQ7YE9KdhjOgModdF8KJMruqSyMhF9nfzZHoF9Ofdcdta6KjpBWzPj1ohF
+m4eEpAuviJZhTrbd4bsB5rGPsS36sQ==
+=B3EN
+-----END PGP SIGNATURE-----
+
+--3wi3PFeZ5yvi0QCn9ANfGGkLme5v4eGs4--
 
 
