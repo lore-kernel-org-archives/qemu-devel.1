@@ -2,71 +2,107 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BB5C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5510CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B3BF20760
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:23:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3BF20760
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B33420760
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:24:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B33420760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2vg-0000t5-RK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:23:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39044)
+	id 1jr2x6-0002Eu-BT
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:24:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jr2Vh-0006l1-Vj; Thu, 02 Jul 2020 12:56:29 -0400
-Resent-Date: Thu, 02 Jul 2020 12:56:29 -0400
-Resent-Message-Id: <E1jr2Vh-0006l1-Vj@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21765)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jr2Vd-0005pi-Lo; Thu, 02 Jul 2020 12:56:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593708972; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=euIPG+HWRK/NbLR4zFo22HMm4w2d84nGg2sS+p4s62gJy/2NB/6hSfSnRlm6K1jxWLyFIiDWe6Y20nrZA/fbstmSY4i5vLlM53CKDvL3n3kWLiM03Ave1EPKToe8uLb9Gv4K3J3nbfVdIVqmP2fDAA/FkFKbHLZG3hzMBHMYDaE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593708972;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ZbMnK6eoivpHg8SxZRf23uF4AOJ0sm4+Pj1w0CQBhhI=; 
- b=jX46K+vlqlFEfqF9oqIw5mMcrQY2qSNNQArKswzKMfmNccaJ2fQIYUT6m4ZtXVy8ypjFXYB1V1p0p27ExC5pXjqiNp5MA6Q3Jzh6nXVMdITKs7r8RDhfS4iSIxzsNc6ax7RBAaGCkTWGBDizkDibVg6SJnz6zpnTo/I/KwWeEbI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593708969703479.23878214302226;
- Thu, 2 Jul 2020 09:56:09 -0700 (PDT)
-Message-ID: <159370896812.5963.1313110087906314185@d1fd068a5071>
-Subject: Re: [PATCH v2 00/44] Less clumsy error checking
-In-Reply-To: <20200702155000.3455325-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
+ id 1jr2W0-00074F-LN
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:56:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35066)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
+ id 1jr2Vy-0005sn-76
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:56:48 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 062GVi8R172341; Thu, 2 Jul 2020 12:56:43 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320s23fwmb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Jul 2020 12:56:42 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062GXQJ2177284;
+ Thu, 2 Jul 2020 12:56:42 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 320s23fwky-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Jul 2020 12:56:42 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062Gu4or002855;
+ Thu, 2 Jul 2020 16:56:41 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma04dal.us.ibm.com with ESMTP id 31wwr9mdpp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 02 Jul 2020 16:56:41 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 062GudlD27132300
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 2 Jul 2020 16:56:39 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D8D17136059;
+ Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8B1B313604F;
+ Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Thu, 2 Jul 2020 09:56:09 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:03:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 02 Jul 2020 12:56:39 -0400
+From: tobin <tobin@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 1/1] SEV: QMP support for Inject-Launch-Secret
+In-Reply-To: <20200702155240.GD14863@work-vm>
+References: <20200630134102.46777-1-tobin@linux.vnet.ibm.com>
+ <20200630134102.46777-2-tobin@linux.vnet.ibm.com>
+ <20200702155240.GD14863@work-vm>
+Message-ID: <7880f4b376d4f6afe29288673575f20a@linux.vnet.ibm.com>
+X-Sender: tobin@linux.vnet.ibm.com
+User-Agent: Roundcube Webmail/1.0.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-02_09:2020-07-02,
+ 2020-07-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 suspectscore=2 adultscore=0 lowpriorityscore=0
+ cotscore=-2147483648 spamscore=0 mlxscore=0 clxscore=1011 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2007020111
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=tobin@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 12:56:44
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,183 +115,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
+ tobin@ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMjE1NTAwMC4zNDU1
-MzI1LTEtYXJtYnJ1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MiAwMC80NF0gTGVzcyBjbHVtc3kgZXJyb3Ig
-Y2hlY2tpbmcKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNzAyMTU1MDAwLjM0NTUzMjUt
-MS1hcm1icnVAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1ODEzMTZkIGhtcDogSWdub3JlIEVycm9yIG9iamVj
-dHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNlcwozODJmOWNjIHFkZXY6IElnbm9yZSBF
-cnJvciBvYmplY3RzIHdoZXJlIHRoZSByZXR1cm4gdmFsdWUgc3VmZmljZXMKMmQ1NDAzMSBxZW11
-LWltZzogSWdub3JlIEVycm9yIG9iamVjdHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNl
-cwpjMWRhNTUxIGVycm9yOiBBdm9pZCBlcnJvcl9wcm9wYWdhdGUoKSBhZnRlciBtaWdyYXRlX2Fk
-ZF9ibG9ja2VyKCkKNTg0MDMzYSBxYXBpOiBQdXJnZSBlcnJvcl9wcm9wYWdhdGUoKSBmcm9tIFFB
-UEkgY29yZQpkNWMxOGU3IHFhcGk6IFNtb290aCB2aXNpdG9yIGVycm9yIGNoZWNraW5nIGluIGdl
-bmVyYXRlZCBjb2RlCmEwYjJlYjcgcWFwaTogU21vb3RoIGFub3RoZXIgdmlzaXRvciBlcnJvciBj
-aGVja2luZyBwYXR0ZXJuCjU5ZmJlMDMgZXJyb3I6IFJlZHVjZSB1bm5lY2Vzc2FyeSBlcnJvciBw
-cm9wYWdhdGlvbgpkNTQwMWVkIGVycm9yOiBFbGltaW5hdGUgZXJyb3JfcHJvcGFnYXRlKCkgbWFu
-dWFsbHkKMjhkYTQ1MiBlcnJvcjogRWxpbWluYXRlIGVycm9yX3Byb3BhZ2F0ZSgpIHdpdGggQ29j
-Y2luZWxsZSwgcGFydCAyCjI0OTUxOGQgZXJyb3I6IEVsaW1pbmF0ZSBlcnJvcl9wcm9wYWdhdGUo
-KSB3aXRoIENvY2NpbmVsbGUsIHBhcnQgMQo3OWQyNmIzIGVycm9yOiBBdm9pZCB1bm5lY2Vzc2Fy
-eSBlcnJvcl9wcm9wYWdhdGUoKSBhZnRlciBlcnJvcl9zZXRnKCkKNjlmMjFlZSBxZGV2OiBVc2Ug
-cmV0dXJuZWQgYm9vbCB0byBjaGVjayBmb3IgZmFpbHVyZSwgQ29jY2luZWxsZSBwYXJ0CmNjMTBi
-NGYgcWRldjogTWFrZSBmdW5jdGlvbnMgdGFraW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qg
-dm9pZAo5MzdlMDA3IHFvbTogTWFrZSBmdW5jdGlvbnMgdGFraW5nIEVycm9yICoqIHJldHVybiBi
-b29sLCBub3QgMC8tMQpjMTMwMDhkIHFvbTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9y
-IGZhaWx1cmUsIG1hbnVhbCBwYXJ0CmE3NmU2YjhhIHFvbTogVXNlIHJldHVybmVkIGJvb2wgdG8g
-Y2hlY2sgZm9yIGZhaWx1cmUsIENvY2NpbmVsbGUgcGFydAo1ODMxYjE5IHFvbTogTWFrZSBmdW5j
-dGlvbnMgdGFraW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qgdm9pZAplZTg5MTM2IHFvbTog
-UHV0IG5hbWUgcGFyYW1ldGVyIGJlZm9yZSB2YWx1ZSAvIHZpc2l0b3IgcGFyYW1ldGVyCmNjYTky
-ZTcgcW9tOiBVc2UgcmV0dXJuIHZhbHVlcyB0byBjaGVjayBmb3IgZXJyb3Igd2hlcmUgdGhhdCdz
-IHNpbXBsZXIKYjNlNGZiZCBxb206IERvbid0IGhhbmRsZSBpbXBvc3NpYmxlIG9iamVjdF9wcm9w
-ZXJ0eV9nZXRfbGluaygpIGZhaWx1cmUKNjRjMzg2OCBxb206IENyYXNoIG1vcmUgbmljZWx5IG9u
-IG9iamVjdF9wcm9wZXJ0eV9nZXRfbGluaygpIGZhaWx1cmUKMTA0NWJiYiBxb206IFJlbmFtZSBx
-ZGV2X2dldF90eXBlKCkgdG8gb2JqZWN0X2dldF90eXBlKCkKYTkwYWE1MiBxb206IFVzZSBlcnJv
-cl9yZXBvcnRmX2VycigpIGluc3RlYWQgb2YgZ19wcmludGVycigpIGluIGV4YW1wbGVzCjA0MmMx
-MTkgczM5MHgvcGNpOiBGaXggaGFybWxlc3MgbWlzdGFrZSBpbiB6cGNpJ3MgcHJvcGVydHkgZmlk
-J3Mgc2V0dGVyCjc1NTY1MjAgYmxvY2svcGFyYWxsZWxzOiBTaW1wbGlmeSBwYXJhbGxlbHNfb3Bl
-bigpIGFmdGVyIHByZXZpb3VzIGNvbW1pdAo2N2MzNjI3IHFhcGk6IFVzZSByZXR1cm5lZCBib29s
-IHRvIGNoZWNrIGZvciBmYWlsdXJlLCBtYW51YWwgcGFydApkNDYxZjg4IHFhcGk6IFVzZSByZXR1
-cm5lZCBib29sIHRvIGNoZWNrIGZvciBmYWlsdXJlLCBDb2NjaW5lbGxlIHBhcnQKNjFjM2M4NCBx
-YXBpOiBNYWtlIHZpc2l0b3IgZnVuY3Rpb25zIHRha2luZyBFcnJvciAqKiByZXR1cm4gYm9vbCwg
-bm90IHZvaWQKZTExODQxZCBobXA6IEVsaW1pbmF0ZSBhIHZhcmlhYmxlIGluIGhtcF9taWdyYXRl
-X3NldF9wYXJhbWV0ZXIoKQpiMTExNDdkIGJsb2NrOiBBdm9pZCBlcnJvciBhY2N1bXVsYXRpb24g
-aW4gYmRydl9pbWdfY3JlYXRlKCkKNWRkZmRhYiBxZW11LW9wdGlvbjogVXNlIHJldHVybmVkIGJv
-b2wgdG8gY2hlY2sgZm9yIGZhaWx1cmUKMTMyZWQ3NSBxZW11LW9wdGlvbjogTWFrZSBmdW5jdGlv
-bnMgdGFraW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qgdm9pZAo0OGEwOWVhIHFlbXUtb3B0
-aW9uOiBSZXBsYWNlIG9wdF9zZXQoKSBieSBjbGVhbmVyIG9wdF92YWxpZGF0ZSgpCjdlYTk0NWQg
-cWVtdS1vcHRpb246IEZhY3RvciBvdXQgaGVscGVyIG9wdF9jcmVhdGUoKQozNzgyMzBkIHFlbXUt
-b3B0aW9uOiBTaW1wbGlmeSBhcm91bmQgZmluZF9kZWZhdWx0X2J5X25hbWUoKQo0MTliOGU5IHFl
-bXUtb3B0aW9uOiBGYWN0b3Igb3V0IGhlbHBlciBmaW5kX2RlZmF1bHRfYnlfbmFtZSgpCjA2NmZl
-NTEgcWVtdS1vcHRpb246IE1ha2UgdXNlcyBvZiBmaW5kX2Rlc2NfYnlfbmFtZSgpIG1vcmUgc2lt
-aWxhcgo1Y2U1NmZlIHFlbXUtb3B0aW9uOiBDaGVjayByZXR1cm4gdmFsdWUgaW5zdGVhZCBvZiBA
-ZXJyIHdoZXJlIGNvbnZlbmllbnQKMzY3ZWMyNSB2aXJ0aW8tY3J5cHRvLXBjaTogVGlkeSB1cCB2
-aXJ0aW9fY3J5cHRvX3BjaV9yZWFsaXplKCkKOGRmM2I4ZiBtYWNpbzogVGlkeSB1cCBlcnJvciBo
-YW5kbGluZyBpbiBtYWNpb19uZXd3b3JsZF9yZWFsaXplKCkKMGUwMGU0NiBxZGV2OiBVc2UgcmV0
-dXJuZWQgYm9vbCB0byBjaGVjayBmb3IgcWRldl9yZWFsaXplKCkgZXRjLiBmYWlsdXJlCjE1YTQx
-YTUgZXJyb3I6IERvY3VtZW50IEVycm9yIEFQSSB1c2FnZSBydWxlcwo2Y2MwNmExIGVycm9yOiBJ
-bXByb3ZlIGV4YW1wbGVzIGluIGVycm9yLmgncyBiaWcgY29tbWVudAoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS80NCBDaGVja2luZyBjb21taXQgNmNjMDZhMWI0OGU0IChlcnJvcjogSW1wcm92ZSBl
-eGFtcGxlcyBpbiBlcnJvci5oJ3MgYmlnIGNvbW1lbnQpCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBz
-aG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzM3OiBGSUxFOiBpbmNsdWRlL3FhcGkvZXJyb3Iu
-aDoyNzoKKyAqICAgICBlcnJvcl9zZXRnKGVycnAsICJpbnZhbGlkIHF1YXJrXG4iIC8vIFdST05H
-IQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-LzQ0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzQ0IENoZWNraW5nIGNvbW1pdCAxNWE0
-MWE1YmEyNzMgKGVycm9yOiBEb2N1bWVudCBFcnJvciBBUEkgdXNhZ2UgcnVsZXMpCjMvNDQgQ2hl
-Y2tpbmcgY29tbWl0IDBlMDBlNDYzZTY5MCAocWRldjogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hl
-Y2sgZm9yIHFkZXZfcmVhbGl6ZSgpIGV0Yy4gZmFpbHVyZSkKNC80NCBDaGVja2luZyBjb21taXQg
-OGRmM2I4Zjg3MmQzIChtYWNpbzogVGlkeSB1cCBlcnJvciBoYW5kbGluZyBpbiBtYWNpb19uZXd3
-b3JsZF9yZWFsaXplKCkpCjUvNDQgQ2hlY2tpbmcgY29tbWl0IDM2N2VjMjUwZWZiYyAodmlydGlv
-LWNyeXB0by1wY2k6IFRpZHkgdXAgdmlydGlvX2NyeXB0b19wY2lfcmVhbGl6ZSgpKQo2LzQ0IENo
-ZWNraW5nIGNvbW1pdCA1Y2U1NmZlYzJhMzIgKHFlbXUtb3B0aW9uOiBDaGVjayByZXR1cm4gdmFs
-dWUgaW5zdGVhZCBvZiBAZXJyIHdoZXJlIGNvbnZlbmllbnQpCjcvNDQgQ2hlY2tpbmcgY29tbWl0
-IDA2NmZlNTE4MmVmZiAocWVtdS1vcHRpb246IE1ha2UgdXNlcyBvZiBmaW5kX2Rlc2NfYnlfbmFt
-ZSgpIG1vcmUgc2ltaWxhcikKOC80NCBDaGVja2luZyBjb21taXQgNDE5YjhlOTQ2ZWUwIChxZW11
-LW9wdGlvbjogRmFjdG9yIG91dCBoZWxwZXIgZmluZF9kZWZhdWx0X2J5X25hbWUoKSkKOS80NCBD
-aGVja2luZyBjb21taXQgMzc4MjMwZGYwZGMyIChxZW11LW9wdGlvbjogU2ltcGxpZnkgYXJvdW5k
-IGZpbmRfZGVmYXVsdF9ieV9uYW1lKCkpCjEwLzQ0IENoZWNraW5nIGNvbW1pdCA3ZWE5NDVkZjAz
-ZjkgKHFlbXUtb3B0aW9uOiBGYWN0b3Igb3V0IGhlbHBlciBvcHRfY3JlYXRlKCkpCjExLzQ0IENo
-ZWNraW5nIGNvbW1pdCA0OGEwOWVhMmJhNzIgKHFlbXUtb3B0aW9uOiBSZXBsYWNlIG9wdF9zZXQo
-KSBieSBjbGVhbmVyIG9wdF92YWxpZGF0ZSgpKQoxMi80NCBDaGVja2luZyBjb21taXQgMTMyZWQ3
-NTBkMTQ1IChxZW11LW9wdGlvbjogTWFrZSBmdW5jdGlvbnMgdGFraW5nIEVycm9yICoqIHJldHVy
-biBib29sLCBub3Qgdm9pZCkKMTMvNDQgQ2hlY2tpbmcgY29tbWl0IDVkZGZkYWIzZWE0NSAocWVt
-dS1vcHRpb246IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNrIGZvciBmYWlsdXJlKQoxNC80NCBD
-aGVja2luZyBjb21taXQgYjExMTQ3ZDNiZGI5IChibG9jazogQXZvaWQgZXJyb3IgYWNjdW11bGF0
-aW9uIGluIGJkcnZfaW1nX2NyZWF0ZSgpKQoxNS80NCBDaGVja2luZyBjb21taXQgZTExODQxZDMw
-MzBkIChobXA6IEVsaW1pbmF0ZSBhIHZhcmlhYmxlIGluIGhtcF9taWdyYXRlX3NldF9wYXJhbWV0
-ZXIoKSkKMTYvNDQgQ2hlY2tpbmcgY29tbWl0IDYxYzNjODQ4YjZmMCAocWFwaTogTWFrZSB2aXNp
-dG9yIGZ1bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJuIGJvb2wsIG5vdCB2b2lkKQpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ0NDogRklMRTogc2NyaXB0cy9xYXBpL3Zp
-c2l0LnB5OjI2OgorYm9vbCB2aXNpdF90eXBlXyUoY19uYW1lKXMoVmlzaXRvciAqdiwgY29uc3Qg
-Y2hhciAqbmFtZSwgJShjX3R5cGUpc29iaiwgRXJyb3IgKiplcnJwKTsKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTEyOiBGSUxFOiBzY3JpcHRzL3FhcGkvdmlzaXQucHk6MTI0
-OgorYm9vbCB2aXNpdF90eXBlXyUoY19uYW1lKXMoVmlzaXRvciAqdiwgY29uc3QgY2hhciAqbmFt
-ZSwgJShjX25hbWUpcyAqKm9iaiwgRXJyb3IgKiplcnJwKQoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzI1NDE6IEZJTEU6IHNjcmlwdHMvcWFwaS92aXNpdC5weToxNjA6Citib29s
-IHZpc2l0X3R5cGVfJShjX25hbWUpcyhWaXNpdG9yICp2LCBjb25zdCBjaGFyICpuYW1lLCAlKGNf
-bmFtZSlzICpvYmosIEVycm9yICoqZXJycCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMyNTU2OiBGSUxFOiBzY3JpcHRzL3FhcGkvdmlzaXQucHk6MTc0OgorYm9vbCB2aXNpdF90
-eXBlXyUoY19uYW1lKXMoVmlzaXRvciAqdiwgY29uc3QgY2hhciAqbmFtZSwgJShjX25hbWUpcyAq
-Km9iaiwgRXJyb3IgKiplcnJwKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI1
-ODU6IEZJTEU6IHNjcmlwdHMvcWFwaS92aXNpdC5weToyNTE6Citib29sIHZpc2l0X3R5cGVfJShj
-X25hbWUpcyhWaXNpdG9yICp2LCBjb25zdCBjaGFyICpuYW1lLCAlKGNfbmFtZSlzICoqb2JqLCBF
-cnJvciAqKmVycnApCgp0b3RhbDogMCBlcnJvcnMsIDUgd2FybmluZ3MsIDI0MDMgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMTYvNDQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvNDQgQ2hlY2tp
-bmcgY29tbWl0IGQ0NjFmODg2Nzc4MSAocWFwaTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sg
-Zm9yIGZhaWx1cmUsIENvY2NpbmVsbGUgcGFydCkKMTgvNDQgQ2hlY2tpbmcgY29tbWl0IDY3YzM2
-MjcwNmYyYyAocWFwaTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9yIGZhaWx1cmUsIG1h
-bnVhbCBwYXJ0KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEg
-c2VwYXJhdGUgbGluZQojNzU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MzE1NDoKKyAgICAg
-ICAgLyogVGhlIHZhbHVlIHdhcyBjaGVja2VkIGluIHZpc2l0X3R5cGVfT25PZmZTcGxpdCgpIGFi
-b3ZlLiBJZgoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODcgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMTgvNDQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTkvNDQgQ2hlY2tpbmcgY29t
-bWl0IDc1NTY1MjAzYjgxMiAoYmxvY2svcGFyYWxsZWxzOiBTaW1wbGlmeSBwYXJhbGxlbHNfb3Bl
-bigpIGFmdGVyIHByZXZpb3VzIGNvbW1pdCkKMjAvNDQgQ2hlY2tpbmcgY29tbWl0IDA0MmMxMTlh
-YTE5ZSAoczM5MHgvcGNpOiBGaXggaGFybWxlc3MgbWlzdGFrZSBpbiB6cGNpJ3MgcHJvcGVydHkg
-ZmlkJ3Mgc2V0dGVyKQoyMS80NCBDaGVja2luZyBjb21taXQgYTkwYWE1MjRhMjA0IChxb206IFVz
-ZSBlcnJvcl9yZXBvcnRmX2VycigpIGluc3RlYWQgb2YgZ19wcmludGVycigpIGluIGV4YW1wbGVz
-KQoyMi80NCBDaGVja2luZyBjb21taXQgMTA0NWJiYmIyZDcwIChxb206IFJlbmFtZSBxZGV2X2dl
-dF90eXBlKCkgdG8gb2JqZWN0X2dldF90eXBlKCkpCjIzLzQ0IENoZWNraW5nIGNvbW1pdCA2NGMz
-ODY4YTk1NWIgKHFvbTogQ3Jhc2ggbW9yZSBuaWNlbHkgb24gb2JqZWN0X3Byb3BlcnR5X2dldF9s
-aW5rKCkgZmFpbHVyZSkKMjQvNDQgQ2hlY2tpbmcgY29tbWl0IGIzZTRmYmRmZWM2OCAocW9tOiBE
-b24ndCBoYW5kbGUgaW1wb3NzaWJsZSBvYmplY3RfcHJvcGVydHlfZ2V0X2xpbmsoKSBmYWlsdXJl
-KQoyNS80NCBDaGVja2luZyBjb21taXQgY2NhOTJlNzkzNDUyIChxb206IFVzZSByZXR1cm4gdmFs
-dWVzIHRvIGNoZWNrIGZvciBlcnJvciB3aGVyZSB0aGF0J3Mgc2ltcGxlcikKMjYvNDQgQ2hlY2tp
-bmcgY29tbWl0IGVlODkxMzYzYjYzNCAocW9tOiBQdXQgbmFtZSBwYXJhbWV0ZXIgYmVmb3JlIHZh
-bHVlIC8gdmlzaXRvciBwYXJhbWV0ZXIpCjI3LzQ0IENoZWNraW5nIGNvbW1pdCA1ODMxYjE5MmIx
-ZGQgKHFvbTogTWFrZSBmdW5jdGlvbnMgdGFraW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qg
-dm9pZCkKMjgvNDQgQ2hlY2tpbmcgY29tbWl0IGE3NmU2YjhhMTVlNiAocW9tOiBVc2UgcmV0dXJu
-ZWQgYm9vbCB0byBjaGVjayBmb3IgZmFpbHVyZSwgQ29jY2luZWxsZSBwYXJ0KQoyOS80NCBDaGVj
-a2luZyBjb21taXQgYzEzMDA4ZDdiYjRjIChxb206IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNr
-IGZvciBmYWlsdXJlLCBtYW51YWwgcGFydCkKMzAvNDQgQ2hlY2tpbmcgY29tbWl0IDkzN2UwMDc2
-N2I2MiAocW9tOiBNYWtlIGZ1bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJuIGJvb2wsIG5v
-dCAwLy0xKQozMS80NCBDaGVja2luZyBjb21taXQgY2MxMGI0ZjQxZjFhIChxZGV2OiBNYWtlIGZ1
-bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJuIGJvb2wsIG5vdCB2b2lkKQozMi80NCBDaGVj
-a2luZyBjb21taXQgNjlmMjFlZTk3YzExIChxZGV2OiBVc2UgcmV0dXJuZWQgYm9vbCB0byBjaGVj
-ayBmb3IgZmFpbHVyZSwgQ29jY2luZWxsZSBwYXJ0KQozMy80NCBDaGVja2luZyBjb21taXQgNzlk
-MjZiM2FjMjVhIChlcnJvcjogQXZvaWQgdW5uZWNlc3NhcnkgZXJyb3JfcHJvcGFnYXRlKCkgYWZ0
-ZXIgZXJyb3Jfc2V0ZygpKQozNC80NCBDaGVja2luZyBjb21taXQgMjQ5NTE4ZGRhZDVjIChlcnJv
-cjogRWxpbWluYXRlIGVycm9yX3Byb3BhZ2F0ZSgpIHdpdGggQ29jY2luZWxsZSwgcGFydCAxKQoz
-NS80NCBDaGVja2luZyBjb21taXQgMjhkYTQ1MmVjNWEyIChlcnJvcjogRWxpbWluYXRlIGVycm9y
-X3Byb3BhZ2F0ZSgpIHdpdGggQ29jY2luZWxsZSwgcGFydCAyKQozNi80NCBDaGVja2luZyBjb21t
-aXQgZDU0MDFlZGU2OWU4IChlcnJvcjogRWxpbWluYXRlIGVycm9yX3Byb3BhZ2F0ZSgpIG1hbnVh
-bGx5KQozNy80NCBDaGVja2luZyBjb21taXQgNTlmYmUwMzY1ZjUxIChlcnJvcjogUmVkdWNlIHVu
-bmVjZXNzYXJ5IGVycm9yIHByb3BhZ2F0aW9uKQozOC80NCBDaGVja2luZyBjb21taXQgYTBiMmVi
-N2NkMjRjIChxYXBpOiBTbW9vdGggYW5vdGhlciB2aXNpdG9yIGVycm9yIGNoZWNraW5nIHBhdHRl
-cm4pCjM5LzQ0IENoZWNraW5nIGNvbW1pdCBkNWMxOGU3NjNkYjMgKHFhcGk6IFNtb290aCB2aXNp
-dG9yIGVycm9yIGNoZWNraW5nIGluIGdlbmVyYXRlZCBjb2RlKQo0MC80NCBDaGVja2luZyBjb21t
-aXQgNTg0MDMzYTM3YWI0IChxYXBpOiBQdXJnZSBlcnJvcl9wcm9wYWdhdGUoKSBmcm9tIFFBUEkg
-Y29yZSkKNDEvNDQgQ2hlY2tpbmcgY29tbWl0IGMxZGE1NTE1M2M0NyAoZXJyb3I6IEF2b2lkIGVy
-cm9yX3Byb3BhZ2F0ZSgpIGFmdGVyIG1pZ3JhdGVfYWRkX2Jsb2NrZXIoKSkKNDIvNDQgQ2hlY2tp
-bmcgY29tbWl0IDJkNTQwMzEwMGJiNyAocWVtdS1pbWc6IElnbm9yZSBFcnJvciBvYmplY3RzIHdo
-ZXJlIHRoZSByZXR1cm4gdmFsdWUgc3VmZmljZXMpCjQzLzQ0IENoZWNraW5nIGNvbW1pdCAzODJm
-OWNjMWFmOWQgKHFkZXY6IElnbm9yZSBFcnJvciBvYmplY3RzIHdoZXJlIHRoZSByZXR1cm4gdmFs
-dWUgc3VmZmljZXMpCjQ0LzQ0IENoZWNraW5nIGNvbW1pdCA1ODEzMTZkMWEyMjQgKGhtcDogSWdu
-b3JlIEVycm9yIG9iamVjdHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNlcykKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDIxNTUw
-MDAuMzQ1NTMyNS0xLWFybWJydUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On 2020-07-02 11:53, Dr. David Alan Gilbert wrote:
+> * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
+>> From: Tobin Feldman-Fitzthum <tobin@ibm.com>
+>> 
+>> AMD SEV allows a guest owner to inject a secret blob
+>> into the memory of a virtual machine. The secret is
+>> encrypted with the SEV Transport Encryption Key and
+>> integrity is guaranteed with the Transport Integrity
+>> Key. Although QEMU faciliates the injection of the
+>> launch secret, it cannot access the secret.
+>> 
+>> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
+>> ---
+>>  include/monitor/monitor.h |  3 ++
+>>  include/sysemu/sev.h      |  2 ++
+>>  monitor/misc.c            |  8 ++---
+>>  qapi/misc-target.json     | 18 +++++++++++
+>>  target/i386/monitor.c     |  9 ++++++
+>>  target/i386/sev-stub.c    |  5 +++
+>>  target/i386/sev.c         | 66 
+>> +++++++++++++++++++++++++++++++++++++++
+>>  target/i386/trace-events  |  1 +
+>>  8 files changed, 108 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+>> index 1018d754a6..bf049c5b00 100644
+>> --- a/include/monitor/monitor.h
+>> +++ b/include/monitor/monitor.h
+>> @@ -4,6 +4,7 @@
+>>  #include "block/block.h"
+>>  #include "qapi/qapi-types-misc.h"
+>>  #include "qemu/readline.h"
+>> +#include "include/exec/hwaddr.h"
+>> 
+>>  extern __thread Monitor *cur_mon;
+>>  typedef struct MonitorHMP MonitorHMP;
+>> @@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
+>>  int monitor_set_cpu(int cpu_index);
+>>  int monitor_get_cpu_index(void);
+>> 
+>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
+>> **errp);
+>> +
+>>  void monitor_read_command(MonitorHMP *mon, int show_prompt);
+>>  int monitor_read_password(MonitorHMP *mon, ReadLineFunc 
+>> *readline_func,
+>>                            void *opaque);
+>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+>> index 98c1ec8d38..b279b293e8 100644
+>> --- a/include/sysemu/sev.h
+>> +++ b/include/sysemu/sev.h
+>> @@ -18,4 +18,6 @@
+>> 
+>>  void *sev_guest_init(const char *id);
+>>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
+>> +int sev_inject_launch_secret(const char *hdr, const char *secret,
+>> +                             uint64_t gpa);
+>>  #endif
+>> diff --git a/monitor/misc.c b/monitor/misc.c
+>> index 89bb970b00..b9ec8ba410 100644
+>> --- a/monitor/misc.c
+>> +++ b/monitor/misc.c
+>> @@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor 
+>> *mon, const QDict *qdict)
+>>      memory_dump(mon, count, format, size, addr, 1);
+>>  }
+>> 
+>> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
+>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
+>> **errp)
+>>  {
+>>      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
+>> -                                                 addr, 1);
+>> +                                                 addr, size);
+>> 
+>>      if (!mrs.mr) {
+>>          error_setg(errp, "No memory is mapped at address 0x%" 
+>> HWADDR_PRIx, addr);
+>> @@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict 
+>> *qdict)
+>>      MemoryRegion *mr = NULL;
+>>      void *ptr;
+>> 
+>> -    ptr = gpa2hva(&mr, addr, &local_err);
+>> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
+>>      if (local_err) {
+>>          error_report_err(local_err);
+>>          return;
+>> @@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict 
+>> *qdict)
+>>      void *ptr;
+>>      uint64_t physaddr;
+>> 
+>> -    ptr = gpa2hva(&mr, addr, &local_err);
+>> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
+>>      if (local_err) {
+>>          error_report_err(local_err);
+>>          return;
+>> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+>> index dee3b45930..d145f916b3 100644
+>> --- a/qapi/misc-target.json
+>> +++ b/qapi/misc-target.json
+>> @@ -200,6 +200,24 @@
+>>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+>>    'if': 'defined(TARGET_I386)' }
+>> 
+>> +##
+>> +# @sev-inject-launch-secret:
+>> +#
+>> +# This command injects a secret blob into memory of SEV guest.
+>> +#
+>> +# @packet-header: the launch secret packet header encoded in base64
+>> +#
+>> +# @secret: the launch secret data to be injected encoded in base64
+>> +#
+>> +# @gpa: the guest physical address where secret will be injected.
+>> +#
+>> +# Since: 5.1
+>> +#
+>> +##
+>> +{ 'command': 'sev-inject-launch-secret',
+>> +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' 
+>> },
+>> +  'if': 'defined(TARGET_I386)' }
+>> +
+>>  ##
+>>  # @dump-skeys:
+>>  #
+>> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+>> index 27ebfa3ad2..42bcfe6dc0 100644
+>> --- a/target/i386/monitor.c
+>> +++ b/target/i386/monitor.c
+>> @@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error 
+>> **errp)
+>> 
+>>      return data;
+>>  }
+>> +
+>> +void qmp_sev_inject_launch_secret(const char *packet_hdr,
+>> +                                  const char *secret, uint64_t gpa,
+>> +                                  Error **errp)
+>> +{
+>> +    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
+>> +        error_setg(errp, "SEV inject secret failed");
+>> +    }
+>> +}
+>> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+>> index e5ee13309c..fed4588185 100644
+>> --- a/target/i386/sev-stub.c
+>> +++ b/target/i386/sev-stub.c
+>> @@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
+>>  {
+>>      return NULL;
+>>  }
+>> +int sev_inject_launch_secret(const char *hdr, const char *secret,
+>> +                             uint64_t gpa)
+>> +{
+>> +    return 1;
+>> +}
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index d273174ad3..b35f1ddc0c 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -28,6 +28,8 @@
+>>  #include "sysemu/runstate.h"
+>>  #include "trace.h"
+>>  #include "migration/blocker.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "monitor/monitor.h"
+>> 
+>>  #define TYPE_SEV_GUEST "sev-guest"
+>>  #define SEV_GUEST(obj)                                          \
+>> @@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr, 
+>> uint64_t len)
+>>      return 0;
+>>  }
+>> 
+>> +int sev_inject_launch_secret(const char *packet_hdr,
+>> +                             const char *secret, uint64_t gpa)
+>> +{
+>> +    struct kvm_sev_launch_secret input;
+>> +    guchar *data = NULL, *hdr = NULL;
+>> +    int error, ret = 1;
+>> +    void *hva;
+>> +    gsize hdr_sz = 0, data_sz = 0;
+>> +    Error *local_err = NULL;
+>> +    MemoryRegion *mr = NULL;
+>> +
+>> +    /* secret can be inject only in this state */
+>> +    if (!sev_check_state(SEV_STATE_LAUNCH_SECRET)) {
+> 
+> This gives a build error for me; sev_check_state is declared as :
+> 
+> static bool
+> sev_check_state(const SevGuestState *sev, SevState state)
+> 
+> so it's expecting the state.
+> 
+
+Ah, my bad. I think I missed the change from sev_state to sev_guest.
+I will send a v2 through with all the other fixes in the near future,
+unless there is anything else.
+
+Thanks,
+Tobin
+
+>> +        error_report("SEV: Not in correct state. (LSECRET) %x",
+>> +                     sev_state->state);
+> 
+> also it's showing as sev_state undeclared.
+> 
+>> +        return 1;
+>> +    }
+>> +
+>> +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
+>> +    if (!hdr || hdr_sz != 52) {
+> 
+> Here and ...
+> 
+>> +        error_report("SEV: Failed to decode sequence header");
+>> +        return 1;
+>> +    }
+>> +
+>> +    data = g_base64_decode(secret, &data_sz);
+>> +    if (!data || data_sz <= 0 || data_sz > 0x3E80) {
+> 
+> here - please don't embed magic constants; they should be a #define
+> or const somewhere so we can tell what they are.
+> 
+>> +        error_report("SEV: Failed to decode data");
+>> +        goto err;
+>> +    }
+>> +
+>> +    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
+>> +    if (!hva) {
+>> +        error_report("SEV: Failed to calculate guest address.");
+>> +        goto err;
+>> +    }
+>> +
+>> +    input.hdr_uaddr = (unsigned long)hdr;
+>> +    input.hdr_len = hdr_sz;
+>> +
+>> +    input.trans_uaddr = (unsigned long)data;
+>> +    input.trans_len = data_sz;
+>> +
+>> +    input.guest_uaddr = (unsigned long)hva;
+>> +    input.guest_len = data_sz;
+> 
+> I'd probably use casts to uint64_t here for hdr, data, and hva
+> since that's what the structure you are assigning to has.
+> 
+>> +
+>> +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
+>> +                                input.trans_uaddr, input.trans_len);
+>> +
+>> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_SECRET,
+>> +                    &input, &error);
+>> +    if (ret) {
+>> +        error_report("SEV: failed to inject secret ret=%d fw_error=%d 
+>> '%s'",
+>> +                     ret, error, fw_error_to_str(error));
+>> +        goto err;
+>> +    }
+>> +
+>> +    ret = 0;
+>> +
+>> +err:
+>> +    g_free(data);
+>> +    g_free(hdr);
+>> +    return ret;
+>> +}
+>> +
+>>  static void
+>>  sev_register_types(void)
+>>  {
+>> diff --git a/target/i386/trace-events b/target/i386/trace-events
+>> index 789c700d4a..9f299e94a2 100644
+>> --- a/target/i386/trace-events
+>> +++ b/target/i386/trace-events
+>> @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void 
+>> *pdh) "policy 0x%x session
+>>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 
+>> 0x%" PRIu64
+>>  kvm_sev_launch_measurement(const char *value) "data %s"
+>>  kvm_sev_launch_finish(void) ""
+>> +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, 
+>> int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len 
+>> %d"
+>> --
+>> 2.20.1 (Apple Git-117)
+>> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
