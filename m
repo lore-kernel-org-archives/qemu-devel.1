@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CB4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C00C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2079521527
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A45521534
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AndSdr9Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2079521527
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oYZ02HnU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A45521534
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2kl-0003BR-Bf
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34470)
+	id 1jr2ld-00047P-Lv
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:12:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Au-000751-VY
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:00 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44875)
+ id 1jr2B3-0007Vt-7H
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:09 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44883)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2As-0000AD-Io
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:00 -0400
+ id 1jr2B1-0000Az-1j
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707698; x=1625243698;
+ t=1593707707; x=1625243707;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=5EovO1WkJPYTFla2UfJh5X7iRR/dpSD5g5yDMA7sFZ4=;
- b=AndSdr9ZcOv3sqhHGVabj9+ldCn38zitO/GQcC3yOwpPLiRVUOmbHTmB
- qg6cqFvjOnhmPlf48pIYMqHPH9z1lXpmBLrhsF/TUFkjLtjOKKPui5FOB
- xESuRpGZsJ8Sdl2U95r4jNkI3NvXljVFNjxwgurDBDXtTSKVA5/00cSqN
- 0OS0L2c3JaiP74694wyouejsSr1354FHYMtFhKwqW1GBnLIIjX9dEZj/F
- 3m/WgsRIGCazYAO/iTO3SjVSf0wCflipic1DrPY+ISqHuUe9BjvnK7TMO
- yeXFHMwmKe2mSiGBQeqa1daiPUIDLteKCfRnE0X7oEQoBSjxfhXhVoJJI w==;
-IronPort-SDR: O+o9prxz+om6/rATqqGnOyb/ybHNk04Exhs5GacBu1pguAUCi4VSFKe3n1cwVjqR3kFOtOJFxw
- iBPKEFC3g1JCGY4L9nMuMjb8VuGT7zf7qFTOTDpDNjK+us0vL9PL8jBhugB7arYFaJJO5ud7dS
- Q2Vgi+cKSeRm+pntxa9KlGiS/d+SlR6BbH3Mzd6IShnCnSN4ikJFT4x8PgaIRlxSBUgoYZY+Lx
- TfZ/t0cKvi5hvabycz8GYRoPTkKr6SqjMABGePaZ/T80558tTxqDlMgTg90BURvaFhiCuGoKEK
- bUw=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498557"
+ bh=XIrl3Uuj9xY0opM8Q9Cnd1OyyTHdzNgiHpQaOfMaY6c=;
+ b=oYZ02HnUHl1a6Bjyp9w1tb0EOWeOBcTy23T2nvagO543zNA9o2j8B2bR
+ +ZPrQcyka4lqEmNOCuojJAL24nVnbrKwf17a0eBe2IeeC9PqhK/jcMFuG
+ 78ZM5nGuE5xnbZPSV7QtTu9cSaoCKPAB2TJijTNi2erGQXzHcCEVGrqBL
+ arZKM/6NMO+cM8hExD/LiP2Q5VvOfoQZjYLRMAk9CaRzGXBSQ2nAw8Omf
+ QBqJmZWN6DKRkpdSQWcttDzYEiSdbmH83ZNrJvWPWyW44s+mJIlRTMvlj
+ nYe9jWS4BxtiVwLV+b+C3/2tYCSlSorbkrkvswCwZlg24M9N8oIupIhx2 g==;
+IronPort-SDR: RpOYGPTkuG8q86bjVU1fOstmP8iOs2qD/z2qyDNL1WpS1ux2pgMQzGuI07c74prEihi+vd4w91
+ 1cRFrZR5GD9SDs45GSbG1BYMEwZ84j+JV6z6A20qmPfIhRnqUpLYnfBFmiTSSeHJeMjUIhjtAl
+ 8g9G1Navy+OcuIvW7+MT6ZzK7tL1XLaaq9hZ7EJcfs6C9pkySZ8W21T6+VJKi2dF4WNxZh5qVB
+ WIiAlNDxjEbglWtbeB6woR4vRUqS+P3KM/KcsGo5s2VQwWCcI8tn83e8jcqyulVNw8JFgui5DQ
+ lDQ=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498568"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:35 +0800
-IronPort-SDR: Yv/RqQmJh/gr/jHemUOJJJugVx5aNWWn5EQcoCgAWaIHhNV70cCurVJtZKKv0fWgN2JyAwxhSc
- HbZDpMteyD+88w/cMTWKwvBb0DUECejD4=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:36 +0800
+IronPort-SDR: DyJPGnAoXPRb2r6/FVlj4+oaZcA685iO+I3IVtQYlqoxdnSQ+uemus19mxPhwHaM5q99FeO4l9
+ K4ixj9RnfaJUgkZqrZQbQB+w68ZDJhCQA=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:50 -0700
-IronPort-SDR: qqaFtyAQYfZUEE2HWYLCaLyVCbdieVsajiukvkLcoe5B5aKiia/dUkir/avYbAepgxhsyO9YlU
- 4ZrGhXo0fx3Q==
+ 02 Jul 2020 09:21:51 -0700
+IronPort-SDR: J5mGMbwxa8FMY7qOOSelHrVUp7qJDfXhObZjjqLQto46PhdTel1TxJU1bt/Ldhtavz4DciDwBa
+ o4BBkSOBdzDg==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:35 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:36 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 56/64] target/riscv: vector iota instruction
-Date: Thu,  2 Jul 2020 09:23:46 -0700
-Message-Id: <20200702162354.928528-57-alistair.francis@wdc.com>
+Subject: [PULL v2 60/64] target/riscv: floating-point scalar move instructions
+Date: Thu,  2 Jul 2020 09:23:50 -0700
+Message-Id: <20200702162354.928528-61-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -114,112 +114,91 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200701152549.1218-54-zhiwei_liu@c-sky.com>
+Message-Id: <20200701152549.1218-58-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  5 +++++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 27 +++++++++++++++++++++++
- target/riscv/vector_helper.c            | 29 +++++++++++++++++++++++++
- 4 files changed, 62 insertions(+)
+ target/riscv/insn32.decode              |  3 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 49 +++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 0f9012be7e..91db396979 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1109,3 +1109,8 @@ DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsbf_m, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsif_m, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vmsof_m, void, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index fab4a0b7e2..415523573d 100644
+index e06c0ffc22..17288a3c95 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -560,6 +560,7 @@ vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
- vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
-+viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+@@ -72,6 +72,7 @@
+ @r2_vm   ...... vm:1 ..... ..... ... ..... ....... &rmr %rs2 %rd
+ @r1_vm   ...... vm:1 ..... ..... ... ..... ....... %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
++@r2rd    .......   ..... ..... ... ..... ....... %rs2 %rd
+ @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
+ @r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
+ @r_vm_0  ...... . ..... ..... ... ..... .......    &rmrr vm=0 %rs2 %rs1 %rd
+@@ -565,6 +566,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+ vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
++vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
++vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 33ffe5dc1a..4dc893fa70 100644
+index b10b89daa9..7af16ce0a8 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2481,3 +2481,30 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
- GEN_M_TRANS(vmsbf_m)
- GEN_M_TRANS(vmsif_m)
- GEN_M_TRANS(vmsof_m)
+@@ -2709,3 +2709,52 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
+     }
+     return false;
+ }
 +
-+/* Vector Iota Instruction */
-+static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
++/* Floating-Point Scalar Move Instructions */
++static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
 +{
-+    if (vext_check_isa_ill(s) &&
-+        vext_check_reg(s, a->rd, false) &&
-+        vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2, 1) &&
-+        (a->vm != 0 || a->rd != 0)) {
-+        uint32_t data = 0;
++    if (!s->vill && has_ext(s, RVF) &&
++        (s->mstatus_fs != 0) && (s->sew != 0)) {
++        unsigned int len = 8 << s->sew;
++
++        vec_element_loadi(s, cpu_fpr[a->rd], a->rs2, 0);
++        if (len < 64) {
++            tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd],
++                            MAKE_64BIT_MASK(len, 64 - len));
++        }
++
++        mark_fs_dirty(s);
++        return true;
++    }
++    return false;
++}
++
++/* vfmv.s.f vd, rs1 # vd[0] = rs1 (vs2=0) */
++static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
++{
++    if (!s->vill && has_ext(s, RVF) && (s->sew != 0)) {
++        TCGv_i64 t1;
++        /* The instructions ignore LMUL and vector register group. */
++        uint32_t vlmax = s->vlen >> 3;
++
++        /* if vl == 0, skip vector register write back */
 +        TCGLabel *over = gen_new_label();
 +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
 +
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        static gen_helper_gvec_3_ptr * const fns[4] = {
-+            gen_helper_viota_m_b, gen_helper_viota_m_h,
-+            gen_helper_viota_m_w, gen_helper_viota_m_d,
-+        };
-+        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,
-+                           s->vlen / 8, data, fns[s->sew]);
++        /* zeroed all elements */
++        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), vlmax, vlmax, 0);
++
++        /* NaN-box f[rs1] as necessary for SEW */
++        t1 = tcg_temp_new_i64();
++        if (s->sew == MO_64 && !has_ext(s, RVD)) {
++            tcg_gen_ori_i64(t1, cpu_fpr[a->rs1], MAKE_64BIT_MASK(32, 32));
++        } else {
++            tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
++        }
++        vec_element_storei(s, a->rd, 0, t1);
++        tcg_temp_free_i64(t1);
 +        gen_set_label(over);
 +        return true;
 +    }
 +    return false;
 +}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index a58809a3cd..e0e6299e64 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4644,3 +4644,32 @@ void HELPER(vmsof_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
- {
-     vmsetm(vd, v0, vs2, env, desc, ONLY_FIRST);
- }
-+
-+/* Vector Iota Instruction */
-+#define GEN_VEXT_VIOTA_M(NAME, ETYPE, H, CLEAR_FN)                        \
-+void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
-+                  uint32_t desc)                                          \
-+{                                                                         \
-+    uint32_t mlen = vext_mlen(desc);                                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-+    uint32_t vm = vext_vm(desc);                                          \
-+    uint32_t vl = env->vl;                                                \
-+    uint32_t sum = 0;                                                     \
-+    int i;                                                                \
-+                                                                          \
-+    for (i = 0; i < vl; i++) {                                            \
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
-+            continue;                                                     \
-+        }                                                                 \
-+        *((ETYPE *)vd + H(i)) = sum;                                      \
-+        if (vext_elem_mask(vs2, mlen, i)) {                               \
-+            sum++;                                                        \
-+        }                                                                 \
-+    }                                                                     \
-+    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
-+}
-+
-+GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
-+GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
-+GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
-+GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
 -- 
 2.27.0
 
