@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A451DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DEAC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ED5020771
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:54:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10085207D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hE0K5CDe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED5020771
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrxEYE2t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10085207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1Xi-0006xb-LC
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:54:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49806)
+	id 1jr1ZG-00015E-7F
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:56:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Th-0008IK-0k
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35597
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tb-0008Dl-V2
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26122
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1TX-0004qc-UX
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:20 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1TV-0004oP-4y
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593705010;
+ s=mimecast20190719; t=1593705007;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=anqLy2GztNn/2Nq6AiIlwpA3jES1aqZTdMhm8FjZwm4=;
- b=hE0K5CDeXa+I17jw7PlQSD6lHRoWU/cL3ubZSeMv/YF4BUzmbEhE70XR9cUeXL7J8iEMrP
- Fc59+/QCxtUJWh/odJD32BpZSGNGOXOZK6emeteeqVYl4gcahlDbuw7TNmKKS+yLAAYHCX
- ch1GsmIcsfyXWy9badqkl8meM3IWf0Y=
+ bh=KHMn5I1RFKg3+jBpgffrwvUDe1QNVNMfFvqwt1B/NqU=;
+ b=DrxEYE2tFCMIUbVX10Zrq3xdXJrmjiLEo6rVCWcYRMF6WxVTqfERhCL0ufnchek5FArM1T
+ 4oFaYrWsld2h9mqDCORX5ko+MiaxCE6L0t2C0GzLVccaak+9rr5rq/7SFiHp5QReVH/rpf
+ XH1yGlh1JnhJn/K3vMcpdId2eHVApkQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-5ST091-aOzyraWLc20YOgw-1; Thu, 02 Jul 2020 11:50:08 -0400
-X-MC-Unique: 5ST091-aOzyraWLc20YOgw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-243-YOgmg9EvOqCgNptcAiPK5A-1; Thu, 02 Jul 2020 11:50:05 -0400
+X-MC-Unique: YOgmg9EvOqCgNptcAiPK5A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BCE818FE872;
- Thu,  2 Jul 2020 15:50:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F31D800C60;
+ Thu,  2 Jul 2020 15:50:04 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DDF173FF7;
- Thu,  2 Jul 2020 15:50:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CEECA2B4C5;
+ Thu,  2 Jul 2020 15:50:03 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BCD2911358CC; Thu,  2 Jul 2020 17:50:00 +0200 (CEST)
+ id 9DACD1138536; Thu,  2 Jul 2020 17:50:00 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/44] hmp: Eliminate a variable in
- hmp_migrate_set_parameter()
-Date: Thu,  2 Jul 2020 17:49:31 +0200
-Message-Id: <20200702155000.3455325-16-armbru@redhat.com>
+Subject: [PATCH v2 09/44] qemu-option: Simplify around find_default_by_name()
+Date: Thu,  2 Jul 2020 17:49:25 +0200
+Message-Id: <20200702155000.3455325-10-armbru@redhat.com>
 In-Reply-To: <20200702155000.3455325-1-armbru@redhat.com>
 References: <20200702155000.3455325-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,36 +105,62 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- monitor/hmp-cmds.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ util/qemu-option.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 2b0b58a336..d7810cb564 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1247,7 +1247,6 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-     MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
-     uint64_t valuebw = 0;
-     uint64_t cache_size;
--    MultiFDCompression compress_type;
-     Error *err = NULL;
-     int val, ret;
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 14e211ddd8..e7b540a21b 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -277,7 +277,6 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
+ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+ {
+     QemuOpt *opt;
+-    const char *def_val;
  
-@@ -1343,11 +1342,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-         break;
-     case MIGRATION_PARAMETER_MULTIFD_COMPRESSION:
-         p->has_multifd_compression = true;
--        visit_type_MultiFDCompression(v, param, &compress_type, &err);
--        if (err) {
--            break;
+     if (opts == NULL) {
+         return NULL;
+@@ -285,12 +284,10 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+ 
+     opt = qemu_opt_find(opts, name);
+     if (!opt) {
+-        def_val = find_default_by_name(opts, name);
+-        if (def_val) {
+-            return def_val;
 -        }
--        p->multifd_compression = compress_type;
-+        visit_type_MultiFDCompression(v, param, &p->multifd_compression,
-+                                      &err);
-         break;
-     case MIGRATION_PARAMETER_MULTIFD_ZLIB_LEVEL:
-         p->has_multifd_zlib_level = true;
++        return find_default_by_name(opts, name);
+     }
+-    return opt ? opt->str : NULL;
++
++    return opt->str;
+ }
+ 
+ void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
+@@ -319,8 +316,7 @@ const char *qemu_opt_iter_next(QemuOptsIter *iter)
+ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
+ {
+     QemuOpt *opt;
+-    const char *def_val;
+-    char *str = NULL;
++    char *str;
+ 
+     if (opts == NULL) {
+         return NULL;
+@@ -328,11 +324,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
+ 
+     opt = qemu_opt_find(opts, name);
+     if (!opt) {
+-        def_val = find_default_by_name(opts, name);
+-        if (def_val) {
+-            str = g_strdup(def_val);
+-        }
+-        return str;
++        return g_strdup(find_default_by_name(opts, name));
+     }
+     str = opt->str;
+     opt->str = NULL;
 -- 
 2.26.2
 
