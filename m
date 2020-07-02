@@ -2,87 +2,87 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97962C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BEEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:40:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FD5820885
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:37:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2415A20885
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:40:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqT4H7A8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD5820885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XW9kVTSd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2415A20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqyTT-00063G-KX
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:37:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
+	id 1jqyW2-0007Rs-EB
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:40:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqySn-0005Sg-OO
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:37:13 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55943)
+ id 1jqyVJ-0006yQ-4L
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:39:49 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36683)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jqySl-0003cv-9Y
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:37:13 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g75so26569972wme.5
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 05:37:08 -0700 (PDT)
+ id 1jqyVH-0004wO-NO
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:39:48 -0400
+Received: by mail-wr1-x441.google.com with SMTP id k6so28111309wrn.3
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 05:39:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=H4lAOi0jdudNldy9T7erB2iyrG8uPkvf10Sc4D+gr0I=;
- b=eqT4H7A8Ctclf58N1CSAB9Ov1y/LeL7m4NvG/m+hYzk8olvnBF1e/2NsIP6/XrCIz0
- IZlE2Q4/H2yP6J2TTxMbJr9RldfT0T3yarAhZpQBvoetfyzEjaaWkgSTHCRDfTSKS50b
- +2wOdaJ/EIVYPyk+cwLEd7WKTAu1X+3adVfuIeHmh1/yelJzKAapeOqTQzAFfMaDR4Uk
- cTaqlibvCKk406VA2f70fP5rLxzkwpydqUKwC/2svUWh9DOu4HOL33fXhObKQK/mEVM+
- qv65Ynu0LAXPbo9XQUxSf3477g81z73duaqc+Tm3V4MHlRlizJnKStrhika/QH1R1Pd7
- gOiw==
+ bh=vubpZi/mRE5M1Rf4FEjDKdzxGMYDJkWsMdW9+7FWEwo=;
+ b=XW9kVTSdsN+Mj01oUOMlm7WVz9iB2N1oo6W6tyCMj3FVHKL63fZkGYgazJukMBS1XA
+ TeQCMLzbZLX6Xr7EaB5/jyPHfd8yu0kdr1lKylhH3yKcS4iTlfu/DSX9MnOBrj5e4zmQ
+ DYhFeY9Fsx1yEhbHrBaZZ+Wn1pPhMtpIEgh+yBT3aVfEQEUTbhnAKEMJZHZtpyjeIrUx
+ h9SL9qMvbbhai1Zs1jVwdWJH2m9PMFWlizzX5eaMgsXHF/02Icn0TlHwVqmPiVT/SCv2
+ Jzjq8J566Ho3212rjb69Y+74vrg4Ej7j/TC9au1p1OP38ZXvZPH93lqcLr7/uwbuomgZ
+ Gz5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=H4lAOi0jdudNldy9T7erB2iyrG8uPkvf10Sc4D+gr0I=;
- b=rg7bXhk7yEP7ZvvV0tIjzDorPSJM+YURBOhHm3cXCqkVe+5cQj8D/wVUALgpOE5NfW
- RFj7ubz3uyIr3aMsuuu0wa4qQ78YdYTFA4PGjI0cL0YXsibrHjKWBrKIMUfh0a7+BhfZ
- FLaYiD0O7eJlQPIQKBQTkO2PAJeFzkZUBc3NltCE+r/6wp8hBzeriyyBloL5Urt2ZbmD
- OdZ5G8K8PA7qS92ReirzER3UWmoECiJebRW8VTl9YR7Hs7G6FznTT86Ht0tkX2QkxzGi
- it0l+VIYhjPmtySsvxAHTgSDqEDcF20itiCUsUhTFlCdQoEKJ1tMFzIcEpG4KkFCkFfY
- IRXg==
-X-Gm-Message-State: AOAM530BIkpxja4e3vokee0MnUuoRQrltm9sAn5ph8w9SjqeD8bxmpAP
- ZOjKAfYLnVyJ40IjHl+XgRo=
-X-Google-Smtp-Source: ABdhPJzkUo3lG8n3k1V4kOD8MDFB5CBlzQXNppNgINVoRlwUTYFhpX/OQSerDj2La7z+beJxfE9WIg==
-X-Received: by 2002:a1c:24c6:: with SMTP id k189mr33144569wmk.9.1593693427112; 
- Thu, 02 Jul 2020 05:37:07 -0700 (PDT)
+ bh=vubpZi/mRE5M1Rf4FEjDKdzxGMYDJkWsMdW9+7FWEwo=;
+ b=ayXNj84Le1FJalDS4KvdxZJcRP6Yzh1F4cksoJ6IyJIdGGc+trfUAoU2oNuq9JimDo
+ XCDStyNHKsChi+uqkEDGblLDrZ5M3f8LE5PtvhFyeMiUfosGUEbowUVDr1UPEPAxP6bu
+ RA7cd79t7+MAVELzhh9ESo/1y1MmxRj/7cX3e/MFusbDHU6J8fDBysxytj3E2Pir9FZO
+ Egd/qPS3FDXW1y7lJ1R8xqOQQBAHeaSUoCmzqQoGoDvqQC+7M3qETimZJrgSZWfD9MPE
+ jdSobOvTc5wwozzwryRaHSwFN0CdVqyIZ5LTfHtw87GJ46Xa9UVBITQskRFj6vAwHbvP
+ ZvgA==
+X-Gm-Message-State: AOAM5314+tn+iN+Mq9931+lpJjeh35+g8Wxqea+uVpk6pSNw8eeMKROJ
+ ltK2CEXhs6egO7eRrUItK88=
+X-Google-Smtp-Source: ABdhPJxOu9OLgayXKMaJCfCuSepo4jwpb86ybGqNPvydD160F+IThXdhRcZe0OdRY8hX/tw/1Bi3Yg==
+X-Received: by 2002:a5d:6288:: with SMTP id k8mr30547107wru.373.1593693586177; 
+ Thu, 02 Jul 2020 05:39:46 -0700 (PDT)
 Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x11sm9978551wmc.26.2020.07.02.05.37.05
+ by smtp.gmail.com with ESMTPSA id y17sm11171685wrd.58.2020.07.02.05.39.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jul 2020 05:37:06 -0700 (PDT)
-Subject: Re: [PATCH] MAINTAINERS: update linux-user maintainer
-To: riku.voipio@linaro.org, qemu-devel@nongnu.org
-References: <20200702111636.25792-1-riku.voipio@linaro.org>
+ Thu, 02 Jul 2020 05:39:45 -0700 (PDT)
+Subject: Re: [PATCH v3 0/2] target mips: Misc fixes and improvements
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-devel@nongnu.org
+References: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <10cbb5a0-fe6a-3163-2a9e-c0f81f7bfbb5@amsat.org>
-Date: Thu, 2 Jul 2020 14:37:05 +0200
+Message-ID: <a97c16a0-4f21-ef84-b2cf-9b861efcbe11@amsat.org>
+Date: Thu, 2 Jul 2020 14:39:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200702111636.25792-1-riku.voipio@linaro.org>
+In-Reply-To: <20200701182559.28841-1-aleksandar.qemu.devel@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -104,42 +104,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, laurent@vivier.eu
+Cc: Huacai Chen <chenhc@lemote.com>, aleksandar.rikalo@syrmia.com,
+ Paul Burton <paulburton@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/20 1:16 PM, riku.voipio@linaro.org wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
+On 7/1/20 8:25 PM, Aleksandar Markovic wrote:
+> A collection of pending fixes and improvements.
 > 
-> I haven't been active for a while. Pass the maintainer hat
-> forward to Laurent, who has done a stellar job filling in.
+> v2->v3:
 > 
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-
-Thanks a lot for your contributions Riku!!!
-
-FWIW:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  MAINTAINERS | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>     - minor content and commit message changes
 > 
-> diff --git MAINTAINERS MAINTAINERS
-> index dec252f38b..29a23b6d3a 100644
-> --- MAINTAINERS
-> +++ MAINTAINERS
-> @@ -2629,8 +2629,7 @@ F: bsd-user/
->  F: default-configs/*-bsd-user.mak
->  
->  Linux user
-> -M: Riku Voipio <riku.voipio@iki.fi>
-> -R: Laurent Vivier <laurent@vivier.eu>
-> +M: Laurent Vivier <laurent@vivier.eu>
->  S: Maintained
->  F: linux-user/
->  F: default-configs/*-linux-user.mak
+> v1->v2:
 > 
+>     - minor content and commit message changes
+> 
+> Aleksandar Markovic (2):
+>   target/mips: Remove identical if/else branches
+>   MAINTAINERS: Adjust MIPS maintainership
 
+Thanks, added to mips-next, splitting the 2nd patch in 3:
+MAINTAINERS: Adjust MIPS maintainership (remove Aurelien Jarno)
+MAINTAINERS: Adjust MIPS maintainership (remove Paul Burton)
+MAINTAINERS: Adjust MIPS maintainership (Add Huacai Chen & Jiaxun Yang)
 
