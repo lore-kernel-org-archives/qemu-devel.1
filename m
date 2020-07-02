@@ -4,69 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD84C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE65BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AA1F2075D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE8D02070C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:12:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6n/Nbk9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA1F2075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NDS6WZ7y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8D02070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqx99-0003lV-Q4
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52452)
+	id 1jqx9A-0003rH-SO
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:12:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqx67-0006XD-Qr
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:09:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44394
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqx6B-0006fP-Iz
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:09:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35144
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqx64-0000zG-Bl
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:09:43 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqx66-000102-Ij
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:09:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593688179;
+ s=mimecast20190719; t=1593688181;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SlxeB32C41oY/6x4THLquL8lc0tiCsay6MBQ8yHR1TI=;
- b=C6n/Nbk9qNy1aXZmEtagf7ops8GZk5sv2qrAmskcnRfMpl5hESlCk3yEuk20HtMbYNhPaU
- h8JL5EsZNrqAlFYrISd4dA4I4Ci7UWlq9kLM/WJF8pjW/Fs1yfCHn1o+stXsa8c+oVMRnb
- NVj7npmGe7mnHMyTwfdU8Fyufmi0jMg=
+ bh=6IqxJa1RG8FIZ2rgzSK93kc5aM2ItqZUYklHh0smqis=;
+ b=NDS6WZ7y5C5PVCoIa5pxRQVDcQowk389B6LfsyFwS+Es5+CcOnQoNtZMrGoFaT5tjVsQN0
+ bMubLAcLb5nFd0ys/3Wj17A/LPFMxcyOQuAcv+51JrbdfT3lwfQ3QK3yBFIxxjaYkdUFEb
+ i5w8sisSIPA0bmtM4HrwgcEVPXHD1AU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-qhWaZk8UP_2NxC70ys5WVg-1; Thu, 02 Jul 2020 07:09:35 -0400
-X-MC-Unique: qhWaZk8UP_2NxC70ys5WVg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-164-F6vb2zBiOM2tk3ruO6_2iw-1; Thu, 02 Jul 2020 07:09:39 -0400
+X-MC-Unique: F6vb2zBiOM2tk3ruO6_2iw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1932E800C64
- for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 11:09:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 699C5107ACF4;
+ Thu,  2 Jul 2020 11:09:38 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B780679229;
- Thu,  2 Jul 2020 11:09:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 299BA5C1D6;
+ Thu,  2 Jul 2020 11:09:38 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AAF741138473; Thu,  2 Jul 2020 13:09:31 +0200 (CEST)
+ id 238101138482; Thu,  2 Jul 2020 13:09:32 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/28] tests: Use error_free_or_abort() where appropriate
-Date: Thu,  2 Jul 2020 13:09:10 +0200
-Message-Id: <20200702110931.2953148-8-armbru@redhat.com>
+Subject: [PULL 22/28] x86: Fix x86_cpu_new() error handling
+Date: Thu,  2 Jul 2020 13:09:25 +0200
+Message-Id: <20200702110931.2953148-23-armbru@redhat.com>
 In-Reply-To: <20200702110931.2953148-1-armbru@redhat.com>
 References: <20200702110931.2953148-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,214 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace
+The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+pointer to a variable containing NULL.  Passing an argument of the
+latter kind twice without clearing it in between is wrong: if the
+first call sets an error, it no longer points to NULL for the second
+call.
 
-    g_assert(err != NULL);
-    error_free(err);
-    err = NULL;
+x86_cpu_new() is wrong that way: it passes &local_err to
+object_property_set_uint() without checking it, and then to
+qdev_realize().  If both fail, we'll trip error_setv()'s assertion.
+To assess the bug's impact, we'd need to figure out how to make both
+calls fail.  Too much work for ignorant me, sorry.
 
-and variations thereof by
+Fix by checking for failure right away.
 
-    error_free_or_abort(&err);
-
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200630090351.1247703-6-armbru@redhat.com>
+Message-Id: <20200630090351.1247703-21-armbru@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/check-block-qdict.c   | 24 ++++++------------------
- tests/check-qom-proplist.c  |  7 ++-----
- tests/test-base64.c         |  3 +--
- tests/test-bdrv-graph-mod.c |  4 +---
- tests/test-block-iothread.c |  3 +--
- tests/test-crypto-cipher.c  |  8 ++------
- tests/test-io-task.c        |  4 +---
- 7 files changed, 14 insertions(+), 39 deletions(-)
+ hw/i386/x86.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
-index 73d3e9f574..5a25825093 100644
---- a/tests/check-block-qdict.c
-+++ b/tests/check-block-qdict.c
-@@ -610,9 +610,7 @@ static void qdict_rename_keys_test(void)
-     copy = qdict_clone_shallow(dict);
-     qdict_rename_keys(copy, renames, &local_err);
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 34229b45c7..93f7371a56 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -118,14 +118,16 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
  
--    g_assert(local_err != NULL);
--    error_free(local_err);
--    local_err = NULL;
-+    error_free_or_abort(&local_err);
- 
-     g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
-     g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
-@@ -649,9 +647,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.0.policy", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -660,9 +656,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.a", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -673,9 +667,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.b", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -684,9 +676,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.3", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- 
-     src = qdict_new();
-@@ -695,9 +685,7 @@ static void qdict_crumple_test_bad_inputs(void)
-     qdict_put_str(src, "rule.+1", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
--    g_assert(error != NULL);
--    error_free(error);
--    error = NULL;
-+    error_free_or_abort(&error);
-     qobject_unref(src);
- }
- 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 8c71734e1a..e1e0a96661 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -491,17 +491,14 @@ static void test_dummy_getenum(void)
-                                    "av",
-                                    "BadAnimal",
-                                    &err);
--    g_assert(err != NULL);
--    error_free(err);
--    err = NULL;
-+    error_free_or_abort(&err);
- 
-     /* A non-enum property name */
-     val = object_property_get_enum(OBJECT(dobj),
-                                    "iv",
-                                    "DummyAnimal",
-                                    &err);
--    g_assert(err != NULL);
--    error_free(err);
-+    error_free_or_abort(&err);
- 
-     object_unparent(OBJECT(dobj));
- }
-diff --git a/tests/test-base64.c b/tests/test-base64.c
-index ec122ceba5..a7f722c459 100644
---- a/tests/test-base64.c
-+++ b/tests/test-base64.c
-@@ -54,10 +54,9 @@ static void test_base64_bad(const char *input,
-                                      &len,
-                                      &err);
- 
--    g_assert(err != NULL);
-+    error_free_or_abort(&err);
-     g_assert(actual == NULL);
-     g_assert_cmpint(len, ==, 0);
--    error_free(err);
- }
- 
- 
-diff --git a/tests/test-bdrv-graph-mod.c b/tests/test-bdrv-graph-mod.c
-index f93f3168b0..8cff13830e 100644
---- a/tests/test-bdrv-graph-mod.c
-+++ b/tests/test-bdrv-graph-mod.c
-@@ -115,9 +115,7 @@ static void test_update_perm_tree(void)
-                       BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY, &error_abort);
- 
-     bdrv_append(filter, bs, &local_err);
+ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
+ {
+-    Object *cpu = NULL;
+     Error *local_err = NULL;
 -
--    g_assert_nonnull(local_err);
--    error_free(local_err);
-+    error_free_or_abort(&local_err);
+-    cpu = object_new(MACHINE(x86ms)->cpu_type);
++    Object *cpu = object_new(MACHINE(x86ms)->cpu_type);
  
-     blk_unref(root);
+     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
++    if (local_err) {
++        goto out;
++    }
+     qdev_realize(DEVICE(cpu), NULL, &local_err);
+ 
++out:
+     object_unref(cpu);
+     error_propagate(errp, local_err);
  }
-diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
-index a953794be2..3f866a35c6 100644
---- a/tests/test-block-iothread.c
-+++ b/tests/test-block-iothread.c
-@@ -650,8 +650,7 @@ static void test_propagate_mirror(void)
-     blk_insert_bs(blk, src, &error_abort);
- 
-     bdrv_try_set_aio_context(target, ctx, &local_err);
--    g_assert(local_err);
--    error_free(local_err);
-+    error_free_or_abort(&local_err);
- 
-     g_assert(blk_get_aio_context(blk) == main_ctx);
-     g_assert(bdrv_get_aio_context(src) == main_ctx);
-diff --git a/tests/test-crypto-cipher.c b/tests/test-crypto-cipher.c
-index 07fa2fa616..bebba1a4f4 100644
---- a/tests/test-crypto-cipher.c
-+++ b/tests/test-crypto-cipher.c
-@@ -761,10 +761,7 @@ static void test_cipher_short_plaintext(void)
-                                  sizeof(plaintext1),
-                                  &err);
-     g_assert(ret == -1);
--    g_assert(err != NULL);
--
--    error_free(err);
--    err = NULL;
-+    error_free_or_abort(&err);
- 
-     /* Should report an error as plaintext is larger than
-      * block size, but not a multiple of block size
-@@ -775,9 +772,8 @@ static void test_cipher_short_plaintext(void)
-                                  sizeof(plaintext2),
-                                  &err);
-     g_assert(ret == -1);
--    g_assert(err != NULL);
-+    error_free_or_abort(&err);
- 
--    error_free(err);
-     qcrypto_cipher_free(cipher);
- }
- 
-diff --git a/tests/test-io-task.c b/tests/test-io-task.c
-index c8a3813d49..85e7a98da5 100644
---- a/tests/test-io-task.c
-+++ b/tests/test-io-task.c
-@@ -240,9 +240,7 @@ static void test_task_thread_failure(void)
-     object_unref(obj);
- 
-     g_assert(data.source == obj);
--    g_assert(data.err != NULL);
--
--    error_free(data.err);
-+    error_free_or_abort(&data.err);
- 
-     self = g_thread_self();
- 
 -- 
 2.26.2
 
