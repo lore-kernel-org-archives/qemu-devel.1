@@ -1,91 +1,86 @@
 Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A4BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 06:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EADFDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 07:01:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BEE020874
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 06:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0F502085B
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 07:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KI/x/zuB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEE020874
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y386RBUb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F502085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqsjw-00053e-FV
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 02:30:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56144)
+	id 1jqtDd-0002Lt-S6
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 03:01:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
- id 1jqsiw-0004Xx-OT
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 02:29:30 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:35234)
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1jqtCb-0001nu-8C; Thu, 02 Jul 2020 03:00:09 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
- id 1jqsit-0007bm-7r
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 02:29:30 -0400
-Received: by mail-io1-xd41.google.com with SMTP id v8so27609346iox.2
- for <qemu-devel@nongnu.org>; Wed, 01 Jul 2020 23:29:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1jqtCZ-0007Vo-De; Thu, 02 Jul 2020 03:00:08 -0400
+Received: by mail-oi1-x243.google.com with SMTP id t198so10285026oie.7;
+ Thu, 02 Jul 2020 00:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jPrvwtBC4msht07XU6HfXreW0edx7kKMedH4nk4y2i0=;
- b=KI/x/zuBnFAdiqoyYgOJNOcBNEzsdF4u+yywWa+81PtRO5R7OvVd5U55HploMyMwnQ
- aAw12lliTQTgqu7NvQD7QYpKWzQHaAd1d/HRMp1+s8aN7kNye1vrSm0n9d57jgZWoBPl
- zAlTedMAEbP4Qikh8S6CdmeS8F6LAF7mJn6hSIG6yrsE6pAwp9HeTClVQ60bZ0Zq1SYd
- keOIAcu+NfZ4UvO7MggnXwkV5NeGF8L1PyjftqdnKkQzZ4XynZYu1VnuaAEkmX6GuJAn
- 0h6hBrRinImwZ+QeAHnBqx5AK+bhrtY5unWkaKje7icN6I85K9eGvfAJIZu1/l30wL8R
- JHWA==
+ :cc; bh=6Nam8M205vGCTrGD6I1P4GjjUjCFVP/knAYaNpne5Ko=;
+ b=Y386RBUbE/mcQ1XLmOBWPpfkfZLOZMWbtPifUIpruTJR5rySQ5yiesbMi6fxoFil23
+ aDwV7/0+P1DNUNURVkWtX/+REA2RiiKC/WGOOmRbsfZyCX96nnnOgpdVqS7lP2iMMaKf
+ jXE7OS5hbv66pi+ZoQwXU5dNbmcm+Q4wCkeEAssi169SdjNpXaeb3ULn8frcEg5m4Iy3
+ pEucTM7/7l9aaow6Qvysh2ghSu00W5tWy7w9xfisPpC/gypetPG9w9IIRQubnbFfOxoq
+ +FQRMIjF2NVqFFfjMsQeZ0J2ggSE31rvDwJiOQZ5Hkbv+YH3FK3rxn2Y8pCDaZ2XB8wM
+ 7Q0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jPrvwtBC4msht07XU6HfXreW0edx7kKMedH4nk4y2i0=;
- b=MU1OeYomaSaLweIUGRJucR34hQiEqEEhW6E6EgBkNYzGLSCVmnjZNrq2OXPMFA2aGF
- 2QOSeSZxacnxPWL+YVWoxzzutXUe3nGojwJLHereTXW3ycJhXfghKoBs4NMArMVUYSpE
- H4BD47BiRQ9ZHK3OWNgmiAnrxagnsFGEKxcC42uJYDei0GSQBsqFWN4v7okBdpMyECDS
- VyskatriGUGZkHcISBZfG6Lit9UXKOI4JGbPDM9sT1/GHt7yAPxo9ZJwzfeeG6BrPwNp
- 7yznUQ8YAJvHVDVIY7OMlmNYTWN0zX6Q5PCkpJgR1izrShidwYJfGUmsRs1fEpkiGkVD
- 0XZw==
-X-Gm-Message-State: AOAM531bOKwuPtI7968gNXljyaEOUICq8gg3nO6o+Ac6TgXX3jnftf5f
- lmuBamBV8QdXHBdHZzYbjz7dUHmpaBhOYupVERkp3g==
-X-Google-Smtp-Source: ABdhPJy5oi4XQxJQzOHFHe26aXtmxvML8JciZ5xW8I+q1weAkYLmxp7GHEfnJsQ0FP/rE8UCcoG+IhoVDthh0s8oGLo=
-X-Received: by 2002:a05:6638:1187:: with SMTP id
- f7mr32722798jas.58.1593671365175; 
- Wed, 01 Jul 2020 23:29:25 -0700 (PDT)
+ bh=6Nam8M205vGCTrGD6I1P4GjjUjCFVP/knAYaNpne5Ko=;
+ b=V9AUVeM8GbtIsV/S3AdPEdGW27VhDjKULo8uB4A0hKA5ahs6fAey+fG8rTI2peH9Ju
+ kBkbGS7jbCR1vqx2//j8InpbE2OPAduqfA6NopbfCLNwWE7/AZjcXnfsr2AtbvVldwlp
+ 6N6DYeywV9lyZXAx/lwJ7/W93hwJWBc6rjjcTybTkcQaoT6Y98Xfs4jMJtorraPCYm0H
+ ip2+l6crObqMXWVr21tNmP9w8SaAx6wplUCy9XZjRLlugCTpPOumEgWgP3rEHUzcAFLl
+ +PV85F2P7ROKShDmWbJSLArKPkoqIfWId4Jh1mm8gQxHZ76tKAb7TUJ1/rypC2oZa1lD
+ cmqA==
+X-Gm-Message-State: AOAM530DRjN8aFZRDIuB2pLoh/2zZAiZzqB56gkSTDZginraKN7oZ/vs
+ jYJwe+5K1s3qZRI6DzHB3Kd/yHxebIgpdVN1hjY=
+X-Google-Smtp-Source: ABdhPJwq5tAewaZAMa5pexNz64FjE7TBxhWJhqYXQnCq+s6yFNDcsumbffHtzRdRIyUk7r3272VVPfQdQvLKXdMYt7Y=
+X-Received: by 2002:aca:4dcb:: with SMTP id a194mr23358409oib.59.1593673205389; 
+ Thu, 02 Jul 2020 00:00:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200626205917.4545-1-zhiwei_liu@c-sky.com>
- <20200626205917.4545-6-zhiwei_liu@c-sky.com>
- <CAEiOBXVqe06_ODA_wou0R8QthNP-g87Apvgpx0jhLNmz9-pmPQ@mail.gmail.com>
- <dda16a36-0814-7bc6-6ee8-dec9a75fe1e4@c-sky.com>
-In-Reply-To: <dda16a36-0814-7bc6-6ee8-dec9a75fe1e4@c-sky.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Thu, 2 Jul 2020 14:29:14 +0800
-Message-ID: <CAEiOBXWs5VCGGrLTB6CqJPQN7rX6NEZcdRH7nBktb_ufZ+W+jQ@mail.gmail.com>
-Subject: Re: [PATCH 5/6] target/riscv: Flush not valid NaN-boxing input to
- canonical NaN
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: multipart/alternative; boundary="0000000000009c3e6505a96f8762"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=chihmin.chao@sifive.com; helo=mail-io1-xd41.google.com
+References: <cover.1593456926.git.balaton@eik.bme.hu>
+ <5057ce7a-8e34-5b07-e93b-9cf8976fa3b2@ilande.co.uk>
+In-Reply-To: <5057ce7a-8e34-5b07-e93b-9cf8976fa3b2@ilande.co.uk>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Thu, 2 Jul 2020 08:59:54 +0200
+Message-ID: <CABLmASGbMZGRTb30sVcsufyTKTbFX19=xFoXSJ+1jzt5h03dUA@mail.gmail.com>
+Subject: Re: [PATCH v7 0/8] Mac Old World ROM experiment
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: multipart/alternative; boundary="0000000000004b9cb205a96ff50d"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=hsp.cat7@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,1506 +93,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Ian Jiang <ianjiang.ict@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009c3e6505a96f8762
+--0000000000004b9cb205a96ff50d
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jun 30, 2020 at 3:37 PM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+If you can sort out the issue with masking in patches 1 and 2 then I'd be
+> happy to
+> take patches 1-5. Obviously there is still some discussion around the i2c
+> part, so I
+> can wait a few more days to see what the outcome is there: the patches
+> generally seem
+> okay, the one change I would like to see is to add a comment around the
+> SPD parts
+> mentioning that these are only used by the real G3 ROM and not OpenBIOS.
+>
+> My only concern is whether an incomplete i2c implementation could cause
+> OSs that
+> currently boot to hang, so it is important that you can test a variety of
+> OS images
+> from MacOS to Linux and BSD to ensure that it doesn't cause any regression.
+>
+>
+Hi, I tested this patch set both on top of current master and on top of
+Mark' screamer branch.
 
->
->
-> On 2020/6/30 15:31, Chih-Min Chao wrote:
->
-> On Sat, Jun 27, 2020 at 5:09 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
->> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
->> ---
->>  target/riscv/insn_trans/trans_rvd.inc.c |   7 +-
->>  target/riscv/insn_trans/trans_rvf.inc.c | 272 ++++++++++++++++++++----
->>  2 files changed, 235 insertions(+), 44 deletions(-)
->>
->> diff --git a/target/riscv/insn_trans/trans_rvd.inc.c
->> b/target/riscv/insn_trans/trans_rvd.inc.c
->> index c0f4a0c789..16947ea6da 100644
->> --- a/target/riscv/insn_trans/trans_rvd.inc.c
->> +++ b/target/riscv/insn_trans/trans_rvd.inc.c
->> @@ -241,10 +241,15 @@ static bool trans_fcvt_d_s(DisasContext *ctx,
->> arg_fcvt_d_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVD);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fcvt_d_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fcvt_d_s(cpu_fpr[a->rd], cpu_env, t1);
->>
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c
->> b/target/riscv/insn_trans/trans_rvf.inc.c
->> index 04bc8e5cb5..b0379b9d1f 100644
->> --- a/target/riscv/insn_trans/trans_rvf.inc.c
->> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
->> @@ -58,11 +58,23 @@ static bool trans_fmadd_s(DisasContext *ctx,
->> arg_fmadd_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    TCGv_i64 t3 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    tcg_gen_mov_i64(t3, cpu_fpr[a->rs3]);
->> +    check_nanboxed(ctx, 3, t1, t2, t3);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
->> +    gen_helper_fmadd_s(cpu_fpr[a->rd], cpu_env, t1, t2, t3);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->> +    tcg_temp_free_i64(t3);
->>      return true;
->>  }
->>
->> @@ -70,11 +82,23 @@ static bool trans_fmsub_s(DisasContext *ctx,
->> arg_fmsub_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    TCGv_i64 t3 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    tcg_gen_mov_i64(t3, cpu_fpr[a->rs3]);
->> +    check_nanboxed(ctx, 3, t1, t2, t3);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
->> +    gen_helper_fmsub_s(cpu_fpr[a->rd], cpu_env, t1, t2, t3);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->> +    tcg_temp_free_i64(t3);
->>      return true;
->>  }
->>
->> @@ -82,11 +106,23 @@ static bool trans_fnmsub_s(DisasContext *ctx,
->> arg_fnmsub_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    TCGv_i64 t3 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    tcg_gen_mov_i64(t3, cpu_fpr[a->rs3]);
->> +    check_nanboxed(ctx, 3, t1, t2, t3);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fnmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
->> +    gen_helper_fnmsub_s(cpu_fpr[a->rd], cpu_env, t1, t2, t3);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->> +    tcg_temp_free_i64(t3);
->>      return true;
->>  }
->>
->> @@ -94,11 +130,23 @@ static bool trans_fnmadd_s(DisasContext *ctx,
->> arg_fnmadd_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    TCGv_i64 t3 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    tcg_gen_mov_i64(t3, cpu_fpr[a->rs3]);
->> +    check_nanboxed(ctx, 3, t1, t2, t3);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fnmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
->> -    mark_fs_dirty(ctx);
->> +    gen_helper_fnmadd_s(cpu_fpr[a->rd], cpu_env, t1, t2, t3);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->> +    mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->> +    tcg_temp_free_i64(t3);
->>      return true;
->>  }
->>
->> @@ -107,11 +155,19 @@ static bool trans_fadd_s(DisasContext *ctx,
->> arg_fadd_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fadd_s(cpu_fpr[a->rd], cpu_env,
->> -                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    gen_helper_fadd_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -120,11 +176,19 @@ static bool trans_fsub_s(DisasContext *ctx,
->> arg_fsub_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fsub_s(cpu_fpr[a->rd], cpu_env,
->> -                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    gen_helper_fsub_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -133,11 +197,19 @@ static bool trans_fmul_s(DisasContext *ctx,
->> arg_fmul_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fmul_s(cpu_fpr[a->rd], cpu_env,
->> -                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    gen_helper_fmul_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -146,11 +218,19 @@ static bool trans_fdiv_s(DisasContext *ctx,
->> arg_fdiv_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fdiv_s(cpu_fpr[a->rd], cpu_env,
->> -                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    gen_helper_fdiv_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -159,10 +239,16 @@ static bool trans_fsqrt_s(DisasContext *ctx,
->> arg_fsqrt_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fsqrt_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fsqrt_s(cpu_fpr[a->rd], cpu_env, t1);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> @@ -170,14 +256,23 @@ static bool trans_fsgnj_s(DisasContext *ctx,
->> arg_fsgnj_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      if (a->rs1 == a->rs2) { /* FMOV */
->> -        tcg_gen_mov_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1]);
->> +        tcg_gen_mov_i64(cpu_fpr[a->rd], t1);
->>      } else { /* FSGNJ */
->> -        tcg_gen_deposit_i64(cpu_fpr[a->rd], cpu_fpr[a->rs2],
->> cpu_fpr[a->rs1],
->> -                            0, 31);
->> +        tcg_gen_deposit_i64(cpu_fpr[a->rd], t2, t1, 0, 31);
->>      }
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -185,16 +280,26 @@ static bool trans_fsgnjn_s(DisasContext *ctx,
->> arg_fsgnjn_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      if (a->rs1 == a->rs2) { /* FNEG */
->> -        tcg_gen_xori_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], INT32_MIN);
->> +        tcg_gen_xori_i64(cpu_fpr[a->rd], t1, INT32_MIN);
->>      } else {
->>          TCGv_i64 t0 = tcg_temp_new_i64();
->> -        tcg_gen_not_i64(t0, cpu_fpr[a->rs2]);
->> -        tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, cpu_fpr[a->rs1], 0, 31);
->> +        tcg_gen_not_i64(t0, t2);
->> +        tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, t1, 0, 31);
->
->  t0 is not necessary but t2 could be leveraged directly.
+On top of master with mac99 machine
+MacOS:
+HD boot: all 9.x and all 10.X boot to desktop
+CD boot: all 9.x and all 10.X boot to installer
+Linux:
+HD boot: Fedora 12, Debian 4, Debian Squeeze
+CD boot: Debian 10, Lubuntu-16.04 Live boots to desktop
+Freebsd tested (Live CD only)
+CD boot only: 12.1 boots to black screen (terminal shows: call-method
+set-depth failed with error ffffffdf) 11.4 boots to root login.
 
-+        tcg_gen_not_i64(t2, t2);
-+        tcg_gen_deposit_i64(cpu_fpr[a->rd], t2, t1, 0, 31);
+On top of master with g3beige machine
+MacOS:
+HD boot: 10.0,10.1 boot to desktop
+Linux:
+HD boot: Fedora 12 boots to graphical login screen then hangs
 
->          tcg_temp_free_i64(t0);
->>      }
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -202,16 +307,26 @@ static bool trans_fsgnjx_s(DisasContext *ctx,
->> arg_fsgnjx_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->>      if (a->rs1 == a->rs2) { /* FABS */
->> -        tcg_gen_andi_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], ~INT32_MIN);
->> +        tcg_gen_andi_i64(cpu_fpr[a->rd], t1, ~INT32_MIN);
->>      } else {
->>          TCGv_i64 t0 = tcg_temp_new_i64();
->> -        tcg_gen_andi_i64(t0, cpu_fpr[a->rs2], INT32_MIN);
->> -        tcg_gen_xor_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], t0);
->> +        tcg_gen_andi_i64(t0, t2, INT32_MIN);
->> +        tcg_gen_xor_i64(cpu_fpr[a->rd], t1, t0);
->>          tcg_temp_free_i64(t0);
->>
-> the same as above,  t0 could be removed
+On top of screamer branch with mac99 machine
+MacOS:
+HD boot: 9.0 and 9.1 often hang with audio extension error. 9.2 and all
+10.X boot to desktop. Nothing new here.
+CD boot: all 9.x and all 10.X boot to installer
+Linux:
+HD boot: Debian 4 boots to failing X server
+CD boot: Lubuntu-16.04 boot to desktop
 
->      }
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -220,10 +335,18 @@ static bool trans_fmin_s(DisasContext *ctx,
->> arg_fmin_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> -    gen_helper_fmin_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                      cpu_fpr[a->rs2]);
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->> +    gen_helper_fmin_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -232,10 +355,18 @@ static bool trans_fmax_s(DisasContext *ctx,
->> arg_fmax_s *a)
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->>
->> -    gen_helper_fmax_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
->> -                      cpu_fpr[a->rs2]);
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->> +    gen_helper_fmax_s(cpu_fpr[a->rd], cpu_env, t1, t2);
->>      gen_nanbox_fpr(ctx, a->rd);
->> +
->>      mark_fs_dirty(ctx);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -245,11 +376,16 @@ static bool trans_fcvt_w_s(DisasContext *ctx,
->> arg_fcvt_w_s *a)
->>      REQUIRE_EXT(ctx, RVF);
->>
->>      TCGv t0 = tcg_temp_new();
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fcvt_w_s(t0, cpu_env, t1);
->>      gen_set_gpr(a->rd, t0);
->> -    tcg_temp_free(t0);
->>
->> +    tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> @@ -259,11 +395,16 @@ static bool trans_fcvt_wu_s(DisasContext *ctx,
->> arg_fcvt_wu_s *a)
->>      REQUIRE_EXT(ctx, RVF);
->>
->>      TCGv t0 = tcg_temp_new();
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fcvt_wu_s(t0, cpu_env, t1);
->>      gen_set_gpr(a->rd, t0);
->> -    tcg_temp_free(t0);
->>
->> +    tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> @@ -291,10 +432,20 @@ static bool trans_feq_s(DisasContext *ctx,
->> arg_feq_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->>      TCGv t0 = tcg_temp_new();
->> -    gen_helper_feq_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->> +    gen_helper_feq_s(t0, cpu_env, t1, t2);
->>      gen_set_gpr(a->rd, t0);
->> +
->>      tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -302,10 +453,20 @@ static bool trans_flt_s(DisasContext *ctx,
->> arg_flt_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->>      TCGv t0 = tcg_temp_new();
->> -    gen_helper_flt_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->> +    gen_helper_flt_s(t0, cpu_env, t1, t2);
->>      gen_set_gpr(a->rd, t0);
->> +
->>      tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -313,10 +474,20 @@ static bool trans_fle_s(DisasContext *ctx,
->> arg_fle_s *a)
->>  {
->>      REQUIRE_FPU;
->>      REQUIRE_EXT(ctx, RVF);
->> +
->>      TCGv t0 = tcg_temp_new();
->> -    gen_helper_fle_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    TCGv_i64 t2 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]);
->> +    check_nanboxed(ctx, 2, t1, t2);
->> +
->> +    gen_helper_fle_s(t0, cpu_env, t1, t2);
->>      gen_set_gpr(a->rd, t0);
->> +
->>      tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->> +    tcg_temp_free_i64(t2);
->>      return true;
->>  }
->>
->> @@ -326,12 +497,15 @@ static bool trans_fclass_s(DisasContext *ctx,
->> arg_fclass_s *a)
->>      REQUIRE_EXT(ctx, RVF);
->>
->>      TCGv t0 = tcg_temp_new();
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->>
->> -    gen_helper_fclass_s(t0, cpu_fpr[a->rs1]);
->> -
->> +    gen_helper_fclass_s(t0, t1);
->>      gen_set_gpr(a->rd, t0);
->> -    tcg_temp_free(t0);
->>
->> +    tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> @@ -400,10 +574,16 @@ static bool trans_fcvt_l_s(DisasContext *ctx,
->> arg_fcvt_l_s *a)
->>      REQUIRE_EXT(ctx, RVF);
->>
->>      TCGv t0 = tcg_temp_new();
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fcvt_l_s(t0, cpu_env, t1);
->>      gen_set_gpr(a->rd, t0);
->> +
->>      tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> @@ -413,10 +593,16 @@ static bool trans_fcvt_lu_s(DisasContext *ctx,
->> arg_fcvt_lu_s *a)
->>      REQUIRE_EXT(ctx, RVF);
->>
->>      TCGv t0 = tcg_temp_new();
->> +    TCGv_i64 t1 = tcg_temp_new_i64();
->> +    tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
->> +    check_nanboxed(ctx, 1, t1);
->> +
->>      gen_set_rm(ctx, a->rm);
->> -    gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[a->rs1]);
->> +    gen_helper_fcvt_lu_s(t0, cpu_env, t1);
->>      gen_set_gpr(a->rd, t0);
->> +
->>      tcg_temp_free(t0);
->> +    tcg_temp_free_i64(t1);
->>      return true;
->>  }
->>
->> --
->> 2.23.0
->>
->>
-> It may be more readable to use local macro to wrap allocation and free of
-> tcg temp variables. Most functions are two-operands,
-> some requires one and the other needs three operands.  They may be like
->
-> #define GEN_ONE_OPERAND \
->
->       TCGv_i64 t1 = tcg_temp_new_i64(); \
->       tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]); \
->       check_nanboxed(ctx, 1, t1);
->
->
->  #define GEN_TWO_OPERAND \
->
->       TCGv_i64 t1 = tcg_temp_new_i64(); \
->
->       TCGv_i64 t2 = tcg_temp_new_i64(); \
->
->       tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]); \
->       tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]); \
->       check_nanboxed(ctx, 2, t1, t2);
->
->
->   #define GEN_THREE_OPERAND \
->
->       TCGv_i64 t1 = tcg_temp_new_i64(); \
->
->       TCGv_i64 t2 = tcg_temp_new_i64(); \
->
->       TCGv_i64 t3 = tcg_temp_new_i64(); \
->
->       tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]); \
->       tcg_gen_mov_i64(t2, cpu_fpr[a->rs2]); \
->       tcg_gen_mov_i64(t3, cpu_fpr[a->rs3]); \
->       check_nanboxed(ctx, 3, t1, t2, t3);
->
->
->   #define FREE_ONE_OPERAND \
->
->       tcg_temp_free_i64(t1);
->
->
->
->   #define FREE_TWO_OPERAND \
->
->       tcg_temp_free_i64(t1); \
->
->       tcg_temp_free_i64(t2);
->
->
->
->   #define FREE_THREE_OPERAND \
->
->       tcg_temp_free_i64(t1); \
->
->       tcg_temp_free_i64(t2); \
->
->       tcg_temp_free_i64(t3);
->
-> Good.
->
-> Do you think inline function will be better? I just don't like many MACROS
-> in one function.
->
-> Zhiwei
->
-> Chih-Min Chao
->
-> Either macro or inline is ok to me.  Just want an simple wrapping of
-duplicated tcg new and free.
+On top of screamer branch with g3beige machine:
+MacOS:
+HD boot: 10.0, 10.1 boot to desktop.
+CD boot: 10.0 to 10.4 boot to installer
+Linux:
+HD boot: Fedora 12 boots to graphical login screen then hangs
 
-Chih-Min Chao
+All in all, I see no regressions.
+The boing is beautiful when g3beige/screamer with increased buffer size
+boots the G3 rom ;-)
 
---0000000000009c3e6505a96f8762
+Best,
+Howard
+
+--0000000000004b9cb205a96ff50d
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><div><div dir=3D"ltr" class=3D"gmail_sign=
-ature" data-smartmail=3D"gmail_signature"><div dir=3D"ltr"><br></div></div>=
-</div></div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr=
-">On Tue, Jun 30, 2020 at 3:37 PM LIU Zhiwei &lt;<a href=3D"mailto:zhiwei_l=
-iu@c-sky.com">zhiwei_liu@c-sky.com</a>&gt; wrote:<br></div><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
-gb(204,204,204);padding-left:1ex">
- =20
-   =20
- =20
-  <div>
-    <br>
-    <br>
-    <div>On 2020/6/30 15:31, Chih-Min Chao
-      wrote:<br>
-    </div>
-    <blockquote type=3D"cite">
-     =20
-      <div dir=3D"ltr">
-        <div dir=3D"ltr">On Sat, Jun 27, 2020 at 5:09 AM LIU Zhiwei &lt;<a =
-href=3D"mailto:zhiwei_liu@c-sky.com" target=3D"_blank">zhiwei_liu@c-sky.com=
-</a>&gt; wrote:<br>
-        </div>
-        <div class=3D"gmail_quote">
-          <blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8=
-ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Signed-off-by: =
-LIU Zhiwei
-            &lt;<a href=3D"mailto:zhiwei_liu@c-sky.com" target=3D"_blank">z=
-hiwei_liu@c-sky.com</a>&gt;<br>
-            ---<br>
-            =C2=A0target/riscv/insn_trans/trans_rvd.inc.c |=C2=A0 =C2=A07 +=
--<br>
-            =C2=A0target/riscv/insn_trans/trans_rvf.inc.c | 272
-            ++++++++++++++++++++----<br>
-            =C2=A02 files changed, 235 insertions(+), 44 deletions(-)<br>
-            <br>
-            diff --git a/target/riscv/insn_trans/trans_rvd.inc.c
-            b/target/riscv/insn_trans/trans_rvd.inc.c<br>
-            index c0f4a0c789..16947ea6da 100644<br>
-            --- a/target/riscv/insn_trans/trans_rvd.inc.c<br>
-            +++ b/target/riscv/insn_trans/trans_rvd.inc.c<br>
-            @@ -241,10 +241,15 @@ static bool
-            trans_fcvt_d_s(DisasContext *ctx, arg_fcvt_d_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVD);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fcvt_d_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fcvt_d_s(cpu_fpr[a-&gt;rd], cpu_env, =
-t1);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            diff --git a/target/riscv/insn_trans/trans_rvf.inc.c
-            b/target/riscv/insn_trans/trans_rvf.inc.c<br>
-            index 04bc8e5cb5..b0379b9d1f 100644<br>
-            --- a/target/riscv/insn_trans/trans_rvf.inc.c<br>
-            +++ b/target/riscv/insn_trans/trans_rvf.inc.c<br>
-            @@ -58,11 +58,23 @@ static bool trans_fmadd_s(DisasContext
-            *ctx, arg_fmadd_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t3 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t3, cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 3, t1, t2, t3);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fmadd_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0cpu_fpr[a-&gt;rs2],
-            cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fmadd_s(cpu_fpr[a-&gt;rd], cpu_env, t=
-1, t2,
-            t3);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t3);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -70,11 +82,23 @@ static bool trans_fmsub_s(DisasContext
-            *ctx, arg_fmsub_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t3 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t3, cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 3, t1, t2, t3);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fmsub_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0cpu_fpr[a-&gt;rs2],
-            cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fmsub_s(cpu_fpr[a-&gt;rd], cpu_env, t=
-1, t2,
-            t3);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t3);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -82,11 +106,23 @@ static bool trans_fnmsub_s(DisasContext
-            *ctx, arg_fnmsub_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t3 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t3, cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 3, t1, t2, t3);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fnmsub_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs2],
-            cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fnmsub_s(cpu_fpr[a-&gt;rd], cpu_env, =
-t1, t2,
-            t3);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t3);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -94,11 +130,23 @@ static bool trans_fnmadd_s(DisasContext
-            *ctx, arg_fnmadd_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t3 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t3, cpu_fpr[a-&gt;rs3]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 3, t1, t2, t3);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fnmadd_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs2],
-            cpu_fpr[a-&gt;rs3]);<br>
-            -=C2=A0 =C2=A0 mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 gen_helper_fnmadd_s(cpu_fpr[a-&gt;rd], cpu_env, =
-t1, t2,
-            t3);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            +=C2=A0 =C2=A0 mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t3);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -107,11 +155,19 @@ static bool trans_fadd_s(DisasContext
-            *ctx, arg_fadd_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fadd_s(cpu_fpr[a-&gt;rd], cpu_env,<br=
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
+der-left:1px solid rgb(204,204,204);padding-left:1ex">
+If you can sort out the issue with masking in patches 1 and 2 then I&#39;d =
+be happy to<br>
+take patches 1-5. Obviously there is still some discussion around the i2c p=
+art, so I<br>
+can wait a few more days to see what the outcome is there: the patches gene=
+rally seem<br>
+okay, the one change I would like to see is to add a comment around the SPD=
+ parts<br>
+mentioning that these are only used by the real G3 ROM and not OpenBIOS.<br=
 >
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs1],
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fadd_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -120,11 +176,19 @@ static bool trans_fsub_s(DisasContext
-            *ctx, arg_fsub_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fsub_s(cpu_fpr[a-&gt;rd], cpu_env,<br=
->
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs1],
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fsub_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -133,11 +197,19 @@ static bool trans_fmul_s(DisasContext
-            *ctx, arg_fmul_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fmul_s(cpu_fpr[a-&gt;rd], cpu_env,<br=
->
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs1],
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fmul_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -146,11 +218,19 @@ static bool trans_fdiv_s(DisasContext
-            *ctx, arg_fdiv_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fdiv_s(cpu_fpr[a-&gt;rd], cpu_env,<br=
->
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs1],
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fdiv_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -159,10 +239,16 @@ static bool trans_fsqrt_s(DisasContext
-            *ctx, arg_fsqrt_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fsqrt_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fsqrt_s(cpu_fpr[a-&gt;rd], cpu_env, t=
-1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -170,14 +256,23 @@ static bool trans_fsgnj_s(DisasContext
-            *ctx, arg_fsgnj_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0if (a-&gt;rs1 =3D=3D a-&gt;rs2) { /* FMOV *=
-/<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(cpu_fpr[a-&gt;rd],
-            cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(cpu_fpr[a-&gt;rd],=
- t1);<br>
-            =C2=A0 =C2=A0 =C2=A0} else { /* FSGNJ */<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i64(cpu_fpr[a-&gt;=
-rd],
-            cpu_fpr[a-&gt;rs2], cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0, 31);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i64(cpu_fpr[a-&gt;=
-rd], t2, t1, 0,
-            31);<br>
-            =C2=A0 =C2=A0 =C2=A0}<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -185,16 +280,26 @@ static bool
-            trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0if (a-&gt;rs1 =3D=3D a-&gt;rs2) { /* FNEG *=
-/<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_xori_i64(cpu_fpr[a-&gt;rd]=
-,
-            cpu_fpr[a-&gt;rs1], INT32_MIN);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_xori_i64(cpu_fpr[a-&gt;rd]=
-, t1, INT32_MIN);<br>
-            =C2=A0 =C2=A0 =C2=A0} else {<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TCGv_i64 t0 =3D tcg_temp_new_=
-i64();<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_not_i64(t0, cpu_fpr[a-&gt;=
-rs2]);<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i64(cpu_fpr[a-&gt;=
-rd], t0,
-            cpu_fpr[a-&gt;rs1], 0, 31);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_not_i64(t0, t2);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i64(cpu_fpr[a-&gt;=
-rd], t0, t1, 0,
-            31);</blockquote></div></div></blockquote></div></blockquote><d=
-iv>=C2=A0t0 is not necessary but t2 could be leveraged directly.=C2=A0</div=
-><div>=C2=A0<br>+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_not_i64(t2, t2);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_deposit_i64(cpu_fpr[a-&gt;=
-rd], t2, t1, 0,
-            31);<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
-><div><blockquote type=3D"cite"><div dir=3D"ltr"><div class=3D"gmail_quote"=
-><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border=
--left:1px solid rgb(204,204,204);padding-left:1ex">
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t0);<br>
-            =C2=A0 =C2=A0 =C2=A0}<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -202,16 +307,26 @@ static bool
-            trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0if (a-&gt;rs1 =3D=3D a-&gt;rs2) { /* FABS *=
-/<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(cpu_fpr[a-&gt;rd]=
-,
-            cpu_fpr[a-&gt;rs1], ~INT32_MIN);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(cpu_fpr[a-&gt;rd]=
-, t1,
-            ~INT32_MIN);<br>
-            =C2=A0 =C2=A0 =C2=A0} else {<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TCGv_i64 t0 =3D tcg_temp_new_=
-i64();<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(t0, cpu_fpr[a-&gt=
-;rs2],
-            INT32_MIN);<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_xor_i64(cpu_fpr[a-&gt;rd],
-            cpu_fpr[a-&gt;rs1], t0);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andi_i64(t0, t2, INT32_MIN=
-);<br>
-            +=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_xor_i64(cpu_fpr[a-&gt;rd],=
- t1, t0);<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_temp_free_i64(t0);<br></b=
-lockquote></div></div></blockquote></div></blockquote><div>the same as abov=
-e,=C2=A0 t0 could be removed=C2=A0</div><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
-ding-left:1ex"><div><blockquote type=3D"cite"><div dir=3D"ltr"><div class=
-=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-            =C2=A0 =C2=A0 =C2=A0}<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -220,10 +335,18 @@ static bool trans_fmin_s(DisasContext
-            *ctx, arg_fmin_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            -=C2=A0 =C2=A0 gen_helper_fmin_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            +=C2=A0 =C2=A0 gen_helper_fmin_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -232,10 +355,18 @@ static bool trans_fmax_s(DisasContext
-            *ctx, arg_fmax_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            -=C2=A0 =C2=A0 gen_helper_fmax_s(cpu_fpr[a-&gt;rd], cpu_env,
-            cpu_fpr[a-&gt;rs1],<br>
-            -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            +=C2=A0 =C2=A0 gen_helper_fmax_s(cpu_fpr[a-&gt;rd], cpu_env, t1=
-, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_nanbox_fpr(ctx, a-&gt;rd);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -245,11 +376,16 @@ static bool
-            trans_fcvt_w_s(DisasContext *ctx, arg_fcvt_w_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a-&gt;r=
-s1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fcvt_w_s(t0, cpu_env, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            -=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            <br>
-            +=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -259,11 +395,16 @@ static bool
-            trans_fcvt_wu_s(DisasContext *ctx, arg_fcvt_wu_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a-&gt;=
-rs1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fcvt_wu_s(t0, cpu_env, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            -=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            <br>
-            +=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -291,10 +432,20 @@ static bool trans_feq_s(DisasContext
-            *ctx, arg_feq_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            -=C2=A0 =C2=A0 gen_helper_feq_s(t0, cpu_env, cpu_fpr[a-&gt;rs1]=
-,
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            +=C2=A0 =C2=A0 gen_helper_feq_s(t0, cpu_env, t1, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -302,10 +453,20 @@ static bool trans_flt_s(DisasContext
-            *ctx, arg_flt_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            -=C2=A0 =C2=A0 gen_helper_flt_s(t0, cpu_env, cpu_fpr[a-&gt;rs1]=
-,
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            +=C2=A0 =C2=A0 gen_helper_flt_s(t0, cpu_env, t1, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -313,10 +474,20 @@ static bool trans_fle_s(DisasContext
-            *ctx, arg_fle_s *a)<br>
-            =C2=A0{<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_FPU;<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            -=C2=A0 =C2=A0 gen_helper_fle_s(t0, cpu_env, cpu_fpr[a-&gt;rs1]=
-,
-            cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 2, t1, t2);<br>
-            +<br>
-            +=C2=A0 =C2=A0 gen_helper_fle_s(t0, cpu_env, t1, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t2);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -326,12 +497,15 @@ static bool
-            trans_fclass_s(DisasContext *ctx, arg_fclass_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            <br>
-            -=C2=A0 =C2=A0 gen_helper_fclass_s(t0, cpu_fpr[a-&gt;rs1]);<br>
-            -<br>
-            +=C2=A0 =C2=A0 gen_helper_fclass_s(t0, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            -=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            <br>
-            +=C2=A0 =C2=A0 tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -400,10 +574,16 @@ static bool
-            trans_fcvt_l_s(DisasContext *ctx, arg_fcvt_l_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[a-&gt;r=
-s1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fcvt_l_s(t0, cpu_env, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            @@ -413,10 +593,16 @@ static bool
-            trans_fcvt_lu_s(DisasContext *ctx, arg_fcvt_lu_s *a)<br>
-            =C2=A0 =C2=A0 =C2=A0REQUIRE_EXT(ctx, RVF);<br>
-            <br>
-            =C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
-            +=C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64();<br>
-            +=C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]);<br>
-            +=C2=A0 =C2=A0 check_nanboxed(ctx, 1, t1);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_rm(ctx, a-&gt;rm);<br>
-            -=C2=A0 =C2=A0 gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[a-&gt;=
-rs1]);<br>
-            +=C2=A0 =C2=A0 gen_helper_fcvt_lu_s(t0, cpu_env, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0gen_set_gpr(a-&gt;rd, t0);<br>
-            +<br>
-            =C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
-            +=C2=A0 =C2=A0 tcg_temp_free_i64(t1);<br>
-            =C2=A0 =C2=A0 =C2=A0return true;<br>
-            =C2=A0}<br>
-            <br>
-            -- <br>
-            2.23.0<br>
-            <br>
-          </blockquote>
-          <div><br>
-          </div>
-          <div>It may be more readable to use local macro to wrap
-            allocation and free of tcg temp variables. Most functions
-            are two-operands,=C2=A0</div>
-          <div>some requires one and the other needs three operands.=C2=A0
-            They may be like<br>
-            <br>
-            #define GEN_ONE_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64(); \=C2=
-=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]); \=
 <br>
-            =C2=A0 =C2=A0 =C2=A0=C2=A0check_nanboxed(ctx, 1, t1);<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0#define GEN_TWO_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64(); \ =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64(); \ =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1]); \=
-=C2=A0 =C2=A0 =C2=A0=C2=A0</div>
-          <div>=C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2])=
-; \=C2=A0 =C2=A0 =C2=A0=C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0=C2=A0check_nanboxed(ctx, 2, t1, t2);<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0=C2=A0<br>
-            =C2=A0 #define GEN_THREE_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t1 =3D tcg_temp_new_i64(); \ =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t2 =3D tcg_temp_new_i64(); \ =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 =C2=A0 =C2=A0 TCGv_i64 t3 =3D tcg_temp_new_i64(); \ =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            <div>=C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t1, cpu_fpr[a-&gt;rs1=
-]); \=C2=A0 =C2=A0 =C2=A0=C2=A0</div>
-            <div>=C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t2, cpu_fpr[a-&gt;rs2=
-]); \=C2=A0 =C2=A0 =C2=A0=C2=A0<br>
-              =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(t3, cpu_fpr[a-&gt;rs3]);=
- \=C2=A0 =C2=A0 =C2=A0=C2=A0<br>
-            </div>
-            =C2=A0 =C2=A0 =C2=A0 check_nanboxed(ctx, 3, t1, t2, t3);<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0=C2=A0<br>
-            =C2=A0 #define FREE_ONE_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t1); =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 #define FREE_TWO_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t1); \ =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t2); =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 <br>
-            =C2=A0 #define FREE_THREE_OPERAND \ =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t1); \ =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t2); \ =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0
-            =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0<br>
-            =C2=A0 =C2=A0 =C2=A0 tcg_temp_free_i64(t3);<br>
-            <br>
-          </div>
-        </div>
-      </div>
-    </blockquote>
-    Good. <br>
-    <br>
-    Do you think inline function will be better? I just don&#39;t like many
-    MACROS in one function. <br>
-    <br>
-    Zhiwei<br>
-    <blockquote type=3D"cite">
-      <div dir=3D"ltr">
-        <div class=3D"gmail_quote">
-          <div>Chih-Min Chao</div></div></div></blockquote></div></blockquo=
-te><div>Either macro or inline is ok to me.=C2=A0 Just want an simple wrapp=
-ing of duplicated tcg new and free.</div><div><br></div><div>Chih-Min Chao=
-=C2=A0</div></div></div>
+My only concern is whether an incomplete i2c implementation could cause OSs=
+ that<br>
+currently boot to hang, so it is important that you can test a variety of O=
+S images<br>
+from MacOS to Linux and BSD to ensure that it doesn&#39;t cause any regress=
+ion.<br>
+<br></blockquote><div>=C2=A0</div><div>Hi, I tested this patch set both on =
+top of current master and on top of Mark&#39; screamer branch.</div><div><b=
+r></div><div>On top of master with mac99 machine<br></div><div>MacOS:<br></=
+div><div>HD boot: all 9.x and all 10.X boot to desktop<br></div><div>CD boo=
+t: all 9.x and all 10.X boot to installer<br></div><div>Linux:<br></div><di=
+v>HD boot: Fedora 12, Debian 4, Debian Squeeze</div><div>CD boot: Debian 10=
+, Lubuntu-16.04 Live boots to desktop<br></div><div>Freebsd tested (Live CD=
+ only)<br></div><div>CD boot only: 12.1 boots to black screen (terminal sho=
+ws: call-method set-depth failed with error ffffffdf) 11.4 boots to root lo=
+gin.<br></div></div><div class=3D"gmail_quote"><br><div>On top of master wi=
+th g3beige machine</div><div>MacOS:</div><div>HD boot: 10.0,10.1 boot to de=
+sktop<br></div><div>Linux:</div><div>HD boot: Fedora 12 boots to graphical =
+login screen then hangs</div><div><br></div><div>On top of screamer branch =
+with mac99 machine<br></div><div>MacOS:<br></div><div>HD boot: 9.0 and 9.1 =
+often hang with audio extension error. 9.2 and all 10.X boot to desktop. No=
+thing new here.<br></div><div>CD boot: all 9.x and all 10.X boot to install=
+er</div><div>Linux:<br></div><div>HD boot: Debian 4 boots to failing X serv=
+er<br></div><div>CD boot: Lubuntu-16.04 boot to desktop<br></div><div><br><=
+/div><div>On top of screamer branch with g3beige machine:</div><div>MacOS:<=
+br></div><div>HD boot: 10.0, 10.1 boot to desktop.</div><div>CD boot: 10.0 =
+to 10.4 boot to installer</div><div>Linux: <br></div><div>HD boot: Fedora 1=
+2 boots to graphical login screen then hangs<br></div><div><br></div><div>A=
+ll in all, I see no regressions.</div><div>The boing is beautiful when g3be=
+ige/screamer with increased buffer size boots the G3 rom ;-) <br></div><div=
+><br></div><div>Best,</div><div>Howard<br></div><div><br></div><div><br></d=
+iv><div> <br></div></div></div>
 
---0000000000009c3e6505a96f8762--
+--0000000000004b9cb205a96ff50d--
 
