@@ -3,88 +3,98 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A071FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F324C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 699B220675
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4900820675
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P79sEnMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 699B220675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtrPRx+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4900820675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqxNw-0005q2-Lf
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:28:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54900)
+	id 1jqxPf-0001bd-Gn
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:29:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <riku.voipio@linaro.org>)
- id 1jqxCv-0002jc-Kd
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:16:45 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39131)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <riku.voipio@linaro.org>)
- id 1jqxCq-0004Bt-G1
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:16:45 -0400
-Received: by mail-lj1-x242.google.com with SMTP id b25so27835591ljp.6
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 04:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JrNeompWDwNp8Z5Ja7J55uX8CFz38zDaSbG6Gnq0KtQ=;
- b=P79sEnMhOEk5PpYThGPDws2kVSPOMK9AXCNJ5XFL4sGAHY6QiJPW6FRVSlM2X/1YtU
- TI7/9kS9WnGqwYc9PEE2l9QQK7mqimlr4ppsN+GnL1HlhPZWvLOCQzhnZtiG4uKmvQ8S
- drxqNL05En2FWEL9t+SMFxe5Ecn1JC6yvlZHbHAsA6BV7Zj0vKw6Y/xZNAR95LWDgvB1
- tanM2c1//YwJhoJ3azSl/ZBQeK+iqALnKbrDK8TvcT6P8GB+TcU2FgAvaGq+iY7vu+bj
- HLr2hBt6mvbxqaTGq2u3qtaW2ExCs1kkAizKprjyA1iLrlIJ/gxEwesbGVW6zSFGtBUF
- zIOw==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqxMX-0003eU-L2
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:26:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47387)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqxMW-0007b4-1X
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:26:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593689199;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=JfM6OLCt1Oz7J160Bs1Wy7L5auM7Ow31HfnQNnRNMNo=;
+ b=AtrPRx+wCQmH/hp2rK8z1f/W39/lDn09YX3ySCsmXnNZJvwxCQHJ4zCNm6nFWQ4le886fy
+ Aff3vKoEFemSvcsR/DhdJ6onUFZNfU+JJtrhNK9QIgPbURPmGhP5xQv+8WJUjX7jeyoA+z
+ 5KepjCtW338ol78dp4ydlECA2Yk3KsY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-BOhwQo22MA-5zl4PhhLA2A-1; Thu, 02 Jul 2020 07:26:37 -0400
+X-MC-Unique: BOhwQo22MA-5zl4PhhLA2A-1
+Received: by mail-wm1-f72.google.com with SMTP id g187so28342765wme.0
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 04:26:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JrNeompWDwNp8Z5Ja7J55uX8CFz38zDaSbG6Gnq0KtQ=;
- b=bEw5Zc5v1DOyEl567RPeKXj6XGXiYOAy+ZPH+u3Q6WfWt0bqlrx8Hzu6JwvY8WkhMf
- OWM5DSo0QFeeZUjGZHojC+9bAddF+gxUu4KWmDhu6lXbj2C/o7K9pkkD6B50pKLl4w/6
- wQKLEV0huXzQiIs+KZnMqIirtSrS+2hEfZTpX8MsyndXZInpI2pPnRX66pcWVNHEkyIo
- xdq2JTjvXn4mbvdHs8VfrA8PrIiWP/s4gCBH700m8efMdYmxpNzg04Mn5X4UW9xB+ZBR
- aGeY0xlezVwCapOzFKCkYegL3XksZEAPdadCxjnMI9dQR1z3MJ8Gv0VWQ6c4g3R5hAws
- 1fUQ==
-X-Gm-Message-State: AOAM532I6uR9OKvcejKz0EVFhLYQ+KlZmfnGeYGP69oBnHAvaGm9SEll
- ZTgRYcNyTb5zqbvjeHlUsmXI1V05j11JZA==
-X-Google-Smtp-Source: ABdhPJytdnQlc3F+BuWAx6yDQ805hHhUZ3VeH/tH68BRFQdzNl9hOIMzVRHj6SRagiBNm0KSAXzDUw==
-X-Received: by 2002:a2e:8954:: with SMTP id b20mr13183900ljk.262.1593688597577; 
- Thu, 02 Jul 2020 04:16:37 -0700 (PDT)
-Received: from berserk.kos.to (81-197-129-36.elisa-laajakaista.fi.
- [81.197.129.36])
- by smtp.gmail.com with ESMTPSA id k7sm3251758lfd.67.2020.07.02.04.16.36
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JfM6OLCt1Oz7J160Bs1Wy7L5auM7Ow31HfnQNnRNMNo=;
+ b=cwXN7qRQgVRV7+jHONrpwttTXEwiUgrqskj3pqi+hHMDPXB+8YhlGsyUYCRyZm/CeL
+ OfqnjZEj6lpzXUueMK4cbMqd2QHo3+kmeojcYcd/alGrxOs56y0WKxpfWq8/t2tJJ99Q
+ i1jLjpoxK078magrc9qsDPoAwLkFJ5wFpR6f7G9fSUYQcR/I/J8QTkWzd9+ka5oVpMDN
+ /PaVJ61ViX4DQUfEAizCB9FIjuveCdoB/j1nFFbDuxrPfR4UeBavaIWxm44Bu5us/d+C
+ Zwp3XstTdFrb6KRlh7rqlRQMKkCLsAFBrVTfP9Te1dGqWwOT65D0A1n/zN2kNP0S/F1G
+ M1dA==
+X-Gm-Message-State: AOAM532XK44Y/aqFxAcuZ/XZx1tnrHEo5mKiVAJBNBp+F25tNAmnH43d
+ X6l1q/1i+xH9N07mFWDCBmmcFBNjhjmhDZHoKeXAH3JJA1lfENBKjf85xupPDuGLdl1qmb5oMv5
+ JwfWYJmJXcyUO/Gk=
+X-Received: by 2002:adf:e88b:: with SMTP id d11mr21403384wrm.378.1593689196627; 
+ Thu, 02 Jul 2020 04:26:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVv0p8fjJlZB/6dkfAX+cGUpWJJ7KMRhh3pofEy0BXAm5PMTCy6uKjzf20yAsW4Vdk0dm9NQ==
+X-Received: by 2002:adf:e88b:: with SMTP id d11mr21403375wrm.378.1593689196434; 
+ Thu, 02 Jul 2020 04:26:36 -0700 (PDT)
+Received: from redhat.com ([93.157.82.4])
+ by smtp.gmail.com with ESMTPSA id c25sm9890047wml.46.2020.07.02.04.26.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 04:16:36 -0700 (PDT)
-From: riku.voipio@linaro.org
-To: qemu-devel@nongnu.org
-Subject: [PATCH] MAINTAINERS: update linux-user maintainer
-Date: Thu,  2 Jul 2020 14:16:36 +0300
-Message-Id: <20200702111636.25792-1-riku.voipio@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ Thu, 02 Jul 2020 04:26:35 -0700 (PDT)
+Date: Thu, 2 Jul 2020 07:26:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v7 5/5] hw/arm/virt: Let the virtio-iommu bypass MSIs
+Message-ID: <20200702072623-mutt-send-email-mst@kernel.org>
+References: <20200629070404.10969-1-eric.auger@redhat.com>
+ <20200629070404.10969-6-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=riku.voipio@linaro.org; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200629070404.10969-6-eric.auger@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: 2
+X-Spam_score: 0.2
+X-Spam_bar: /
+X-Spam_report: (0.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_SBL_CSS=3.335, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,37 +108,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Riku Voipio <riku.voipio@linaro.org>,
- philmd@redhat.com, laurent@vivier.eu
+Cc: peter.maydell@linaro.org, jean-philippe@linaro.org, qemu-devel@nongnu.org,
+ peterx@redhat.com, armbru@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
+ bbhushan2@marvell.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+On Mon, Jun 29, 2020 at 09:04:04AM +0200, Eric Auger wrote:
+> At the moment the virtio-iommu translates MSI transactions.
+> This behavior is inherited from ARM SMMU. The virt machine
+> code knows where the guest MSI doorbells are so we can easily
+> declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
+> setting the guest will not map MSIs through the IOMMU and those
+> transactions will be simply bypassed.
+> 
+> Depending on which MSI controller is in use (ITS or GICV2M),
+> we declare either:
+> - the ITS interrupt translation space (ITS_base + 0x10000),
+>   containing the GITS_TRANSLATOR or
+> - The GICV2M single frame, containing the MSI_SETSP_NS register.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-I haven't been active for a while. Pass the maintainer hat
-forward to Laurent, who has done a stellar job filling in.
+This needs ARM ACK.
 
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git MAINTAINERS MAINTAINERS
-index dec252f38b..29a23b6d3a 100644
---- MAINTAINERS
-+++ MAINTAINERS
-@@ -2629,8 +2629,7 @@ F: bsd-user/
- F: default-configs/*-bsd-user.mak
- 
- Linux user
--M: Riku Voipio <riku.voipio@iki.fi>
--R: Laurent Vivier <laurent@vivier.eu>
-+M: Laurent Vivier <laurent@vivier.eu>
- S: Maintained
- F: linux-user/
- F: default-configs/*-linux-user.mak
--- 
-2.20.1
+> ---
+> v5 -> v6:
+> - do not hardcode doorbell base and size
+> - removed Jean's R-b
+> 
+> v3 -> v4:
+> - use ':' as separators
+> 
+> v2 -> v3:
+> - Add a new value to VirtMSIControllerType
+> 
+> v1 -> v2:
+> - Test which MSI controller is instantiated
+> - If GICV2M is in use, declare its doorbell as an MSI doorbell too
+> ---
+>  include/hw/arm/virt.h |  7 +++++++
+>  hw/arm/virt.c         | 30 ++++++++++++++++++++++++++++++
+>  2 files changed, 37 insertions(+)
+> 
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 31878ddc72..a18b6b397b 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -96,6 +96,12 @@ typedef enum VirtIOMMUType {
+>      VIRT_IOMMU_VIRTIO,
+>  } VirtIOMMUType;
+>  
+> +typedef enum VirtMSIControllerType {
+> +    VIRT_MSI_CTRL_NONE,
+> +    VIRT_MSI_CTRL_GICV2M,
+> +    VIRT_MSI_CTRL_ITS,
+> +} VirtMSIControllerType;
+> +
+>  typedef enum VirtGICType {
+>      VIRT_GIC_VERSION_MAX,
+>      VIRT_GIC_VERSION_HOST,
+> @@ -136,6 +142,7 @@ typedef struct {
+>      OnOffAuto acpi;
+>      VirtGICType gic_version;
+>      VirtIOMMUType iommu;
+> +    VirtMSIControllerType msi_controller;
+>      uint16_t virtio_iommu_bdf;
+>      struct arm_boot_info bootinfo;
+>      MemMapEntry *memmap;
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index cd0834ce7f..eb4344cf6e 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -602,6 +602,7 @@ static void create_its(VirtMachineState *vms)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vms->memmap[VIRT_GIC_ITS].base);
+>  
+>      fdt_add_its_gic_node(vms);
+> +    vms->msi_controller = VIRT_MSI_CTRL_ITS;
+>  }
+>  
+>  static void create_v2m(VirtMachineState *vms)
+> @@ -622,6 +623,7 @@ static void create_v2m(VirtMachineState *vms)
+>      }
+>  
+>      fdt_add_v2m_gic_node(vms);
+> +    vms->msi_controller = VIRT_MSI_CTRL_GICV2M;
+>  }
+>  
+>  static void create_gic(VirtMachineState *vms)
+> @@ -2200,8 +2202,36 @@ out:
+>  static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>                                              DeviceState *dev, Error **errp)
+>  {
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          virt_memory_pre_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
+> +        hwaddr db_start = 0, db_end = 0;
+> +        char *resv_prop_str;
+> +
+> +        switch (vms->msi_controller) {
+> +        case VIRT_MSI_CTRL_NONE:
+> +            return;
+> +        case VIRT_MSI_CTRL_ITS:
+> +            /* GITS_TRANSLATER page */
+> +            db_start = base_memmap[VIRT_GIC_ITS].base + 0x10000;
+> +            db_end = base_memmap[VIRT_GIC_ITS].base +
+> +                     base_memmap[VIRT_GIC_ITS].size - 1;
+> +            break;
+> +        case VIRT_MSI_CTRL_GICV2M:
+> +            /* MSI_SETSPI_NS page */
+> +            db_start = base_memmap[VIRT_GIC_V2M].base;
+> +            db_end = db_start + base_memmap[VIRT_GIC_V2M].size - 1;
+> +            break;
+> +        }
+> +        resv_prop_str = g_strdup_printf("0x%"PRIx64":0x%"PRIx64":%u",
+> +                                        db_start, db_end,
+> +                                        VIRTIO_IOMMU_RESV_MEM_T_MSI);
+> +
+> +        qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
+> +        qdev_prop_set_string(dev, "reserved-regions[0]", resv_prop_str);
+> +        g_free(resv_prop_str);
+>      }
+>  }
+>  
+> -- 
+> 2.20.1
 
 
