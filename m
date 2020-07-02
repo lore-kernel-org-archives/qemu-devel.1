@@ -2,83 +2,82 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79210C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:35:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4861220760
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86E412084C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:35:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BftfDORh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4861220760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RDNjLjaz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E412084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr35f-0007ir-KP
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:33:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47972)
+	id 1jr37Z-0000Rb-Rf
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:35:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr34t-0006N4-QT
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:32:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32091
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jr36y-0008Si-Vj
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:35:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40470
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr34q-0005CU-2k
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:32:51 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jr36x-0005OQ-Eb
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:35:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593711167;
+ s=mimecast20190719; t=1593711298;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BnZy4a3qx8rV1s26VNnhxGfnA3j20WQIJT1hinhaNZw=;
- b=BftfDORhKasxQ9liZm7xKeJPIYI+L5FMhTxxNz7Btof6OXwfCvI7Ev3UewnsHTh4o+8/oD
- 1BPbkjeSAes+nobHLHPXhtIxFimZ3P+bWnisSgAeYpMGbsDIZSTcqS4QmqFZNve4xnHNoH
- f1i8Og5J0f/3FrnX3vRdE+8iJVfwPj4=
+ bh=9YNmg/mFKu7luS99ZFfFPg7Kb+7UQzf5+JxwHDHkkmo=;
+ b=RDNjLjazEc1U+GJsHbPnpnuXNC5nRgjgSogk+IorEeaJfqcJKKv0q4bfeex4jufE2rLSE9
+ 8SxhdSKqjIsbDqbXSVyz0L7lzC70e7e+JZDv0KUDFlyotqpSD1mAHCoAHGFolSicw7zOv0
+ SVM5GSqXuoFgWadmPPQ6RLKoliL2eYA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-dz7v0XBWMUa44uByTgzYUw-1; Thu, 02 Jul 2020 13:32:43 -0400
-X-MC-Unique: dz7v0XBWMUa44uByTgzYUw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-307-RBB11cMyPtKDmUAhzB-bkA-1; Thu, 02 Jul 2020 13:34:57 -0400
+X-MC-Unique: RBB11cMyPtKDmUAhzB-bkA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 932321005513;
- Thu,  2 Jul 2020 17:32:42 +0000 (UTC)
-Received: from [10.3.112.202] (ovpn-112-202.phx2.redhat.com [10.3.112.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 05B4179259;
- Thu,  2 Jul 2020 17:32:41 +0000 (UTC)
-Subject: Re: [PATCH v2 32/44] qdev: Use returned bool to check for failure,
- Coccinelle part
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200702155000.3455325-1-armbru@redhat.com>
- <20200702155000.3455325-33-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <055e3b38-df67-6d74-d3ae-d980168fb2b8@redhat.com>
-Date: Thu, 2 Jul 2020 12:32:41 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D07800C64;
+ Thu,  2 Jul 2020 17:34:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F4B277899;
+ Thu,  2 Jul 2020 17:34:55 +0000 (UTC)
+Subject: Re: [PATCH] configure / util: Auto-detect the availability of
+ openpty()
+To: Michele Denber <denber@mindspring.com>
+References: <20200702143955.678-1-thuth@redhat.com>
+ <5EFE07BC.6040407@mindspring.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1e699fdc-639e-ef8a-313f-7e665cad868c@redhat.com>
+Date: Thu, 2 Jul 2020 19:34:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200702155000.3455325-33-armbru@redhat.com>
+In-Reply-To: <5EFE07BC.6040407@mindspring.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -99,33 +98,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+Cc: Peter Tribble <peter.tribble@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/20 10:49 AM, Markus Armbruster wrote:
-> The previous commit enables conversion of
+On 02/07/2020 18.13, Michele Denber wrote:
 > 
->      qdev_prop_set_drive_err(..., &err);
->      if (err) {
->      ...
->      }
 > 
-> to
+> On 07/02/20 10:39, Thomas Huth wrote:
+>> Recent versions of Solaris (v11.4) now feature an openpty() function,
+>> too, causing a build failure since we ship our own implementation of
+>> openpty() for Solaris in util/qemu-openpty.c so far. Since there are
+>> now both variants available in the wild, with and without this function,
+>> let's introduce a proper HAVE_OPENPTY define for this to fix the build
+>> failure.
+>>
+>> Signed-off-by: Thomas Huth<thuth@redhat.com>
+>> ---
+>>   Note: Untested, since I do not have a VM with Solaris. Michele,
+>>   Peter, I'd really appreciate a "Tested-by:" from you here. Thanks!
+> Sorry, I was off on another project (doing my taxes).  Is this patch 
+> missing something?  It looks like there should be more.  The last line is
 > 
->      if (!qdev_prop_set_drive_err(..., errp)) {
->      ...
->      }
+> static void cfmakeraw (struct termios *termios_p) {
 > 
-> Coccinelle script:
-> 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> with no matching "}".
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+That's just the context, cut at three lines after the last change. 
+Simply try to apply the patch with "patch -p1 -i ..." or "git am" in a 
+separate git branch if you're using git. It should hopefully apply cleanly.
+
+  Thomas
 
 
