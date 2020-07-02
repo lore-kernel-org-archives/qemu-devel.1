@@ -2,93 +2,91 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C95C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA95C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:51:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64B1E20737
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECF4220737
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajA0khJl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64B1E20737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TAIrsQyB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF4220737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr3MP-00013V-NP
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:50:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49606)
+	id 1jr3Mb-0001WO-6P
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:51:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3Ad-000447-GV; Thu, 02 Jul 2020 13:38:47 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38581)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jr3Aa-0007QB-3a; Thu, 02 Jul 2020 13:38:46 -0400
-Received: by mail-ed1-x542.google.com with SMTP id n2so15810660edr.5;
- Thu, 02 Jul 2020 10:38:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xGMBUKmbOHM91wM5NSBe4GbwryQGSgV9I5NHAM4u6j4=;
- b=ajA0khJlrtKyh/ciXYcO/A+HBSIxkuK4fVilr/2oozC8Bqwom7lXukl9/hcfrCi2n2
- 3tmW3XdRfTN1vqb8Pl/1nwNFe/aIDYGehm3F+WyJeh9pxziqXSn8SxTNwKAgYFttk7cg
- 5ZQsV1ITy+LrUjVWM/gat9ZygMOVBps3573MXx4tpMPegRc7y3iLvco81iKdA15uM0V9
- IIBFCbFDSNkTyvzEGXQttSiSGLb8+u7JOqotPR27surKl19QW0KV8BU9ZuOM84J3N/bN
- 8Idx//S6+ADiyL9Ji0F5cjS5bRJONeacnJZz5gntZxn3yX9HEkE6hV5QDu8mglB1/g5B
- V7IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=xGMBUKmbOHM91wM5NSBe4GbwryQGSgV9I5NHAM4u6j4=;
- b=udK0foiSF+Si5zre5n3fhWzqPPjt3+7dkXmUZJQNlpFxgOzBZ+Wyr0sVifC0wcz0QF
- cA184aqErtCUM8G1KjOpbERDgG6WhZ4bAZWDmrTZN1RupdKTYhfizAmGnI7iFtnhW8k7
- ldj4U12wzsba8TeQfbUocJXCDAKk+CQ10ebmNDUvb56Gae0iO3u2W7Wi76mcziGYMr7r
- hhC1GFQUboCcwvBiXlx5lex6Qw0FODVHnEpJ25aHOr9wYGm8LZtQ0PQbnOZkl6r/sRg+
- hW3woEAps9U2PxARuHgyZeNDeN4kdQs14WX6eLoqBm8D012CL+O4CDgDoTYOwYOGanXp
- wQSg==
-X-Gm-Message-State: AOAM5319M1waki5tjoTSJiIyMf4j5NMMKwXv+1gUFhLE10DXLEZAfips
- i8tIY/WPkZIyrEw1mRNO8AEQ1XoiYks=
-X-Google-Smtp-Source: ABdhPJyt4R5MFRveV5qHEJpsce49Qczmkcw15XOMhCiDC9L3MuBAzG8q1z2SCwFopE+FReVNoIuppg==
-X-Received: by 2002:a05:6402:203a:: with SMTP id
- ay26mr24737685edb.276.1593711521381; 
- Thu, 02 Jul 2020 10:38:41 -0700 (PDT)
-Received: from x1w.redhat.com (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id w20sm5710344eds.21.2020.07.02.10.38.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jul 2020 10:38:40 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/19] .mailmap: Display correct email address for Stefan
- Weil
-Date: Thu,  2 Jul 2020 19:38:17 +0200
-Message-Id: <20200702173818.14651-19-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200702173818.14651-1-f4bug@amsat.org>
-References: <20200702173818.14651-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr3F2-00039w-Sv
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:43:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39827
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr3F0-0000NH-O2
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:43:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593711797;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Tz+HekEY3idcB3CO8nMFKcYSvrcKTNjh//fdxg+qoRQ=;
+ b=TAIrsQyB8Z2ot935XUzL8FDTj8CetfK1mJFrHAX1r0J5aUSguCqgbsFse0VoPzolnrtLL8
+ WkKUhb/ujYYmgnObyxLRyFvGTKVhAfFgW7i7TUDlYll2cMRJgjF+iik6wJ7hFHNhWIG7w7
+ r5GPOEmZ/sLvxVryu77sRZ9jt5B320E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-AhHgDpMLPimiPdyw1ATMOw-1; Thu, 02 Jul 2020 13:43:14 -0400
+X-MC-Unique: AhHgDpMLPimiPdyw1ATMOw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8344B804001;
+ Thu,  2 Jul 2020 17:43:13 +0000 (UTC)
+Received: from [10.3.112.202] (ovpn-112-202.phx2.redhat.com [10.3.112.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA9A973FEA;
+ Thu,  2 Jul 2020 17:43:12 +0000 (UTC)
+Subject: Re: [PATCH v2 33/44] error: Avoid unnecessary error_propagate() after
+ error_setg()
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200702155000.3455325-1-armbru@redhat.com>
+ <20200702155000.3455325-34-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <78109b04-cc8f-8265-477c-f240bc16e346@redhat.com>
+Date: Thu, 2 Jul 2020 12:43:12 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20200702155000.3455325-34-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,55 +100,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix Stefan Weil email address in the following commit:
+On 7/2/20 10:49 AM, Markus Armbruster wrote:
+> Replace
+> 
+>      error_setg(&err, ...);
+>      error_propagate(errp, err);
+> 
+> by
+> 
+>      error_setg(errp, ...);
+> 
 
-  $ git log --author='stefan@kiwi.(none)' --oneline
-  f880defbb0 block/vpc: Fix size calculation
+> 
+> Candidates for conversion tracked down with this Coccinelle script:
+> 
+>      @@
+>      identifier err, errp;
+>      expression list args;
+>      @@
+>      -    error_setg(&err, args);
+>      +    error_setg(errp, args);
+> 	 ... when != err
+> 	 error_propagate(errp, err);
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Also unify his email in the following commits:
+> +++ b/backends/cryptodev.c
+> @@ -158,16 +158,15 @@ cryptodev_backend_set_queues(Object *obj, Visitor *v, const char *name,
+>       uint32_t value;
+>   
+>       if (!visit_type_uint32(v, name, &value, &local_err)) {
+> -        goto out;
+> +        error_propagate(errp, local_err);
+> +        return;
+>       }
 
-  $ git log --author='weil@mail.berlios.de' --oneline | head
-  9e4dd565b4 vnc: Limit r/w access to size of allocated memory
-  657c166f8e qemu-iotests: README: Fix spelling
-  3b5fe6e60c qemu-iotests: add support for vdi format "static" option
-  c83f64d498 qemu-iotests: fix pattern for write test
-  7ef6d3dc39 block/vvfat: Remove unused code
-  ce137829e7 block/vvfat: Fix potential memory leaks and other memory errors
-  5354d08312 Fix mismatching allocation and deallocation
-  7f6f0ae5b9 tcg: Add some assertions
-  c0ad3001bf tcg: Add forward declarations for local functions
-  840f58617b tcg: Don't declare TCG_TARGET_REG_BITS in tcg-target.h
-  ...
+Looks like this error_propgate is spurious if you just use
+  if (!visit_type_uint32(..., errp)) {
 
-Cc: Stefan Weil <sw@weilnetz.de>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- .mailmap | 3 +++
- 1 file changed, 3 insertions(+)
+Oh - that's not the pattern you flagged, and a later patch then 
+addresses it.  It might help if the commit message for this patch 
+mentions that further cleanups are still forthcoming.
 
-diff --git a/.mailmap b/.mailmap
-index 67f7d5caf2..f5ca5aa37e 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -156,6 +156,9 @@ Shin'ichiro Kawasaki <kawasaki@juno.dti.ne.jp>
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
- Sochin Jiang <sochin.jiang@huawei.com>
- Stefan Berger <stefanb@linux.ibm.com> <Stefan Berger stefanb@linux.vnet.ibm.com>
-+Stefan Weil <sw@weilnetz.de> <stefan@kiwi.(none)>
-+Stefan Weil <sw@weilnetz.de> <stefan@weilnetz.de>
-+Stefan Weil <sw@weilnetz.de> <weil@mail.berlios.de>
- Takashi Yoshii <takasi-y@ops.dti.ne.jp>
- Thomas Huth <thuth@redhat.com>
- Thomas Knych <thomaswk@google.com>
+
+> +++ b/backends/hostmem-file.c
+> @@ -114,18 +114,16 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+>       uint64_t val;
+>   
+>       if (host_memory_backend_mr_inited(backend)) {
+> -        error_setg(&local_err, "cannot change property '%s' of %s",
+> -                   name, object_get_typename(o));
+> -        goto out;
+> +        error_setg(errp, "cannot change property '%s' of %s", name,
+> +                   object_get_typename(o));
+> +        return;
+>       }
+>   
+>       if (!visit_type_size(v, name, &val, &local_err)) {
+> -        goto out;
+> +        error_propagate(errp, local_err);
+> +        return;
+>       }
+
+Another case where the first 'if' matches the subject of this patch, and 
+the second 'if' can avoid local_err but that the change will be done in 
+a later patch.  And several more later on, but this is how far it took 
+me to realize that you intentionally saved them for later.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.21.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
