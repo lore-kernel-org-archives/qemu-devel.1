@@ -2,78 +2,78 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D51C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8ADC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A368D206E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A87E720720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Y4A+UXOe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A368D206E2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HSic4g62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A87E720720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2dc-0002Fv-To
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:04:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34494)
+	id 1jr2eg-0003cz-Vv
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:05:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Az-0007KI-N7
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:05 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44861)
+ id 1jr2Ae-0006Kl-AJ
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:44 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44883)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2Ax-00008W-J5
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:05 -0400
+ id 1jr2Ac-0000Az-83
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707703; x=1625243703;
+ t=1593707682; x=1625243682;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=dDV/yHkrwFn/9rABPcF1aNzRfax0gE0wIAinS/zJxug=;
- b=Y4A+UXOex2/zRJdbtTXmI2SAT+4QCqGd3MrAlFyNMtpVf1OF5pAGbdIE
- udCJ+4ZWI1+Sx5g2UcNr2hVIj6agIX4cS/6OgJKrc4jZBAp0T+jdl5PXZ
- tuqhkyS1QDAg5L3ikA7RZjlTaCYbJl7J1+g3SNwZ/liyTNAyKHG4nNwTO
- g7TiOJggWCUa2UXOqLSDH5ukuwqCh8z3o/sLzpMpDD15kIkpa0yh1Mhwx
- bIO90kyeVDMXR0mrpZwqawUMIC7Fl2nuFeWdFNxA5AiyDX7GP4XtmHdch
- Ef1aodU28XCI7Kr4qRAouXt0JuY/Ha7gjUgQWzI8wS8IChcXjT7f07BTE g==;
-IronPort-SDR: cWhI41dEgmLJvpheiu9i9hTJZdWnX/4nUREr1pzuxU4Pi7/HxKWcq1ouGAMLMaW60+kWVctoKY
- Va6DX6tGqPOyvk7/pjvM0KDtc5DcQCjljuQWEWpx8osmlhgSgV2lHta1FLv5nX4lOLvqOa5cuf
- C+0E2xLvccYcbzpYSnmwoIm6re6BfY+8UwXSOG/JE6vF8X8mQdWdqPCBxpquV+ZSA+UkscgtC5
- 5inXeEzde+RDl6dB15IL3w/R50f72ER/pBx+qNbINnJjPvE4LRVjb5+VWjeP7X4pn7AtWJvenQ
- AXI=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498563"
+ bh=VkSd+rjGLnkS591IuVwDrdQgJV/0ZYuRrhez6yw5Bq0=;
+ b=HSic4g62Vimw/8ACtwGfJs77rnLOhaKtab45kL8JkmuU641sKfqvUZGm
+ p/Eh9CuYdym+dPgi4KB/2ulv7dIeWs8K+HXSQWMm6Fi97QKTcSSbK7lPa
+ k3zgh8FRlCvIX9BwuHMpnHpkrDrpEr4Kv5PImz12ChDBd3FgxERjIYzcZ
+ sszCjwSyUw6EpQf32cLn8JT4VolEE00KwGzcnnboCJvfcO/bI36VDbk2A
+ t1y2I9Tld87Jvb6ssMq1Lx+/Tape47O+Apcv2rFyr9TO+YvQRP2wnDsqe
+ NGLGtjthA9Jf2wkTk42ANBvCe8x4HkEs4mxz6ZihrDyfgWgC4e2IfvYlL Q==;
+IronPort-SDR: D8I0lpNZ2jP8Cs2rYhqNyn5u+o5Jeuscmr/omsU+dUTNEvRQ5IANwTSjeYxdQoSsRd8zaaNO1e
+ Px0bmQ06g6zj+fs4YDx5izqgmwofhYWEPHp+YHCUInwF+F1x4/cZBs/nZkA7rRY6HcV/rLpGrn
+ PqwHVeOVF1S+/2SCu5Gbe5RCm03yXKxFTsq/BqTyC+YUo1gUnJLavjyetgbhTsxP0Y65oqqD6+
+ i6rpDU8GmQskYmYe9x5MEGMHbMZRtPJsR01+6+AOr/Irr7RNSftlebxf8+2iYDTchj4Ln2goJ0
+ BzA=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498533"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:35 +0800
-IronPort-SDR: jOxtBBVfkjKKYHYC2fNmuxjdHPG/Wlb4UaoUfyqommyTnY+Ch3fQ9ay762pITNIb93/DcS3B6J
- pZBCDs6LVqR8fNEdOTPHAjWroFyGvq/qk=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:31 +0800
+IronPort-SDR: Zkaq1nh2WGr7nGwJLdADv//7w2nd1p323iYKlblE9ECq0IdRciNOjdYLjW8mvHpmM3TAm3v5wB
+ QTRQsL7QWei5jmTpwPHTXybmjBy2g0WMg=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:50 -0700
-IronPort-SDR: /Xd1e/qUBOHtRI+I7d03IWcGvVAgSamOOasrMfcXcjJJpZDVvYfDw9tEPyBI+yCUp4kAKcCY/8
- Z3I8NGosCqwQ==
+ 02 Jul 2020 09:21:46 -0700
+IronPort-SDR: 8S5ZMrbRfDaMLSj3E29CnIPUslG3atnOJUEtC8l0acjSjFpl0Snb2NcIiTctVXEHew0bVmhxk2
+ Gqqa9Pqvtkdg==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:35 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:31 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 58/64] target/riscv: integer extract instruction
-Date: Thu,  2 Jul 2020 09:23:48 -0700
-Message-Id: <20200702162354.928528-59-alistair.francis@wdc.com>
+Subject: [PULL v2 44/64] target/riscv: vector floating-point merge instructions
+Date: Thu,  2 Jul 2020 09:23:34 -0700
+Message-Id: <20200702162354.928528-45-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -103,9 +103,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -113,150 +112,120 @@ Sender: "Qemu-devel"
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200701152549.1218-56-zhiwei_liu@c-sky.com>
+Message-Id: <20200701152549.1218-42-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/insn32.decode              |   1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 116 ++++++++++++++++++++++++
- 2 files changed, 117 insertions(+)
+ target/riscv/helper.h                   |  4 +++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 38 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 24 ++++++++++++++++
+ 4 files changed, 68 insertions(+)
 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index fb744c5ec9..2c3f0a4e0c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1000,3 +1000,7 @@ DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 6f2e2df7d3..c4496cd010 100644
+index 6912eda259..38e7445a16 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -563,6 +563,7 @@ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
-+vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+@@ -515,6 +515,8 @@ vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
+ vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
+ vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
+ vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
++vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
++vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index e94d149d3b..cfbbd88dbf 100644
+index 361bdce654..b6872376ce 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2533,3 +2533,119 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
-     }
-     return false;
- }
+@@ -2184,3 +2184,41 @@ GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
+ 
+ /* Vector Floating-Point Classify Instruction */
+ GEN_OPFV_TRANS(vfclass_v, opfv_check)
 +
-+/*
-+ *** Vector Permutation Instructions
-+ */
++/* Vector Floating-Point Merge Instruction */
++GEN_OPFVF_TRANS(vfmerge_vfm,  opfvf_check)
 +
-+/* Integer Extract Instruction */
-+
-+static void load_element(TCGv_i64 dest, TCGv_ptr base,
-+                         int ofs, int sew)
++static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
 +{
-+    switch (sew) {
-+    case MO_8:
-+        tcg_gen_ld8u_i64(dest, base, ofs);
-+        break;
-+    case MO_16:
-+        tcg_gen_ld16u_i64(dest, base, ofs);
-+        break;
-+    case MO_32:
-+        tcg_gen_ld32u_i64(dest, base, ofs);
-+        break;
-+    case MO_64:
-+        tcg_gen_ld_i64(dest, base, ofs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+        break;
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        (s->sew != 0)) {
++
++        if (s->vl_eq_vlmax) {
++            tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
++                                 MAXSZ(s), MAXSZ(s), cpu_fpr[a->rs1]);
++        } else {
++            TCGv_ptr dest;
++            TCGv_i32 desc;
++            uint32_t data = FIELD_DP32(0, VDATA, LMUL, s->lmul);
++            static gen_helper_vmv_vx * const fns[3] = {
++                gen_helper_vmv_v_x_h,
++                gen_helper_vmv_v_x_w,
++                gen_helper_vmv_v_x_d,
++            };
++            TCGLabel *over = gen_new_label();
++            tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++            dest = tcg_temp_new_ptr();
++            desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++            tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
++            fns[s->sew - 1](dest, cpu_fpr[a->rs1], cpu_env, desc);
++
++            tcg_temp_free_ptr(dest);
++            tcg_temp_free_i32(desc);
++            gen_set_label(over);
++        }
++        return true;
 +    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 63f08e4554..1d5667f471 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4194,3 +4194,27 @@ RVVCALL(OPIVV1, vfclass_v_d, OP_UU_D, H8, H8, fclass_d)
+ GEN_VEXT_V(vfclass_v_h, 2, 2, clearh)
+ GEN_VEXT_V(vfclass_v_w, 4, 4, clearl)
+ GEN_VEXT_V(vfclass_v_d, 8, 8, clearq)
++
++/* Vector Floating-Point Merge Instruction */
++#define GEN_VFMERGE_VF(NAME, ETYPE, H, CLEAR_FN)              \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2, \
++                  CPURISCVState *env, uint32_t desc)          \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vm = vext_vm(desc);                              \
++    uint32_t vl = env->vl;                                    \
++    uint32_t esz = sizeof(ETYPE);                             \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                  \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        *((ETYPE *)vd + H(i))                                 \
++          = (!vm && !vext_elem_mask(v0, mlen, i) ? s2 : s1);  \
++    }                                                         \
++    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                  \
 +}
 +
-+/* offset of the idx element with base regsiter r */
-+static uint32_t endian_ofs(DisasContext *s, int r, int idx)
-+{
-+#ifdef HOST_WORDS_BIGENDIAN
-+    return vreg_ofs(s, r) + ((idx ^ (7 >> s->sew)) << s->sew);
-+#else
-+    return vreg_ofs(s, r) + (idx << s->sew);
-+#endif
-+}
-+
-+/* adjust the index according to the endian */
-+static void endian_adjust(TCGv_i32 ofs, int sew)
-+{
-+#ifdef HOST_WORDS_BIGENDIAN
-+    tcg_gen_xori_i32(ofs, ofs, 7 >> sew);
-+#endif
-+}
-+
-+/* Load idx >= VLMAX ? 0 : vreg[idx] */
-+static void vec_element_loadx(DisasContext *s, TCGv_i64 dest,
-+                              int vreg, TCGv idx, int vlmax)
-+{
-+    TCGv_i32 ofs = tcg_temp_new_i32();
-+    TCGv_ptr base = tcg_temp_new_ptr();
-+    TCGv_i64 t_idx = tcg_temp_new_i64();
-+    TCGv_i64 t_vlmax, t_zero;
-+
-+    /*
-+     * Mask the index to the length so that we do
-+     * not produce an out-of-range load.
-+     */
-+    tcg_gen_trunc_tl_i32(ofs, idx);
-+    tcg_gen_andi_i32(ofs, ofs, vlmax - 1);
-+
-+    /* Convert the index to an offset. */
-+    endian_adjust(ofs, s->sew);
-+    tcg_gen_shli_i32(ofs, ofs, s->sew);
-+
-+    /* Convert the index to a pointer. */
-+    tcg_gen_ext_i32_ptr(base, ofs);
-+    tcg_gen_add_ptr(base, base, cpu_env);
-+
-+    /* Perform the load. */
-+    load_element(dest, base,
-+                 vreg_ofs(s, vreg), s->sew);
-+    tcg_temp_free_ptr(base);
-+    tcg_temp_free_i32(ofs);
-+
-+    /* Flush out-of-range indexing to zero.  */
-+    t_vlmax = tcg_const_i64(vlmax);
-+    t_zero = tcg_const_i64(0);
-+    tcg_gen_extu_tl_i64(t_idx, idx);
-+
-+    tcg_gen_movcond_i64(TCG_COND_LTU, dest, t_idx,
-+                        t_vlmax, dest, t_zero);
-+
-+    tcg_temp_free_i64(t_vlmax);
-+    tcg_temp_free_i64(t_zero);
-+    tcg_temp_free_i64(t_idx);
-+}
-+
-+static void vec_element_loadi(DisasContext *s, TCGv_i64 dest,
-+                              int vreg, int idx)
-+{
-+    load_element(dest, cpu_env, endian_ofs(s, vreg, idx), s->sew);
-+}
-+
-+static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-+{
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv dest = tcg_temp_new();
-+
-+    if (a->rs1 == 0) {
-+        /* Special case vmv.x.s rd, vs2. */
-+        vec_element_loadi(s, tmp, a->rs2, 0);
-+    } else {
-+        /* This instruction ignores LMUL and vector register groups */
-+        int vlmax = s->vlen >> (3 + s->sew);
-+        vec_element_loadx(s, tmp, a->rs2, cpu_gpr[a->rs1], vlmax);
-+    }
-+    tcg_gen_trunc_i64_tl(dest, tmp);
-+    gen_set_gpr(a->rd, dest);
-+
-+    tcg_temp_free(dest);
-+    tcg_temp_free_i64(tmp);
-+    return true;
-+}
++GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
++GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
++GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
 -- 
 2.27.0
 
