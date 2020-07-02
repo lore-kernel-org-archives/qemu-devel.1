@@ -4,74 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B991C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7CDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:24:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11389207D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46CC7207D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:24:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fjwAT7dF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11389207D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvndFnoD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CC7207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqyFv-0003YK-BU
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:23:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45354)
+	id 1jqyGC-0003yp-Cc
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:24:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqyD9-0008Op-LY
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:21:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27658
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqyDJ-0000BJ-Mh
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:21:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51231
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqyD8-0000SJ-5o
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:21:03 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqyDI-0000dK-3e
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:21:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593692460;
+ s=mimecast20190719; t=1593692471;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ZGQ5Wu+dd92yFv0n0MdGpoDsI6uh8nmJFuW7b6CbOI8=;
- b=fjwAT7dFOzMNIm7wgYbP/VjGSHZ/B4czF1x6PJBixaRF4c5AhM3/RP5bxUZXnA5pOUGsum
- pAm9qCoNnBxHqD8rCvpfosVsbJEUpZu/f2fT86e8ZtAkwSywsJytXez8FXp8U9nw9Paxno
- 1g1dAOd2oAP7huXGtVo1Kb6Zdy+lI1Q=
+ references:references; bh=2lksNVHVDfn+JRUysyPNuTS6EqEm1HR/0tS62Mk0Giw=;
+ b=dvndFnoDJ64fVq3pKOaYCkwkGe2eNkSbqUOX4JA6gq0SEmjMN4MQAeg3S+bBQjM9VXnsn8
+ lGF3XKy3QSKVPMiOUdOQCTsySmMHEO/NH3KJC7QylE+vwm2lR38my2bEsvYSIhJNOm5mEI
+ jPbNNGXiJ4zMd9g3+qOw0Wyj+f1n4hM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406--3pQQLMaPoaoZF85gyLa9g-1; Thu, 02 Jul 2020 08:20:56 -0400
-X-MC-Unique: -3pQQLMaPoaoZF85gyLa9g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-390-2UxAlRjYMT66HxTXbv1FAg-1; Thu, 02 Jul 2020 08:21:07 -0400
+X-MC-Unique: 2UxAlRjYMT66HxTXbv1FAg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF6C018FE882
- for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 12:20:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59C0980DAF0
+ for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 12:20:56 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
  [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E819A2B4DE;
- Thu,  2 Jul 2020 12:20:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB9DB7789F;
+ Thu,  2 Jul 2020 12:20:55 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4B22931E8E; Thu,  2 Jul 2020 14:20:48 +0200 (CEST)
+ id 5D29231E93; Thu,  2 Jul 2020 14:20:48 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/10] build: fix device module builds
-Date: Thu,  2 Jul 2020 14:20:42 +0200
-Message-Id: <20200702122048.27798-5-kraxel@redhat.com>
+Subject: [PULL 05/10] ccid: build smartcard as module
+Date: Thu,  2 Jul 2020 14:20:43 +0200
+Message-Id: <20200702122048.27798-6-kraxel@redhat.com>
 In-Reply-To: <20200702122048.27798-1-kraxel@redhat.com>
 References: <20200702122048.27798-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,32 +101,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-See comment.  Feels quite hackish.  Better ideas anyone?
+Drops libcacard.so dependency from core qemu.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20200624131045.14512-5-kraxel@redhat.com
+Message-id: 20200624131045.14512-6-kraxel@redhat.com
 ---
- Makefile.target | 7 +++++++
- 1 file changed, 7 insertions(+)
+ Makefile.objs        | 1 +
+ util/module.c        | 2 ++
+ hw/Makefile.objs     | 1 +
+ hw/usb/Makefile.objs | 4 +++-
+ 4 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 8ed1eba95b9c..c70325df5796 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -179,6 +179,13 @@ endif # CONFIG_SOFTMMU
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
+diff --git a/Makefile.objs b/Makefile.objs
+index 98383972eef3..3d45492d8b46 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -59,6 +59,7 @@ common-obj-y += migration/
+ common-obj-y += audio/
+ common-obj-m += audio/
+ common-obj-y += hw/
++common-obj-m += hw/
  
-+#
-+# common-obj-m has some crap here, probably as side effect from
-+# filling obj-y.  Clear it.  Fixes suspious dependency errors when
-+# building devices as modules.
-+#
-+common-obj-m :=
-+
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call unnest-vars,.., \
-                authz-obj-y \
+ common-obj-y += replay/
+ 
+diff --git a/util/module.c b/util/module.c
+index ee560a4b4269..89da9a3cce05 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -261,6 +261,8 @@ static struct {
+     const char *prefix;
+     const char *module;
+ } const qom_modules[] = {
++    { "ccid-card-passthru",    "hw-", "usb-smartcard"         },
++    { "ccid-card-emulated",    "hw-", "usb-smartcard"         },
+ };
+ 
+ static bool module_loaded_qom_all;
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 4cbe5e4e57d6..af8fd9a510ed 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -43,4 +43,5 @@ devices-dirs-y += smbios/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
++common-obj-m += usb/
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index fa5c3fa1b877..3c5b3d4fadd3 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -29,11 +29,13 @@ common-obj-$(CONFIG_USB_NETWORK)      += dev-network.o
+ 
+ ifeq ($(CONFIG_USB_SMARTCARD),y)
+ common-obj-y                          += dev-smartcard-reader.o
+-common-obj-$(CONFIG_SMARTCARD)        += smartcard.mo
++ifeq ($(CONFIG_SMARTCARD),y)
++common-obj-m                          += smartcard.mo
+ smartcard.mo-objs := ccid-card-passthru.o ccid-card-emulated.o
+ smartcard.mo-cflags := $(SMARTCARD_CFLAGS)
+ smartcard.mo-libs := $(SMARTCARD_LIBS)
+ endif
++endif
+ 
+ ifeq ($(CONFIG_POSIX),y)
+ common-obj-$(CONFIG_USB_STORAGE_MTP)  += dev-mtp.o
 -- 
 2.18.4
 
