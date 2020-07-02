@@ -2,154 +2,110 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A63EC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2803CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:25:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58BB320747
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E538B206DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:25:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsJoh0YP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BB320747
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULX5bAzl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E538B206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqwMA-0000GQ-JE
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:22:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39220)
+	id 1jqwOz-00020g-5K
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:25:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1jqwLc-0008IH-Vi
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:21:41 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52312)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1jqwLb-0006DS-6o
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:21:40 -0400
-Received: by mail-wm1-x342.google.com with SMTP id q15so26139350wmj.2
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 03:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pn/iRItMkTY07UzX0WwMASPjN/nYYmjk0bA3lbQdYV0=;
- b=TsJoh0YPRydtwcFVZUTEQ7prBzZXAdXAsqj6P7MsmzE5t82L5+t08OSLGzu1ciPDix
- 5h4+9SguipJQk/0SVXgnr7A3eoXGxYqWuaIeGsvlDU7Z17XzbqTLlHo0anxc56sd7bSI
- f/PI3sWyl6IEsy0J80HrSaTTYuBIjoyEosCllNRL4DtptCvK/RNYOJFIpOQYuFR+GNZR
- ZqGBuiumJldbGLIrFbWjuBlddVXf+0xrRLEObM+CLGw7C1pOyFWJW7/eiXEmflbr4zI8
- WKCMm6hJ1evc3msSLJVK5uWjzi+fFDFn8BECu2rPohV/GBUjdRI5pNZlFqhScbRKSI0Q
- wSPQ==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqwOK-0001Zq-1P
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:24:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39749
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jqwOH-0007dv-NP
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:24:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593685463;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=MUk2aAcWmM/f12tQIphC8WFrAQrL+dFs4W/fqsOd9Ow=;
+ b=ULX5bAzlbISGVKMwHqkmdTcacuVHJYW5AmxXMNJoR4YpAeH+cr1NAsaspk4LUmG0N3TvSw
+ h2IZw/zBREe09T4gcgPOwZBDtREgXYIGZfo9flW11ISKWOIP/RnVIrFA6TaqWe2o4Gh+uP
+ 4zG+Rqbk0k1dm9XYN1zrT4ZyRkxzOXA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-7R_iWXdXMX2XE94BI9z90A-1; Thu, 02 Jul 2020 06:24:22 -0400
+X-MC-Unique: 7R_iWXdXMX2XE94BI9z90A-1
+Received: by mail-wr1-f69.google.com with SMTP id g14so24765254wrp.8
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 03:24:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=pn/iRItMkTY07UzX0WwMASPjN/nYYmjk0bA3lbQdYV0=;
- b=coB7IEE/TPDrpDheAQPwjgQqXKIP1aNllMaFQYGHVRbxL0lAfh9++a4mFFTs6eBrL/
- SAXa4FLi7Q/1P22IBsRNL6LQybT2mzYEoV27+IJMEAp8OYx1hP3cBkgTuFr65MebSinz
- hVXvPRFvyX+0QdtyQ0NFZMAJNACkByR+DZTjDKJcLJd0TlItpEVSbgZvRFBJN8moUHSk
- 07qIZm4p1XGgWawjtuJedAQYw7sHjF5vypNqsr/pWE3kaJTy47IjE9uUj+SCqxojaTZj
- 6BCQ4ShQvh0eh/QTfyinedLpfC8i9rlPJ72z7E9ayFnwZ50M7yogtETl7V3alwL8mCRd
- gUqA==
-X-Gm-Message-State: AOAM532sbzS4QsuKtdGaYN81ahmKwwqakrEZvaRHf7BZ5HLDtKir+bT2
- aLTQSobYabP33owzFmXlFlA=
-X-Google-Smtp-Source: ABdhPJwAcWsas+Lk3qL2Zqcc7IZr2Zdfk1ORK9S4Sg2IA14WW4JP5J8YUyxHH7+j9k4E/WW4lmov4g==
-X-Received: by 2002:a7b:ce87:: with SMTP id q7mr32475586wmj.39.1593685297277; 
- Thu, 02 Jul 2020 03:21:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:2cad:376b:7d21:868e?
- ([2001:b07:6468:f312:2cad:376b:7d21:868e])
- by smtp.googlemail.com with ESMTPSA id r3sm10562154wmh.36.2020.07.02.03.21.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jul 2020 03:21:36 -0700 (PDT)
-Subject: Re: [PATCH] cpus: Move CPU code from exec.c to cpus.c
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200701175432.18892-1-philmd@redhat.com>
- <b476ded8-fbd6-f9d5-66b7-67e7128e86fd@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- mQHhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
- CxXPkIBTvYY+ZPkoTh5xF9oS1jqI8iRLzouzF8yXs3QjQIZ2SfuCxSVwlV65jotcjD2FTN04
- hVopm9llFijNZpVIOGUTqzM4U55sdsCcZUluWM6x4HSOdw5F5Utxfp1wOjD/v92Lrax0hjiX
- DResHSt48q+8FrZzY+AUbkUS+Jm34qjswdrgsC5uxeVcLkBgWLmov2kMaMROT0YmFY6A3m1S
- P/kXmHDXxhe23gKb3dgwxUTpENDBGcfEzrzilWueOeUWiOcWuFOed/C3SyijBx3Av/lbCsHU
- Vx6pMycNTdzU1BuAroB+Y3mNEuW56Yd44jlInzG2UOwt9XjjdKkJZ1g0P9dwptwLEgTEd3Fo
- UdhAQyRXGYO8oROiuh+RZ1lXp6AQ4ZjoyH8WLfTLf5g1EKCTc4C1sy1vQSdzIRu3rBIjAvnC
- tGZADei1IExLqB3uzXKzZ1BZ+Z8hnt2og9hb7H0y8diYfEk2w3R7wEr+Ehk5NQsT2MPI2QBd
- wEv1/Aj1DgUHZAHzG1QN9S8wNWQ6K9DqHZTBnI1hUlkp22zCSHK/6FwUCuYp1zcAEQEAAbQj
- UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT6JAg0EEwECACMFAlRCcBICGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRB+FRAMzTZpsbceDp9IIN6BIA0Ol7MoB15E
- 11kRz/ewzryFY54tQlMnd4xxfH8MTQ/mm9I482YoSwPMdcWFAKnUX6Yo30tbLiNB8hzaHeRj
- jx12K+ptqYbg+cevgOtbLAlL9kNgLLcsGqC2829jBCUTVeMSZDrzS97ole/YEez2qFpPnTV0
- VrRWClWVfYh+JfzpXmgyhbkuwUxNFk421s4Ajp3d8nPPFUGgBG5HOxzkAm7xb1cjAuJ+oi/K
- CHfkuN+fLZl/u3E/fw7vvOESApLU5o0icVXeakfSz0LsygEnekDbxPnE5af/9FEkXJD5EoYG
- SEahaEtgNrR4qsyxyAGYgZlS70vkSSYJ+iT2rrwEiDlo31MzRo6Ba2FfHBSJ7lcYdPT7bbk9
- AO3hlNMhNdUhoQv7M5HsnqZ6unvSHOKmReNaS9egAGdRN0/GPDWr9wroyJ65ZNQsHl9nXBqE
- AukZNr5oJO5vxrYiAuuTSd6UI/xFkjtkzltG3mw5ao2bBpk/V/YuePrJsnPFHG7NhizrxttB
- nTuOSCMo45pfHQ+XYd5K1+Cv/NzZFNWscm5htJ0HznY+oOsZvHTyGz3v91pn51dkRYN0otqr
- bQ4tlFFuVjArBZcapSIe6NV8C4cEiSS5AQ0EVEJxcwEIAK+nUrsUz3aP2aBjIrX3a1+C+39R
- nctpNIPcJjFJ/8WafRiwcEuLjbvJ/4kyM6K7pWUIQftl1P8Woxwb5nqL7zEFHh5I+hKS3haO
- 5pgco//V0tWBGMKinjqntpd4U4Dl299dMBZ4rRbPvmI8rr63sCENxTnHhTECyHdGFpqSzWzy
- 97rH68uqMpxbUeggVwYkYihZNd8xt1+lf7GWYNEO/QV8ar/qbRPG6PEfiPPHQd/sldGYavmd
- //o6TQLSJsvJyJDt7KxulnNT8Q2X/OdEuVQsRT5glLaSAeVAABcLAEnNgmCIGkX7TnQF8a6w
- gHGrZIR9ZCoKvDxAr7RP6mPeS9sAEQEAAYkDEgQYAQIACQUCVEJxcwIbAgEpCRB+FRAMzTZp
- scBdIAQZAQIABgUCVEJxcwAKCRC/+9JfeMeug/SlCACl7QjRnwHo/VzENWD9G2VpUOd9eRnS
- DZGQmPo6Mp3Wy8vL7snGFBfRseT9BevXBSkxvtOnUUV2YbyLmolAODqUGzUI8ViF339poOYN
- i6Ffek0E19IMQ5+CilqJJ2d5ZvRfaq70LA/Ly9jmIwwX4auvXrWl99/2wCkqnWZI+PAepkcX
- JRD4KY2fsvRi64/aoQmcxTiyyR7q3/52Sqd4EdMfj0niYJV0Xb9nt8G57Dp9v3Ox5JeWZKXS
- krFqy1qyEIypIrqcMbtXM7LSmiQ8aJRM4ZHYbvgjChJKR4PsKNQZQlMWGUJO4nVFSkrixc9R
- Z49uIqQK3b3ENB1QkcdMg9cxsB0Onih8zR+Wp1uDZXnz1ekto+EivLQLqvTjCCwLxxJafwKI
- bqhQ+hGR9jF34EFur5eWt9jJGloEPVv0GgQflQaE+rRGe+3f5ZDgRe5Y/EJVNhBhKcafcbP8
- MzmLRh3UDnYDwaeguYmxuSlMdjFL96YfhRBXs8tUw6SO9jtCgBvoOIBDCxxAJjShY4KIvEpK
- b2hSNr8KxzelKKlSXMtB1bbHbQxiQcerAipYiChUHq1raFc3V0eOyCXK205rLtknJHhM5pfG
- 6taABGAMvJgm/MrVILIxvBuERj1FRgcgoXtiBmLEJSb7akcrRlqe3MoPTntSTNvNzAJmfWhd
- SvP0G1WDLolqvX0OtKMppI91AWVu72f1kolJg43wbaKpRJg1GMkKEI3H+jrrlTBrNl/8e20m
- TElPRDKzPiowmXeZqFSS1A6Azv0TJoo9as+lWF+P4zCXt40+Zhh5hdHO38EV7vFAVG3iuay6
- 7ToF8Uy7tgc3mdH98WQSmHcn/H5PFYk3xTP3KHB7b0FZPdFPQXBZb9+tJeZBi9gMqcjMch+Y
- R8dmTcQRQX14bm5nXlBF7VpSOPZMR392LY7wzAvRdhz7aeIUkdO7VelaspFk2nT7wOj1Y6uL
- nRxQlLkBDQRUQnHuAQgAx4dxXO6/Zun0eVYOnr5GRl76+2UrAAemVv9Yfn2PbDIbxXqLff7o
- yVJIkw4WdhQIIvvtu5zH24iYjmdfbg8iWpP7NqxUQRUZJEWbx2CRwkMHtOmzQiQ2tSLjKh/c
- HeyFH68xjeLcinR7jXMrHQK+UCEw6jqi1oeZzGvfmxarUmS0uRuffAb589AJW50kkQK9VD/9
- QC2FJISSUDnRC0PawGSZDXhmvITJMdD4TjYrePYhSY4uuIV02v028TVAaYbIhxvDY0hUQE4r
- 8ZbGRLn52bEzaIPgl1p/adKfeOUeMReg/CkyzQpmyB1TSk8lDMxQzCYHXAzwnGi8WU9iuE1P
- 0wARAQABiQHzBBgBAgAJBQJUQnHuAhsMAAoJEH4VEAzNNmmxp1EOoJy0uZggJm7gZKeJ7iUp
- eX4eqUtqelUw6gU2daz2hE/jsxsTbC/w5piHmk1H1VWDKEM4bQBTuiJ0bfo55SWsUNN+c9hh
- IX+Y8LEe22izK3w7mRpvGcg+/ZRG4DEMHLP6JVsv5GMpoYwYOmHnplOzCXHvmdlW0i6SrMsB
- Dl9rw4AtIa6bRwWLim1lQ6EM3PWifPrWSUPrPcw4OLSwFk0CPqC4HYv/7ZnASVkR5EERFF3+
- 6iaaVi5OgBd81F1TCvCX2BEyIDRZLJNvX3TOd5FEN+lIrl26xecz876SvcOb5SL5SKg9/rCB
- ufdPSjojkGFWGziHiFaYhbuI2E+NfWLJtd+ZvWAAV+O0d8vFFSvriy9enJ8kxJwhC0ECbSKF
- Y+W1eTIhMD3aeAKY90drozWEyHhENf4l/V+Ja5vOnW+gCDQkGt2Y1lJAPPSIqZKvHzGShdh8
- DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
- S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <34ef8d81-4559-9887-3420-c0045bb83d46@redhat.com>
-Date: Thu, 2 Jul 2020 12:21:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=MUk2aAcWmM/f12tQIphC8WFrAQrL+dFs4W/fqsOd9Ow=;
+ b=WWiDx8EFBTc9OXD+X7ACJZ+I2xTj5hFukDw9pHd3eIMqAfta/JEFWUeA+JY43VTHO8
+ dlnz1cW8faBz5SjaZ928bbJa00D9As0MdLYaiYHvwx9aVAJh1hHVDDOAe5Q6kxEcnfGc
+ qt6MJ6aRUXBQaniqc6wP7l8178e1IMYkGbGyDJRAaCkUtWL8i8tfjX4V5vB9vmmbb5Fn
+ SloZLWQIxAa9EZDla/K+O+GJDV/IpphlccBucgKL5B6RJ67tgEB0dpPBBDAufyyLOF2C
+ JY/r9K0NUuG9kAtMfRKm+kf4nshh95P93t+43WBmYJ/IxVWZFR3+TMgk5wAQUekUMdq4
+ WdOg==
+X-Gm-Message-State: AOAM531r9qBAH1W7jHUoAootYjaPN9wz8+qNrItk2vj+ScCdbT4FE406
+ JaEllS0BH0J4OtIcbxCur9DlL7kTUsmzT0M3T98Vr9AV1u+Xc9GwXqpBDPpuBho29MNDK2tiXRz
+ fUplZYEXmom8Oxlo=
+X-Received: by 2002:a1c:3c82:: with SMTP id
+ j124mr33127208wma.155.1593685460842; 
+ Thu, 02 Jul 2020 03:24:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJycZgtBn+qYM+eicbvEADuaU+YMouO48rm6S2tQkUt29Q20uUu0b/ofyFM90vzmfwnKDAnaUg==
+X-Received: by 2002:a1c:3c82:: with SMTP id
+ j124mr33127189wma.155.1593685460648; 
+ Thu, 02 Jul 2020 03:24:20 -0700 (PDT)
+Received: from redhat.com ([93.157.82.4])
+ by smtp.gmail.com with ESMTPSA id r1sm9984689wrw.24.2020.07.02.03.24.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Jul 2020 03:24:19 -0700 (PDT)
+Date: Thu, 2 Jul 2020 06:24:17 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH RFC] virtio-fs: force virtio 1.x usage
+Message-ID: <20200702061631-mutt-send-email-mst@kernel.org>
+References: <20200629102758.421552-1-cohuck@redhat.com>
+ <20200629104948-mutt-send-email-mst@kernel.org>
+ <20200629173933.35cea40f.cohuck@redhat.com>
+ <20200629114515-mutt-send-email-mst@kernel.org>
+ <20200630113527.7b27f34f.cohuck@redhat.com>
+ <20200630064227-mutt-send-email-mst@kernel.org>
+ <20200630133043.2be1d209.cohuck@redhat.com>
+ <20200630074918-mutt-send-email-mst@kernel.org>
+ <20200701155819.55c64224.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b476ded8-fbd6-f9d5-66b7-67e7128e86fd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
+In-Reply-To: <20200701155819.55c64224.cohuck@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: 2
+X-Spam_score: 0.2
 X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (0.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_SBL_CSS=3.335, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -162,109 +118,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/07/20 11:38, Paolo Bonzini wrote:
-> On 01/07/20 19:54, Philippe Mathieu-Daudé wrote:
->> This code was introduced with SMP support in commit 6a00d60127,
->> later commit 296af7c952 moved CPU parts to cpus.c but forgot this
->> code. Move now and simplify ifdef'ry.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  cpus.c | 18 ++++++++++++++++++
->>  exec.c | 22 ----------------------
->>  2 files changed, 18 insertions(+), 22 deletions(-)
->>
->> diff --git a/cpus.c b/cpus.c
->> index 41d1c5099f..472686cbbc 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -92,6 +92,11 @@ static unsigned int throttle_percentage;
->>  #define CPU_THROTTLE_PCT_MAX 99
->>  #define CPU_THROTTLE_TIMESLICE_NS 10000000
->>  
->> +CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
->> +
->> +/* current CPU in the current thread. It is only valid inside cpu_exec() */
->> +__thread CPUState *current_cpu;
->> +
->>  bool cpu_is_stopped(CPUState *cpu)
->>  {
->>      return cpu->stopped || !runstate_is_running();
->> @@ -134,6 +139,19 @@ static bool all_cpu_threads_idle(void)
->>      return true;
->>  }
->>  
->> +CPUState *qemu_get_cpu(int index)
->> +{
->> +    CPUState *cpu;
->> +
->> +    CPU_FOREACH(cpu) {
->> +        if (cpu->cpu_index == index) {
->> +            return cpu;
->> +        }
->> +    }
->> +
->> +    return NULL;
->> +}
->> +
->>  /***********************************************************/
->>  /* guest cycle counter */
->>  
->> diff --git a/exec.c b/exec.c
->> index 21926dc9c7..997b7db15f 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -98,12 +98,6 @@ AddressSpace address_space_memory;
->>  static MemoryRegion io_mem_unassigned;
->>  #endif
->>  
->> -CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
->> -
->> -/* current CPU in the current thread. It is only valid inside
->> -   cpu_exec() */
->> -__thread CPUState *current_cpu;
->> -
->>  uintptr_t qemu_host_page_size;
->>  intptr_t qemu_host_page_mask;
->>  
->> @@ -832,22 +826,6 @@ const VMStateDescription vmstate_cpu_common = {
->>      }
->>  };
->>  
->> -#endif
->> -
->> -CPUState *qemu_get_cpu(int index)
->> -{
->> -    CPUState *cpu;
->> -
->> -    CPU_FOREACH(cpu) {
->> -        if (cpu->cpu_index == index) {
->> -            return cpu;
->> -        }
->> -    }
->> -
->> -    return NULL;
->> -}
->> -
->> -#if !defined(CONFIG_USER_ONLY)
->>  void cpu_address_space_init(CPUState *cpu, int asidx,
->>                              const char *prefix, MemoryRegion *mr)
->>  {
->>
+On Wed, Jul 01, 2020 at 03:58:19PM +0200, Cornelia Huck wrote:
+> On Tue, 30 Jun 2020 09:02:31 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Queued, thanks.
+> > On Tue, Jun 30, 2020 at 01:30:43PM +0200, Cornelia Huck wrote:
+> > > On Tue, 30 Jun 2020 06:45:42 -0400
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Tue, Jun 30, 2020 at 11:35:27AM +0200, Cornelia Huck wrote:  
 > 
-> Paolo
+> > > > > First, I noticed that virtio-iommu does not force virtio-1, either; I
+> > > > > think it should? Eric?
+> > > > > 
+> > > > > Then, there's the mechanism using different names for transitional and
+> > > > > non-transitional devices. Devices that support both usually define both
+> > > > > names (with disable_legacy and disable_modern set appropriately) and a
+> > > > > base name (where the properties can be set manually for the desired
+> > > > > effect). Most virtio-1 only devices set neither the non-transitional
+> > > > > nor the transitional name and rely on virtio_pci_force_virtio_1() to
+> > > > > disable legacy support. But there are outliers:
+> > > > > 
+> > > > > * this device: it has only a non-transitional name
+> > > > >   ("vhost-user-fs-pci"), which means we automatically get the correct
+> > > > >   configuration; in order to define a transitional/legacy device, you
+> > > > >   would need to use the base name "vhost-user-fs-pci-base" explicitly,
+> > > > >   and it's unlikely that someone has been doing that.
+> > > > > * virtio-iommu (which I *think* is a virtio-1 only device): it defines
+> > > > >   the full set of transitional, non-transitional, and base names.
+> > > > > 
+> > > > > How should we proceed?
+> > > > > * With this patch here, we can fence off the very unlikely possibility
+> > > > >   of somebody configuring a non-modern virtio-fs device for pci. We
+> > > > >   probably should do it, but I don't think we need compat handling.
+> > > > > * For virtio-iommu, we should get an agreement what the desired state
+> > > > >   is. If it really should be modern only, we need compat handling, as
+> > > > >   the device had been added in 5.0. (And we need to figure out how to
+> > > > >   apply that compat handling.)    
+> > > > 
+> > > > 
+> > > > Well I know it's not really used on x86 yet, so no problem there.
+> > > > 
+> > > > Which machines are actually affected?  
+> > > 
+> > > I'd suspect ARM, but breaking even a subset is not nice.  
+> > 
+> > OK so MMIO does not have transitional at all right?
 > 
+> IIRC, yes.
 > 
+> But I think there are ARM machines that use virtio-pci as well, right?
 
-Wait... this is in exec.c because cpus.c is not linked into user-mode
-emulators.
 
-Paolo
+Right :(
+
+I guess we do need a compat property for that.
+
+
+-- 
+MST
+
 
