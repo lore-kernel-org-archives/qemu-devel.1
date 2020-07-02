@@ -2,110 +2,92 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1FAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3C3C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56A820772
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56A820772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6686E20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 12:55:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZroHUwXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6686E20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqyg4-0003jq-8S
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:50:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52304)
+	id 1jqykd-0005ag-MY
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 08:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jqyfP-0003BU-Je
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:50:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50942
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jqyfM-0008GF-QE
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:50:15 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 062CWYXY038237
- for <qemu-devel@nongnu.org>; Thu, 2 Jul 2020 08:50:11 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 320t3gdp6b-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 08:50:11 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062CfAl2093046
- for <qemu-devel@nongnu.org>; Thu, 2 Jul 2020 08:50:10 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0b-001b2d01.pphosted.com with ESMTP id 320t3gdp61-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 02 Jul 2020 08:50:10 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062CeaLu016296;
- Thu, 2 Jul 2020 12:50:10 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma05wdc.us.ibm.com with ESMTP id 31wwr98bc3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 02 Jul 2020 12:50:10 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 062Co9HC61735254
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 2 Jul 2020 12:50:09 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6514E6A047;
- Thu,  2 Jul 2020 12:50:09 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EC56B6A04F;
- Thu,  2 Jul 2020 12:50:08 +0000 (GMT)
-Received: from [9.160.82.151] (unknown [9.160.82.151])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu,  2 Jul 2020 12:50:08 +0000 (GMT)
-Subject: Re: [PATCH 2/2] configure: add support for Control-Flow Integrity
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200702054948.10257-1-dbuono@linux.vnet.ibm.com>
- <20200702054948.10257-3-dbuono@linux.vnet.ibm.com>
- <20200702095252.GF1888119@redhat.com>
-From: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Message-ID: <0ed44c55-1f5d-6866-9555-82134ef628fb@linux.vnet.ibm.com>
-Date: Thu, 2 Jul 2020 08:50:08 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqyjx-0004vc-8t
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:54:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52327
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jqyju-0003uc-MK
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 08:54:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593694493;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sjIR17RXyrp9rt77O9z67JZAZOIw0bB/tG2j/Aq/3M8=;
+ b=ZroHUwXD9Nj2Y1qlD41P4RX0lcKILZ1FwDhenibH4TwMPNJgiGNqsnpPdNcT3ndvtoAK1q
+ 4Cy6KcfBEF+s1wIZ4Thwf9E6leXYzEhVospYcbIj3fhWvljOcrb3+Mig4DvOpd7mhckB0V
+ WgBK2iIBu6PygjPnOWf3pcpwf/J22qY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-M9os4lUqMzW6F8ZvvrnewA-1; Thu, 02 Jul 2020 08:54:49 -0400
+X-MC-Unique: M9os4lUqMzW6F8ZvvrnewA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6D058BD306;
+ Thu,  2 Jul 2020 12:54:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CB9060CD3;
+ Thu,  2 Jul 2020 12:54:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id EE3F511384A6; Thu,  2 Jul 2020 14:54:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 07/46] error: Avoid more error_propagate() when error is
+ not used here
+References: <20200624164344.3778251-1-armbru@redhat.com>
+ <20200624164344.3778251-8-armbru@redhat.com>
+ <aa48ada1-2712-e658-6c36-440b402b046a@virtuozzo.com>
+ <878sg8r9bp.fsf@dusky.pond.sub.org>
+Date: Thu, 02 Jul 2020 14:54:46 +0200
+In-Reply-To: <878sg8r9bp.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Sat, 27 Jun 2020 14:18:18 +0200")
+Message-ID: <877dvm9iw9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200702095252.GF1888119@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-02_05:2020-07-02,
- 2020-07-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
- cotscore=-2147483648 adultscore=0 phishscore=0 clxscore=1015 mlxscore=0
- priorityscore=1501 spamscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007020089
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 08:50:11
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,124 +100,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Markus Armbruster <armbru@redhat.com> writes:
 
-
-On 7/2/2020 5:52 AM, Daniel P. Berrangé wrote:
-> On Thu, Jul 02, 2020 at 01:49:48AM -0400, Daniele Buono wrote:
->> This patch adds a flag to enable/disable control flow integrity checks
->> on indirect function calls. This feature is only provided by LLVM/Clang
->> v3.9 or higher, and only allows indirect function calls to functions
->> with compatible signatures.
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>
+>> 24.06.2020 19:43, Markus Armbruster wrote:
+>>> When all we do with an Error we receive into a local variable is
+>>> propagating to somewhere else, we can just as well receive it there
+>>> right away.  The previous commit did that for simple cases with
+>>> Coccinelle.  Do it for a few more manually.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>   blockdev.c     |  5 +----
+>>>   hw/core/numa.c | 44 ++++++++++++++------------------------------
+>>>   qdev-monitor.c | 11 ++++-------
+>>>   3 files changed, 19 insertions(+), 41 deletions(-)
+>>>
+>>> diff --git a/blockdev.c b/blockdev.c
+>>> index b66863c42a..73736a4eaf 100644
+>>> --- a/blockdev.c
+>>> +++ b/blockdev.c
+>>> @@ -1009,13 +1009,10 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+>>>       }
+>>>         /* Actual block device init: Functionality shared with
+>>> blockdev-add */
+>>> -    blk = blockdev_init(filename, bs_opts, &local_err);
+>>> +    blk = blockdev_init(filename, bs_opts, errp);
+>>>       bs_opts = NULL;
+>>>       if (!blk) {
+>>> -        error_propagate(errp, local_err);
+>>>           goto fail;
+>>> -    } else {
+>>> -        assert(!local_err);
+>>>       }
+>>>         /* Create legacy DriveInfo */
+>>> diff --git a/hw/core/numa.c b/hw/core/numa.c
+>>> index 5f81900f88..aa8c6be210 100644
+>>> --- a/hw/core/numa.c
+>>> +++ b/hw/core/numa.c
+>>> @@ -449,40 +449,33 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
+>>>     void set_numa_options(MachineState *ms, NumaOptions *object,
+>>> Error **errp)
+>>>   {
+>>> -    Error *err = NULL;
+>>> -
+>>>       if (!ms->numa_state) {
+>>>           error_setg(errp, "NUMA is not supported by this machine-type");
+>>> -        goto end;
+>>> +        return;
+>>>       }
+>>>         switch (object->type) {
+>>>       case NUMA_OPTIONS_TYPE_NODE:
+>>> -        parse_numa_node(ms, &object->u.node, &err);
+>>> -        if (err) {
+>>> -            goto end;
+>>> -        }
+>>> +        parse_numa_node(ms, &object->u.node, errp);
+>>>           break;
 >>
->> We also add an option to enable a debugging version of cfi, with verbose
->> output in case of a CFI violation.
->>
->> CFI on indirect function calls does not support calls to functions in
->> shared libraries (since they were not known at compile time), and such
->> calls are forbidden. QEMU relies on dlopen/dlsym when using modules,
->> so we make modules incompatible with CFI.
->>
->> We introduce a blacklist file, to disable CFI checks in a limited number
->> of TCG functions.
->>
->> The feature relies on link-time optimization (lto), which requires the
->> use of the gold linker, and the LLVM versions of ar, ranlib and nm.
->> This patch take care of checking that all the compiler toolchain
->> dependencies are met.
->>
->> Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
->> ---
->>   cfi-blacklist.txt |  27 +++++++
->>   configure         | 177 ++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 204 insertions(+)
->>   create mode 100644 cfi-blacklist.txt
->>
->> diff --git a/cfi-blacklist.txt b/cfi-blacklist.txt
->> new file mode 100644
->> index 0000000000..bf804431a5
->> --- /dev/null
->> +++ b/cfi-blacklist.txt
->> @@ -0,0 +1,27 @@
->> +# List of functions that should not be compiled with Control-Flow Integrity
->> +
->> +[cfi-icall]
->> +# TCG creates binary blobs at runtime, with the transformed code.
->> +# When it's time to execute it, the code is called with an indirect function
->> +# call. Since such function did not exist at compile time, the runtime has no
->> +# way to verify its signature. Disable CFI checks in the function that calls
->> +# the binary blob
->> +fun:cpu_tb_exec
->> +
->> +# TCI (Tiny Compiler Interpreter) is an interpreter for TCG pseudo code.
->> +# One possible operation in the pseudo code is a call to binary code.
->> +# Therefore, disable CFI checks in the interpreter function
->> +fun:tcg_qemu_tb_exec
->> +
->> +# TCG Plugins Callback Functions. The mechanism rely on opening external
->> +# shared libraries at runtime and get pointers to functions in such libraries
->> +# Since these pointers are external to the QEMU binary, the runtime cannot
->> +# verify their signature. Disable CFI Checks in all the functions that use
->> +# such pointers.
->> +fun:plugin_vcpu_cb__simple
->> +fun:plugin_cb__simple
->> +fun:plugin_cb__udata
->> +fun:qemu_plugin_tb_trans_cb
->> +fun:qemu_plugin_vcpu_syscall
->> +fun:qemu_plugin_vcpu_syscall_ret
->> +fun:plugin_load
-> 
-> The need to maintain this list of functions makes me feel very
-> uneasy.
-> 
-> How can we have any confidence that this list of functions is
-> accurate ? How will maintainers ensure that they correctly update
-> it as they are writing/changing code, and how will they test the
-> result ?
-> 
-> It feels like it has the same general maint problem as the original
-> seccomp code we used, where we were never confident we had added
-> the right exceptions to let QEMU run without crashing when users
-> tickled some feature we forgot about.
-> 
-> 
-> Regards,
-> Daniel
-> 
+>> Could we use return here and and for other "break" operators here, to stress, that we
+>> are not going to do something more in case of failure (as well as in case of
+>> success)? To prevent the future addition of some code after the switch without
+>> handling the error carefully here.
+>
+> Can do.
 
-I agree with you that keeping that list updated is a daunting task. In 
-my opinion, however, it is not as difficult as a seccomp filter, for the 
-following reasons:
+Second thoughts: I'd prefer not to mess with it now.
 
-1) Seccomp covers everything that runs in your process, including shared 
-libraries that you have no control over. CFI covers only the code in the 
-QEMU binary. So at least we don't have to guess what other libraries 
-used by QEMU will or won't do during execution.
+The sane way to add code after the switch is to make the
+parse_numa_FOO() return bool, then bail out like this:
 
-2) With seccomp you have to filter behavior that, while admissible, 
-should not happen in your code. CFI can be seen as a run-time type 
-checking system; if the signature of the function is wrong, that is a 
-coding error... in theory. In practice, there is a corner-case because 
-the type checking doesn't know the signature of code loaded or written 
-at run-time, and that is why you have to use a CFI filter.
+             if (!parse_numa_node(ms, &object->u.node, errp)) {
+                 return;
+             }
 
-So yes, there is risk, but IMHO it's not as high as in seccomp.
+Too much for me right now.  I'm having a hard time getting this ready in
+time of the freeze.  We can always improve on top.
 
-I think with a bit of education, it would be easy to spot red flags in 
-new code.
-As for education/testing... I can definitely work on a doc to be put in 
-docs/devel.
-Testing for CFI violations may be more difficult, however if a test code 
-that exercises it is written in tests/, compiling QEMU with CFI and 
-running the test should be sufficient to hit the violation.
-I also wonder if this is something that could be put in the fuzzing 
-environment. It would probably also help in finding coding error in 
-corner cases quicker.
+[...]
 
-Regards,
-Daniele
 
