@@ -2,88 +2,74 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4083C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6F9C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:34:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC1C20781
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:34:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L9tEKTUw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC1C20781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 245C020781
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:34:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245C020781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1ED-0003Yq-DX
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43650)
+	id 1jr1Ej-0004Jl-DY
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:34:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jr18B-0002B8-M2
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:28:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22243
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jr189-0006VR-Ej
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:28:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593703684;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QxoFW6hoZksDABSpmYqYrKiiIan582I8JtfglTl03eI=;
- b=L9tEKTUw4wZ2J2019brbzqnrl8g9GSZUWyWi89D0QzYygnzI2c9zCb5oDRsVW+TPr7pInL
- sqBetmuGKHGvEiPhyLAezWi2h4QBkQDaEftrfoREVgfi7RD+eNTrVcPb4uxbug1d/2X5QR
- 9bMLLm0QtrxZ5fqRsDiElo3/PP57yvg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-Ijy_va28O9CYCORRwxcXZQ-1; Thu, 02 Jul 2020 11:28:03 -0400
-X-MC-Unique: Ijy_va28O9CYCORRwxcXZQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 973FC8CA881;
- Thu,  2 Jul 2020 15:28:01 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C901F5DD63;
- Thu,  2 Jul 2020 15:27:58 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH v2 8/9] hw/arm/smmuv3: Get prepared for range invalidation
-Date: Thu,  2 Jul 2020 17:26:58 +0200
-Message-Id: <20200702152659.8522-9-eric.auger@redhat.com>
-In-Reply-To: <20200702152659.8522-1-eric.auger@redhat.com>
-References: <20200702152659.8522-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17Y-0000VW-Cj
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:28 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:55509)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17U-0006Iw-KR
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:28 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1Ma1oK-1jKzi03uVg-00VxzB; Thu, 02 Jul 2020 17:27:21 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 11/12] linux-user: Add strace support for printing arguments
+ of ioctl()
+Date: Thu,  2 Jul 2020 17:27:09 +0200
+Message-Id: <20200702152710.84602-12-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
+References: <20200702152710.84602-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Provags-ID: V03:K1:E+0dm+HWfCguEDzHrtn8eQbhZFfat0ROl5K0fA5A9/w8sctK+RM
+ Xo06laWCKAeFZylufldzBYcMjZmgycJOp+Z6Zddg4T+g/KkRp72oYKfuf0B5MKRbjqoTgXg
+ 1/c9oy8DrEbnAfZ98Px4/A3ZuEKlETEwNTqXIBeNGsRwv61WkufbKBS8tVZ9g4MypmWDTpa
+ oRhx325XfXnT4HuRWRS1w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:JLhb5A2y2mw=:9dXDTE5bDUsN2X9M46nbqO
+ hTrKTXSTkb50uL06jkyu2kfptRz8SMDC0LXWszYUIqirLu5oeFOvQE7PrRCdNwr2ySk0U+OS8
+ 15Naz9rCcy/Z7bY+tWNWwvDsHVa/eqo+4qRWUgmPKnwGz15ESGpBZeYzxMMG7gHLMhFahGu2X
+ uwPyy+NkL6gXGr6+XdPSG6gL4E/m5XgiJnWfsZCiAcQwyhzczUoaEifL87KaGpJdKyw/RPE4J
+ 0ipt6Te3B5ILAchNVc/XH4pSEvQkniCxCDV2STsojhoTXAezEO6BJGPckW+DDY9S1sf/jClHw
+ +fgNJmWBcuvaMfoniXGQGifISVVvAyDoWU6623Co2DOLVW39dRj9MaZtBEnzZH2JfcFTNzKB5
+ pKgUkJ7L0xWUwAXENShwsCE0hMTQ0HKYZ8akZK+G7UpZyV5ZLbCFA2mx5d5h95pwOpvRmW72O
+ 2sni7DL4ExdtdQC5AKGQa91NiZgYJ2YopVnKroE5W1fnRLlAJ3XDuZRgr/mbA8MSYEbO7+FWE
+ JxNcfopPavT/k6BAIWgjivx8x18mtVrn199GUjUrXbSBkvBsyJjvSe6q5UmCjx7PlXGBIlqEC
+ R8zJJCWWp3A263zghCvkUhifytdy8srYnjaRYXRQYWd9XYgsMBrn0vPjHioydFicn40F96raS
+ 9RB6auCHrRrWdo92rLsRzYr9ZswNcYJhWLVm4iImHak4DXq4XXmm4GmnPsKf73tZ71qnAQ+0h
+ 6SfqD5qxh8X0aB2pi4NSjCYx2UI889sIDhDJHxjnBCkeIU35W7yQucQ5Gnyy2VnVaVzW7cNJj
+ io0En4lxZ+1ZOZebnDndMz2Y4cxANdZ8lcF5VSkMKfojAgVTEQ=
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:27:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,246 +82,451 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
- mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
- will@kernel.org
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enhance the smmu_iotlb_inv_iova() helper with range invalidation.
-This uses the new fields passed in the NH_VA and NH_VAA commands:
-the size of the range, the level and the granule.
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-As NH_VA and NH_VAA both use those fields, their decoding and
-handling is factorized in a new smmuv3_s1_range_inval() helper.
+This patch implements functionality for strace argument printing for ioctls.
+When running ioctls through qemu with "-strace", they get printed in format:
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+    "ioctl(fd_num,0x*,0x*) = ret_value"
+
+where the request code an the ioctl's third argument get printed in a hexadicemal
+format. This patch changes that by enabling strace to print both the request code
+name and the contents of the third argument. For example, when running ioctl
+RTC_SET_TIME with "-strace", with changes from this patch, it gets printed in
+this way:
+
+    "ioctl(3,RTC_SET_TIME,{12,13,15,20,10,119,0,0,0}) = 0"
+
+In case of IOC_R type ioctls, the contents of the third argument get printed
+after the return value, and the argument inside the ioctl call gets printed
+as pointer in hexadecimal format. For example, when running RTC_RD_TIME with
+"-strace", with changes from this patch, it gets printed in this way:
+
+    "ioctl(3,RTC_RD_TIME,0x40800374) = 0 ({22,9,13,11,5,120,0,0,0})"
+
+In case of IOC_RW type ioctls, the contents of the third argument get printed
+both inside the ioctl call and after the return value.
+
+Implementation notes:
+
+    Functions "print_ioctl()" and "print_syscall_ret_ioctl()", that are defined
+    in "strace.c", are listed in file "strace.list" as "call" and "result"
+    value for ioctl. Structure definition "IOCTLEntry" as well as predefined
+    values for IOC_R, IOC_W and IOC_RW were cut and pasted from file "syscall.c"
+    to file "qemu.h" so that they can be used by these functions to print the
+    contents of the third ioctl argument. Also, the "static" identifier for array
+    "ioctl_entries[]" was removed and this array was declared as "extern" in "qemu.h"
+    so that it can also be used by these functions. To decode the structure type
+    of the ioctl third argument, function "thunk_print()" was defined in file
+    "thunk.c" and its definition is somewhat simillar to that of function
+    "thunk_convert()".
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200619124727.18080-3-filip.bozuta@syrmia.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/arm/smmuv3-internal.h     |  4 +++
- include/hw/arm/smmu-common.h |  3 +-
- hw/arm/smmu-common.c         | 28 ++++++++++++----
- hw/arm/smmuv3.c              | 64 +++++++++++++++++++++++-------------
- hw/arm/trace-events          |  4 +--
- 5 files changed, 71 insertions(+), 32 deletions(-)
+ include/exec/user/thunk.h |   1 +
+ linux-user/qemu.h         |  20 +++++
+ linux-user/strace.c       | 107 ++++++++++++++++++++++++++
+ linux-user/strace.list    |   3 +-
+ linux-user/syscall.c      |  20 +----
+ thunk.c                   | 154 ++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 285 insertions(+), 20 deletions(-)
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index 4112394129..5babf72f7d 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -298,6 +298,8 @@ enum { /* Command completion notification */
+diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+index eae2c27f99da..7992475c9f8a 100644
+--- a/include/exec/user/thunk.h
++++ b/include/exec/user/thunk.h
+@@ -73,6 +73,7 @@ void thunk_register_struct_direct(int id, const char *name,
+                                   const StructEntry *se1);
+ const argtype *thunk_convert(void *dst, const void *src,
+                              const argtype *type_ptr, int to_host);
++const argtype *thunk_print(void *arg, const argtype *type_ptr);
+ 
+ extern StructEntry *struct_entries;
+ 
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index be67391ba49d..5c964389c101 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -184,6 +184,26 @@ struct linux_binprm {
+         int (*core_dump)(int, const CPUArchState *); /* coredump routine */
  };
  
- #define CMD_TYPE(x)         extract32((x)->word[0], 0 , 8)
-+#define CMD_NUM(x)          extract32((x)->word[0], 12 , 5)
-+#define CMD_SCALE(x)        extract32((x)->word[0], 20 , 5)
- #define CMD_SSEC(x)         extract32((x)->word[0], 10, 1)
- #define CMD_SSV(x)          extract32((x)->word[0], 11, 1)
- #define CMD_RESUME_AC(x)    extract32((x)->word[0], 12, 1)
-@@ -310,6 +312,8 @@ enum { /* Command completion notification */
- #define CMD_RESUME_STAG(x)  extract32((x)->word[2], 0 , 16)
- #define CMD_RESP(x)         extract32((x)->word[2], 11, 2)
- #define CMD_LEAF(x)         extract32((x)->word[2], 0 , 1)
-+#define CMD_TTL(x)          extract32((x)->word[2], 8 , 2)
-+#define CMD_TG(x)           extract32((x)->word[2], 10, 2)
- #define CMD_STE_RANGE(x)    extract32((x)->word[2], 0 , 5)
- #define CMD_ADDR(x) ({                                        \
-             uint64_t high = (uint64_t)(x)->word[3];           \
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index cc228b51b4..82bd9a4e8c 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -163,7 +163,8 @@ SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova,
-                                uint8_t tg, uint8_t level);
- void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
--void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova);
-+void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova,
-+                         uint8_t tg, uint64_t num_pages, uint8_t ttl);
++typedef struct IOCTLEntry IOCTLEntry;
++
++typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
++                             int fd, int cmd, abi_long arg);
++
++struct IOCTLEntry {
++    int target_cmd;
++    unsigned int host_cmd;
++    const char *name;
++    int access;
++    do_ioctl_fn *do_ioctl;
++    const argtype arg_type[5];
++};
++
++extern IOCTLEntry ioctl_entries[];
++
++#define IOC_R 0x0001
++#define IOC_W 0x0002
++#define IOC_RW (IOC_R | IOC_W)
++
+ void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
+ abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
+                               abi_ulong stringp, int push_ptr);
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 32e5e987acbb..5235b2260cdd 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -860,6 +860,44 @@ print_syscall_ret_listxattr(const struct syscallname *name, abi_long ret,
+ #define print_syscall_ret_flistxattr     print_syscall_ret_listxattr
+ #endif
  
- /* Unmap the range of all the notifiers registered to any IOMMU mr */
- void smmu_inv_notifiers_all(SMMUState *s);
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 5c14127a24..198ed6a928 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -127,18 +127,34 @@ static gboolean smmu_hash_remove_by_asid_iova(gpointer key, gpointer value,
- 
-     if (info->asid >= 0) {
-         return (info->asid == SMMU_IOTLB_ASID(*iotlb_key)) &&
--                ((info->iova & ~entry->addr_mask) == entry->iova);
-+               (((entry->iova & ~info->mask) == info->iova) ||
-+               ((info->iova & ~entry->addr_mask) ==  entry->iova));
-     } else {
--        return (info->iova & ~entry->addr_mask) == entry->iova;
-+        return (((entry->iova & ~info->mask) == info->iova) ||
-+               ((info->iova & ~entry->addr_mask) ==  entry->iova));
-     }
++#ifdef TARGET_NR_ioctl
++static void
++print_syscall_ret_ioctl(const struct syscallname *name, abi_long ret,
++                        abi_long arg0, abi_long arg1, abi_long arg2,
++                        abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_err(ret);
++
++    if (ret >= 0) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++
++        const IOCTLEntry *ie;
++        const argtype *arg_type;
++        void *argptr;
++        int target_size;
++
++        for (ie = ioctl_entries; ie->target_cmd != 0; ie++) {
++            if (ie->target_cmd == arg1) {
++                break;
++            }
++        }
++
++        if (ie->target_cmd == arg1 &&
++           (ie->access == IOC_R || ie->access == IOC_RW)) {
++            arg_type = ie->arg_type;
++            qemu_log(" (");
++            arg_type++;
++            target_size = thunk_type_size(arg_type, 0);
++            argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
++            thunk_print(argptr, arg_type);
++            unlock_user(argptr, arg2, target_size);
++            qemu_log(")");
++        }
++    }
++    qemu_log("\n");
++}
++#endif
++
+ UNUSED static struct flags access_flags[] = {
+     FLAG_GENERIC(F_OK),
+     FLAG_GENERIC(R_OK),
+@@ -3026,6 +3064,75 @@ print_statx(const struct syscallname *name,
  }
+ #endif
  
--inline void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova)
-+inline void
-+smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova,
-+                    uint8_t tg, uint64_t num_pages, uint8_t ttl)
- {
--    SMMUIOTLBPageInvInfo info = {.asid = asid, .iova = iova};
-+    if (ttl && (num_pages == 1)) {
-+        uint64_t key = smmu_get_iotlb_key(asid, iova, tg, ttl);
- 
--    trace_smmu_iotlb_inv_iova(asid, iova);
--    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid_iova, &info);
-+        g_hash_table_remove(s->iotlb, &key);
++#ifdef TARGET_NR_ioctl
++static void
++print_ioctl(const struct syscallname *name,
++            abi_long arg0, abi_long arg1, abi_long arg2,
++            abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++
++    const IOCTLEntry *ie;
++    const argtype *arg_type;
++    void *argptr;
++    int target_size;
++
++    for (ie = ioctl_entries; ie->target_cmd != 0; ie++) {
++        if (ie->target_cmd == arg1) {
++            break;
++        }
++    }
++
++    if (ie->target_cmd == 0) {
++        print_raw_param("%#x", arg1, 0);
++        print_raw_param("%#x", arg2, 1);
 +    } else {
-+            /* if tg is not set we use 4KB range invalidation */
-+            uint8_t granule = tg ? tg * 2 + 10 : 12;
++        qemu_log("%s", ie->name);
++        arg_type = ie->arg_type;
 +
-+            SMMUIOTLBPageInvInfo info = {
-+                 .asid = asid, .iova = iova,
-+                 .mask = (num_pages * 1 << granule) - 1};
++        if (arg_type[0] != TYPE_NULL) {
++            qemu_log(",");
 +
-+            g_hash_table_foreach_remove(s->iotlb,
-+                                        smmu_hash_remove_by_asid_iova,
-+                                        &info);
++            switch (arg_type[0]) {
++            case TYPE_PTRVOID:
++                print_pointer(arg2, 1);
++                break;
++            case TYPE_CHAR:
++            case TYPE_SHORT:
++            case TYPE_INT:
++                print_raw_param("%d", arg2, 1);
++                break;
++            case TYPE_LONG:
++                print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
++                break;
++            case TYPE_ULONG:
++                print_raw_param(TARGET_ABI_FMT_lu, arg2, 1);
++                break;
++            case TYPE_PTR:
++                switch (ie->access) {
++                case IOC_R:
++                    print_pointer(arg2, 1);
++                    break;
++                case IOC_W:
++                case IOC_RW:
++                    arg_type++;
++                    target_size = thunk_type_size(arg_type, 0);
++                    argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
++                    thunk_print(argptr, arg_type);
++                    unlock_user(argptr, arg2, target_size);
++                    break;
++                }
++                break;
++            default:
++                g_assert_not_reached();
++            }
++        }
 +    }
- }
- 
- inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index e4a2cea7ad..89ab11fc36 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -785,42 +785,49 @@ epilogue:
-  * @n: notifier to be called
-  * @asid: address space ID or negative value if we don't care
-  * @iova: iova
-+ * @tg: translation granule (if communicated through range invalidation)
-+ * @num_pages: number of @granule sized pages (if tg != 0), otherwise 1
++    print_syscall_epilogue(name);
++}
++#endif
++
+ /*
+  * An array of all of the syscalls we know about
   */
- static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-                                IOMMUNotifier *n,
--                               int asid,
--                               dma_addr_t iova)
-+                               int asid, dma_addr_t iova,
-+                               uint8_t tg, uint64_t num_pages)
- {
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
--    SMMUEventInfo event = {.inval_ste_allowed = true};
--    SMMUTransTableInfo *tt;
--    SMMUTransCfg *cfg;
-     IOMMUTLBEntry entry;
-+    uint8_t granule = tg;
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index ebb713252ce3..a04706a524ae 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -433,7 +433,8 @@
+ { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ioctl
+-{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
++{ TARGET_NR_ioctl, "ioctl" , NULL, print_ioctl,
++                   print_syscall_ret_ioctl},
+ #endif
+ #ifdef TARGET_NR_io_destroy
+ { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 506b94a12c1e..82afadcea0e2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4481,24 +4481,6 @@ STRUCT_MAX
+ #undef STRUCT
+ #undef STRUCT_SPECIAL
  
--    cfg = smmuv3_get_config(sdev, &event);
--    if (!cfg) {
--        return;
--    }
-+    if (!tg) {
-+        SMMUEventInfo event = {.inval_ste_allowed = true};
-+        SMMUTransCfg *cfg = smmuv3_get_config(sdev, &event);
-+        SMMUTransTableInfo *tt;
+-typedef struct IOCTLEntry IOCTLEntry;
+-
+-typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                             int fd, int cmd, abi_long arg);
+-
+-struct IOCTLEntry {
+-    int target_cmd;
+-    unsigned int host_cmd;
+-    const char *name;
+-    int access;
+-    do_ioctl_fn *do_ioctl;
+-    const argtype arg_type[5];
+-};
+-
+-#define IOC_R 0x0001
+-#define IOC_W 0x0002
+-#define IOC_RW (IOC_R | IOC_W)
+-
+ #define MAX_STRUCT_SIZE 4096
  
--    if (asid >= 0 && cfg->asid != asid) {
--        return;
--    }
-+        if (!cfg) {
-+            return;
-+        }
+ #ifdef CONFIG_FIEMAP
+@@ -5374,7 +5356,7 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
  
--    tt = select_tt(cfg, iova);
--    if (!tt) {
--        return;
-+        if (asid >= 0 && cfg->asid != asid) {
-+            return;
-+        }
+ #endif
+ 
+-static IOCTLEntry ioctl_entries[] = {
++IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+ #define IOCTL_SPECIAL(cmd, access, dofn, ...)                      \
+diff --git a/thunk.c b/thunk.c
+index 7f31cffe0968..992a19b1c946 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -271,6 +271,160 @@ const argtype *thunk_convert(void *dst, const void *src,
+     return type_ptr;
+ }
+ 
++const argtype *thunk_print(void *arg, const argtype *type_ptr)
++{
++    int type;
 +
-+        tt = select_tt(cfg, iova);
-+        if (!tt) {
-+            return;
++    type = *type_ptr++;
++
++    switch (type) {
++    case TYPE_CHAR:
++        qemu_log("%c", *(uint8_t *)arg);
++        break;
++    case TYPE_SHORT:
++        qemu_log("%" PRId16, tswap16(*(uint16_t *)arg));
++        break;
++    case TYPE_INT:
++        qemu_log("%" PRId32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_LONGLONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONGLONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#if HOST_LONG_BITS == 32 && TARGET_ABI_BITS == 32
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu32, tswap32(*(uint32_t *))arg);
++        break;
++#elif HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 32
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++#elif HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#else
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#endif
++    case TYPE_OLDDEVT:
++    {
++        uint64_t val = 0;
++        switch (thunk_type_size(type_ptr - 1, 1)) {
++        case 2:
++            val = *(uint16_t *)arg;
++            break;
++        case 4:
++            val = *(uint32_t *)arg;
++            break;
++        case 8:
++            val = *(uint64_t *)arg;
++            break;
 +        }
-+        granule = tt->granule_sz;
-     }
- 
-     entry.target_as = &address_space_memory;
-     entry.iova = iova;
--    entry.addr_mask = (1 << tt->granule_sz) - 1;
-+    entry.addr_mask = num_pages * (1 << granule) - 1;
-     entry.perm = IOMMU_NONE;
- 
-     memory_region_notify_one(n, &entry);
- }
- 
--/* invalidate an asid/iova tuple in all mr's */
--static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-+/* invalidate an asid/iova range tuple in all mr's */
-+static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova,
-+                                      uint8_t tg, uint64_t num_pages)
- {
-     SMMUDevice *sdev;
- 
-@@ -828,28 +835,39 @@ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-         IOMMUMemoryRegion *mr = &sdev->iommu;
-         IOMMUNotifier *n;
- 
--        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-+        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova,
-+                                        tg, num_pages);
- 
-         IOMMU_NOTIFIER_FOREACH(n, mr) {
--            smmuv3_notify_iova(mr, n, asid, iova);
-+            smmuv3_notify_iova(mr, n, asid, iova, tg, num_pages);
-         }
-     }
- }
- 
- static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
- {
-+    uint8_t scale = 0, num = 0, ttl = 0;
-     dma_addr_t addr = CMD_ADDR(cmd);
-     uint8_t type = CMD_TYPE(cmd);
-     uint16_t vmid = CMD_VMID(cmd);
-     bool leaf = CMD_LEAF(cmd);
-+    uint8_t tg = CMD_TG(cmd);
-+    hwaddr num_pages = 1;
-     int asid = -1;
- 
-+    if (tg) {
-+        scale = CMD_SCALE(cmd);
-+        num = CMD_NUM(cmd);
-+        ttl = CMD_TTL(cmd);
-+        num_pages = (num + 1) * (1 << (scale));
++        switch (thunk_type_size(type_ptr - 1, 0)) {
++        case 2:
++            qemu_log("%" PRIu16, tswap16(val));
++            break;
++        case 4:
++            qemu_log("%" PRIu32, tswap32(val));
++            break;
++        case 8:
++            qemu_log("%" PRIu64, tswap64(val));
++            break;
++        }
 +    }
++    break;
++    case TYPE_ARRAY:
++        {
++            int i, array_length, arg_size;
++            uint8_t *a;
++            int is_string = 0;
 +
-     if (type == SMMU_CMD_TLBI_NH_VA) {
-         asid = CMD_ASID(cmd);
-     }
--    trace_smmuv3_s1_range_inval(vmid, asid, addr, leaf);
--    smmuv3_inv_notifiers_iova(s, asid, addr);
--    smmu_iotlb_inv_iova(s, asid, addr);
-+    trace_smmuv3_s1_range_inval(vmid, asid, addr, tg, num_pages, ttl, leaf);
-+    smmuv3_inv_notifiers_iova(s, asid, addr, tg, num_pages);
-+    smmu_iotlb_inv_iova(s, asid, addr, tg, num_pages, ttl);
- }
++            array_length = *type_ptr++;
++            arg_size = thunk_type_size(type_ptr, 0);
++            a = arg;
++
++            if (*type_ptr == TYPE_CHAR) {
++                qemu_log("\"");
++                is_string = 1;
++            } else {
++                qemu_log("[");
++            }
++
++            for (i = 0; i < array_length; i++) {
++                if (i > 0 && !is_string) {
++                    qemu_log(",");
++                }
++                thunk_print(a, type_ptr);
++                a += arg_size;
++            }
++
++            if (is_string) {
++                qemu_log("\"");
++            } else {
++                qemu_log("]");
++            }
++
++            type_ptr = thunk_type_next(type_ptr);
++        }
++        break;
++    case TYPE_STRUCT:
++        {
++            int i;
++            const StructEntry *se;
++            uint8_t  *a;
++            const argtype *field_types;
++            const int *arg_offsets;
++
++            se = struct_entries + *type_ptr++;
++            a = arg;
++
++            field_types = se->field_types;
++            arg_offsets = se->field_offsets[0];
++
++            qemu_log("{");
++            for (i = 0; i < se->nb_fields; i++) {
++                if (i > 0) {
++                    qemu_log(",");
++                }
++                field_types = thunk_print(a + arg_offsets[i], field_types);
++            }
++            qemu_log("}");
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return type_ptr;
++}
++
+ /* from em86 */
  
- static int smmuv3_cmdq_consume(SMMUv3State *s)
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index c219fe9e82..3d905e0f7d 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -45,11 +45,11 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
- smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
- smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
- smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
--smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
-+smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, uint8_t tg, uint64_t num_pages, uint8_t ttl, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" tg=%d num_pages=0x%"PRIx64" ttl=%d leaf=%d"
- smmuv3_cmdq_tlbi_nh(void) ""
- smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
- smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
- smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
--smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
-+smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova, uint8_t tg, uint64_t num_pages) "iommu mr=%s asid=%d iova=0x%"PRIx64" tg=%d num_pages=0x%"PRIx64
- 
+ /* Utility function: Table-driven functions to translate bitmasks
 -- 
-2.21.3
+2.26.2
 
 
