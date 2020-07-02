@@ -2,75 +2,88 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F04FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDBFC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:40:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C21BC20737
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:38:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C21BC20737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id DEF2220748
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:40:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+lRJs8A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF2220748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1IL-0003RY-2G
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:38:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43356)
+	id 1jr1Ka-00061s-6l
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:40:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17d-0000ht-1x
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:33 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:43027)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17Y-0006Jm-KZ
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:32 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MbAxU-1jFTNX29A8-00bbBZ; Thu, 02 Jul 2020 17:27:19 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 09/12] linux-user: Add strace support for printing arguments
- of fallocate()
-Date: Thu,  2 Jul 2020 17:27:07 +0200
-Message-Id: <20200702152710.84602-10-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
-References: <20200702152710.84602-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jr17p-0001FV-60
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50789
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jr17m-0006OY-TK
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593703662;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S3NFNYSrX7syMo104tWcXIgZ34cLFK5JYwxiQJRSUHU=;
+ b=b+lRJs8A7L0QFNZLab0v7olaqFPPNv0UWuEg6DfEU1GEKAfHQd7/E1xg2KdK+dg31j3mcz
+ hep0ZmHMNKfQ+xBj0ApW5a8L/gUhRjIIESgk4UP/oePVuzXnN9ECvaMUjz1fLGI5RTqkKi
+ +stRuw/hattmbtwKaj0ETC/YrJYi//I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-XpmiJm--NoWvDCE3vSfOoA-1; Thu, 02 Jul 2020 11:27:38 -0400
+X-MC-Unique: XpmiJm--NoWvDCE3vSfOoA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7C1C10059B4;
+ Thu,  2 Jul 2020 15:27:36 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2070F5DD61;
+ Thu,  2 Jul 2020 15:27:24 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v2 3/9] hw/arm/smmu: Introduce smmu_get_iotlb_key()
+Date: Thu,  2 Jul 2020 17:26:53 +0200
+Message-Id: <20200702152659.8522-4-eric.auger@redhat.com>
+In-Reply-To: <20200702152659.8522-1-eric.auger@redhat.com>
+References: <20200702152659.8522-1-eric.auger@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wAQbsdi2ybPskcxRUNZ0iiHDf3KChToM9lAyGJ/WqCrR5Cb3DwY
- dNx35lwhloNcujyEx42X/KuzYDqinGVW+C//Wzqg3zh9E456muP2XB9Tfm3rzDKlO6rJFQh
- JzlbX3eIZOR86s2YbcFGEMnembPeEZYFCp47rGsUAcCN2LVTIIEGKQPO4boTx2UelmfdE02
- 5iKm1C6Oo9jDU+niAF66w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:OkLfliOPCGo=:vuJPrLrM2cM0b8opczaD7p
- KHcsgFu/KT6l1vylxMksYvRoBdwNwHRl5huljwG+snoheC7lCyg3b4HlQU8otvRXyHHDeQX5v
- qtFm2DeVcJ+fA2cQ80c6ZBngSrSKm9VDjzBii6I8Odvwxv1WiXAQBJ4lzKE6hllbkyoUrHx8t
- 08aLjDTBRcq8iaye7nTiXeHZg0x4pCgczBbSh0K9ej8YWMCtv22jQAf70vo9rIoryHkB7x06I
- RXSj6jEOJfj1FVopYx6/Xv39LRLFQzKENEPw8korUcw+NrIKQprLphIneJudRx8SzhstvWBs6
- s2hWLS6XNpqHTPXfNefSd6rBUGyVUNbls50LRKpUwWf+rM84y0a8JZxYKrWoyoraU69prWbyn
- fOkJkYHJyebK69XX/3JPTMH/LxSFwzOGODIkiHehD6UfawtrivUbyqIXZb/b/fDNqO/F55vCp
- AqVH5Q7T9s9aic6a7Nouj9c1AR5sxEsq4v8uODmpVAlWhjKFAhRtIQww6W8p6vVCL/aNRw8rh
- uNLZOgvQ+XaN/LADXiDH1tGAOm8ZVML34tIc3Giy6t4nqR1r0U46jDztu9suHc4YfUv9J0l75
- tM+i5h4MgtvpI9ocD+eSX2oB99lrqzNzK9MqA4t21sbIJglCyuhzdExybo1NkL114Und308c3
- 74U/Cx16siGvMD9l4KFPn0nuc2n7euUCbQJYBqPgcxuHXjqPFU0chpb7atIalrwey9PEJWAMl
- 11haurRszZxZjcD7qxmJB6ARGJn61ULOL5g/ZJep0/Bhny11O0pFxTfJoj+kwBeHFuUboFMJo
- uUHcE6GZ6a1XiNKGZrf8JYBpbYoITVmV7QndD3q8Hl0gAAwQhg=
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 10:57:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,176 +96,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>, Riku Voipio <riku.voipio@iki.fi>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Introduce the smmu_get_iotlb_key() helper and the
+SMMU_IOTLB_ASID() macro. Also move smmu_get_iotlb_key and
+smmu_iotlb_key_hash in the IOTLB related code section.
 
-This patch implements strace argument printing functionality for following syscall:
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-    *fallocate - manipulate file space
-
-        int fallocate(int fd, int mode, off_t offset, off_t len)
-        man page: https://www.man7.org/linux/man-pages/man2/fallocate.2.html
-
-Implementation notes:
-
-    This syscall's second argument "mode" is composed of predefined values
-    which represent flags that determine the type of operation that is
-    to be performed on the file space. For that reason, a printing
-    function "print_fallocate" was stated in file "strace.list". This printing
-    function uses an already existing function "print_flags()" to print flags of
-    the "mode" argument. These flags are stated inside an array "falloc_flags"
-    that contains values of type "struct flags". These values are instantiated
-    using an existing macro "FLAG_GENERIC()". Most of these flags are defined
-    after kernel version 3.0 which is why they are enwrapped in an #ifdef
-    directive.
-    The syscall's third ant fourth argument are of type "off_t" which can
-    cause variations between 32/64-bit architectures. To handle this variation,
-    function "target_offset64()" was copied from file "strace.c" and used in
-    "print_fallocate" to print "off_t" arguments for 32-bit architectures.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200619123331.17387-7-filip.bozuta@syrmia.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/qemu.h      | 16 ++++++++++++++++
- linux-user/strace.c    | 40 ++++++++++++++++++++++++++++++++++++++++
- linux-user/strace.list |  2 +-
- linux-user/syscall.c   | 16 ----------------
- 4 files changed, 57 insertions(+), 17 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 8f938b8105b3..be67391ba49d 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -670,6 +670,22 @@ static inline int is_error(abi_long ret)
-     return (abi_ulong)ret >= (abi_ulong)(-4096);
+v1 -> v2:
+- creation
+---
+ hw/arm/smmu-internal.h       |  1 +
+ include/hw/arm/smmu-common.h |  1 +
+ hw/arm/smmu-common.c         | 66 ++++++++++++++++++++----------------
+ 3 files changed, 38 insertions(+), 30 deletions(-)
+
+diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
+index 7794d6d394..3104f768cd 100644
+--- a/hw/arm/smmu-internal.h
++++ b/hw/arm/smmu-internal.h
+@@ -96,4 +96,5 @@ uint64_t iova_level_offset(uint64_t iova, int inputsize,
+             MAKE_64BIT_MASK(0, gsz - 3);
  }
  
-+#if TARGET_ABI_BITS == 32
-+static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
-+{
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    return ((uint64_t)word0 << 32) | word1;
-+#else
-+    return ((uint64_t)word1 << 32) | word0;
-+#endif
-+}
-+#else /* TARGET_ABI_BITS == 32 */
-+static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
-+{
-+    return word0;
-+}
-+#endif /* TARGET_ABI_BITS != 32 */
-+
- /**
-  * preexit_cleanup: housekeeping before the guest exits
-  *
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 957f08f1adf2..32e5e987acbb 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1135,6 +1135,26 @@ UNUSED static struct flags statx_mask[] = {
-     FLAG_END,
- };
++#define SMMU_IOTLB_ASID(key) ((key).asid)
+ #endif
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 1dceec5cb1..5f9f3535d2 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -155,6 +155,7 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
  
-+UNUSED static struct flags falloc_flags[] = {
-+    FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
-+    FLAG_GENERIC(FALLOC_FL_PUNCH_HOLE),
-+#ifdef FALLOC_FL_NO_HIDE_STALE
-+    FLAG_GENERIC(FALLOC_FL_NO_HIDE_STALE),
-+#endif
-+#ifdef FALLOC_FL_COLLAPSE_RANGE
-+    FLAG_GENERIC(FALLOC_FL_COLLAPSE_RANGE),
-+#endif
-+#ifdef FALLOC_FL_ZERO_RANGE
-+    FLAG_GENERIC(FALLOC_FL_ZERO_RANGE),
-+#endif
-+#ifdef FALLOC_FL_INSERT_RANGE
-+    FLAG_GENERIC(FALLOC_FL_INSERT_RANGE),
-+#endif
-+#ifdef FALLOC_FL_UNSHARE_RANGE
-+    FLAG_GENERIC(FALLOC_FL_UNSHARE_RANGE),
-+#endif
-+};
-+
- /*
-  * print_xxx utility functions.  These are used to print syscall
-  * parameters in certain format.  All of these have parameter
-@@ -1552,6 +1572,26 @@ print_faccessat(const struct syscallname *name,
- }
- #endif
+ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
+ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+ void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index f3aa581f80..7dc8541e8b 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -32,10 +32,42 @@
  
-+#ifdef TARGET_NR_fallocate
-+static void
-+print_fallocate(const struct syscallname *name,
-+    abi_long arg0, abi_long arg1, abi_long arg2,
-+    abi_long arg3, abi_long arg4, abi_long arg5)
+ /* IOTLB Management */
+ 
++static guint smmu_iotlb_key_hash(gconstpointer v)
 +{
-+    print_syscall_prologue(name);
-+    print_raw_param("%d", arg0, 0);
-+    print_flags(falloc_flags, arg1, 0);
-+#if TARGET_ABI_BITS == 32
-+    print_raw_param("%" PRIu64, target_offset64(arg2, arg3), 0);
-+    print_raw_param("%" PRIu64, target_offset64(arg4, arg5), 1);
-+#else
-+    print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg3, 1);
-+#endif
-+    print_syscall_epilogue(name);
-+}
-+#endif
++    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
++    uint32_t a, b, c;
 +
- #ifdef TARGET_NR_fchmodat
- static void
- print_fchmodat(const struct syscallname *name,
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index e99030c9ef39..ebb713252ce3 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -182,7 +182,7 @@
- { TARGET_NR_fadvise64_64, "fadvise64_64" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_fallocate
--{ TARGET_NR_fallocate, "fallocate" , NULL, NULL, NULL },
-+{ TARGET_NR_fallocate, "fallocate" , NULL, print_fallocate, NULL },
- #endif
- #ifdef TARGET_NR_fanotify_init
- { TARGET_NR_fanotify_init, "fanotify_init" , NULL, NULL, NULL },
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1b971c06b270..506b94a12c1e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6712,22 +6712,6 @@ void syscall_init(void)
++    /* Jenkins hash */
++    a = b = c = JHASH_INITVAL + sizeof(*key);
++    a += key->asid;
++    b += extract64(key->iova, 0, 32);
++    c += extract64(key->iova, 32, 32);
++
++    __jhash_mix(a, b, c);
++    __jhash_final(a, b, c);
++
++    return c;
++}
++
++static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
++{
++    const SMMUIOTLBKey *k1 = v1;
++    const SMMUIOTLBKey *k2 = v2;
++
++    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
++}
++
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
++{
++    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++
++    return key;
++}
++
+ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+                                  hwaddr iova)
+ {
+-    SMMUIOTLBKey key = {.asid = cfg->asid, .iova = iova};
++    SMMUIOTLBKey key = smmu_get_iotlb_key(cfg->asid, iova);
+     IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
+ 
+     if (entry) {
+@@ -62,8 +94,7 @@ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
+         smmu_iotlb_inv_all(bs);
      }
+ 
+-    key->asid = cfg->asid;
+-    key->iova = entry->iova;
++    *key = smmu_get_iotlb_key(cfg->asid, entry->iova);
+     trace_smmu_iotlb_insert(cfg->asid, entry->iova);
+     g_hash_table_insert(bs->iotlb, key, entry);
+ }
+@@ -80,12 +111,12 @@ static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
+     uint16_t asid = *(uint16_t *)user_data;
+     SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
+ 
+-    return iotlb_key->asid == asid;
++    return SMMU_IOTLB_ASID(*iotlb_key) == asid;
  }
  
--#if TARGET_ABI_BITS == 32
--static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
+ inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
+ {
+-    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++    SMMUIOTLBKey key = smmu_get_iotlb_key(asid, iova);
+ 
+     trace_smmu_iotlb_inv_iova(asid, iova);
+     g_hash_table_remove(s->iotlb, &key);
+@@ -383,31 +414,6 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+     return NULL;
+ }
+ 
+-static guint smmu_iotlb_key_hash(gconstpointer v)
 -{
--#ifdef TARGET_WORDS_BIGENDIAN
--    return ((uint64_t)word0 << 32) | word1;
--#else
--    return ((uint64_t)word1 << 32) | word0;
--#endif
--}
--#else /* TARGET_ABI_BITS == 32 */
--static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
--{
--    return word0;
--}
--#endif /* TARGET_ABI_BITS != 32 */
+-    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
+-    uint32_t a, b, c;
 -
- #ifdef TARGET_NR_truncate64
- static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
-                                          abi_long arg2,
+-    /* Jenkins hash */
+-    a = b = c = JHASH_INITVAL + sizeof(*key);
+-    a += key->asid;
+-    b += extract64(key->iova, 0, 32);
+-    c += extract64(key->iova, 32, 32);
+-
+-    __jhash_mix(a, b, c);
+-    __jhash_final(a, b, c);
+-
+-    return c;
+-}
+-
+-static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+-{
+-    const SMMUIOTLBKey *k1 = v1;
+-    const SMMUIOTLBKey *k2 = v2;
+-
+-    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
+-}
+-
+ /* Unmap the whole notifier's range */
+ static void smmu_unmap_notifier_range(IOMMUNotifier *n)
+ {
 -- 
-2.26.2
+2.21.3
 
 
