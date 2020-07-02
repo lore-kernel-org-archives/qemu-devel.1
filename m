@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BABC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EBCC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:37:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D184A207CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:37:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F2EC207CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 13:37:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5ILsou+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D184A207CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4HHgP0e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2EC207CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqzP2-0001BZ-W0
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:37:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35156)
+	id 1jqzPU-0002Fo-U4
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 09:37:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqzE1-00054f-8f
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:26:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24179
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqzE2-00058i-V1
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:26:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43952
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqzDo-0007E7-65
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:26:00 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jqzDr-0007Fr-Bm
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 09:26:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593696347;
+ s=mimecast20190719; t=1593696349;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=78ZqT/uZ8eziZKb6Hd8L36FhzoEDJo7U+60kBi85GCc=;
- b=b5ILsou+uTRsssnM3QP+HY5yOrUGOJTUX1alNTNadGnbofMibELSoPAhhdypyRdrtSfQrJ
- ADEWcRnI1ah54bmeojU0SDqCpRbGNY2tEFzKy0Zy7N5lhhTl6jpjxLMropobQZ/uX9NuS8
- F//myoNxFDqR4ziHSaod9M7gDxV0gAg=
+ references:references; bh=VrjkzeYjFVWx4CauFAh7J9oz+USZwYX0CXQbxUCKY7M=;
+ b=H4HHgP0eBGZiZEOQ+WQb9xr1UqnpCgFPD2Th/C6oHi8XadgE9oyiV5RFLTGyBQu+0SXGPD
+ IOqDVQx6XuXzZxf4fwQ+GPd3xxwD7a2g9+QakyQCINuxueZrGeyiNBcURuvLaIrOqLRzH7
+ xBrsKL86srr7Cq8tgPESP2kc/UKwz14=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-ahNS_axjNuKAYajzkwSpLg-1; Thu, 02 Jul 2020 09:25:45 -0400
-X-MC-Unique: ahNS_axjNuKAYajzkwSpLg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-23-fPicelFPMHGqopa2mkvvdA-1; Thu, 02 Jul 2020 09:25:45 -0400
+X-MC-Unique: fPicelFPMHGqopa2mkvvdA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4595F107ACF2;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FB66805EEE;
  Thu,  2 Jul 2020 13:25:44 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
  [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EEE1160CD3;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E3A175C1C5;
  Thu,  2 Jul 2020 13:25:35 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 80EB431EE4; Thu,  2 Jul 2020 15:25:25 +0200 (CEST)
+ id 46A8531E93; Thu,  2 Jul 2020 15:25:25 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/20] pc_basic_device_init: pass PCMachineState
-Date: Thu,  2 Jul 2020 15:25:16 +0200
-Message-Id: <20200702132525.6849-12-kraxel@redhat.com>
+Subject: [PATCH v5 05/20] audio: deprecate -soundhw es1370
+Date: Thu,  2 Jul 2020 15:25:10 +0200
+Message-Id: <20200702132525.6849-6-kraxel@redhat.com>
 In-Reply-To: <20200702132525.6849-1-kraxel@redhat.com>
 References: <20200702132525.6849-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,71 +104,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Need access to pcms for pcspk initialization.
-Just preparation, no functional change.
+Switch to deprecated_register_soundhw().  Remove the now obsolete init
+function.  Add an alias so both es1370 and ES1370 are working with
+-device.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/i386/pc.h | 3 ++-
- hw/i386/pc.c         | 3 ++-
- hw/i386/pc_piix.c    | 2 +-
- hw/i386/pc_q35.c     | 2 +-
- 4 files changed, 6 insertions(+), 4 deletions(-)
+ hw/audio/es1370.c | 9 ++-------
+ qdev-monitor.c    | 1 +
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index dce1273c7dad..3a601dbe71da 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -160,7 +160,8 @@ void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion **ram_memory);
- uint64_t pc_pci_hole64_start(void);
- DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
--void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-+void pc_basic_device_init(struct PCMachineState *pcms,
-+                          ISABus *isa_bus, qemu_irq *gsi,
-                           ISADevice **rtc_state,
-                           bool create_fdctrl,
-                           bool no_vmport,
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4af9679d039b..d89e577f6fa1 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1155,7 +1155,8 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
-     g_free(a20_line);
+diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
+index 5f8a83ff5624..4255463a49ff 100644
+--- a/hw/audio/es1370.c
++++ b/hw/audio/es1370.c
+@@ -884,12 +884,6 @@ static void es1370_exit(PCIDevice *dev)
+     AUD_remove_card(&s->card);
  }
  
--void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-+void pc_basic_device_init(struct PCMachineState *pcms,
-+                          ISABus *isa_bus, qemu_irq *gsi,
-                           ISADevice **rtc_state,
-                           bool create_fdctrl,
-                           bool no_vmport,
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 1d832b2878b1..a3b416507286 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -235,7 +235,7 @@ static void pc_init1(MachineState *machine,
-     }
+-static int es1370_init (PCIBus *bus)
+-{
+-    pci_create_simple (bus, -1, TYPE_ES1370);
+-    return 0;
+-}
+-
+ static Property es1370_properties[] = {
+     DEFINE_AUDIO_PROPERTIES(ES1370State, card),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -928,7 +922,8 @@ static const TypeInfo es1370_info = {
+ static void es1370_register_types (void)
+ {
+     type_register_static (&es1370_info);
+-    pci_register_soundhw("es1370", "ENSONIQ AudioPCI ES1370", es1370_init);
++    deprecated_register_soundhw("es1370", "ENSONIQ AudioPCI ES1370",
++                                0, TYPE_ES1370);
+ }
  
-     /* init basic PC hardware */
--    pc_basic_device_init(isa_bus, x86ms->gsi, &rtc_state, true,
-+    pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, true,
-                          (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
-                          0x4);
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 047ea8db28ea..b16e22c6cccd 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -275,7 +275,7 @@ static void pc_q35_init(MachineState *machine)
-     }
- 
-     /* init basic PC hardware */
--    pc_basic_device_init(isa_bus, x86ms->gsi, &rtc_state, !mc->no_floppy,
-+    pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, !mc->no_floppy,
-                          (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
-                          0xff0104);
- 
+ type_init (es1370_register_types)
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 105d9792ecdf..e3083fae394b 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -55,6 +55,7 @@ typedef struct QDevAlias
+ static const QDevAlias qdev_alias_table[] = {
+     { "AC97", "ac97" }, /* -soundhw name */
+     { "e1000", "e1000-82540em" },
++    { "ES1370", "es1370" }, /* -soundhw name */
+     { "ich9-ahci", "ahci" },
+     { "lsi53c895a", "lsi" },
+     { "virtio-9p-ccw", "virtio-9p", QEMU_ARCH_S390X },
 -- 
 2.18.4
 
