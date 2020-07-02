@@ -2,80 +2,93 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52199C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:30:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E986DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:32:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20949207D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:30:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20949207D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAAD5207D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 20:32:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAAD5207D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr5rE-00027x-Bs
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 16:30:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44006)
+	id 1jr5sn-0003Ut-W8
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 16:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jr5ps-0000cu-J1; Thu, 02 Jul 2020 16:29:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:61705)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jr5pt-0000dT-1d
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:29:33 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46604
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jr5pp-0004sS-W1; Thu, 02 Jul 2020 16:29:32 -0400
-IronPort-SDR: PZ7EC5Ty8ahbbZj6hOOUcRuYFl6ThrGtyzoh4YTT70dTh89ygOvN5T95sGZPdkMqryZgKEWVhP
- Rdoo7Qmdd0ew==
-X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="148560792"
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; d="scan'208";a="148560792"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 13:29:26 -0700
-IronPort-SDR: pvqX6ntg3dWiziXvEJlbSB5y1/Q3vFV7ZRUT3mQszE6Gbr6NvEg57mCL3ScA28Bxg3AtAYpKzE
- HjidLe+afM4w==
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; d="scan'208";a="426073606"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.212.130.2])
- by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 13:29:25 -0700
-Subject: Re: nvme emulation merge process
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>, Kevin Wolf <kwolf@redhat.com>
-References: <20200630100139.1483002-1-its@irrelevant.dk>
- <20200630125932.GA553472@localhost.localdomain>
- <c10b18a8-44f3-7dab-b9bb-7d017f210934@redhat.com>
- <20200630154228.GB1987534@dhcp-10-100-145-180.wdl.wdc.com>
- <20200630203630.am3a3bc5ze5m2r3k@apples.localdomain>
- <20200701103407.GA11634@linux.fritz.box>
- <20200701131820.l4gb2ewjmnm6ysmt@apples.localdomain>
- <645af679-d2a3-a744-d07c-477198879680@redhat.com>
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Message-ID: <28258e14-843d-d736-e3b1-9bb11bf2e138@linux.intel.com>
-Date: Thu, 2 Jul 2020 13:29:26 -0700
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jr5pq-0004rB-70
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:29:32 -0400
+Received: from host86-182-221-233.range86-182.btcentralplus.com
+ ([86.182.221.233] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jr5pp-0004vE-4G; Thu, 02 Jul 2020 21:29:32 +0100
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200702141050.30073-1-thuth@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <fa3e540b-08c6-2df8-fa27-74203a505f7d@ilande.co.uk>
+Date: Thu, 2 Jul 2020 21:29:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <645af679-d2a3-a744-d07c-477198879680@redhat.com>
+In-Reply-To: <20200702141050.30073-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=134.134.136.24;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 16:29:27
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.182.221.233
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH] tests/acceptance: Add a test for the sun4u sparc64 machine
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,128 +101,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <Niklas.Cassel@wdc.com>,
- Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 6:57 AM, Philippe Mathieu-Daudé wrote:
-> On 7/1/20 3:18 PM, Klaus Jensen wrote:
->> On Jul  1 12:34, Kevin Wolf wrote:
->>> Am 30.06.2020 um 22:36 hat Klaus Jensen geschrieben:
->>>> On Jun 30 08:42, Keith Busch wrote:
->>>>> On Tue, Jun 30, 2020 at 04:09:46PM +0200, Philippe Mathieu-DaudÃ© wrote:
->>>>>> What I see doable for the following days is:
->>>>>> - hw/block/nvme: Fix I/O BAR structure [3]
->>>>>> - hw/block/nvme: handle transient dma errors
->>>>>> - hw/block/nvme: bump to v1.3
->>>>>
->>>>>
->>>>> These look like sensible patches to rebase future work on, IMO. The 1.3
->>>>> updates had been prepared a while ago, at least.
->>>>
->>>> I think Philippe's "hw/block/nvme: Fix I/O BAR structure" series is a
->>>> no-brainer. It just needs to get in asap.
->>>
->>> I think we need to talk about how nvme patches are supposed to get
->>> merged. I'm not familiar with the hardware nor the code, so the model
->>> was that I just blindly merge patches that Keith has reviewed/acked,
->>> just to spare him the work to prepare a pull request. But obviously, we
->>> started doing things this way when there was a lot less activity around
->>> the nvme emulation.
->>>
->>> If we find that this doesn't scale any more, maybe we need to change
->>> something.
->>
->> Honestly, I do not think the current model has worked very well for some
->> time; especially for larger series where I, for one, has felt that my
->> work was largely ignored due to a lack of designated reviewers. Things
->> only picked up when Beata, Maxim and Philippe started reviewing my
->> series - maybe out of pity or because I was bombing the list, I don't
->> know ;)
-> 
-> I have no interest in the NVMe device emulation, but one of the first
-> thing I notice when I look at the wiki the time I wanted to send my
-> first patch, is the "Return the favor" paragraph:
-> https://wiki.qemu.org/Contribute/SubmitAPatch#Return_the_favor
-> 
->  "Peer review only works if everyone chips in a bit of review time.
->   If everyone submitted more patches than they reviewed, we would
->   have a patch backlog. A good goal is to try to review at least as
->   many patches from others as what you submit. Don't worry if you
->   don't know the code base as well as a maintainer; it's perfectly
->   fine to admit when your review is weak because you are unfamiliar
->   with the code."
-> 
-> So as some reviewed my patches, I try to return the favor to the
-> community, in particular when I see someone is stuck waiting for
-> review, and the patch topic is some area I can understand.
-> 
-> I don't see that as an "out of pity" reaction.
-> 
-> Note, it is true bomb series scares reviewers. You learned it the
-> bad way. But you can see, after resending the first part of your
-> "bomb", even if it took 10 versions, the result is a great
-> improvement!
-> 
->> We've also seen good patches from Andrzej linger on the list for quite a
->> while, prompting a number of RESENDs. I only recently allocated more
->> time and upped my review game, but I hope that contributors feel that
->> stuff gets reviewed in a timely fashion by now.
->>
->> Please understand that this is in NO WAY a criticism of Keith who
->> already made it very clear to me that he did not have a lot time to
->> review, but only ack the odd patch.
->>
->>> Depending on how much time Keith can spend on review in the
->>> near future and how much control he wants to keep over the development,
->>> I could imagine adding Klaus to MAINTAINERS, either as a co-maintainer
->>> or as a reviewer. Then I could rely on reviews/acks from either of you
->>> for merging series.
->>>
->>
->> I would be happy to step up (officially) to help maintain the device
->> with Keith and review on a daily basis, and my position can support
->> this.
-> 
-> Sounds good to me, but it is up to Keith Busch to accept.
-> 
-> It would be nice to have at least one developer from WDC listed as
-> designated reviewer too.
-> 
-> Maxim is candidate for designated reviewer but I think he doesn't
-> have the time.
-> 
-> It would also nice to have Andrzej Jakowski listed, if he is interested.
+On 02/07/2020 15:10, Thomas Huth wrote:
 
-Thx! Of course I am interested in helping and I think it is actually great 
-idea to have couple of designated maintainers/reviewers as it would be easier
-for folks to receive feedback vs requesting it in polling manner :)
-And please don't get me wrong -- I'm not complaining about anything -- I
-think it is just reality that everybody is stretched out into multiple directions
-struggling to allocate time for multiple things. Having many people will
-actually increase likelihood of introducing high quality improvements.
-
-Also, +1 on separate tree for nvme emulation.
-
+> We can use the image from the advent calendar 2018 to test the sun4u
+> machine. It's not using the "QEMU advent calendar" string, so we can
+> not use the do_test_advcal_2018() from boot_linux_console.py, thus
+> let's also put it into a separate file to also be able to add an
+> entry to the MAINTAINERS file.
 > 
->>
->>> Of course, the patches don't necessarily have to go through my tree
->>> either if this only serves to complicate things these days. If sending
->>> separate pull requests directly to Peter would make things easier, I
->>> certainly wouldn't object.
->>>
->>
->> I don't think there is any reason to by-pass your tree. I think the
->> volume would need to increase even further for that to make sense.
->>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  MAINTAINERS                               |  1 +
+>  tests/acceptance/machine_sparc64_sun4u.py | 35 +++++++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+>  create mode 100644 tests/acceptance/machine_sparc64_sun4u.py
 > 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index dec252f38b..c26bc06e39 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1318,6 +1318,7 @@ F: include/hw/pci-host/sabre.h
+>  F: hw/pci-bridge/simba.c
+>  F: include/hw/pci-bridge/simba.h
+>  F: pc-bios/openbios-sparc64
+> +F: tests/acceptance/machine_sparc64_sun4u.py
+>  
+>  Sun4v
+>  M: Artyom Tarasenko <atar4qemu@gmail.com>
+> diff --git a/tests/acceptance/machine_sparc64_sun4u.py b/tests/acceptance/machine_sparc64_sun4u.py
+> new file mode 100644
+> index 0000000000..2506eefe3f
+> --- /dev/null
+> +++ b/tests/acceptance/machine_sparc64_sun4u.py
+> @@ -0,0 +1,35 @@
+> +# Functional test that boots a Linux kernel and checks the console
+> +#
+> +# Copyright (c) 2020 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Thomas Huth <thuth@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later. See the COPYING file in the top-level directory.
+> +
+> +import os
+> +
+> +from avocado_qemu import Test
+> +from avocado_qemu import wait_for_console_pattern
+> +from avocado.utils import archive
+> +
+> +class Sun4uMachine(Test):
+> +    """Boots the Linux kernel and checks that the console is operational"""
+> +
+> +    timeout = 90
+> +
+> +    def test_sparc64_sun4u(self):
+> +        """
+> +        :avocado: tags=arch:sparc64
+> +        :avocado: tags=machine:sun4u
+> +        """
+> +        tar_url = ('https://www.qemu-advent-calendar.org'
+> +                   '/2018/download/day23.tar.xz')
+> +        tar_hash = '142db83cd974ffadc4f75c8a5cad5bcc5722c240'
+> +        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
+> +        archive.extract(file_path, self.workdir)
+> +        self.vm.set_console()
+> +        self.vm.add_args('-kernel', self.workdir + '/day23/vmlinux')
+> +        self.vm.launch()
+> +        wait_for_console_pattern(self, 'Starting logging: OK')
 
+Thanks Thomas!
+
+I've just tested this and the patch appears to work fine and passes here:
+
+Fetching asset from
+tests/acceptance/machine_sparc64_sun4u.py:Sun4uMachine.test_sparc64_sun4u
+JOB ID     : c719db83a6011ed88a485b177079d0add26f6f81
+JOB LOG    :
+/home/build/src/qemu/git/qemu/tests/results/job-2020-07-02T21.25-c719db8/job.log
+ (01/11) tests/acceptance/empty_cpu_model.py:EmptyCPUModel.test: CANCEL: No QEMU
+binary defined or found in the build tree (0.00 s)
+ (02/11) tests/acceptance/machine_sparc64_sun4u.py:Sun4uMachine.test_sparc64_sun4u:
+PASS (18.74 s)
+...
+...
+
+
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
 
