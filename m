@@ -2,79 +2,78 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6100FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65933C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20D9E2088E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:54:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3024E20870
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:56:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Q0haZAgN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D9E2088E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Zn2VmjRe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3024E20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2U9-0003oe-D0
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:54:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33934)
+	id 1jr2VI-0005ho-FD
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:56:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2AE-0005B9-AM
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:18 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44864)
+ id 1jr2Av-00077P-KO
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:01 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4451fe355=alistair.francis@wdc.com>)
- id 1jr2AB-00008e-G9
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:34:17 -0400
+ id 1jr2At-0000Ah-1J
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:35:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1593707655; x=1625243655;
+ t=1593707699; x=1625243699;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=EkEQl7juhJW/aRK22dY4u1XreUCyImyPF6vMUQHgv+I=;
- b=Q0haZAgN7kBXhbDtFNJPEwHYtzlpanBwcqRVSgFCk/BCGzr6/u+3ob+v
- 3U7aymYwa5DoegnReHQJiq1P97aMhTT0POvRYUqkipszXNjDPA3uBc80Q
- 4cKZAVlpZ7CnTSkX3sAdAEM/IAzJs7r2VeVM3nk/DxiCgFUukJ2z8n1r5
- xkp66OOP+mS8EFQxonKtwtGG+UyCd1PW422hUDmhas9jOIRzxHQY4y4GA
- gWRzUvbAouyoBABgm3qYS8Fu70YO31KVL+/yvqEVLbCd3r3WpREHM8BaP
- 7u/Rf2+JtKV8/AfLw4WL80wuuCEZPyN+8cdqbNiKNxWRavnUPhmBWh/Tx Q==;
-IronPort-SDR: 6Bjkn8yDqfCWpNf+e2meffcRIiIc64VtyPzN5fxbWxffWqvsDG/I9BFby5kDYDDQsPAkGP73ZH
- jTY0IBa3CbH0JT5IK+rD3pPTB1kjO4SYgRpYFzkrVMIwrcCWr8RbvbMaxQALGbAj+ZytovJhCZ
- Gk2lswJxPG7+ODjYyTtxwJEBuLMSQnsgoxkKfDg6qwyXsLtm8GjHy+CpqweSUi8ZS2V+PE5VIa
- eDy7pxh1eLmOGCrlFjeeFWETuexC3Y+hUQa5GUx4MgWX0oxwJwjcyY/0zRLcTzmy83UYu78OPA
- 0OU=
-X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498493"
+ bh=6Ynlm94Zc+VFzL93voN7Gbl80eTnrXSvwDT3htX/+BU=;
+ b=Zn2VmjReifz9mh7G0RIBIUt7r4FCp3gbIwJ1MkPPnPwBhxeqn/cvanbm
+ rClSmKM7fUA6YSIaxLS4ksuSIEI/gzAZQFcdqhOvBLqD4ifhcHwzfAI15
+ 5SdKctP2LVONk+333NMVmOXiGEvvSgamGjWtE89n3MNpl9ljuMWXzgl5y
+ SR1bn7dL2NfuelgxoMfqn7Z4guEf4wRWkgQJG9bnRHi8zwWU5/CmaWlrT
+ EoJOw9HgaBLnsjzgKfUuuvDPG3nc9QehN7RbHfz17ufOxsYR5w4B/g+DH
+ 7OjrmCNU9jN/yihtQGWWC6p/za6y54ENCSqivfmtPxVDPHmyy6xoaUnAS A==;
+IronPort-SDR: dhPNzo22te8ZM42nBfhW/82rGRnsjMUjsk0CBDvJfHX4+ORM6y1NnEJWWuaeOcZVyhTfRZScw+
+ alDX63nQU49G9eCgCDX2ES3F9ODN2+QSxxKx5KH/BFXoq7ki2fP1PNaOlAsyi6bNSFjKUS+q7z
+ U59d+1+GkFqQkpZx0tA5HJaK3izdN2MUCLdeYUyAIG0YoP0rxfaNKnTtm7T+VSNYeerKIOhqMN
+ MF0mOUMvRI68ed4ydG39TdGCFM6SjGBL+CPQBs3LA0vq1g2cug4r7GX7o3oFDzZlQf7Q8Msgny
+ JoY=
+X-IronPort-AV: E=Sophos;i="5.75,304,1589212800"; d="scan'208";a="141498560"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:27 +0800
-IronPort-SDR: R/w+7ciGqMWhC5freIS8VI+7lmR7pOGwQAdYefoWqn8Q4P31oi4CL9fvO72YuL5DyCjTBljocq
- shregT/uZexTWzeOWsNA4Ig0vk7sKq3Zw=
+ by ob1.hgst.iphmx.com with ESMTP; 03 Jul 2020 00:33:35 +0800
+IronPort-SDR: BOyex8aqGFkfUYtI4rLRaHUGCMizrivundEJFSJn7apjsYz8TdHfNpWvhwciFYYHnPefcIA3ri
+ r1BeEh9GUJS9UUiZ2gq2/PFFKeu7N74OM=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Jul 2020 09:21:42 -0700
-IronPort-SDR: Goq4i3XPX+m4MVnuDEkDCfklaNxm3H9Er6wyRajmj1UEw3y63bsrn3kvJ6jOxTxqFyLkl3Ox6Q
- edJFjrF3O6DA==
+ 02 Jul 2020 09:21:50 -0700
+IronPort-SDR: 5Fu2XOAsE6+Qs6VpbjXnD/4goTnA8uTYfKE8TOI/IvzOyGY58uQGyCfLBYpyXQugirQDjtz0Wf
+ FgjRbutATv/Q==
 WDCIronportException: Internal
 Received: from 6hj08h2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.118])
- by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:26 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 02 Jul 2020 09:33:35 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 27/64] target/riscv: vector single-width saturating add and
- subtract
-Date: Thu,  2 Jul 2020 09:23:17 -0700
-Message-Id: <20200702162354.928528-28-alistair.francis@wdc.com>
+Subject: [PULL v2 57/64] target/riscv: vector element index instruction
+Date: Thu,  2 Jul 2020 09:23:47 -0700
+Message-Id: <20200702162354.928528-58-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200702162354.928528-1-alistair.francis@wdc.com>
 References: <20200702162354.928528-1-alistair.francis@wdc.com>
@@ -115,495 +114,113 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200701152549.1218-25-zhiwei_liu@c-sky.com>
+Message-Id: <20200701152549.1218-55-zhiwei_liu@c-sky.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  33 ++
- target/riscv/insn32.decode              |  10 +
- target/riscv/insn_trans/trans_rvv.inc.c |  16 +
- target/riscv/vector_helper.c            | 385 ++++++++++++++++++++++++
- 4 files changed, 444 insertions(+)
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 25 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 24 ++++++++++++++++++++++++
+ 4 files changed, 56 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 9851086730..85bd4b91bc 100644
+index 91db396979..c6695ea7a8 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -692,3 +692,36 @@ DEF_HELPER_4(vmv_v_x_b, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_h, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_w, void, ptr, i64, env, i32)
- DEF_HELPER_4(vmv_v_x_d, void, ptr, i64, env, i32)
+@@ -1114,3 +1114,8 @@ DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
 +
-+DEF_HELPER_6(vsaddu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vssub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsaddu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssubu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vssub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_4(vid_v_b, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_h, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_w, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_d, void, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 238aa014d1..70df42de9a 100644
+index 415523573d..6f2e2df7d3 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -409,6 +409,16 @@ vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
- vmerge_vvm      010111 0 ..... ..... 000 ..... 1010111 @r_vm_0
- vmerge_vxm      010111 0 ..... ..... 100 ..... 1010111 @r_vm_0
- vmerge_vim      010111 0 ..... ..... 011 ..... 1010111 @r_vm_0
-+vsaddu_vv       100000 . ..... ..... 000 ..... 1010111 @r_vm
-+vsaddu_vx       100000 . ..... ..... 100 ..... 1010111 @r_vm
-+vsaddu_vi       100000 . ..... ..... 011 ..... 1010111 @r_vm
-+vsadd_vv        100001 . ..... ..... 000 ..... 1010111 @r_vm
-+vsadd_vx        100001 . ..... ..... 100 ..... 1010111 @r_vm
-+vsadd_vi        100001 . ..... ..... 011 ..... 1010111 @r_vm
-+vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
-+vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
-+vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
-+vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
+@@ -70,6 +70,7 @@
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+ @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+ @r2_vm   ...... vm:1 ..... ..... ... ..... ....... &rmr %rs2 %rd
++@r1_vm   ...... vm:1 ..... ..... ... ..... ....... %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
+ @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
+ @r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
+@@ -561,6 +562,7 @@ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
++vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index f9532ebc71..a2ab14ade0 100644
+index 4dc893fa70..e94d149d3b 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1731,3 +1731,19 @@ static bool trans_vmv_v_i(DisasContext *s, arg_vmv_v_i *a)
- GEN_OPIVV_TRANS(vmerge_vvm, opivv_vadc_check)
- GEN_OPIVX_TRANS(vmerge_vxm, opivx_vadc_check)
- GEN_OPIVI_TRANS(vmerge_vim, 0, vmerge_vxm, opivx_vadc_check)
+@@ -2508,3 +2508,28 @@ static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
+     }
+     return false;
+ }
 +
-+/*
-+ *** Vector Fixed-Point Arithmetic Instructions
-+ */
++/* Vector Element Index Instruction */
++static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        vext_check_overlap_mask(s, a->rd, a->vm, false)) {
++        uint32_t data = 0;
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
 +
-+/* Vector Single-Width Saturating Add and Subtract */
-+GEN_OPIVV_TRANS(vsaddu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vsadd_vv,  opivv_check)
-+GEN_OPIVV_TRANS(vssubu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vssub_vv,  opivv_check)
-+GEN_OPIVX_TRANS(vsaddu_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vsadd_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vssubu_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vssub_vx,  opivx_check)
-+GEN_OPIVI_TRANS(vsaddu_vi, 1, vsaddu_vx, opivx_check)
-+GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        static gen_helper_gvec_2_ptr * const fns[4] = {
++            gen_helper_vid_v_b, gen_helper_vid_v_h,
++            gen_helper_vid_v_w, gen_helper_vid_v_d,
++        };
++        tcg_gen_gvec_2_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 92d90d07d6..1277aa1c10 100644
+index e0e6299e64..0fa899b6ff 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -2112,3 +2112,388 @@ GEN_VEXT_VMERGE_VX(vmerge_vxm_b, int8_t,  H1, clearb)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_h, int16_t, H2, clearh)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_w, int32_t, H4, clearl)
- GEN_VEXT_VMERGE_VX(vmerge_vxm_d, int64_t, H8, clearq)
+@@ -4673,3 +4673,27 @@ GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
+ GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
+ GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
+ GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
 +
-+/*
-+ *** Vector Fixed-Point Arithmetic Instructions
-+ */
-+
-+/* Vector Single-Width Saturating Add and Subtract */
-+
-+/*
-+ * As fixed point instructions probably have round mode and saturation,
-+ * define common macros for fixed point here.
-+ */
-+typedef void opivv2_rm_fn(void *vd, void *vs1, void *vs2, int i,
-+                          CPURISCVState *env, int vxrm);
-+
-+#define OPIVV2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)     \
-+static inline void                                                  \
-+do_##NAME(void *vd, void *vs1, void *vs2, int i,                    \
-+          CPURISCVState *env, int vxrm)                             \
-+{                                                                   \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                                 \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1);                    \
++/* Vector Element Index Instruction */
++#define GEN_VEXT_VID_V(NAME, ETYPE, H, CLEAR_FN)                          \
++void HELPER(NAME)(void *vd, void *v0, CPURISCVState *env, uint32_t desc)  \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    int i;                                                                \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(i)) = i;                                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
 +}
 +
-+static inline void
-+vext_vv_rm_1(void *vd, void *v0, void *vs1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
-+             opivv2_rm_fn *fn)
-+{
-+    for (uint32_t i = 0; i < vl; i++) {
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-+            continue;
-+        }
-+        fn(vd, vs1, vs2, i, env, vxrm);
-+    }
-+}
-+
-+static inline void
-+vext_vv_rm_2(void *vd, void *v0, void *vs1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t desc, uint32_t esz, uint32_t dsz,
-+             opivv2_rm_fn *fn, clear_fn *clearfn)
-+{
-+    uint32_t vlmax = vext_maxsz(desc) / esz;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vl = env->vl;
-+
-+    switch (env->vxrm) {
-+    case 0: /* rnu */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 0, fn);
-+        break;
-+    case 1: /* rne */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 1, fn);
-+        break;
-+    case 2: /* rdn */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 2, fn);
-+        break;
-+    default: /* rod */
-+        vext_vv_rm_1(vd, v0, vs1, vs2,
-+                     env, vl, vm, mlen, 3, fn);
-+        break;
-+    }
-+
-+    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
-+}
-+
-+/* generate helpers for fixed point instructions with OPIVV format */
-+#define GEN_VEXT_VV_RM(NAME, ESZ, DSZ, CLEAR_FN)                \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,     \
-+                  CPURISCVState *env, uint32_t desc)            \
-+{                                                               \
-+    vext_vv_rm_2(vd, v0, vs1, vs2, env, desc, ESZ, DSZ,         \
-+                 do_##NAME, CLEAR_FN);                          \
-+}
-+
-+static inline uint8_t saddu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
-+{
-+    uint8_t res = a + b;
-+    if (res < a) {
-+        res = UINT8_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint16_t saddu16(CPURISCVState *env, int vxrm, uint16_t a,
-+                               uint16_t b)
-+{
-+    uint16_t res = a + b;
-+    if (res < a) {
-+        res = UINT16_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint32_t saddu32(CPURISCVState *env, int vxrm, uint32_t a,
-+                               uint32_t b)
-+{
-+    uint32_t res = a + b;
-+    if (res < a) {
-+        res = UINT32_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint64_t saddu64(CPURISCVState *env, int vxrm, uint64_t a,
-+                               uint64_t b)
-+{
-+    uint64_t res = a + b;
-+    if (res < a) {
-+        res = UINT64_MAX;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vsaddu_vv_b, OP_UUU_B, H1, H1, H1, saddu8)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_h, OP_UUU_H, H2, H2, H2, saddu16)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_w, OP_UUU_W, H4, H4, H4, saddu32)
-+RVVCALL(OPIVV2_RM, vsaddu_vv_d, OP_UUU_D, H8, H8, H8, saddu64)
-+GEN_VEXT_VV_RM(vsaddu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vsaddu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vsaddu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vsaddu_vv_d, 8, 8, clearq)
-+
-+typedef void opivx2_rm_fn(void *vd, target_long s1, void *vs2, int i,
-+                          CPURISCVState *env, int vxrm);
-+
-+#define OPIVX2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)          \
-+static inline void                                                  \
-+do_##NAME(void *vd, target_long s1, void *vs2, int i,               \
-+          CPURISCVState *env, int vxrm)                             \
-+{                                                                   \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, (TX1)(T1)s1);           \
-+}
-+
-+static inline void
-+vext_vx_rm_1(void *vd, void *v0, target_long s1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
-+             opivx2_rm_fn *fn)
-+{
-+    for (uint32_t i = 0; i < vl; i++) {
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-+            continue;
-+        }
-+        fn(vd, s1, vs2, i, env, vxrm);
-+    }
-+}
-+
-+static inline void
-+vext_vx_rm_2(void *vd, void *v0, target_long s1, void *vs2,
-+             CPURISCVState *env,
-+             uint32_t desc, uint32_t esz, uint32_t dsz,
-+             opivx2_rm_fn *fn, clear_fn *clearfn)
-+{
-+    uint32_t vlmax = vext_maxsz(desc) / esz;
-+    uint32_t mlen = vext_mlen(desc);
-+    uint32_t vm = vext_vm(desc);
-+    uint32_t vl = env->vl;
-+
-+    switch (env->vxrm) {
-+    case 0: /* rnu */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 0, fn);
-+        break;
-+    case 1: /* rne */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 1, fn);
-+        break;
-+    case 2: /* rdn */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 2, fn);
-+        break;
-+    default: /* rod */
-+        vext_vx_rm_1(vd, v0, s1, vs2,
-+                     env, vl, vm, mlen, 3, fn);
-+        break;
-+    }
-+
-+    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
-+}
-+
-+/* generate helpers for fixed point instructions with OPIVX format */
-+#define GEN_VEXT_VX_RM(NAME, ESZ, DSZ, CLEAR_FN)          \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1,    \
-+        void *vs2, CPURISCVState *env, uint32_t desc)     \
-+{                                                         \
-+    vext_vx_rm_2(vd, v0, s1, vs2, env, desc, ESZ, DSZ,    \
-+                 do_##NAME, CLEAR_FN);                    \
-+}
-+
-+RVVCALL(OPIVX2_RM, vsaddu_vx_b, OP_UUU_B, H1, H1, saddu8)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_h, OP_UUU_H, H2, H2, saddu16)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_w, OP_UUU_W, H4, H4, saddu32)
-+RVVCALL(OPIVX2_RM, vsaddu_vx_d, OP_UUU_D, H8, H8, saddu64)
-+GEN_VEXT_VX_RM(vsaddu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vsaddu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vsaddu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vsaddu_vx_d, 8, 8, clearq)
-+
-+static inline int8_t sadd8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-+{
-+    int8_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT8_MIN) {
-+        res = a > 0 ? INT8_MAX : INT8_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int16_t sadd16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-+{
-+    int16_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT16_MIN) {
-+        res = a > 0 ? INT16_MAX : INT16_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int32_t sadd32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-+{
-+    int32_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT32_MIN) {
-+        res = a > 0 ? INT32_MAX : INT32_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int64_t sadd64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-+{
-+    int64_t res = a + b;
-+    if ((res ^ a) & (res ^ b) & INT64_MIN) {
-+        res = a > 0 ? INT64_MAX : INT64_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vsadd_vv_b, OP_SSS_B, H1, H1, H1, sadd8)
-+RVVCALL(OPIVV2_RM, vsadd_vv_h, OP_SSS_H, H2, H2, H2, sadd16)
-+RVVCALL(OPIVV2_RM, vsadd_vv_w, OP_SSS_W, H4, H4, H4, sadd32)
-+RVVCALL(OPIVV2_RM, vsadd_vv_d, OP_SSS_D, H8, H8, H8, sadd64)
-+GEN_VEXT_VV_RM(vsadd_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vsadd_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vsadd_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vsadd_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vsadd_vx_b, OP_SSS_B, H1, H1, sadd8)
-+RVVCALL(OPIVX2_RM, vsadd_vx_h, OP_SSS_H, H2, H2, sadd16)
-+RVVCALL(OPIVX2_RM, vsadd_vx_w, OP_SSS_W, H4, H4, sadd32)
-+RVVCALL(OPIVX2_RM, vsadd_vx_d, OP_SSS_D, H8, H8, sadd64)
-+GEN_VEXT_VX_RM(vsadd_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vsadd_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vsadd_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vsadd_vx_d, 8, 8, clearq)
-+
-+static inline uint8_t ssubu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
-+{
-+    uint8_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint16_t ssubu16(CPURISCVState *env, int vxrm, uint16_t a,
-+                               uint16_t b)
-+{
-+    uint16_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint32_t ssubu32(CPURISCVState *env, int vxrm, uint32_t a,
-+                               uint32_t b)
-+{
-+    uint32_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline uint64_t ssubu64(CPURISCVState *env, int vxrm, uint64_t a,
-+                               uint64_t b)
-+{
-+    uint64_t res = a - b;
-+    if (res > a) {
-+        res = 0;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vssubu_vv_b, OP_UUU_B, H1, H1, H1, ssubu8)
-+RVVCALL(OPIVV2_RM, vssubu_vv_h, OP_UUU_H, H2, H2, H2, ssubu16)
-+RVVCALL(OPIVV2_RM, vssubu_vv_w, OP_UUU_W, H4, H4, H4, ssubu32)
-+RVVCALL(OPIVV2_RM, vssubu_vv_d, OP_UUU_D, H8, H8, H8, ssubu64)
-+GEN_VEXT_VV_RM(vssubu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vssubu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vssubu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vssubu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vssubu_vx_b, OP_UUU_B, H1, H1, ssubu8)
-+RVVCALL(OPIVX2_RM, vssubu_vx_h, OP_UUU_H, H2, H2, ssubu16)
-+RVVCALL(OPIVX2_RM, vssubu_vx_w, OP_UUU_W, H4, H4, ssubu32)
-+RVVCALL(OPIVX2_RM, vssubu_vx_d, OP_UUU_D, H8, H8, ssubu64)
-+GEN_VEXT_VX_RM(vssubu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vssubu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vssubu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vssubu_vx_d, 8, 8, clearq)
-+
-+static inline int8_t ssub8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-+{
-+    int8_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT8_MIN) {
-+        res = a > 0 ? INT8_MAX : INT8_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int16_t ssub16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-+{
-+    int16_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT16_MIN) {
-+        res = a > 0 ? INT16_MAX : INT16_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int32_t ssub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-+{
-+    int32_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT32_MIN) {
-+        res = a > 0 ? INT32_MAX : INT32_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+static inline int64_t ssub64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-+{
-+    int64_t res = a - b;
-+    if ((res ^ a) & (a ^ b) & INT64_MIN) {
-+        res = a > 0 ? INT64_MAX : INT64_MIN;
-+        env->vxsat = 0x1;
-+    }
-+    return res;
-+}
-+
-+RVVCALL(OPIVV2_RM, vssub_vv_b, OP_SSS_B, H1, H1, H1, ssub8)
-+RVVCALL(OPIVV2_RM, vssub_vv_h, OP_SSS_H, H2, H2, H2, ssub16)
-+RVVCALL(OPIVV2_RM, vssub_vv_w, OP_SSS_W, H4, H4, H4, ssub32)
-+RVVCALL(OPIVV2_RM, vssub_vv_d, OP_SSS_D, H8, H8, H8, ssub64)
-+GEN_VEXT_VV_RM(vssub_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vssub_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vssub_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vssub_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vssub_vx_b, OP_SSS_B, H1, H1, ssub8)
-+RVVCALL(OPIVX2_RM, vssub_vx_h, OP_SSS_H, H2, H2, ssub16)
-+RVVCALL(OPIVX2_RM, vssub_vx_w, OP_SSS_W, H4, H4, ssub32)
-+RVVCALL(OPIVX2_RM, vssub_vx_d, OP_SSS_D, H8, H8, ssub64)
-+GEN_VEXT_VX_RM(vssub_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vssub_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vssub_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vssub_vx_d, 8, 8, clearq)
++GEN_VEXT_VID_V(vid_v_b, uint8_t, H1, clearb)
++GEN_VEXT_VID_V(vid_v_h, uint16_t, H2, clearh)
++GEN_VEXT_VID_V(vid_v_w, uint32_t, H4, clearl)
++GEN_VEXT_VID_V(vid_v_d, uint64_t, H8, clearq)
 -- 
 2.27.0
 
