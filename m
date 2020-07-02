@@ -2,116 +2,118 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97BF1C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B88C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:12:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 675D4206B7
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:10:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5HOiwZZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 675D4206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAA4F20771
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:12:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA4F20771
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr0rT-0000no-OH
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:10:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38286)
+	id 1jr0sh-0001on-8b
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:12:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jr0qc-00005Z-DL
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:09:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38869
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jr0qZ-0001jq-IH
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:09:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593702594;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=kXUIIWsomfnf+P2AvevBX0lA6yMWXYA8nyEZOxgGVT8=;
- b=b5HOiwZZKaHvw2YT+DNDoOtw3lq7b43dqySjlbU1JUrP5edVgVjN6c+xi66vYdi8+htORy
- DlHVBdypqRkvn97w/P6AyCJfEqhxvV3Rlhiugp2nUoOLcmzBFLlvMqPzaWTeZp3Aozimhc
- zWQ1IOFsB339aSbR8dl0qaWUGVCGJKY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-MI4riuhAMyKu57YmEIW_eg-1; Thu, 02 Jul 2020 11:09:52 -0400
-X-MC-Unique: MI4riuhAMyKu57YmEIW_eg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F12818FE874;
- Thu,  2 Jul 2020 15:09:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-196.ams2.redhat.com
- [10.36.113.196])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B3F115C1D6;
- Thu,  2 Jul 2020 15:09:48 +0000 (UTC)
-Subject: Re: [PATCH v9 30/34] qcow2: Add prealloc field to QCowL2Meta
-To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org
-References: <cover.1593342067.git.berto@igalia.com>
- <0dd88b3b4d3e90b28267267d7686cf5350d9dea0.1593342067.git.berto@igalia.com>
- <cadd98f7-1fc4-3a54-5999-b988cc79e618@redhat.com>
- <687f5402-2316-e06a-2fd1-37375a4fa119@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a053de54-93f7-8f13-be5e-6f5d276a7d3d@redhat.com>
-Date: Thu, 2 Jul 2020 17:09:47 +0200
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr0rW-0000zc-FX
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:10:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:59271)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr0rU-00022u-MP
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:10:54 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MIMXE-1jcfNH2z1I-00EPq6; Thu, 02 Jul 2020 17:10:43 +0200
+Subject: Re: [PATCH] linux-user: Fix "print_fdset()" in "strace.c" to not
+ print "," after last value
+To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200702102749.22178-1-Filip.Bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <17e105d2-9c60-8a79-bcca-ec3704163c33@vivier.eu>
+Date: Thu, 2 Jul 2020 17:10:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <687f5402-2316-e06a-2fd1-37375a4fa119@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HdFlgJKSlTkC4UQbumK6M1IlEeZ4vPMSu"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200702102749.22178-1-Filip.Bozuta@syrmia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:1KPRAgS6C1lyoCrm3p8FfzYAqiwzlVvt+nixRHAaBKO4fNoqXJb
+ uLVOf239/2oKJzVtlAEyPPJZ1Pm4QVp8NUo+M9zWV199WEWhs8xf9AzhI/p8gXmdSneAxnn
+ JTGxykzTbZh45H3v7eS9OnI1b66FEe7HDrHxWtcHRINyGOp2jjxJ8C7tgHFSmIk2zCm4mfp
+ SAbLHwmH2yKp30qRVGBoQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mfGkd+g9Tk4=:1Vmkb4T0I5OmGxqsLbbWz7
+ pzr85XE6mvxRKG5SEyNhGsNqDSXXKg0fL/OXbsT6XpN4RmilZSCcAmsH6NJco2Z48SSXS26ZI
+ 9u+HICAF+E0IY22NveG0vgByywQTnGe4jS2ji+bW/9N4sg9yYM/YzBKqfD9yeHXZrxVnYgGk1
+ LvMvdhtMfnNyJaaz0B8jTqanuUDSU384ped1n3gi5aOh96HGVUFTytSmJDxYs0h0aI8yiSi8G
+ 83fU8BlrvbLSXIY/wftV0mx1lV77P2BPChRIfXd7B0gns5YuQGRzd7D18bdzd2152whlMh4nx
+ oDB47zTBzk1Z86MUP1AEkvA0ur8Xmm7ehPZy8vcOZXUnnMr0iQKHLbxCv5MBP4snzj2KIuOpy
+ gxLvrkf56VGONJSd7QjRLveLNeL7VRnodOnCxLjdvMh+qXn3X2Zx2FmzyKVxl8y9XNMtTBUBM
+ 63YVJSIFiQ/1mfpnddZSJnpzKyyBpP7bYHDup+mZ763bV6qzQ02HCFDYDt44qxu0Z9QJbBNcL
+ rUrV3/aGmU9svb5pNLUb6/OlEmHrRHD8dcjPsm1eJeB5sWYt1ELt8d1lA8hVn3J8m4AIoJaU6
+ MY6phkYavzYzHBVdN99cJ/0j91As7zrcb9qkY9yl/FQLgJN+tQ2CfqCbAiDtEmqLDK9HL7fa+
+ CJy6A1qJCixIgqfF6Y4d7mppY03XY1fKqso2u2ZTQVNOWFNFgGfs1EOPdQqJzuN9UskAxawPy
+ 1Zqg1uRk2cEMjbHe01CFBVfyko1Cvp/4q6iMCYSGVfit24SRbPemT1UYF/pNVTa8n4rrc2Bf7
+ Ng0wR8oQiWnIjRd+aYXdCb8Ix35Hcrl/CDcf+H6bjXCQ4qSb1Qa4ucMmxvnHdb1+oqLiSAP
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:10:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,123 +126,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HdFlgJKSlTkC4UQbumK6M1IlEeZ4vPMSu
-Content-Type: multipart/mixed; boundary="gBbKa85tsaw1OY0EIl3UmxdPH4BuWiV5g"
+Le 02/07/2020 à 12:27, Filip Bozuta a écrit :
+> Function "print_fdset()" in "strace.c" is used to print the file descriptor
+> values in "print__newselect()" which prints arguments of syscall _newselect().
+> Until changes from this patch, this function was printing "," even after the
+> last value of the fd_set argument. This was changed in this patch by removing
+> this unnecessary "," after the last fd value and thus improving the estetics of
+> the _newselect() "-strace" print.
+> 
+> Implementation notes:
+> 
+>    The printing fix was made possible by using an existing function "get_comma()"
+>    which returns a "," or an empty string "" based on its argument (0 for "," and
+>    other for "").
+> ---
+>  linux-user/strace.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 6044c66954..23ca5d88c8 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -541,6 +541,7 @@ static void
+>  print_fdset(int n, abi_ulong target_fds_addr)
+>  {
+>      int i;
+> +    int first = 1;
+>  
+>      qemu_log("[");
+>      if( target_fds_addr ) {
+> @@ -555,9 +556,12 @@ print_fdset(int n, abi_ulong target_fds_addr)
+>              return;
+>  
+>          for (i=n; i>=0; i--) {
+> -            if ((tswapal(target_fds[i / TARGET_ABI_BITS]) >> (i & (TARGET_ABI_BITS - 1))) & 1)
+> -                qemu_log("%d,", i);
+> +            if ((tswapal(target_fds[i / TARGET_ABI_BITS]) >>
+> +                (i & (TARGET_ABI_BITS - 1))) & 1) {
+> +                qemu_log("%s%d", get_comma(first), i);
+> +                first = 0;
+>              }
+> +        }
+>          unlock_user(target_fds, target_fds_addr, 0);
+>      }
+>      qemu_log("]");
+> 
 
---gBbKa85tsaw1OY0EIl3UmxdPH4BuWiV5g
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Please repost with your signed-off-by.
 
-On 02.07.20 16:58, Eric Blake wrote:
-> On 7/2/20 9:50 AM, Max Reitz wrote:
->> On 28.06.20 13:02, Alberto Garcia wrote:
->>> This field allows us to indicate that the L2 metadata update does not
->>> come from a write request with actual data but from a preallocation
->>> request.
->>>
->>> For traditional images this does not make any difference, but for
->>> images with extended L2 entries this means that the clusters are
->>> allocated normally in the L2 table but individual subclusters are
->>> marked as unallocated.
->>>
->>> This will allow preallocating images that have a backing file.
->>>
->>> There is one special case: when we resize an existing image we can
->>> also request that the new clusters are preallocated. If the image
->>> already had a backing file then we have to hide any possible stale
->>> data and zero out the new clusters (see commit 955c7d6687 for more
->>> details).
->>>
->>> In this case the subclusters cannot be left as unallocated so the L2
->>> bitmap must be updated.
->>>
->>> Signed-off-by: Alberto Garcia <berto@igalia.com>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-8 ++++++++
->>> =C2=A0 block/qcow2-cluster.c | 2 +-
->>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
-6 ++++++
->>> =C2=A0 3 files changed, 15 insertions(+), 1 deletion(-)
->>
->> Sounds good, but I=E2=80=99m just not quite sure about the details on
->> falloc/full allocation: With .prealloc =3D true, writing to the
->> preallocated subclusters will require a COW operation.=C2=A0 That=E2=80=
-=99s not
->> ideal, and avoiding those COWs may be a reason to do preallocation in
->> the first place.
->=20
-> I'm not sure I follow the complaint.=C2=A0 If a cluster is preallocated b=
-ut
-> the subcluster is marked unallocated, then doing a partial write to that
-> subcluster must provide the correct contents for the rest of the
-> subcluster (either filling with zero, or reading from a backing file) -
-> but this COW can be limited to just the portion of the subcluster, and
-> is no different than the COW you have to perform without subclusters
-> when doing a write to a preallocated cluster in general.
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-It was my impression that falloc/full preallocation would create normal
-data clusters, not zero clusters, so no COW was necessary when writing
-to them.
-
->> Now, with backing files, it=E2=80=99s entirely correct.=C2=A0 You need a=
- COW
->> operation, because that=E2=80=99s the point of having a backing file.
->>
->> But without a backing file I wonder if it wouldn=E2=80=99t be better to =
-set
->> .prealloc =3D false to avoid that COW.
->=20
-> Without a backing file, there is no read required - writing to an
-> unallocated subcluster within a preallocated cluster merely has to
-> provide zeros to the rest of the write.=C2=A0 And depending on whether we=
- can
-> intelligently guarantee that the underlying protocol already reads as
-> zeroes when preallocated, we even have an optimization where even that
-> is not necessary.=C2=A0 We can still lump it in the "COW" terminology, in
-> that our write is more complex than merely writing in place, but it
-> isn't a true copy-on-write operation as there is nothing to be copied.
-
-The term =E2=80=9CCOW=E2=80=9D specifically in the qcow2 driver also refers=
- to having to
-write zeroes to an area that isn=E2=80=99t written to by the guest as part =
-of
-the process of having to allocate a (sub)cluster.
-
-(Of course there is no COW from a backing file if there is no backing file.=
-)
-
-Max
-
-
---gBbKa85tsaw1OY0EIl3UmxdPH4BuWiV5g--
-
---HdFlgJKSlTkC4UQbumK6M1IlEeZ4vPMSu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl79+LsACgkQ9AfbAGHV
-z0A+zgf+PY5V3idD3Ln0vlcdyUiEarWY7/+B5ee9dHpMxUSW7z7wDJtzS9x5hhHH
-036IDxFxtMO617c/wwuZyfVD/gSKSfay+z3IsMRcCNnO1VK4XdJ9XS9yx5/awEw6
-asRndmLSMB2WMVBrQxA3Fbdyrpz9Lataz51QADAfz63xOYZ2R/YhHu8f2hsSXKxO
-lt+hcgq4RR8r0FQWAhtWuj2dHm2BJw4QVrJbpH27H4alN3BCiAmW5GW1PjO7dihv
-DE/gu656Yjd3rKsn0q0/iLndCI+VJHIDB9cWnKE5fwW7fydCiNY4+xmzduARh4b6
-RnVbXl95XShKAlVtC6KbuJ24OIzBaQ==
-=ATnD
------END PGP SIGNATURE-----
-
---HdFlgJKSlTkC4UQbumK6M1IlEeZ4vPMSu--
-
+Thanks,
+Laurent
 
