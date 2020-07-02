@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57130C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66326C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22602207D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 326CD207D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:56:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cES1XQv8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22602207D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmMLSMr4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326CD207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1Zf-0001oe-4f
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:56:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
+	id 1jr1Zo-0002Cu-BW
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:56:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tg-0008H1-69
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21916
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1Tm-0008Qm-0d
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:26 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53051
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1TV-0004oy-Dg
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:19 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jr1TY-0004qO-2t
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:50:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593705008;
+ s=mimecast20190719; t=1593705010;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g3ySM10k9UbCgKhWVEE6TxsHmdluVXj5wEYfSDsLmz0=;
- b=cES1XQv8hiMGymfN8e2H8yQliDpxOeImtmvGTTrJND+qgf2TBlRy2n+xRLvE0DqUbMNTlH
- +Cg/1V2mbEVrT9/VEIR373P91q2p8pARzZJmPdXOOylrxBc/87FT85tAQ3QBKGj1CxS4lL
- I7NOLImrCJTba6iM563sFfcMZbKtFjI=
+ bh=7NOE60j2QgUo6Kq6ScNTmZ4kfjzZraVmBVHXQBwe5Uc=;
+ b=LmMLSMr4iBgWkxoIs8rixFXPAoiYLqiWa5tge6TOPlnEnlLPCz9YyCMPcbdph0Ni/5vGXS
+ b/eW+ZuSj/5zAB2yStWDiyqEd54HyhKUc+6z8KIADevQKle0DKLDnGVi3+Iw2OVK15yvzJ
+ pPvW1pGsDe3FTCWOBtq/A5fAKaXpd2A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-y8cfMvO1OGCEbsa05mDe1Q-1; Thu, 02 Jul 2020 11:50:06 -0400
-X-MC-Unique: y8cfMvO1OGCEbsa05mDe1Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-83-d2cYXeWgNzSsBVCH-8AxKQ-1; Thu, 02 Jul 2020 11:50:07 -0400
+X-MC-Unique: d2cYXeWgNzSsBVCH-8AxKQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D08D1054F91;
- Thu,  2 Jul 2020 15:50:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A58931054F8F;
+ Thu,  2 Jul 2020 15:50:06 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D43D873FF2;
- Thu,  2 Jul 2020 15:50:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B7477611F;
+ Thu,  2 Jul 2020 15:50:06 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9919011385D7; Thu,  2 Jul 2020 17:50:00 +0200 (CEST)
+ id E4B681135220; Thu,  2 Jul 2020 17:50:00 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/44] qemu-option: Factor out helper find_default_by_name()
-Date: Thu,  2 Jul 2020 17:49:24 +0200
-Message-Id: <20200702155000.3455325-9-armbru@redhat.com>
+Subject: [PATCH v2 23/44] qom: Crash more nicely on object_property_get_link()
+ failure
+Date: Thu,  2 Jul 2020 17:49:39 +0200
+Message-Id: <20200702155000.3455325-24-armbru@redhat.com>
 In-Reply-To: <20200702155000.3455325-1-armbru@redhat.com>
 References: <20200702155000.3455325-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,141 +103,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- util/qemu-option.c | 47 ++++++++++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 20 deletions(-)
+Pass &error_abort instead of NULL where the returned value is
+dereferenced or asserted to be non-null.  Drop a now redundant
+assertion.
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 1df55bc881..14e211ddd8 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -142,6 +142,13 @@ static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
-     return NULL;
- }
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/core/platform-bus.c     | 6 +++---
+ hw/ppc/spapr_drc.c         | 3 ++-
+ hw/ppc/spapr_hcall.c       | 3 ++-
+ hw/ppc/spapr_pci_nvlink2.c | 3 ++-
+ ui/vnc.c                   | 2 +-
+ 5 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
+index d494e5cec1..5037ca265e 100644
+--- a/hw/core/platform-bus.c
++++ b/hw/core/platform-bus.c
+@@ -22,6 +22,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/platform-bus.h"
+ #include "hw/qdev-properties.h"
++#include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/module.h"
  
-+static const char *find_default_by_name(QemuOpts *opts, const char *name)
-+{
-+    const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
-+
-+    return desc ? desc->def_value_str : NULL;
-+}
-+
- void parse_option_size(const char *name, const char *value,
-                        uint64_t *ret, Error **errp)
- {
-@@ -270,7 +277,7 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
- const char *qemu_opt_get(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
- 
-     if (opts == NULL) {
-         return NULL;
-@@ -278,9 +285,9 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            return desc->def_value_str;
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            return def_val;
-         }
+@@ -63,9 +64,8 @@ hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
+         return -1;
      }
-     return opt ? opt->str : NULL;
-@@ -312,7 +319,7 @@ const char *qemu_opt_iter_next(QemuOptsIter *iter)
- char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     char *str = NULL;
  
-     if (opts == NULL) {
-@@ -321,9 +328,9 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            str = g_strdup(desc->def_value_str);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            str = g_strdup(def_val);
+-    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container", NULL);
+-
+-    assert(parent_mr);
++    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container",
++                                         &error_abort);
+     if (parent_mr != pbus_mr_obj) {
+         /* MMIO region is not mapped on platform bus */
+         return -1;
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index d10193f39e..1f18b79348 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -870,7 +870,8 @@ int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
+             continue;
          }
-         return str;
-     }
-@@ -349,7 +356,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
-                                      bool defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     bool ret = defval;
  
-     if (opts == NULL) {
-@@ -358,9 +365,9 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+-        obj = object_property_get_link(root_container, prop->name, NULL);
++        obj = object_property_get_link(root_container, prop->name,
++                                       &error_abort);
+         drc = SPAPR_DR_CONNECTOR(obj);
+         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
  
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_bool(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_bool(name, def_val, &ret, &error_abort);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 0f54988f2e..c1d01228c6 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1655,7 +1655,8 @@ static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spapr)
+             continue;
          }
-         return ret;
-     }
-@@ -386,7 +393,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
-                                            uint64_t defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     uint64_t ret = defval;
+         drc = SPAPR_DR_CONNECTOR(object_property_get_link(drc_container,
+-                                                          prop->name, NULL));
++                                                          prop->name,
++                                                          &error_abort));
  
-     if (opts == NULL) {
-@@ -395,9 +402,9 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
- 
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_number(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_number(name, def_val, &ret, &error_abort);
+         if (spapr_drc_transient(drc)) {
+             spapr_drc_reset(drc);
+diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+index 8332d5694e..dd8cd6db96 100644
+--- a/hw/ppc/spapr_pci_nvlink2.c
++++ b/hw/ppc/spapr_pci_nvlink2.c
+@@ -358,7 +358,8 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
+     for (i = 0; i < sphb->nvgpus->num; ++i) {
+         SpaprPhbPciNvGpuSlot *nvslot = &sphb->nvgpus->slots[i];
+         Object *nv_mrobj = object_property_get_link(OBJECT(nvslot->gpdev),
+-                                                    "nvlink2-mr[0]", NULL);
++                                                    "nvlink2-mr[0]",
++                                                    &error_abort);
+         uint32_t associativity[] = {
+             cpu_to_be32(0x4),
+             SPAPR_GPU_NUMA_ID,
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 527ad25124..f006aa1afd 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -568,7 +568,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+                        &info->vencrypt, &info->has_vencrypt);
+         if (vd->dcl.con) {
+             dev = DEVICE(object_property_get_link(OBJECT(vd->dcl.con),
+-                                                  "device", NULL));
++                                                  "device", &error_abort));
+             info->has_display = true;
+             info->display = g_strdup(dev->id);
          }
-         return ret;
-     }
-@@ -424,7 +431,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
-                                          uint64_t defval, bool del)
- {
-     QemuOpt *opt;
--    const QemuOptDesc *desc;
-+    const char *def_val;
-     uint64_t ret = defval;
- 
-     if (opts == NULL) {
-@@ -433,9 +440,9 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
- 
-     opt = qemu_opt_find(opts, name);
-     if (opt == NULL) {
--        desc = find_desc_by_name(opts->list->desc, name);
--        if (desc && desc->def_value_str) {
--            parse_option_size(name, desc->def_value_str, &ret, &error_abort);
-+        def_val = find_default_by_name(opts, name);
-+        if (def_val) {
-+            parse_option_size(name, def_val, &ret, &error_abort);
-         }
-         return ret;
-     }
 -- 
 2.26.2
 
