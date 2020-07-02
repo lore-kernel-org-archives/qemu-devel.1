@@ -2,92 +2,73 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA5AC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E09C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D24B02084C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:31:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTBwKezL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24B02084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B9FA20720
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 16:33:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B9FA20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr27b-0001vv-2p
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58800)
+	id 1jr29k-0003X1-Mo
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 12:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr206-0007rG-FB
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:23:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35737
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr297-0002t0-Nq
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:09 -0400
+Resent-Date: Thu, 02 Jul 2020 12:33:09 -0400
+Resent-Message-Id: <E1jr297-0002t0-Nq@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21357)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jr203-0006Lr-Tz
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:23:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593707026;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RytLM0wkVNDj78wPhEpEO39LSmFEGISsxQ8o1e59J/c=;
- b=RTBwKezLTD++ww7dFzyMP21XzoeAEgdlnKicCqcuANZMEAD+WSgBETAWt08BzljTQRLAn+
- 8SY3R4g91K9UsYURv5b7OzWLaTiU3zLUSxT7EI48EZfBRasTeZXUsqIFMoNW1Dgs0SO+uz
- iG16q/uVw0Q5iAceYGK0lnldjJnd5CE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-oje2sbvnPJy7jvs9IZ1KQg-1; Thu, 02 Jul 2020 12:23:39 -0400
-X-MC-Unique: oje2sbvnPJy7jvs9IZ1KQg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B5E88015F3;
- Thu,  2 Jul 2020 16:23:38 +0000 (UTC)
-Received: from [10.3.112.202] (ovpn-112-202.phx2.redhat.com [10.3.112.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A08D25C1D6;
- Thu,  2 Jul 2020 16:23:37 +0000 (UTC)
-Subject: Re: [PATCH v2 03/44] qdev: Use returned bool to check for
- qdev_realize() etc. failure
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200702155000.3455325-1-armbru@redhat.com>
- <20200702155000.3455325-4-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b4689d9d-dcc2-c0fe-a2ee-ae0bdfff3d67@redhat.com>
-Date: Thu, 2 Jul 2020 11:23:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jr295-0008Vv-Cv
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:33:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593707572; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=PcrqwsnNLuqiJsf3IXkGhElul19bOZoA+NpMlAOBy57YdKa0aggDcEKONQIZ/oNuc9zuoR+h1a6/gDASbDZdOhql4pTUaioLkTwtW4Am00w9hSdViC+LpvBHrmGi+wwrC/2uULaItIaxRuNL6ghutXWb8/a5yYTQP6LJtYcXM6o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593707572;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=gZfh4QyA5XsOrX6ZA0eC1Og0xeDwQNjY+DIgvNNTrGY=; 
+ b=hy5ELj/vP8Z9obQuuk6hw58OZMhO8mODgxe7VQvt0iH223+QnNlUSw71aztYSFSRdCM/UM8VejZJmiz4VRVV1/KMWu4p8BaMp+z+koesFNOB1fNQB1gyo1vvZFpKL+Y85Fxa+v8tQ18Y5qTqzOlS6YBAI648yTRAb+htn7diOk8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593707571654175.69117657047548;
+ Thu, 2 Jul 2020 09:32:51 -0700 (PDT)
+Message-ID: <159370757024.5963.14636160371738602235@d1fd068a5071>
+Subject: Re: [PULL v2 00/12] Linux user for 5.1 patches
+In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20200702155000.3455325-4-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Thu, 2 Jul 2020 09:32:51 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:58:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,64 +81,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ atar4qemu@gmail.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/20 10:49 AM, Markus Armbruster wrote:
-> Convert
-> 
->      foo(..., &err);
->      if (err) {
->          ...
->      }
-> 
-> to
-> 
->      if (!foo(..., &err)) {
->          ...
->      }
-> 
-> for qdev_realize(), qdev_realize_and_unref(), qbus_realize() and their
-> wrappers isa_realize_and_unref(), pci_realize_and_unref(),
-> sysbus_realize(), sysbus_realize_and_unref(), usb_realize_and_unref().
-> Coccinelle script:
-> 
->      @@
->      identifier fun = {isa_realize_and_unref, pci_realize_and_unref, qbus_realize, qdev_realize, qdev_realize_and_unref, sysbus_realize, sysbus_realize_and_unref, usb_realize_and_unref};
->      expression list args, args2;
->      typedef Error;
->      Error *err;
->      @@
->      -    fun(args, &err, args2);
->      -    if (err)
->      +    if (!fun(args, &err, args2))
->           {
->               ...
->           }
-> 
-> Chokes on hw/arm/musicpal.c's lcd_refresh() with the unhelpful error
-> message "no position information".  Nothing to convert there; skipped.
-> 
-> Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
-> ARMSSE being used both as typedef and function-like macro there.
-> Converted manually.
-> 
-> A few line breaks tidied up manually.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-
-The conversion is quite straight-forward.  The patch is big, but 
-correct, and you documented where it is not mechanical.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMjE1MjcxMC44NDYw
+Mi0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWlt
+YWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDIxNTI3MTAu
+ODQ2MDItMS1sYXVyZW50QHZpdmllci5ldS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5
+cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
 
