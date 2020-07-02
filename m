@@ -6,72 +6,76 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D313FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 21:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F9BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 21:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C0462075D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 21:02:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9C7A20936
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 21:04:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SB7lTprt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0462075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VIIFUu4L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C7A20936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr6M8-0002b7-On
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 17:02:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54890)
+	id 1jr6ND-00047J-WD
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 17:04:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr69H-0004pe-HC
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20833
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr69K-0004wm-9l
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27593
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr69C-0003aU-CO
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:35 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jr69D-0003as-57
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 16:49:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593722969;
+ s=mimecast20190719; t=1593722970;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=WRQFF1Ean5S7aC9TWsKn+9OiHTseT6Iuu52pMwLAYM4=;
- b=SB7lTprt45olPquqNeSe7i7J8wWEF36GIND0uCC8XZzG+UhH8eFimbrDk2+YjrC3I+PUnL
- WJwVzuInxZdRNls57rzJv4VnyOgYso5QvFJ0lKabBk/t4fTdQDJcMhnyjsj7In2Da4B7+U
- E+3oM0mJPlNM90z30tL17E4UV3IPb4I=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7hw25PI/Oaktt4jt4bTRsaghMdLJdGNuxNjT6APB1vw=;
+ b=VIIFUu4LKAxJal1h7A0ZkJMWwlDzdxER8IptCbfZ15Z46Ob+rcPlczjB/NywWLHNnp09qG
+ Gca4zQ7UE8MSl5whpZWwDZMC2WFQBA5lJAM3LYzGzzG/EriU4cCp1r1n3ysWo42jimiUoa
+ 8pAojFK1DBEEnNIdxjMr5f2mmVZLUaA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-5_xydxvzPmyYquW_YrXV3Q-1; Thu, 02 Jul 2020 16:49:28 -0400
-X-MC-Unique: 5_xydxvzPmyYquW_YrXV3Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-180-xV_s93goMHWI71uvvIEKeA-1; Thu, 02 Jul 2020 16:49:26 -0400
+X-MC-Unique: xV_s93goMHWI71uvvIEKeA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAAE78014D7;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 849E6106B245;
  Thu,  2 Jul 2020 20:49:25 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
  [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20B4173FE9;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 825F8779EB;
  Thu,  2 Jul 2020 20:49:15 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 44ED131EE4; Thu,  2 Jul 2020 22:49:00 +0200 (CEST)
+ id 0C98531E87; Thu,  2 Jul 2020 22:49:00 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/21] microvm/acpi: use seabios with acpi=on
-Date: Thu,  2 Jul 2020 22:48:49 +0200
-Message-Id: <20200702204859.9876-12-kraxel@redhat.com>
+Subject: [PATCH v4 06/21] acpi: move acpi_dsdt_add_power_button() to ged
+Date: Thu,  2 Jul 2020 22:48:44 +0200
+Message-Id: <20200702204859.9876-7-kraxel@redhat.com>
 In-Reply-To: <20200702204859.9876-1-kraxel@redhat.com>
 References: <20200702204859.9876-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:18:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:42:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,37 +107,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With acpi=off continue to use qboot.
+Allow reuse for microvm.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/microvm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ include/hw/acpi/generic_event_device.h | 1 +
+ hw/acpi/generic_event_device.c         | 8 ++++++++
+ hw/arm/virt-acpi-build.c               | 8 --------
+ 3 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 1bcd57a6fd80..ac605d92b984 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -52,6 +52,7 @@
- #include "hw/xen/start_info.h"
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index 9687cb524258..ebed1ffe4231 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -113,5 +113,6 @@ typedef struct AcpiGedState {
  
- #define MICROVM_QBOOT_FILENAME "qboot.rom"
-+#define MICROVM_BIOS_FILENAME  "bios-microvm.bin"
+ void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
+                    uint32_t ged_irq, AmlRegionSpace rs, hwaddr ged_base);
++void acpi_dsdt_add_power_button(Aml *scope);
  
- static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
- {
-@@ -174,7 +175,9 @@ static void microvm_devices_init(MicrovmMachineState *mms)
-     }
- 
-     if (bios_name == NULL) {
--        bios_name = MICROVM_QBOOT_FILENAME;
-+        bios_name = x86_machine_is_acpi_enabled(x86ms)
-+            ? MICROVM_BIOS_FILENAME
-+            : MICROVM_QBOOT_FILENAME;
-     }
-     x86_bios_rom_init(get_system_memory(), true);
+ #endif
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+index 491df80a5cc7..6df400e1ee16 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -142,6 +142,14 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+     aml_append(table, dev);
  }
+ 
++void acpi_dsdt_add_power_button(Aml *scope)
++{
++    Aml *dev = aml_device(ACPI_POWER_BUTTON_DEVICE);
++    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
++    aml_append(scope, dev);
++}
++
+ /* Memory read by the GED _EVT AML dynamic method */
+ static uint64_t ged_evt_read(void *opaque, hwaddr addr, unsigned size)
+ {
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 1384a2cf2ab4..852eb6484b0e 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -357,14 +357,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+     aml_append(scope, dev);
+ }
+ 
+-static void acpi_dsdt_add_power_button(Aml *scope)
+-{
+-    Aml *dev = aml_device(ACPI_POWER_BUTTON_DEVICE);
+-    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
+-    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+-    aml_append(scope, dev);
+-}
+-
+ static void acpi_dsdt_add_tpm(Aml *scope, VirtMachineState *vms)
+ {
+     PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(vms->platform_bus_dev);
 -- 
 2.18.4
 
