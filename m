@@ -3,70 +3,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA11C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373E6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:56:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53C7F2075D
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C7F2075D
+	by mail.kernel.org (Postfix) with ESMTPS id 0BA7720772
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:56:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA7720772
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqwp1-0003JL-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:52:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46914)
+	id 1jqwtG-0005Xo-AK
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:56:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqwnm-0001fc-I6
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:50:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39226)
+ id 1jqwse-0004yt-RC
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:55:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39634)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqwnk-0000mt-Ef
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:50:46 -0400
+ id 1jqwsc-0001QC-V3
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:55:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jqwni-00034G-Cg
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 10:50:42 +0000
+ id 1jqwsb-0003S7-HR
+ for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 10:55:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 49A1C2E810A
- for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 10:50:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 82AD02E80BA
+ for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 10:55:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jul 2020 10:42:06 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1833661@bugs.launchpad.net>
+Date: Thu, 02 Jul 2020 10:49:29 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1878645@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: mips pflash
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cleber-gnu philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <156110193683.18432.8339006487274258755.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159368652733.1630.14845389977553399994.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1833661] Re: Linux kernel oops on Malta board while accessing
- pflash
+X-Launchpad-Bug-Commenters: a1xndr ajbennee philmd pmaydell
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
+Message-ID: <87r1tup4xy.fsf@linaro.org>
+Subject: [Bug 1878645] Re: [RFC PATCH] cpus: Initialize current_cpu with the
+ first vCPU created
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8905cb290063b34aeb7e7af49c6fc028a55522ba
+X-Launchpad-Hash: 5b75b4efc721026eb65d5ccbeef7c201d90bea57
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:50
@@ -88,49 +84,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1833661 <1833661@bugs.launchpad.net>
+Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200702104929.sUt-sBgnR1xx5xHflBQWRyjinRT75fdePc0bkMm9XSY@z>
 
-** Changed in: qemu
-     Assignee: Philippe Mathieu-Daud=C3=A9 (philmd) =3D> (unassigned)
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 01/07/20 22:35, Peter Maydell wrote:
+>> For the monitor, that
+>> would be the current "default cpu" as set by the "cpu"
+>> command (cf monitor_set_cpu()). The bug here will be that
+>> somewhere along the line we are probably missing plumbing
+>> sufficient to pass down "which CPU do we want".
+>
+> Yeah, the fix is probably to add a functions that returns either
+> current_cpu or the monitor CPU, and use it in device emulation if
+> applicable.
+>
+> The problem with current_cpu is that it affects stuff like run_on_cpu,
+> and that is guaranteed to cause havoc to code that expects to run on a
+> given CPU and therefore doesn't use locks.
+
+IIRC the original reported bug was in a APM callback which was triggered
+by an MMIO operation. Currently we don't expose the current cpu via the
+memory dispatch routines. Should we to ensure there is always something
+valid there?
+
+>
+> Paolo
+
+
+-- =
+
+Alex Benn=C3=A9e
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1833661
+https://bugs.launchpad.net/bugs/1878645
 
 Title:
-  Linux kernel oops on Malta board while accessing pflash
+  null-ptr dereference in ich9_apm_ctrl_changed
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  commit 33d609990621dea6c7d056c86f707b8811320ac1
+  Hello,
+  While fuzzing, I found an input which triggers a NULL pointer dereference=
+ in
+  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
+is bug
+  is specific to QTest?
 
-  While running tests/acceptance/linux_ssh_mips_malta.py, the big-endian
-  tests fail:
+  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
+00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
+  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
+  =3D=3D23862=3D=3DHint: address points to the zero page.
+      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
+mu/accel/tcg/tcg-all.c:57:21
+      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
+ude/hw/core/cpu.h:872:5
+      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
+emu/hw/isa/lpc_ich9.c:442:13
+      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
+hw/isa/apm.c:50:13
+      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
+pment/qemu/memory.c:483:5
+      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
+nt/qemu/memory.c:544:18
+      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
+pment/qemu/memory.c:1476:16
+      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
+/qemu/exec.c:3137:23
+      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
+c.c:3177:14
+      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
+u/exec.c:3268:18
+      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
+:60:5
+      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
+qemu/qtest.c:392:13
+      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
+mu/qtest.c:710:9
+      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
+c:722:5
+      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
+/qemu/chardev/char.c:183:9
+      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
+/chardev/char.c:195:9
+      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
+ev/char-fd.c:68:9
+      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
+elopment/qemu/io/channel-watch.c:84:12
+      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e897)
+      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
+ftmmu/vl.c:1664:9
+      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
+.c:49:5
+      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
+6-softmmu/qemu-system-i386+0xc9c819)
 
-    physmap-flash.0: Found 1 x32 devices at 0x0 in 32-bit bank. Manufacture=
-r ID 0x000000 Chip ID 0x000000
-    Intel/Sharp Extended Query Table at 0x0031
-    Using buffer write method
-    Searching for RedBoot partition table in physmap-flash.0 at offset 0x10=
-03f0000
-    Creating 3 MTD partitions on "physmap-flash.0":
-    0x000000000000-0x000000100000 : "YAMON"
-    0x000000100000-0x0000003e0000 : "User FS"
-    0x0000003e0000-0x000000400000 : "Board Config"
-    CPU 0 Unable to handle kernel paging request at virtual address 00000014
+  =
 
-  The 64-bit test fails with:
+  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
+qtest commands:
 
-    CPU 0 Unable to handle kernel paging request at virtual address
-  0000000000000028
+  cat << EOF | ./qemu-system-i386 \
+  -qtest stdio -nographic -monitor none -serial none \
+  -M pc-q35-5.0
+  outl 0xcf8 0x8400f841
+  outl 0xcfc 0xaa215d6d
+  outl 0x6d30 0x2ef8ffbe
+  outb 0xb2 0x20
+  EOF
+
+  Please let me know if I can provide any further info.
+  -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1833661/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
