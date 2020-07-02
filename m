@@ -2,80 +2,96 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373E6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CE4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BA7720772
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:56:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA7720772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0E3A620772
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 10:58:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCE6oFwL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E3A620772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqwtG-0005Xo-AK
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49358)
+	id 1jqwvG-0006Se-Bd
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 06:58:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqwse-0004yt-RC
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:55:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39634)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jqwsc-0001QC-V3
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:55:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jqwsb-0003S7-HR
- for <qemu-devel@nongnu.org>; Thu, 02 Jul 2020 10:55:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 82AD02E80BA
- for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 10:55:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jqwuc-00063B-Nb
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:57:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45250
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jqwuZ-0006Tv-S1
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 06:57:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593687466;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2SIcKgGaawDaQ/7agoENxmtGPMex1JZHuuWtBE2g5rk=;
+ b=aCE6oFwLY3prLz1L/q6dlJQaZAkzNMGL455pB+y1skg8BNy5fhb2kxxfZsEKp0EGBYgC8E
+ Wo3/8mLMTSEKKf16PLu44Y73Bkb2+tUNOgSWweTVWA58xjVwqeYa+rXR1tyaUL8lz6Co+i
+ YjoqPxuV1/kV+CnLrdy7cqFHDd5T0WI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-LzTx9yeFN4enA1kqMreuAQ-1; Thu, 02 Jul 2020 06:57:40 -0400
+X-MC-Unique: LzTx9yeFN4enA1kqMreuAQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 912D6107ACCD
+ for <qemu-devel@nongnu.org>; Thu,  2 Jul 2020 10:57:39 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-177.ams2.redhat.com
+ [10.36.113.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A0CC10023A7;
+ Thu,  2 Jul 2020 10:57:38 +0000 (UTC)
+Subject: Re: [PATCH v10 1/5] crypto: Add tls-cipher-suites object
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200623172726.21040-1-philmd@redhat.com>
+ <20200623172726.21040-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <735af131-8ed5-ca21-219c-80f4ac84fd30@redhat.com>
+Date: Thu, 2 Jul 2020 12:57:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jul 2020 10:49:29 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1878645@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr ajbennee philmd pmaydell
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
-Message-ID: <87r1tup4xy.fsf@linaro.org>
-Subject: [Bug 1878645] Re: [RFC PATCH] cpus: Initialize current_cpu with the
- first vCPU created
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5b75b4efc721026eb65d5ccbeef7c201d90bea57
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200623172726.21040-2-philmd@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 04:00:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,136 +100,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200702104929.sUt-sBgnR1xx5xHflBQWRyjinRT75fdePc0bkMm9XSY@z>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 06/23/20 19:27, Philippe Mathieu-Daudé wrote:
+> On the host OS, various aspects of TLS operation are configurable.
+> In particular it is possible for the sysadmin to control the TLS
+> cipher/protocol algorithms that applications are permitted to use.
+> 
+> * Any given crypto library has a built-in default priority list
+>   defined by the distro maintainer of the library package (or by
+>   upstream).
+> 
+> * The "crypto-policies" RPM (or equivalent host OS package)
+>   provides a config file such as "/etc/crypto-policies/config",
+>   where the sysadmin can set a high level (library-independent)
+>   policy.
+> 
+>   The "update-crypto-policies --set" command (or equivalent) is
+>   used to translate the global policy to individual library
+>   representations, producing files such as
+>   "/etc/crypto-policies/back-ends/*.config". The generated files,
+>   if present, are loaded by the various crypto libraries to
+>   override their own built-in defaults.
+> 
+>   For example, the GNUTLS library may read
+>   "/etc/crypto-policies/back-ends/gnutls.config".
+> 
+> * A management application (or the QEMU user) may overide the
+>   system-wide crypto-policies config via their own config, if
+>   they need to diverge from the former.
+> 
+> Thus the priority order is "QEMU user config" > "crypto-policies
+> system config" > "library built-in config".
+> 
+> Introduce the "tls-cipher-suites" object for exposing the ordered
+> list of permitted TLS cipher suites from the host side to the
+> guest firmware, via fw_cfg. The list is represented as an array
+> of bytes.
+> 
+> The priority at which the host-side policy is retrieved is given
+> by the "priority" property of the new object type. For example,
+> "priority=@SYSTEM" may be used to refer to
+> "/etc/crypto-policies/back-ends/gnutls.config" (given that QEMU
+> uses GNUTLS).
+> 
+> The firmware uses the IANA_TLS_CIPHER array for configuring
+> guest-side TLS, for example in UEFI HTTPS Boot.
+> 
+> [Description from Daniel P. Berrangé, edited by Laszlo Ersek.]
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> v10: rewrote logic (danpb)
+> ---
+>  include/crypto/tls-cipher-suites.h |  39 ++++++++++
+>  crypto/tls-cipher-suites.c         | 115 +++++++++++++++++++++++++++++
+>  crypto/Makefile.objs               |   1 +
+>  crypto/trace-events                |   5 ++
+>  qemu-options.hx                    |  19 +++++
+>  5 files changed, 179 insertions(+)
+>  create mode 100644 include/crypto/tls-cipher-suites.h
+>  create mode 100644 crypto/tls-cipher-suites.c
+> 
+> diff --git a/include/crypto/tls-cipher-suites.h b/include/crypto/tls-cipher-suites.h
+> new file mode 100644
+> index 0000000000..1be7917233
+> --- /dev/null
+> +++ b/include/crypto/tls-cipher-suites.h
+> @@ -0,0 +1,39 @@
+> +/*
+> + * QEMU TLS Cipher Suites Registry (RFC8447)
+> + *
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +#ifndef QCRYPTO_TLSCIPHERSUITES_H
+> +#define QCRYPTO_TLSCIPHERSUITES_H
+> +
+> +#include "qom/object.h"
+> +#include "crypto/tlscreds.h"
+> +
+> +#define TYPE_QCRYPTO_TLS_CIPHER_SUITES "tls-cipher-suites"
+> +#define QCRYPTO_TLS_CIPHER_SUITES(obj) \
+> +    OBJECT_CHECK(QCryptoTLSCipherSuites, (obj), TYPE_QCRYPTO_TLS_CIPHER_SUITES)
+> +
+> +typedef struct QCryptoTLSCipherSuites {
+> +    /* <private> */
+> +    QCryptoTLSCreds parent_obj;
+> +    /* <public> */
+> +} QCryptoTLSCipherSuites;
+> +
+> +/**
+> +  * qcrypto_tls_cipher_suites_get_data:
+> +  * @obj: pointer to a TLS cipher suites object
+> +  * @errp: pointer to a NULL-initialized error object
+> +  *
+> +  * Returns: reference to a byte array containing the data.
+> +  * The caller should release the reference when no longer
+> +  * required.
+> +  */
+> +GByteArray *qcrypto_tls_cipher_suites_get_data(QCryptoTLSCipherSuites *obj,
+> +                                               Error **errp);
+> +
+> +#endif /* QCRYPTO_TLSCIPHERSUITES_H */
+> diff --git a/crypto/tls-cipher-suites.c b/crypto/tls-cipher-suites.c
+> new file mode 100644
+> index 0000000000..5b403f86c9
+> --- /dev/null
+> +++ b/crypto/tls-cipher-suites.c
+> @@ -0,0 +1,115 @@
+> +/*
+> + * QEMU TLS Cipher Suites
+> + *
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qom/object_interfaces.h"
+> +#include "crypto/tlscreds.h"
+> +#include "crypto/tls-cipher-suites.h"
+> +#include "trace.h"
+> +
+> +/*
+> + * IANA registered TLS ciphers:
+> + * https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+> + */
+> +typedef struct {
+> +    uint8_t data[2];
+> +} QEMU_PACKED IANA_TLS_CIPHER;
+> +
+> +GByteArray *qcrypto_tls_cipher_suites_get_data(QCryptoTLSCipherSuites *obj,
+> +                                               Error **errp)
+> +{
+> +    QCryptoTLSCreds *creds = QCRYPTO_TLS_CREDS(obj);
+> +    gnutls_priority_t pcache;
+> +    GByteArray *byte_array;
+> +    const char *err;
+> +    size_t i;
+> +    int ret;
+> +
+> +    trace_qcrypto_tls_cipher_suite_priority(creds->priority);
+> +    ret = gnutls_priority_init(&pcache, creds->priority, &err);
+> +    if (ret < 0) {
+> +        error_setg(errp, "Syntax error using priority '%s': %s",
+> +                   creds->priority, gnutls_strerror(ret));
+> +        return NULL;
+> +    }
+> +
+> +    byte_array = g_byte_array_new();
+> +
+> +    for (i = 0;; i++) {
+> +        int ret;
+> +        unsigned idx;
+> +        const char *name;
+> +        IANA_TLS_CIPHER cipher;
+> +        gnutls_protocol_t protocol;
+> +        const char *version;
+> +
+> +        ret = gnutls_priority_get_cipher_suite_index(pcache, i, &idx);
+> +        if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+> +            break;
+> +        }
+> +        if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE) {
+> +            continue;
+> +        }
+> +
+> +        name = gnutls_cipher_suite_info(idx, (unsigned char *)&cipher,
+> +                                        NULL, NULL, NULL, &protocol);
+> +        if (name == NULL) {
+> +            continue;
+> +        }
+> +
+> +        version = gnutls_protocol_get_name(protocol);
+> +        g_byte_array_append(byte_array, cipher.data, 2);
+> +        trace_qcrypto_tls_cipher_suite_info(cipher.data[0],
+> +                                            cipher.data[1],
+> +                                            version, name);
+> +    }
+> +    trace_qcrypto_tls_cipher_suite_count(byte_array->len);
+> +    gnutls_priority_deinit(pcache);
+> +
+> +    return byte_array;
+> +}
+> +
+> +static void qcrypto_tls_cipher_suites_complete(UserCreatable *uc,
+> +                                               Error **errp)
+> +{
+> +    QCryptoTLSCreds *creds = QCRYPTO_TLS_CREDS(uc);
+> +
+> +    if (!creds->priority) {
+> +        error_setg(errp, "'priority' property is not set");
+> +        return;
+> +    }
+> +}
+> +
+> +static void qcrypto_tls_cipher_suites_class_init(ObjectClass *oc, void *data)
+> +{
+> +    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
+> +
+> +    ucc->complete = qcrypto_tls_cipher_suites_complete;
+> +}
+> +
+> +static const TypeInfo qcrypto_tls_cipher_suites_info = {
+> +    .parent = TYPE_QCRYPTO_TLS_CREDS,
+> +    .name = TYPE_QCRYPTO_TLS_CIPHER_SUITES,
+> +    .instance_size = sizeof(QCryptoTLSCreds),
+> +    .class_size = sizeof(QCryptoTLSCredsClass),
+> +    .class_init = qcrypto_tls_cipher_suites_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+> +};
+> +
+> +static void qcrypto_tls_cipher_suites_register_types(void)
+> +{
+> +    type_register_static(&qcrypto_tls_cipher_suites_info);
+> +}
+> +
+> +type_init(qcrypto_tls_cipher_suites_register_types);
+> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+> index 707c02ad37..f1965b1a68 100644
+> --- a/crypto/Makefile.objs
+> +++ b/crypto/Makefile.objs
+> @@ -13,6 +13,7 @@ crypto-obj-y += cipher.o
+>  crypto-obj-$(CONFIG_AF_ALG) += afalg.o
+>  crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
+>  crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
+> +crypto-obj-$(CONFIG_GNUTLS) += tls-cipher-suites.o
+>  crypto-obj-y += tlscreds.o
+>  crypto-obj-y += tlscredsanon.o
+>  crypto-obj-y += tlscredspsk.o
+> diff --git a/crypto/trace-events b/crypto/trace-events
+> index 9e594d30e8..798b6067ab 100644
+> --- a/crypto/trace-events
+> +++ b/crypto/trace-events
+> @@ -21,3 +21,8 @@ qcrypto_tls_creds_x509_load_cert_list(void *creds, const char *file) "TLS creds
+>  # tlssession.c
+>  qcrypto_tls_session_new(void *session, void *creds, const char *hostname, const char *authzid, int endpoint) "TLS session new session=%p creds=%p hostname=%s authzid=%s endpoint=%d"
+>  qcrypto_tls_session_check_creds(void *session, const char *status) "TLS session check creds session=%p status=%s"
+> +
+> +# tls-cipher-suites.c
+> +qcrypto_tls_cipher_suite_priority(const char *name) "priority: %s"
+> +qcrypto_tls_cipher_suite_info(uint8_t data0, uint8_t data1, const char *version, const char *name) "data=[0x%02x,0x%02x] version=%s name=%s"
+> +qcrypto_tls_cipher_suite_count(unsigned count) "count: %u"
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 93bde2bbc8..4f519f35fd 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4566,6 +4566,25 @@ SRST
+>          string as described at
+>          https://gnutls.org/manual/html_node/Priority-Strings.html.
+>  
+> +    ``-object tls-cipher-suites,id=id,priority=priority``
+> +        Creates a TLS cipher suites object, which can be used to control
+> +        the TLS cipher/protocol algorithms that applications are permitted
+> +        to use.
+> +
+> +        The ``id`` parameter is a unique ID which frontends will use to
+> +        access the ordered list of permitted TLS cipher suites from the
+> +        host.
+> +
+> +        The ``priority`` parameter allows to override the global default
+> +        priority used by gnutls. This can be useful if the system
+> +        administrator needs to use a weaker set of crypto priorities for
+> +        QEMU without potentially forcing the weakness onto all
+> +        applications. Or conversely if one wants wants a stronger
+> +        default for QEMU than for all other applications, they can do
+> +        this through this parameter. Its format is a gnutls priority
+> +        string as described at
+> +        https://gnutls.org/manual/html_node/Priority-Strings.html.
+> +
+>      ``-object filter-buffer,id=id,netdev=netdevid,interval=t[,queue=all|rx|tx][,status=on|off][,position=head|tail|id=<id>][,insert=behind|before]``
+>          Interval t can't be 0, this filter batches the packet delivery:
+>          all packets arriving in a given interval on netdev netdevid are
+> 
 
-> On 01/07/20 22:35, Peter Maydell wrote:
->> For the monitor, that
->> would be the current "default cpu" as set by the "cpu"
->> command (cf monitor_set_cpu()). The bug here will be that
->> somewhere along the line we are probably missing plumbing
->> sufficient to pass down "which CPU do we want".
->
-> Yeah, the fix is probably to add a functions that returns either
-> current_cpu or the monitor CPU, and use it in device emulation if
-> applicable.
->
-> The problem with current_cpu is that it affects stuff like run_on_cpu,
-> and that is guaranteed to cause havoc to code that expects to run on a
-> given CPU and therefore doesn't use locks.
+Acked-by: Laszlo Ersek <lersek@redhat.com>
 
-IIRC the original reported bug was in a APM callback which was triggered
-by an MMIO operation. Currently we don't expose the current cpu via the
-memory dispatch routines. Should we to ensure there is always something
-valid there?
-
->
-> Paolo
-
-
--- =
-
-Alex Benn=C3=A9e
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878645
-
-Title:
-  null-ptr dereference in ich9_apm_ctrl_changed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input which triggers a NULL pointer dereference=
- in
-  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
-is bug
-  is specific to QTest?
-
-  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
-00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
-  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
-  =3D=3D23862=3D=3DHint: address points to the zero page.
-      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
-mu/accel/tcg/tcg-all.c:57:21
-      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
-ude/hw/core/cpu.h:872:5
-      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
-emu/hw/isa/lpc_ich9.c:442:13
-      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
-hw/isa/apm.c:50:13
-      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
-pment/qemu/memory.c:483:5
-      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/memory.c:544:18
-      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/memory.c:1476:16
-      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
-/qemu/exec.c:3137:23
-      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
-c.c:3177:14
-      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
-u/exec.c:3268:18
-      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
-:60:5
-      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
-qemu/qtest.c:392:13
-      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
-mu/qtest.c:710:9
-      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
-c:722:5
-      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
-/qemu/chardev/char.c:183:9
-      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
-/chardev/char.c:195:9
-      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
-ev/char-fd.c:68:9
-      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
-elopment/qemu/io/channel-watch.c:84:12
-      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0xc9c819)
-
-  =
-
-  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
-qtest commands:
-
-  cat << EOF | ./qemu-system-i386 \
-  -qtest stdio -nographic -monitor none -serial none \
-  -M pc-q35-5.0
-  outl 0xcf8 0x8400f841
-  outl 0xcfc 0xaa215d6d
-  outl 0x6d30 0x2ef8ffbe
-  outb 0xb2 0x20
-  EOF
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
