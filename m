@@ -2,88 +2,74 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDBFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A56C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:41:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEF2220748
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:40:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+lRJs8A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF2220748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA1B420748
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 15:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1B420748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr1Ka-00061s-6l
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:40:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43428)
+	id 1jr1Km-0006B7-Tm
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 11:41:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jr17p-0001FV-60
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50789
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jr17m-0006OY-TK
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593703662;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S3NFNYSrX7syMo104tWcXIgZ34cLFK5JYwxiQJRSUHU=;
- b=b+lRJs8A7L0QFNZLab0v7olaqFPPNv0UWuEg6DfEU1GEKAfHQd7/E1xg2KdK+dg31j3mcz
- hep0ZmHMNKfQ+xBj0ApW5a8L/gUhRjIIESgk4UP/oePVuzXnN9ECvaMUjz1fLGI5RTqkKi
- +stRuw/hattmbtwKaj0ETC/YrJYi//I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-XpmiJm--NoWvDCE3vSfOoA-1; Thu, 02 Jul 2020 11:27:38 -0400
-X-MC-Unique: XpmiJm--NoWvDCE3vSfOoA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7C1C10059B4;
- Thu,  2 Jul 2020 15:27:36 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2070F5DD61;
- Thu,  2 Jul 2020 15:27:24 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH v2 3/9] hw/arm/smmu: Introduce smmu_get_iotlb_key()
-Date: Thu,  2 Jul 2020 17:26:53 +0200
-Message-Id: <20200702152659.8522-4-eric.auger@redhat.com>
-In-Reply-To: <20200702152659.8522-1-eric.auger@redhat.com>
-References: <20200702152659.8522-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17d-0000jY-MV
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:33 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:37185)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jr17Z-0006KA-ED
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 11:27:33 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MQdtO-1jUNd01ICk-00Nkn9; Thu, 02 Jul 2020 17:27:20 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 10/12] linux-user: Add thunk argument types for SIOCGSTAMP
+ and SIOCGSTAMPNS
+Date: Thu,  2 Jul 2020 17:27:08 +0200
+Message-Id: <20200702152710.84602-11-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200702152710.84602-1-laurent@vivier.eu>
+References: <20200702152710.84602-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 03:23:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Provags-ID: V03:K1:3nIlbLU+2yQQKq6NSedOQYPnM4aUXCiwBB0MsNrGnBnEO0mZ4Wd
+ +g4kt6vYOXkWHWhNm3rwGXzTcCab14RncLgR2kk5c5u0mZXNVoUZTNz4UbhIjJHjk1TzaP+
+ 6hXO8b6Y29O8sN/KmHUaLgYYheSEwj8yTHvWAANWBIz3v2YXWCVxViBORyHUd1SgIXHO//u
+ DU1/wx7bMEIJv4L6goCjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KPLfRaGoZa0=:ZPpFdgIoaNyOjWACIrLNks
+ uVrd8dUh2mgL+BnJmCDhEY3ipDFyqWqwj1jhYOD6CzoMInqPPUt274kE9GIoYSKMVLSB9WkOs
+ 2zdtESmCcwYmepS3ZXsSP+ZDqGYp0YeqziVqWytgui+RXoUYJ55bWVTBaE5CoLNbKmk/7CXj7
+ 76H+9Khmf+2KAqzM9JKjKx56Thv3+NEzBwY7lfaZU7chkRvqcqYrfBRjFJOSIyPNI8MiluQKH
+ MRp1TUukxi3Sv33eoKC55RVmXVn0FDMV5Td1IuMuikyt7OdDivSQw1ym4qRfDoe+SCdi/cnP1
+ XTH2L5tQk1gBOApsm+3v9I4h4hhw3PkonMV4aTQi2tbWNhxhOEj6hZo5YFZYuHVIeX2dArQAB
+ 7Zw8iYsXqwMqSC+GUPSg4xoFxioXlSgtn4Vw4fHW/Sada10yAAcEdkyTFoOhjPYjO4Q6wmLyr
+ K4/hZDGCm07WWVzKsUk200wInGvDnQtVSVmpIbQ0DkYFoVR02bwji+Llfm3xs8znfdkAHdjhk
+ o3rIjymNXDY0kGoz7gmnx5GIWxLOeeDPNVT3axaZjCh5tsu8FKKPkb001bnGxyGYh1AIj1HVZ
+ Lrk8FVuAasOBPwWsmKclq6WWKKUQVtp/67NjR7miIg1yy9nfLFSeZvZhcbPtPmGA0M9U1kdHl
+ d7uyFSAUgGrjyl9UK6bZ4SMTw9otdm9CJFbNEDoy2D3lBQ588ULQn+SHMYx+GWorvB1dhePnc
+ n4PvZBJCIDjd0vUSMSIelJj07RrM57stSCPibZemgUjyQUIiwNs0vRLh9iM3gjdoxIZWyc8wd
+ n43bVnQk2ZshMAk40dbA1Ux20rlHISWzCljPBTrpnYXZilHsoU=
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 11:27:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,157 +82,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
- mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
- will@kernel.org
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce the smmu_get_iotlb_key() helper and the
-SMMU_IOTLB_ASID() macro. Also move smmu_get_iotlb_key and
-smmu_iotlb_key_hash in the IOTLB related code section.
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Socket ioctls SIOCGSTAMP and SIOCGSTAMPNS, used for timestamping the socket
+connection, are defined in file "ioctls.h" differently from other ioctls.
+The reason for this difference is explained in the comments above their definition.
+These ioctls didn't have defined thunk argument types before changes from this
+patch. They have special handling functions ("do_ioctl_SIOCGSTAMP" and
+"do_ioctl_SIOCGSTAMPNS") that take care of setting values for approppriate argument
+types (struct timeval and struct timespec) and thus no thunk argument types were
+needed for their implementation. But this patch adds those argument type definitions
+in file "syscall_types.h" and "ioctls.h" as it is needed for printing arguments
+of these ioctls with strace.
 
+Implementation notes:
+
+    There are two variants of these ioctls: SIOCGSTAMP_OLD/SIOCGSTAM_NEW and
+    SIOCGSTAMPNS_OLD/SIOCGSTAMPNS_NEW. One is the old existing definition and the
+    other is the 2038 safe variant used for 32-bit architectures. Corresponding
+    structure definitions STRUCT_timespec/STRUCT__kernel_timespec and
+    STRUCT_timeval/STRUCT__kernel_sock_timeval were added for these variants.
+    STRUCT_timeval definition was already inside the file as it is used by
+    another implemented ioctl. Two cases were added for definitions
+    STRUCT_timeval/STRUCT__kernel_sock_timeval to manage the case when the
+    "u_sec" field of the timeval structure is of type int.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200619124727.18080-2-filip.bozuta@syrmia.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
+ linux-user/ioctls.h        | 12 ++++++++----
+ linux-user/syscall_types.h | 22 ++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
-v1 -> v2:
-- creation
----
- hw/arm/smmu-internal.h       |  1 +
- include/hw/arm/smmu-common.h |  1 +
- hw/arm/smmu-common.c         | 66 ++++++++++++++++++++----------------
- 3 files changed, 38 insertions(+), 30 deletions(-)
-
-diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
-index 7794d6d394..3104f768cd 100644
---- a/hw/arm/smmu-internal.h
-+++ b/hw/arm/smmu-internal.h
-@@ -96,4 +96,5 @@ uint64_t iova_level_offset(uint64_t iova, int inputsize,
-             MAKE_64BIT_MASK(0, gsz - 3);
- }
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index f2e2fa9c878b..0713ae131162 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -279,13 +279,17 @@
+    * FIXME: create a macro to define this kind of entry
+    */
+   { TARGET_SIOCGSTAMP_OLD, TARGET_SIOCGSTAMP_OLD,
+-    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP },
++    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP,
++    { MK_PTR(MK_STRUCT(STRUCT_timeval)) } },
+   { TARGET_SIOCGSTAMPNS_OLD, TARGET_SIOCGSTAMPNS_OLD,
+-    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS },
++    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS,
++    { MK_PTR(MK_STRUCT(STRUCT_timespec)) } },
+   { TARGET_SIOCGSTAMP_NEW, TARGET_SIOCGSTAMP_NEW,
+-    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP },
++    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP,
++    { MK_PTR(MK_STRUCT(STRUCT__kernel_sock_timeval)) } },
+   { TARGET_SIOCGSTAMPNS_NEW, TARGET_SIOCGSTAMPNS_NEW,
+-    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS },
++    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS,
++    { MK_PTR(MK_STRUCT(STRUCT__kernel_timespec)) } },
  
-+#define SMMU_IOTLB_ASID(key) ((key).asid)
- #endif
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index 1dceec5cb1..5f9f3535d2 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -155,6 +155,7 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
+   IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index e2b0484f50e5..3f1f0334649b 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -137,10 +137,32 @@ STRUCT(snd_timer_params,
+        TYPE_INT, /* filter */
+        MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
  
- IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
- void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
-+SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
- void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
- void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index f3aa581f80..7dc8541e8b 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -32,10 +32,42 @@
- 
- /* IOTLB Management */
- 
-+static guint smmu_iotlb_key_hash(gconstpointer v)
-+{
-+    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
-+    uint32_t a, b, c;
++#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
++STRUCT(timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_INT) /* tv_usec */
 +
-+    /* Jenkins hash */
-+    a = b = c = JHASH_INITVAL + sizeof(*key);
-+    a += key->asid;
-+    b += extract64(key->iova, 0, 32);
-+    c += extract64(key->iova, 32, 32);
++STRUCT(_kernel_sock_timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_INT) /* tv_usec */
++#else
++STRUCT(timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_LONG) /* tv_usec */
 +
-+    __jhash_mix(a, b, c);
-+    __jhash_final(a, b, c);
++STRUCT(_kernel_sock_timeval,
++       TYPE_LONGLONG, /* tv_sec */
++       TYPE_LONGLONG) /* tv_usec */
++#endif
 +
-+    return c;
-+}
-+
-+static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-+{
-+    const SMMUIOTLBKey *k1 = v1;
-+    const SMMUIOTLBKey *k2 = v2;
-+
-+    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
-+}
-+
-+SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
-+{
-+    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
-+
-+    return key;
-+}
-+
- IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
-                                  hwaddr iova)
- {
--    SMMUIOTLBKey key = {.asid = cfg->asid, .iova = iova};
-+    SMMUIOTLBKey key = smmu_get_iotlb_key(cfg->asid, iova);
-     IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
+ STRUCT(timespec,
+        TYPE_LONG, /* tv_sec */
+        TYPE_LONG) /* tv_nsec */
  
-     if (entry) {
-@@ -62,8 +94,7 @@ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
-         smmu_iotlb_inv_all(bs);
-     }
- 
--    key->asid = cfg->asid;
--    key->iova = entry->iova;
-+    *key = smmu_get_iotlb_key(cfg->asid, entry->iova);
-     trace_smmu_iotlb_insert(cfg->asid, entry->iova);
-     g_hash_table_insert(bs->iotlb, key, entry);
- }
-@@ -80,12 +111,12 @@ static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
-     uint16_t asid = *(uint16_t *)user_data;
-     SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
- 
--    return iotlb_key->asid == asid;
-+    return SMMU_IOTLB_ASID(*iotlb_key) == asid;
- }
- 
- inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
- {
--    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
-+    SMMUIOTLBKey key = smmu_get_iotlb_key(asid, iova);
- 
-     trace_smmu_iotlb_inv_iova(asid, iova);
-     g_hash_table_remove(s->iotlb, &key);
-@@ -383,31 +414,6 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
-     return NULL;
- }
- 
--static guint smmu_iotlb_key_hash(gconstpointer v)
--{
--    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
--    uint32_t a, b, c;
--
--    /* Jenkins hash */
--    a = b = c = JHASH_INITVAL + sizeof(*key);
--    a += key->asid;
--    b += extract64(key->iova, 0, 32);
--    c += extract64(key->iova, 32, 32);
--
--    __jhash_mix(a, b, c);
--    __jhash_final(a, b, c);
--
--    return c;
--}
--
--static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
--{
--    const SMMUIOTLBKey *k1 = v1;
--    const SMMUIOTLBKey *k2 = v2;
--
--    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
--}
--
- /* Unmap the whole notifier's range */
- static void smmu_unmap_notifier_range(IOMMUNotifier *n)
- {
++STRUCT(_kernel_timespec,
++       TYPE_LONGLONG, /* tv_sec */
++       TYPE_LONGLONG) /* tv_nsec */
++
+ STRUCT(snd_timer_status,
+        MK_STRUCT(STRUCT_timespec), /* tstamp */
+        TYPE_INT, /* resolution */
 -- 
-2.21.3
+2.26.2
 
 
