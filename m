@@ -2,73 +2,132 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3062CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:47:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFA8B20780
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22F9A20780
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 11:47:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="GEP8tN32"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA8B20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RjZDn2zK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F9A20780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jqxfG-00059z-8a
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:46:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33360)
+	id 1jqxgX-00066x-EG
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 07:47:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jqxda-0003xH-30
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:44:18 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:57759)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jqxeI-0004aa-HL
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:45:02 -0400
+Received: from mail-eopbgr80123.outbound.protection.outlook.com
+ ([40.107.8.123]:48097 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jqxdX-0005Ap-Fx
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:44:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=zLquVldDscfwLaJthVfyrjtjhlvEdCOhcfdS025nTCE=; b=GEP8tN32v0skyYwGWDhlePUgXA
- tcOi5XjHgUE3M2U1q7Zse4zlKc45UZsFpRjdS0szalAJIw1q5mgUy3qpjyN7FP6//u28C3tl48nnV
- AWnMyHtSo0fhBEo3oom/O3kMqL5T/SUVxwlCAV9jj9EwX+2nXQXezmhV8ogja2M7/1DQ9QB3rdv1v
- 1LsYovTJhntX+4oUs2ufrPv1O5F24B1jRiY6Z82HHepMG8OshVcgjokGmlWHvKVJ1OR5ftc/RHWqn
- iGWK9HBq7Q6Hoya5hnPC6UOqrAS04FRhDuhzV+vSmwPaF2A87+qhBbKH4ZLvjDsBnXinig2hY5CzR
- tjNM0s7T1JgzwTGHbtRpQ1pEpANr3RTYF5PXKv+/xUbo0MGmAKUjiNDmKsFVpuo/b2xk0h+CrlY9q
- VyH/xAO+KxCGLFQ/0bc3Z99FLdF+vvAtDU3FFZBBljSCVnf3b3ATRuF1WRm/6rKW0PdwaZmUXItpY
- Pr+nav05y31lA+LkO61Qj90az/v6NTFFDeAweyRAR+TwFVxXKGDLK2MZH5l2mGrwOLLOSyFfSSMNs
- ctUyvBRvpTBTD0CiSz7PSXTPac02sj1iEGkcxhE57JhmiavbyQmkhFsG+8/kC4/9eQWxhrdbOQK39
- b8K0NFIRAWAiYfyQJJ8j9ChuD6l+iqb/Y0vISIw34=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Date: Thu, 02 Jul 2020 13:43:11 +0200
-Message-ID: <1814766.vrYqd63b1M@silver>
-In-Reply-To: <20200701171240.5374ebc1@bahia.lan>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <3956126.q4pgddXim5@silver> <20200701171240.5374ebc1@bahia.lan>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jqxeD-0005Y9-ST
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 07:45:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A7afiJBgypnAUm1vFCSwDLnCypxdPV3QPXhm4rHCXqjERTIV1BngUGa0GYS5ublT1WU6aOzUgcvVlDi8/GoV+auqs5k+8uLmMJ9oEKmiT0yiaACRpLt2NAyHwoLICVDEUHxF8f/stzT7qLELSuR5XeGJpjJLF+1OGKNhummQStlL4u7y4DItF16gnI7zulorZ4/qTsWi6kkGdG+0EUj5OZ+SAfsQTDTr53okZAoMt2UZ7WbtKtu2FEZf7016MYwH0fhnX5QCvKeUS3jXXcZu3YzBoWe76suP62QWUQROY32o2UHYWX0m/2hvG9I5F7AOqgS77SZZREBoTxmiM/rI1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AdXpYlo4En3V2awi+fCvMM2/E8x9Fsb9bBuRklFwrBs=;
+ b=oZdNxxzerlOrN8ARMSSLt72Y8jeZtfnNmJnwmBGfhVjITxJg+L7kFjS3rsMzquBgb88UXo/3bTUdqL8ob8rr6zGFbGOwCb9rd8/JTKP/eSX0i3sfzZnY1uMwDNuCdzuRKfQFEx0bcDdxlywGNjYkFCvtPE6AUG/n86F0OCescoybC7fc59lXUjqV20VBYeKJvQ3ksHcx55jQD106eweRCxe/1UAhr46VVfuRxuo8l1x16OmTzatyAs+VltfKJ06R9n7G8AL+RcMr+ssYM4Fpb1afW8qBTXXL7QM74Q9LtzuteKnSnTYrKmVpFVW41SYGnKYjen/QaOd7MtiDqOquRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AdXpYlo4En3V2awi+fCvMM2/E8x9Fsb9bBuRklFwrBs=;
+ b=RjZDn2zKxABfNLuOVrEDo3cEnpA5clDulJ6JDthATiVH5N7AVnyJNqP0qRdvqUPTLvbObwhombSWtALMAPPOCEIXXBDEJJy4r6Qn1FK/zOSbpqoAX1Duey2BRDAAcSwK46hRpgZxMNsYTb1AmhAEV94QhkvPjWHi+fwTyUKzbhA=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3096.eurprd08.prod.outlook.com (2603:10a6:209:43::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Thu, 2 Jul
+ 2020 11:44:53 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Thu, 2 Jul 2020
+ 11:44:53 +0000
+Subject: Re: Properly quitting qemu immediately after failing migration
+To: Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <0dce6c63-4b83-8b1a-6d00-07235f637997@redhat.com>
+ <92ce741d-ef67-fbf9-a889-27d9ae218681@virtuozzo.com>
+ <9eecca93-e7d9-d1da-7fcd-ee60978ec460@redhat.com>
+ <61a5c813-d638-3e03-05a6-a7b0c27cc834@virtuozzo.com>
+ <f166c770-7c5d-2854-1dfe-3a69300eca5f@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c1d6592a-980d-3aab-dcba-9cecfc1e0f2b@virtuozzo.com>
+Date: Thu, 2 Jul 2020 14:44:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <f166c770-7c5d-2854-1dfe-3a69300eca5f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR03CA0024.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::37) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 07:44:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.54) by
+ AM0PR03CA0024.eurprd03.prod.outlook.com (2603:10a6:208:14::37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3153.23 via Frontend Transport; Thu, 2 Jul 2020 11:44:53 +0000
+X-Originating-IP: [185.215.60.54]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 34896653-75da-487f-59fd-08d81e7d55da
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3096:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3096BA2274B3F6DF6B07F65FC16D0@AM6PR08MB3096.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0452022BE1
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gabSHAjnSXzR1l9500zrpZOlSexlptIb/FU71jF3tq+f/TMfIuPIwdhZ9A7bs94cmLoNHGmiZSyOVZCD0M8YyqbhrbrOmcn6HlNctnoN0oemrqaKiK+xAZV0h25k10M4WMlVGmJxOwqUxiK3ko4/a3wZ6dSNFl9Ksb/P/eJcCJVMABuDRfPet6KMT2+ewXm/udQ+5VC3LXzS5ofUQi+Xf6h02AgeGVRZCa4sH9YMz5AyTwh3aNYh9rR3J/N2BfFRSDCQo3L2s/c+N8KflYad9CGByhWB6Uxzj0KB+dOPycjumd6fCfU4JhuPvbdYLQ1Oa7U0xHLR8ZBKlpjaQGRBwTzDM1KChzJvkicLvJlTY5+/LuDHmGMBc/0z2jxd3AAdSD6/W4zUaAi7rffBcwaUwQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(396003)(366004)(39840400004)(376002)(136003)(8936002)(2906002)(5660300002)(8676002)(36756003)(316002)(16576012)(110136005)(2616005)(956004)(83380400001)(66476007)(66946007)(66556008)(6486002)(52116002)(86362001)(16526019)(31686004)(26005)(31696002)(53546011)(478600001)(186003)(14773001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: XnhPbvPkiKDHTMwyRfiQgPCI6tyNgnn0Me/nKF9fC3mk040tUKDgZSxI8fYh40VzSKPR9bQo6bvlrsEo1KAojV0hhI0YMMZoBBz+aF8egpQbIUj6KKm4sK+/HhEQItGAVSQbUCxdf/btfeNhdkfteDvgOUq1LIv5/rAkHqPiOuXVq0h6FRnFqnQRm6ZaXfP7udvnSj7t/UC1ZDrYeCqM838oyUOTuNcNLwyOzd2gjiMzHRjLtWhfvCedEC7IdwEb6Ips2y7oVaAt7+xdjAH0/cbdhX1N4U6t5PNBD1G5mTsHNVa5sjOV7/9onbFsaOrIv/VVT9sZrScpcCjxBru4DfKjUx0sjvepSgyg+POG3KaG6GsGDP493QlJoBW3dPb8ZVZtssx149KjJmxzUHgG8PDoho7aZQWLU+LLFJ2tRn2ZL4r5yd/K1w2N/FLaUCKObXgmkJ0pAZLYR4qH0mB5eYbphA/14339Z4jjACBrMFg=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34896653-75da-487f-59fd-08d81e7d55da
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2020 11:44:53.4437 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IOZX2fS8nBJilUWhEQvNKCJJZbcGaC3lTjwtNcwOsoD1L3Ckj3uaeE72TWAQwki10Zdrjq63Y/N5Uu7S/QamcEQW2b3WsogWmiCnp/NMaw8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3096
+Received-SPF: pass client-ip=40.107.8.123;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 07:44:54
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,233 +144,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 1. Juli 2020 17:12:40 CEST Greg Kurz wrote:
-> On Wed, 01 Jul 2020 13:47:12 +0200
+02.07.2020 10:23, Max Reitz wrote:
+> On 01.07.20 18:16, Vladimir Sementsov-Ogievskiy wrote:
+>> 29.06.2020 18:00, Max Reitz wrote:
+>>> On 29.06.20 16:18, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 29.06.2020 16:48, Max Reitz wrote:
+>>>>> Hi,
+>>>>>
+>>>>> In an iotest, I’m trying to quit qemu immediately after a migration has
+>>>>> failed.  Unfortunately, that doesn’t seem to be possible in a clean
+>>>>> way:
+>>>>> migrate_fd_cleanup() runs only at some point after the migration state
+>>>>> is already “failed”, so if I just wait for that “failed” state and
+>>>>> immediately quit, some cleanup functions may not have been run yet.
+>>>>>
+>>>>> This is a problem with dirty bitmap migration at least, because it
+>>>>> increases the refcount on all block devices that are to be migrated, so
+>>>>> if we don’t call the cleanup function before quitting, the refcount
+>>>>> will
+>>>>> stay elevated and bdrv_close_all() will hit an assertion because those
+>>>>> block devices are still around after blk_remove_all_bs() and
+>>>>> blockdev_close_all_bdrv_states().
+>>>>>
+>>>>> In practice this particular issue might not be that big of a problem,
+>>>>> because it just means qemu aborts when the user intended to let it quit
+>>>>> anyway.  But on one hand I could imagine that there are other clean-up
+>>>>> paths that should definitely run before qemu quits (although I don’t
+>>>>> know), and on the other, it’s a problem for my test.
+>>>>>
+>>>>> I tried working around the problem for my test by waiting on “Unable to
+>>>>> write” appearing on stderr, because that indicates that
+>>>>> migrate_fd_cleanup()’s error_report_err() has been reached.  But on one
+>>>>> hand, that isn’t really nice, and on the other, it doesn’t even work
+>>>>> when the failure is on the source side (because then there is no
+>>>>> s->error for migrate_fd_cleanup() to report).
+>>>
+>>> (I’ve now managed to work around it by invoking blockdev-del on a node
+>>> affected by bitmap migration until it succeeds, because blockdev-del can
+>>> only succeed once the bitmap migration code has dropped its reference to
+>>> it.)
+>>>
+>>>>> In all, I’m asking:
+>>>>> (1) Is there a nice solution for me now to delay quitting qemu until
+>>>>> the
+>>>>> failed migration has been fully resolved, including the clean-up?
+>>>>>
+>>>>> (2) Isn’t it a problem if qemu crashes when you issue “quit” via QMP at
+>>>>> the wrong time?  Like, maybe lingering subprocesses when using “exec”?
+>>>>>
+>>>>>
+>>>>
+>>>> I'll look more closely tomorrow, but as a short answer: try my series
+>>>> "[PATCH v2 00/22] Fix error handling during bitmap postcopy" it
+>>>> handles different problems around migration failures & qemu shutdown,
+>>>> probably it will help.
+>>>
+>>> Not, it doesn’t seem to.
+>>>
+>>> I’m not sure what exactly that series addresses, but FWIW I’m hitting
+>>> the problem in non-postcopy migration.  What my simplest reproducer
+>>> does is:
+>>
+>> Bitmaps migration is postcopy by nature (and it may not work without
+>> migrate-start-postcopy, but work in most simple cases, as when we have
+>> small bitmap data to migrate, it can migrate during migration downtime).
+>> Most complicated part of the series were about postcopy. Still it fixes
+>> some other things.
+>>
+>> It seems, that patch (see the second paragraph)
+>> "[PATCH v2 10/22] migration/block-dirty-bitmap: cancel migration on
+>> shutdown"
+>>
+>>>     If target is turned of prior to postcopy finished, target crashes
+>>>     because busy bitmaps are found at shutdown.
+>>>     Canceling incoming migration helps, as it removes all unfinished (and
+>>>     therefore busy) bitmaps.
+>>
+>>>     Similarly on source we crash in bdrv_close_all which asserts that all
+>>>     bdrv states are removed, because bdrv states involved into dirty
+>>> bitmap
+>>>     migration are referenced by it. So, we need to cancel outgoing
+>>>     migration as well.
+>>      should address exactly your issue.
 > 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Mittwoch, 1. Juli 2020 12:09:24 CEST Greg Kurz wrote:
-> > > No I'm talking about code that isn't changed by this series:
-> > >     if (initial_offset == 0) {
-> > >     
-> > >         v9fs_co_rewinddir(pdu, fidp);
-> > >     
-> > >     } else {
-> > >     
-> > >         v9fs_co_seekdir(pdu, fidp, initial_offset);
-> > >     
-> > >     }
-> > >     count = v9fs_do_readdir(pdu, fidp, max_count);
-> > > 
-> > > Leaving these outside the critical section seems to negate
-> > > your arguments... please clarify.
-> > 
-> > Yeah, I admit I have neglected this issue, as concurrent readdir requests
-> > with same FID always was some kind of theoretical issue. But yes, you are
-> > right,
-> It's perfectly fine to miss things, that's what reviews are made for :)
+> Hm.  I’ve tested your series and still hit the issue.
 > 
-> > that should be addressed by
-> > 
-> > 1. entirely removing the rewinddir/seekdir code here
-> > 
-> > 2. passing initial_offset to v9fs_do_readdir(), which in turn would
-> > 
-> >    pass it to readdir_many()
-> > 
-> > 3. readdir_many() would handle rewinddir/seekdir exclusively in its
-> > crticial> 
-> >    section.
+> I could imagine that my problem lies with a failed migration that is
+> automatically “cancelled” by nature, so the problem isn’t that it isn’t
+> cancelled, but that the clean-up runs after accepting further QMP
+> commands (like quit).
+
+Looking at my patch I see
+
++void dirty_bitmap_mig_cancel_outgoing(void)
++{
++    dirty_bitmap_do_save_cleanup(&dbm_state.save);
++}
++
+
+So, may be "cancel" is just a bad name. It should work, but it doesn't.
+
 > 
-> Sounds good. v7 ?
-
-Sure, that's not the problem, I can repost this handled appropriately of 
-course.
-
-But would you please finalize your picture of this patch set first? I would 
-really (try) to finally nail this thing with the next version.
-
-> > > There are indeed several issues with the current readdir:
-> > > 
-> > > 1) potential inconsistency on concurrent Treaddir requests
-> > > 
-> > > 2) excessive dispatching to worker threads
-> > > 
-> > > So we agreed that 1) should never happen with a regular linux
-> > > client (we could even dump the lock actually) but we want to
-> > > make it clear in the code anyway that actions on the directory
-> > > stream are serialized.
-> > 
-> > My point is you are trying to fix a merely thereotical issue on code
-> > that's
-> > conceptually, inherently wrong and dead end code at first place. Top half
-> > code
-> I'm not trying to fix anything. We already have locking in place to
-> deal with this theoretical issue and it interferes with your changes.
-> I don't care that much if a silly guest shoots itself in the foot
-> actually, so it'll be fine with me if you just dump the lock, as
-> long as it doesn't cause QEMU to hang or crash.
-
-Ah ok, I got you as if you wanted to fix more details on the old readdir code, 
-which would be a clear blocker for this patch set to proceed. Good then.
-
-> > should always be designed to be as thin as possible. The old readdir code
-> > though is the complete opposite.
+>>>
+>>> On the source VM:
+>>>
+>>> blockdev-add node-name='foo' driver='null-co'
+>>> block-dirty-bitmap-add node='foo' name='bmap0'
+>>>
+>>> (Launch destination VM with some -incoming, e.g.
+>>> -incoming 'exec: cat /tmp/mig_file')
+>>>
+>>> Both on source and destination:
+>>>
+>>> migrate-set-capabilities capabilities=[
+>>>       {capability='events', state=true},
+>>>       {capability='dirty-bitmaps', state=true}
+>>> ]
+>>>
+>>> On source:
+>>>
+>>> migrate uri='exec: cat > /tmp/mig_file'
+>>>
+>>> Then wait for a MIGRATION event with data/status == 'failed', and then
+>>> issue 'quit'.
+>>>
+>>> Max
+>>>
+>>
+>> Can you post exact reproducer iotest?
 > 
-> It isn't readdir only, most requests span over multiple v9fs_co_*() calls...
-
-Right, I know! And that's actually my root motivation to finally bring this 
-patch set forward, since I am very aware that this patch set is just a small 
-brick in the overall procecss of fixing similarly affected code portions. So 
-yes, that's my plan to fix them with upcoming patch sets, too.
-
-Having said that, could we probably try to make future reviews a bit more 
-efficient at certain aspects? For instance it would help a lot if the patch 
-set was reviewed entirely, and not stopped at the very first issue spotted and 
-then suspended to ++version, as this creates large latencies in the overall 
-review process?
-
-And likewise it would also help if review is prioritized on relevant behaviour 
-aspects (concept, design) first before arguing about code style details like 
-variable names or other details invisible to users.
-
-And finally: compromises. As man power on 9p is very limited, it would make 
-sense to limit patch sets at a certain extent and agree to postpone certain 
-non-critical issues to subsequent patches (or sets of), otherwise a patch set 
-will grow and grow and it will take ages to get forward.
-
-> > > 2) basically means moving some logic from the frontend to the
-> > > backend, ie. called from v9fs_co_run_in_worker(). This implies
-> > > that a very long request (ie. one that would span on many calls
-> > > to readdir()) cannot be interrupted by the client anymore, as
-> > > opposed to what we have now BTW.
+> I didn’t have an iotest until now (because it was a simple test written
+> up in Ruby), but what I’ve attached should work.
 > 
-> ... most likely to allow clients to interrupt a long request with a
-> Tflush. Have you considered this aspect in your changes ?
-
-In this particular patch set, no, as for readdir this should not be an issue 
-in practice for anybody. After this patch set is applied, even on huge 
-directories, the fs driver's duration for readdir would barely be measurable. 
-In fact the server's latency would always be much higher, yet.
-
-But also for the upcoming, planned patch sets (i.e. other request types): That 
-would be an example where I would ask you to lower you expectations a bit and 
-that we could agree to postpone such an aspect to a subsequent, separate patch 
-(or set of).
-
-> > 3) Complexity of old readdir code is so much bigger compared to the new
-> > one
-> > 
-> >    such that probability of additional issues is also significantly
-> >    higher.
-> > > 
-> > > I tend to think that addressing both issues in one "rush" is
-> > > as much "error prone".
-> > 
-> > No it's not. The optimized readdir implementation is quantifyable,
-> > significantly less complex than the old implementation (i.e. significantly
-> > smaller amount of branches and error pathes, determenistic clear
-> > separation of thread's task assignments which includes much smaller
-> > amount of thread hops). Less complexity and increased determinism
-> > consequently means reduced chance of misbehaviours. So that's not a
-> > subjective, but rather a quantifyable, proven statement.
-> > 
-> > You can't switch from the old (wrong) concept to the new concept without
-> > some minimum amount of changes, which yes are not small, but I don't see
-> > any way to make the change set smaller without yet introducing new
-> > negative side effects.
-> > 
-> > I am now using words that I heard from your side before: please be
-> > realistic. Currently man power on 9p code is extremely limited to put it
-> > mildly. Yes, we could spend time on fixing this (theoretical) issue on
-> > the old readdir could. But what would it buy? Due to the limited man
-> > power we can only move forward with compromises; in this case you are
-> > fighting for code that's DOA. The only thing that you achieve by still
-> > sticking to the old readdir code is you are preventing that we move
-> > forward at all. Remember: I originally sent this patch almost 7 months
-> > ago.
-> > 
-> > > > Also: it does not make sense to move locking on this series from fs
-> > > > driver
-> > > > back to main I/O thread. Atomicity must retain on driver side, not on
-> > > > top
-> > > > half.
-> > > 
-> > > Then the whole seekdir/rewinddir/telldir/readdir sequence should
-> > > be called with a single v9fs_co_run_in_worker() invocation, in
-> > > which case the locking could just be something like:
-> > > 
-> > > int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-> > > 
-> > >                                       struct V9fsDirEnt **entries,
-> > >                                       int32_t maxsize, bool dostat)
-> > > 
-> > > {
-> > > 
-> > >     int err = 0;
-> > >     
-> > >     if (v9fs_request_cancelled(pdu)) {
-> > >     
-> > >         return -EINTR;
-> > >     
-> > >     }
-> > >     
-> > >     v9fs_readdir_lock(&fidp->fs.dir);
-> > >     
-> > >     v9fs_co_run_in_worker({
-> > >     
-> > >         err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
-> > >     
-> > >     });
-> > >     
-> > >     v9fs_readdir_unlock(&fidp->fs.dir);
-> > >     return err;
-> > > 
-> > > }
-> > 
-> > That's exactly what should be prevented. The lock must be on driver thread
-> > side, not on main thread side. The goal is to reduce the time slice of
-> > individual locks. If the lock is on main thread, the time slice of a lock
-> > (even on huge directories with thousands of entries) is multiple factors
-> > larger than if the lock is on driver thread side. So that's not just few
-> > percent or so, it is huge.
+> Note that you need system load to trigger the problem (or the clean-up
+> code is scheduled too quickly), so I usually just run like three
+> instances concurrently.
 > 
-> Sorry I don't get it...  In a contention-less situation, which is the
-> case we really care for, qemu_co_mutex_lock() has no overhead.
-
-Yes, it only kicks in if there is concurrency.
-
-> > > This would technically leave the locking in the main I/O thread,
-> > > but it isn't conceptually different from locking at the beginning
-> > > of do_readdir_lock() and unlocking before returning. My concern
-> > > is that I don't know how coroutine mutexes behave with multiple
-> > > worker threads...
-> > 
-> > Well, your Mutex -> CoMutex change was intended to fix a deadlock with the
-> > old readdir implementation. That deadlock could not happen with the new
-> > readdir implementation, which suggests that it probably makes sense to
-> > revert this change (i.e. CoMutex -> Mutex) for this new implementation.
+> (while TEST_DIR=/tmp/t$i ./check 400; do; done)
 > 
-> No we can't because it is also used with 9p2000.u, that you said you
-> don't want to fix.
+> Max
+> 
 
-Yes and no, I did not say I don't want to fix readdir for 9p2000.u at all. 
-What I said was I want to prioritize and concentrate on the most relevant 
-issues first. 9p2000.L is the most commonly used protocol variant, so I would 
-like to fix the most severe (e.g. performance) issues for 9p2000.L first 
-before spending time on 9p2000.u which is AFAICS barely used in comparison, 
-which I personally don't use at all, and which I am hence not testing in the 
-same degree and cannot serve with the same quality as 9p2000.L right now.
+Thanks! Aha, reporoduced on your branch, more than 500 rolls, several (5-6) instances.
 
-Plus if there are really users caring for 9p2000.u, I can gladly assist them 
-to address these issues for 9p2000.u as well, provided that they help at least 
-with testing the required 9p2000.u changes.
+Interesting, if drop failure-waiting loop, it crashes without any race, just crashes.
 
-Back to the actual topic: so what do we do about the mutex then? CoMutex for 
-9p2000.u and Mutex for 9p2000.L? I know you find that ugly, but it would just 
-be a transitional measure.
+Move to my branch.
 
+With dropped fail-waiting loop, it crashes in about 17 tries, with several instances.
+
+Ahahaha. and with fail-waiting loop as is, it crashes immediately, without a race.
+
+So my patch make it work visa-versa. Magic.
+
+For me this looks like my patch just don't do what it should. I'll work on this and
+resend the series together with new test case. Or may be better to split the series,
+to address different issues separately.
+
+-- 
 Best regards,
-Christian Schoenebeck
-
-
+Vladimir
 
